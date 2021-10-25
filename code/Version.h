@@ -1,0 +1,8 @@
+#ifndef __VERSION_H__
+#define __VERSION_H__
+
+#define PLUGIN_VERSION_MAJ 0
+#define PLUGIN_VERSION_MIN 90
+#define PLUGIN_VERSION PLUGIN_VERSION_MAJ + PLUGIN_VERSION_MIN * 0.01
+
+#endif
