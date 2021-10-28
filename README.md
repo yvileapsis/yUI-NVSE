@@ -1,7 +1,7 @@
 
 <p align="center">
   <a href="https://github.com/xNVSE/NVSE/releases">
-    <img height="300px" src="https://i.imgur.com/7Ce3UvS.png">
+    <img height="300px" src="https://cdn.discordapp.com/attachments/724924815869345803/903218762751299624/660209289637396483.png">
   </a>
 </p>
 
