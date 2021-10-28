@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 class Options
 {
@@ -26,6 +27,8 @@ public:
 
 	std::string	m_altEXE;
 	std::string	m_altDLL;
+
+	UInt32	m_appID;
 
 private:
 	bool	Verify(void);

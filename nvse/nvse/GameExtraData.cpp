@@ -62,6 +62,7 @@ STATIC_ASSERT(sizeof(ExtraWornLeft) == 0x0C);
 STATIC_ASSERT(sizeof(ExtraCannotWear) == 0x0C);
 STATIC_ASSERT(sizeof(ExtraContainerChanges::EntryData) == 0x0C);
 
+#if RUNTIME
 static const UInt32 s_ExtraContainerChangesVtbl					= 0x01015BB8;	//	0x0100fb78;
 static const UInt32 s_ExtraWornVtbl								= 0x01015BDC;
 //static const UInt32 s_ExtraWornLeftVtbl							= 0x01015BE8;
@@ -87,6 +88,8 @@ static const UInt32 s_ExtraSemaphore	= 0x011C3920;
 static const UInt32 s_SemaphoreWait		= 0x0040FBF0;
 static const UInt32 s_SemaphoreLeave	= 0x0040FBA0;
 
+#endif
+
 static void** g_ExtraSemaphore = (void **)s_ExtraSemaphore;
 
 void* GetExtraSemaphore()
@@ -111,206 +114,510 @@ void CallSemaphore4(void * Semaphore, UInt32 SemaphoreFunc)
 	_asm popad
 };
 
-ExtraContainerChanges::ExtendDataList *ExtraContainerChangesExtendDataListCreate(ExtraDataList *pExtraDataList)
+SInt32 ExtraContainerChanges::ExtendDataList::AddAt(ExtraDataList* item, SInt32 index)
 {
-	ExtraContainerChanges::ExtendDataList *xData = (ExtraContainerChanges::ExtendDataList*)GameHeapAlloc(sizeof(ExtraContainerChanges::ExtendDataList));
-	xData->Init();
-	if (pExtraDataList) xData->Append(pExtraDataList);
+	//CallSemaphore4(GetExtraSemaphore(), s_SemaphoreWait);
+	SInt32 Result = tList<ExtraDataList>::AddAt(item, index);
+	//CallSemaphore(GetExtraSemaphore(), s_SemaphoreLeave);
+	return Result;
+};
+
+void ExtraContainerChanges::ExtendDataList::RemoveAll() const
+{
+	//CallSemaphore4(GetExtraSemaphore(), s_SemaphoreWait);
+	tList<ExtraDataList>::RemoveAll();
+	//CallSemaphore(GetExtraSemaphore(), s_SemaphoreLeave);
+};
+
+ExtraDataList* ExtraContainerChanges::ExtendDataList::RemoveNth(SInt32 n)
+{
+	//CallSemaphore4(GetExtraSemaphore(), s_SemaphoreWait);
+	ExtraDataList* Result = tList<ExtraDataList>::RemoveNth(n);
+	//CallSemaphore(GetExtraSemaphore(), s_SemaphoreLeave);
+	return Result;
+};
+
+ExtraContainerChanges::ExtendDataList* ExtraContainerChangesExtendDataListCreate(ExtraDataList* pExtraDataList)
+{
+	ExtraContainerChanges::ExtendDataList* xData = (ExtraContainerChanges::ExtendDataList*)FormHeap_Allocate(sizeof(ExtraContainerChanges::ExtendDataList));
+	if (xData) {
+		memset(xData, 0, sizeof(ExtraContainerChanges::ExtendDataList));
+		if (pExtraDataList)
+			if (xData->AddAt(pExtraDataList, eListEnd)==eListInvalid) {
+				FormHeap_Free(xData);
+				xData = NULL;
+			}
+	}
 	return xData;
 }
 
-static void ExtraContainerChangesExtendDataListFree(ExtraContainerChanges::ExtendDataList *xData, bool bFreeList)
+static void ExtraContainerChangesExtendDataListFree(ExtraContainerChanges::ExtendDataList* xData, bool bFreeList)
 {
 	if (xData)
 	{
-		if (bFreeList) xData->Clear();
-		GameHeapFree(xData);
+		if (bFreeList)
+		{
+			UInt32 i = 0;
+			ExtraDataList* pExtraDataList = xData->GetNthItem(i);
+			while (pExtraDataList)
+			{
+				for (UInt32 j = 0 ; j<0xFF ; j++)
+					pExtraDataList->RemoveByType(j);
+				i++;
+				pExtraDataList = xData->GetNthItem(i);
+			}
+		}
+		FormHeap_Free(xData);
 	}
+}
+
+static bool ExtraContainerChangesExtendDataListAdd(ExtraContainerChanges::ExtendDataList* xData, ExtraDataList* xList) {
+	if (xData && xList) {
+		xData->AddAt(xList, eListEnd);
+		return true;
+	}
+	return false;
+}
+
+static bool ExtraContainerChangesExtendDataListRemove(ExtraContainerChanges::ExtendDataList* xData, ExtraDataList* xList, bool bFreeList) {
+	if (xData && xList) {
+		UInt32 i = 0;
+		ExtraDataList* pExtraDataList = xData->GetNthItem(i);
+		while (pExtraDataList && pExtraDataList != xList) {
+				i++;
+				pExtraDataList = xData->GetNthItem(i);
+		}
+		if (pExtraDataList == xList) {
+			xData->RemoveNth(i);
+			if (bFreeList) {
+				for (UInt32 j = 0 ; j<0xFF ; j++)
+					pExtraDataList->RemoveByType(j);
+				FormHeap_Free(xList);
+			}
+			return true;
+		}
+	}
+	return false;
 }
 
 void ExtraContainerChanges::EntryData::Cleanup()
 {
-	if (!extendData) return;
-	ListNode<ExtraDataList> *xdlIter = extendData->Head(), *prev = NULL;;
-	ExtraDataList *xData;
-	ExtraCount *xCount;
-	do
-	{
-		xData = xdlIter->data;
-		if (xData)
-		{
-			xCount = (ExtraCount*)xData->GetByType(kExtraData_Count);
-			if (xCount && (xCount->count <= 1)) xData->RemoveByType(kExtraData_Count);
-			if (xData->m_data)
-			{
-				prev = xdlIter;
-				xdlIter = xdlIter->next;
-				continue;
+	// Didn't find the hook, let's fake it
+	if (extendData) {
+		ExtraContainerChanges::ExtendDataList::Iterator iter = extendData->Begin();
+		while (!iter.End())
+			if (iter.Get()) {
+				ExtraCount* xCount = (ExtraCount*)iter.Get()->GetByType(kExtraData_Count);
+				if (xCount && xCount->count<2)
+					iter.Get()->RemoveByType(kExtraData_Count);
+				if (countDelta || iter.Get()->m_data)	// There are other extras than count like ExtraWorn :)
+					++iter;
+				else
+					extendData->RemoveIf(ExtraDataListInExtendDataListMatcher(iter.Get()));
+			}
+			else
+				extendData->RemoveIf(ExtraDataListInExtendDataListMatcher(iter.Get()));
+	}
+}
+
+#ifdef RUNTIME
+ExtraContainerChanges::EntryData* ExtraContainerChanges::EntryData::Create(UInt32 refID, UInt32 count, ExtraContainerChanges::ExtendDataList* pExtendDataList)
+{
+	ExtraContainerChanges::EntryData* xData = (ExtraContainerChanges::EntryData*)FormHeap_Allocate(sizeof(ExtraContainerChanges::EntryData));
+	if (xData) {
+		memset(xData, 0, sizeof(ExtraContainerChanges::EntryData));
+		if (refID) {
+			TESForm * pForm = LookupFormByID(refID);
+			if (pForm) {
+				xData->type = pForm;
+				xData->countDelta = count;
+				xData->extendData = pExtendDataList;
+			}
+			else {
+				FormHeap_Free(xData);
+				xData = NULL;
 			}
 		}
-		GameHeapFree(xData);
-		xdlIter = prev ? prev->RemoveNext() : xdlIter->RemoveMe();
 	}
-	while (xdlIter);
+	return xData;
+}
+#endif
+
+ExtraContainerChanges::EntryData* ExtraContainerChanges::EntryData::Create(TESForm* pForm, UInt32 count, ExtraContainerChanges::ExtendDataList* pExtendDataList)
+{
+	ExtraContainerChanges::EntryData* xData = (ExtraContainerChanges::EntryData*)FormHeap_Allocate(sizeof(ExtraContainerChanges::EntryData));
+	if (xData) {
+		memset(xData, 0, sizeof(ExtraContainerChanges::EntryData));
+		if (pForm) {
+			xData->type = pForm;
+			xData->countDelta = count;
+			xData->extendData = pExtendDataList;
+		}
+	}
+	return xData;
 }
 
-ExtraContainerChanges *ExtraContainerChanges::Create()
+ExtraContainerChanges::ExtendDataList* ExtraContainerChanges::EntryData::Add(ExtraDataList* newList)
 {
-	UInt32 *dataPtr = (UInt32*)GameHeapAlloc(sizeof(ExtraContainerChanges));
-	dataPtr[0] = kVtbl_ExtraContainerChanges;
-	dataPtr[1] = kExtraData_ContainerChanges;
-	dataPtr[2] = 0;
-	dataPtr[3] = 0;
-	return (ExtraContainerChanges*)dataPtr;
+	if (extendData)
+		extendData->AddAt(newList, eListEnd);
+	else
+		/* ExtendDataList* */ extendData = ExtraContainerChangesExtendDataListCreate(newList);
+	ExtraCount* xCount = (ExtraCount*)newList->GetByType(kExtraData_Count);
+	countDelta += xCount ? xCount->count : 1;
+	return extendData;
 }
 
-ExtraContainerChanges::Data *ExtraContainerChanges::Data::Create(TESObjectREFR *owner)
+bool ExtraContainerChanges::EntryData::Remove(ExtraDataList* toRemove, bool bFree)
 {
-	Data *data = (Data*)GameHeapAlloc(sizeof(Data));
-	MemZero(data, sizeof(Data));
-	data->owner = owner;
-	data->objList = (EntryDataList*)GameHeapAlloc(sizeof(EntryDataList));
-	data->objList->Init();
+	if (extendData && toRemove) {
+		SInt32 index = extendData->GetIndexOf(ExtraDataListInExtendDataListMatcher(toRemove));
+		if (index >= 0) {
+			ExtraCount* xCount = (ExtraCount*)toRemove->GetByType(kExtraData_Count);
+			SInt16 count = xCount ? xCount->count : 1;
+
+			extendData->RemoveNth(index);
+			countDelta -= count;
+			if (bFree) {
+				toRemove->RemoveAll(true);
+				FormHeap_Free(toRemove);
+			}
+			return true;
+		}
+
+	}
+	return false;
+}
+
+void ExtraContainerChangesEntryDataFree(ExtraContainerChanges::EntryData* xData, bool bFreeList) {
+	if (xData) {
+		if (xData->extendData) {
+			ExtraContainerChangesExtendDataListFree(xData->extendData, bFreeList);
+		}
+		FormHeap_Free(xData);
+	}
+}
+
+ExtraContainerChanges::EntryDataList* ExtraContainerChangesEntryDataListCreate(UInt32 refID, UInt32 count, ExtraContainerChanges::ExtendDataList* pExtendDataList)
+{
+#ifdef RUNTIME
+	ExtraContainerChanges::EntryDataList* xData = (ExtraContainerChanges::EntryDataList*)FormHeap_Allocate(sizeof(ExtraContainerChanges::EntryDataList));
+	if (xData) {
+		memset(xData, 0, sizeof(ExtraContainerChanges::EntryDataList));
+		xData->AddAt(ExtraContainerChanges::EntryData::Create(refID, count, pExtendDataList), eListEnd);
+	}
+	return xData;
+#else
+	return NULL;
+#endif
+}
+
+void ExtraContainerChangesEntryDataListFree(ExtraContainerChanges::EntryDataList* xData, bool bFreeList) {
+	if (xData) {
+		UInt32 i = 0;
+		ExtraContainerChanges::EntryData* pX = xData->GetNthItem(i);
+		if (pX) {
+			ExtraContainerChangesEntryDataFree(pX, bFreeList);
+			i++;
+			pX = xData->GetNthItem(i);
+		}
+		FormHeap_Free(xData);
+	}
+}
+
+ExtraContainerChanges::ExtendDataList* ExtraContainerChanges::Add(TESForm* form, ExtraDataList* dataList)
+{
+	if (!data) {
+		// wtf
+		_WARNING("ExtraContainerChanges::Add() encountered ExtraContainerChanges with NULL data");
+		return NULL;
+	}
+
+	if (!data->objList) {
+		data->objList = ExtraContainerChangesEntryDataListCreate();
+	}
+
+	// try to locate the form
+	EntryData* found = data->objList->Find(ItemInEntryDataListMatcher(form));
+	if (!found) {
+		// add it to the list with a count delta of 0
+		found = EntryData::Create(form, 0);
+		data->objList->AddAt(found, eListEnd);
+	}
+
+	return found->Add(dataList);
+}
+
+ExtraContainerChanges* ExtraContainerChanges::Create()
+{
+	ExtraContainerChanges* xChanges = (ExtraContainerChanges*)BSExtraData::Create(kExtraData_ContainerChanges, sizeof(ExtraContainerChanges), s_ExtraContainerChangesVtbl);
+	xChanges->data = NULL;
+	return xChanges;
+}
+
+ExtraContainerChanges::Data* ExtraContainerChanges::Data::Create(TESObjectREFR* owner)
+{
+	Data* data = (Data*)FormHeap_Allocate(sizeof(Data));
+	if (data) {
+		data->owner = owner;
+		data->objList = NULL;
+		data->unk2 = 0.0;
+		data->unk3 = 0.0;
+	}
 	return data;
+}
+
+ExtraContainerChanges* ExtraContainerChanges::Create(TESObjectREFR* thisObj, UInt32 refID, UInt32 count, ExtraContainerChanges::ExtendDataList* pExtendDataList)
+{
+	ExtraContainerChanges* xData = (ExtraContainerChanges*)BSExtraData::Create(kExtraData_ContainerChanges, sizeof(ExtraContainerChanges), s_ExtraContainerChangesVtbl);
+	if (xData) {
+		xData->data = ExtraContainerChanges::Data::Create(thisObj);
+		if (refID) {
+			xData->data->objList = ExtraContainerChangesEntryDataListCreate(refID, count, pExtendDataList);
+		}
+	}
+	return xData;
+}
+
+void ExtraContainerChangesFree(ExtraContainerChanges* xData, bool bFreeList) {
+	if (xData) {
+		if (xData->data) {
+			if (xData->data->objList && bFreeList) {
+				ExtraContainerChangesEntryDataListFree(xData->data->objList, true);
+			}
+			FormHeap_Free(xData->data);
+		}
+		FormHeap_Free(xData);
+	}
 }
 
 void ExtraContainerChanges::Cleanup()
 {
-	if (data && data->objList)
-	{
-		ListNode<EntryData> *entryIter = data->objList->Head();
-		do
-		{
-			if (entryIter->data)
-				entryIter->data->Cleanup();
+	if (data && data->objList) {
+		for (EntryDataList::Iterator iter = data->objList->Begin(); !iter.End(); ++iter) {
+			iter.Get()->Cleanup() ;
+
+			// make sure we don't have any NULL ExtraDataList's in extend data, game will choke when saving
+			if (iter->extendData == nullptr)
+			{
+				continue;
+			}
+
+			for (SInt32 index = 0; index < iter->extendData->Count(); ) {
+				ExtraDataList* xtendData = iter->extendData->GetNthItem(index);
+				if (xtendData && !xtendData->m_data) {
+					iter->extendData->RemoveNth(index);
+					FormHeap_Free(xtendData);
+				}
+				else {
+					index++;
+				}
+			}
 		}
-		while (entryIter = entryIter->next);
 	}
+}
+
+ExtraDataList* ExtraContainerChanges::SetEquipped(TESForm* obj, bool bEquipped, bool bForce)
+{
+	if (data) {
+		EntryData* xData = data->objList->Find(ItemInEntryDataListMatcher(obj));
+		if (xData) {
+			ExtraDataList* Possible = NULL;
+			bool atleastOne = xData->extendData && (xData->extendData->Count()>0);
+			if (atleastOne)
+				for (ExtendDataList::Iterator iter = xData->extendData->Begin(); !iter.End(); ++iter)
+					if (iter.Get()->HasType(kExtraData_Worn) || iter.Get()->HasType(kExtraData_WornLeft)) {
+						if (!bEquipped)
+							if (bForce || !iter.Get()->HasType(kExtraData_WornLeft)) {
+								iter.Get()->RemoveByType(kExtraData_Worn);
+								iter.Get()->RemoveByType(kExtraData_WornLeft);
+								Cleanup();
+								return iter.Get(); 
+							}
+
+					}
+					else
+						if (bEquipped)
+							if (bForce || !iter.Get()->HasType(kExtraData_CannotWear))
+								Possible = iter.Get();
+			if (!xData->extendData)
+				xData->extendData = ExtraContainerChangesExtendDataListCreate(NULL);
+			if (Possible) {
+				Possible->Add(ExtraWorn::Create());
+				return Possible; 
+			}
+		}
+	}
+	return NULL; 
+}
+
+bool ExtraContainerChanges::Remove(TESForm* obj, ExtraDataList* dataList, bool bFree)
+{
+	for (UInt32 i = 0; i < data->objList->Count(); i++)
+		if (data->objList->GetNthItem(i)->type == obj) {
+			ExtraContainerChanges::EntryData* found = data->objList->GetNthItem(i);
+			if (dataList && found->extendData) {
+				for (UInt32 j = 0; j < found->extendData->Count(); j++)
+					if (found->extendData->GetNthItem(j) == dataList)
+						found->extendData->RemoveNth(j);
+			}
+			else if (!dataList && !found->extendData)
+				data->objList->RemoveNth(i);
+		}
+	return false;
 }
 
 #ifdef RUNTIME
 
 void ExtraContainerChanges::DebugDump()
 {
-	//_MESSAGE("Dumping ExtraContainerChanges");
-	//gLog.Indent();
+	_MESSAGE("Dumping ExtraContainerChanges");
+	gLog.Indent();
 
 	if (data && data->objList)
 	{
 		for (ExtraContainerChanges::EntryDataList::Iterator entry = data->objList->Begin(); !entry.End(); ++entry)
 		{
-			//_MESSAGE("Type: %s CountDelta: %d [%08X]", GetFullName(entry.Get()->type), entry.Get()->countDelta, entry.Get());
-			//gLog.Indent();
+			_MESSAGE("Type: %s CountDelta: %d [%08X]", GetFullName(entry.Get()->type), entry.Get()->countDelta, entry.Get());
+			gLog.Indent();
 			if (!entry.Get() || !entry.Get()->extendData)
-			{
-				//_MESSAGE("* No extend data *");
-			}
+				_MESSAGE("* No extend data *");
 			else
 			{
 				for (ExtraContainerChanges::ExtendDataList::Iterator extendData = entry.Get()->extendData->Begin(); !extendData.End(); ++extendData)
 				{
-					//_MESSAGE("Extend Data: [%08X]", extendData.Get());
-					//gLog.Indent();
+					_MESSAGE("Extend Data: [%08X]", extendData.Get());
+					gLog.Indent();
 					if (extendData.Get()) {
 						extendData.Get()->DebugDump();
 						ExtraCount* xCount = (ExtraCount*)extendData.Get()->GetByType(kExtraData_Count);
-						//if (xCount) _MESSAGE("ExtraCount value : %d", xCount->count);
+						if (xCount) {
+							_MESSAGE("ExtraCount value : %d", xCount->count);
+						}
 					}
-					//else _MESSAGE("NULL");
+					else
+						_MESSAGE("NULL");
 
-					//gLog.Outdent();
+					gLog.Outdent();
 				}
 			}
-			//gLog.Outdent();
+			gLog.Outdent();
 		}
 	}
-	//gLog.Outdent();
+	gLog.Outdent();
 }
 #endif
 
-BSExtraData *BSExtraData::Create(UInt8 xType, UInt32 size, UInt32 vtbl)
+ExtraContainerChanges* ExtraContainerChanges::GetForRef(TESObjectREFR* refr)
 {
-	BSExtraData *xData = (BSExtraData*)GameHeapAlloc(size);
-	MemZero(xData, size);
-	*(UInt32*)xData = vtbl;
+	ExtraContainerChanges* xChanges = (ExtraContainerChanges*)refr->extraDataList.GetByType(kExtraData_ContainerChanges);
+	if (!xChanges) {
+		xChanges = ExtraContainerChanges::Create();
+		refr->extraDataList.Add(xChanges);
+	}
+	return xChanges;
+}
+
+UInt32 ExtraContainerChanges::GetAllEquipped(std::vector<EntryData*>& outEntryData, std::vector<ExtendDataList*>& outExtendData)
+{
+	if (data && data->objList)
+	{
+		for (ExtraContainerChanges::EntryDataList::Iterator entry = data->objList->Begin(); !entry.End(); ++entry)
+		{
+			if (entry.Get() && entry.Get()->extendData)
+			{
+				for (ExtraContainerChanges::ExtendDataList::Iterator extendData = entry.Get()->extendData->Begin(); !extendData.End(); ++extendData)
+				{
+					if (extendData.Get()->IsWorn()) {
+						outEntryData.push_back(entry.Get());
+						outExtendData.push_back(entry.Get()->extendData);
+					}
+				}
+			}
+		}
+	}
+	return outEntryData.size();
+}
+
+// static
+BSExtraData* BSExtraData::Create(UInt8 xType, UInt32 size, UInt32 vtbl)
+{
+	void* memory = FormHeap_Allocate(size);
+	memset(memory, 0, size);
+	((UInt32*)memory)[0] = vtbl;
+	BSExtraData* xData = (BSExtraData*)memory;
 	xData->type = xType;
 	return xData;
 }
 
-ExtraHealth *ExtraHealth::Create(float _health)
+ExtraHealth* ExtraHealth::Create() 
 {
-	UInt32 *dataPtr = (UInt32*)GameHeapAlloc(sizeof(ExtraHealth));
-	dataPtr[0] = kVtbl_ExtraHealth;
-	dataPtr[1] = kExtraData_Health;
-	dataPtr[2] = 0;
-	ExtraHealth *xHealth = (ExtraHealth*)dataPtr;
-	xHealth->health = _health;
+	ExtraHealth* xHealth = (ExtraHealth*)BSExtraData::Create(kExtraData_Health, sizeof(ExtraHealth), s_ExtraHealthVtbl);
 	return xHealth;
 }
 
-ExtraWorn *ExtraWorn::Create()
+ExtraWorn* ExtraWorn::Create() 
 {
-	UInt32 *dataPtr = (UInt32*)GameHeapAlloc(sizeof(ExtraWorn));
-	dataPtr[0] = kVtbl_ExtraWorn;
-	dataPtr[1] = kExtraData_Worn;
-	dataPtr[2] = 0;
-	return (ExtraWorn*)dataPtr;
+	ExtraWorn* xWorn = (ExtraWorn*)BSExtraData::Create(kExtraData_Worn, sizeof(ExtraWorn), s_ExtraWornVtbl);
+	return xWorn;
 }
 
-ExtraCannotWear *ExtraCannotWear::Create()
+//ExtraWornLeft* ExtraWornLeft::Create() 
+//{
+//	ExtraWornLeft* xWornLeft = (ExtraWornLeft*)BSExtraData::Create(kExtraData_WornLeft, sizeof(ExtraWornLeft), s_ExtraWornLeftVtbl);
+//	return xWornLeft;
+//}
+
+ExtraCannotWear* ExtraCannotWear::Create() 
 {
-	UInt32 *dataPtr = (UInt32*)GameHeapAlloc(sizeof(ExtraCannotWear));
-	dataPtr[0] = kVtbl_ExtraCannotWear;
-	dataPtr[1] = kExtraData_CannotWear;
-	dataPtr[2] = 0;
-	return (ExtraCannotWear*)dataPtr;
+	ExtraCannotWear* xCannotWear = (ExtraCannotWear*)BSExtraData::Create(kExtraData_CannotWear, sizeof(ExtraCannotWear), s_ExtraCannotWearVtbl);
+	return xCannotWear;
 }
 
-ExtraLock *ExtraLock::Create()
+ExtraLock* ExtraLock::Create()
 {
-	UInt32 *dataPtr = (UInt32*)GameHeapAlloc(sizeof(ExtraLock));
-	dataPtr[0] = kVtbl_ExtraLock;
-	dataPtr[1] = kExtraData_Lock;
-	dataPtr[2] = 0;
-	UInt32 *lockData = (UInt32*)GameHeapAlloc(sizeof(Data));
-	MemZero(lockData, sizeof(Data));
-	dataPtr[3] = (UInt32)lockData;
-	return (ExtraLock*)dataPtr;
+	ExtraLock* xLock = (ExtraLock*)BSExtraData::Create(kExtraData_Lock, sizeof(ExtraLock), s_ExtraLockVtbl);
+	ExtraLock::Data* lockData = (ExtraLock::Data*)FormHeap_Allocate(sizeof(ExtraLock::Data));
+	memset(lockData, 0, sizeof(ExtraLock::Data));
+	xLock->data = lockData;
+	return xLock;
 }
 
-ExtraCount *ExtraCount::Create(UInt32 count)
+ExtraCount* ExtraCount::Create(UInt32 count)
 {
-	UInt32 *dataPtr = (UInt32*)GameHeapAlloc(sizeof(ExtraCount));
-	dataPtr[0] = kVtbl_ExtraCount;
-	dataPtr[1] = kExtraData_Count;
-	dataPtr[2] = 0;
-	dataPtr[3] = count;
-	return (ExtraCount*)dataPtr;
+	ExtraCount* xCount = (ExtraCount*)BSExtraData::Create(kExtraData_Count, sizeof(ExtraCount), s_ExtraCountVtbl);
+	xCount->count = count;
+	return xCount;
 }
 
-ExtraTeleport *ExtraTeleport::Create()
+ExtraTeleport* ExtraTeleport::Create()
 {
-	UInt32 *dataPtr = (UInt32*)GameHeapAlloc(sizeof(ExtraTeleport));
-	dataPtr[0] = kVtbl_ExtraTeleport;
-	dataPtr[1] = kExtraData_Teleport;
-	dataPtr[2] = 0;
-	UInt32 *teleData = (UInt32*)GameHeapAlloc(sizeof(Data));
-	MemZero(teleData, sizeof(Data));
-	dataPtr[3] = (UInt32)teleData;
-	return (ExtraTeleport*)dataPtr;
+	ExtraTeleport* tele = (ExtraTeleport*)BSExtraData::Create(kExtraData_Teleport, sizeof(ExtraTeleport), s_ExtraTeleportVtbl);
+	
+	// create data
+	ExtraTeleport::Data* data = (ExtraTeleport::Data*)FormHeap_Allocate(sizeof(ExtraTeleport::Data));
+	data->linkedDoor = NULL;
+	data->yRot = -0.0;
+	data->xRot = 0.0;
+	data->x = 0.0;
+	data->y = 0.0;
+	data->z = 0.0;
+	data->zRot = 0.0;
+
+	tele->data = data;
+	return tele;
 }
 
-ExtraWeaponModFlags *ExtraWeaponModFlags::Create(UInt8 _flags)
+ExtraWeaponModFlags* ExtraWeaponModFlags::Create()
 {
-	UInt32 *dataPtr = (UInt32*)GameHeapAlloc(sizeof(ExtraWeaponModFlags));
-	dataPtr[0] = kVtbl_ExtraWeaponModFlags;
-	dataPtr[1] = kExtraData_WeaponModFlags;
-	dataPtr[2] = 0;
-	dataPtr[3] = _flags;
-	return (ExtraWeaponModFlags*)dataPtr;
+	ExtraWeaponModFlags* xWeaponModFlags = (ExtraWeaponModFlags*)BSExtraData::Create(kExtraData_WeaponModFlags, sizeof(ExtraWeaponModFlags), s_ExtraWeaponModFlagsVtbl);
+
+	xWeaponModFlags->flags = 0;
+
+	return xWeaponModFlags;
 }
 
-UInt32 GetCountForExtraDataList(ExtraDataList* list)
+SInt32 GetCountForExtraDataList(ExtraDataList* list)
 {
 	if (!list)
 		return 1;
@@ -319,247 +626,150 @@ UInt32 GetCountForExtraDataList(ExtraDataList* list)
 	return xCount ? xCount->count : 1;
 }
 
-ExtraOwnership *ExtraOwnership::Create(TESForm *_owner)
+ExtraOwnership* ExtraOwnership::Create() 
 {
-	UInt32 *dataPtr = (UInt32*)GameHeapAlloc(sizeof(ExtraOwnership));
-	dataPtr[0] = kVtbl_ExtraOwnership;
-	dataPtr[1] = kExtraData_Ownership;
-	dataPtr[2] = 0;
-	dataPtr[3] = (UInt32)_owner;
-	return (ExtraOwnership*)dataPtr;
+	ExtraOwnership* xOwner = (ExtraOwnership*)BSExtraData::Create(kExtraData_Ownership, sizeof(ExtraOwnership), s_ExtraOwnershipVtbl);
+	return xOwner;
 }
 
-ExtraRank *ExtraRank::Create(UInt32 _rank)
+ExtraRank* ExtraRank::Create()
 {
-	UInt32 *dataPtr = (UInt32*)GameHeapAlloc(sizeof(ExtraRank));
-	dataPtr[0] = kVtbl_ExtraRank;
-	dataPtr[1] = kExtraData_Rank;
-	dataPtr[2] = 0;
-	dataPtr[3] = _rank;
-	return (ExtraRank*)dataPtr;
+	ExtraRank* xRank = (ExtraRank*)BSExtraData::Create(kExtraData_Rank, sizeof(ExtraRank), s_ExtraRankVtbl);
+	return xRank;
 }
 
-ExtraAction *ExtraAction::Create(TESObjectREFR *_actionRef)
+ExtraAction* ExtraAction::Create()
 {
-	UInt32 *dataPtr = (UInt32*)GameHeapAlloc(sizeof(ExtraAction));
-	dataPtr[0] = kVtbl_ExtraAction;
-	dataPtr[1] = kExtraData_Action;
-	dataPtr[2] = 0;
-	dataPtr[3] = 0;
-	dataPtr[4] = (UInt32)_actionRef;
-	return (ExtraAction*)dataPtr;
+	ExtraAction* xAction = (ExtraAction*)BSExtraData::Create(kExtraData_Action, sizeof(ExtraAction), s_ExtraActionVtbl);
+	return xAction;
 }
 
-const char *kExtraDataNames[] =
-{
-	"Unknown00", "Havok", "Cell3D", "CellWaterType", "RegionList", "SeenData", "EditorID", "CellMusicType", "CellClimate",
-	"ProcessMiddleLow", "CellCanopyShadowMask", "DetachTime", "PersistentCell", "Script", "Action", "StartingPosition",
-	"Anim", "Unknown11", "UsedMarkers", "DistantData", "RagdollData", "ContainerChanges", "Worn", "WornLeft", "PackageStartLocation",
-	"Package", "TrespassPackage", "RunOncePacks", "ReferencePointer", "Follower", "LevCreaModifier", "Ghost", "OriginalReference",
-	"Ownership", "Global", "Rank", "Count", "Health", "Uses", "TimeLeft", "Charge", "Light", "Lock", "Teleport", "MapMarker",
-	"Unknown2D", "LeveledCreature", "LeveledItem", "Scale", "Seed", "NonActorMagicCaster", "NonActorMagicTarget", "Unknown34",
-	"PlayerCrimeList", "Unknown36", "EnableStateParent", "EnableStateChildren", "ItemDropper", "DroppedItemList", "RandomTeleportMarker",
-	"MerchantContainer", "SavedHavokData", "CannotWear", "Poison", "Unknown40", "LastFinishedSequence", "SavedAnimation",
-	"NorthRotation", "XTarget", "FriendHits", "HeadingTarget", "Unknown47", "RefractionProperty", "StartingWorldOrCell", "Hotkey",
-	"Unknown4B", "EditorRefMovedData", "InfoGeneralTopic", "HasNoRumors", "Sound", "TerminalState", "LinkedRef", "LinkedRefChildren",
-	"ActivateRef", "ActivateRefChildren", "TalkingActor", "ObjectHealth", "DecalRefs", "Unknown58", "CellImageSpace", "NavMeshPortal",
-	"ModelSwap", "Radius", "Radiation", "FactionChanges", "DismemberedLimbs", "ActorCause", "MultiBound", "MultiBoundData",
-	"MultiBoundRef", "Unknown64", "ReflectedRefs", "ReflectorRefs", "EmittanceSource", "RadioData", "CombatStyle", "Unknown6A",
-	"Primitive", "OpenCloseActivateRef", "AnimNoteReciever", "Ammo", "PatrolRefData", "PackageData", "OcclusionPlane", "CollisionData",
-	"SayTopicInfoOnceADay", "EncounterZone", "SayToTopicInfo", "OcclusionPlaneRefData", "PortalRefData", "Portal", "Room", "HealthPerc",
-	"RoomRefData", "GuardedRefData", "CreatureAwakeSound", "WaterZoneMap", "Unknown7F", "IgnoredBySandbox", "CellAcousticSpace",
-	"ReservedMarkers", "WeaponIdleSound", "WaterLightRefs", "LitWaterRefs", "WeaponAttackSound", "ActivateLoopSound",
-	"PatrolRefInUseData", "AshPileRef", "CreatureMovementSound", "FollowerSwimBreadcrumbs", "CellImpactSwap", "WeaponModFlags",
-	"ModdingItem", "SecuritronFace", "AudioMarker", "AudioBuoyMarker", "SpecialRenderFlags"
-};
-
-const char *GetExtraDataName(UInt8 extraDataType)
-{
-	return (extraDataType < kExtraData_Max) ? kExtraDataNames[extraDataType] : "INVALID";
-}
-
-char * GetExtraDataValue(BSExtraData* traverse)
-{
-	static char buffer[32767];
-	ExtraOwnership * pXOwner;
-	ExtraRank * pXRank;
-	ExtraCount * pXCount;
-	ExtraHealth * pXHealth;
-	ExtraScript* pXScript;
-	ExtraAction* pXAction;
-	ExtraHotkey* pXHotkey;
-	TESObjectREFR* refr;
-	switch (traverse->type) {			
-		case	kExtraData_Havok                    	: return ""; break;
-		case	kExtraData_Cell3D                   	: return ""; break;
-		case	kExtraData_CellWaterType            	: return ""; break;
-		case	kExtraData_RegionList               	: return ""; break;
-		case	kExtraData_SeenData                 	: return ""; break;
-		case	kExtraData_CellMusicType            	: return ""; break;
-		case	kExtraData_CellClimate              	: return ""; break;
-		case	kExtraData_ProcessMiddleLow         	: return ""; break;
-		case	kExtraData_CellCanopyShadowMask     	: return ""; break;
-		case	kExtraData_DetachTime               	: return ""; break;
-		case	kExtraData_PersistentCell           	: return ""; break;
-		case	kExtraData_Script                   	: 
-			pXScript = (ExtraScript*)traverse;
-			if (pXScript->script)
-				sprintf_s(buffer, sizeof(buffer), "script:[%#10X] eventList:[%#10X]  flags:{%#10x}", pXScript->script->refID, pXScript->eventList, pXScript->script->flags);
-			else
-				sprintf_s(buffer, sizeof(buffer), "script:[%#10X] eventList:[%#10X]  flags:{%#10x}", pXScript->script, pXScript->eventList, pXScript->script->flags);
-			return buffer;
-			break;
-		case	kExtraData_Action                   	: 
-			pXAction = (ExtraAction*)traverse;
-			if (pXAction->actionRef && pXAction->actionRef->GetFullName())
-				sprintf_s(buffer, sizeof(buffer), "{%#2X} [%#10X] (%s)", pXAction->byte0C, pXAction->actionRef->refID, pXAction->actionRef->GetFullName()->name);
-			else
-				sprintf_s(buffer, sizeof(buffer), "{%#2X} [%#10X] ()", pXAction->byte0C, pXAction->actionRef->refID);
-			return buffer; break;
-		case	kExtraData_StartingPosition         	: return ""; break;
-		case	kExtraData_Anim                     	: return ""; break;
-		case	kExtraData_UsedMarkers              	: return ""; break;
-		case	kExtraData_DistantData              	: return ""; break;
-		case	kExtraData_RagdollData              	: return ""; break;
-		case	kExtraData_ContainerChanges         	: return ""; break;
-		case	kExtraData_Worn                     	: return ""; break;
-		case	kExtraData_WornLeft                 	: return ""; break;
-		case	kExtraData_PackageStartLocation     	: return ""; break;
-		case	kExtraData_Package                  	: return ""; break;
-		case	kExtraData_TrespassPackage          	: return ""; break;
-		case	kExtraData_RunOncePacks             	: return ""; break;
-		case	kExtraData_ReferencePointer         	: 
-			refr = ((ExtraReferencePointer*)traverse)->refr;
-			if (refr && refr->GetFullName())
-				sprintf_s(buffer, sizeof(buffer), "[%#10X] (%s) [%#10X]", refr->refID, refr->GetFullName()->name, refr->extraDataList.m_data);
-			else
-				sprintf_s(buffer, sizeof(buffer), "[%#10X] () [%#10X]", refr->refID, refr->extraDataList.m_data);
-			return buffer; break;
-		case	kExtraData_Follower                 	: return ""; break;
-		case	kExtraData_LevCreaModifier          	: return ""; break;
-		case	kExtraData_Ghost                    	: return ""; break;
-		case	kExtraData_OriginalReference        	: return ""; break;
-		case	kExtraData_Ownership                	: 
-			pXOwner = (ExtraOwnership*)traverse;
-			if (pXOwner->owner)
-				if (pXOwner->owner->GetFullName())
-					sprintf_s(buffer, sizeof(buffer), "[%#10X] (%s)", pXOwner->owner->refID, pXOwner->owner->GetFullName()->name);
-				else
-					sprintf_s(buffer, sizeof(buffer), "[%#10X]", pXOwner->owner->refID);
-			else
-				sprintf_s(buffer, sizeof(buffer), "[]");
-			return buffer;
-			break;
-		case	kExtraData_Global                   	: 
-			return "Global"; break;
-		case	kExtraData_Rank                     	: 
-			pXRank = (ExtraRank*)traverse;
-			sprintf_s(buffer, sizeof(buffer), "%d", pXRank->rank);
-			return buffer;
-			break;
-		case	kExtraData_Count                    	: 
-			pXCount = (ExtraCount*)traverse;
-			sprintf_s(buffer, sizeof(buffer), "%d", pXCount->count);
-			return buffer;
-			break;
-		case	kExtraData_Health                   	: 
-			pXHealth = (ExtraHealth*)traverse;
-			sprintf_s(buffer, sizeof(buffer), "%f", pXHealth->health);
-			return buffer;
-			break;
-		case	kExtraData_Uses                     	: return ""; break;
-		case	kExtraData_TimeLeft                 	: return ""; break;
-		case	kExtraData_Charge                   	: return ""; break;
-		case	kExtraData_Light                    	: return ""; break;
-		case	kExtraData_Lock                     	: return ""; break;
-		case	kExtraData_Teleport                 	: return ""; break;
-		case	kExtraData_MapMarker                	: return ""; break;
-		case	kExtraData_LeveledCreature          	: return ""; break;
-		case	kExtraData_LeveledItem              	: return ""; break;
-		case	kExtraData_Scale                    	: return ""; break;
-		case	kExtraData_Seed                     	: return ""; break;
-		case	kExtraData_PlayerCrimeList          	: return ""; break;
-		case	kExtraData_EnableStateParent        	: return ""; break;
-		case	kExtraData_EnableStateChildren      	: return ""; break;
-		case	kExtraData_ItemDropper              	: return ""; break;
-		case	kExtraData_DroppedItemList          	: return ""; break;
-		case	kExtraData_RandomTeleportMarker     	: return ""; break;
-		case	kExtraData_MerchantContainer        	: return ""; break;
-		case	kExtraData_SavedHavokData           	: return ""; break;
-		case	kExtraData_CannotWear               	: return ""; break;
-		case	kExtraData_Poison                   	: return ""; break;
-		case	kExtraData_LastFinishedSequence     	: return ""; break;
-		case	kExtraData_SavedAnimation           	: return ""; break;
-		case	kExtraData_NorthRotation            	: return ""; break;
-		case	kExtraData_XTarget                  	: return ""; break;
-		case	kExtraData_FriendHits               	: return ""; break;
-		case	kExtraData_HeadingTarget            	: return ""; break;
-		case	kExtraData_RefractionProperty       	: return ""; break;
-		case	kExtraData_StartingWorldOrCell      	: return ""; break;
-		case	kExtraData_Hotkey:
-			pXHotkey = (ExtraHotkey*)traverse;
-			sprintf_s(buffer, sizeof(buffer), "%f", pXHotkey->index);
-			return buffer;
-			break;
-		case	kExtraData_EditorRefMovedData       	: return ""; break;
-		case	kExtraData_InfoGeneralTopic         	: return ""; break;
-		case	kExtraData_HasNoRumors              	: return ""; break;
-		case	kExtraData_Sound                    	: return ""; break;
-		case	kExtraData_TerminalState            	: return ""; break;
-		case	kExtraData_LinkedRef                	: return ""; break;
-		case	kExtraData_LinkedRefChildren        	: return ""; break;
-		case	kExtraData_ActivateRef              	: return ""; break;
-		case	kExtraData_ActivateRefChildren      	: return ""; break;
-		case	kExtraData_TalkingActor             	: return ""; break;
-		case	kExtraData_ObjectHealth             	: return ""; break;
-		case	kExtraData_DecalRefs                	: return ""; break;
-		case	kExtraData_CellImageSpace           	: return ""; break;
-		case	kExtraData_NavMeshPortal            	: return ""; break;
-		case	kExtraData_ModelSwap                	: return ""; break;
-		case	kExtraData_Radius                   	: return ""; break;
-		case	kExtraData_Radiation                	: return ""; break;
-		case	kExtraData_FactionChanges           	: return ""; break;
-		case	kExtraData_DismemberedLimbs         	: return ""; break;
-		case	kExtraData_MultiBound               	: return ""; break;
-		case	kExtraData_MultiBoundData           	: return ""; break;
-		case	kExtraData_MultiBoundRef            	: return ""; break;
-		case	kExtraData_ReflectedRefs            	: return ""; break;
-		case	kExtraData_ReflectorRefs            	: return ""; break;
-		case	kExtraData_EmittanceSource          	: return ""; break;
-		case	kExtraData_RadioData                	: return ""; break;
-		case	kExtraData_CombatStyle              	: return ""; break;
-		case	kExtraData_Primitive                	: return ""; break;
-		case	kExtraData_OpenCloseActivateRef     	: return ""; break;
-		case	kExtraData_AnimNoteReciever				: return ""; break;
-		case	kExtraData_Ammo                     	: return ""; break;
-		case	kExtraData_PatrolRefData            	: return ""; break;
-		case	kExtraData_PackageData              	: return ""; break;
-		case	kExtraData_OcclusionPlane           	: return ""; break;
-		case	kExtraData_CollisionData            	: return ""; break;
-		case	kExtraData_SayTopicInfoOnceADay     	: return ""; break;
-		case	kExtraData_EncounterZone            	: return ""; break;
-		case	kExtraData_SayToTopicInfo           	: return ""; break;
-		case	kExtraData_OcclusionPlaneRefData    	: return ""; break;
-		case	kExtraData_PortalRefData            	: return ""; break;
-		case	kExtraData_Portal                   	: return ""; break;
-		case	kExtraData_Room                     	: return ""; break;
-		case	kExtraData_HealthPerc               	: return ""; break;
-		case	kExtraData_RoomRefData              	: return ""; break;
-		case	kExtraData_GuardedRefData           	: return ""; break;
-		case	kExtraData_CreatureAwakeSound       	: return ""; break;
-		case	kExtraData_WaterZoneMap             	: return ""; break;
-		case	kExtraData_IgnoredBySandbox         	: return ""; break;
-		case	kExtraData_CellAcousticSpace        	: return ""; break;
-		case	kExtraData_ReservedMarkers          	: return ""; break;
-		case	kExtraData_WeaponIdleSound          	: return ""; break;
-		case	kExtraData_WaterLightRefs           	: return ""; break;
-		case	kExtraData_LitWaterRefs             	: return ""; break;
-		case	kExtraData_WeaponAttackSound        	: return ""; break;
-		case	kExtraData_ActivateLoopSound        	: return ""; break;
-		case	kExtraData_PatrolRefInUseData       	: return ""; break;
-		case	kExtraData_AshPileRef               	: return ""; break;
-		case	kExtraData_CreatureMovementSound    	: return ""; break;
-		case	kExtraData_FollowerSwimBreadcrumbs  	: return ""; break;
+const char * GetExtraDataName(UInt8 ExtraDataType) {
+	switch (ExtraDataType) {			
+		case	kExtraData_Havok                    	: return "Havok"; break;
+		case	kExtraData_Cell3D                   	: return "Cell3D"; break;
+		case	kExtraData_CellWaterType            	: return "CellWaterType"; break;
+		case	kExtraData_RegionList               	: return "RegionList"; break;
+		case	kExtraData_SeenData                 	: return "SeenData"; break;
+		case	kExtraData_CellMusicType            	: return "CellMusicType"; break;
+		case	kExtraData_CellClimate              	: return "CellClimate"; break;
+		case	kExtraData_ProcessMiddleLow         	: return "ProcessMiddleLow"; break;
+		case	kExtraData_CellCanopyShadowMask     	: return "CellCanopyShadowMask"; break;
+		case	kExtraData_DetachTime               	: return "DetachTime"; break;
+		case	kExtraData_PersistentCell           	: return "PersistentCell"; break;
+		case	kExtraData_Script                   	: return "Script"; break;
+		case	kExtraData_Action                   	: return "Action"; break;
+		case	kExtraData_StartingPosition         	: return "StartingPosition"; break;
+		case	kExtraData_Anim                     	: return "Anim"; break;
+		case	kExtraData_UsedMarkers              	: return "UsedMarkers"; break;
+		case	kExtraData_DistantData              	: return "DistantData"; break;
+		case	kExtraData_RagdollData              	: return "RagdollData"; break;
+		case	kExtraData_ContainerChanges         	: return "ContainerChanges"; break;
+		case	kExtraData_Worn                     	: return "Worn"; break;
+		case	kExtraData_WornLeft                 	: return "WornLeft"; break;
+		case	kExtraData_PackageStartLocation     	: return "PackageStartLocation"; break;
+		case	kExtraData_Package                  	: return "Package"; break;
+		case	kExtraData_TrespassPackage          	: return "TrespassPackage"; break;
+		case	kExtraData_RunOncePacks             	: return "RunOncePacks"; break;
+		case	kExtraData_ReferencePointer         	: return "ReferencePointer"; break;
+		case	kExtraData_Follower                 	: return "Follower"; break;
+		case	kExtraData_LevCreaModifier          	: return "LevCreaModifier"; break;
+		case	kExtraData_Ghost                    	: return "Ghost"; break;
+		case	kExtraData_OriginalReference        	: return "OriginalReference"; break;
+		case	kExtraData_Ownership                	: return "Ownership"; break;
+		case	kExtraData_Global                   	: return "Global"; break;
+		case	kExtraData_Rank                     	: return "Rank"; break;
+		case	kExtraData_Count                    	: return "Count"; break;
+		case	kExtraData_Health                   	: return "Health"; break;
+		case	kExtraData_Uses                     	: return "Uses"; break;
+		case	kExtraData_TimeLeft                 	: return "TimeLeft"; break;
+		case	kExtraData_Charge                   	: return "Charge"; break;
+		case	kExtraData_Light                    	: return "Light"; break;
+		case	kExtraData_Lock                     	: return "Lock"; break;
+		case	kExtraData_Teleport                 	: return "Teleport"; break;
+		case	kExtraData_MapMarker                	: return "MapMarker"; break;
+		case	kExtraData_LeveledCreature          	: return "LeveledCreature"; break;
+		case	kExtraData_LeveledItem              	: return "LeveledItem"; break;
+		case	kExtraData_Scale                    	: return "Scale"; break;
+		case	kExtraData_Seed                     	: return "Seed"; break;
+		case	kExtraData_PlayerCrimeList          	: return "PlayerCrimeList"; break;
+		case	kExtraData_EnableStateParent        	: return "EnableStateParent"; break;
+		case	kExtraData_EnableStateChildren      	: return "EnableStateChildren"; break;
+		case	kExtraData_ItemDropper              	: return "ItemDropper"; break;
+		case	kExtraData_DroppedItemList          	: return "DroppedItemList"; break;
+		case	kExtraData_RandomTeleportMarker     	: return "RandomTeleportMarker"; break;
+		case	kExtraData_MerchantContainer        	: return "MerchantContainer"; break;
+		case	kExtraData_SavedHavokData           	: return "SavedHavokData"; break;
+		case	kExtraData_CannotWear               	: return "CannotWear"; break;
+		case	kExtraData_Poison                   	: return "Poison"; break;
+		case	kExtraData_LastFinishedSequence     	: return "LastFinishedSequence"; break;
+		case	kExtraData_SavedAnimation           	: return "SavedAnimation"; break;
+		case	kExtraData_NorthRotation            	: return "NorthRotation"; break;
+		case	kExtraData_XTarget                  	: return "XTarget"; break;
+		case	kExtraData_FriendHits               	: return "FriendHits"; break;
+		case	kExtraData_HeadingTarget            	: return "HeadingTarget"; break;
+		case	kExtraData_RefractionProperty       	: return "RefractionProperty"; break;
+		case	kExtraData_StartingWorldOrCell      	: return "StartingWorldOrCell"; break;
+		case	kExtraData_Hotkey                   	: return "Hotkey"; break;
+		case	kExtraData_EditorRefMovedData       	: return "EditorRefMovedData"; break;
+		case	kExtraData_InfoGeneralTopic         	: return "InfoGeneralTopic"; break;
+		case	kExtraData_HasNoRumors              	: return "HasNoRumors"; break;
+		case	kExtraData_Sound                    	: return "Sound"; break;
+		case	kExtraData_TerminalState            	: return "TerminalState"; break;
+		case	kExtraData_LinkedRef                	: return "LinkedRef"; break;
+		case	kExtraData_LinkedRefChildren        	: return "LinkedRefChildren"; break;
+		case	kExtraData_ActivateRef              	: return "ActivateRef"; break;
+		case	kExtraData_ActivateRefChildren      	: return "ActivateRefChildren"; break;
+		case	kExtraData_TalkingActor             	: return "TalkingActor"; break;
+		case	kExtraData_ObjectHealth             	: return "ObjectHealth"; break;
+		case	kExtraData_DecalRefs                	: return "DecalRefs"; break;
+		case	kExtraData_CellImageSpace           	: return "CellImageSpace"; break;
+		case	kExtraData_NavMeshPortal            	: return "NavMeshPortal"; break;
+		case	kExtraData_ModelSwap                	: return "ModelSwap"; break;
+		case	kExtraData_Radius                   	: return "Radius"; break;
+		case	kExtraData_Radiation                	: return "Radiation"; break;
+		case	kExtraData_FactionChanges           	: return "FactionChanges"; break;
+		case	kExtraData_DismemberedLimbs         	: return "DismemberedLimbs"; break;
+		case	kExtraData_MultiBound               	: return "MultiBound"; break;
+		case	kExtraData_MultiBoundData           	: return "MultiBoundData"; break;
+		case	kExtraData_MultiBoundRef            	: return "MultiBoundRef"; break;
+		case	kExtraData_ReflectedRefs            	: return "ReflectedRefs"; break;
+		case	kExtraData_ReflectorRefs            	: return "ReflectorRefs"; break;
+		case	kExtraData_EmittanceSource          	: return "EmittanceSource"; break;
+		case	kExtraData_RadioData                	: return "RadioData"; break;
+		case	kExtraData_CombatStyle              	: return "CombatStyle"; break;
+		case	kExtraData_Primitive                	: return "Primitive"; break;
+		case	kExtraData_OpenCloseActivateRef     	: return "OpenCloseActivateRef"; break;
+		case	kExtraData_AnimNoteReciever				: return "AnimNoteReciever"; break;
+		case	kExtraData_Ammo                     	: return "Ammo"; break;
+		case	kExtraData_PatrolRefData            	: return "PatrolRefData"; break;
+		case	kExtraData_PackageData              	: return "PackageData"; break;
+		case	kExtraData_OcclusionPlane           	: return "OcclusionPlane"; break;
+		case	kExtraData_CollisionData            	: return "CollisionData"; break;
+		case	kExtraData_SayTopicInfoOnceADay     	: return "SayTopicInfoOnceADay"; break;
+		case	kExtraData_EncounterZone            	: return "EncounterZone"; break;
+		case	kExtraData_SayToTopicInfo           	: return "SayToTopicInfo"; break;
+		case	kExtraData_OcclusionPlaneRefData    	: return "OcclusionPlaneRefData"; break;
+		case	kExtraData_PortalRefData            	: return "PortalRefData"; break;
+		case	kExtraData_Portal                   	: return "Portal"; break;
+		case	kExtraData_Room                     	: return "Room"; break;
+		case	kExtraData_HealthPerc               	: return "HealthPerc"; break;
+		case	kExtraData_RoomRefData              	: return "RoomRefData"; break;
+		case	kExtraData_GuardedRefData           	: return "GuardedRefData"; break;
+		case	kExtraData_CreatureAwakeSound       	: return "CreatureAwakeSound"; break;
+		case	kExtraData_WaterZoneMap             	: return "WaterZoneMap"; break;
+		case	kExtraData_IgnoredBySandbox         	: return "IgnoredBySandbox"; break;
+		case	kExtraData_CellAcousticSpace        	: return "CellAcousticSpace"; break;
+		case	kExtraData_ReservedMarkers          	: return "ReservedMarkers"; break;
+		case	kExtraData_WeaponIdleSound          	: return "WeaponIdleSound"; break;
+		case	kExtraData_WaterLightRefs           	: return "WaterLightRefs"; break;
+		case	kExtraData_LitWaterRefs             	: return "LitWaterRefs"; break;
+		case	kExtraData_WeaponAttackSound        	: return "WeaponAttackSound"; break;
+		case	kExtraData_ActivateLoopSound        	: return "ActivateLoopSound"; break;
+		case	kExtraData_PatrolRefInUseData       	: return "PatrolRefInUseData"; break;
+		case	kExtraData_AshPileRef               	: return "AshPileRef"; break;
+		case	kExtraData_CreatureMovementSound    	: return "CreatureMovementSound"; break;
+		case	kExtraData_FollowerSwimBreadcrumbs  	: return "FollowerSwimBreadcrumbs"; break;
 	};
 	return "unknown";
 }
@@ -567,68 +777,72 @@ char * GetExtraDataValue(BSExtraData* traverse)
 class TESScript;
 class TESScriptableForm;
 
-ExtraScript *ExtraScript::Create(TESForm *baseForm, bool create, TESObjectREFR *container)
-{
-	UInt32 *dataPtr = (UInt32*)GameHeapAlloc(sizeof(ExtraScript));
-	dataPtr[0] = kVtbl_ExtraScript;
-	dataPtr[1] = kExtraData_Script;
-	dataPtr[2] = 0;
-	dataPtr[3] = 0;
-	dataPtr[4] = 0;
-	ExtraScript *xScript = (ExtraScript*)dataPtr;
-	if (baseForm)
-	{
-		TESScriptableForm *scriptable = DYNAMIC_CAST(baseForm, TESForm, TESScriptableForm);
-		if (scriptable && scriptable->script)
-		{
-			xScript->script = scriptable->script;
-			if (create)
-			{
-				ScriptEventList::Event *pEvent = (ScriptEventList::Event*)GameHeapAlloc(sizeof(ScriptEventList));
-				pEvent->eventMask = ScriptEventList::kEvent_OnAdd;
-				pEvent->object = container;
-				ScriptEventList *pEventList = xScript->script->CreateEventList();
-				if (pEventList)
-				{
-					xScript->eventList = pEventList;
-					if (!pEventList->m_eventList)
-					{
-						pEventList->m_eventList = (ScriptEventList::EventList*)GameHeapAlloc(sizeof(ScriptEventList::EventList));
-						pEventList->m_eventList->Init();
-						pEventList->m_eventList->Insert(pEvent);
-					}
-				}
+ExtraScript* ExtraScript::Create(TESForm* baseForm, bool create, TESObjectREFR* container) {
+	ExtraScript* xScript = (ExtraScript*)BSExtraData::Create(kExtraData_Script, sizeof(ExtraScript), s_ExtraScriptVtbl);
+	if (xScript && baseForm) {
+		TESScriptableForm* pScript = DYNAMIC_CAST(baseForm, TESForm, TESScriptableForm);
+		if (pScript && pScript->script) {
+			xScript->script = pScript->script;
+			if (create) {
+				xScript->eventList = xScript->script->CreateEventList();
+				if (container)
+					xScript->EventCreate(ScriptEventList::kEvent_OnAdd, container);
 			}
 		}
 	}
 	return xScript;
 }
 
-ExtraFactionChanges *ExtraFactionChanges::Create()
+void ExtraScript::EventCreate(UInt32 eventCode, TESObjectREFR* container) {
+	if (eventList) {
+		// create Event struct
+		ScriptEventList::Event * pEvent = (ScriptEventList::Event*)FormHeap_Allocate(sizeof(ScriptEventList::Event));
+		if (pEvent) {
+			pEvent->eventMask = eventCode;
+			pEvent->object = container;
+		}
+
+		if (!eventList->m_eventList) {
+			eventList->m_eventList = (ScriptEventList::EventList*)FormHeap_Allocate(sizeof(ScriptEventList::EventList));
+			eventList->m_eventList->Init();
+		}
+		if (eventList->m_eventList && pEvent)
+			eventList->m_eventList->AddAt(pEvent, 0);
+	}
+}
+
+ExtraFactionChanges* ExtraFactionChanges::Create()
 {
-	UInt32 *dataPtr = (UInt32*)GameHeapAlloc(sizeof(ExtraFactionChanges));
-	dataPtr[0] = kVtbl_ExtraFactionChanges;
-	dataPtr[1] = kExtraData_FactionChanges;
-	dataPtr[2] = 0;
-	UInt32 *listData = (UInt32*)GameHeapAlloc(sizeof(FactionListEntry));
-	listData[0] = 0;
-	listData[1] = 0;
-	dataPtr[3] = (UInt32)listData;
-	return (ExtraFactionChanges*)dataPtr;
+	ExtraFactionChanges* xFactionChanges = (ExtraFactionChanges*)BSExtraData::Create(kExtraData_FactionChanges, sizeof(ExtraFactionChanges), s_ExtraFactionChangesVtbl);
+	ExtraFactionChanges::FactionListEntry* FactionChangesData = (FactionListEntry*)FormHeap_Allocate(sizeof(FactionListEntry));
+	memset(FactionChangesData, 0, sizeof(FactionListEntry));
+	xFactionChanges->data = FactionChangesData;
+	return xFactionChanges;
 }
 
 ExtraFactionChanges::FactionListEntry* GetExtraFactionList(BaseExtraList& xDataList)
 {
-	ExtraFactionChanges* xFactionChanges = GetExtraType(xDataList, FactionChanges);
+	ExtraFactionChanges* xFactionChanges = GetByTypeCast(xDataList, FactionChanges);
 	if (xFactionChanges)
 		return xFactionChanges->data;
 	return NULL;
 }
 
-void SetExtraFactionRank(BaseExtraList& xDataList, TESFaction * faction, char rank)
+SInt8 GetExtraFactionRank(BaseExtraList& xDataList, TESFaction * faction)
 {
-	FactionListData *pData = NULL;
-	ExtraFactionChanges* xFactionChanges = GetExtraType(xDataList, FactionChanges);
+	ExtraFactionChanges* xFactionChanges = GetByTypeCast(xDataList, FactionChanges);
+	if (xFactionChanges && xFactionChanges->data) {
+		ExtraFactionChangesMatcher matcher(faction, xFactionChanges);
+		ExtraFactionChanges::FactionListData* pData = xFactionChanges->data->Find(matcher);
+		return (pData) ? pData->rank : -1;
+	}
+	return -1;
+}
+
+void SetExtraFactionRank(BaseExtraList& xDataList, TESFaction * faction, SInt8 rank)
+{
+	ExtraFactionChanges::FactionListData* pData = NULL;
+	ExtraFactionChanges* xFactionChanges = GetByTypeCast(xDataList, FactionChanges);
 	if (xFactionChanges && xFactionChanges->data) {
 		ExtraFactionChangesMatcher matcher(faction, xFactionChanges);
 		pData = xFactionChanges->data->Find(matcher);
@@ -640,21 +854,19 @@ void SetExtraFactionRank(BaseExtraList& xDataList, TESFaction * faction, char ra
 			xFactionChanges = ExtraFactionChanges::Create();
 			xDataList.Add(xFactionChanges);
 		}
-		pData = (FactionListData*)GameHeapAlloc(sizeof(FactionListData));
+		pData = (ExtraFactionChanges::FactionListData*)FormHeap_Allocate(sizeof(ExtraFactionChanges::FactionListData));
 		if (pData) {
 			pData->faction = faction;
 			pData->rank = rank;
-			xFactionChanges->data->Append(pData);
+			xFactionChanges->data->AddAt(pData, -2);
 		}
 	}
 }
 
-ExtraHotkey *ExtraHotkey::Create(UInt8 _index)
+ExtraHotkey* ExtraHotkey::Create()
 {
-	UInt32 *dataPtr = (UInt32*)GameHeapAlloc(sizeof(ExtraHotkey));
-	dataPtr[0] = kVtbl_ExtraHotkey;
-	dataPtr[1] = kExtraData_Hotkey;
-	dataPtr[2] = 0;
-	dataPtr[3] = _index;
-	return (ExtraHotkey*)dataPtr;
+	ExtraHotkey* xHotkey = (ExtraHotkey*)BSExtraData::Create(kExtraData_Hotkey, sizeof(ExtraHotkey), s_ExtraHotkeyVtbl);
+	xHotkey->index  = 0;
+	return xHotkey;
 }
+

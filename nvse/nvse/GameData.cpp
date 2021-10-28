@@ -1,7 +1,20 @@
 #include "GameData.h"
 
+#if RUNTIME
+DataHandler* DataHandler::GetSingleton()
+{
+	DataHandler** g_dataHandler = (DataHandler**)0x011C3F2C;
+	return *g_dataHandler;
+}
+#else
 
-DataHandler* DataHandler::GetSingleton() { return *(DataHandler**)0x011C3F2C; }
+DataHandler* DataHandler::Get()
+{
+	DataHandler** g_dataHandler = (DataHandler**)0xED3B0C;
+	return *g_dataHandler;
+}
+
+#endif
 
 class LoadedModFinder
 {
@@ -12,7 +25,7 @@ public:
 
 	bool Accept(ModInfo* modInfo)
 	{
-		return _stricmp(modInfo->name, m_stringToFind) == 0;
+		return !StrCompare(modInfo->name, m_stringToFind);
 	}
 };
 
@@ -39,18 +52,9 @@ const ModInfo ** DataHandler::GetActiveModList()
 	return activeModList;
 }
 
-UInt8 DataHandler::GetModIndex(const char *modName)
+UInt8 DataHandler::GetModIndex(const char* modName)
 {
-	ListNode<ModInfo> *iter = modList.modInfoList.Head();
-	ModInfo *modInfo;
-	do
-	{
-		modInfo = iter->data;
-		if (modInfo && StrEqualCI(modInfo->name, modName))
-			return modInfo->modIndex;
-	}
-	while (iter = iter->next);
-	return 0xFF;
+	return modList.modInfoList.GetIndexOf(LoadedModFinder(modName));
 }
 
 const char* DataHandler::GetNthModName(UInt32 modIndex)
@@ -62,6 +66,11 @@ const char* DataHandler::GetNthModName(UInt32 modIndex)
 		return "";
 }
 
+void DataHandler::DisableAssignFormIDs(bool shouldAsssign)
+{
+	ThisStdCall(0x464D30, this, shouldAsssign);
+}
+
 struct IsModLoaded
 {
 	bool Accept(ModInfo* pModInfo) const {
@@ -71,7 +80,8 @@ struct IsModLoaded
 
 UInt8 DataHandler::GetActiveModCount() const
 {
-	return modList.modInfoList.Count();
+	UInt32 count = modList.modInfoList.CountIf(IsModLoaded());
+	return count;
 }
 
 ModInfo::ModInfo() {

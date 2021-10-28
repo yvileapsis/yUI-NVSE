@@ -18,6 +18,20 @@ extern SInt32 FUNCTION_CONTEXT_COUNT;
 
 #endif
 
+enum class NVSEVarType
+{
+	kVarType_Null = 0,
+	kVarType_Array,
+	kVarType_String
+};
+#if _DEBUG
+extern Map<ScriptEventList*, Map<UInt32, NVSEVarType>> g_nvseVarGarbageCollectionMap;
+#else
+extern UnorderedMap<ScriptEventList*, UnorderedMap<UInt32, NVSEVarType>> g_nvseVarGarbageCollectionMap;
+#endif
+
+
+
 struct Operator;
 struct SliceToken;
 struct ArrayElementToken;
@@ -152,31 +166,30 @@ struct ForEachContext
 // slightly less ugly but still cheap polymorphism
 struct ScriptToken
 {
-protected:
-	Token_Type	type;
-	UInt8		variableType;
-	UInt16		refIdx;
+	friend ExpressionEvaluator;
 
-	struct Value {
-		std::string					str;
-		union {
-			Script::RefVariable		* refVar;
-			UInt32					formID;
-			double					num;
-			TESGlobal				* global;
-			Operator				* op;
+	Token_Type	type;
+	UInt8		variableType;	
+	Script*		owningScript;
+
+	union Value
+	{
+		Script::RefVariable		* refVar;
+		UInt32					formID;
+		double					num;
+		char					* str;
+		TESGlobal				* global;
+		Operator				* op;
 #if RUNTIME		// run-time only
-			ArrayID					arrID;
-			ScriptEventList::Var	* var;
+		ArrayID					arrID;
+		ScriptEventList::Var	* var;
 #endif
-			// compile-time only
-			VariableInfo			* varInfo;
-			CommandInfo				* cmd;
-			ScriptToken				* token;
-		};
+		// compile-time only
+		VariableInfo			* varInfo;
+		CommandInfo				* cmd;
+		ScriptToken				* token;
 	} value;
 
-	ScriptToken();
 	ScriptToken(Token_Type _type, UInt8 _varType, UInt16 _refIdx);
 	ScriptToken(bool boolean);
 	ScriptToken(double num);
@@ -189,47 +202,51 @@ protected:
 	ScriptToken(Operator* op);
 	ScriptToken(UInt32 data, Token_Type asType);		// ArrayID or FormID
 
-	ScriptToken(const ScriptToken& rhs);	// unimplemented, don't want copy constructor called
+	//ScriptToken(const ScriptToken& rhs);	// unimplemented, don't want copy constructor called
 #if RUNTIME
 	ScriptToken(ScriptEventList::Var* var);
 #endif
 
-	Token_Type	ReadFrom(ExpressionEvaluator* context);	// reconstitute param from compiled data, return the type
-public:
+	ScriptToken();
+	ScriptToken(const ScriptToken& from);
+
+	ScriptToken(ExpressionEvaluator& evaluator);
+
 	virtual	~ScriptToken();
 
-	virtual const char	*			GetString() const;
-	virtual UInt32					GetFormID() const;
-	virtual TESForm*				GetTESForm() const;
-	virtual double					GetNumber() const;
+	virtual const char	*			GetString();
+	virtual UInt32					GetFormID();
+	virtual TESForm*				GetTESForm();
+	virtual double					GetNumber();
 	virtual const ArrayKey *		GetArrayKey() const { return NULL; }
 	virtual const ForEachContext *	GetForEachContext() const { return NULL; }
 	virtual const Slice *			GetSlice() const { return NULL; }
-	virtual bool					GetBool() const;
+	virtual bool					GetBool();
 #if RUNTIME
-	virtual ArrayID					GetArray() const;
-	ScriptEventList::Var *	GetVar() const;
+	Token_Type	ReadFrom(ExpressionEvaluator* context);	// reconstitute param from compiled data, return the type
+	virtual ArrayID					GetArray();
+	ArrayVar*						GetArrayVar();
+	ScriptEventList::Var *			GetVar() const;
+	bool ResolveVariable();
+	void							Delete() const;
 #endif
 	virtual bool			CanConvertTo(Token_Type to) const;	// behavior varies b/w compile/run-time for ambiguous types
 	virtual ArrayID			GetOwningArrayID() const { return 0; }
 	virtual const ScriptToken  *  GetToken() const { return NULL; }
 	virtual const TokenPair	* GetPair() const { return NULL; }
 
-	ScriptToken	*			ToBasicToken() const;		// return clone as one of string, number, array, form
+	ScriptToken	*			ToBasicToken();		// return clone as one of string, number, array, form
 	
 	TESGlobal *				GetGlobal() const;
 	Operator *				GetOperator() const;
 	VariableInfo *			GetVarInfo() const;
 	CommandInfo *			GetCommandInfo() const;
-	Script::RefVariable*	GetRefVariable() const;
 	UInt16					GetRefIndex() const { return IsGood() ? refIdx : 0; }
 	UInt8					GetVariableType() const { return IsVariable() ? variableType : Script::eVarType_Invalid; }
 
-	UInt32					GetActorValue() const;		// kActorVal_XXX or kActorVal_NoActorValue if none
-	char					GetAxis() const;			// 'X', 'Y', 'Z', or otherwise -1
-	UInt32					GetSex() const;				// 0=male, 1=female, otherwise -1
-	UInt32					GetAnimGroup() const;		// TESAnimGroup::kAnimGroup_XXX (kAnimGroup_Max if none)
-	EffectSetting *			GetEffectSetting() const;	// from string, effect code, or TESForm*
+	UInt32					GetActorValue();		// kActorVal_XXX or kActorVal_NoActorValue if none
+	char					GetAxis();			// 'X', 'Y', 'Z', or otherwise -1
+	UInt32					GetSex();				// 0=male, 1=female, otherwise -1
 
 	bool					Write(ScriptLineBuffer* buf);
 	Token_Type				Type() const		{ return type; }
@@ -238,9 +255,14 @@ public:
 	bool					IsVariable() const	{ return type >= kTokenType_NumericVar && type <= kTokenType_ArrayVar; }
 
 	double					GetNumericRepresentation(bool bFromHex);	// attempts to convert string to number
-	char*					DebugPrint(void);
+	char* DebugPrint() const;
+	bool					IsInvalid() const;
+	bool					IsOperator() const;
+	bool					IsLogicalOperator() const;
+	std::string				GetVariableDataAsString();
 
 	static ScriptToken* Read(ExpressionEvaluator* context);
+
 
 	static ScriptToken* Create(bool boolean)													{ return new ScriptToken(boolean); }
 	static ScriptToken* Create(double num)														{ return new ScriptToken(num);	}
@@ -261,75 +283,155 @@ public:
 	static ScriptToken* Create(UInt32 varID, UInt32 lbound, UInt32 ubound);
 	static ScriptToken* Create(ArrayElementToken* elem, UInt32 lbound, UInt32 ubound);
 	static ScriptToken* Create(UInt32 bogus);	// unimplemented, to block implicit conversion to double
-};
 
-struct SliceToken : public ScriptToken
+	void SetString(const char *srcStr);
+	std::string GetVariableName(ScriptEventList* eventList) const;
+
+	ScriptToken& operator=(const ScriptToken &rhs);
+
+	UInt16		refIdx;
+	CommandReturnType returnType;
+#if RUNTIME
+	void* operator new(size_t size);
+	void operator delete(void* p);
+	
+	bool cached = false;
+	UInt32 cmdOpcodeOffset;
+	ExpressionEvaluator* context;
+	UInt16		varIdx;
+	OperatorType shortCircuitParentType;
+	UInt8 shortCircuitDistance;
+	UInt8 shortCircuitStackOffset;
+
+#if _DEBUG
+	std::string varName;
+#endif
+#endif
+
+};
+//STATIC_ASSERT(sizeof(ScriptToken) == 0x30);
+
+struct SliceToken : ScriptToken
 {
 	Slice	slice;
 
 	SliceToken(Slice* _slice);
 	virtual const Slice* GetSlice() const { return type == kTokenType_Slice ? &slice : NULL; }
+
+	void* operator new(size_t size)
+	{
+		return ::operator new(size);
+	}
+
+	void operator delete(void* p)
+	{
+		::operator delete(p);
+	}
 };
 
-struct PairToken : public ScriptToken
+struct PairToken : ScriptToken
 {
 	TokenPair	pair;
 
 	PairToken(ScriptToken* l, ScriptToken* r);
 	virtual const TokenPair* GetPair() const { return type == kTokenType_Pair ? &pair : NULL; }
+	void* operator new(size_t size)
+	{
+		return ::operator new(size);
+	}
+
+	void operator delete(void* p)
+	{
+		::operator delete(p);
+	}
 };
 
 #if RUNTIME
 
-struct ArrayElementToken : public ScriptToken
+struct ArrayElementToken : ScriptToken
 {
 	ArrayKey	key;
 
 	ArrayElementToken(ArrayID arr, ArrayKey* _key);
-	virtual const ArrayKey*	GetArrayKey() const { return type == kTokenType_ArrayElement ? &key : NULL; }
-	virtual const char*		GetString() const;
-	virtual double			GetNumber() const;
-	virtual UInt32			GetFormID() const;
-	virtual ArrayID			GetArray() const;
-	virtual TESForm*		GetTESForm() const;
-	virtual bool			GetBool() const;
-	virtual bool			CanConvertTo(Token_Type to) const;
-	virtual ArrayID			GetOwningArrayID() const {
-		return type == kTokenType_ArrayElement ? value.arrID : 0; }
+	const ArrayKey*	GetArrayKey() const override { return type == kTokenType_ArrayElement ? &key : NULL; }
+	const char*		GetString() override;
+	double			GetNumber() override;
+	UInt32			GetFormID() override;
+	ArrayID			GetArray() override;
+	TESForm*		GetTESForm() override;
+	bool			GetBool()  override;
+	bool			CanConvertTo(Token_Type to) const override;
+	ArrayID			GetOwningArrayID() const override { return type == kTokenType_ArrayElement ? value.arrID : 0; }
+	void* operator new(size_t size);
+
+	void operator delete(void* p);
 };
 
-struct ForEachContextToken : public ScriptToken
+struct ForEachContextToken : ScriptToken
 {
 	ForEachContext		context;
 
 	ForEachContextToken(UInt32 srcID, UInt32 iterID, UInt32 varType, ScriptEventList::Var* var);
 	virtual const ForEachContext* GetForEachContext() const { return Type() == kTokenType_ForEachContext ? &context : NULL; }
+	void* operator new(size_t size);
+
+	void operator delete(void* p);
 };
 
-struct AssignableStringToken : public ScriptToken
+struct AssignableSubstringToken : ScriptToken
 {
 	UInt32		lower;
 	UInt32		upper;
 	std::string	substring;
 
-	AssignableStringToken(UInt32 _id, UInt32 lbound, UInt32 ubound);
-	virtual const char* GetString() const { return substring.c_str(); }
+	AssignableSubstringToken(UInt32 _id, UInt32 lbound, UInt32 ubound);
+	const char* GetString() override { return substring.c_str(); }
 	virtual bool Assign(const char* str) = 0;
+
+	void* operator new(size_t size)
+	{
+		return ::operator new(size);
+	}
+
+	void operator delete(void* p)
+	{
+		::operator delete(p);
+	}
 };
 
-struct AssignableStringVarToken : public AssignableStringToken
+struct AssignableSubstringStringVarToken : public AssignableSubstringToken
 {
-	AssignableStringVarToken(UInt32 _id, UInt32 lbound, UInt32 ubound);
-	virtual bool Assign(const char* str);
+	AssignableSubstringStringVarToken(UInt32 _id, UInt32 lbound, UInt32 ubound);
+	bool Assign(const char* str) override;
+
+	void* operator new(size_t size)
+	{
+		return ::operator new(size);
+	}
+
+	void operator delete(void* p)
+	{
+		::operator delete(p);
+	}
 };
 
-struct AssignableStringArrayElementToken : public AssignableStringToken
+struct AssignableSubstringArrayElementToken : public AssignableSubstringToken
 {
 	ArrayKey	key;
 
-	AssignableStringArrayElementToken(UInt32 _id, const ArrayKey& _key, UInt32 lbound, UInt32 ubound);
-	virtual ArrayID		GetArray() const { return value.arrID; }
-	virtual bool Assign(const char* str);
+	AssignableSubstringArrayElementToken(UInt32 _id, const ArrayKey& _key, UInt32 lbound, UInt32 ubound);
+	ArrayID		GetArray() override { return value.arrID; }
+	bool Assign(const char* str) override;
+
+	void* operator new(size_t size)
+	{
+		return ::operator new(size);
+	}
+
+	void operator delete(void* p)
+	{
+		::operator delete(p);
+	}
 };
 
 #endif
@@ -380,7 +482,11 @@ struct Operator
 	bool ExpectsStringLiteral() { return type == kOpType_MemberAccess; }
 
 	Token_Type GetResult(Token_Type lhs, Token_Type rhs);	// at compile-time determine type resulting from operation
+#if !DISABLE_CACHING
+	ScriptToken* Evaluate(ScriptToken* lhs, ScriptToken* rhs, ExpressionEvaluator* context, Op_Eval& cacheEval, bool& cacheSwapOrder);	// at run-time, operate on the operands and return result
+#else
 	ScriptToken* Evaluate(ScriptToken* lhs, ScriptToken* rhs, ExpressionEvaluator* context);	// at run-time, operate on the operands and return result
+#endif
 };
 
 bool CanConvertOperand(Token_Type from, Token_Type to);	// don't use directly at run-time, use ScriptToken::CanConvertTo() instead

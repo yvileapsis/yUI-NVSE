@@ -1,6 +1,7 @@
 #pragma once
-
 #include "ScriptUtils.h"
+#include <unordered_map>
+#include "FastStack.h"
 
 struct UserFunctionParam
 {
@@ -46,6 +47,7 @@ private:
 	ScriptEventList		* m_eventList;		// cached for quicker construction of function script, but requires care when dealing with recursive function calls
 
 public:
+	FunctionInfo() {}
 	FunctionInfo(Script* script);
 	~FunctionInfo();
 
@@ -82,6 +84,8 @@ public:
 	ScriptToken*  Result() { return m_result; }
 	FunctionInfo* Info() { return m_info; }
 	Script* InvokingScript() { return m_invokingScript; }
+	void* operator new(size_t size);
+	void operator delete(void* p);
 };
 
 // controls user function calls.
@@ -96,13 +100,13 @@ class UserFunctionManager
 	static const UInt32	kMaxNestDepth = 30;	// arbitrarily low; have seen 180+ nested calls execute w/o problems
 	
 	UInt32								m_nestDepth;
-	std::stack<FunctionContext*>		m_functionStack;
-	std::map<Script*, FunctionInfo*>	m_functionInfos;
+	Stack<FunctionContext*>		m_functionStack; // I'd put 1 but you just know there's someone who loves recursion enough to do it in obscript -Korma
+	UnorderedMap<Script*, FunctionInfo>	m_functionInfos;
 
 	// these take a ptr to the function script to check that it matches executing script
 	FunctionContext* Top(Script* funcScript);
 	bool Pop(Script* funcScript);
-	void Push(FunctionContext* context) { m_functionStack.push(context); }
+	void Push(FunctionContext* context) { m_functionStack.Push(context); }
 	FunctionInfo* GetFunctionInfo(Script* funcScript);
 
 public:

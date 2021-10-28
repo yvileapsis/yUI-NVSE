@@ -30,27 +30,19 @@ bool Cmd_Log10_Execute(COMMAND_ARGS)
 
 bool Cmd_Floor_Execute(COMMAND_ARGS)
 {
-	*result = 0;
-
-	float arg = 0;
-	if(!ExtractArgs(EXTRACT_ARGS, &arg))
-		return true;
-
-	*result = floor(arg);
-
+	float arg;
+	if (ExtractArgs(EXTRACT_ARGS, &arg))
+		*result = ifloor(arg);
+	else *result = 0;
 	return true;
 }
 
 bool Cmd_Ceil_Execute(COMMAND_ARGS)
 {
-	*result = 0;
-
-	float arg = 0;
-	if(!ExtractArgs(EXTRACT_ARGS, &arg))
-		return true;
-
-	*result = ceil(arg);
-
+	float arg;
+	if (ExtractArgs(EXTRACT_ARGS, &arg))
+		*result = iceil(arg);
+	else *result = 0;
 	return true;
 }
 
@@ -254,3 +246,272 @@ bool Cmd_ClearBit_Execute(COMMAND_ARGS)
 
 	return true;
 }
+
+bool Cmd_GetBit_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	UInt32	data = 0;
+	UInt32	idx = 0;
+
+	if(!ExtractArgs(EXTRACT_ARGS, &data, &idx))
+		return true;
+
+	*result = (data & (1 << idx)) >> idx;
+
+	return true;
+}
+
+// trig functions using radians
+
+bool Cmd_rSin_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	float arg = 0;
+	if(!ExtractArgs(EXTRACT_ARGS, &arg))
+		return true;
+
+	*result = sin(arg);
+
+	return true;
+}
+
+bool Cmd_rCos_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	float arg = 0;
+	if(!ExtractArgs(EXTRACT_ARGS, &arg))
+		return true;
+
+	*result = cos(arg);
+
+	return true;
+}
+
+bool Cmd_rTan_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	float arg = 0;
+	if(!ExtractArgs(EXTRACT_ARGS, &arg))
+		return true;
+
+	*result = tan(arg);
+
+	return true;
+}
+
+bool Cmd_ASin_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	float arg = 0;
+	if(!ExtractArgs(EXTRACT_ARGS, &arg))
+		return true;
+
+	*result = asin(arg);
+
+	return true;
+}
+
+bool Cmd_ACos_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	float arg = 0;
+	if(!ExtractArgs(EXTRACT_ARGS, &arg))
+		return true;
+
+	*result = acos(arg);
+
+	return true;
+}
+
+bool Cmd_ATan_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	float arg = 0;
+	if(!ExtractArgs(EXTRACT_ARGS, &arg))
+		return true;
+
+	*result = atan(arg);
+
+	return true;
+}
+
+bool Cmd_ATan2_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	float f1 = 0;
+	float f2 = 0;
+	if(!ExtractArgs(EXTRACT_ARGS, &f1, &f2)) return true;
+
+	*result = atan2(f1,f2);
+
+	return true;
+}
+bool Cmd_Sinh_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	float arg = 0;
+	if(!ExtractArgs(EXTRACT_ARGS, &arg))
+		return true;
+
+	*result = sinh(arg);
+
+	return true;
+}
+bool Cmd_Cosh_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	float arg = 0;
+	if(!ExtractArgs(EXTRACT_ARGS, &arg))
+		return true;
+
+	*result = cosh(arg);
+
+	return true;
+}
+bool Cmd_Tanh_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	float arg = 0;
+	if(!ExtractArgs(EXTRACT_ARGS, &arg))
+		return true;
+
+	*result = tanh(arg);
+
+	return true;
+}
+
+// trig functions using degrees
+#define DEGTORAD 0.01745329252f
+
+bool Cmd_dSin_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	float arg = 0;
+	if(!ExtractArgs(EXTRACT_ARGS, &arg))
+		return true;
+
+	*result = sin(arg*DEGTORAD);
+
+	return true;
+}
+bool Cmd_dCos_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	float arg = 0;
+	if(!ExtractArgs(EXTRACT_ARGS, &arg))
+		return true;
+
+	*result = cos(arg*DEGTORAD);
+
+	return true;
+}
+bool Cmd_dTan_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	float arg = 0;
+	if(!ExtractArgs(EXTRACT_ARGS, &arg))
+		return true;
+
+	*result = tan(arg*DEGTORAD);
+
+	return true;
+}
+bool Cmd_dASin_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	float arg = 0;
+	if(!ExtractArgs(EXTRACT_ARGS, &arg))
+		return true;
+
+	*result = asin(arg)/DEGTORAD;
+
+	return true;
+}
+bool Cmd_dACos_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	float arg = 0;
+	if(!ExtractArgs(EXTRACT_ARGS, &arg))
+		return true;
+
+	*result = acos(arg)/DEGTORAD;
+
+	return true;
+}
+bool Cmd_dATan_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	float arg = 0;
+	if(!ExtractArgs(EXTRACT_ARGS, &arg))
+		return true;
+
+	*result = atan(arg)/DEGTORAD;
+
+	return true;
+}
+bool Cmd_dATan2_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	float f1 = 0;
+	float f2 = 0;
+	if(!ExtractArgs(EXTRACT_ARGS, &f1, &f2)) return true;
+
+	*result = atan2(f1,f2)/DEGTORAD;
+
+	return true;
+}
+bool Cmd_dSinh_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	float arg = 0;
+	if(!ExtractArgs(EXTRACT_ARGS, &arg))
+		return true;
+
+	*result = sinh(arg*DEGTORAD);
+
+	return true;
+}
+bool Cmd_dCosh_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	float arg = 0;
+	if(!ExtractArgs(EXTRACT_ARGS, &arg))
+		return true;
+
+	*result = cosh(arg*DEGTORAD);
+
+	return true;
+}
+bool Cmd_dTanh_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	float arg = 0;
+	if(!ExtractArgs(EXTRACT_ARGS, &arg))
+		return true;
+
+	*result = tanh(arg*DEGTORAD);
+
+	return true;
+}
+

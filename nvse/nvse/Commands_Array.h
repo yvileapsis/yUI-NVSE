@@ -11,6 +11,7 @@ static ParamInfo kParams_OneArray[] =
 };
 
 DEFINE_COMMAND_EXP(ar_Size, returns the size of an array or -1 if the array does not exist, 0, kParams_OneArray);
+DEFINE_COMMAND_EXP(ar_Packed, returns if the array is packed (array) or not (map), 0, kParams_OneArray);
 DEFINE_COMMAND_EXP(ar_Dump, dumps the contents of an array for debugging purposes., 0, kParams_OneArray);
 DEFINE_COMMAND(ar_DumpID, dumps an array given an integer ID, 0, 1, kParams_OneInt);
 

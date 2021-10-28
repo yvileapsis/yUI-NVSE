@@ -274,6 +274,7 @@ bool Cmd_ListClear_Execute(COMMAND_ARGS)
 #endif
 	if (ExtractArgs(EXTRACT_ARGS, &pListForm)) {
 		pListForm->list.RemoveAll();
+		pListForm->numAddedObjects = 0;
 	}
 #if REPORT_BAD_FORMLISTS
 	} __except(EXCEPTION_EXECUTE_HANDLER)

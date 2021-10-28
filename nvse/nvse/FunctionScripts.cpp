@@ -13,18 +13,24 @@ UserFunctionManager::UserFunctionManager() : m_nestDepth(0)
 }
 
 UserFunctionManager::~UserFunctionManager()
-{
-	while (m_functionStack.size())
+{	
+	while (!m_functionStack.Empty())
 	{
-		delete m_functionStack.top();
-		m_functionStack.pop();
+		FunctionContext** context = &m_functionStack.Top();
+		delete* context;
 	}
+}
 
-	while (m_functionInfos.size())
-	{
-		delete m_functionInfos.begin()->second;
-		m_functionInfos.erase(m_functionInfos.begin());
-	}
+static SmallObjectsAllocator::LockBasedAllocator<FunctionContext, 5> g_functionContextAllocator;
+
+void* FunctionContext::operator new(size_t size)
+{
+	return g_functionContextAllocator.Allocate();
+}
+
+void FunctionContext::operator delete(void* p)
+{
+	g_functionContextAllocator.Free(p);
 }
 
 UserFunctionManager* UserFunctionManager::GetSingleton()
@@ -39,8 +45,8 @@ UserFunctionManager* UserFunctionManager::GetSingleton()
 
 FunctionContext* UserFunctionManager::Top(Script* funcScript)
 {
-	if (m_functionStack.size() && m_functionStack.top()->Info()->GetScript() == funcScript)
-		return m_functionStack.top();
+	if (m_functionStack.Size() && m_functionStack.Top()->Info()->GetScript() == funcScript)
+		return m_functionStack.Top();
 
 	return NULL;
 }
@@ -50,16 +56,16 @@ bool UserFunctionManager::Pop(Script* funcScript)
 	FunctionContext* context = Top(funcScript);
 	if (context)
 	{
-		m_functionStack.pop();
+		m_functionStack.Pop();
 		delete context;
 		return true;
 	}
 
 #ifdef DBG_EXPR_LEAKS
-	if (FUNCTION_CONTEXT_COUNT != m_functionStack.size()) {
+	if (FUNCTION_CONTEXT_COUNT != m_functionStack.Size()) {
 		DEBUG_PRINT("UserFunctionManager::Pop() detects leak - %d FunctionContext exist, %d expected",
 			FUNCTION_CONTEXT_COUNT,
-			m_functionStack.size());
+			m_functionStack.Size());
 	}
 #endif
 
@@ -97,8 +103,10 @@ public:
 
 		if (scrToken) {
 			m_funcScript = DYNAMIC_CAST(scrToken->GetTESForm(), TESForm, Script);
-			delete scrToken;
-			scrToken = NULL;
+			if (!scrToken->cached)
+			{
+				delete scrToken;
+			}
 		}
 
 		return m_funcScript;
@@ -240,18 +248,7 @@ bool UserFunctionManager::Return(ExpressionEvaluator* eval)
 
 FunctionInfo* UserFunctionManager::GetFunctionInfo(Script* funcScript)
 {
-	FunctionInfo* funcInfo = NULL;
-	std::map<Script*, FunctionInfo*>::iterator iter = m_functionInfos.find(funcScript);
-	if (iter != m_functionInfos.end())
-		funcInfo = iter->second;
-	else	// doesn't exist yet, create and cache
-	{
-		funcInfo = new FunctionInfo(funcScript);
-		m_functionInfos[funcScript] = funcInfo;
-		if (!funcInfo->IsGood())
-			ShowRuntimeError(funcScript, "Could not parse function definition.");
-	}
-
+	FunctionInfo *funcInfo = m_functionInfos.Emplace(funcScript, funcScript);
 	return (funcInfo->IsGood()) ? funcInfo : NULL;
 }
 	
@@ -342,9 +339,11 @@ FunctionInfo::FunctionInfo(Script* script)
 
 	// construct event list
 	m_eventList = m_script->CreateEventList();
+	if (!m_eventList)
+		ShowRuntimeError(script, "Cannot create initial event script.");
 
 	// successfully constructed
-	m_bad = false;
+	m_bad = (NULL == m_eventList);
 }
 
 FunctionInfo::~FunctionInfo()
@@ -352,9 +351,7 @@ FunctionInfo::~FunctionInfo()
 	if (m_numDestructibles)
 		delete[] m_destructibles;
 
-	if (m_eventList) {
-		delete m_eventList;
-	}
+	GameHeapFree(m_eventList);
 }
 
 FunctionContext* FunctionInfo::CreateContext(UInt8 version, Script* invokingScript)
@@ -443,11 +440,16 @@ m_invokingScript(invokingScript), m_callerVersion(version), m_bad(true), m_resul
 	}
 	else {
 		m_eventList = info->GetEventList();
+		if (!m_eventList) // Let's try again if it failed originally (though info would be null in that case, so very unlikely to be called ever).
+			m_eventList = info->GetScript()->CreateEventList();
 	}
 
 	if (!m_eventList)
 	{
-		ShowRuntimeError(info->GetScript(), "Couldn't create eventlist");
+		if (info->IsActive())
+			ShowRuntimeError(info->GetScript(), "Couldn't create eventlist");
+		else
+			ShowRuntimeError(info->GetScript(), "Couldn't recreate eventlist");
 		return;
 	}
 
@@ -484,6 +486,7 @@ bool FunctionContext::Execute(FunctionCaller & caller)
 	if (!caller.PopulateArgs(m_eventList, m_info))
 		return false;
 
+	
 	// run the script
 	CALL_MEMBER_FN(m_info->GetScript(), Execute)(caller.ThisObj(), m_eventList, caller.ContainingObj(), false);
 
@@ -552,9 +555,14 @@ bool InternalFunctionCaller::PopulateArgs(ScriptEventList* eventList, FunctionIn
 				var->data = g_StringMap.Add(info->GetScript()->GetModIndex(), (const char*)m_args[i], true);
 				break;
 			case Script::eVarType_Array:
-				// ###TODO
-				ShowRuntimeError(m_script, "Param type Array not implemented for internal function calls");
-				return false;
+				{
+					ArrayID arrID = (ArrayID)m_args[i];
+					if (g_ArrayMap.Get(arrID))
+						g_ArrayMap.AddReference (&var->data, arrID, info->GetScript()->GetModIndex());
+					else
+						var->data = 0;
+				}
+				break;
 			default:
 				// wtf?
 				ShowRuntimeError(m_script, "Unexpected param type %02X in internal function call", param->varType);
@@ -588,7 +596,8 @@ bool InternalFunctionCaller::vSetArgs(UInt8 numArgs, va_list args)
 	return true;
 }
 
-namespace PluginAPI {
+namespace PluginAPI
+{
 	bool CallFunctionScript(Script* fnScript, TESObjectREFR* callingObj, TESObjectREFR* container, 
 		NVSEArrayVarInterface::Element* result, UInt8 numArgs, ...)
 	{
@@ -596,34 +605,36 @@ namespace PluginAPI {
 		va_list args;
 		va_start(args, numArgs);
 		bool success = caller.vSetArgs(numArgs, args);
-		if (success) {
-			*result = NVSEArrayVarInterface::Element();
+		if (success)
+		{
 			ScriptToken* ret = UserFunctionManager::Call(caller);
-			if (ret) {
-				switch (ret->Type()) {
-					case kTokenType_Number:
-						*result =  ret->GetNumber();
-						break;
-					case kTokenType_Form:
-						*result =  ret->GetTESForm();
-						break;
-					case kTokenType_Array:
-						*result = (NVSEArrayVarInterface::Array*)ret->GetArray();
-						break;
-					case kTokenType_String:
-						{
-							*result = NVSEArrayVarInterface::Element(ret->GetString());
+			if (ret)
+			{
+				if (result)
+				{
+					switch (ret->Type())
+					{
+						case kTokenType_Number:
+							*result =  ret->GetNumber();
 							break;
-						}
-					default:
-						ShowRuntimeError(fnScript, "Function script called from plugin returned unexpected type %02X", ret->Type());
-						success = false;
+						case kTokenType_Form:
+							*result =  ret->GetTESForm();
+							break;
+						case kTokenType_Array:
+							*result = ret->GetArray();
+							break;
+						case kTokenType_String:
+							*result = ret->GetString();
+							break;
+						default:
+							*result = NVSEArrayVarInterface::Element();
+							ShowRuntimeError(fnScript, "Function script called from plugin returned unexpected type %02X", ret->Type());
+							success = false;
+					}
 				}
-
 				delete ret;
 			}
 		}
-
 		return success;
 	}
 }

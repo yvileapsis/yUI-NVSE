@@ -13,6 +13,7 @@ Options::Options()
 ,m_moduleInfo(false)
 ,m_skipLauncher(true)
 ,m_fpsLimit(0)
+,m_appID(0)
 {
 	//
 }
@@ -166,6 +167,25 @@ bool Options::Read(int argc, char ** argv)
 				{
 					m_skipLauncher = false;
 				}
+				else if(!_stricmp(arg, "appid"))
+				{
+					if(argc >= 1)
+					{
+						const char	* appIDStr = *argv++;
+						argc--;
+
+						if(sscanf_s(appIDStr, "%d", &m_appID) != 1)
+						{
+							_ERROR("couldn't read appID as an integer (%s)", appIDStr);
+							return false;
+						}
+					}
+					else
+					{
+						_ERROR("appID not specified");
+						return false;
+					}
+				}
 				else
 				{
 					_ERROR("unknown switch (%s)", arg);
@@ -219,6 +239,7 @@ void Options::PrintUsage(void)
 	_MESSAGE("  -minfo - log information about the DLLs loaded in to the target process");
 	_MESSAGE("  -noskiplauncher - does not skip the default Bethesda launcher window");
 	_MESSAGE("                    note: specifying this option may cause compatibility problems");
+	_MESSAGE("  -appid <id> - choose a different steam appid (use 22490 for enplczru)");
 }
 
 bool Options::Verify(void)

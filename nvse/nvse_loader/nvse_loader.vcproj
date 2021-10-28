@@ -96,7 +96,7 @@
 			<Tool
 				Name="VCPostBuildEventTool"
 				Description="Installing Loader..."
-				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(FalloutNVPath)\$(TargetFileName)&quot;"
+				CommandLine="copy &quot;$(TargetPath)&quot; &quot;$(FalloutNVPathD)\$(TargetFileName)&quot;"
 			/>
 		</Configuration>
 		<Configuration

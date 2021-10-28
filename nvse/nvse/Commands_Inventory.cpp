@@ -1627,8 +1627,7 @@ bool Cmd_SetHotkeyItem_Execute(COMMAND_ARGS)
 				};
 			}
 			if(found) {
-				found->RemoveByType(kExtraData_Hotkey, true);
-				xHotkey = NULL;
+				found->RemoveByType(kExtraData_Hotkey);
 				found = NULL;
 			}
 
@@ -1699,7 +1698,7 @@ bool Cmd_ClearHotkey_Execute(COMMAND_ARGS)
 					break;
             }
             if(found)
-				found->RemoveByType(kExtraData_Hotkey, true);
+				found->RemoveByType(kExtraData_Hotkey);
         }
     }
     return true;
@@ -1785,9 +1784,7 @@ static bool AdjustHealth(TESHealthForm* pHealth, ExtraDataList* pExtraData, floa
 	if (nuHealth < 0) nuHealth = 0;
 	if (nuHealth >= pHealth->health) {
 		if (pXHealth) {
-			pExtraData->Remove(pXHealth);
-			FormHeap_Free(pXHealth);
-			pXHealth = NULL;
+			pExtraData->Remove(pXHealth, true);
 		}
 	} else if (pXHealth) {
 		pXHealth->health = nuHealth;
@@ -1796,10 +1793,7 @@ static bool AdjustHealth(TESHealthForm* pHealth, ExtraDataList* pExtraData, floa
 		pXHealth = ExtraHealth::Create();
 		if (pXHealth) {
 			pXHealth->health = nuHealth;
-			if (!pExtraData->Add(pXHealth)) {
-				FormHeap_Free(pXHealth);
-				pXHealth = NULL;
-			}
+			pExtraData->Add(pXHealth);
 		}
 	}
 	return true;
@@ -2058,7 +2052,7 @@ bool Cmd_GetAmmoCasing_Execute(COMMAND_ARGS)
 	}
 
 	TESAmmo* pAmmo = DYNAMIC_CAST(form, TESForm, TESAmmo);
-	if (pAmmo) {
+	if (pAmmo && pAmmo->casing) {
 		*refResult = pAmmo->casing->refID;
 	}
 	return true;
@@ -2244,23 +2238,17 @@ bool Cmd_SetEquippedWeaponModFlags_Execute(COMMAND_ARGS)
 	// Modify existing flags
 	if (pXWeaponModFlags) {
 		if (flags) {
-			pXWeaponModFlags->flags = (UInt8) flags;
+			pXWeaponModFlags->flags = (UInt8)flags;
 		} else {
-			equipD.pExtraData->Remove(pXWeaponModFlags);
-			FormHeap_Free(pXWeaponModFlags);
-			pXWeaponModFlags = NULL;
+			equipD.pExtraData->Remove(pXWeaponModFlags, true);
 		}
 
 		// Create new extra data
 	} else if (flags) {
 		pXWeaponModFlags = ExtraWeaponModFlags::Create();
 		if (pXWeaponModFlags) {
-			pXWeaponModFlags->flags = (UInt8) flags;
-
-			if (!equipD.pExtraData->Add(pXWeaponModFlags)) {
-				FormHeap_Free(pXWeaponModFlags);
-				pXWeaponModFlags = NULL;
-			}
+			pXWeaponModFlags->flags = (UInt8)flags;
+			equipD.pExtraData->Add(pXWeaponModFlags);
 		}
 	}
 
@@ -2462,7 +2450,7 @@ bool SetTokenValueOrRef(TESObjectREFR * thisObj, TESForm* pItem, float value = 1
 				currRank = 0;
 			pForm = SetFirstItemWithHealthAndOwnershipByRefID(thisObj, refID, 1, value, ref, currRank);
 			thisObj->MarkAsModified(TESObjectREFR::kChanged_Inventory);	// Makes the change permanent
-			if (IsConsoleMode()) {
+			if (IsConsoleMode() && ref != nullptr) {
 				if (pForm->GetFullName())
 					Console_Print("SetTokenValueOrRef: >> %f [%x] (%s)", value, ref->refID, pForm->GetFullName()->name);
 				else
@@ -2627,6 +2615,11 @@ bool Cmd_IsPlayable_Execute(COMMAND_ARGS)
 				TESAmmo* ammo = DYNAMIC_CAST(form, TESForm, TESAmmo);
 				if (ammo)
 					*result = ammo->IsPlayable() ? 1 : 0;
+				else {
+					TESRace* race = DYNAMIC_CAST(form, TESForm, TESRace);
+					if (race)
+						*result = race->IsPlayable() ? 1 : 0;
+				}
 			}
 		}
 	}
@@ -2744,7 +2737,7 @@ bool Cmd_SetEquipmentBipedMask_Execute(COMMAND_ARGS)
 	return true;
 }
 
-bool Cmd_EquipItem2_Execute(COMMAND_ARGS)
+bool Cmd_EquipItem2_Execute_OBSE(COMMAND_ARGS)
 {
 	// forces onEquip block to run
 
@@ -2772,6 +2765,43 @@ bool Cmd_EquipItem2_Execute(COMMAND_ARGS)
 			}
 		}
 	}
+
+	return true;
+}
+
+bool Cmd_EquipItem2_Execute(COMMAND_ARGS)
+{
+	TESForm *item = NULL;
+	UInt32 noUnequip = 0, noMessage = 1;
+
+	if (!thisObj || !ExtractArgs(EXTRACT_ARGS, &item, &noUnequip, &noMessage)) return true;
+
+	Actor *actor = DYNAMIC_CAST(thisObj, TESObjectREFR, Actor);
+	if (!actor) return true;
+
+	UInt8 itemType = item->typeID;
+	// Those following are the only equip-able types.
+	if ((itemType != kFormType_Armor) && (itemType != kFormType_Book) && (itemType != kFormType_Weapon) && 
+		(itemType != kFormType_Ammo) && (itemType != kFormType_AlchemyItem)) return true;
+
+	ExtraContainerChanges *xChanges = (ExtraContainerChanges*)actor->extraDataList.GetByType(kExtraData_ContainerChanges);
+	if (!xChanges || !xChanges->data || !xChanges->data->objList) return true;
+
+	ExtraContainerChanges::EntryData *entry = xChanges->data->objList->Find(ItemInEntryDataListMatcher(item));
+	if (!entry) return true;
+
+	UInt32 eqpCount = 1;
+	if (itemType == kFormType_Weapon)
+	{
+		TESObjectWEAP *weapon = DYNAMIC_CAST(item, TESForm, TESObjectWEAP);
+		// If the weapon is stack-able, equip whole stack.
+		if (weapon && (weapon->eWeaponType > 9)) eqpCount = entry->countDelta;
+	}
+	else if (itemType == kFormType_Ammo) eqpCount = entry->countDelta;
+
+	ExtraDataList *xData = entry->extendData ? entry->extendData->GetNthItem(0) : NULL;
+
+	actor->EquipItem(item, eqpCount, xData, 1, noUnequip != 0, noMessage != 0);
 
 	return true;
 }

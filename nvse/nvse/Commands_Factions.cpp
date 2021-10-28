@@ -35,6 +35,7 @@ bool Cmd_GetFactionRank_Eval(COMMAND_ARGS_EVAL)
 
 bool Cmd_GetFactionRank_Execute(COMMAND_ARGS)
 {
+	*result = -1;
 	TESFaction* faction;
 	if (ExtractArgs(EXTRACT_ARGS, &faction))
 	{

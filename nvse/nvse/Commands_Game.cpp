@@ -5,12 +5,17 @@
 #include "GameUI.h"
 #include "GameData.h"
 #include "Hooks_SaveLoad.h"
-#include <set>
+
+#include "containers.h"
 #include "GameScript.h"
+#include "SafeWrite.h"
+#include "Hooks_Gameplay.h"
+
+Cmd_Execute Cmd_AddSpell_Execute = (Cmd_Execute)0x005C1D40;
 
 bool Cmd_GetNumericGameSetting_Execute(COMMAND_ARGS)
 {
-	char settingName[512] = { 0 };
+	char settingName[512];
 	*result = -1;
 
 	if (ExtractArgs(EXTRACT_ARGS, &settingName))
@@ -29,7 +34,7 @@ bool Cmd_GetNumericGameSetting_Execute(COMMAND_ARGS)
 
 bool Cmd_SetNumericGameSetting_Execute(COMMAND_ARGS)
 {
-	char settingName[512] = { 0 };
+	char settingName[512];
 	float newVal = 0;
 	*result = 0;
 
@@ -51,7 +56,7 @@ bool Cmd_SetNumericGameSetting_Execute(COMMAND_ARGS)
 
 bool Cmd_GetNumericIniSetting_Execute(COMMAND_ARGS)
 {
-	char settingName[512] = { 0 };
+	char settingName[512];
 	*result = -1;
 
 	if (ExtractArgs(EXTRACT_ARGS, &settingName))
@@ -70,7 +75,7 @@ bool Cmd_GetNumericIniSetting_Execute(COMMAND_ARGS)
 
 bool Cmd_SetNumericIniSetting_Execute(COMMAND_ARGS)
 {
-	char settingName[512] = { 0 };
+	char settingName[512];
 	float newVal = 0;
 	*result = 0;
 
@@ -104,49 +109,32 @@ bool Cmd_GetCrosshairRef_Execute(COMMAND_ARGS)
 	return true;
 }
 
+UnorderedSet<UInt32> s_gameLoadedInformedScripts, s_gameRestartedInformedScripts;
+
 bool Cmd_GetGameLoaded_Execute(COMMAND_ARGS)
 {
-	static std::set<UInt32>	informedScripts;
-
 	*result = 0;
 
-	// was a game loaded?
-	if(g_gameLoaded)
-	{
-		// yes, clear the list of scripts we've informed and reset the 'game loaded' flag
-		informedScripts.clear();
-
-		g_gameLoaded = false;
-	}
-
-	if(scriptObj)
+	if (scriptObj)
 	{
 		// have we returned 'true' to this script yet?
-		if(informedScripts.find(scriptObj->refID) == informedScripts.end())
+		if (s_gameLoadedInformedScripts.Insert(scriptObj->refID))
 		{
 			// no, return true and add to the set
 			*result = 1;
-
-			informedScripts.insert(scriptObj->refID);
 		}
 		if (IsConsoleMode())
 			Console_Print("GetGameLoaded >> %.0f", *result);
 	}
-
+	
 	return true;
 }
 
 bool Cmd_GetGameRestarted_Execute(COMMAND_ARGS)
 {
-	static std::set<UInt32> regScripts;
-
-	*result = 0;
-
-	if (scriptObj && (regScripts.find(scriptObj->refID) == regScripts.end()))
-	{
+	if (scriptObj && s_gameRestartedInformedScripts.Insert(scriptObj->refID))
 		*result = 1;
-		regScripts.insert(scriptObj->refID);
-	}
+	else *result = 0;
 
 	return true;
 }
@@ -320,3 +308,70 @@ bool Cmd_MessageBoxEx_Execute(COMMAND_ARGS)
 
 	return true;
 }
+
+#if RUNTIME
+static UInt32* kuGridsToLoadAddr = (UInt32*)0x011C63D0;
+static UInt32 kuGridsSquareAddr = 0x005D45A5;
+static Cmd_Execute Cmd_OutputLocalMapPictures_Execute = (Cmd_Execute)0x005D4580;
+#else
+#error
+#endif
+
+static SInt8 sGridsToLoad_Override = -1;
+
+bool Cmd_SetOutputLocalMapPicturesGrids_Execute(COMMAND_ARGS)
+{
+	SInt32 grids = 0;
+	*result = 0;
+
+	// uGrids override must be <= original value and odd
+	if (ExtractArgs(EXTRACT_ARGS, &grids) && grids > 0 && grids <= *kuGridsToLoadAddr && (grids & 1))
+	{
+		sGridsToLoad_Override = grids*grids;
+		*result = 1;
+	}
+
+	return true;
+}
+
+bool Cmd_OutputLocalMapPicturesOverride_Execute(COMMAND_ARGS)
+{
+	UInt8 oldGrids = *(SInt8*)kuGridsSquareAddr;
+
+	bool bDoHook = (sGridsToLoad_Override != -1);
+	if (bDoHook)
+	{
+		// temporarily modify uGridToLoad
+		//*kuGridsSquareAddr = sGridsToLoad_Override;
+		SafeWrite8(kuGridsSquareAddr, sGridsToLoad_Override);
+
+		// install hook
+		// not needed WriteRelJump(kOLMPPatchAddr, (UInt32)&GridCellArray_GetGridEntry_Hook);
+	}
+
+	Cmd_OutputLocalMapPictures_Execute(PASS_COMMAND_ARGS);
+
+	if (bDoHook)
+	{
+		// restore original uGridsToLoad
+		//*kuGridsToLoadAddr = oldGrids;
+		SafeWrite8(kuGridsSquareAddr, oldGrids);
+
+		// uninstall hook
+		// not needed WriteRelCall(kOLMPPatchAddr, kGridCellArray_GetGridEntry);
+	}
+
+	return true;
+}
+
+bool Cmd_GetGridsToLoad_Execute(COMMAND_ARGS)
+{
+	*result = (double)(*kuGridsToLoadAddr);
+	return true;
+}
+
+bool Cmd_AddSpellNS_Execute(COMMAND_ARGS)
+{
+	return RunCommand_NS(PASS_COMMAND_ARGS, Cmd_AddSpell_Execute);
+}
+

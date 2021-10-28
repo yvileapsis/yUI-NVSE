@@ -57,12 +57,19 @@ class ModelLoader;
 
 class NiNode;
 class NiControllerSequence;
-class RefNiRefObject;
 class NiRefObject;
 class RefNiObject;
 
 class BSAnimGroupSequence;
 struct BSAData;
+
+class RefNiRefObject
+{
+public:
+	NiRefObject*	niRefObject;
+	
+	//	RefNiRefObject SetNiRefObject(NiRefObject* niRefObject);
+};
 
 // 18
 class BSTask
@@ -79,7 +86,7 @@ public:
 	BSTask	* unk004;	// uninitialized OBSE, not confirmed, NiRefObject
 	UInt32	refCounter; // Counter: NiRefObject RefCounter
 	UInt32	unk00C;		// Semaphore/Status
-	UInt32	unk010;		// Paired : 10 and 14 for a 64 bit integer
+	UInt32	unk010;		// Paired : 10 and 14 as a 64 bit integer, it could be very large flag bits or an integer
 	UInt32	unk014;
 
 	static UInt32*	GetCounterSingleton();
@@ -91,7 +98,7 @@ class IOTask : public BSTask
 public:
 	virtual void Unk_05(void);			// doesNothing
 	virtual void Unk_06(void);				
-	virtual void Unk_07(UInt32 arg0);	// most (all?) implementations appear to call IOManager::1202D98(this, arg0) eventually
+	virtual void Unk_07(UInt32 arg0);	// most (all?) implementations appear to call IOManager::00C3DF40(this, arg0) eventually. It updates the bits 23/32 of the giant bit flag possibly.
 
 	IOTask();
 	~IOTask();
@@ -116,6 +123,7 @@ public:
 	//Unk_01:	doesNothing
 	//Unk_02:	virtual void Call_Unk_0A(void);
 	//Unk_03:	implemented
+	//Unk_07:	recursivly calls Unk_07(arg_0) on all non null children before calling its parent.
 	virtual void Unk_08(void);				// doesNothing
 	virtual void Unk_09(UInt32 arg0);
 	virtual void Unk_0A(void);				
@@ -246,11 +254,12 @@ public:
 // 014
 class KFModel
 {
+public:
 	const char			* path;					// 000
 	BSAnimGroupSequence	* controllerSequence;	// 004
 	TESAnimGroup		* animGroup;			// 008
 	UInt32				unk0C;					// 00C
-	UInt32				unk10;					// 010
+	UInt32				refCount;				// 010
 };
 
 // 30
@@ -343,58 +352,87 @@ public:
 extern IOManager** g_ioManager;
 */
 
-template <typename T_Key, typename T_Data> class LockFreeMap
-{
-public:
-	struct Entry
-	{
-		T_Key        key;
-		T_Data        data;
-		Entry* next;
-	};
-
-	struct Bucket
-	{
-		Entry* entries;
-	};
-
-	/*00*/virtual void        Destroy(bool doFree);
-	/*04*/virtual void* Unk_01(UInt32 arg);
-	/*08*/virtual bool        Lookup(T_Key key, T_Data* result);
-	/*0C*/virtual bool        Unk_03(UInt32 arg1, UInt32 arg2, UInt32 arg3, UInt8 arg4);
-	/*10*/virtual bool        Insert(T_Key key, T_Data* dataPtr, UInt8 arg3);
-	/*14*/virtual bool        EraseKey(T_Key key);
-	/*18*/virtual bool        Unk_06(UInt32 arg1, UInt32 arg2);
-	/*1C*/virtual bool        Unk_07(UInt32 arg);
-	/*20*/virtual bool        Unk_08(UInt32 arg1, UInt32 arg2);
-	/*24*/virtual UInt32    CalcBucketIndex(T_Key key);
-	/*28*/virtual void        FreeKey(T_Key key);
-	/*2C*/virtual T_Key        GenerateKey(T_Key src);
-	/*30*/virtual void        CopyKeyTo(T_Key src, T_Key* destPtr);
-	/*34*/virtual bool        LKeyGreaterOrEqual(T_Key lkey, T_Key rkey);
-	/*38*/virtual bool        KeysEqual(T_Key lkey, T_Key rkey);
-	/*3C*/virtual UInt32    IncNumItems();
-	/*40*/virtual UInt32    DecNumItems();
-	/*44*/virtual UInt32    GetNumItems();
-
-	void* ptr04;            // 04
-	UInt32            numBuckets;        // 08
-	Bucket* buckets;        // 0C
-	UInt32            unk10;            // 10
-	void* ptr14;            // 14
-	UInt32            numItems;        // 18
-	UInt32            unk1C;            // 1C
-	void*        semaphore;        // 20
-	void* semaphorePt2;        // 24
-	UInt32            unk28[6];        // 28
+// O4 assumed
+class InterfacedClass {
+	virtual void Destroy(bool doFree);
+	virtual void AllocateTLSValue(void) = 0;		// not implemented
 };
 
-class AnimIdle;
-class Animation;
-class QueuedReplacementKFList;
-class QueuedHelmet;
-class BSFileEntry;
-class LoadedFile;
+// 40
+template<typename _K, class _C>
+class LockFreeMap: InterfacedClass
+{
+	// 0C
+	struct Data004
+	{
+		UInt32	unk000;		// 00
+		UInt32	unk004;		// 04
+		UInt32	*unk008;	// 08
+	};
+
+	// 24
+	struct TLSValue
+	{
+		LockFreeMap	*map;				// 00
+		UInt32		mapData004Unk000;	// 04
+		UInt32		mapData004Unk008;	// 08
+		UInt32		*mapData004Unk00C;	// 0C	stores first DWord of bucket during lookup, next pointer is data, next flags bit 0 is status ok/found
+		UInt32		unk010;				// 10	stores bucketOffset during lookup
+		UInt32		*unk014;			// 14	stores pointer to bucket during lookup
+		UInt32		*unk018;			// 18
+		UInt32		unk01C;				// 1C
+		UInt32		unk020;				// 20
+	};
+
+	// 10
+	struct Data014
+	{
+		// 08
+		struct Data008
+		{
+			UInt32		threadID;	// 00 threadID
+			TLSValue	*tlsValue;	// 04 lpTlsValue obtained from AllocateTLSValue of LockFreeMap
+		};
+
+		UInt32	alloc;			// Init'd to arg0, count of array at 008
+		UInt32	tlsDataIndex;	// Init'd by TlsAlloc
+		Data008	**dat008;		// array of pair of DWord
+		UInt32	count;		// Init'd to 0
+	};	// most likely an array or a map
+
+	virtual bool Get(_K key, _C *destination) = 0;
+	virtual void Unk_03(void) = 0;
+	virtual void Unk_04(void) = 0;
+	virtual void Unk_05(void) = 0;
+	virtual void Unk_06(void) = 0;
+	virtual void Unk_07(void) = 0;
+	virtual void Unk_08(void) = 0;
+	virtual UInt32 Hash(_K key) = 0;
+	virtual void Unk_0A(void) = 0;
+	virtual void Unk_0B(void) = 0;
+	virtual void Unk_0C(void) = 0;
+	virtual void Unk_0D(void) = 0;
+	virtual void Unk_0E(void) = 0;
+	virtual void Unk_0F(void) = 0;
+	virtual void Unk_10(void) = 0;
+	virtual void Unk_11(void) = 0;
+
+	Data004	**dat004;		// 04 array of arg0 12 bytes elements (uninitialized)
+	UInt32	bucketCount;	// 08 Init'd to arg1, count of DWord to allocate in array at 000C
+	UInt32	**buckets;		// 0C array of arg1 DWord elements
+	UInt32	unk010;			// 10 Init'd to arg2
+	Data014	*dat014;		// 14 Init'd to a 16 bytes structure
+	UInt32	unk018;			// 18
+	UInt32	unk01C;			// 1C
+	UInt32	unk020[2];		// 20 Pair of DWord (tList ?)
+	// ?
+};
+
+template<class _C>
+class LockFreeStringMap: LockFreeMap<char const *, _C> {};
+
+template<class _C>
+class LockFreeCaseInsensitiveStringMap: LockFreeStringMap<_C> {};
 
 // 1C
 class ModelLoader
@@ -403,19 +441,17 @@ public:
 	ModelLoader();
 	~ModelLoader();
 
-	LockFreeMap<const char*, Model*>					*modelMap;			// 00
-	LockFreeMap<const char*, KFModel*>					*kfMap;				// 04
-	LockFreeMap<TESObjectREFR*, QueuedReference*>		*refMap1;			// 08
-	LockFreeMap<TESObjectREFR*, QueuedReference*>		*refMap2;			// 0C
-	LockFreeMap<AnimIdle*, QueuedAnimIdle*>				*idleMap;			// 10
-	LockFreeMap<Animation*, QueuedReplacementKFList*>	*animMap;			// 14
-	LockFreeMap<TESObjectREFR*, QueuedHelmet*>			*helmetMap;			// 18
-	void												*attachQueue;		// 1C
-	LockFreeMap<BSFileEntry*, QueuedTexture*>			*textureMap;		// 20
-	LockFreeMap<const char*, LoadedFile*>				*fileMap;			// 24
-	BackgroundCloneThread								*bgCloneThread;		// 28
+	// #TODO: generalize key for LockFreeMap, document LockFreeStringMap
 
-	static ModelLoader *GetSingleton();
-	void QueueReference(TESObjectREFR *refr, UInt32 arg2, UInt32 arg3);
-	NiNode *LoadModel(const char *nifPath, UInt32 arg2, UInt8 arg3, UInt32 arg4, UInt8 arg5, UInt8 arg6);
+	LockFreeCaseInsensitiveStringMap<Model *>			* modelMap;				// 00
+	LockFreeCaseInsensitiveStringMap<KFModel *>			* kfMap;				// 04
+	LockFreeMap< TESObjectREFR*, NiPointer<QueuedReference *> >		* refMap;	// 08 key is TESObjectREFR*
+	//LockFreeMap< NiPointer<QueuedAnimIdle *> >		* idleMap;					// 0C key is AnimIdle* (strange same constructor as for 08)
+	//LockFreeMap< NiPointer<QueuedHelmet *> >			* helmetMap;				// 10 key is TESObjectREFR*
+	//LockFreeQueue< NiPointer<AttachDistant3DTask *> >	* distant3DMap;				// 14
+	//BackgroundCloneThread								* bgCloneThread;			// 18
+
+	static ModelLoader* GetSingleton();
+
+	void QueueReference(TESObjectREFR* refr, UInt32 arg1, bool ifInMainThread);
 };

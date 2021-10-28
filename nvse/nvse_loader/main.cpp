@@ -125,14 +125,23 @@ int main(int argc, char ** argv)
 	if(procHookInfo.procType == kProcType_Steam)
 	{
 		// same for standard and nogore
-		const char * kAppID = "22380";
+		char appIDStr[128];
+		UInt32 appID = 22380;
+
+		if(g_options.m_appID)
+		{
+			_MESSAGE("using alternate appid %d", g_options.m_appID);
+			appID = g_options.m_appID;
+		}
+
+		sprintf_s(appIDStr, sizeof(appIDStr), "%d", appID);
 
 		// set this no matter what to work around launch issues
-		SetEnvironmentVariable("SteamGameId", kAppID);
+		SetEnvironmentVariable("SteamGameId", appIDStr);
 
 		if(g_options.m_skipLauncher)
 		{
-			SetEnvironmentVariable("SteamAppID", kAppID);
+			SetEnvironmentVariable("SteamAppID", appIDStr);
 		}
 	}
 

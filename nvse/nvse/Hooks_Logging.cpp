@@ -3,6 +3,12 @@
 #include <cstdarg>
 #include "Utilities.h"
 
+#if RUNTIME
+
+#define kPatchSCOF 0x0071DE73
+#define kStrCRLF 0x0101F520
+#define kBufferSCOF 0x0071DE11
+
 static FILE * s_errorLog = NULL;
 static int ErrorLogHook(const char * fmt, const char * fmt_alt, ...)
 {
@@ -42,11 +48,12 @@ static int HavokErrorLogHook(int severity, const char * fmt, ...)
 void Hook_Logging_Init(void)
 {
 	UInt32	enableGameErrorLog = 0;
+	UInt32	disableSCOFfixes = 0;
 
 	if(GetNVSEConfigOption_UInt32("Logging", "EnableGameErrorLog", &enableGameErrorLog) && enableGameErrorLog)
 	{
-		s_errorLog = fopen("falloutnv_error.log", "w");
-		s_havokErrorLog = fopen("falloutnv_havok.log", "w");
+		fopen_s(&s_errorLog, "falloutnv_error.log", "w");
+		fopen_s(&s_havokErrorLog, "falloutnv_havok.log", "w");
 
 		WriteRelJump(0x005B5E40, (UInt32)ErrorLogHook);
 
@@ -55,4 +62,12 @@ void Hook_Logging_Init(void)
 		WriteRelCall(0x00625A63, (UInt32)HavokErrorLogHook);
 		WriteRelCall(0x00625A92, (UInt32)HavokErrorLogHook);
 	}
+
+	if(!GetNVSEConfigOption_UInt32("FIXES", "DisableSCOFfixes", &disableSCOFfixes) || !disableSCOFfixes)
+	{
+		SafeWrite8(kPatchSCOF + 1, 1);					// Only write one char.
+		SafeWrite32(kPatchSCOF + 2 + 1, kStrCRLF + 1);	// Skip \r
+	}
 }
+
+#endif

@@ -9,7 +9,9 @@
 #include "GameScript.h"
 #include "GameOSDepend.h"
 #include "GameSettings.h"
+#include "GameProcess.h"
 #include "ArrayVar.h"
+#include "InventoryReference.h"
 
 bool Cmd_GetBaseObject_Execute(COMMAND_ARGS)
 {
@@ -72,8 +74,132 @@ bool Cmd_GetTeleportCell_Execute(COMMAND_ARGS)
 		return true;
 
 	ExtraTeleport* xTele = GetByTypeCast(thisObj->extraDataList, Teleport);
-	if (xTele) {
+	// parentCell will be null if linked door's cell is not currently loaded (e.g. most exterior cells)
+	if (xTele && xTele->data && xTele->data->linkedDoor && xTele->data->linkedDoor->parentCell) {
 		*refResult = xTele->data->linkedDoor->parentCell->refID;
+	}
+
+	return true;
+}
+
+bool Cmd_IsLoadDoor_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+
+	if (!thisObj)
+		return true;
+
+	if (GetByTypeCast(thisObj->extraDataList, Teleport) || GetByTypeCast(thisObj->extraDataList, RandomTeleportMarker))
+		*result = 1;
+
+	return true;
+}
+
+enum {
+	kTeleport_X,
+	kTeleport_Y,
+	kTeleport_Z,
+	kTeleport_Rot,
+};
+
+static const float kRadToDegree = 57.29577951f;
+static const float kDegreeToRad = 0.01745329252f;
+
+bool GetTeleportInfo(COMMAND_ARGS, UInt32 which)
+{
+	*result = 0;
+
+	if (!thisObj || thisObj->baseForm->typeID != kFormType_Door)
+		return true;
+
+	ExtraTeleport* tele = GetByTypeCast(thisObj->extraDataList, Teleport);
+	if (tele && tele->data)
+	{
+		switch (which)
+		{
+		case kTeleport_X:
+			*result = tele->data->x;
+			break;
+		case kTeleport_Y:
+			*result = tele->data->y;
+			break;
+		case kTeleport_Z:
+			*result = tele->data->z;
+			break;
+		case kTeleport_Rot:
+			*result = tele->data->zRot * kRadToDegree;
+			break;
+		}
+	}
+
+	return true;
+}
+
+bool Cmd_GetDoorTeleportX_Execute(COMMAND_ARGS)
+{
+	return GetTeleportInfo(PASS_COMMAND_ARGS, kTeleport_X);
+}
+
+bool Cmd_GetDoorTeleportY_Execute(COMMAND_ARGS)
+{
+	return GetTeleportInfo(PASS_COMMAND_ARGS, kTeleport_Y);
+}
+
+bool Cmd_GetDoorTeleportZ_Execute(COMMAND_ARGS)
+{
+	return GetTeleportInfo(PASS_COMMAND_ARGS, kTeleport_Z);
+}
+
+bool Cmd_GetDoorTeleportRot_Execute(COMMAND_ARGS)
+{
+	return GetTeleportInfo(PASS_COMMAND_ARGS, kTeleport_Rot);
+}
+
+bool Cmd_SetDoorTeleport_Execute(COMMAND_ARGS)
+{
+	// linkedDoor x y z (rot). if omitted, coords/rot taken from linked ref
+
+	*result = 0;
+	if (!thisObj || thisObj->baseForm->typeID != kFormType_Door)
+		return true;
+
+	TESObjectREFR* linkedDoor = NULL;
+	float x = 999;
+	float y = 999;
+	float z = 999;
+	float rot = 999;
+
+	if (GetByTypeCast(thisObj->extraDataList, RandomTeleportMarker))
+		return true;
+
+	if (ExtractArgs(EXTRACT_ARGS, &linkedDoor, &x, &y, &z, &rot) && linkedDoor && linkedDoor->IsPersistent())	// ###TODO: necessary for linkedref to be door?
+	{
+		ExtraTeleport* tele = GetByTypeCast(thisObj->extraDataList, Teleport);
+		if (!tele)
+		{
+			tele = ExtraTeleport::Create();
+			thisObj->extraDataList.Add(tele);
+		}
+
+		tele->data->linkedDoor = linkedDoor;
+		if (x == 999 && y == 999 && z == 999)
+		{
+			x = linkedDoor->posX;
+			y = linkedDoor->posY;
+			z = linkedDoor->posZ;
+		}
+
+		if (rot == 999)
+			rot = linkedDoor->rotZ;
+		else
+			rot *= kDegreeToRad;
+
+		tele->data->x = x;
+		tele->data->y = y;
+		tele->data->z = z;
+		tele->data->zRot = rot;
+
+		*result = 1;
 	}
 
 	return true;
@@ -100,10 +226,13 @@ bool Cmd_GetParentWorldspace_Execute(COMMAND_ARGS)
 
 	if(!thisObj) return true;
 
-	if (thisObj->parentCell && thisObj->parentCell->worldSpace) {
-		*refResult = thisObj->parentCell->worldSpace->refID;
-	}
-
+	ExtraPersistentCell* xPersistentCell = (ExtraPersistentCell*)GetByTypeCast(thisObj->extraDataList, PersistentCell);
+	if (xPersistentCell && xPersistentCell->persistentCell && xPersistentCell->persistentCell->worldSpace)
+		*refResult = xPersistentCell->persistentCell->worldSpace->refID;
+	else
+		if (thisObj->parentCell && thisObj->parentCell->worldSpace) {
+			*refResult = thisObj->parentCell->worldSpace->refID;
+		}
 	return true;
 }
 
@@ -119,9 +248,7 @@ struct CellScanInfo
 	UInt8	cellDepth;									//depth of adjacent cells to scan
 	bool	includeTakenRefs;
 
-	CellScanInfo() : curCell(NULL), cell(NULL), world(NULL), curX(0), curY(0), formType(0), cellDepth(0), includeTakenRefs(false)
-	{	}
-
+	CellScanInfo() {}
 	CellScanInfo(UInt8 _cellDepth, UInt8 _formType, bool _includeTaken, TESObjectCELL* _cell) 
 					:	curCell(NULL), cell(_cell), world(NULL), curX(0), curY(0), formType(_formType), cellDepth(_cellDepth), includeTakenRefs(_includeTaken)
 	{
@@ -185,6 +312,25 @@ struct CellScanInfo
 			NextCell();
 	}
 
+};
+
+class RefMatcherARefr
+{
+	bool m_includeTaken;
+	TESObjectREFR* m_refr;
+public:
+	RefMatcherARefr(bool includeTaken, TESObjectREFR* refr) : m_includeTaken(includeTaken), m_refr(refr)
+		{ }
+
+	bool Accept(const TESObjectREFR* refr)
+	{
+		if (!m_includeTaken && refr->IsInventoryObject() && refr->IsTaken())
+			return false;
+		else if (refr == m_refr)
+			return true;
+		else
+			return false;
+	}
 };
 
 class RefMatcherAnyForm
@@ -275,7 +421,8 @@ public:
 	}
 };
 
-static const TESObjectCELL::RefList::Iterator GetCellRefEntry(const TESObjectCELL::RefList& refList, UInt32 formType, TESObjectCELL::RefList::Iterator prev, bool includeTaken /*, ProjectileFinder* projFinder = NULL*/)
+static const TESObjectCELL::RefList::Iterator GetCellRefEntry(const TESObjectCELL::RefList& refList, UInt32 formType, TESObjectCELL::RefList::Iterator prev,
+															  bool includeTaken /*, ProjectileFinder* projFinder = NULL*/, TESObjectREFR* refr = NULL)
 {
 	TESObjectCELL::RefList::Iterator entry;
 	switch(formType)
@@ -293,6 +440,10 @@ static const TESObjectCELL::RefList::Iterator GetCellRefEntry(const TESObjectCEL
 	//	if (projFinder)
 	//		entry = visitor.Find(*projFinder, prev);
 	//	break;
+	case 203:	//A specific reference
+		if (refr)
+			entry = refList.Find(RefMatcherARefr(includeTaken, refr), prev);
+		break;
 	default:
 		entry = refList.Find(RefMatcherFormType(formType, includeTaken), prev);
 	}
@@ -300,27 +451,30 @@ static const TESObjectCELL::RefList::Iterator GetCellRefEntry(const TESObjectCEL
 	return entry;
 }
 
-static TESObjectREFR* CellScan(Script* scriptObj, TESObjectCELL* cellToScan = NULL, UInt32 formType = 0, UInt32 cellDepth = 0, bool getFirst = false, bool includeTaken = false /*, ProjectileFinder* projFinder = NULL*/)
+UnorderedMap<UInt32, CellScanInfo> s_scanScripts;
+
+static TESObjectREFR* CellScan(Script* scriptObj, TESObjectCELL* cellToScan = NULL, UInt32 formType = 0, UInt32 cellDepth = 0, bool getFirst = false, bool includeTaken = false, TESObjectREFR* refr = NULL)
 {
-	static std::map<UInt32, CellScanInfo> scanScripts;
-	UInt32 idx = scriptObj->refID;
-
-	if (getFirst)
-		scanScripts.erase(idx);
-
-	if (scanScripts.find(idx) == scanScripts.end())
+	CellScanInfo *info;
+	auto refId = scriptObj->refID;
+	if (scriptObj->GetModIndex() == 0xFF && IsConsoleMode())
+		refId = 0xFFFEED; // console creates new script per command, use common magic refID for all
+	if (s_scanScripts.Insert(refId, &info) || getFirst)
 	{
-		scanScripts[idx] = CellScanInfo(cellDepth, formType, includeTaken, cellToScan);
-		scanScripts[idx].FirstCell();
+		if (!cellToScan)
+		{
+			ShowRuntimeError(scriptObj, "GetFirstRef MUST be called before GetNextRef");
+			return nullptr;
+		}
+		new (info) CellScanInfo(cellDepth, formType, includeTaken, cellToScan);
+		info->FirstCell();
 	}
-
-	CellScanInfo* info = &(scanScripts[idx]);
 
 	bool bContinue = true;
 	while (bContinue)
 	{
-		info->prev = GetCellRefEntry(info->curCell->objectList, info->formType, info->prev, info->includeTakenRefs /*, projFinder*/);
-		if (info->prev.End() || !(*info->prev))				//no ref found
+		info->prev = GetCellRefEntry(info->curCell->objectList, info->formType, info->prev, info->includeTakenRefs, refr);
+		if (info->prev.End() || !*info->prev)				//no ref found
 		{
 			if (!info->NextCell())			//check next cell if possible
 				bContinue = false;
@@ -328,24 +482,21 @@ static TESObjectREFR* CellScan(Script* scriptObj, TESObjectCELL* cellToScan = NU
 		else
 			bContinue = false;			//found a ref
 	}
-
-	if ((*info->prev))
+	
+	if (!info->prev.End() && *info->prev)
 		return info->prev.Get();
-	else
-	{
-		scanScripts.erase(idx);
-		return NULL;
-	}
-
+	s_scanScripts.Erase(scriptObj->refID);
+	return NULL;
 }
 
-static bool GetFirstRef_Execute(COMMAND_ARGS, bool bUsePlayerCell = true)
+static bool GetFirstRef_Execute(COMMAND_ARGS, bool bUsePlayerCell = true, bool bUseRefr = false)
 {
 	UInt32 formType = 0;
 	SInt32 cellDepth = -127;
 	UInt32 bIncludeTakenRefs = 0;
 	UInt32* refResult = (UInt32*)result;
 	TESObjectCELL* cell = NULL;
+	TESObjectREFR* refr = NULL;
 	double uGrid = 0;
 	*refResult = 0;
 
@@ -355,14 +506,30 @@ static bool GetFirstRef_Execute(COMMAND_ARGS, bool bUsePlayerCell = true)
 
 	if (bUsePlayerCell)
 	{
-		if (ExtractArgs(EXTRACT_ARGS, &formType, &cellDepth, &bIncludeTakenRefs))
-			cell = pc->parentCell;
+		if (bUseRefr)
+		{
+			formType = 203;
+			if (ExtractArgs(EXTRACT_ARGS, &refr, &cellDepth, &bIncludeTakenRefs))
+				cell = pc->parentCell;
+			else
+				return true;
+		}
 		else
-			return true;
+			if (ExtractArgs(EXTRACT_ARGS, &formType, &cellDepth, &bIncludeTakenRefs))
+				cell = pc->parentCell;
+			else
+				return true;
 	}
 	else
-		if (!ExtractArgs(EXTRACT_ARGS, &cell, &formType, &cellDepth, &bIncludeTakenRefs))
-			return true;
+		if (bUseRefr)
+		{
+			formType = 203;
+			if (!ExtractArgs(EXTRACT_ARGS, &cell, &refr, &cellDepth, &bIncludeTakenRefs))
+				return true;
+		}
+		else
+			if (!ExtractArgs(EXTRACT_ARGS, &cell, &formType, &cellDepth, &bIncludeTakenRefs))
+				return true;
 
 	if (!cell)
 		return true;
@@ -375,9 +542,9 @@ static bool GetFirstRef_Execute(COMMAND_ARGS, bool bUsePlayerCell = true)
 		else
 			cellDepth = 0;
 
-	TESObjectREFR* refr = CellScan(scriptObj, cell, formType, cellDepth, true, bIncludeTakenRefs ? true : false);
-	if (refr)
-		*refResult = refr->refID;
+	TESObjectREFR* found = CellScan(scriptObj, cell, formType, cellDepth, true, bIncludeTakenRefs ? true : false, refr);
+	if (found)
+		*refResult = found->refID;
 
 	if (IsConsoleMode())
 		Console_Print("GetFirstRef >> %08x", *refResult);
@@ -397,6 +564,20 @@ bool Cmd_GetFirstRefInCell_Execute(COMMAND_ARGS)
 	return true;
 }
 
+bool Cmd_GetInGrid_Execute(COMMAND_ARGS)
+{
+	if (GetFirstRef_Execute(PASS_COMMAND_ARGS, true, true))
+		*result = *(UInt32*)result ? 1.0 : 0.0;
+	return true;
+}
+
+bool Cmd_GetInGridInCell_Execute(COMMAND_ARGS)
+{
+	if (GetFirstRef_Execute(PASS_COMMAND_ARGS, false, true))
+		*result = *(UInt32*)result ? 1.0 : 0.0;
+	return true;
+}
+
 bool Cmd_GetNextRef_Execute(COMMAND_ARGS)
 {
 	
@@ -410,6 +591,9 @@ bool Cmd_GetNextRef_Execute(COMMAND_ARGS)
 	TESObjectREFR* refr = CellScan(scriptObj);
 	if (refr)
 		*refResult = refr->refID;
+
+	if (IsConsoleMode())
+		Console_Print("GetNextRef >> %08x", *refResult);
 
 	return true;
 }
@@ -487,13 +671,13 @@ bool Cmd_GetNumRefsInCell_Execute(COMMAND_ARGS)
 bool GetRefs_Execute(COMMAND_ARGS, bool bUsePlayerCell = true)
 {
 	// returns an array of references formID in the specified cell(s)
-	ArrayID arrID = g_ArrayMap.Create(kDataType_Numeric, true, scriptObj->GetModIndex());
-	*result = arrID;
+	ArrayVar *arr = g_ArrayMap.Create(kDataType_Numeric, true, scriptObj->GetModIndex());
+	*result = arr->ID();
 	UInt32 formType = 0;
 	SInt32 cellDepth = -127;
 	UInt32 includeTakenRefs = 0;
 	double uGrid = 0;
-	double arrIndex = 0.0;
+	double arrIndex = 0;
 
 	PlayerCharacter* pc = PlayerCharacter::GetSingleton();
 	if (!pc || !(pc->parentCell))
@@ -536,29 +720,29 @@ bool GetRefs_Execute(COMMAND_ARGS, bool bUsePlayerCell = true)
 				case 0:
 					if (RefMatcherAnyForm(bIncludeTakenRefs).Accept(pRefr))
 					{
-						g_ArrayMap.SetElementFormID(arrID, arrIndex, pRefr->refID);
-						arrIndex += 1.0;
+						arr->SetElementFormID(arrIndex, pRefr->refID);
+						arrIndex += 1;
 					}
 					break;
 				case 200:
 					if (RefMatcherActor().Accept(pRefr))
 					{
-						g_ArrayMap.SetElementFormID(arrID, arrIndex, pRefr->refID);
-						arrIndex += 1.0;
+						arr->SetElementFormID(arrIndex, pRefr->refID);
+						arrIndex += 1;
 					}
 					break;
 				case 201:
 					if (RefMatcherItem(bIncludeTakenRefs).Accept(pRefr))
 					{
-						g_ArrayMap.SetElementFormID(arrID, arrIndex, pRefr->refID);
-						arrIndex += 1.0;
+						arr->SetElementFormID(arrIndex, pRefr->refID);
+						arrIndex += 1;
 					}
 					break;
 				default:
 					if (RefMatcherFormType(formType, bIncludeTakenRefs).Accept(pRefr))
 					{
-						g_ArrayMap.SetElementFormID(arrID, arrIndex, pRefr->refID);
-						arrIndex += 1.0;
+						arr->SetElementFormID(arrIndex, pRefr->refID);
+						arrIndex += 1;
 					}
 				}
 		}
@@ -580,16 +764,13 @@ bool Cmd_GetRefsInCell_Execute(COMMAND_ARGS)
 
 bool Cmd_GetRefCount_Execute(COMMAND_ARGS)
 {
-	if (!thisObj)
-		return true;
-
-	*result = 1;
-
-	ExtraCount* pXCount = GetByTypeCast(thisObj->extraDataList, Count);
-	if (pXCount) {
-		*result = pXCount->count;
-		if (IsConsoleMode())
-			Console_Print("%s: %d", GetFullName(thisObj->baseForm), pXCount->count);
+	InventoryReference *invRefr = s_invRefMap.GetPtr(thisObj->refID);
+	if (invRefr)
+		*result = invRefr->m_data.entry->countDelta;
+	else
+	{
+		ExtraCount *xCount = GetByTypeCast(thisObj->extraDataList, Count);
+		*result = xCount ? xCount->count : 1;
 	}
 	return true;
 }
@@ -605,10 +786,7 @@ bool Cmd_SetRefCount_Execute(COMMAND_ARGS)
 	ExtraCount* pXCount = GetByTypeCast(thisObj->extraDataList, Count);
 	if (!pXCount) {
 		pXCount = ExtraCount::Create();
-		if (!thisObj->extraDataList.Add(pXCount)) {
-			FormHeap_Free(pXCount);
-			return true;
-		}
+		thisObj->extraDataList.Add(pXCount);
 	}
 	pXCount->count = newCount;
 
@@ -652,12 +830,7 @@ bool Cmd_SetOpenKey_Execute(COMMAND_ARGS)
 	ExtraLock* xLock = GetByTypeCast(thisObj->extraDataList, Lock);
 	if (!xLock) {
 		xLock = ExtraLock::Create();
-		if (!thisObj->extraDataList.Add(xLock))
-		{
-			FormHeap_Free(xLock->data);
-			FormHeap_Free(xLock);
-			return true;
-		}
+		thisObj->extraDataList.Add(xLock);
 	}
 
 	if (xLock)
@@ -677,14 +850,10 @@ bool Cmd_ClearOpenKey_Execute(COMMAND_ARGS)
 		return true;
 
 	ExtraLock* xLock = GetByTypeCast(thisObj->extraDataList, Lock);
-	if (xLock) {
-		if (thisObj->extraDataList.Remove(xLock))
-		{
-			FormHeap_Free(xLock->data);
-			FormHeap_Free(xLock);
-			*result = 1;
-			return true;
-		}
+	if (xLock)
+	{
+		thisObj->extraDataList.Remove(xLock, true);
+		*result = 1;
 	}
 
 	return true;
@@ -765,7 +934,7 @@ bool Cmd_GetParentCellOwningFactionRequiredRank_Execute(COMMAND_ARGS)
 
 bool Cmd_GetActorBaseFlagsLow_Execute(COMMAND_ARGS)
 {
-	TESActorBase	* obj = NULL;
+	TESActorBase * obj = NULL;
 
 	*result = 0;
 
@@ -775,7 +944,7 @@ bool Cmd_GetActorBaseFlagsLow_Execute(COMMAND_ARGS)
 		obj = DYNAMIC_CAST(thisObj->baseForm, TESForm, TESActorBase);
 
 	if(obj)
-		*result = obj->flags & 0xFFFF;
+		*result = obj->baseData.flags & 0xFFFF;
 
 	return true;
 }
@@ -793,14 +962,14 @@ bool Cmd_SetActorBaseFlagsLow_Execute(COMMAND_ARGS)
 		obj = DYNAMIC_CAST(thisObj->baseForm, TESForm, TESActorBase);
 
 	if(obj)
-		obj->flags = (data & 0x0000FFFF) | (obj->flags & 0xFFFF0000);
+		obj->baseData.flags = (data & 0x0000FFFF) | (obj->flags & 0xFFFF0000);
 
 	return true;
 }
 
 bool Cmd_GetActorBaseFlagsHigh_Execute(COMMAND_ARGS)
 {
-	TESActorBase	* obj = NULL;
+	TESActorBase * obj = NULL;
 
 	*result = 0;
 
@@ -810,12 +979,82 @@ bool Cmd_GetActorBaseFlagsHigh_Execute(COMMAND_ARGS)
 		obj = DYNAMIC_CAST(thisObj->baseForm, TESForm, TESActorBase);
 
 	if(obj)
-		*result = (obj->flags >> 16) & 0xFFFF;
+		*result = (obj->baseData.flags >> 16) & 0xFFFF;
 
 	return true;
 }
 
 bool Cmd_SetActorBaseFlagsHigh_Execute(COMMAND_ARGS)
+{
+	TESActorBase	* obj = NULL;
+	UInt32			data;
+
+	*result = 0;
+
+	if(!ExtractArgs(EXTRACT_ARGS, &data, &obj)) return true;
+
+	if(!obj && thisObj && thisObj->baseForm)
+		obj = DYNAMIC_CAST(thisObj->baseForm, TESForm, TESActorBase);
+
+	if(obj)
+		obj->baseData.flags = ((data << 16) & 0xFFFF0000) | (obj->baseData.flags & 0x0000FFFF);
+
+	return true;
+}
+
+bool Cmd_GetFlagsLow_Execute(COMMAND_ARGS)
+{
+	TESForm	* obj = NULL;
+
+	*result = 0;
+
+	if(!ExtractArgs(EXTRACT_ARGS, &obj)) return true;
+
+	if(!obj && thisObj)
+		obj = thisObj;
+
+	if(obj)
+		*result = obj->flags & 0xFFFF;
+
+	return true;
+}
+
+bool Cmd_SetFlagsLow_Execute(COMMAND_ARGS)
+{
+	TESForm	* obj = NULL;
+	UInt32			data;
+
+	*result = 0;
+
+	if(!ExtractArgs(EXTRACT_ARGS, &data, &obj)) return true;
+
+	if(!obj && thisObj)
+		obj = thisObj;
+
+	if(obj)
+		obj->flags = (data & 0x0000FFFF) | (obj->flags & 0xFFFF0000);
+
+	return true;
+}
+
+bool Cmd_GetFlagsHigh_Execute(COMMAND_ARGS)
+{
+	TESForm	* obj = NULL;
+
+	*result = 0;
+
+	if(!ExtractArgs(EXTRACT_ARGS, &obj)) return true;
+
+	if(!obj && thisObj)
+		obj = thisObj;
+
+	if(obj)
+		*result = (obj->flags >> 16) & 0xFFFF;
+
+	return true;
+}
+
+bool Cmd_SetFlagsHigh_Execute(COMMAND_ARGS)
 {
 	TESActorBase	* obj = NULL;
 	UInt32			data;
@@ -1153,6 +1392,45 @@ bool Cmd_GetEyes_Execute(COMMAND_ARGS)
 	return true;
 }
 
+bool Cmd_GetEyesFlags_Execute(COMMAND_ARGS)
+{
+	TESEyes*	eyes = NULL;
+	TESForm*	form = NULL;
+	UInt32		flagMask = 0x0FFFFFFFF;
+	UInt32		iResult = 0;
+	*result = 0;
+
+	if (ExtractArgs(EXTRACT_ARGS, &form, &flagMask) && form) {
+		eyes = DYNAMIC_CAST(form, TESForm, TESEyes);
+		if (eyes)
+		{
+			iResult = eyes->eyeFlags & flagMask;
+			*result = iResult;
+		}
+	}
+
+	if(IsConsoleMode())
+		Console_Print("GetEyesFlags: %08X", iResult);
+
+	return true;
+}
+
+bool Cmd_SetEyesFlags_Execute(COMMAND_ARGS)
+{
+	TESEyes*	eyes = NULL;
+	TESForm*	form = NULL;
+	UInt32		flagMask = 0x0FFFFFFFF;
+	*result = 0;
+
+	if (ExtractArgs(EXTRACT_ARGS, &form, &flagMask) && form && (flagMask < 0x0FF) ) {
+		eyes = DYNAMIC_CAST(form, TESForm, TESEyes);
+		if (eyes)
+			eyes->eyeFlags = flagMask;
+	}
+
+	return true;
+}
+
 bool Cmd_GetHair_Execute(COMMAND_ARGS)
 {
 	TESNPC	* npc = 0;
@@ -1173,6 +1451,44 @@ bool Cmd_GetHair_Execute(COMMAND_ARGS)
 
 	if(IsConsoleMode())
 		Console_Print("GetHair: %08X", *refResult);
+
+	return true;
+}
+
+bool Cmd_GetHairFlags_Execute(COMMAND_ARGS)
+{
+	TESHair*	hair = NULL;
+	TESForm*	form = NULL;
+	UInt32		flagMask = 0x0FFFFFFFF;
+	UInt32		iResult = 0;
+	*result = 0;
+
+	if (ExtractArgs(EXTRACT_ARGS, &form, &flagMask) && form) {
+		hair = DYNAMIC_CAST(form, TESForm, TESHair);
+		if (hair)
+		{
+			iResult = hair->hairFlags & flagMask;
+			*result = iResult;
+		}
+	}
+
+	if(IsConsoleMode())
+		Console_Print("GetHairFlags: %08X", iResult);
+	return true;
+}
+
+bool Cmd_SetHairFlags_Execute(COMMAND_ARGS)
+{
+	TESHair*	hair = NULL;
+	TESForm*	form = NULL;
+	UInt32		flagMask = 0x0FFFFFFFF;
+	*result = 0;
+
+	if (ExtractArgs(EXTRACT_ARGS, &form, &flagMask) && form && (flagMask < 0x0FF) ) {
+		hair = DYNAMIC_CAST(form, TESForm, TESHair);
+		if (hair)
+			hair->hairFlags = flagMask;
+	}
 
 	return true;
 }
@@ -1350,11 +1666,16 @@ bool Cmd_GetNPCHeight_Execute(COMMAND_ARGS)
 
 bool Cmd_Update3D_Execute(COMMAND_ARGS)
 {
-	if (thisObj) {
-		if (thisObj->Update3D()) {
-			*result = 1.0;
+	*result = 0.0;
+	if (thisObj)
+		if (alternateUpdate3D)
+		{
+			if (thisObj->Update3D_v1c())
+				*result = 1.0;
 		}
-	}
+		else
+			if (thisObj->Update3D()) 
+				*result = 1.0;
 
 	return true;
 }
@@ -1400,6 +1721,75 @@ bool Cmd_PlaceAtMeAndKeep_Execute(COMMAND_ARGS)
 		form = LookupFormByID(*refResult);
 	if (form)
 		CALL_MEMBER_FN(TESSaveLoadGame::Get(), AddCreatedForm)((TESForm*)(form));
+
+	return true;
+}
+
+bool Cmd_GetActorFIKstatus_Eval(COMMAND_ARGS_EVAL)
+{
+	*result = 0;
+	if (!thisObj)
+		return false;
+
+	Actor* actor = DYNAMIC_CAST(thisObj, TESObjectREFR, Actor);
+	if (actor && actor->ragDollController)
+		*result = /*actor->ragDollController->bool021F &&*/ actor->ragDollController->fikStatus;
+
+	return true;
+}
+
+bool Cmd_GetActorFIKstatus_Execute(COMMAND_ARGS)
+{
+	return Cmd_GetActorFIKstatus_Eval(thisObj, NULL, NULL, result);
+};
+
+bool Cmd_SetActorFIKstatus_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+	UInt32	doSet = 0;
+	if(!ExtractArgs(EXTRACT_ARGS, &doSet))
+		return true;
+
+	if (!thisObj)
+		return false;
+
+	Actor* actor = DYNAMIC_CAST(thisObj, TESObjectREFR, Actor);
+	if (actor && actor->ragDollController && actor->ragDollController->bool021F)
+		actor->ragDollController->fikStatus = doSet ? true : false;
+
+	return true;
+};
+
+// Port from OBSE
+
+class EffectShaderFinder
+{
+	TESEffectShader		* m_shader;
+	TESObjectREFR		* m_refr;
+public:
+	EffectShaderFinder(TESObjectREFR* refr, TESEffectShader* shader) : m_refr(refr), m_shader(shader) { }
+
+	bool Accept(BSTempEffect* effect)
+	{
+		MagicShaderHitEffect* mgsh = DYNAMIC_CAST(effect, BSTempEffect, MagicShaderHitEffect);
+		if (mgsh && mgsh->target == m_refr && mgsh->effectShader == m_shader) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+};
+
+bool Cmd_HasEffectShader_Execute(COMMAND_ARGS)
+{
+	TESEffectShader * shader = NULL;
+	*result = 0.0;
+
+	if (thisObj && ExtractArgs(EXTRACT_ARGS, &shader) && shader) {
+		EffectShaderFinder finder(thisObj, shader);
+		*result = g_actorProcessManager->tempEffects.CountIf(finder);
+	}
 
 	return true;
 }

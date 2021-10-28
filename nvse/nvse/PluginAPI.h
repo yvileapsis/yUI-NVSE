@@ -177,7 +177,7 @@ struct NVSEMessagingInterface
 	typedef void (* EventCallback)(Message* msg);
 
 	enum {
-		kVersion = 3
+		kVersion = 4
 	};
 
 	// NVSE messages
@@ -194,12 +194,12 @@ struct NVSEMessagingInterface
 										// as there may be no .nvse file associated with the savegame
 
 		kMessage_SaveGame,				// as above
-
+	
 		kMessage_Precompile,			// EDITOR: Dispatched when the user attempts to save a script in the script editor.
 										// NVSE first does its pre-compile checks; if these pass the message is dispatched before
 										// the vanilla compiler does its own checks. 
 										// data: ScriptBuffer* to the buffer representing the script under compilation
-
+		
 		kMessage_PreLoadGame,			// dispatched immediately before savegame is read by Fallout
 										// dataLen: length of file path, data: char* file path of .fos savegame file
 
@@ -210,30 +210,31 @@ struct NVSEMessagingInterface
 										//as there is a chance that after that callback is invoked the game will encounter an error
 										//while loading the saved game (eg. corrupted save) which may require you to reset some of your
 										//plugin state.
+										//data: bool, true if game successfully loaded, false otherwise */
 
-										kMessage_PostPostLoad,			// sent right after kMessage_PostLoad to facilitate the correct dispatching/registering of messages/listeners
-																		// plugins may register as listeners during the first callback while deferring dispatches until the next
-																		kMessage_RuntimeScriptError,	// dispatched when an NVSE script error is encountered during runtime/
-																										// data: char* errorMessageText
-																// added for kVersion = 2
-																kMessage_DeleteGame,			// sent right before deleting the .nvse cosave and the .fos save.
-																								// dataLen: length of file path, data: char* file path of .fos savegame file
-																								kMessage_RenameGame,			// sent right before renaming the .nvse cosave and the .fos save.
-																																// dataLen: length of old file path, data: char* old file path of .fos savegame file
-																																// you are expected to save the data and wait for kMessage_RenameNewGame
-																																kMessage_RenameNewGame,			// sent right after kMessage_RenameGame.
-																																								// dataLen: length of new file path, data: char* new file path of .fos savegame file
-																																								kMessage_NewGame,				// sent right before iterating through plugins newGame.
-																																																// dataLen: 0, data: NULL
-																																						// added for kVersion == 3
-																																						kMessage_DeleteGameName,		// version of the messages sent with a save file name instead of a save file path.
-																																						kMessage_RenameGameName,
-																																						kMessage_RenameNewGameName,
+		kMessage_PostPostLoad,			// sent right after kMessage_PostLoad to facilitate the correct dispatching/registering of messages/listeners
+										// plugins may register as listeners during the first callback while deferring dispatches until the next
+		kMessage_RuntimeScriptError,	// dispatched when an NVSE script error is encountered during runtime/
+										// data: char* errorMessageText
+// added for kVersion = 2
+		kMessage_DeleteGame,			// sent right before deleting the .nvse cosave and the .fos save.
+										// dataLen: length of file path, data: char* file path of .fos savegame file
+		kMessage_RenameGame,			// sent right before renaming the .nvse cosave and the .fos save.
+										// dataLen: length of old file path, data: char* old file path of .fos savegame file
+										// you are expected to save the data and wait for kMessage_RenameNewGame
+		kMessage_RenameNewGame,			// sent right after kMessage_RenameGame.
+										// dataLen: length of new file path, data: char* new file path of .fos savegame file
+		kMessage_NewGame,				// sent right before iterating through plugins newGame.
+										// dataLen: 0, data: NULL
+// added for kVersion == 3
+		kMessage_DeleteGameName,		// version of the messages sent with a save file name instead of a save file path.
+		kMessage_RenameGameName,
+		kMessage_RenameNewGameName,
 
-																																						// added for kVersion == 4 (xNVSE)
-																																						kMessage_DeferredInit,
-																																						kMessage_ClearScriptDataCache,
-																																						kMessage_MainGameLoop,			// called each game loop
+// added for kVersion == 4 (xNVSE)
+		kMessage_DeferredInit,
+		kMessage_ClearScriptDataCache,
+		kMessage_MainGameLoop,			// called each game loop
 	};
 
 	UInt32	version;
@@ -298,7 +299,7 @@ struct NVSEMessagingInterface
 *	 to hold all of the array data; use GetArraySize() to determine the size.
 *	-Use LookupArrayByID to attempt to get an Array* given its unique integer ID. This allows
 *	 plugin commands to accept arrays as arguments by defining the parameter as an integer.
-*	 See the nvse_plugin_example project for sample usage. Or, better, see below for info
+*	 See the yUI project for sample usage. Or, better, see below for info
 *	 on using kParamType_Array to accept array arguments directly.
 *
 *	-Plugin commands can now accept arrays as arguments provided the script calling the 
@@ -341,15 +342,18 @@ struct NVSEArrayVarInterface
 		UInt8			dataType;
 
 		friend class PluginAPI::ArrayAPI;
+		friend class ArrayVar;
 
-		bool IsValid() const { return dataType != kType_Invalid; }
-		UInt8 GetType() const { return dataType; }
+		bool			IsValid() const { return dataType != kType_Invalid; }
+		UInt8			GetType() const { return dataType; }
 
-		UInt32 Raw() { return raw; }
-		double Number() { return dataType == kType_Numeric ? num : 0; }
-		TESForm* Form() { return dataType == kType_Form ? form : NULL; }
-		const char* String() { return dataType == kType_String ? str : NULL; }
-		Array* Array() { return dataType == kType_Array ? arr : NULL; }
+		UInt32			Raw() { return raw; }
+		double			Number() { return dataType == kType_Numeric ? num : 0; }
+		TESForm*		Form() { return dataType == kType_Form ? form : NULL; }
+		const char*		String() { return dataType == kType_String ? str : NULL; }
+		Array*			Array() { return dataType == kType_Array ? arr : NULL; }
+		void			Reset() { if (dataType == kType_String) { FormHeap_Free(str); dataType = kType_Invalid; str = NULL; } }
+
 	};
 
 	struct ElementL : Element
@@ -432,7 +436,6 @@ typedef NVSEArrayVarInterface::Element NVSEArrayElement;
 typedef NVSEArrayVarInterface::ElementR ArrayElementR;
 typedef NVSEArrayVarInterface::ElementL ArrayElementL;
 
-
 #endif
 		
 /**** command table API docs *******************************************************
@@ -463,6 +466,7 @@ struct NVSECommandTableInterface
 	UInt32				(* GetReturnType)(const CommandInfo* cmd);		// return type enum defined in CommandTable.h
 	UInt32				(* GetRequiredNVSEVersion)(const CommandInfo* cmd);
 	const PluginInfo*	(* GetParentPlugin)(const CommandInfo* cmd);	// returns a pointer to the PluginInfo of the NVSE plugin that adds the command, if any. returns NULL otherwise
+	const PluginInfo*	(* GetPluginInfoByName)(const char *pluginName);	// Returns a pointer to the PluginInfo of the NVSE plugin of the specified name; returns NULL is the plugin is not loaded.
 };
 
 /**** script API docs **********************************************************
@@ -531,7 +535,7 @@ struct NVSEScriptInterface
 struct NVSEDataInterface
 {
 	enum {
-		kVersion = 1
+		kVersion = 2
 	};
 
 	UInt32		version;
@@ -543,23 +547,39 @@ struct NVSEDataInterface
 
 		kNVSEData_SingletonMax,
 	};
-	void * (* GetSingleton)(UInt32 singletonID);
-	enum  {
+	void* (*GetSingleton)(UInt32 singletonID);
+	enum {
 		kNVSEData_InventoryReferenceCreate = 1,
 		kNVSEData_InventoryReferenceGetForRefID,
 		kNVSEData_InventoryReferenceGetRefBySelf,
 		kNVSEData_ArrayVarMapDeleteBySelf,
 		kNVSEData_StringVarMapDeleteBySelf,
+		kNVSEData_LambdaDeleteAllForScript,
+		kNVSEData_InventoryReferenceCreateEntry,
+
+		// If a command that accepts a script (=> lambdas) needs to store the script event list (variable value list) for longer
+		// than the lifetime of the parent script (UDFs clear their lists immediately after execution for example), then you can call
+		// kNVSEData_LambdaSaveVariableList which will save the variable list after deletion so that the lambda can still use the values
+		// until the lambda is discarded. It is required that you clean up with kNVSEData_LambdaUnsaveVariableList when you are no longer
+		// keeping the lambda.
+		kNVSEData_LambdaSaveVariableList,
+		kNVSEData_LambdaUnsaveVariableList,
+
+		kNVSEData_IsScriptLambda,
+		kNVSEData_HasScriptCommand,
+		kNVSEData_DecompileScript,
 
 		kNVSEData_FuncMax,
 	};
-	void * (* GetFunc)(UInt32 funcID);
-	enum  {
+	void* (*GetFunc)(UInt32 funcID);
+	enum {
 		kNVSEData_NumPreloadMods = 1,
 
 		kNVSEData_DataMax,
 	};
-	void * (* GetData)(UInt32 dataID);
+	void* (*GetData)(UInt32 dataID);
+	// v2: xNVSE caches script data for additional performance and short circuit evaluation, if you are manipulating script data then you can clear the cache 
+	void (*ClearScriptDataCache)();
 };
 #endif
 
@@ -669,6 +689,16 @@ struct NVSESerializationInterface
 
 	// Peeks at the data without interfiring with the current position
 	UInt32	(* PeekRecordData)(void * buf, UInt32 length);
+
+	void	(*WriteRecord8)(UInt8 inData);
+	void	(*WriteRecord16)(UInt16 inData);
+	void	(*WriteRecord32)(UInt32 inData);
+	void	(*WriteRecord64)(const void *inData);
+
+	UInt8	(*ReadRecord8)();
+	UInt16	(*ReadRecord16)();
+	UInt32	(*ReadRecord32)();
+	void	(*ReadRecord64)(void *outData);
 };
 
 struct PluginInfo
@@ -694,7 +724,7 @@ typedef bool (* _NVSEPlugin_Load)(const NVSEInterface * nvse);
  *	command must be assigned a unique opcode.
  *	
  *	The base API is pretty simple. Create a project based on the
- *	nvse_plugin_example project included with the NVSE source code, then define
+ *	yUI project included with the NVSE source code, then define
  *	and export these functions:
  *	
  *	bool NVSEPlugin_Query(const NVSEInterface * nvse, PluginInfo * info)

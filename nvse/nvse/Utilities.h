@@ -1,12 +1,17 @@
 #pragma once
+#include <string>
+#include <vector>
+
+
+#include "common/ICriticalSection.h"
 
 class Script;
 
 void DumpClass(void * theClassPtr, UInt32 nIntsToDump = 512);
 const char * GetObjectClassName(void * obj);
-//const std::string & GetFalloutDirectory(void);
-//std::string GetNVSEConfigOption(const char * section, const char * key);
-//bool GetNVSEConfigOption_UInt32(const char * section, const char * key, UInt32 * dataOut);
+const std::string & GetFalloutDirectory(void);
+std::string GetNVSEConfigOption(const char * section, const char * key);
+bool GetNVSEConfigOption_UInt32(const char * section, const char * key, UInt32 * dataOut);
 
 // this has been tested to work for non-varargs functions
 // varargs functions end up with 'this' passed as the last parameter (ie. probably broken)
@@ -38,7 +43,7 @@ const char * GetObjectClassName(void * obj);
 
 
 // ConsolePrint() limited to 512 chars; use this to print longer strings to console
-//void Console_Print_Long(const std::string& str);
+void Console_Print_Long(const std::string& str);
 
 // Macro for debug output to console at runtime
 #if RUNTIME
@@ -97,21 +102,21 @@ namespace MersenneTwister
 };
 
 // alternative to strtok; doesn't modify src string, supports forward/backward iteration
-//class Tokenizer
-//{
-//public:
-//	Tokenizer(const char* src, const char* delims);
-//	~Tokenizer();
-//
-//	// these return the offset of token in src, or -1 if no token
-//	UInt32 NextToken(std::string& outStr);
-//	UInt32 PrevToken(std::string& outStr);
-//
-//private:
-//	std::string m_delims;
-//	size_t		m_offset;
-//	std::string m_data;
-//};
+class Tokenizer
+{
+public:
+	Tokenizer(const char* src, const char* delims);
+	~Tokenizer();
+
+	// these return the offset of token in src, or -1 if no token
+	UInt32 NextToken(std::string& outStr);
+	UInt32 PrevToken(std::string& outStr);
+
+private:
+	std::string m_delims;
+	size_t		m_offset;
+	std::string m_data;
+};
 
 #if RUNTIME
 
@@ -122,11 +127,11 @@ const char * GetSeparatorChars(Script * script);
 
 const char * GetDXDescription(UInt32 keycode);
 
-//bool ci_equal(char ch1, char ch2);
-//bool ci_less(const char* lh, const char* rh);
-//void MakeUpper(std::string& str);
-//void MakeUpper(char* str);
-//void MakeLower(std::string& str);
+bool ci_equal(char ch1, char ch2);
+bool ci_less(const char* lh, const char* rh);
+void MakeUpper(std::string& str);
+void MakeUpper(char* str);
+void MakeLower(std::string& str);
 
 // this copies the string onto the FormHeap - used to work around alloc/dealloc mismatch when passing
 // data between nvse and plugins
@@ -159,7 +164,7 @@ public:
 
 // thread-safe template versions of ThisStdCall()
 
-template <typename T_Ret = void, typename ...Args>
+template <typename T_Ret = UInt32, typename ...Args>
 __forceinline T_Ret ThisCall(UInt32 _addr, void* _this, Args ...args)
 {
 	class T {};
@@ -170,20 +175,59 @@ __forceinline T_Ret ThisCall(UInt32 _addr, void* _this, Args ...args)
 	return ((T*)_this->*u.func)(std::forward<Args>(args)...);
 }
 
+template <typename T_Ret = UInt32, typename ...Args>
+__forceinline T_Ret ThisStdCall(UInt32 _addr, const void *_this, Args ...args)
+{
+	return ((T_Ret (__thiscall *)(const void*, Args...))_addr)(_this, std::forward<Args>(args)...);
+}
+
 template <typename T_Ret = void, typename ...Args>
 __forceinline T_Ret StdCall(UInt32 _addr, Args ...args)
 {
-	return ((T_Ret(__stdcall*)(Args...))_addr)(std::forward<Args>(args)...);
+	return ((T_Ret (__stdcall *)(Args...))_addr)(std::forward<Args>(args)...);
 }
 
 template <typename T_Ret = void, typename ...Args>
 __forceinline T_Ret CdeclCall(UInt32 _addr, Args ...args)
 {
-	return ((T_Ret(__cdecl*)(Args...))_addr)(std::forward<Args>(args)...);
+	return ((T_Ret (__cdecl *)(Args...))_addr)(std::forward<Args>(args)...);
 }
 
-template <typename T_Ret = UInt32, typename ...Args>
-__forceinline T_Ret ThisStdCall(UInt32 _addr, const void* _this, Args ...args)
+void ShowErrorMessageBox(const char* message);
+
+class ScopedLock
 {
-	return ((T_Ret(__thiscall*)(const void*, Args...))_addr)(_this, std::forward<Args>(args)...);
+public:
+	ScopedLock(ICriticalSection& critSection);
+
+	~ScopedLock();
+
+private:
+	ICriticalSection& m_critSection;
+};
+
+#if RUNTIME
+
+const char* GetModName(Script* script);
+
+void ShowRuntimeError(Script* script, const char* fmt, ...);
+
+inline void* GameHeapAlloc(UInt32 size)
+{
+	return ThisStdCall<void*>(0xAA3E40, (void*)0x11F6238, size);
 }
+
+inline void GameHeapFree(void* ptr)
+{
+	ThisStdCall(0xAA4060, (void*)0x11F6238, ptr);
+}
+
+#endif
+
+std::string FormatString(const char* fmt, ...);
+
+#if EDITOR
+void GeckExtenderMessageLog(const char* fmt, ...);
+#endif
+
+std::vector<void*> GetCallStack(int i);

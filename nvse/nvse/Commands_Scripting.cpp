@@ -23,8 +23,8 @@ static const void * kOpHandlerRetnAddr = (void *)0x005E234B;
 #endif
 
 //static SavedIPInfo s_savedIPTable[kMaxSavedIPs] = { { 0 } };
-typedef std::map<UInt32, SavedIPInfo> MapSavedIPInfo;
-static std::map<UInt32, MapSavedIPInfo> s_savedIPTable;
+typedef UnorderedMap<UInt32, SavedIPInfo> MapSavedIPInfo;
+static UnorderedMap<UInt32, MapSavedIPInfo> s_savedIPTable;
 
 // ### stack abuse! get a pointer to the parent's stack frame
 // ### valid when parent is called from kOpHandlerRetnAddr
@@ -50,30 +50,9 @@ SInt32 * GetCalculatedOpLength(UInt32 * opcodeOffsetPtr)
 
 bool Cmd_Label_Execute(COMMAND_ARGS)
 {
-	// make sure this is only called from the main execution loop
-	ASSERT_STR(scriptData == scriptObj->data, "Label may not be called inside a set or if statement");
-	ASSERT(_ReturnAddress() == kOpHandlerRetnAddr);
-
 	UInt32	idx = 0;
 
-	if(!ExtractArgs(EXTRACT_ARGS, &idx)) return true;
-
-	// this must happen after extractargs updates opcodeOffsetPtr so it points to the next instruction
-	if (s_savedIPTable.find(scriptObj->refID) == s_savedIPTable.end())
-	{
-		MapSavedIPInfo * newMapSavedIPInfo = new MapSavedIPInfo;
-		s_savedIPTable[scriptObj->refID] = *newMapSavedIPInfo;
-	}
-	if (s_savedIPTable.find(scriptObj->refID) == s_savedIPTable.end())
-		return true;
-
-	if (s_savedIPTable[scriptObj->refID].find(idx) == s_savedIPTable[scriptObj->refID].end())
-	{
-		SavedIPInfo* newSavedIPInfo = (SavedIPInfo*)new SavedIPInfo;
-		s_savedIPTable[scriptObj->refID][idx] = *newSavedIPInfo;
-	}
-	if (s_savedIPTable[scriptObj->refID].find(idx) == s_savedIPTable[scriptObj->refID].end())
-		return true;
+	if (!ExtractArgs(EXTRACT_ARGS, &idx)) return true;
 
 	SavedIPInfo		* info = &s_savedIPTable[scriptObj->refID][idx];
 	ScriptRunner	* scriptRunner = GetScriptRunner(opcodeOffsetPtr);
@@ -82,30 +61,26 @@ bool Cmd_Label_Execute(COMMAND_ARGS)
 	info->ip = *opcodeOffsetPtr;
 
 	// save if/else/endif stack
-	info->stackDepth = scriptRunner->stackDepth;
+	info->stackDepth = scriptRunner->ifStackDepth;
 	ASSERT((info->stackDepth + 1) < kMaxSavedIPStack);
 
-	memcpy(info->stack, scriptRunner->stack, (info->stackDepth + 1) * sizeof(UInt32));
+	memcpy(info->stack, scriptRunner->ifStack, (info->stackDepth + 1) * sizeof(UInt32));
 
 	return true;
 }
 
 bool Cmd_Goto_Execute(COMMAND_ARGS)
 {
-	// make sure this is only called from the main execution loop
-	ASSERT_STR(scriptData == scriptObj->data, "Goto may not be called inside a set or if statement");
-	ASSERT(_ReturnAddress() == kOpHandlerRetnAddr);
-
 	UInt32	idx = 0;
 
-	if(!ExtractArgs(EXTRACT_ARGS, &idx)) return true;
+	if (!ExtractArgs(EXTRACT_ARGS, &idx)) return true;
 
-	if (s_savedIPTable.find(scriptObj->refID) == s_savedIPTable.end())
-		return true;
-	if (s_savedIPTable[scriptObj->refID].find(idx) == s_savedIPTable[scriptObj->refID].end()) 
-		return true;
+	MapSavedIPInfo *savedIPInfo = s_savedIPTable.GetPtr(scriptObj->refID);
+	if (!savedIPInfo) return true;
 
-	SavedIPInfo		* info = &s_savedIPTable[scriptObj->refID][idx];
+	SavedIPInfo *info = savedIPInfo->GetPtr(idx);
+	if (!info) return true;
+
 	ScriptRunner	* scriptRunner = GetScriptRunner(opcodeOffsetPtr);
 	SInt32			* calculatedOpLength = GetCalculatedOpLength(opcodeOffsetPtr);
 
@@ -113,8 +88,8 @@ bool Cmd_Goto_Execute(COMMAND_ARGS)
 	*calculatedOpLength += info->ip - *opcodeOffsetPtr;
 
 	// restore the if/else/endif stack
-	scriptRunner->stackDepth = info->stackDepth;
-	memcpy(scriptRunner->stack, info->stack, (info->stackDepth + 1) * sizeof(UInt32));
+	scriptRunner->ifStackDepth = info->stackDepth;
+	memcpy(scriptRunner->ifStack, info->stack, (info->stackDepth + 1) * sizeof(UInt32));
 
 	return true;
 }
@@ -125,16 +100,7 @@ bool Cmd_Let_Execute(COMMAND_ARGS)
 {
 	ExpressionEvaluator evaluator(PASS_COMMAND_ARGS);
 
-	if (extraTraces)
-		gLog.Indent();
-
-	if (extraTraces)
-		_MESSAGE("Extracting args for Let at %08X", *opcodeOffsetPtr - 4);
-
 	evaluator.ExtractArgs();
-
-	if (extraTraces)
-		gLog.Outdent();
 
 	return true;
 }
@@ -146,17 +112,8 @@ bool Cmd_eval_Execute(COMMAND_ARGS)
 	*result = 0;
 	ExpressionEvaluator eval(PASS_COMMAND_ARGS);
 
-	if (extraTraces)
-		gLog.Indent();
-
-	if (extraTraces)
-		_MESSAGE("Extracting args for Eval at %08X", *opcodeOffsetPtr - 4);
-
 	if (eval.ExtractArgs() && eval.Arg(0))
 		*result = eval.Arg(0)->GetBool() ? 1 : 0;
-
-	if (extraTraces)
-		gLog.Outdent();
 
 	return true;
 }
@@ -172,14 +129,12 @@ bool Cmd_testexpr_Execute(COMMAND_ARGS)
 	{
 		if (eval.Arg(0)->Type() == kTokenType_ArrayElement)		// is it an array elem with valid index?
 		{
-			const ArrayKey* key = eval.Arg(0)->GetArrayKey();
-			*result = (g_ArrayMap.HasKey(eval.Arg(0)->GetOwningArrayID(), *key)) ? 1 : 0;
+			ArrayVar *arr = g_ArrayMap.Get(eval.Arg(0)->GetOwningArrayID());
+			if (arr) *result = arr->HasKey(eval.Arg(0)->GetArrayKey());
 		}
 		else
 			*result = 1;
 	}
-
-	eval.ToggleErrorSuppression(false);
 	return true;
 }
 
@@ -327,7 +282,7 @@ bool Cmd_ToString_Execute(COMMAND_ARGS)
 		else if (eval.Arg(0)->CanConvertTo(kTokenType_Number))
 		{
 			char buf[0x20];
-			sprintf_s(buf, sizeof(buf), "%g", eval.Arg(0)->GetNumber());
+			snprintf(buf, sizeof(buf), "%g", eval.Arg(0)->GetNumber());
 			tokenAsString = buf;
 		}
 		else if (eval.Arg(0)->CanConvertTo(kTokenType_Form))
@@ -382,9 +337,53 @@ bool Cmd_PrintDebug_Execute(COMMAND_ARGS)
 	return true;
 }
 
+bool Cmd_PrintF(COMMAND_ARGS, bool debug)
+{
+	*result = 0;
+	if (!debug || ModDebugState(scriptObj))
+	{
+		ExpressionEvaluator eval(PASS_COMMAND_ARGS);
+		if (eval.ExtractArgs() && eval.Arg(0) && eval.Arg(0)->CanConvertTo(kTokenType_String) && eval.Arg(1) && eval.Arg(1)->CanConvertTo(kTokenType_String))
+		{
+			try
+			{
+				FILE* f;
+				errno_t e = fopen_s(&f, eval.Arg(0)->GetString(), "a+");
+				if (!e)
+				{
+					const char* str = eval.Arg(1)->GetString();
+					fprintf(f, str);
+					fprintf(f, "\r\n");
+					fclose(f);
+				}
+				else
+					_MESSAGE("Cannot open file %s [%d]", eval.Arg(0)->GetString(), e);
+
+			}
+			catch(...)
+			{
+				_MESSAGE("Cannot write to file %s", eval.Arg(0)->GetString());
+			}
+		}
+	}
+	return true;
+}
+
+bool Cmd_PrintF_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+	return Cmd_PrintF(PASS_COMMAND_ARGS, false);
+}
+
+bool Cmd_PrintDebugF_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+	return Cmd_PrintF(PASS_COMMAND_ARGS, true);
+}
+
 bool Cmd_TypeOf_Execute(COMMAND_ARGS)
 {
-	std::string typeStr = "NULL";
+	const char *typeStr = "NULL";
 
 	ExpressionEvaluator eval(PASS_COMMAND_ARGS);
 	if (eval.ExtractArgs() && eval.Arg(0))
@@ -396,10 +395,17 @@ bool Cmd_TypeOf_Execute(COMMAND_ARGS)
 		else if (eval.Arg(0)->CanConvertTo(kTokenType_Form))
 			typeStr = "Form";
 		else if (eval.Arg(0)->CanConvertTo(kTokenType_Array))
-			typeStr = g_ArrayMap.GetTypeString(eval.Arg(0)->GetArray());
+		{
+			ArrayVar *arr = g_ArrayMap.Get(eval.Arg(0)->GetArray());
+			if (!arr) typeStr = "<Bad Array>";
+			else if (arr->KeyType() == kDataType_Numeric)
+				typeStr = arr->IsPacked() ? "Array" : "Map";
+			else if (arr->KeyType() == kDataType_String)
+				typeStr = "StringMap";
+		}
 	}
 
-	AssignToStringVar(PASS_COMMAND_ARGS, typeStr.c_str());
+	AssignToStringVar(PASS_COMMAND_ARGS, typeStr);
 	return true;
 }
 
@@ -414,12 +420,6 @@ bool Cmd_Call_Execute(COMMAND_ARGS)
 	*result = 0;
 
 	ExpressionEvaluator eval(PASS_COMMAND_ARGS);
-
-	if (extraTraces)
-		gLog.Indent();
-
-	if (extraTraces)
-		_MESSAGE("Extracting args for Call at %08X", *opcodeOffsetPtr - 4);
 
 	ScriptToken* funcResult = UserFunctionManager::Call(&eval);
 	if (funcResult)
@@ -446,9 +446,6 @@ bool Cmd_Call_Execute(COMMAND_ARGS)
 			ShowRuntimeError(scriptObj, "Function call returned unexpected token type %d", funcResult->Type());
 	}
 
-	if (extraTraces)
-		gLog.Outdent();
-
 	delete funcResult;
 	return true;
 }
@@ -464,20 +461,20 @@ bool Cmd_SetFunctionValue_Execute(COMMAND_ARGS)
 
 bool Cmd_GetUserTime_Execute(COMMAND_ARGS)
 {
-	ArrayID arrID = g_ArrayMap.Create(kDataType_String, false, scriptObj->GetModIndex());
-	*result = arrID;
+	ArrayVar *arr = g_ArrayMap.Create(kDataType_String, false, scriptObj->GetModIndex());
+	*result = arr->ID();
 
 	SYSTEMTIME localTime;
 	GetLocalTime(&localTime);
 
-	g_ArrayMap.SetElementNumber(arrID, "Year", localTime.wYear);
-	g_ArrayMap.SetElementNumber(arrID, "Month", localTime.wMonth);
-	g_ArrayMap.SetElementNumber(arrID, "DayOfWeek", localTime.wDayOfWeek + 1);
-	g_ArrayMap.SetElementNumber(arrID, "Day", localTime.wDay);
-	g_ArrayMap.SetElementNumber(arrID, "Hour", localTime.wHour);
-	g_ArrayMap.SetElementNumber(arrID, "Minute", localTime.wMinute);
-	g_ArrayMap.SetElementNumber(arrID, "Second", localTime.wSecond);
-	g_ArrayMap.SetElementNumber(arrID, "Millisecond", localTime.wMilliseconds);
+	arr->SetElementNumber("Year", localTime.wYear);
+	arr->SetElementNumber("Month", localTime.wMonth);
+	arr->SetElementNumber("DayOfWeek", localTime.wDayOfWeek + 1);
+	arr->SetElementNumber("Day", localTime.wDay);
+	arr->SetElementNumber("Hour", localTime.wHour);
+	arr->SetElementNumber("Minute", localTime.wMinute);
+	arr->SetElementNumber("Second", localTime.wSecond);
+	arr->SetElementNumber("Millisecond", localTime.wMilliseconds);
 
 	return true;
 }
@@ -491,14 +488,12 @@ class ModLocalDataManager
 public:
 	ArrayElement* Get(UInt8 modIndex, const char* key);
 	bool Set(UInt8 modIndex, const char* key, const ArrayElement& data);
-	bool Set(UInt8 modIndex, const char* key, ScriptToken* data, ExpressionEvaluator& eval);
 	bool Remove(UInt8 modIndex, const char* key);
 	ArrayID GetAllAsNVSEArray(UInt8 modIndex);
 
-	~ModLocalDataManager();
 private:
-	typedef std::map<const char*, ArrayElement*, bool (*)(const char*, const char*)> ModLocalData;
-	typedef std::map<UInt8, ModLocalData*> ModLocalDataMap;
+	typedef UnorderedMap<char*, ArrayElement> ModLocalData;
+	typedef UnorderedMap<UInt32, ModLocalData> ModLocalDataMap;
 
 	ModLocalDataMap m_data;
 };
@@ -507,115 +502,68 @@ ModLocalDataManager s_modDataManager;
 
 ArrayElement* ModLocalDataManager::Get(UInt8 modIndex, const char* key)
 {
-	ModLocalDataMap::iterator iter = m_data.find(modIndex);
-	if (iter != m_data.end() && iter->second) {
-		ModLocalData::iterator dataIter = iter->second->find(key);
-		if (dataIter != iter->second->end()) {
-			return dataIter->second;
-		}
-	}
-
+	ModLocalData *modLocData = m_data.GetPtr(modIndex);
+	if (modLocData)
+		return modLocData->GetPtr(const_cast<char*>(key));
 	return NULL;
 }
 
 ArrayID ModLocalDataManager::GetAllAsNVSEArray(UInt8 modIndex)
 {
-	ArrayID id = g_ArrayMap.Create(kDataType_String, false, modIndex);
-	ModLocalDataMap::iterator iter = m_data.find(modIndex);
-	if (iter != m_data.end() && iter->second) {
-		for (ModLocalData::iterator dataIter = iter->second->begin(); dataIter != iter->second->end(); ++dataIter) {
-			ArrayElement* elem = dataIter->second;
-			const char* key = dataIter->first;
-			g_ArrayMap.SetElement(id, key, *elem);
-		}
-	}
-
-	return id;
+	ArrayVar *arr = g_ArrayMap.Create(kDataType_String, false, modIndex);
+	ModLocalData *modLocData = m_data.GetPtr(modIndex);
+	if (modLocData)
+		for (auto dataIter = modLocData->Begin(); !dataIter.End(); ++dataIter)
+			arr->SetElement(dataIter.Key(), &dataIter.Get());
+	return arr->ID();
 }
 
 bool ModLocalDataManager::Remove(UInt8 modIndex, const char* key)
 {
-	ModLocalDataMap::iterator iter = m_data.find(modIndex);
-	if (iter != m_data.end() && iter->second) {
-		ModLocalData::iterator dataIter = iter->second->find(key);
-		if (dataIter != iter->second->end()) {
-			iter->second->erase(dataIter);
+	ModLocalData *modLocData = m_data.GetPtr(modIndex);
+	if (modLocData)
+	{
+		auto dataIter = modLocData->Find(const_cast<char*>(key));
+		if (!dataIter.End())
+		{
+			dataIter.Get().Unset();
+			dataIter.Remove();
 			return true;
 		}
 	}
-
 	return false;
 }
 
 bool ModLocalDataManager::Set(UInt8 modIndex, const char* key, const ArrayElement& data)
 {
-	ArrayID dummy = 0;
-	if (key && !data.GetAsArray(&dummy)) {
-		UInt32 len = strlen(key) + 1;
-		char* newKey = new char[len+1];
-		strcpy_s(newKey, len, key);
-		MakeUpper(newKey);
-		key = newKey;
-
-		ModLocalDataMap::iterator indexIter = m_data.find(modIndex);
-		if (indexIter == m_data.end()) {
-			indexIter = m_data.insert(ModLocalDataMap::value_type(modIndex, new ModLocalData(ci_less))).first;
-		}
-
-		ModLocalData::iterator dataIter = indexIter->second->find(key);
-		if (dataIter == indexIter->second->end()) {
-			dataIter = indexIter->second->insert(ModLocalData::value_type(key, new ArrayElement())).first;
-		}
-
-		return dataIter->second->Set(data);
+	if (*key)
+	{
+		//MakeUpper(const_cast<char*>(key));
+		m_data[modIndex][const_cast<char*>(key)].Set(&data);
+		return true;
 	}
-
 	return false;
-}
-
-bool ModLocalDataManager::Set(UInt8 modIndex, const char* key, ScriptToken* data, ExpressionEvaluator& eval)
-{
-	if (data) {
-		ArrayElement elem;
-		if (BasicTokenToElem(data, elem, &eval)) {
-			return Set(modIndex, key, elem);
-		}
-	}
-
-	return false;
-}
-
-ModLocalDataManager::~ModLocalDataManager()
-{
-	for (ModLocalDataMap::iterator index = m_data.begin(); index != m_data.end(); ++index) {
-		for (ModLocalData::iterator data = index->second->begin(); data != index->second->end(); ++data) {
-			delete data->second;
-			delete data->first;
-		}
-		delete index->second;
-	}
 }
 
 bool Cmd_SetModLocalData_Execute(COMMAND_ARGS)
 {
-	*result = 0.0;
-
+	*result = 0;
 	ExpressionEvaluator eval(PASS_COMMAND_ARGS);
-	if (eval.ExtractArgs() && eval.NumArgs() == 2 && eval.Arg(0)->CanConvertTo(kTokenType_String)) {
-		*result = s_modDataManager.Set(scriptObj->GetModIndex(), eval.Arg(0)->GetString(), eval.Arg(1), eval) ? 1.0 : 0.0;
+	if (eval.ExtractArgs() && eval.NumArgs() == 2 && eval.Arg(0)->CanConvertTo(kTokenType_String))
+	{
+		ArrayElement elem;
+		if (BasicTokenToElem(eval.Arg(1), elem, &eval) && (elem.DataType() != kDataType_Array) && s_modDataManager.Set(scriptObj->GetModIndex(), eval.Arg(0)->GetString(), elem))
+			*result = 1;
 	}
-
 	return true;
 }
 
 bool Cmd_RemoveModLocalData_Execute(COMMAND_ARGS)
 {
-	*result = 0.0;
 	ExpressionEvaluator eval(PASS_COMMAND_ARGS);
-	if (eval.ExtractArgs() && eval.NumArgs() == 1 && eval.Arg(0)->CanConvertTo(kTokenType_String)) {
-		*result = s_modDataManager.Remove(scriptObj->GetModIndex(), eval.Arg(0)->GetString()) ? 1.0 : 0.0;
-	}
-
+	if (eval.ExtractArgs() && eval.NumArgs() == 1 && eval.Arg(0)->CanConvertTo(kTokenType_String) && s_modDataManager.Remove(scriptObj->GetModIndex(), eval.Arg(0)->GetString()))
+		*result = 1;
+	else *result = 0;
 	return true;
 }
 
@@ -625,41 +573,39 @@ bool Cmd_GetModLocalData_Execute(COMMAND_ARGS)
 	eval.ExpectReturnType(kRetnType_Default);
 	*result = 0;
 
-	if (eval.ExtractArgs() && eval.NumArgs() == 1 && eval.Arg(0)->CanConvertTo(kTokenType_String)) {
-		ArrayElement* data = s_modDataManager.Get(scriptObj->GetModIndex(), eval.Arg(0)->GetString());
-		if (data) {
-			double num = 0;
-			UInt32 formID = 0;
-			std::string str;
-
-			if (data->GetAsNumber(&num)) {
-				*result = num;
-				return true;
-			}
-			else if (data->GetAsFormID(&formID)) {
-				UInt32* refResult = (UInt32*)result;
-				*refResult = formID;
-				eval.ExpectReturnType(kRetnType_Form);
-				return true;
-			}
-			else if (data->GetAsString(str)) {
-				AssignToStringVar(PASS_COMMAND_ARGS, str.c_str());
-				eval.ExpectReturnType(kRetnType_String);
-				return true;
+	if (eval.ExtractArgs() && eval.NumArgs() == 1 && eval.Arg(0)->CanConvertTo(kTokenType_String))
+	{
+		ArrayElement *data = s_modDataManager.Get(scriptObj->GetModIndex(), eval.Arg(0)->GetString());
+		if (data)
+		{
+			switch (data->DataType())
+			{
+				case kDataType_Numeric:
+					*result = data->m_data.num;
+					break;
+				case kDataType_Form:
+				{
+					UInt32 *refResult = (UInt32*)result;
+					*refResult = data->m_data.formID;
+					eval.ExpectReturnType(kRetnType_Form);
+					break;
+				}
+				case kDataType_String:
+					AssignToStringVar(PASS_COMMAND_ARGS, data->m_data.GetStr());
+					eval.ExpectReturnType(kRetnType_String);
+					break;
 			}
 		}
 	}
-
 	return true;
 }
 
 bool Cmd_ModLocalDataExists_Execute(COMMAND_ARGS)
 {
 	ExpressionEvaluator eval(PASS_COMMAND_ARGS);
-	if (eval.ExtractArgs() && eval.NumArgs() == 1 && eval.Arg(0)->CanConvertTo(kTokenType_String)) {
-		*result = s_modDataManager.Get(scriptObj->GetModIndex(), eval.Arg(0)->GetString()) ? 1.0 : 0.0;
-	}
-
+	if (eval.ExtractArgs() && eval.NumArgs() == 1 && eval.Arg(0)->CanConvertTo(kTokenType_String) && s_modDataManager.Get(scriptObj->GetModIndex(), eval.Arg(0)->GetString()))
+		*result = 1;
+	else *result = 0;
 	return true;
 }
 
@@ -684,11 +630,6 @@ bool Cmd_Internal_PopExecutionContext_Execute(COMMAND_ARGS)
 
 bool Cmd_Let_Parse(UInt32 numParams, ParamInfo* paramInfo, ScriptLineBuffer* lineBuf, ScriptBuffer* scriptBuf)
 {
-#if RUNTIME
-	Console_Print("Let cannot be called from the console.");
-	return false;
-#endif
-
 	ExpressionParser parser(scriptBuf, lineBuf);
 	if (!parser.ParseArgs(paramInfo, numParams))
 		return false;
@@ -902,6 +843,12 @@ static ParamInfo kParams_OneNVSEString[] =
 	{	"string",	kNVSEParamType_String,	0	},
 };
 
+static ParamInfo kParams_TwoNVSEString[] =
+{
+	{	"filename",	kNVSEParamType_String,	0	},
+	{	"string",	kNVSEParamType_String,	0	},
+};
+
 CommandInfo kCommandInfo_ToString =
 {
 	"ToString",
@@ -957,6 +904,36 @@ CommandInfo kCommandInfo_PrintDebug =
 	1,
 	kParams_OneNVSEString,
 	HANDLER(Cmd_PrintDebug_Execute),
+	Cmd_Expression_Parse,
+	NULL,
+	0
+};
+
+CommandInfo kCommandInfo_PrintF =
+{
+	"PrintF",
+	"",
+	0,
+	"prints a string expression to a file",
+	0,
+	2,
+	kParams_TwoNVSEString,
+	HANDLER(Cmd_PrintF_Execute),
+	Cmd_Expression_Parse,
+	NULL,
+	0
+};
+
+CommandInfo kCommandInfo_PrintDebugF =
+{
+	"PrintDebugF",
+	"PrintDF",
+	0,
+	"prints a string expression to a file in debug mode",
+	0,
+	2,
+	kParams_TwoNVSEString,
+	HANDLER(Cmd_PrintDebugF_Execute),
 	Cmd_Expression_Parse,
 	NULL,
 	0

@@ -2,12 +2,13 @@
 
 #include "CommandTable.h"
 #include "ParamInfos.h"
+#include "ScriptUtils.h"
 
-DEFINE_COMMAND(IsScripted, returns 1 if the object or reference has a script attached to it., 0, 1, kParams_OneOptionalObject);
-DEFINE_COMMAND(GetScript, returns the script of the reference or passed object., 0, 1, kParams_OneOptionalObject);
-DEFINE_COMMAND(RemoveScript, removes the script of the reference or passed object., 0, 1, kParams_OneOptionalObject);
-DEFINE_COMMAND(SetScript, sets the script of the reference or passed object., 0, 2, kParams_OneObject_OneOptionalObject);
-DEFINE_COMMAND(IsFormValid, returns 1 if the reference or passed object is valid., 0, 1, kParams_OneOptionalObject);
+DEFINE_COMMAND(IsScripted, returns 1 if the object or reference has a script attached to it., 0, 1, kParams_OneOptionalForm);
+DEFINE_COMMAND(GetScript, returns the script of the reference or passed object., 0, 1, kParams_OneOptionalForm);
+DEFINE_COMMAND(RemoveScript, removes the script of the reference or passed object., 0, 1, kParams_OneOptionalForm);
+DEFINE_COMMAND(SetScript, sets the script of the reference or passed object., 0, 2, kParams_OneForm_OneOptionalForm);
+DEFINE_COMMAND(IsFormValid, returns 1 if the reference or passed object is valid., 0, 1, kParams_OneOptionalForm);
 
 static ParamInfo kParams_OneReference[1] =
 {
@@ -60,35 +61,32 @@ static ParamInfo kParams_GetFormFromMod[2] =
 	{	"formID",	kParamType_String,	0	},
 };
 
-DEFINE_COMMAND(GetNumExplicitRefs, returns the number of literal references in a script, 0, 1, kParams_OneOptionalObjectID);
+DEFINE_COMMAND(GetNumExplicitRefs, returns the number of literal references in a script, 0, 1, kParams_OneOptionalForm);
 
-DEFINE_COMMAND(GetNthExplicitRef, returns the nth literal reference in a script, 0, 2, kParams_OneInt_OneOptionalObjectID);
+DEFINE_COMMAND(GetNthExplicitRef, returns the nth literal reference in a script, 0, 2, kParams_OneInt_OneOptionalForm);
 
-DEFINE_COMMAND(RunScript, debug, 0, 1, kParams_OneObjectID);
+DEFINE_COMMAND(RunScript, debug, 0, 1, kParams_OneForm);
 
 DEFINE_COMMAND(GetCurrentScript, returns the calling script, 0, 0, NULL);
 DEFINE_COMMAND(GetCallingScript, returns the script that called the executing function script, 0, 0, NULL);
 
-#if EVENT_MANAGER
-static ParamInfo kOBSEParams_SetEventHandler[4] =
+static ParamInfo kNVSEParams_SetEventHandler[4] =
 {
-	{ "event name",			kOBSEParamType_String,	0 },
-	{ "function script",	kOBSEParamType_Form,	0 },
-	{ "filter",				kOBSEParamType_Pair,	1 },
-	{ "filter",				kOBSEParamType_Pair,	1 },
+	{ "event name",			kNVSEParamType_String,	0 },
+	{ "function script",	kNVSEParamType_Form,	0 },
+	{ "filter",				kNVSEParamType_Pair,	1 },
+	{ "filter",				kNVSEParamType_Pair,	1 },
 };
 
-DEFINE_COMMAND(SetEventHandler, defines a function script to serve as a callback for game events, 0, 4, kOBSEParams_SetEventHandler);
-DEFINE_COMMAND(RemoveEventHandler, removes event handlers matching the event, script, and optional filters specified, 0, 4, kOBSEParams_SetEventHandler);
-DEFINE_COMMAND(GetCurrentEventName, returns the name of the event currently being processed by an event handler, 0, 0, NULL);
+DEFINE_COMMAND_EXP(SetEventHandler, defines a function script to serve as a callback for game events, 0, kNVSEParams_SetEventHandler);
+DEFINE_COMMAND_EXP(RemoveEventHandler, "removes event handlers matching the event, script, and optional filters specified", 0, kNVSEParams_SetEventHandler);
+DEFINE_CMD(GetCurrentEventName, returns the name of the event currently being processed by an event handler, 0, NULL);
 
-static ParamInfo kOBSEParams_DispatchEvent[3] =
+static ParamInfo kNVSEParams_DispatchEvent[3] =
 {
-	{	"eventName",			kOBSEParamType_String,	0	},
-	{	"args",					kOBSEParamType_Array,	1	},
-	{	"sender",				kOBSEParamType_String,	1	}
+	{	"eventName",			kNVSEParamType_String,	0	},
+	{	"args",					kNVSEParamType_Array,	1	},
+	{	"sender",				kNVSEParamType_String,	1	}
 };
 
-DEFINE_COMMAND(DispatchEvent, dispatches a user-defined event to any registered listeners, 0, 3, kOBSEParams_DispatchEvent);
-
-#endif
+DEFINE_COMMAND_EXP(DispatchEvent, dispatches a user-defined event to any registered listeners, 0, kNVSEParams_DispatchEvent);

@@ -23,36 +23,22 @@ IFileStream::~IFileStream()
 /**
  *	Opens a file for reading and attaches it to the stream
  */
-bool IFileStream::Open(const char *name)
+bool IFileStream::Open(const char * name)
 {
 	Close();
+
 	theFile = CreateFile(name, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (theFile == INVALID_HANDLE_VALUE) return false;
-	LARGE_INTEGER temp;
-	GetFileSizeEx(theFile, &temp);
-	streamLength = temp.QuadPart;
-	streamOffset = 0;
-	return true;
-}
+	if(theFile != INVALID_HANDLE_VALUE)
+	{
+		LARGE_INTEGER	temp;
 
-bool IFileStream::OpenWrite(const char *name)
-{
-	Close();
-	theFile = CreateFile(name, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (theFile == INVALID_HANDLE_VALUE) return false;
-	LARGE_INTEGER temp;
-	GetFileSizeEx(theFile, &temp);
-	streamOffset = streamLength = temp.QuadPart;
-	SetFilePointerEx(theFile, temp, NULL, FILE_BEGIN);
-	return true;
-}
+		GetFileSizeEx(theFile, &temp);
 
-bool IFileStream::OpenWriteEx(char *name, bool append)
-{
-	MakeAllDirs(name);
-	bool result = append ? OpenWrite(name) : Create(name);
-	if (result && streamLength) Write8('\n');
-	return result;
+		streamLength = temp.QuadPart;
+		streamOffset = 0;
+	}
+
+	return theFile != INVALID_HANDLE_VALUE;
 }
 
 static UINT_PTR CALLBACK BrowseEventProc(HWND window, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -102,13 +88,18 @@ bool IFileStream::BrowseOpen(void)
  *	Creates a new file for writing, overwriting any previously-existing files,
  *	and attaches it to the stream
  */
-bool IFileStream::Create(const char *name)
+bool IFileStream::Create(const char * name)
 {
 	Close();
+
 	theFile = CreateFile(name, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (theFile == INVALID_HANDLE_VALUE) return false;
-	streamOffset = streamLength = 0;
-	return true;
+	if(theFile != INVALID_HANDLE_VALUE)
+	{
+		streamLength = 0;
+		streamOffset = 0;
+	}
+
+	return theFile != INVALID_HANDLE_VALUE;
 }
 
 bool IFileStream::BrowseCreate(const char * defaultName, const char * defaultPath, const char * title)
@@ -198,18 +189,26 @@ void IFileStream::SetOffset(SInt64 inOffset)
 	streamOffset = inOffset;
 }
 
-void IFileStream::MakeAllDirs(char *path)
+// ### TODO: get rid of buf
+void IFileStream::MakeAllDirs(const char * path)
 {
-	char *traverse = path, curr;
-	while (curr = *traverse)
+	char	buf[1024];
+	char	* traverse = buf;
+
+	while(1)
 	{
-		if ((curr == '\\') || (curr == '/'))
+		char	data = *path++;
+
+		if(!data)
+			break;
+
+		if((data == '\\') || (data == '/'))
 		{
 			*traverse = 0;
-			_mkdir(path);
-			*traverse = '\\';
+			_mkdir(buf);
 		}
-		traverse++;
+
+		*traverse++ = data;
 	}
 }
 

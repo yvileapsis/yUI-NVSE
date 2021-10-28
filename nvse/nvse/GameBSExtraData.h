@@ -1,10 +1,9 @@
 #pragma once
-#include "Utilities.h"
 
 // Added to remove a cyclic dependency between GameForms.h and GameExtraData.h
+#include "Utilities.h"
 
 class TESForm;
-class TESFaction;
 
 // C+?
 class BSExtraData
@@ -13,7 +12,7 @@ public:
 	BSExtraData();
 	virtual ~BSExtraData();
 
-	virtual void	Fn_01(void);
+	virtual bool Differs(BSExtraData* extra);	// 001
 
 	static BSExtraData* Create(UInt8 xType, UInt32 size, UInt32 vtbl);
 
@@ -26,31 +25,57 @@ public:
 // 020
 struct BaseExtraList
 {
-	void* vtable;
-
-	BSExtraData		*m_data;					// 004
-	UInt8			m_presenceBitfield[0x15];	// 008 - if a bit is set, then the extralist should contain that extradata
-	UInt8			pad1D[3];					// 01D
-
 	bool HasType(UInt32 type) const;
-	BSExtraData *GetByType(UInt32 type) const;
+
+	__forceinline BSExtraData *GetByType(UInt8 type) const
+	{
+		return ThisStdCall<BSExtraData*>(0x410220, this, type);
+	}
+
 	void MarkType(UInt32 type, bool bCleared);
-	void Remove(BSExtraData *toRemove, bool doFree = false);
-	void RemoveByType(UInt32 type);
-	BSExtraData *Add(BSExtraData *xData);
-	void RemoveAll(bool doFree = true);
-	bool MarkScriptEvent(UInt32 eventMask, TESForm *eventTarget);
-	void Copy(BaseExtraList *sourceList);
+
+	__forceinline void Remove(BSExtraData *toRemove, bool doFree)
+	{
+		ThisStdCall(0x410020, this, toRemove, doFree);
+	}
+
+	__forceinline void RemoveByType(UInt32 type)
+	{
+		ThisStdCall(0x410140, this, type);
+	}
+
+	__forceinline BSExtraData *Add(BSExtraData *toAdd)
+	{
+		return ThisStdCall<BSExtraData*>(0x40FF60, this, toAdd);
+	}
+
+	__forceinline void RemoveAll(bool doFree)
+	{
+		ThisStdCall(0x40FAE0, this, doFree);
+	}
+
+	bool MarkScriptEvent(UInt32 eventMask, TESForm* eventTarget);
+
+	__forceinline void Copy(BaseExtraList *from)
+	{
+		ThisStdCall(0x411EC0, this, from);
+	}
+
 	void DebugDump() const;
+
 	bool IsWorn();
-	char GetExtraFactionRank(TESFaction *faction);
-	bool GetCannotWear() { return ThisCall<bool>(0x418B10, this); };
+
+	void		** m_vtbl;					// 000
+	BSExtraData	* m_data;					// 004
+	UInt8		m_presenceBitfield[0x15];	// 008 - if a bit is set, then the extralist should contain that extradata
+											// bits are numbered starting from the lsb
+	UInt8		pad1D[3];					// 01D
 };
 
 struct ExtraDataList : public BaseExtraList
 {
-	ExtraDataList *CreateCopy();
-	static ExtraDataList* __stdcall Create(BSExtraData *xBSData = NULL);
+	static ExtraDataList * Create(BSExtraData* xBSData = NULL);
 };
 
+STATIC_ASSERT(offsetof(BaseExtraList, m_presenceBitfield) == 0x008);
 STATIC_ASSERT(sizeof(ExtraDataList) == 0x020);

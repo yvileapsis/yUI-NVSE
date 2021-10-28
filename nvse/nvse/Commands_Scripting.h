@@ -13,13 +13,6 @@ struct SavedIPInfo
 	UInt32	stack[kMaxSavedIPStack];
 };
 
-struct ScriptRunner
-{
-	UInt32	pad[0x20 >> 2];
-	UInt32	stackDepth;
-	UInt32	stack[1];
-};
-
 extern ScriptRunner * GetScriptRunner(UInt32 * opcodeOffsetPtr);
 extern SInt32 * GetCalculatedOpLength(UInt32 * opcodeOffsetPtr);
 
@@ -38,6 +31,8 @@ extern CommandInfo kCommandInfo_Break;
 extern CommandInfo kCommandInfo_ToString;
 extern CommandInfo kCommandInfo_Print;
 extern CommandInfo kCommandInfo_PrintDebug;
+extern CommandInfo kCommandInfo_PrintF;
+extern CommandInfo kCommandInfo_PrintDebugF;
 extern CommandInfo kCommandInfo_testexpr;
 extern CommandInfo kCommandInfo_TypeOf;
 

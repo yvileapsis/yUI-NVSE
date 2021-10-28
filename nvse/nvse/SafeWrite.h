@@ -1,30 +1,37 @@
 #pragma once
 
-__declspec(noinline) void __stdcall SafeWrite8(UInt32 addr, UInt32 data);
-__declspec(noinline) void __stdcall SafeWrite16(UInt32 addr, UInt32 data);
-__declspec(noinline) void __stdcall SafeWrite32(UInt32 addr, UInt32 data);
-__declspec(noinline) void __stdcall SafeWriteBuf(UInt32 addr, void * data, UInt32 len);
-__declspec(noinline) UInt32 __stdcall DetourVtable(UInt32 addr, UInt32 dst);
-__declspec(noinline) UInt32 __stdcall DetourRelCall(UInt32 jumpSrc, UInt32 jumpTgt);
+void SafeWrite8(UInt32 addr, UInt32 data);
+void SafeWrite16(UInt32 addr, UInt32 data);
+void SafeWrite32(UInt32 addr, UInt32 data);
+void SafeWriteBuf(UInt32 addr, const char* data, UInt32 len);
 
 // 5 bytes
-__declspec(noinline) void __stdcall WriteRelJump(UInt32 jumpSrc, UInt32 jumpTgt);
-__declspec(noinline) void __stdcall WriteRelCall(UInt32 jumpSrc, UInt32 jumpTgt);
-void NopFunctionCall(UInt32 addr, UInt32 numArgs);
-void NopFunctionCall(UInt32 addr);
-void NopIndirectCall(UInt32 addr);
-void NopIndirectCall(UInt32 addr, UInt32 numArgs);
+template <typename T>
+void WriteRelJump(UInt32 jumpSrc, T jumpTgt)
+{
+	// jmp rel32
+	SafeWrite8(jumpSrc, 0xE9);
+	SafeWrite32(jumpSrc + 1, UInt32(jumpTgt) - jumpSrc - 1 - 4);
+}
 
+void WriteRelCall(UInt32 jumpSrc, UInt32 jumpTgt);
+
+template <typename T>
+void WriteRelCall(UInt32 jumpSrc, T jumpTgt)
+{
+	WriteRelCall(jumpSrc, UInt32(jumpTgt));
+}
+
+template <typename T>
+void WriteVirtualCall(UInt32 jumpSrc, T jumpTgt)
+{
+	SafeWrite8(jumpSrc - 6, 0xB8); // mov eax
+	SafeWrite32(jumpSrc - 5, (UInt32)jumpTgt);
+	SafeWrite8(jumpSrc - 1, 0x90); // nop
+}
 
 // 6 bytes
-__declspec(noinline) void WriteRelJne(UInt32 jumpSrc, UInt32 jumpTgt);
-__declspec(noinline) void WriteRelJle(UInt32 jumpSrc, UInt32 jumpTgt);
-__declspec(noinline) void WriteRelJe(UInt32 jumpSrc, UInt32 jumpTgt);
-
-// replace a memory range (inclusive) with NOP
-#define NopMemoryRange(start, end) PatchMemoryNop(start, end-start + 1)
+void WriteRelJnz(UInt32 jumpSrc, UInt32 jumpTgt);
+void WriteRelJle(UInt32 jumpSrc, UInt32 jumpTgt);
 
 void PatchMemoryNop(ULONG_PTR Address, SIZE_T Size);
-void PatchMemoryInt3(ULONG_PTR Address, SIZE_T Size);
-
-UInt32 __stdcall GetRelJumpAddr(UInt32 jumpSrc);

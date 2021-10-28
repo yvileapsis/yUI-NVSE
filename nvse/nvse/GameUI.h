@@ -3,20 +3,15 @@
 #include "GameTiles.h"
 #include "GameTypes.h"
 
+
 class Menu;
 class SceneGraph;
 class FOPipboyManager;
 class NiObject;
 class TESObjectREFR;
 class NiNode;
-class BSShaderAccumulator;
-class ShadowSceneNode;
-class NiSourceTexture;
-class FORenderedMenu;
-class TileExtra;
-class NiRefObject;
 
-typedef Menu* (*_TempMenuByType)(UInt32 menuType);
+typedef Menu * (* _TempMenuByType)(UInt32 menuType);
 extern const _TempMenuByType TempMenuByType;
 
 enum MenuSpecialKeyboardInputCode
@@ -36,8 +31,7 @@ enum MenuSpecialKeyboardInputCode
 	kMenu_PageDown = 0x10,
 };
 
-struct InterfaceManagerStruct0178;
-
+// 584
 // 584
 class InterfaceManager
 {
@@ -208,10 +202,10 @@ public:
 	NiNode					*niNode080;			// 080
 	NiNode					*niNode084;			// 084
 	UInt32					unk088;				// 088
-	BSShaderAccumulator		*shaderAccum08C;	// 08C
-	BSShaderAccumulator		*shaderAccum090;	// 090
-	ShadowSceneNode			*shadowScene094;	// 094
-	ShadowSceneNode			*shadowScene098;	// 098
+	void		*shaderAccum08C;	// 08C
+	void		*shaderAccum090;	// 090
+	void			*shadowScene094;	// 094
+	void			*shadowScene098;	// 098
 	Tile					*menuRoot;			// 09C
 	Tile					*globalsTile;		// 0A0	globals.xml
 	NiNode					*unk0A4;			// 0A4 saw Tile? seen NiNode
@@ -259,7 +253,7 @@ public:
 	UInt32					keyRepeatStartTime;	// 154
 	UInt32					lastKeyRepeatTime;	// 158
 	UInt32					unk15C[4];			// 15C
-	FORenderedMenu*			renderedMenu;		// 16C
+	void*					renderedMenu;		// 16C
 	UInt8					byte170;			// 170
 	UInt8					byte171;			// 171
 	UInt8					byte172;			// 172
@@ -285,7 +279,7 @@ public:
 	Tutorials				help;				// 4D4
 };
 STATIC_ASSERT(sizeof(InterfaceManager) == 0x580);
-STATIC_ASSERT(sizeof(InterfaceManager::Struct0178) == 0x64);
+
 
 void Debug_DumpMenus(void);
 
@@ -332,7 +326,15 @@ enum
 	kMenuType_Max =				kMenuType_Trait,
 };
 
-struct EventCallbackScripts;
+class TileExtra : public NiExtraData
+{
+public:
+	TileExtra();
+	~TileExtra();
+
+	Tile* parentTile;	// 0C
+	NiNode* parentNode;	// 10
+};
 
 class Menu
 {
@@ -340,26 +342,22 @@ public:
 	Menu();
 	~Menu();
 
-	virtual void	Destructor(bool doFree);
-	virtual void	SetTile(UInt32 idx, Tile *value); // can be used to determine how many Tile*s are in a Menu class
-	virtual void	HandleLeftClickPress(UInt32 tileID, Tile* activeTile); // called when the mouse has moved and left click is pressed
-	virtual void	HandleClick(SInt32 tileID, Tile *clickedTile);
-	virtual void	HandleMouseover(UInt32 arg0, Tile *activeTile);	//	Called on mouseover, activeTile is moused-over Tile
-	virtual void	HandleMouseoverTileAlt(UInt32 arg0, Tile* tile);
-	virtual void	Unk_06(UInt32 arg0, UInt32 arg1, UInt32 arg2);  // unused?
-	virtual void	Unk_07(UInt32 arg0, UInt32 arg1, UInt32 arg2); // unused?
-	virtual void	HandleActiveMenuClick(UInt32 tileID, Tile* activeTile); // StartMenu, RaceSexMenu, VATSMenu, BookMenu
-	virtual void	Unk_09(UInt32 arg0, UInt32 arg1); // unused?
-	virtual void	HandleMousewheel(UInt32 tileID, Tile* tile);
-	virtual void	Update(void);	// Called every frame while the menu is active
-	virtual bool	HandleKeyboardInput(UInt32 inputChar);	// Return false for handling keyboard shortcuts
+	virtual void	Destructor(bool arg0);		// pass false to free memory
+	virtual void	SetField(UInt32 idx, Tile* value);
+	virtual void	Unk_02(UInt32 arg0, UInt32 arg1);	// show menu?
+	virtual void	HandleClick(UInt32 buttonID, Tile* clickedButton); // buttonID = <id> trait defined in XML
+	virtual void	HandleMouseover(UInt32 arg0, Tile * activeTile);	//called on mouseover, activeTile is moused-over Tile
+	virtual void	Unk_05(UInt32 arg0, UInt32 arg1);
+	virtual void	Unk_06(UInt32 arg0, UInt32 arg1, UInt32 arg2);
+	virtual void	Unk_07(UInt32 arg0, UInt32 arg1, UInt32 arg2);
+	virtual void	Unk_08(UInt32 arg0, UInt32 arg1);
+	virtual void	Unk_09(UInt32 arg0, UInt32 arg1);
+	virtual void	Unk_0A(UInt32 arg0, UInt32 arg1);
+	virtual void	Unk_0B(void);
+	virtual bool	HandleKeyboardInput(char inputChar);	//for keyboard shortcuts, return true if handled
 	virtual UInt32	GetID(void);
-	virtual bool	HandleSpecialKeyInput(MenuSpecialKeyboardInputCode code, UInt32 arg1);
-	virtual bool	HandleControllerInput(int a2, Tile* tile);
-	virtual void	OnRegisterTileValueAbove2710h(int val); // unimplemented by any vanilla menus, called at 0xA1F28E
-	virtual void	HandleControllerConnectOrDisconnect(bool isControllerConnected);
-	
-	// 14
+	virtual bool	Unk_0E(UInt32 arg0, UInt32 arg1);
+
 	struct TemplateInstance
 	{
 		UInt32		unk00;		// 00
@@ -367,17 +365,16 @@ public:
 		String		tileName;	// 08
 		Tile* tile;		// 10
 	};
-
-	// 14
+	
 	struct TemplateData
 	{
 		const char* templateName;	// 00
 		TileExtra* tileExtra;		// 04
 		DList<TemplateInstance>	instances;		// 08
 	};
-
+	
 	TileMenu* tile;			// 04
-	tList<TemplateData>	menuTemplates;	// 08
+	tList				<TemplateData>	menuTemplates;	// 08
 	UInt32				unk10;			// 10
 	UInt32				unk14;			// 14	Same as id (20)
 	UInt32				unk18;			// 18
@@ -389,27 +386,17 @@ public:
 	UInt32				visibilityState;// 24 :: Initialised to 4
 	// check 1 at 0xA0B174, 0x70D529, 0x70D592 :: set at 0x712224
 	// check 2 at 0x711FF1 :: set 2 at 0xA1D987 (when closes menu), 0xA1DA41
-    // check 4 at 0xA1D9EC (when closing menu) :: set at 0x7036A4, 0x71204D
+	// check 4 at 0xA1D9EC (when closing menu) :: set at 0x7036A4, 0x71204D
 	// check 8 at 0x712194 :: set 8 at 0xA1DB8F (when opening menu), 0x720B39
-	
-	Menu *HandleMenuInput(int tileID, Tile *clickedTile);
-	Tile *AddTileFromTemplate(Tile *destTile, const char *templateName, UInt32 arg3);
+
+	Menu* HandleMenuInput(int tileID, Tile* clickedTile);
+	Tile* AddTileFromTemplate(Tile* destTile, const char* templateName, UInt32 arg3);
 
 	bool GetTemplateExists(const char* templateName);
 };
 
-/*
-// 170
-class RaceSexMenu : public Menu		// 1036
+class RaceSexMenu : public Menu
 {
 public:
-	RaceSexMenu();
-	~RaceSexMenu();
-
-	UInt32				unk028[44];		// 028
-	TESNPC				*npc;			// 0D8
-	UInt32				unk0DC[37];		// 0DC
-
 	void UpdatePlayerHead(void);
 };
-*/

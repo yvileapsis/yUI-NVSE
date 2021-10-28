@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "common/IPipeServer.h"
 
 class IPipeClient

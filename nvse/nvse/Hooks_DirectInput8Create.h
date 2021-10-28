@@ -30,12 +30,10 @@ public:
 		kFlag_GameState =				1 << 0,	// input passed to game post-filtering
 		kFlag_RawState =				1 << 1,	// user input
 		kFlag_InsertedState =			1 << 2,	// keydown was inserted by script
-		kFlag_Pressed =					kFlag_GameState | kFlag_RawState | kFlag_InsertedState,
 
 		// modifiers
 		kFlag_IgnoreDisabled_User =		1 << 3,	// ignore user-disabled keys
 		kFlag_IgnoreDisabled_Script =	1 << 4,	// ignore script-disabled keys
-		kFlag_IgnoreDisabled =			kFlag_IgnoreDisabled_User | kFlag_IgnoreDisabled_Script,
 
 		kFlag_DefaultBackCompat =		kFlag_GameState,
 	};
@@ -50,15 +48,12 @@ public:
 
 	DIHookControl();
 
-	bool	IsKeyPressed(UInt32 keycode, UInt32 flags = 1);
-	bool	IsKeyPressedRaw(UInt32 keycode);
-	bool	IsLMBPressed();
+	bool	IsKeyPressed(UInt32 keycode, UInt32 flags = 0);
 	bool	IsKeyDisabled(UInt32 keycode);
 	bool	IsKeyHeld(UInt32 keycode);
 	bool	IsKeyTapped(UInt32 keycode);
 
 	void	SetKeyDisableState(UInt32 keycode, bool bDisable, UInt32 mask);
-	void	SetLMBDisabled(bool bDisable);
 	void	SetKeyHeldState(UInt32 keycode, bool bHold);
 	void	TapKey(UInt32 keycode);
 
@@ -84,7 +79,6 @@ private:
 		bool	scriptDisable;	// key cannot be pressed by script
 
 		bool	Process(bool keyDown, UInt32 idx);
-		UInt8	StateMask();
 	};
 
 	KeyInfo	m_keys[kMaxMacros];

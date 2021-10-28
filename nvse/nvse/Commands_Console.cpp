@@ -2,6 +2,7 @@
 #include "GameAPI.h"
 #include "GameForms.h"
 #include "GameScript.h"
+#include "StringVar.h"
 
 bool Cmd_PrintToConsole_Execute(COMMAND_ARGS)
 {
@@ -121,4 +122,19 @@ bool Cmd_SetConsoleEcho_Execute(COMMAND_ARGS)
 
 	return true;
 };
+
+bool Cmd_HasConsoleOutputFilename_Execute(COMMAND_ARGS)
+{
+	*result = ConsoleManager::HasConsoleOutputFilename();
+
+	return true;
+}
+
+bool Cmd_GetConsoleOutputFilename_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+	AssignToStringVar(PASS_COMMAND_ARGS, ConsoleManager::GetConsoleOutputFilename());
+	
+	return true;
+}
 

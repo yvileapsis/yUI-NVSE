@@ -1,13 +1,19 @@
 #include "ScriptUtils.h"
+
+#include <set>
+
 #include "CommandTable.h"
 #include "GameForms.h"
 #include "GameObjects.h"
 #include "Hooks_Script.h"
 #include <string>
+
+
+#include "containers.h"
+#include "FastStack.h"
 #include "ParamInfos.h"
 #include "FunctionScripts.h"
 #include "GameRTTI.h"
-
 #if RUNTIME
 
 #ifdef DBG_EXPR_LEAKS
@@ -64,9 +70,19 @@ static bool ShowWarning(const char* msg)
 ErrOutput g_ErrOut(ShowError, ShowWarning);
 
 #if RUNTIME
+UInt32 AddStringVar(const char* data, ScriptToken& lh, ExpressionEvaluator& context)
+{
+	const auto makeTemporary = lh.owningScript->IsUserDefinedFunction() && lh.refIdx == 0;
+	if (!lh.refIdx)
+		g_nvseVarGarbageCollectionMap[context.eventList].Emplace(lh.GetVar()->id, NVSEVarType::kVarType_String);
+	return g_StringMap.Add(lh.owningScript->GetModIndex(), data, makeTemporary);
+}
+
+#endif
+
+#if RUNTIME
 
 // run-time errors
-
 enum {
 	kScriptError_UnhandledOperator,
 	kScriptError_DivisionByZero,
@@ -110,13 +126,13 @@ ScriptToken* Eval_Comp_String_String(OperatorType op, ScriptToken* lh, ScriptTok
 	switch (op)
 	{
 	case kOpType_GreaterThan:
-		return ScriptToken::Create(_stricmp(lhs, rhs) > 0);
+		return ScriptToken::Create(StrCompare(lhs, rhs) > 0);
 	case kOpType_LessThan:
-		return ScriptToken::Create(_stricmp(lhs, rhs) < 0);
+		return ScriptToken::Create(StrCompare(lhs, rhs) < 0);
 	case kOpType_GreaterOrEqual:
-		return ScriptToken::Create(_stricmp(lhs, rhs) >= 0);
+		return ScriptToken::Create(StrCompare(lhs, rhs) >= 0);
 	case kOpType_LessOrEqual:
-		return ScriptToken::Create(_stricmp(lhs, rhs) <= 0);
+		return ScriptToken::Create(StrCompare(lhs, rhs) <= 0);
 	default:
 		context->Error("Unhandled operator %s", OpTypeToSymbol(op));
 		return NULL;
@@ -158,9 +174,9 @@ ScriptToken* Eval_Eq_String(OperatorType op, ScriptToken* lh, ScriptToken* rh, E
 	switch (op)
 	{
 	case kOpType_Equals:
-		return ScriptToken::Create(_stricmp(lhs, rhs) == 0);
+		return ScriptToken::Create(!StrCompare(lhs, rhs));
 	case kOpType_NotEqual:
-		return ScriptToken::Create(_stricmp(lhs, rhs) != 0);
+		return ScriptToken::Create(StrCompare(lhs, rhs) != 0);
 	default:
 		context->Error("Unhandled operator %s", OpTypeToSymbol(op));
 		return NULL;
@@ -225,9 +241,24 @@ ScriptToken* Eval_Add_Number(OperatorType op, ScriptToken* lh, ScriptToken* rh, 
 	return ScriptToken::Create(lh->GetNumber() + rh->GetNumber());
 }
 
+char* __fastcall ConcatStrings(const char *lStr, const char *rStr)
+{
+	UInt32 lLen = StrLen(lStr), rLen = StrLen(rStr);
+	if (lLen || rLen)
+	{
+		char *conStr = (char*)malloc(lLen + rLen + 1);
+		if (lLen) memcpy(conStr, lStr, lLen);
+		memcpy(conStr + lLen, rStr, rLen + 1);
+		return conStr;
+	}
+	return "";
+}
+
 ScriptToken* Eval_Add_String(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	return ScriptToken::Create(std::string(lh->GetString()) + std::string(rh->GetString()));
+	ScriptToken *token = ScriptToken::Create((const char*)NULL);
+	token->value.str = ConcatStrings(lh->GetString(), rh->GetString());
+	return token;
 }
 
 ScriptToken* Eval_Arithmetic(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
@@ -296,112 +327,191 @@ ScriptToken* Eval_Assign_Numeric(OperatorType op, ScriptToken* lh, ScriptToken* 
 
 ScriptToken* Eval_Assign_String(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	UInt32 strID = lh->GetVar()->data;
+	ScriptEventList::Var *var = lh->GetVar();
+	UInt32 strID = (int)var->data;
 	StringVar* strVar = g_StringMap.Get(strID);
-	if (!strVar)
-	{
-		strID = g_StringMap.Add(context->script->GetModIndex(), rh->GetString());
-		lh->GetVar()->data = strID;
-	}
-	else
-		strVar->Set(rh->GetString());
 
-	return ScriptToken::Create(rh->GetString());
+	const char *str = rh->GetString();
+
+	if (!strVar)
+		var->data = (int)AddStringVar(str, *lh, *context);
+	else strVar->Set(str);
+
+	return ScriptToken::Create(str);
 }
 
 ScriptToken* Eval_Assign_AssignableString(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	AssignableStringToken* aStr = dynamic_cast<AssignableStringToken*> (lh);
-	return aStr->Assign(rh->GetString()) ? ScriptToken::Create(aStr->GetString()) : NULL;
+	AssignableSubstringToken* aStr = dynamic_cast<AssignableSubstringToken*> (lh);
+	return aStr->Assign(rh->GetString()) ? ScriptToken::Create(aStr->GetString()) : nullptr;
 }
 
 ScriptToken* Eval_Assign_Form(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
+	UInt32 formID = rh->GetFormID();
 	UInt64* outRefID = (UInt64*)&(lh->GetVar()->data);
-	*outRefID = rh->GetFormID();
-	return ScriptToken::CreateForm(rh->GetFormID());
+	*outRefID = formID;
+	return ScriptToken::CreateForm(formID);
 }
 
 ScriptToken* Eval_Assign_Form_Number(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
+	UInt32 formID = rh->GetFormID();
 	UInt64* outRefID = (UInt64*)&(lh->GetVar()->data);
-	*outRefID = rh->GetFormID();
-	return ScriptToken::CreateForm(rh->GetFormID());
+	*outRefID = formID;
+	return ScriptToken::CreateForm(formID);
 }
 
 ScriptToken* Eval_Assign_Global(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	lh->GetGlobal()->data = rh->GetNumber();
-	return ScriptToken::Create(rh->GetNumber());
+	double value = rh->GetNumber();
+	lh->GetGlobal()->data = value;
+	return ScriptToken::Create(value);
 }
 
 ScriptToken* Eval_Assign_Array(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	g_ArrayMap.AddReference(&lh->GetVar()->data, rh->GetArray(), context->script->GetModIndex());
-	return ScriptToken::CreateArray(lh->GetVar()->data);
+	ScriptEventList::Var *var = lh->GetVar();
+	g_ArrayMap.AddReference(&var->data, rh->GetArray(), context->script->GetModIndex());
+	if (!lh->refIdx)
+		g_nvseVarGarbageCollectionMap[context->eventList].Emplace(var->id, NVSEVarType::kVarType_Array);
+	return ScriptToken::CreateArray(var->data);
+}
+
+const auto g_invalidElemMessageStr = "Array element is invalid";
+
+bool GetArrayAndArrayKey(ScriptToken* lh, const ArrayKey*& key, ArrayVar*& arr, ExpressionEvaluator* context)
+{
+	key = lh->GetArrayKey();
+	if (!key)
+	{
+		context->Error(g_invalidElemMessageStr);
+		return false;
+	}
+	arr = g_ArrayMap.Get(lh->GetOwningArrayID());
+	if (!arr)
+	{
+		context->Error("Invalid array access - the array was not initialized.");
+		return false;
+	}
+	return true;
 }
 
 ScriptToken* Eval_Assign_Elem_Number(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	const ArrayKey* key = lh->GetArrayKey();
-	if (!key)
+	const ArrayKey* key;
+	ArrayVar* arr;
+	if (!GetArrayAndArrayKey(lh, key, arr, context))
+	{
+		return nullptr;
+	}
+
+	double value = rh->GetNumber();
+	if (key->KeyType() == kDataType_Numeric)
+	{
+		if (!arr->SetElementNumber(key->key.num, value))
+			return NULL;
+	}
+	else if (!arr->SetElementNumber(key->key.GetStr(), value))
 		return NULL;
 
-	return g_ArrayMap.SetElementNumber(lh->GetOwningArrayID(), *key, rh->GetNumber()) ? ScriptToken::Create(rh->GetNumber()) : NULL;
+	return ScriptToken::Create(value);
 }
 
 ScriptToken* Eval_Assign_Elem_String(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	const ArrayKey* key = lh->GetArrayKey();
-	if (!key)
-		return NULL;
+	const ArrayKey* key;
+	ArrayVar* arr;
+	if (!GetArrayAndArrayKey(lh, key, arr, context))
+	{
+		return nullptr;
+	}
 
-	return g_ArrayMap.SetElementString(lh->GetOwningArrayID(), *key, rh->GetString()) ? ScriptToken::Create(rh->GetString()) : NULL;
+	const char *str = rh->GetString();
+	if (key->KeyType() == kDataType_Numeric)
+	{
+		if (!arr->SetElementString(key->key.num, str))
+		{
+			context->Error("Element with key not found");
+			return nullptr;
+		}
+	}
+	else if (!arr->SetElementString(key->key.GetStr(), str))
+	{
+		context->Error("Element with key not found");
+		return nullptr;
+	}
+
+	return ScriptToken::Create(str);
 }
 
 ScriptToken* Eval_Assign_Elem_Form(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	const ArrayKey* key = lh->GetArrayKey();
-	if (!key)
-		return NULL;
+	const ArrayKey* key;
+	ArrayVar* arr;
+	if (!GetArrayAndArrayKey(lh, key, arr, context))
+	{
+		return nullptr;
+	}
 
-	return g_ArrayMap.SetElementFormID(lh->GetOwningArrayID(), *key, rh->GetFormID()) ? ScriptToken::CreateForm(rh->GetFormID()) : NULL;
+	UInt32 formID = rh->GetFormID();
+	if (key->KeyType() == kDataType_Numeric)
+	{
+		if (!arr->SetElementFormID(key->key.num, formID))
+		{
+			context->Error("Element with key not found");
+			return nullptr;
+		}
+	}
+	else if (!arr->SetElementFormID(key->key.GetStr(), formID))
+	{
+		context->Error("Element with key not found");
+		return nullptr;
+	}
+
+	return ScriptToken::CreateForm(formID);
 }
 
 ScriptToken* Eval_Assign_Elem_Array(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	const ArrayKey* key = lh->GetArrayKey();
-	if (!key)
-		return NULL;
-
-	if (g_ArrayMap.SetElementArray(lh->GetOwningArrayID(), *key, rh->GetArray()))
+	const ArrayKey* key;
+	ArrayVar* arr;
+	if (!GetArrayAndArrayKey(lh, key, arr, context))
 	{
-	//	ArrayID newID;
-	//	// this is pre-reference-counting code; no longer necessary
-	//	if (g_ArrayMap.GetElementArray(lh->GetOwningArrayID(), *key, &newID))
-	//		return ScriptToken::Create(newID, kTokenType_Array);
-		return ScriptToken::CreateArray(rh->GetArray());
+		return nullptr;
 	}
 
-	return NULL;
+	ArrayID rhArrID = rh->GetArray();
+	if (key->KeyType() == kDataType_Numeric)
+	{
+		if (!arr->SetElementArray(key->key.num, rhArrID))
+			return NULL;
+	}
+	else if (!arr->SetElementArray(key->key.GetStr(), rhArrID))
+		return NULL;
+
+	return ScriptToken::CreateArray(rhArrID);
 }
 
 ScriptToken* Eval_PlusEquals_Number(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	lh->GetVar()->data += rh->GetNumber();
-	return ScriptToken::Create(lh->GetVar()->data);
+	ScriptEventList::Var *var = lh->GetVar();
+	var->data += rh->GetNumber();
+	return ScriptToken::Create(var->data);
 }
 
 ScriptToken* Eval_MinusEquals_Number(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	lh->GetVar()->data -= rh->GetNumber();
-	return ScriptToken::Create(lh->GetVar()->data);
+	ScriptEventList::Var *var = lh->GetVar();
+	var->data -= rh->GetNumber();
+	return ScriptToken::Create(var->data);
 }
 
 ScriptToken* Eval_TimesEquals(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	lh->GetVar()->data *= rh->GetNumber();
-	return ScriptToken::Create(lh->GetVar()->data);
+	ScriptEventList::Var *var = lh->GetVar();
+	var->data *= rh->GetNumber();
+	return ScriptToken::Create(var->data);
 }
 
 ScriptToken* Eval_DividedEquals(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
@@ -412,16 +522,18 @@ ScriptToken* Eval_DividedEquals(OperatorType op, ScriptToken* lh, ScriptToken* r
 		context->Error("Division by zero");
 		return NULL;
 	}
-	lh->GetVar()->data /= rhNum;
-	return ScriptToken::Create(lh->GetVar()->data);
+	ScriptEventList::Var *var = lh->GetVar();
+	var->data /= rhNum;
+	return ScriptToken::Create(var->data);
 }
 
 ScriptToken* Eval_ExponentEquals(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
+	ScriptEventList::Var *var = lh->GetVar();
 	double rhNum = rh->GetNumber();
-	double lhNum = lh->GetVar()->data;
-	lh->GetVar()->data = pow(lhNum,rhNum);
-	return ScriptToken::Create(lh->GetVar()->data);
+	double lhNum = var->data;
+	var->data = pow(lhNum, rhNum);
+	return ScriptToken::Create(var->data);
 }
 
 
@@ -466,54 +578,57 @@ ScriptToken* Eval_ExponentEquals_Global(OperatorType op, ScriptToken* lh, Script
 
 ScriptToken* Eval_PlusEquals_String(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	UInt32 strID = lh->GetVar()->data;
+	ScriptEventList::Var *var = lh->GetVar();
+	UInt32 strID = (int)var->data;
 	StringVar* strVar = g_StringMap.Get(strID);
 	if (!strVar)
 	{
-		strID = g_StringMap.Add(context->script->GetModIndex(), "");
-		lh->GetVar()->data = strID;
+		//strID = g_StringMap.Add(context->script->GetModIndex(), "");
+		strID = AddStringVar("", *lh, *context);
+		var->data = (int)strID;
 		strVar = g_StringMap.Get(strID);
 	}
 
-	strVar->Set((strVar->String() + rh->GetString()).c_str());
-	return ScriptToken::Create(strVar->String());
+	strVar->StringRef() += rh->GetString();
+
+	return ScriptToken::Create(strVar->GetCString());
 }
 
 ScriptToken* Eval_TimesEquals_String(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	UInt32 strID = lh->GetVar()->data;
+	ScriptEventList::Var *var = lh->GetVar();
+	UInt32 strID = (int)var->data;
 	StringVar* strVar = g_StringMap.Get(strID);
 	if (!strVar)
 	{
-		strID = g_StringMap.Add(context->script->GetModIndex(), "");
-		lh->GetVar()->data = strID;
+		//strID = g_StringMap.Add(context->script->GetModIndex(), "");
+		strID = AddStringVar("", *lh, *context);
+		var->data = (int)strID;
 		strVar = g_StringMap.Get(strID);
 	}
 
 	std::string str = strVar->String();
-	std::string result = "";
-	if (rh->GetNumber() > 0)
+
+	int rhNum = rh->GetNumber();
+	while (rhNum > 0)
 	{
-		UInt32 rhNum = rh->GetNumber();
-		for (UInt32 i = 0; i < rhNum; i++)
-			result += str;
+		strVar->StringRef() += str;
+		rhNum--;
 	}
 
-	strVar->Set(result.c_str());
 	return ScriptToken::Create(strVar->GetCString());
 }
 
 ScriptToken* Eval_Multiply_String_Number(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	double rhNum = rh->GetNumber();
-	std::string str = lh->GetString();
-	std::string result = "";
+	const char *str = lh->GetString();
+	std::string result;
 
-	if (rhNum > 0)
+	int rhNum = rh->GetNumber();
+	while (rhNum > 0)
 	{
-		UInt32 times = rhNum;
-		for (UInt32 i =0; i < times; i++)
-			result += str;
+		result += str;
+		rhNum--;
 	}
 
 	return ScriptToken::Create(result.c_str());
@@ -522,141 +637,206 @@ ScriptToken* Eval_Multiply_String_Number(OperatorType op, ScriptToken* lh, Scrip
 ScriptToken* Eval_PlusEquals_Elem_Number(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
 	const ArrayKey* key = lh->GetArrayKey();
-	double elemVal;
-	if (!key || !g_ArrayMap.GetElementNumber(lh->GetOwningArrayID(), *key, &elemVal))
-		return NULL;
-
-	return g_ArrayMap.SetElementNumber(lh->GetOwningArrayID(), *key, elemVal + rh->GetNumber()) ? ScriptToken::Create(elemVal + rh->GetNumber()) : NULL;
+	if (key)
+	{
+		ArrayElement *elem = g_ArrayMap.GetElement(lh->GetOwningArrayID(), key);
+		double elemVal;
+		if (elem && elem->GetAsNumber(&elemVal))
+		{
+			elemVal += rh->GetNumber();
+			elem->SetNumber(elemVal);
+			return ScriptToken::Create(elemVal);
+		}
+	}
+	context->Error(g_invalidElemMessageStr);
+	return NULL;
 }
 
 ScriptToken* Eval_MinusEquals_Elem_Number(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
 	const ArrayKey* key = lh->GetArrayKey();
-	double elemVal;
-	if (!key || !g_ArrayMap.GetElementNumber(lh->GetOwningArrayID(), *key, &elemVal))
-		return NULL;
-
-	return g_ArrayMap.SetElementNumber(lh->GetOwningArrayID(), *key, elemVal - rh->GetNumber()) ? ScriptToken::Create(elemVal - rh->GetNumber()) : NULL;
+	if (key)
+	{
+		ArrayElement *elem = g_ArrayMap.GetElement(lh->GetOwningArrayID(), key);
+		double elemVal;
+		if (elem && elem->GetAsNumber(&elemVal))
+		{
+			elemVal -= rh->GetNumber();
+			elem->SetNumber(elemVal);
+			return ScriptToken::Create(elemVal);
+		}
+	}
+	context->Error(g_invalidElemMessageStr);
+	return NULL;
 }
 
 ScriptToken* Eval_TimesEquals_Elem(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
 	const ArrayKey* key = lh->GetArrayKey();
-	double elemVal;
-	if (!key || !g_ArrayMap.GetElementNumber(lh->GetOwningArrayID(), *key, &elemVal))
-		return NULL;
-
-	double result = elemVal * rh->GetNumber();
-	return g_ArrayMap.SetElementNumber(lh->GetOwningArrayID(), *key, result) ? ScriptToken::Create(result) : NULL;
+	if (key)
+	{
+		ArrayElement *elem = g_ArrayMap.GetElement(lh->GetOwningArrayID(), key);
+		double elemVal;
+		if (elem && elem->GetAsNumber(&elemVal))
+		{
+			elemVal *= rh->GetNumber();
+			elem->SetNumber(elemVal);
+			return ScriptToken::Create(elemVal);
+		}
+	}
+	context->Error(g_invalidElemMessageStr);
+	return NULL;
 }
 
 ScriptToken* Eval_DividedEquals_Elem(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
 	const ArrayKey* key = lh->GetArrayKey();
-	double elemVal;
-	if (!key || !g_ArrayMap.GetElementNumber(lh->GetOwningArrayID(), *key, &elemVal))
-		return NULL;
-
-	double result = rh->GetNumber();
-	if (result == 0.0)
+	if (key)
 	{
-		context->Error("Division by zero");
-		return NULL;
+		ArrayElement *elem = g_ArrayMap.GetElement(lh->GetOwningArrayID(), key);
+		double elemVal;
+		if (elem && elem->GetAsNumber(&elemVal))
+		{
+			double result = rh->GetNumber();
+			if (result != 0.0)
+			{
+				elemVal /= result;
+				elem->SetNumber(elemVal);
+				return ScriptToken::Create(elemVal);
+			}
+			context->Error("Division by zero");
+		}
 	}
-
-	result = elemVal / rh->GetNumber();
-	return g_ArrayMap.SetElementNumber(lh->GetOwningArrayID(), *key, result) ? ScriptToken::Create(result) : NULL;
+	context->Error(g_invalidElemMessageStr);
+	return NULL;
 }
 
 ScriptToken* Eval_ExponentEquals_Elem(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
 	const ArrayKey* key = lh->GetArrayKey();
-	double elemVal;
-	if (!key || !g_ArrayMap.GetElementNumber(lh->GetOwningArrayID(), *key, &elemVal))
-		return NULL;
-
-	double result = pow(elemVal,rh->GetNumber());
-	return g_ArrayMap.SetElementNumber(lh->GetOwningArrayID(), *key, result) ? ScriptToken::Create(result) : NULL;
+	if (key)
+	{
+		ArrayElement *elem = g_ArrayMap.GetElement(lh->GetOwningArrayID(), key);
+		double elemVal;
+		if (elem && elem->GetAsNumber(&elemVal))
+		{
+			double result = pow(elemVal, rh->GetNumber());
+			elem->SetNumber(result);
+			return ScriptToken::Create(result);
+		}
+	}
+	context->Error(g_invalidElemMessageStr);
+	return NULL;
 }
 
 ScriptToken* Eval_PlusEquals_Elem_String(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	std::string elemStr;
 	const ArrayKey* key = lh->GetArrayKey();
-	if (!key || !g_ArrayMap.GetElementString(lh->GetOwningArrayID(), *key, elemStr))
-		return NULL;
-
-	elemStr += rh->GetString();
-	return g_ArrayMap.SetElementString(lh->GetOwningArrayID(), *key, elemStr.c_str()) ? ScriptToken::Create(elemStr) : NULL;
+	if (key)
+	{
+		ArrayElement *elem = g_ArrayMap.GetElement(lh->GetOwningArrayID(), key);
+		const char* pElemStr;
+		if (elem && elem->GetAsString(&pElemStr))
+		{
+			ScriptToken *token = ScriptToken::Create((const char*)NULL);
+			char *conStr = ConcatStrings(pElemStr, rh->GetString());
+			token->value.str = conStr;
+			elem->SetString(conStr);
+			return token;
+		}
+	}
+	context->Error(g_invalidElemMessageStr);
+	return NULL;
 }
 
 ScriptToken* Eval_Negation(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	return ScriptToken::Create(lh->GetNumber() * -1);
+	return ScriptToken::Create(-lh->GetNumber());
 }
 
 ScriptToken* Eval_LogicalNot(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	return ScriptToken::Create(lh->GetBool() ? false : true);
+	return ScriptToken::Create(!lh->GetBool());
 }
 
 ScriptToken* Eval_Subscript_Array_Number(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	if (!lh->GetArray())
+	ArrayID arrID = lh->GetArray();
+	ArrayVar *arr = arrID ? g_ArrayMap.Get(arrID) : NULL;
+
+	if (!arr)
 	{
-		context->Error("Invalid array access - the array was not initialized.");
+		context->Error("Invalid array access - the array was not initialized. 0");
 		return NULL;
 	}
-	else if (g_ArrayMap.GetKeyType(lh->GetArray()) != kDataType_Numeric)
+	if (arr->KeyType() != kDataType_Numeric)
 	{
 		context->Error("Invalid array access - expected string index, received numeric.");
 		return NULL;
 	}
-
 	ArrayKey key(rh->GetNumber());
-	return ScriptToken::Create(lh->GetArray(), &key);
+	
+	return ScriptToken::Create(arrID, &key);
 }
 
 ScriptToken* Eval_Subscript_Elem_Number(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
+	auto* arrayElement = dynamic_cast<ArrayElementToken*>(lh);
+
+	// bugfix for `testexpr svKey := aTest["bleh"][0]` when bleh doesn't exist
+	if (!arrayElement->CanConvertTo(kTokenType_String))
+	{
+		return nullptr;
+	}
+	
 	UInt32 idx = rh->GetNumber();
-	return ScriptToken::Create(dynamic_cast<ArrayElementToken*>(lh), idx, idx);
+	return ScriptToken::Create(arrayElement, idx, idx);
 }
 
 ScriptToken* Eval_Subscript_Elem_Slice(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
 	const Slice* slice = rh->GetSlice();
+	if (!slice || slice->bIsString)
+	{
+		context->Error("Invalid array slice operation - array is uninitialized or supplied index does not match key type");
+	}
 	return (slice && !slice->bIsString) ? ScriptToken::Create(dynamic_cast<ArrayElementToken*>(lh), slice->m_lower, slice->m_upper) : NULL;
 }
 
 ScriptToken* Eval_Subscript_Array_String(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	if (!lh->GetArray())
+	ArrayID arrID = lh->GetArray();
+	ArrayVar *arr = arrID ? g_ArrayMap.Get(arrID) : NULL;
+
+	if (!arr)
 	{
-		context->Error("Invalid array access - the array was not initialized.");
+		context->Error("Invalid array access - the array was not initialized. 1");
 		return NULL;
 	}
-	else if (g_ArrayMap.GetKeyType(lh->GetArray()) != kDataType_String)
+	if (arr->KeyType() != kDataType_String)
 	{
 		context->Error("Invalid array access - expected numeric index, received string");
 		return NULL;
 	}
 
 	ArrayKey key(rh->GetString());
-	return ScriptToken::Create(lh->GetArray(), &key);
+	return ScriptToken::Create(arrID, &key);
 }
 
 ScriptToken* Eval_Subscript_Array_Slice(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	UInt32 slicedID = g_ArrayMap.MakeSlice(lh->GetArray(), rh->GetSlice(), context->script->GetModIndex());
-	if (!slicedID)
+	ArrayVar *srcArr = g_ArrayMap.Get(lh->GetArray());
+	if (srcArr)
 	{
-		context->Error("Invalid array slice operation - array is uninitialized or supplied index does not match key type");
-		return NULL;
+		ArrayVar *sliceArr = srcArr->MakeSlice(rh->GetSlice(), context->script->GetModIndex());
+		if (sliceArr) return ScriptToken::CreateArray(sliceArr->ID());
 	}
 
-	return ScriptToken::CreateArray(slicedID);
+	context->Error("Invalid array slice operation - array is uninitialized or supplied index does not match key type");
+	return NULL;
 }
+
+const auto* g_stringVarUninitializedMsg = "String var is uninitialized";
 
 ScriptToken* Eval_Subscript_StringVar_Number(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
@@ -665,6 +845,7 @@ ScriptToken* Eval_Subscript_StringVar_Number(OperatorType op, ScriptToken* lh, S
 	if (var) {
 		StringVar* strVar = g_StringMap.Get(var->data);
 		if (!strVar) {
+			context->Error(g_stringVarUninitializedMsg);
 			return NULL;	// uninitialized
 		}
 
@@ -673,7 +854,8 @@ ScriptToken* Eval_Subscript_StringVar_Number(OperatorType op, ScriptToken* lh, S
 			idx += strVar->GetLength();
 		}
 	}
-
+	else
+		context->Error("Invalid variable");
 	return var ? ScriptToken::Create(var->data, idx, idx) : NULL;
 }
 
@@ -684,7 +866,9 @@ ScriptToken* Eval_Subscript_StringVar_Slice(OperatorType op, ScriptToken* lh, Sc
 	double upper = slice->m_upper;
 	double lower = slice->m_lower;
 	StringVar* strVar = g_StringMap.Get(var->data);
-	if (!strVar) {
+	if (!strVar) 
+	{
+		context->Error(g_stringVarUninitializedMsg);
 		return NULL;
 	}
 
@@ -700,16 +884,18 @@ ScriptToken* Eval_Subscript_StringVar_Slice(OperatorType op, ScriptToken* lh, Sc
 	if (var && slice && !slice->bIsString) {
 		return ScriptToken::Create(var->data, lower, upper);
 	}
+	context->Error("Invalid string var slice operation - variable invalid or variable is not a string var");
 	return NULL;
 }
 
 ScriptToken* Eval_Subscript_String(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	UInt32 idx = (rh->GetNumber() < 0) ? strlen(lh->GetString()) + rh->GetNumber() : rh->GetNumber();
-	if (idx < strlen(lh->GetString()))
-		return ScriptToken::Create(std::string(lh->GetString()).substr(idx, 1));
-	else
-		return ScriptToken::Create("");
+	const char *lStr = lh->GetString();
+	UInt32 lLen = StrLen(lStr);
+	UInt32 idx = (int)rh->GetNumber();
+	if (idx < 0) idx += lLen;
+	UInt32 chr = (idx < lLen) ? lStr[idx] : 0;
+	return ScriptToken::Create((const char*)&chr);
 }
 
 ScriptToken* Eval_Subscript_String_Slice(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
@@ -737,19 +923,22 @@ ScriptToken* Eval_Subscript_String_Slice(OperatorType op, ScriptToken* lh, Scrip
 
 ScriptToken* Eval_MemberAccess(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	if (!lh->GetArray())
+	ArrayID arrID = lh->GetArray();
+	ArrayVar *arr = arrID ? g_ArrayMap.Get(arrID) : NULL;
+
+	if (!arr)
 	{
-		context->Error("Invalid array access - the array was not initialized.");
+		context->Error("Invalid array access - the array was not initialized. 2");
 		return NULL;
 	}
-	else if (g_ArrayMap.GetKeyType(lh->GetArray()) != kDataType_String)
+	if (arr->KeyType() != kDataType_String)
 	{
 		context->Error("Invalid array access - expected numeric index, received string");
 		return NULL;
 	}
 
 	ArrayKey key(rh->GetString());
-	return ScriptToken::Create(lh->GetArray(), &key);
+	return ScriptToken::Create(arrID, &key);
 }
 ScriptToken* Eval_Slice_String(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
@@ -771,20 +960,22 @@ ScriptToken* Eval_ToString_String(OperatorType op, ScriptToken* lh, ScriptToken*
 ScriptToken* Eval_ToString_Number(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
 	char buf[0x20];
-	sprintf_s(buf, sizeof(buf), "%g", lh->GetNumber());
-	return ScriptToken::Create(std::string(buf));
+	snprintf(buf, sizeof(buf), "%g", lh->GetNumber());
+	return ScriptToken::Create(buf);
 }
 
 ScriptToken* Eval_ToString_Form(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	return ScriptToken::Create(std::string(GetFullName(lh->GetTESForm())));
+	return ScriptToken::Create(GetFullName(lh->GetTESForm()));
 }
 
 ScriptToken* Eval_ToString_Array(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	char buf[0x20];
-	sprintf_s(buf, sizeof(buf), "Array ID %d", lh->GetArray());
-	return ScriptToken::Create(std::string(buf));
+	const auto arrayId = lh->GetArray();
+	const auto* arrayVar = g_ArrayMap.Get(arrayId);
+	if (arrayVar)
+		return ScriptToken::Create(arrayVar->GetStringRepresentation());
+	return ScriptToken::Create("array ID " + std::to_string(arrayId) + " (invalid)");
 }
 
 ScriptToken* Eval_ToNumber(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
@@ -796,47 +987,49 @@ ScriptToken* Eval_In(OperatorType op, ScriptToken* lh, ScriptToken* rh, Expressi
 {
 	switch (lh->GetVariableType())
 	{
-	case Script::eVarType_Array:
+		case Script::eVarType_Array:
 		{
-			UInt32 iterID = g_ArrayMap.Create(kDataType_String, false, context->script->GetModIndex());
-			//g_ArrayMap.AddReference(&lh->GetVar()->data, iterID, context->script->GetModIndex());
+			UInt32 iterID = g_ArrayMap.Create(kDataType_String, false, context->script->GetModIndex())->ID();
 
 			ForEachContext con(rh->GetArray(), iterID, Script::eVarType_Array, lh->GetVar());
 			ScriptToken* forEach = ScriptToken::Create(&con);
-			//if (!forEach)
-			//	g_ArrayMap.RemoveReference(&lh->GetVar()->data, context->script->GetModIndex());
 
 			return forEach;
 		}
-	case Script::eVarType_String:
+		case Script::eVarType_String:
 		{
-			UInt32 iterID = lh->GetVar()->data;
+			ScriptEventList::Var *var = lh->GetVar();
+			UInt32 iterID = (int)var->data;
 			StringVar* sv = g_StringMap.Get(iterID);
 			if (!sv)
 			{
-				iterID = g_StringMap.Add(context->script->GetModIndex(), "");
-				lh->GetVar()->data = iterID;
+				//iterID = g_StringMap.Add(context->script->GetModIndex(), "");
+				iterID = AddStringVar("", *lh, *context);
+				var->data = (int)iterID;
 			}
 
 			UInt32 srcID = g_StringMap.Add(context->script->GetModIndex(), rh->GetString(), true);
-			ForEachContext con(srcID, iterID, Script::eVarType_String, lh->GetVar());
+			ForEachContext con(srcID, iterID, Script::eVarType_String, var);
 			ScriptToken* forEach = ScriptToken::Create(&con);
 			return forEach;
 		}
-	case Script::eVarType_Ref:
+		case Script::eVarType_Ref:
 		{
-			TESObjectREFR* src = DYNAMIC_CAST(rh->GetTESForm(), TESForm, TESObjectREFR);
-			if (!src && rh->GetTESForm() && (rh->GetTESForm()->refID == playerID) )
-				src = (TESObjectREFR*)LookupFormByID(playerRefID);
-			if (src) {
+			TESForm *form = rh->GetTESForm();
+			TESObjectREFR* src = DYNAMIC_CAST(form, TESForm, TESObjectREFR);
+			if (!src && form && (form->refID == playerID))
+				src = (TESObjectREFR*)PlayerCharacter::GetSingleton();
+			if (src)
+			{
 				ForEachContext con((UInt32)src, 0, Script::eVarType_Ref, lh->GetVar());
 				ScriptToken* forEach = ScriptToken::Create(&con);
 				return forEach;
 			}
+			context->Error("Source is a base form (must be a reference)");
 			return NULL;
 		}
 	}
-
+	context->Error("Unsupported variable type (only array_var, string_var and ref supported)");
 	return NULL;
 }
 
@@ -854,20 +1047,26 @@ ScriptToken* Eval_Dereference(OperatorType op, ScriptToken* lh, ScriptToken* rh,
 	ArrayID arrID = lh->GetArray();
 	if (!arrID)
 	{
-		context->Error("Invalid array access - the array was not initialized.");
+		context->Error("Invalid array access - the array was not initialized. 3");
 		return NULL;
 	}
 
-	UInt32 size = g_ArrayMap.SizeOf(arrID);
-	ArrayKey valueKey("value");
-	// is this a foreach iterator?
-	if (size == 2 && g_ArrayMap.HasKey(arrID, valueKey) && g_ArrayMap.HasKey(arrID, "key") && g_ArrayMap.HasKey(arrID, "value"))
-		return ScriptToken::Create(arrID, &valueKey);
+	ArrayVar *arr = g_ArrayMap.Get(arrID);
+	if (arr)
+	{
+		// is this a foreach iterator?
+		if ((arr->Size() == 2) && arr->HasKey("key") && arr->HasKey("value"))
+		{
+			ArrayKey valueKey("value");
+			return ScriptToken::Create(arrID, &valueKey);
+		}
 
-	ArrayElement elem;
-	if (g_ArrayMap.GetFirstElement(arrID, &elem, &valueKey))
-		return ScriptToken::Create(arrID, &valueKey);
-
+		const ArrayKey *firstKey;
+		ArrayElement *elem;
+		if (arr->GetFirstElement(&elem, &firstKey))
+			return ScriptToken::Create(arrID, const_cast<ArrayKey*>(firstKey));
+	}
+	context->Error("Invalid array access - the array was not initialized.");
 	return NULL;
 }
 
@@ -875,31 +1074,31 @@ ScriptToken* Eval_Box_Number(OperatorType op, ScriptToken* lh, ScriptToken* rh, 
 {
 	// the inverse operation of dereference: given a value of any type, wraps it in a single-element array
 	// again, a convenience request
-	ArrayID arr = g_ArrayMap.Create(kDataType_Numeric, true, context->script->GetModIndex());
-	g_ArrayMap.SetElementNumber(arr, ArrayKey(0.0), lh->GetNumber());
-	return ScriptToken::CreateArray(arr);
+	ArrayVar *arr = g_ArrayMap.Create(kDataType_Numeric, true, context->script->GetModIndex());
+	arr->SetElementNumber(0.0, lh->GetNumber());
+	return ScriptToken::CreateArray(arr->ID());
 }
 
 ScriptToken* Eval_Box_String(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	ArrayID arr = g_ArrayMap.Create(kDataType_Numeric, true, context->script->GetModIndex());
-	g_ArrayMap.SetElementString(arr, ArrayKey(0.0), lh->GetString());
-	return ScriptToken::CreateArray(arr);
+	ArrayVar *arr = g_ArrayMap.Create(kDataType_Numeric, true, context->script->GetModIndex());
+	arr->SetElementString(0.0, lh->GetString());
+	return ScriptToken::CreateArray(arr->ID());
 }
 
 ScriptToken* Eval_Box_Form(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	ArrayID arr = g_ArrayMap.Create(kDataType_Numeric, true, context->script->GetModIndex());
-	TESForm* form = lh->GetTESForm();
-	g_ArrayMap.SetElementFormID(arr, ArrayKey(0.0), form ? form->refID : 0);
-	return ScriptToken::CreateArray(arr);
+	ArrayVar *arr = g_ArrayMap.Create(kDataType_Numeric, true, context->script->GetModIndex());
+	TESForm *form = lh->GetTESForm();
+	arr->SetElementFormID(0.0, form ? form->refID : 0);
+	return ScriptToken::CreateArray(arr->ID());
 }
 
 ScriptToken* Eval_Box_Array(OperatorType op, ScriptToken* lh, ScriptToken* rh, ExpressionEvaluator* context)
 {
-	ArrayID arr = g_ArrayMap.Create(kDataType_Numeric, true, context->script->GetModIndex());
-	g_ArrayMap.SetElementArray(arr, ArrayKey(0.0), lh->GetArray());
-	return ScriptToken::CreateArray(arr);
+	ArrayVar *arr = g_ArrayMap.Create(kDataType_Numeric, true, context->script->GetModIndex());
+	arr->SetElementArray(0.0, lh->GetArray());
+	return ScriptToken::CreateArray(arr->ID());
 }
 
 
@@ -1295,195 +1494,6 @@ const char* OpTypeToSymbol(OperatorType op)
 	return "<unknown>";
 }
 
-#if 0
-
-// Operand conversion routines
-ScriptToken Number_To_Bool(ScriptToken* token, ExpressionEvaluator* context)
-{
-	return ScriptToken(token->value.num ? true : false);
-}
-
-// this is unused
-ScriptToken Number_To_String(ScriptToken* token, ExpressionEvaluator* context)
-{
-	char str[0x20];
-	sprintf_s(str, sizeof(str), "%f", token->value.num);
-	return ScriptToken(std::string(str));
-}
-
-ScriptToken Bool_To_Number(ScriptToken* token, ExpressionEvaluator* context)
-{
-	return ScriptToken(token->value.num);
-}
-
-ScriptToken Cmd_To_Number(ScriptToken* token, ExpressionEvaluator* context)
-{
-	return ScriptToken(token->value.num);
-}
-
-ScriptToken Cmd_To_Form(ScriptToken* token, ExpressionEvaluator* context)
-{
-	return ScriptToken(*((UInt64*)(&token->value.num)), kTokenType_Form);
-}
-
-ScriptToken Cmd_To_Bool(ScriptToken* token, ExpressionEvaluator* context)
-{
-	return ScriptToken(token->value.num ? true : false);
-}
-
-ScriptToken Ref_To_Form(ScriptToken* token, ExpressionEvaluator* context)
-{
-	token->value.refVar->Resolve(context->eventList);
-	return ScriptToken(token->value.refVar->form ? token->value.refVar->form->refID : 0, kTokenType_Form);
-}
-
-ScriptToken Ref_To_Bool(ScriptToken* token, ExpressionEvaluator* context)
-{
-	token->value.refVar->Resolve(context->eventList);
-	return ScriptToken(token->value.refVar->form ? true : false);
-}
-
-ScriptToken Ref_To_RefVar(ScriptToken* token, ExpressionEvaluator* context)
-{
-	ScriptEventList::Var* var = context->eventList->GetVariable(token->value.refVar->varIdx);
-	if (var)
-		return ScriptToken(var);
-	else
-		return ScriptToken::Bad();
-}
-
-ScriptToken Global_To_Number(ScriptToken* token, ExpressionEvaluator* context)
-{
-	return ScriptToken(token->value.global->data);
-}
-
-ScriptToken Global_To_Bool(ScriptToken* token, ExpressionEvaluator* context)
-{
-	return ScriptToken(token->value.global->data ? true : false);
-}
-
-ScriptToken Form_To_Bool(ScriptToken* token, ExpressionEvaluator* context)
-{
-	return ScriptToken(token->value.formID ? true : false);
-}
-
-ScriptToken NumericVar_To_Number(ScriptToken* token, ExpressionEvaluator* context)
-{
-	return ScriptToken(token->value.var->data);
-}
-
-ScriptToken NumericVar_To_Bool(ScriptToken* token, ExpressionEvaluator* context)
-{
-	return ScriptToken(token->value.var->data ? true : false);
-}
-
-ScriptToken NumericVar_To_Variable(ScriptToken* token, ExpressionEvaluator* context)
-{
-	return ScriptToken(token->value.var);
-}
-
-ScriptToken StringVar_To_String(ScriptToken* token, ExpressionEvaluator* context)
-{
-	StringVar* strVar = g_StringMap.Get(token->value.var->data);
-	if (strVar)
-		return ScriptToken(strVar->String());
-	else
-		return ScriptToken("");
-}
-
-ScriptToken StringVar_To_Variable(ScriptToken* token, ExpressionEvaluator* context)
-{
-	return ScriptToken(token->value.var);
-}
-
-ScriptToken StringVar_To_Bool(ScriptToken* token, ExpressionEvaluator* context)
-{
-	return ScriptToken(token->value.var->data ? true : false);
-}
-
-ScriptToken ArrayVar_To_Array(ScriptToken* token, ExpressionEvaluator* context)
-{
-	ArrayID id = token->value.var->data;
-	return g_ArrayMap.Exists(id) ? ScriptToken(id, kTokenType_Array) : ScriptToken::Bad();
-}
-
-ScriptToken ArrayVar_To_Variable(ScriptToken* token, ExpressionEvaluator* context)
-{
-	return ScriptToken(token->value.var);
-}
-
-ScriptToken ArrayVar_To_Bool(ScriptToken* token, ExpressionEvaluator* context)
-{
-	return ScriptToken(token->value.var->data ? true : false);
-}
-
-ScriptToken Elem_To_Number(ScriptToken* token, ExpressionEvaluator* context)
-{
-	double num;
-	ArrayKey* key = token->Key();
-	if (!key || !g_ArrayMap.GetElementNumber(token->value.arrID, *key, &num))
-		return ScriptToken::Bad();
-
-	return ScriptToken(num);
-}
-
-ScriptToken Elem_To_Form(ScriptToken* token, ExpressionEvaluator* context)
-{
-	UInt32 formID;
-	ArrayKey* key = token->Key();
-	if (!key || !g_ArrayMap.GetElementFormID(token->value.arrID, *key, &formID))
-		return ScriptToken::Bad();
-
-	return ScriptToken(formID, kTokenType_Form);
-}
-
-ScriptToken Elem_To_String(ScriptToken* token, ExpressionEvaluator* context)
-{
-	std::string str;
-	ArrayKey* key = token->Key();
-	if (!key || !g_ArrayMap.GetElementString(token->value.arrID, *key, str))
-		return ScriptToken::Bad();
-
-	return ScriptToken(str);
-}
-
-ScriptToken Elem_To_Array(ScriptToken* token, ExpressionEvaluator* context)
-{
-	ArrayID arr;
-	ArrayKey* key = token->Key();
-	if (!key || !g_ArrayMap.GetElementArray(token->value.arrID, *key, &arr))
-		return ScriptToken::Bad();
-
-	return ScriptToken(arr, kTokenType_Array);
-}
-
-ScriptToken Elem_To_Bool(ScriptToken* token, ExpressionEvaluator* context)
-{
-	bool result;
-	ArrayKey* key = token->Key();
-	if (!key || !g_ArrayMap.GetElementAsBool(token->value.arrID, *key, &result))
-		return ScriptToken::Bad();
-
-	return ScriptToken(result);
-}
-
-ScriptToken RefVar_To_Form(ScriptToken* token, ExpressionEvaluator* context)
-{
-	return ScriptToken(*((UInt64*)(&token->value.var->data)), kTokenType_Form);
-}
-
-ScriptToken RefVar_To_Bool(ScriptToken* token, ExpressionEvaluator* context)
-{
-	return ScriptToken(token->value.var->data ? true : false);
-}
-
-ScriptToken RefVar_To_Variable(ScriptToken* token, ExpressionEvaluator* context)
-{
-	return ScriptToken(token->value.var);
-}
-
-#endif
-
 #if RUNTIME
 
 // ExpressionEvaluator
@@ -1491,6 +1501,11 @@ ScriptToken RefVar_To_Variable(ScriptToken* token, ExpressionEvaluator* context)
 bool ExpressionEvaluator::Active()
 {
 	return ThreadLocalData::Get().expressionEvaluator != NULL;
+}
+
+ExpressionEvaluator& ExpressionEvaluator::Get()
+{
+	return *ThreadLocalData::Get().expressionEvaluator;
 }
 
 void ExpressionEvaluator::ToggleErrorSuppression(bool bSuppress) { 
@@ -1501,6 +1516,8 @@ void ExpressionEvaluator::ToggleErrorSuppression(bool bSuppress) {
 	else 
 		m_flags.Clear(kFlag_SuppressErrorMessages); 
 }
+
+static UnorderedSet<const char*> s_warnedMods; // show corner message only once per mod script error 
 
 void ExpressionEvaluator::Error(const char* fmt, ...)
 {
@@ -1515,22 +1532,7 @@ void ExpressionEvaluator::Error(const char* fmt, ...)
 	char	errorMsg[0x400];
 	vsprintf_s(errorMsg, 0x400, fmt, args);
 
-	// include script data offset and command name/opcode
-	UInt16* opcodePtr = (UInt16*)((UInt8*)script->data + m_baseOffset);
-	CommandInfo* cmd = g_scriptCommands.GetByOpcode(*opcodePtr);
-
-	// include mod filename, save having to ask users to figure it out themselves
-	const char* modName = "Savegame";
-	if (script->GetModIndex() != 0xFF)
-	{
-		modName = DataHandler::Get()->GetNthModName(script->GetModIndex());
-		if (!modName || !modName[0])
-			modName = "Unknown";
-	}
-
-	ShowRuntimeError(script, "%s\n    File: %s Offset: 0x%04X Command: %s", errorMsg, modName, m_baseOffset, cmd ? cmd->longName : "<unknown>");
-	if (m_flags.IsSet(kFlag_StackTraceOnError))
-		PrintStackTrace();
+	this->errorMessages.emplace_back(errorMsg);
 }
 
 void ExpressionEvaluator::PrintStackTrace() {
@@ -1539,7 +1541,7 @@ void ExpressionEvaluator::PrintStackTrace() {
 
 	ExpressionEvaluator* eval = this;
 	while (eval) {
-		CommandInfo* cmd = g_scriptCommands.GetByOpcode(*((UInt16*)((UInt8*)eval->script->data + eval->m_baseOffset)));
+		CommandInfo* cmd = eval->GetCommand();
 		sprintf_s(output, sizeof(output), "  %s @%04X script %08X", cmd ? cmd->longName : "<unknown>", eval->m_baseOffset, eval->script->refID);
 		_MESSAGE(output);
 		Console_Print(output);
@@ -1554,27 +1556,6 @@ void ExpressionEvaluator::PrintStackTrace() {
 #endif
 
 // ExpressionParser
-
-void PrintCompiledCode(ScriptLineBuffer* buf)
-{
-#if _DEBUG && 0		// unused, ShowCompilerError() will break build due to shademe's updates to it
-	std::string bytes;
-	char byte[5];
-
-	for (UInt32 i = 0; i < buf->dataOffset; i++)
-	{
-		if (isprint(buf->dataBuf[i]))
-			sprintf_s(byte, 4, "%c", buf->dataBuf[i]);
-		else
-			sprintf_s(byte, 4, "%02X", buf->dataBuf[i]);
-
-		bytes.append(byte);
-		bytes.append(" ");
-	}
-
-	ShowCompilerError(buf, "COMPILER OUTPUT\n\n%s", bytes.c_str());
-#endif
-}
 
 // Not particularly fond of this but it's become necessary to distinguish between a parser which is parsing part of a larger
 // expression and one parsing an entire script line.
@@ -1708,7 +1689,6 @@ bool ExpressionParser::ParseArgs(ParamInfo* params, UInt32 numParams, bool bUses
 	}
 
 	*numArgsPtr = m_numArgsParsed;
-	//PrintCompiledCode(m_lineBuf);
 	return true;
 }
 
@@ -1750,6 +1730,7 @@ bool ExpressionParser::ValidateArgType(UInt32 paramType, Token_Type argType, boo
 			case kParamType_Sex:
 				return CanConvertOperand(argType, kTokenType_String);
 			case kParamType_Float:
+			case kParamType_Double:
 			case kParamType_Integer:
 			case kParamType_QuestStage:
 			case kParamType_CrimeType:
@@ -1808,7 +1789,7 @@ bool GetUserFunctionParams(const std::string& scriptText, std::vector<UserFuncti
 		std::string token;
 		if (tokens.NextToken(token) != -1)
 		{
-			if (!_stricmp(token.c_str(), "begin"))
+			if (!StrCompare(token.c_str(), "begin"))
 			{
 				UInt32 argStartPos = lineText.find("{");
 				UInt32 argEndPos = lineText.find("}");
@@ -1935,12 +1916,12 @@ bool ExpressionParser::ParseUserFunctionCall()
 
 	// lookup paramInfo from Script
 	// if recursive call, look up from ScriptBuffer instead
-	if (funcScript)
+	if (funcScript && funcScript->text)
 	{
 		char* funcScriptText = funcScript->text;
 		Script::VarInfoEntry* funcScriptVars = &funcScript->varList;
 
-		if (!_stricmp(GetEditorID(funcScript), m_scriptBuf->scriptName.m_data))
+		if (!StrCompare(GetEditorID(funcScript), m_scriptBuf->scriptName.m_data))
 		{
 			funcScriptText = m_scriptBuf->scriptText;
 			funcScriptVars = &m_scriptBuf->vars;
@@ -1956,7 +1937,7 @@ bool ExpressionParser::ParseUserFunctionCall()
 		DynamicParamInfo dynamicParams(funcParams);
 		bParsed = ParseArgs(dynamicParams.Params(), dynamicParams.NumParams());
 	}
-	else	// using refVar as function pointer, use default params
+	else	// using refVar as function pointer, use default params OR NOT EDITOR
 	{
 		ParamInfo* params = kParams_DefaultUserFunctionParams;
 		UInt32 numParams = NUM_PARAMS(kParams_DefaultUserFunctionParams);
@@ -2018,7 +1999,7 @@ bool ExpressionParser::ParseUserFunctionDefinition()
 		std::string token;
 		if (tokens.NextToken(token) != -1)
 		{
-			if (!_stricmp(token.c_str(), "begin"))
+			if (!StrCompare(token.c_str(), "begin"))
 			{
 				if (bFoundBegin)
 				{
@@ -2028,7 +2009,7 @@ bool ExpressionParser::ParseUserFunctionDefinition()
 
 				bFoundBegin = true;
 			}
-			else if (!_stricmp(token.c_str(), "array_var"))
+			else if (!StrCompare(token.c_str(), "array_var"))
 			{
 				if (bFoundBegin)
 				{
@@ -2048,9 +2029,9 @@ bool ExpressionParser::ParseUserFunctionDefinition()
 			}
 			else if (bFoundBegin)
 			{
-				if (!_stricmp(token.c_str(), "string_var") || !_stricmp(token.c_str(), "float") || !_stricmp(token.c_str(), "int") ||
-				!_stricmp(token.c_str(), "ref") || !_stricmp(token.c_str(), "reference") || !_stricmp(token.c_str(), "short") ||
-				!_stricmp(token.c_str(), "long"))
+				if (!StrCompare(token.c_str(), "string_var") || !StrCompare(token.c_str(), "float") || !StrCompare(token.c_str(), "int") ||
+					!StrCompare(token.c_str(), "ref") || !StrCompare(token.c_str(), "reference") || !StrCompare(token.c_str(), "short") ||
+					!StrCompare(token.c_str(), "long"))
 				{
 					Message(kError_UserFunctionVarsMustPrecedeDefinition);
 					return false;
@@ -2066,10 +2047,6 @@ bool ExpressionParser::ParseUserFunctionDefinition()
 		m_lineBuf->Write16(arrayVarIndexes[i]);
 	}
 
-#if _DEBUG
-	//PrintCompiledCode(m_lineBuf);
-#endif
-
 	return true;
 }
 
@@ -2082,7 +2059,6 @@ Token_Type ExpressionParser::Parse()
 
 	*((UInt16*)dataStart) = (m_lineBuf->dataBuf + m_lineBuf->dataOffset) - dataStart;
 
-	//PrintCompiledCode(m_lineBuf);
 	return result;
 }
 
@@ -2559,10 +2535,12 @@ ScriptToken* ExpressionParser::ParseOperand(Operator* curOp)
 			return ScriptToken::Create(varInfo, 0, m_scriptBuf->GetVariableType(varInfo, NULL));
 	}
 
+#if EDITOR
 	// "player" can be base object or ref. Assume base object unless called with dot syntax
-	if (!_stricmp(refToken.c_str(), "player") && dotPos != -1)
+	if (!StrCompare(refToken.c_str(), "player") && dotPos != -1)
 		refToken = "playerRef";
-
+#endif
+	
 	Script::RefVariable* refVar = m_scriptBuf->ResolveRef(refToken.c_str());
 	if (dotPos != -1 && !refVar)
 	{
@@ -2583,7 +2561,7 @@ ScriptToken* ExpressionParser::ParseOperand(Operator* curOp)
 			else						// literal reference to a form
 				return ScriptToken::Create(refVar, refIdx);
 		}
-		else if (refVar->form && refVar->form->typeID != kFormType_Reference && refVar->form->typeID != kFormType_Quest)
+		else if (refVar->form && !refVar->form->GetIsReference() && refVar->form->typeID != kFormType_Quest)
 		{
 			Message(kError_InvalidDotSyntax);
 			return NULL;
@@ -2602,7 +2580,7 @@ ScriptToken* ExpressionParser::ParseOperand(Operator* curOp)
 				Message(kError_RefRequired, cmdInfo->longName);
 				return NULL;
 			}
-			if (refVar && refVar->form && refVar->form->typeID != kFormType_Reference)	// make sure we're calling it on a reference
+			if (refVar && refVar->form && !refVar->form->GetIsReference())	// make sure we're calling it on a reference
 				return NULL;
 
 			return ScriptToken::Create(cmdInfo, refIdx);
@@ -2672,7 +2650,7 @@ bool ExpressionParser::ParseFunctionCall(CommandInfo* cmdInfo)
 	m_lineBuf->cmdOpcode = cmdInfo->opcode;
 	m_lineBuf->callingRefIndex = 0;
 	m_lineBuf->lineOffset = 0;
-	m_lineBuf->paramTextLen = m_lineBuf->paramTextLen - oldOffset;
+	m_lineBuf->paramTextLen = StrLen(m_lineBuf->paramText);
 	
 	// parse the command if numParams > 0
 	bool bParsed = ParseNestedFunction(cmdInfo, m_lineBuf, m_scriptBuf);
@@ -2728,27 +2706,6 @@ std::string ExpressionParser::GetCurToken()
 
 #if RUNTIME
 
-void ShowRuntimeError(Script* script, const char* fmt, ...)
-{
-	char errorHeader[0x400];
-	sprintf_s(errorHeader, 0x400, "Error in script %08x", script ? script->refID : 0);
-
-	va_list args;
-	va_start(args, fmt);
-
-	char	errorMsg[0x400];
-	vsprintf_s(errorMsg, 0x400, fmt, args);
-
-	Console_Print(errorHeader);
-	_MESSAGE(errorHeader);
-	Console_Print(errorMsg);
-	_MESSAGE(errorMsg);
-
-	PluginManager::Dispatch_Message(0, NVSEMessagingInterface::kMessage_RuntimeScriptError, errorMsg, 4, NULL); 
-
-	va_end(args);
-}
-
 /**********************************
 	ExpressionEvaluator
 **********************************/
@@ -2795,6 +2752,17 @@ SInt32 ExpressionEvaluator::ReadSigned32()
 	return data;
 }
 
+UInt8* ExpressionEvaluator::GetCommandOpcodePosition() const
+{
+	return GetScriptDataPosition(script, m_scriptData, m_opcodeOffsetPtr);
+}
+
+CommandInfo* ExpressionEvaluator::GetCommand() const
+{
+	auto* opcodePtr = reinterpret_cast<UInt16*>(static_cast<UInt8*>(m_scriptData) + m_baseOffset);
+	return g_scriptCommands.GetByOpcode(*opcodePtr);
+}
+
 double ExpressionEvaluator::ReadFloat()
 {
 	double data = *((double*)Data());
@@ -2802,65 +2770,51 @@ double ExpressionEvaluator::ReadFloat()
 	return data;
 }
 
-std::string ExpressionEvaluator::ReadString()
+char *ExpressionEvaluator::ReadString(UInt32& incrData)
 {
 	UInt16 len = Read16();
-	char* buf = new char[len + 1];
-	memcpy(buf, Data(), len);
-	buf[len] = 0;
-	std::string str = buf;
-	Data() += len;
-	delete buf;
-	return str;
+	incrData = 2 + len;
+	if (len)
+	{
+		char *resStr = (char*)malloc(len + 1);
+		memcpy(resStr, Data(), len);
+		resStr[len] = 0;
+		Data() += len;
+		return resStr;
+	}
+	return NULL;
 }
 
 void ExpressionEvaluator::PushOnStack()
 {
-	ThreadLocalData& localData = ThreadLocalData::Get();
 	ExpressionEvaluator* top = localData.expressionEvaluator;
 	m_parent = top;
 	localData.expressionEvaluator = this;
 
 	// inherit properties of parent
 	if (top) {
-		// figure out base offset into script data
-		if (top->script == script) {
-			m_baseOffset = top->m_data - (UInt8*)script->data - 4;
-		}
-		else {	// non-recursive user-defined function call
-			m_baseOffset = m_data - (UInt8*)script->data - 4;
-		}
-
 		// inherit flags
 		m_flags.RawSet(top->m_flags.Get());
 		m_flags.Clear(kFlag_ErrorOccurred);
 	}
 }
 
-void ExpressionEvaluator::PopFromStack()
+void ExpressionEvaluator::PopFromStack() const
 {
 	if (m_parent) {
 		// propogate info to parent
 		m_parent->m_expectedReturnType = m_expectedReturnType;
-		if (m_flags.IsSet(kFlag_ErrorOccurred)) {
-			m_parent->m_flags.Set(kFlag_ErrorOccurred);
-		}
 	}
-
-	ThreadLocalData& localData = ThreadLocalData::Get();
 	localData.expressionEvaluator = m_parent;
 }
 
 ExpressionEvaluator::ExpressionEvaluator(COMMAND_ARGS) : m_opcodeOffsetPtr(opcodeOffsetPtr), m_result(result), 
-	m_thisObj(thisObj), script(scriptObj), eventList(eventList), m_params(paramInfo), m_numArgsExtracted(0), m_baseOffset(0),
-	m_expectedReturnType(kRetnType_Default)
+	m_thisObj(thisObj), m_containingObj(containingObj), m_params(paramInfo), m_numArgsExtracted(0), m_expectedReturnType(kRetnType_Default), m_baseOffset(0),
+	localData(ThreadLocalData::Get()), script(scriptObj), eventList(eventList)
 {
-	m_scriptData = (UInt8*)scriptData;
+	m_scriptData = static_cast<UInt8*>(scriptData);
 	m_data = m_scriptData + *m_opcodeOffsetPtr;
 
-	memset(m_args, 0, sizeof(m_args));
-
-	m_containingObj = containingObj;	
 	m_baseOffset = *opcodeOffsetPtr - 4;
 
 	m_flags.Clear();
@@ -2872,33 +2826,48 @@ ExpressionEvaluator::~ExpressionEvaluator()
 {
 	PopFromStack();
 
-	for (UInt32 i = 0; i < kMaxArgs; i++)
-		delete m_args[i];
+	for (UInt32 i = 0; i < m_numArgsExtracted; i++)
+	{
+		auto& token = m_args[i];
+		if (!token->cached)
+		{
+			delete token;
+		}
+	}
+
+	if (!this->errorMessages.empty())
+	{
+		std::string error;
+		for (const auto& msg : errorMessages)
+		{
+			error += msg + '\n';
+		}
+		error.pop_back(); // remove last "\n"
+		// include script data offset and command name/opcode
+		CommandInfo* cmd = GetCommand();
+
+		// include mod filename, save having to ask users to figure it out themselves
+		const char* modName = GetModName(script);
+
+		ShowRuntimeError(script, "%s\n    File: %s Offset: 0x%04X Command: %s", error.c_str(), modName, m_baseOffset, cmd ? cmd->longName : "<unknown>");
+		if (m_flags.IsSet(kFlag_StackTraceOnError))
+			PrintStackTrace();
+	}
 }
 
 bool ExpressionEvaluator::ExtractArgs()
 {
+	
 	UInt32 numArgs = ReadByte();
 	UInt32 curArg = 0;
-
-	if (extraTraces)
-		gLog.Indent();
-
 	while (curArg < numArgs)
 	{
 		ScriptToken* arg = Evaluate();
 		if (!arg)
 			break;
 
-		if (extraTraces)
-			_MESSAGE("Extracting arg %d : %s", curArg, arg->DebugPrint());
-
 		m_args[curArg++] = arg;
 	}
-
-	if (extraTraces)
-		gLog.Outdent();
-
 	if (numArgs == curArg)			// all args extracted
 	{
 		m_numArgsExtracted = curArg;
@@ -2915,6 +2884,7 @@ bool ExpressionEvaluator::ExtractDefaultArgs(va_list varArgs, bool bConvertTESFo
 			ScriptToken* arg = Arg(i);
 			ParamInfo* info = &m_params[i];
 			if (!ConvertDefaultArg(arg, info, bConvertTESForms, varArgs)) {
+				DEBUG_PRINT("Couldn't convert arg %d", i);
 				return false;
 			}
 		}
@@ -2958,7 +2928,7 @@ public:
 			
 	virtual bool SkipArgs(UInt32 numToSkip) { m_curArgIndex += numToSkip; return m_curArgIndex <= m_eval->NumArgs(); }
 	virtual bool HasMoreArgs() { return m_curArgIndex < m_eval->NumArgs(); }
-	virtual std::string GetFormatString() { return m_fmtString; }
+	virtual char *GetFormatString() { return const_cast<char*>(m_fmtString); }
 
 	UInt32 GetCurArgIndex() const { return m_curArgIndex; }
 private:
@@ -3024,13 +2994,17 @@ bool ExpressionEvaluator::ConvertDefaultArg(ScriptToken* arg, ParamInfo* info, b
 
 			break;
 		case kParamType_Integer:
+		{
+			ScriptEventList::Var *var = arg->GetVar();
 			// handle string_var passed as integer to sv_* cmds
-			if (arg->CanConvertTo(kTokenType_StringVar) && arg->GetVar()) {
+			if (var && arg->CanConvertTo(kTokenType_StringVar))
+			{
 				UInt32* out = va_arg(varArgs, UInt32*);
-				*out = arg->GetVar()->data;
+				*out = var->data;
 				break;
 			}
-			// fall-through intentional
+		}
+		// fall-through intentional
 		case kParamType_QuestStage:
 		case kParamType_CrimeType:
 		case kParamType_AnimationGroup:
@@ -3051,6 +3025,15 @@ bool ExpressionEvaluator::ConvertDefaultArg(ScriptToken* arg, ParamInfo* info, b
 		case kParamType_Float:
 			if (arg->CanConvertTo(kTokenType_Number)) {
 				float* out = va_arg(varArgs, float*);
+				*out = arg->GetNumber();
+			}
+			else {
+				return false;
+			}
+			break;
+		case kParamType_Double:
+			if (arg->CanConvertTo(kTokenType_Number)) {
+				double* out = va_arg(varArgs, double*);
 				*out = arg->GetNumber();
 			}
 			else {
@@ -3096,18 +3079,6 @@ bool ExpressionEvaluator::ConvertDefaultArg(ScriptToken* arg, ParamInfo* info, b
 				}
 			}
 			break;
-		//case kParamType_AnimationGroup:
-		//	{
-		//		UInt32 animGroup = arg->GetAnimGroup();
-		//		if (animGroup != TESAnimGroup::kAnimGroup_Max) {
-		//			UInt32* out = va_arg(varArgs, UInt32*);
-		//			*out = animGroup;
-		//		}
-		//		else {
-		//			return false;
-		//		}
-		//	}
-		//	break;
 		case kParamType_Sex:
 			{
 				UInt32 sex = arg->GetSex();
@@ -3122,14 +3093,7 @@ bool ExpressionEvaluator::ConvertDefaultArg(ScriptToken* arg, ParamInfo* info, b
 			break;
 		case kParamType_MagicEffect:
 			{
-				EffectSetting* eff = arg->GetEffectSetting();
-				if (eff) {
-					EffectSetting** out = va_arg(varArgs, EffectSetting**);
-					*out = eff;
-				}
-				else {
-					return false;
-				}
+				return false;
 			}
 			break;
 		default:	// all the rest are TESForm
@@ -3382,8 +3346,6 @@ bool ExpressionEvaluator::ConvertDefaultArg(ScriptToken* arg, ParamInfo* info, b
 											typeToMatch = kFormType_Furniture; break;
 										case kParamType_FormList:
 											typeToMatch = kFormType_ListForm; break;
-										//case kParamType_Birthsign:
-										//	typeToMatch = kFormType_BirthSign; break;
 										case kParamType_WeatherID:
 											typeToMatch = kFormType_Weather; break;
 										case kParamType_NPC:
@@ -3451,129 +3413,262 @@ bool ExpressionEvaluator::ConvertDefaultArg(ScriptToken* arg, ParamInfo* info, b
 	return true;
 }
 
-ScriptToken* ExpressionEvaluator::Evaluate()
+ScriptToken* ExpressionEvaluator::ExecuteCommandToken(ScriptToken const* token)
 {
-	std::stack<ScriptToken*> operands;
-	
-	UInt16 argLen = Read16();
-	UInt8* endData = Data() + argLen - sizeof(UInt16);
-	while (Data() < endData)
+	// execute the command
+	CommandInfo* cmdInfo = token->GetCommandInfo();
+	if (!cmdInfo)
 	{
-		ScriptToken* curToken = ScriptToken::Read(this);
-		if (!curToken)
-			break;
+		return nullptr;
+	}
 
-		if (curToken->Type() == kTokenType_Command)
+	TESObjectREFR* callingObj = m_thisObj;
+	Script::RefVariable* callingRef = script->GetRefFromRefList(token->GetRefIndex());
+	if (callingRef)
+	{
+		callingRef->Resolve(eventList);
+		if (!callingRef->form)
 		{
-			// execute the command
-			CommandInfo* cmdInfo = curToken->GetCommandInfo();
-			if (!cmdInfo)
-			{
-				delete curToken;
-				curToken = NULL;
-				break;
-			}
-
-			TESObjectREFR* callingObj = m_thisObj;
-			Script::RefVariable* callingRef = script->GetVariable(curToken->GetRefIndex());
-			if (callingRef)
-			{
-				callingRef->Resolve(eventList);
-				if (callingRef->form && callingRef->form->IsReference())
-					callingObj = DYNAMIC_CAST(callingRef->form, TESForm, TESObjectREFR);
-				else
-				{
-					delete curToken;
-					curToken = NULL;
-					Error("Attempting to call a function on a NULL reference or base object");
-					break;
-				}
-			}
-
-			TESObjectREFR* contObj = callingRef ? NULL : m_containingObj;
-			double cmdResult = 0;
-
-			UInt16 argsLen = Read16();
-			UInt32 numBytesRead = 0;
-			UInt8* scrData = Data();
-
-			ExpectReturnType(kRetnType_Default);	// expect default return type unless called command specifies otherwise
-			bool bExecuted = cmdInfo->execute(cmdInfo->params, scrData, callingObj, contObj, script, eventList, &cmdResult, &numBytesRead);
-
-			if (!bExecuted)
-			{
-				delete curToken;
-				curToken = NULL;
-				Error("Command %s failed to execute", cmdInfo->longName);
-				break;
-			}
-
-			Data() += argsLen - 2;
-
-			// create a new ScriptToken* based on result type, delete command token when done
-			ScriptToken* cmdToken = curToken;
-			curToken = ScriptToken::Create(cmdResult);
-
-			// adjust token type if we know command return type
-			CommandReturnType retnType = g_scriptCommands.GetReturnType(cmdInfo);
-			if (retnType == kRetnType_Ambiguous || retnType == kRetnType_ArrayIndex)	// return type ambiguous, cmd will inform us of type to expect
-				retnType = GetExpectedReturnType();
-
-			switch (retnType)
-			{
-				case kRetnType_String:
-				{
-					StringVar* strVar = g_StringMap.Get(cmdResult);
-					delete curToken;
-					curToken = ScriptToken::Create(strVar ? strVar->GetCString() : "");
-					break;
-				}
-				case kRetnType_Array:
-				{
-					// ###TODO: cmds can return arrayID '0', not necessarily an error, does this support that?
-					if (g_ArrayMap.Exists(cmdResult) || !cmdResult)	
-					{
-						delete curToken;
-						curToken = ScriptToken::CreateArray(cmdResult);
-						break;
-					}
-					else
-					{
-						Error("A command returned an invalid array");
-						break;
-					}
-				}
-				case kRetnType_Form:
-				{
-					delete curToken;
-					curToken = ScriptToken::CreateForm(*((UInt64*)&cmdResult));
-					break;
-				}
-				case kRetnType_Default:
-					delete curToken;
-					curToken = ScriptToken::Create(cmdResult);
-					break;
-				default:
-					Error("Unknown command return type %d while executing command in ExpressionEvaluator::Evaluate()", retnType);
-			}
-
-			delete cmdToken;
-			cmdToken = NULL;
+			Error("Attempting to call a function on a NULL reference");
+			return nullptr;
 		}
+		if (!callingRef->form->GetIsReference())
+		{
+			Error("Attempting to call a function on a base object (this must be a reference)");
+			return nullptr;
+		}
+		callingObj = DYNAMIC_CAST(callingRef->form, TESForm, TESObjectREFR);
+	}
 
 
-		if (!(curToken->Type() == kTokenType_Operator))
-			operands.push(curToken);
+	TESObjectREFR* contObj = callingRef ? NULL : m_containingObj;
+	double cmdResult = 0;
+
+	//UInt32 numBytesRead = 0;
+	//UInt8* scrData = Data();
+	//UInt16 argsLen = Read16();
+
+	//*m_opcodeOffsetPtr = m_data - m_scriptData;
+	UInt32 opcodeOffset = token->cmdOpcodeOffset;
+	CommandReturnType retnType = token->returnType;
+
+	ExpectReturnType(kRetnType_Default);	// expect default return type unless called command specifies otherwise
+	bool bExecuted = cmdInfo->execute(cmdInfo->params, m_scriptData, callingObj, contObj, script, eventList, &cmdResult, &opcodeOffset);
+
+	if (!bExecuted)
+	{
+		Error("Command %s failed to execute", cmdInfo->longName);
+		return nullptr;
+	}
+
+	if (retnType == kRetnType_Ambiguous || retnType == kRetnType_ArrayIndex)	// return type ambiguous, cmd will inform us of type to expect
+	{
+		retnType = GetExpectedReturnType();
+	}
+
+	switch (retnType)
+	{
+	case kRetnType_Default:
+	{
+		return ScriptToken::Create(cmdResult);
+	}
+	case kRetnType_Form:
+	{
+		return ScriptToken::CreateForm(*reinterpret_cast<UInt32*>(&cmdResult));
+	}
+
+	case kRetnType_String:
+	{
+		StringVar* strVar = g_StringMap.Get(cmdResult);
+		return ScriptToken::Create(strVar ? strVar->GetCString() : "");
+	}
+	case kRetnType_Array:
+	{
+		// ###TODO: cmds can return arrayID '0', not necessarily an error, does this support that?
+		if (g_ArrayMap.Get(cmdResult) || !cmdResult)
+		{
+			return ScriptToken::CreateArray(cmdResult);
+		}
+		Error("A command returned an invalid array");
+		break;
+	}
+	default:
+		Error("Unknown command return type %d while executing command in ExpressionEvaluator::Evaluate()", retnType);
+	}
+	return nullptr;
+}
+
+using CachedTokenIter = Vector<TokenCacheEntry>::Iterator;
+TokenCacheEntry *GetOperatorParent(TokenCacheEntry *iter, TokenCacheEntry *iterEnd)
+{
+	iter++;
+	int count = 0;
+	while (iter < iterEnd)
+	{
+		const ScriptToken *token = &iter->token;
+		if (token->IsOperator())
+		{
+			if (count == 0)
+			{
+				return iter;
+			}
+
+			// e.g. `1 0 ! &&` prevent ! being parent of 1
+			count -= token->GetOperator()->numOperands - 1;
+		}
 		else
 		{
-			Operator* op = curToken->GetOperator();
-			ScriptToken* lhOperand = NULL;
-			ScriptToken* rhOperand = NULL;
+			count++;
+		}
+		if (count == 0)
+		{
+			return iter;
+		}
+		iter++;
+	}
+	return iterEnd;
+}
 
-			if (op->numOperands > operands.size())
+constexpr auto g_noShortCircuit = kOpType_Max;
+
+void ParseShortCircuit(CachedTokens& cachedTokens)
+{
+	TokenCacheEntry *end = cachedTokens.DataEnd();
+	for (auto iter = cachedTokens.Begin(); !iter.End(); ++iter)
+	{
+		TokenCacheEntry *curr = &iter.Get();
+		ScriptToken &token = curr->token;
+		TokenCacheEntry *grandparent = curr;
+		TokenCacheEntry *furthestParent;
+		
+		do
+		{
+			// Find last "parent" operator of same type. E.g `0 1 && 1 && 1 &&` should jump straight to end of expression.
+			furthestParent = grandparent;
+			grandparent = GetOperatorParent(grandparent, end);
+		}
+		while (grandparent < end && grandparent->token.IsLogicalOperator() && (furthestParent == curr || grandparent->token.GetOperator() == furthestParent->token.GetOperator()));
+		
+		if (furthestParent != curr && furthestParent->token.IsLogicalOperator())
+		{
+			token.shortCircuitParentType = furthestParent->token.GetOperator()->type;
+			token.shortCircuitDistance = furthestParent - curr;
+
+			auto* parent = GetOperatorParent(curr, end);
+			token.shortCircuitStackOffset = curr + 1 == parent ? 2 : 1;
+		}
+		else
+		{
+			token.shortCircuitParentType = g_noShortCircuit;
+			token.shortCircuitDistance = 0;
+			token.shortCircuitStackOffset = 0;
+		}
+	}
+}
+
+bool ExpressionEvaluator::ParseBytecode(CachedTokens& cachedTokens)
+{
+	const UInt8 *dataBeforeParsing = m_data;
+	const UInt16 argLen = Read16();
+	const UInt8 *endData = m_data + argLen - sizeof(UInt16);
+	while (m_data < endData)
+	{
+		TokenCacheEntry *entry = cachedTokens.Append(*this);
+		if (entry->token.IsInvalid())
+			return false;
+		entry->token.cached = true;
+	}
+	cachedTokens.incrementData = m_data - dataBeforeParsing;
+	ParseShortCircuit(cachedTokens);
+	return true;
+}
+
+using OperandStack = FastStack<ScriptToken*>;
+
+void ShortCircuit(OperandStack& operands, CachedTokenIter& iter)
+{
+	ScriptToken *lastToken = operands.Top();
+	const OperatorType type = lastToken->shortCircuitParentType;
+	if (type == g_noShortCircuit)
+		return;
+
+	const bool eval = lastToken->GetBool();
+	if (type == kOpType_LogicalAnd && !eval || type == kOpType_LogicalOr && eval)
+	{
+		iter += lastToken->shortCircuitDistance;
+		for (UInt32 i = 0; i < lastToken->shortCircuitStackOffset; ++i)
+		{
+			// Make sure only one operand is left in RPN stack
+			ScriptToken *operand = operands.Top();
+			if (operand && operand != lastToken)
+				operand->Delete();
+			operands.Pop();
+		}
+		operands.Push(lastToken);
+	}
+}
+
+void CopyShortCircuitInfo(ScriptToken* to, ScriptToken* from)
+{
+	to->shortCircuitParentType = from->shortCircuitParentType;
+	to->shortCircuitDistance = from->shortCircuitDistance;
+	to->shortCircuitStackOffset = from->shortCircuitStackOffset;
+}
+
+thread_local TokenCache g_tokenCache;
+
+ScriptToken* ExpressionEvaluator::Evaluate()
+{
+	UInt8 *cacheKey = GetCommandOpcodePosition();
+	CachedTokens &cache = g_tokenCache.Get(cacheKey);
+	if (cache.Empty())
+	{
+		if (!ParseBytecode(cache))
+		{
+			Error("Failed to parse script data");
+			return nullptr;
+		}
+	}
+	else
+	{
+		m_data += cache.incrementData;
+	}
+
+	OperandStack operands;
+	auto iter = cache.Begin();
+	for (; !iter.End(); ++iter)
+	{
+		TokenCacheEntry &entry = iter.Get();
+		ScriptToken *curToken = &entry.token;
+		curToken->context = this;
+
+		if (curToken->Type() != kTokenType_Operator)
+		{
+			if (curToken->Type() == kTokenType_Command)
 			{
-				delete curToken;
-				curToken = NULL;
+				ScriptToken *cmdToken = ExecuteCommandToken(curToken);
+				if (cmdToken == nullptr)
+				{
+					break;
+				}
+				CopyShortCircuitInfo(cmdToken, curToken);
+				curToken = cmdToken;
+			}
+			else if (curToken->IsVariable() && !curToken->ResolveVariable())
+			{
+				Error("Failed to resolve variable");
+				break;
+			}
+			operands.Push(curToken);
+		}
+		else
+		{
+			Operator *op = curToken->GetOperator();
+			ScriptToken* lhOperand = nullptr;
+			ScriptToken* rhOperand = nullptr;
+
+			if (op->numOperands > operands.Size())
+			{
 				Error("Too few operands for operator %s", op->symbol);
 				break;
 			}
@@ -3581,18 +3676,29 @@ ScriptToken* ExpressionEvaluator::Evaluate()
 			switch (op->numOperands)
 			{
 			case 2:
-				rhOperand = operands.top();
-				operands.pop();
+				rhOperand = operands.Top();
+				operands.Pop();
 			case 1:
-				lhOperand = operands.top();
-				operands.pop();
+				lhOperand = operands.Top();
+				operands.Pop();
 			}
 
-			ScriptToken* opResult = op->Evaluate(lhOperand, rhOperand, this);
-			delete lhOperand;
-			delete rhOperand;
-			delete curToken;
-			curToken = NULL;
+			ScriptToken* opResult;
+			if (entry.eval == nullptr)
+			{
+				opResult = op->Evaluate(lhOperand, rhOperand, this, entry.eval, entry.swapOrder);
+			}
+			else
+			{
+				opResult = entry.swapOrder ? entry.eval(op->type, rhOperand, lhOperand, this) : entry.eval(op->type, lhOperand, rhOperand, this);
+			}
+
+
+			if (lhOperand)
+				lhOperand->Delete();
+
+			if (rhOperand)
+				rhOperand->Delete();
 
 			if (!opResult)
 			{
@@ -3600,25 +3706,227 @@ ScriptToken* ExpressionEvaluator::Evaluate()
 				break;
 			}
 
-			operands.push(opResult);
+			opResult->context = this;
+			CopyShortCircuitInfo(opResult, curToken);
+			operands.Push(opResult);
 		}
+		
+		ShortCircuit(operands, iter);
 	}
 
 	// adjust opcode offset ptr (important for recursive calls to Evaluate()
-	*m_opcodeOffsetPtr = m_data - m_scriptData;
+	*m_opcodeOffsetPtr += cache.incrementData;
 
-	if (operands.size() != 1)		// should have one operand remaining - result of expression
+	if (operands.Size() != 1 || this->HasErrors())		// should have one operand remaining - result of expression
 	{
-		Error("An expression failed to evaluate to a valid result");
-		while (operands.size())
+		const auto currentLine = this->GetLineText(cache, iter.Get().token);
+		if (!currentLine.empty())
 		{
-			delete operands.top();
-			operands.pop();
+			Error("Script line approximation: %s (error wrapped in ##'s)", currentLine.c_str());
+			const auto variablesText = this->GetVariablesText(cache);
+			if (!variablesText.empty())
+				Error("\tWhere %s", variablesText.c_str());
 		}
-		return NULL;
+		else
+		{
+			Error("An expression failed to evaluate to a valid result. (Failed to approximate script line)");
+		}
+		while (operands.Size())
+		{
+			ScriptToken *operand = operands.Top();
+			if (operand)
+				operand->Delete();
+			operands.Pop();
+		}
+		return nullptr;
 	}
 
-	return operands.top();
+	return operands.Top();
+}
+
+std::string ExpressionEvaluator::GetLineText(CachedTokens& tokens, ScriptToken& faultingToken) const
+{
+	if (m_flags.IsSet(kFlag_SuppressErrorMessages))
+		return "";
+	std::stack<std::string> operands; // JIP Stack crashes
+	for (auto iter = tokens.Begin(); !iter.End(); ++iter)
+	{
+		auto& token = iter.Get().token;
+		if (!token.IsOperator())
+		{
+			switch (token.Type())
+			{
+			case kTokenType_Number:
+				operands.push(FormatString("%g", token.GetNumber()));
+				break;
+			case kTokenType_String:
+				operands.push('"' + std::string(token.GetString()) + '"');
+				break;
+			case kTokenType_Form:
+			{
+				auto* form = token.GetTESForm();
+				if (form)
+				{
+					auto* formName = form->GetName();
+					if (!formName || StrLen(formName) == 0)
+						operands.push("<FORM (EDITOR ID NOT LOADED)>");
+					else
+						operands.push(std::string(formName));
+					break;
+				}
+				return "";
+			}
+
+			case kTokenType_Global:
+			{
+				auto* global = token.GetGlobal();
+				if (global)
+				{
+					operands.push(std::string(global->name.CStr()));
+					break;
+				}
+				return "";
+			}
+
+			case kTokenType_Command:
+			{
+				auto* cmdInfo = token.GetCommandInfo();
+				if (cmdInfo)
+				{
+					auto operand = std::string(cmdInfo->longName);
+					if (operand.empty())
+					{
+						operand = FormatString("<MISSING PLUGIN COMMAND %X>", cmdInfo->opcode);
+					}
+					if (cmdInfo->numParams)
+					{
+						operand += " <...args>";
+					}
+					auto* callingRef = script->GetRefFromRefList(token.GetRefIndex());
+					if (callingRef && callingRef->form)
+					{
+						auto* name = callingRef->form->GetName();
+						if (name && StrLen(name))
+							operand = std::string(name) + "." + operand;
+					}
+					else if (callingRef && callingRef->varIdx)
+					{
+						auto* varInfo = script->GetVariableInfo(callingRef->varIdx);
+						if (varInfo)
+						{
+							operand = std::string(varInfo->name.CStr()) + "." + operand;
+						}
+					}
+					operands.push(operand);
+					break;
+				}
+				return "";
+			}
+			case kTokenType_NumericVar:
+			case kTokenType_RefVar:
+			case kTokenType_StringVar:
+			case kTokenType_ArrayVar:
+			{
+				const auto varName = token.GetVariableName(eventList);
+				if (!varName.empty())
+					operands.push(varName);
+				break;
+			}
+
+			default:
+				return "";
+			}
+		}
+		else
+		{
+			auto* op = token.GetOperator();
+			if (!op)
+				return "";
+			if (operands.size() < op->numOperands)
+				return "";
+
+			if (op->numOperands == 2)
+			{
+				auto rh = operands.top();
+				operands.pop();
+				auto lh = operands.top();
+				operands.pop();
+
+				if (op->type == kOpType_LeftBracket)
+					operands.push(lh + '[' + rh + ']');
+				else if (op->type == kOpType_Slice || op->type == kOpType_Exponent || op->type == kOpType_MemberAccess || op->type == kOpType_MakePair)
+					operands.push(lh + std::string(op->symbol) + rh);
+				else
+					operands.push(lh + " " + std::string(op->symbol) + " " + rh);
+			}
+			else if (op->numOperands == 1)
+			{
+				auto operand = operands.top();
+				operands.pop();
+				operands.push(std::string(op->symbol) + operand);
+			}
+		}
+		if (&faultingToken == &token && !operands.empty())
+		{
+			auto lastStr = operands.top();
+			operands.pop();
+			lastStr = "##" + lastStr + "##";
+			operands.push(lastStr);
+		}
+	}
+	if (operands.size() == 1)
+	{
+		CommandInfo* cmd = GetCommand();
+		if (!cmd || !cmd->longName)
+			return "";
+		return std::string(cmd->longName) + " " + operands.top();
+	}
+	return "";
+}
+
+std::string ExpressionEvaluator::GetVariablesText(CachedTokens& tokens) const
+{
+	std::string result;
+	std::set<std::pair<UInt32, UInt32>> printedVars;
+	for (auto iter = tokens.Begin(); !iter.End(); ++iter)
+	{
+		auto& token = iter.Get().token;
+		if (printedVars.find(std::make_pair(token.refIdx, token.varIdx)) != printedVars.end())
+			continue;
+		if (token.IsVariable())
+		{
+			result += token.GetVariableName(eventList) + "=" + token.GetVariableDataAsString();
+			printedVars.insert(std::make_pair(token.refIdx, token.varIdx));
+			result += ", ";
+		}
+		else if (token.Type() == kTokenType_Command && token.refIdx)
+		{
+			auto* ref = script->GetRefFromRefList(token.refIdx);
+			if (ref && ref->varIdx)
+			{
+				auto* varInfo = script->GetVariableInfo(ref->varIdx);
+				if (varInfo && varInfo->name.m_bufLen)
+				{
+					auto* var = eventList->GetVariable(varInfo->idx);
+					if (var)
+					{
+						auto* varName = varInfo->name.CStr();
+						auto* form = LookupFormByID(var->GetFormId());
+						if (form)
+							result += FormatString("%s=%s", varName, form->GetStringRepresentation().c_str());
+						else if (var->GetFormId())
+							result += FormatString("%s=invalid form (%x)", varName, var->GetFormId());
+						else
+							result += FormatString("%s=uninitialized form (0)", varName);
+					}
+				}
+			}
+			result += ", ";
+		}
+	}
+	for (auto i = 0; i < 2 && !result.empty(); ++i)
+		result.pop_back(); // remove ", "
+	return result;
 }
 
 //	Pop required operand(s)
@@ -3626,7 +3934,7 @@ ScriptToken* ExpressionEvaluator::Evaluate()
 //	check operand(s)->CanConvertTo() for rule types (also swap them and test if !asymmetric)
 //	if can convert --> pass to rule handler, return result :: else, continue loop
 //	if no matching rule return null
-ScriptToken* Operator::Evaluate(ScriptToken* lhs, ScriptToken* rhs, ExpressionEvaluator* context)
+ScriptToken* Operator::Evaluate(ScriptToken* lhs, ScriptToken* rhs, ExpressionEvaluator* context, Op_Eval& cacheEval, bool& cacheSwapOrder)
 {
 	if (numOperands == 0)	// how'd we get here?
 	{
@@ -3654,12 +3962,21 @@ ScriptToken* Operator::Evaluate(ScriptToken* lhs, ScriptToken* rhs, ExpressionEv
 				bRuleMatches = true;
 			}
 		}
-
 		if (bRuleMatches)
+		{
+			if (lhs->Type() != kTokenType_ArrayElement && rhs ? rhs->Type() != kTokenType_ArrayElement : true) // array elements depend on CanConvertTo to fail, can't cache eval
+			{
+				cacheEval = rule->eval;
+				cacheSwapOrder = bSwapOrder;
+			}
 			return bSwapOrder ? rule->eval(type, rhs, lhs, context) : rule->eval(type, lhs, rhs, context);
+		}
 	}
-
-	return NULL;
+	if (rhs && rhs->Type() == kTokenType_ArrayElement || lhs && lhs->Type() == kTokenType_ArrayElement)
+	{
+		context->Error("Array does not contain key");
+	}
+	return nullptr;
 }
 
 bool BasicTokenToElem(ScriptToken* token, ArrayElement& elem, ExpressionEvaluator* context)
@@ -3677,10 +3994,7 @@ bool BasicTokenToElem(ScriptToken* token, ArrayElement& elem, ExpressionEvaluato
 	else if (basicToken->CanConvertTo(kTokenType_Form))
 		elem.SetFormID(basicToken->GetFormID());
 	else if (basicToken->CanConvertTo(kTokenType_Array))
-	{
-		ArrayID arrID = basicToken->GetArray();
-		elem.SetArray(arrID, g_ArrayMap.GetOwningModIndex(arrID));
-	}
+		elem.SetArray(basicToken->GetArray());
 	else
 		bResult = false;
 
@@ -3690,7 +4004,7 @@ bool BasicTokenToElem(ScriptToken* token, ArrayElement& elem, ExpressionEvaluato
 
 #else			// CS only
 
-static enum BlockType
+enum BlockType
 {
 	kBlockType_Invalid	= 0,
 	kBlockType_ScriptBlock,
@@ -3754,6 +4068,7 @@ private:
 	bool		ProcessBlock(BlockType blockType);
 	bool		AdvanceLine();
 	const char	* BlockTypeAsString(BlockType type);
+	void HandleMacros();
 public:
 	Preprocessor(ScriptBuffer* buf);
 
@@ -3778,7 +4093,7 @@ const char* Preprocessor::BlockTypeAsString(BlockType type)
 }
 
 Preprocessor::Preprocessor(ScriptBuffer* buf) : m_buf(buf), m_loopDepth(0), m_curLineText(""), m_curLineNo(0),
-	m_curBlockStartingLineNo(1), m_scriptText(buf->scriptText), m_scriptTextOffset(0)
+                                                m_curBlockStartingLineNo(1), m_scriptText(buf->scriptText), m_scriptTextOffset(0)
 {
 	AdvanceLine();
 }
@@ -3972,11 +4287,6 @@ bool PrecompileScript(ScriptBuffer* buf)
 
 bool Cmd_Expression_Parse(UInt32 numParams, ParamInfo* paramInfo, ScriptLineBuffer* lineBuf, ScriptBuffer* scriptBuf)
 {
-#if RUNTIME
-	Console_Print("This command cannot be called from the console.");
-	return false;
-#endif
-
 	ExpressionParser parser(scriptBuf, lineBuf);
 	return (parser.ParseArgs(paramInfo, numParams));
 }

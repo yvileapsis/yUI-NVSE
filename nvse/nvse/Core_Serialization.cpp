@@ -5,6 +5,7 @@
 #include <string>
 #include "StringVar.h"
 #include "ArrayVar.h"
+#include "ScriptTokens.h"
 
 /*************************
 Save file format:
@@ -21,7 +22,6 @@ Save file format:
 
 static ModInfo** s_ModFixupTable = NULL;
 bool LoadModList(NVSESerializationInterface* nvse);	// reads saved mod order, builds table mapping changed mod indexes
-bool BuildFixedModIndexTable();
 
 /*******************************
 *	Callbacks
@@ -98,12 +98,6 @@ void Core_NewGameCallback(void * reserved)
 	g_StringMap.Clean();
 }
 
-void Core_PostLoadCallback(bool bLoadSucceeded)
-{
-	g_ArrayMap.PostLoad(bLoadSucceeded);
-	g_StringMap.PostLoad(bLoadSucceeded);
-}
-
 void Core_PreLoadCallback(void * reserved)
 {
 	// this is invoked only if at least one other plugin registers a preload callback
@@ -113,8 +107,9 @@ void Core_PreLoadCallback(void * reserved)
 
 	NVSESerializationInterface* intfc = &g_NVSESerializationInterface;
 
-	g_ArrayMap.Preload();
-	g_StringMap.Preload();
+	g_nvseVarGarbageCollectionMap.Clear();
+	g_ArrayMap.Reset();
+	g_StringMap.Reset();
 
 	UInt32 type, version, length;
 
@@ -123,9 +118,6 @@ void Core_PreLoadCallback(void * reserved)
 			case 'MODS':
 				if (!LoadModList(intfc))
 					_MESSAGE("PRELOAD: Error occurred while loading mod list");
-				else if (!BuildFixedModIndexTable())
-					_MESSAGE("PRELOAD: Failed to build fixed mod index table");
-
 				break;
 #ifdef _DEBUG
 			case 'CROB':
@@ -160,7 +152,7 @@ bool ReadModListFromCoSave(NVSESerializationInterface * intfc)
 {
 	_MESSAGE("Reading mod list from co-save");
 
-	char name[0x104] = { 0 };
+	char name[0x104];
 	UInt16 nameLen = 0;
 
 	intfc->ReadRecordData(&s_numPreloadMods, sizeof(s_numPreloadMods));
@@ -176,15 +168,10 @@ bool ReadModListFromCoSave(NVSESerializationInterface * intfc)
 
 bool LoadModList(NVSESerializationInterface* intfc)
 {
-		// read the mod list
+	// read the mod list
 	return ReadModListFromCoSave(intfc);
 }
 
-bool BuildFixedModIndexTable()
-{
-	//stub
-	return true;
-}
 
 UInt8 ResolveModIndexForPreload(UInt8 modIndexIn)
 {

@@ -13,6 +13,8 @@
 #include <string>
 #include "Utilities.h"
 #include "PluginManager.h"
+#include "NiNodes.h"
+#include <stdexcept>
 
 #include "Commands_Console.h"
 #include "Commands_Game.h"
@@ -31,12 +33,14 @@
 #include "Commands_Array.h"
 #include "Commands_String.h"
 #include "Commands_Algohol.h"
+#include "Commands_Animation.h"
 
 CommandTable g_consoleCommands;
 CommandTable g_scriptCommands;
 
 #if RUNTIME
 
+// 1.4.0.525 runtime
 UInt32 g_offsetConsoleCommandsStart = 0x0118E8E0;
 UInt32 g_offsetConsoleCommandsLast = 0x011908C0;
 UInt32 g_offsetScriptCommandsStart = 0x01190910;
@@ -244,16 +248,6 @@ static void ApplyPatch(const PatchLocation * patch, UInt32 newData)
 	}
 }
 
-bool Cmd_Default_Execute(COMMAND_ARGS)
-{
-	return true;
-}
-
-bool Cmd_Default_Eval(COMMAND_ARGS_EVAL)
-{
-	return true;
-}
-
 bool Cmd_Default_Parse(UInt32 numParams, ParamInfo * paramInfo, ScriptLineBuffer * lineBuf, ScriptBuffer * scriptBuf)
 {
 	return g_defaultParseCommand(numParams, paramInfo, lineBuf, scriptBuf);
@@ -315,40 +309,6 @@ bool Cmd_DumpDocs_Execute(COMMAND_ARGS)
 	return true;
 }
 
-bool Cmd_tcmd_Execute(COMMAND_ARGS)
-{
-	_MESSAGE("tcmd");
-
-	Console_Print("hello world");
-
-	Debug_DumpMenus();
-	Debug_DumpTraits();
-
-	*result = 0;
-
-	return true;
-}
-
-bool Cmd_tcmd2_Execute(COMMAND_ARGS)
-{
-	UInt32	arg;
-
-	_MESSAGE("tcmd2");
-
-	if(ExtractArgs(EXTRACT_ARGS, &arg))
-	{
-		Console_Print("hello args: %d", arg);
-	}
-	else
-	{
-		Console_Print("hello args: failed");
-	}
-
-	*result = 0;
-
-	return true;
-}
-
 class Dumper {
 	UInt32 m_sizeToDump;
 public:
@@ -360,69 +320,6 @@ public:
 		return true;
 	}
 };
-
-bool Cmd_tcmd3_Execute(COMMAND_ARGS)
-{
-	TESForm* pForm = NULL;
-	_MESSAGE("tcmd3");
-
-	if (ExtractArgs(EXTRACT_ARGS, &pForm)) {
-		// we have a pForm
-	} 
-		
-	if (!pForm && thisObj && thisObj->baseForm) {
-		pForm = thisObj->baseForm;
-	}
-
-//	DataHandler* pDH = DataHandler::Get();
-//	int x = 4;
-
-//	GameSettingCollection* pGC = GameSettingCollection::GetSingleton();
-//	IniSettingCollection* pISC = IniSettingCollection::GetIniSettings();
-//	IniSettingCollection* pIPC = IniSettingCollection::GetIniPrefs();
-
-	InterfaceManager* pIM = InterfaceManager::GetSingleton();
-//	DumpClass(pIM);
-
-//	UInt32 formID = 0x105228;
-//	TESForm* pLookedUp = LookupFormByID(formID);
-//	if(pLookedUp) {
-//		UInt32 addr = 0x011B9C2C;
-//		DumpClass((void*)pForm);
-//	}
-
-//	TESObjectWEAP* pWeap = DYNAMIC_CAST(pForm, TESForm, TESObjectWEAP);
-
-	PlayerCharacter* pPC = PlayerCharacter::GetSingleton();
-	if (pPC) {
-		BaseProcess* pBaseProc = pPC->baseProcess;
-		BaseProcess::AmmoInfo* pAmmoInfo = pBaseProc->GetAmmoInfo();
-		DumpClass(pAmmoInfo);
-		DumpClass(pAmmoInfo->unk00);
-//		ExtraAmmo* pAmmo = GetByTypeCast(pPC->extraDataList, Ammo);
-		int x = 4;
-	}
-
-
-
-//	MagicTarget* pTarget = DYNAMIC_CAST(pPC, PlayerCharacter, MagicTarget);
-//	if(pTarget) {
-//		EffectNode* pEffects = pTarget->GetEffectList();
-//		UInt32 cnt = pEffects->Count();
-//		ActiveEffect* pEffect = pEffects->GetNthItem(1);
-//		UInt32 formID = 0x5C6C1;
-//		TESForm* pForm = LookupFormByID(formID);
-//		EffectSetting* pSetting = DYNAMIC_CAST(pForm, TESForm, EffectSetting);
-//
-//		int c = 0;
-//
-//		//pEffects->Visit(Dumper(32));
-//
-//	}
-
-
-	return true;
-}
 
 #endif
 
@@ -440,9 +337,6 @@ DEFINE_CMD_COND(GetNVSEVersion, returns the installed version of NVSE, 0, NULL);
 DEFINE_CMD_COND(GetNVSERevision, returns the numbered revision of the installed version of NVSE, 0, NULL);
 DEFINE_CMD_COND(GetNVSEBeta, returns the numbered beta of the installed version of NVSE, 0, NULL);
 DEFINE_COMMAND(DumpDocs, , 0, 0, NULL);
-DEFINE_COMMAND(tcmd, test, 0, 0, NULL);
-DEFINE_CMD_ALT(tcmd2, testargcmd ,test, 0, 1, kTestArgCommand_Params);
-DEFINE_CMD_ALT(tcmd3, testdump, dump info, 0, 1, kTestDumpCommand_Params);
 
 #define ADD_CMD(command) Add(&kCommandInfo_ ## command )
 #define ADD_CMD_RET(command, rtnType) Add(&kCommandInfo_ ## command, rtnType )
@@ -480,6 +374,7 @@ void CommandTable::Init(void)
 	g_scriptCommands.AddCommandsV1();
 	g_scriptCommands.AddCommandsV3s();
 	g_scriptCommands.AddCommandsV4();
+	g_scriptCommands.AddCommandsV5();
 
 #if _DEBUG
 	g_scriptCommands.AddDebugCommands();
@@ -488,6 +383,7 @@ void CommandTable::Init(void)
 	// register plugins
 	g_pluginManager.Init();
 
+	// patch the code
 	ApplyPatch(kPatch_ScriptCommands_Start, (UInt32)g_scriptCommands.GetStart());
 	ApplyPatch(kPatch_ScriptCommands_End, (UInt32)g_scriptCommands.GetEnd());
 	ApplyPatch(kPatch_ScriptCommands_MaxIdx, g_scriptCommands.GetMaxID());
@@ -496,6 +392,9 @@ void CommandTable::Init(void)
 
 	_MESSAGE("max id = %08X", g_scriptCommands.GetMaxID());
 
+	_MESSAGE("console commands");
+	g_consoleCommands.Dump();
+	_MESSAGE("script commands");
 	g_scriptCommands.Dump();
 
 	_MESSAGE("patched");
@@ -589,17 +488,6 @@ void CommandTable::Dump(void)
 	for(CommandList::iterator iter = m_commands.begin(); iter != m_commands.end(); ++iter)
 	{
 		_DMESSAGE("%08X %04X %s %s", iter->opcode, iter->needsParent, iter->longName, iter->shortName);
-		gLog.Indent();
-
-#if 0
-		for(UInt32 i = 0; i < iter->numParams; i++)
-		{
-			ParamInfo	* param = &iter->params[i];
-			_DMESSAGE("%08X %08X %s", param->typeID, param->isOptional, param->typeStr);
-		}
-#endif
-
-		gLog.Outdent();
 	}
 }
 
@@ -738,7 +626,7 @@ const char* StringForParamType(UInt32 paramType)
 		case kParamType_MiscellaneousStat:	return "MiscStat";
 		case kParamType_ImageSpaceModifier:	return "ImageSpaceModifier";
 		case kParamType_ImageSpace:			return "ImageSpace";
-		case kParamType_Unhandled2C:		return "unk2C";
+		case kParamType_Double:				return "Double";
 		case kParamType_Unhandled2D:		return "unk2D";
 		case kParamType_Unhandled2E:		return "unk2E";
 		case kParamType_EncounterZone:		return "EncounterZone";
@@ -832,8 +720,8 @@ void CommandInfo::DumpFunctionDef() const
 
 CommandInfo * CommandTable::GetByName(const char * name)
 {
-	for(CommandList::iterator iter = m_commands.begin(); iter != m_commands.end(); ++iter)
-		if(!_stricmp(name, iter->longName) || (iter->shortName && !_stricmp(name, iter->shortName)))
+	for (CommandList::iterator iter = m_commands.begin(); iter != m_commands.end(); ++iter)
+		if (!StrCompare(name, iter->longName) || (iter->shortName && !StrCompare(name, iter->shortName)))
 			return &(*iter);
 
 	return NULL;
@@ -842,22 +730,26 @@ CommandInfo * CommandTable::GetByName(const char * name)
 
 CommandInfo* CommandTable::GetByOpcode(UInt32 opcode)
 {
-	// could do binary search here but padding command has opcode 0
-	for (CommandList::iterator iter = m_commands.begin(); iter != m_commands.end(); ++iter)
-		if (iter->opcode == opcode)
-			return &(*iter);
+	const auto baseOpcode = m_commands.begin()->opcode;
+	const auto arrayIndex = opcode - baseOpcode;
+	if (arrayIndex >= m_commands.size())
+	{
+		return nullptr;
+	}
+	auto* const command = &m_commands[arrayIndex];
+	if (command->opcode != opcode)
+	{
+		//_MESSAGE("ERROR: mismatched command opcodes when executing CommandTable::GetByOpcode (opcode: %X base: %X index: %d index opcode: %X)",
+		//	opcode, baseOpcode, arrayIndex, command->opcode);
+		return nullptr;
+	}
+	return command;
 
-	return NULL;
 }
 
 CommandReturnType CommandTable::GetReturnType(const CommandInfo* cmd)
 {
-	CommandMetadata * metadata = NULL;
-	if (cmd)
-		metadata = &m_metadata[cmd->opcode];
-	if (metadata)
-		return metadata->returnType;
-	return kRetnType_Default;
+	return m_metadata[cmd->opcode].returnType;
 }
 
 void CommandTable::SetReturnType(UInt32 opcode, CommandReturnType retnType)
@@ -866,9 +758,7 @@ void CommandTable::SetReturnType(UInt32 opcode, CommandReturnType retnType)
 	if (!cmdInfo)
 		_MESSAGE("CommandTable::SetReturnType() - cannot locate command with opcode %04X", opcode);
 	else {
-		CommandMetadata * metadata = &m_metadata[opcode];
-		if (metadata)
-			metadata->returnType = retnType;
+		m_metadata[opcode].returnType = retnType;
 	}
 }
 
@@ -904,12 +794,10 @@ void CommandTable::RemoveDisabledPlugins(void)
 {
 	for (CommandList::iterator iter = m_commands.begin(); iter != m_commands.end(); ++iter)
 	{
-		CommandMetadata * metadata = &m_metadata[iter->opcode];
-		if (metadata)
-			// plugin failed to load but still registered some commands?
-			// realistically the game is going to go down hard if this happens anyway
-			if(g_pluginManager.LookupHandleFromBaseOpcode(metadata->parentPlugin) == kPluginHandle_Invalid)
-				Replace(iter->opcode, &kPaddingCommand);
+		// plugin failed to load but still registered some commands?
+		// realistically the game is going to go down hard if this happens anyway
+		if(g_pluginManager.LookupHandleFromBaseOpcode(m_metadata[iter->opcode].parentPlugin) == kPluginHandle_Invalid)
+			Replace(iter->opcode, &kPaddingCommand);
 	}
 }
 
@@ -930,12 +818,10 @@ PluginInfo * CommandTable::GetParentPlugin(const CommandInfo * cmd)
 	if (cmd->opcode < kNVSEOpcodeTest)
 		return &g_NVSEPluginInfo;
 
-	CommandMetadata * metadata = &m_metadata[cmd->opcode];
-	if (metadata) {
-		PluginInfo	* info = g_pluginManager.GetInfoFromBase(metadata->parentPlugin);
-		if (info)
-			return info;
-	}
+	PluginInfo *info = g_pluginManager.GetInfoFromBase(m_metadata[cmd->opcode].parentPlugin);
+	if (info)
+		return info;
+
 	return NULL;
 }
 
@@ -966,6 +852,33 @@ void ImportConsoleCommand(const char * name)
 	}
 }
 
+bool Cmd_tcmd_Execute(COMMAND_ARGS)
+{
+	auto* player = LookupFormByID(0x14);
+	auto* playerRef = DYNAMIC_CAST(player, TESForm, TESObjectREFR);
+	auto* list = GameFuncs::GetAnims(playerRef, 0xC);
+	for (auto iter = list->Begin(); !iter.End(); ++iter)
+	{
+		_MESSAGE("ANIM %s", iter.Get());
+	}
+	return true;
+}
+
+bool Cmd_tcmd2_Execute(COMMAND_ARGS)
+{
+	return true;
+}
+
+bool Cmd_tcmd3_Execute(COMMAND_ARGS)
+{
+	return true;
+}
+
+DEFINE_COMMAND(tcmd, test, 0, 0, NULL);
+DEFINE_CMD_ALT(tcmd2, testargcmd ,test, 0, 1, kTestArgCommand_Params);
+DEFINE_CMD_ALT(tcmd3, testdump, dump info, 0, 1, kTestDumpCommand_Params);
+
+
 // internal commands added at the end
 void CommandTable::AddDebugCommands()
 {
@@ -976,11 +889,28 @@ void CommandTable::AddDebugCommands()
 	ADD_CMD(tcmd);
 	ADD_CMD(tcmd2);
 	ADD_CMD(tcmd3);
+
 	ADD_CMD(DumpDocs);
+
+	ADD_CMD(ForcePlayIdle);
 }
 
 void CommandTable::AddCommandsV1()
 {
+	// record return type of vanilla commands which return forms
+	g_scriptCommands.SetReturnType(0x1025, kRetnType_Form);		// PlaceAtMe
+	g_scriptCommands.SetReturnType(0x10CD, kRetnType_Form);		// GetActionRef
+	g_scriptCommands.SetReturnType(0x10CE, kRetnType_Form);		// GetSelf
+	g_scriptCommands.SetReturnType(0x10CF, kRetnType_Form);		// GetContainer
+	g_scriptCommands.SetReturnType(0x10E8, kRetnType_Form);		// GetCombatTarget
+	g_scriptCommands.SetReturnType(0x10E9, kRetnType_Form);		// GetPackageTarget
+	g_scriptCommands.SetReturnType(0x1113, kRetnType_Form);		// GetParentRef
+	g_scriptCommands.SetReturnType(0x116B, kRetnType_Form);		// GetLinkedRef
+	g_scriptCommands.SetReturnType(0x11BD, kRetnType_Form);		// PlaceAtMeHealthPercent
+	g_scriptCommands.SetReturnType(0x11CF, kRetnType_Form);		// GetPlayerGrabbedRef
+	g_scriptCommands.SetReturnType(0x124E, kRetnType_Form);		// GetOwnerLastTarget
+	g_scriptCommands.SetReturnType(0x1265, kRetnType_Form);		// ObjectUnderTheReticule
+
 	RecordReleaseVersion();
 
 	// beta 1
@@ -1177,9 +1107,7 @@ void CommandTable::AddCommandsV1()
 	ADD_CMD(IsFormValid);
 	ADD_CMD(IsReference);
 
-	// beta 4 - compat with 1.1.1.280
-	// oh, sorry, compat with 1.1.1.285
-	// oh, I am bad at reading, compat with 1.2.0.285
+	// beta 4 - compat with 1.2.0.285
 
 	// beta 5
 	ADD_CMD(GetWeaponRequiredStrength);
@@ -1385,7 +1313,7 @@ void CommandTable::AddCommandsV4()
 	ADD_CMD(ForEach);
 	ADD_CMD(Continue);
 	ADD_CMD(Break);
-	ADD_CMD(ToString);
+	ADD_CMD_RET(ToString, kRetnType_String);
 	ADD_CMD(Print);
 	ADD_CMD(testexpr);
 	ADD_CMD_RET(TypeOf, kRetnType_String);
@@ -1393,8 +1321,8 @@ void CommandTable::AddCommandsV4()
 	ADD_CMD_RET(Call, kRetnType_Ambiguous);
 	ADD_CMD(SetFunctionValue);
 	ADD_CMD_RET(GetUserTime, kRetnType_Array);	// corrected in version 4.2 Beta 4 alpha 1
-	ADD_CMD(GetModLocalData);
-	ADD_CMD_RET(SetModLocalData, kRetnType_Ambiguous);	// corrected in version 4.5 Beta 6
+	ADD_CMD_RET(GetModLocalData, kRetnType_Ambiguous);	// corrected in version 5.0 Beta 3
+	ADD_CMD(SetModLocalData);							// restored in version 5.0 Beta 3
 	ADD_CMD(ModLocalDataExists);
 	ADD_CMD(RemoveModLocalData);
 	ADD_CMD_RET(GetAllModLocalData, kRetnType_Array);	// corrected in version 4.5 Beta 6
@@ -1530,7 +1458,7 @@ void CommandTable::AddCommandsV4()
 	ADD_CMD_RET(GetScopeModelPath, kRetnType_String);
 	ADD_CMD(SetScopeModelPath);
 
-	// 4.3 and 4.4 skîpped
+	// 4.3 and 4.4 skï¿½pped
 
 	// 4.5 beta 01 none added
 
@@ -1553,8 +1481,6 @@ void CommandTable::AddCommandsV4()
 	ADD_CMD(SetStringIniSetting);
 
 	// 4.5 beta 07
-
-	// Only some of the following functions have been tested yet
 
 	ADD_CMD(GetPerkRank);										// Tested
 	ADD_CMD(GetAltPerkRank);									// Tested
@@ -1587,22 +1513,103 @@ void CommandTable::AddCommandsV4()
 	ADD_CMD(IsPluginInstalled);									// Tested
 	ADD_CMD(GetPluginVersion);									// Tested
 	ADD_CMD_RET(GenericGetForm, kRetnType_Form);				// Tested
-	ImportConsoleCommand("INV");
-	ADD_CMD_RET(GetNthDefaultForm, kRetnType_Form);
-	ADD_CMD(SetNthDefaultForm);
-	ADD_CMD_RET(GetDefaultForms, kRetnType_Array);
+	ImportConsoleCommand("INV");								// Tested
+	ADD_CMD_RET(GetNthDefaultForm, kRetnType_Form);				// Tested
+	ADD_CMD(SetNthDefaultForm);									// Tested
+	ADD_CMD_RET(GetDefaultForms, kRetnType_Array);				// Tested
 
-	// 4.y beta 0x - String needing underlying forms implementation
-	#if 0
+	// 4.5 beta 08 private. Fix only
 
-	ADD_CMD_RET(GetNthEffectItemScriptName, kRetnType_String);
-	ADD_CMD(SetNthEffectItemScriptNameEX);
+	// 4.6 beta 01
+	ADD_CMD(GetGridsToLoad);
+	ADD_CMD(OutputLocalMapPicturesOverride);
+	ADD_CMD(SetOutputLocalMapPicturesGrids);
 
-	#endif
+	// Events
+	ADD_CMD(SetEventHandler);
+	ADD_CMD(RemoveEventHandler);
+	ADD_CMD_RET(GetCurrentEventName, kRetnType_String);
+	ADD_CMD(DispatchEvent);
+
+	ADD_CMD(GetInGrid);
+	ADD_CMD(GetInGridInCell);									// Name is bad, but in line with others
+
+	// 4.6 beta 02 : Fixes only
+
+	// 4.6 beta 03
+	ADD_CMD(AddSpellNS);
+	ADD_CMD(GetFlagsLow);
+	ADD_CMD(SetFlagsLow);
+	ADD_CMD(GetFlagsHigh);
+	ADD_CMD(SetFlagsHigh);
+	ADD_CMD(HasConsoleOutputFilename);
+	ADD_CMD_RET(GetConsoleOutputFilename, kRetnType_String);
+	ADD_CMD(PrintF);
+	ADD_CMD(PrintDebugF);
+	ImportConsoleCommand("TFIK");
+	ADD_CMD(IsLoadDoor);
+	ADD_CMD(GetDoorTeleportX);
+	ADD_CMD(GetDoorTeleportY);
+	ADD_CMD(GetDoorTeleportZ);
+	ADD_CMD(GetDoorTeleportRot);
+	ADD_CMD(SetDoorTeleport);
+
+	// 4.6 beta 04 : Never public
+	ADD_CMD(GenericCheckForm);
+	ADD_CMD(GetEyesFlags);
+	ADD_CMD(SetEyesFlags);
+	ADD_CMD(GetHairFlags);
+	ADD_CMD(SetHairFlags);
 
 }
 
-namespace PluginAPI {
+void CommandTable::AddCommandsV5()
+{
+	RecordReleaseVersion();
+
+	// 5.0 beta 01
+	ADD_CMD(ar_Packed);
+	ADD_CMD(GetActorFIKstatus);
+	ADD_CMD(SetActorFIKstatus);
+	ADD_CMD(GetBit);
+
+	// 5.0 beta 02
+	ADD_CMD(HasEffectShader);
+
+	// 5.0 beta 03
+	ADD_CMD_RET(GetCurrentQuestObjectiveTeleportLinks, kRetnType_Array);
+	
+	// Port of trig functions from OBSE
+	ADD_CMD(ATan2);
+	ADD_CMD(Sinh);
+	ADD_CMD(Cosh);
+	ADD_CMD(Tanh);
+	ADD_CMD(dSin);
+	ADD_CMD(dCos);
+	ADD_CMD(dTan);
+	ADD_CMD(dASin);
+	ADD_CMD(dACos);
+	ADD_CMD(dATan);
+	ADD_CMD(dATan2);
+	ADD_CMD(dSinh);
+	ADD_CMD(dCosh);
+	ADD_CMD(dTanh);
+
+	// 5.1 beta 01
+	ADD_CMD_RET(GetNthAnimation, kRetnType_String);
+	ADD_CMD(AddAnimation);
+	ADD_CMD(DelAnimation);
+	ADD_CMD(DelAnimations);
+	ADD_CMD_RET(GetClass, kRetnType_Form);
+	ADD_CMD_RET(GetNameOfClass, kRetnType_String);
+	ADD_CMD(ShowLevelUpMenu);
+
+	ADD_CMD(SetWeaponAnimationPath);
+	ADD_CMD(SetActorAnimationPath);
+}
+
+namespace PluginAPI
+{
 	const CommandInfo* GetCmdTblStart() { return g_scriptCommands.GetStart(); }
 	const CommandInfo* GetCmdTblEnd() { return g_scriptCommands.GetEnd(); }
 	const CommandInfo* GetCmdByOpcode(UInt32 opcode) { return g_scriptCommands.GetByOpcode(opcode); }
@@ -1610,4 +1617,5 @@ namespace PluginAPI {
 	UInt32 GetCmdRetnType(const CommandInfo* cmd) { return g_scriptCommands.GetReturnType(cmd); }
 	UInt32 GetReqVersion(const CommandInfo* cmd) { return g_scriptCommands.GetRequiredNVSEVersion(cmd); }
 	const PluginInfo* GetCmdParentPlugin(const CommandInfo* cmd) { return g_scriptCommands.GetParentPlugin(cmd); }
+	const PluginInfo* GetPluginInfoByName(const char *pluginName) {	return g_pluginManager.GetInfoByName(pluginName); }
 }

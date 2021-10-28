@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GameTypes.h"
+#include "NiNodes.h"
 #include "GameScript.h"
 
 struct ParamInfo;
@@ -11,9 +12,14 @@ struct BaseExtraList;
 #define playerID	0x7
 #define playerRefID 0x14
 
-static const UInt32 s_Console__Print = 0x0071D0A0;
+#if RUNTIME
+	static const UInt32 s_Console__Print = 0x0071D0A0;
+#endif
 
 extern bool extraTraces;
+extern bool alternateUpdate3D;
+extern bool s_InsideOnActorEquipHook;
+extern UInt32 s_CheckInsideOnActorEquipHook;
 
 void Console_Print(const char * fmt, ...);
 
@@ -31,7 +37,7 @@ extern const _ExtractArgs ExtractArgs;
 typedef TESForm * (* _CreateFormInstance)(UInt8 type);
 extern const _CreateFormInstance CreateFormInstance;
 
-bool IsScriptCalledFromConsole();
+bool IsConsoleMode();
 bool GetConsoleEcho();
 void SetConsoleEcho(bool doEcho);
 const char * GetFullName(TESForm * baseForm);
@@ -64,11 +70,15 @@ extern const _ShowMessageBox_pScriptRefID ShowMessageBox_pScriptRefID;
 typedef UInt8 * _ShowMessageBox_button;
 extern const _ShowMessageBox_button ShowMessageBox_button;
 
-// unk1 = 0
-// unk3 = 0, "UIVATSInsufficientAP" (sound?)
-// duration = 2
-// unk5 = 0
-typedef bool (*_QueueUIMessage)(const char *msgText, UInt32 iconType, const char *iconPath, const char *soundPath, float displayTime, UInt8 unk5);
+// can be passed to QueueUIMessage to determine Vaultboy icon displayed
+enum eEmotion {
+	happy	= 0,
+	sad		= 1,
+	neutral = 2,
+	pain	= 3
+};
+
+typedef bool (* _QueueUIMessage)(const char* msg, UInt32 emotion, const char* ddsPath, const char* soundName, float msgTime, bool maybeNextToDisplay);
 extern const _QueueUIMessage QueueUIMessage;
 
 const UInt32 kMaxMessageLength = 0x4000;
@@ -82,21 +92,16 @@ void ShowCompilerError(ScriptLineBuffer* lineBuf, const char* fmt, ...);
 
 #else
 
-typedef TESForm * (__cdecl * _GetFormByID)(const char* editorID);
-extern const _GetFormByID GetFormByID;
+
+
 
 typedef void (__cdecl *_ShowCompilerError)(ScriptBuffer* Buffer, const char* format, ...);
 extern const _ShowCompilerError		ShowCompilerError;
 
 #endif
 
-// can be passed to QueueUIMessage to determine Vaultboy icon displayed
-enum eEmotion {
-	neutral = 0,
-	happy = 1,
-	sad = 2,
-	pain = 3
-};
+typedef TESForm* (__cdecl* _GetFormByID)(const char* editorID);
+extern const _GetFormByID GetFormByID;
 
 struct NVSEStringVarInterface;
 	// Problem: plugins may want to use %z specifier in format strings, but don't have access to StringVarMap
@@ -106,87 +111,96 @@ struct NVSEStringVarInterface;
 	// I'm sure there is a better way to do this but I haven't found it
 void RegisterStringVarInterface(NVSEStringVarInterface* intfc);
 
-struct ScriptVar
-{
-	UInt32		id;
-	void		*next;
-	double		data;
-};
-
 // only records individual objects if there's a block that matches it
 // ### how can it tell?
 struct ScriptEventList
 {
 	enum
 	{
-		kEvent_OnAdd =						1,
-		kEvent_OnEquip =					2,
-		kEvent_OnActorEquip =				2,
-		kEvent_OnDrop =						4,
-		kEvent_OnUnequip =					8,
-		kEvent_OnActorUnequip =				8,
+		kEvent_OnAdd			= 0x00000001,
+		kEvent_OnEquip			= 0x00000002,		// Called on Item and on Refr
+		kEvent_OnActorEquip		= kEvent_OnEquip,	// presumably the game checks the type of the object
+		kEvent_OnDrop			= 0x00000004,
+		kEvent_OnUnequip		= 0x00000008,
+		kEvent_OnActorUnequip	= kEvent_OnUnequip,
+		kEvent_OnDeath			= 0x00000010,
+		kEvent_OnMurder			= 0x00000020,
+		kEvent_OnCombatEnd		= 0x00000040,		// See 0x008A083C
+		kEvent_OnHit			= 0x00000080,		// See 0x0089AB12
+		kEvent_OnHitWith		= 0x00000100,		// TESObjectWEAP*	0x0089AB2F
+		kEvent_OnPackageStart	= 0x00000200,
+		kEvent_OnPackageDone	= 0x00000400,
+		kEvent_OnPackageChange	= 0x00000800,
+		kEvent_OnLoad			= 0x00001000,
+		kEvent_OnMagicEffectHit = 0x00002000,		// EffectSetting* 0x0082326F
+		kEvent_OnSell			= 0x00004000,		// 0x0072FE29 and 0x0072FF05, linked to 'Barter Amount Traded' Misc Stat
+		kEvent_OnStartCombat	= 0x00008000,
 
-		kEvent_OnDeath =					0x10,
-		kEvent_OnMurder =					0x20,
-		kEvent_OnCombatEnd =				0x40,			// See 0x008A083C
-		kEvent_OnHit =						0x80,			// See 0x0089AB12
+		kEvent_OnOpen			= 0x00010000,		// while opening some container, not all
+		kEvent_OnClose			= 0x00020000,		// idem
+		kEvent_SayToDone		= 0x00040000,		// in Func0050 0x005791C1 in relation to SayToTopicInfo (OnSayToDone? or OnSayStart/OnSayEnd?)
+		kEvent_OnGrab			= 0x00080000,		// 0x0095FACD and 0x009604B0 (same func which is called from PlayerCharacter_func001B and 0021)
+		kEvent_OnRelease		= 0x00100000,		// 0x0047ACCA in relation to container
+		kEvent_OnDestructionStageChange	= 0x00200000,		// 0x004763E7/0x0047ADEE
+		kEvent_OnFire			= 0x00400000,		// 0x008BAFB9 (references to package use item and use weapon are close)
 
-		kEvent_OnHitWith =					0x100,			// TESObjectWEAP*	0x0089AB2F
-		kEvent_OnPackageStart =				0x200,
-		kEvent_OnPackageDone =				0x400,
-		kEvent_OnPackageChange =			0x800,
-
-		kEvent_OnLoad =						0x1000,
-		kEvent_OnMagicEffectHit =			0x2000,			// EffectSetting* 0x0082326F
-		kEvent_OnSell =						0x4000,			// 0x0072FE29 and 0x0072FF05, linked to 'Barter Amount Traded' Misc Stat
-		kEvent_OnStartCombat =				0x8000,
-
-		kEvent_OnOpen =						0x10000,		// while opening some container, not all
-		kEvent_OnClose =					0x20000,
-		kEvent_SayToDone =					0x40000,		// in Func0050 0x005791C1 in relation to SayToTopicInfo (OnSayToDone? or OnSayStart/OnSayEnd?)
-		kEvent_OnGrab =						0x80000,		// 0x0095FACD and 0x009604B0 (same func which is called from PlayerCharacter_func001B and 0021)
-
-		kEvent_OnRelease =					0x100000,		// 0x0047ACCA in relation to container
-		kEvent_OnDestructionStageChange =	0x200000,		// 0x004763E7/0x0047ADEE
-		kEvent_OnFire =						0x400000,		// 0x008BAFB9 (references to package use item and use weapon are close)
-
-		kEvent_OnTrigger =					0x10000000,		// 0x005D8D6A	Cmd_EnterTrigger_Execute
-		kEvent_OnTriggerEnter =				0x20000000,		// 0x005D8D50	Cmd_EnterTrigger_Execute
-		kEvent_OnTriggerLeave =				0x40000000,		// 0x0062C946	OnTriggerLeave ?
-		kEvent_OnReset =					0x80000000		// 0x0054E5FB
+		kEvent_OnTrigger		= 0x10000000,		// 0x005D8D6A	Cmd_EnterTrigger_Execute
+		kEvent_OnTriggerEnter	= 0x20000000,		// 0x005D8D50	Cmd_EnterTrigger_Execute
+		kEvent_OnTriggerLeave	= 0x40000000,		// 0x0062C946	OnTriggerLeave ?
+		kEvent_OnReset			= 0x80000000		// 0x0054E5FB
 	};
 
 	struct Event
 	{
-		TESForm		*object;
-		UInt32		eventMask;
+		TESForm	* object;
+		UInt32	eventMask;
 	};
 
-	struct Struct10
+	struct VarEntry;
+
+	struct Var
 	{
-		bool	effectStart;
-		bool	effectFinish;
-		UInt8	unk03[6];
+		UInt32		id;
+		VarEntry	* nextEntry;
+		double		data;
+
+		UInt32 GetFormId();
+	};
+
+	struct VarEntry
+	{
+		Var			* var;
+		VarEntry	* next;
+	};
+
+	struct Struct010
+	{
+		UInt8 unk00[8];
 	};
 
 	typedef tList<Event> EventList;
-	typedef tList<ScriptVar> VarList;
 
-	Script			*m_script;		// 00
-	UInt32			m_unk1;			// 04
-	EventList		*m_eventList;	// 08
-	VarList			*m_vars;		// 0C
-	Struct10		*unk010;		// 10
+	Script			* m_script;		// 00
+	UInt32			  m_unk1;			// 04
+	EventList		* m_eventList;	// 08
+	VarEntry		* m_vars;		// 0C
+	Struct010		* unk010;		// 10
 
-	void Dump(void);
-	ScriptVar *GetVariable(UInt32 id);
-	UInt32 ResetAllVariables();
+	void	Dump(void);
+	Var *	GetVariable(UInt32 id);
+	UInt32	ResetAllVariables();
+
+	void	Destructor();
+	tList<Var>* GetVars() const;
 };
 
 ScriptEventList* EventListFromForm(TESForm* form);
 
 typedef bool (* _MarkBaseExtraListScriptEvent)(TESForm* target, BaseExtraList* extraList, UInt32 eventMask);
 extern const _MarkBaseExtraListScriptEvent MarkBaseExtraListScriptEvent;
+
+typedef void (_cdecl * _DoCheckScriptRunnerAndRun)(TESObjectREFR* refr, BaseExtraList* extraList);
+extern const _DoCheckScriptRunnerAndRun DoCheckScriptRunnerAndRun;
 
 struct ExtractedParam
 {
@@ -223,8 +237,8 @@ struct ExtractedParam
 		// variable
 		struct 
 		{
-			ScriptVar			*var;
-			ScriptEventList		*parent;
+			ScriptEventList::Var	* var;
+			ScriptEventList			* parent;
 		} var;
 	} data;
 };
@@ -327,62 +341,6 @@ enum EActorVals {
 	eActorVal_NoActorValue = 256,
 };
 
-// 914
-class ConsoleManager
-{
-public:
-#if RUNTIME
-	MEMBER_FN_PREFIX(ConsoleManager);
-	DEFINE_MEMBER_FN(Print, void, s_Console__Print, const char * fmt, va_list args);
-#endif
-
-	ConsoleManager();
-	~ConsoleManager();
-
-	struct TextNode
-	{
-		TextNode	*next;
-		TextNode	*prev;
-		String		text;
-	};
-
-	struct TextList
-	{
-		TextNode	*first;
-		TextNode	*last;
-		UInt32		count;
-
-		TextList* Append(TextNode* newList);
-	};
-
-	struct RecordedCommand
-	{
-		char buf[100];
-	};
-
-	void* scriptContext;
-	TextList printedLines;
-	TextList inputHistory;
-	unsigned int historyIndex;
-	unsigned int unk020;
-	unsigned int printedCount;
-	unsigned int unk028;
-	unsigned int lineHeight;
-	int textXPos;
-	int textYPos;
-	UInt8 isConsoleOpen;
-	UInt8 unk39;
-	UInt8 isBatchRecording;
-	UInt8 unk3B;
-	unsigned int numRecordedCommands;
-	RecordedCommand recordedCommands[20];
-	char scofPath[260];
-
-	static ConsoleManager * GetSingleton(void);
-	void AppendToSentHistory(const char* src);
-};
-STATIC_ASSERT(sizeof(ConsoleManager) == 0x914);
-
 // A plugin author requested the ability to use OBSE format specifiers to format strings with the args
 // coming from a source other than script.
 // So changed ExtractFormattedString to take an object derived from following class, containing the args
@@ -398,7 +356,7 @@ public:
 	virtual bool Arg(argType asType, void * outResult) = 0;	// retrieve next arg
 	virtual bool SkipArgs(UInt32 numToSkip) = 0;			// skip specified # of args
 	virtual bool HasMoreArgs() = 0;
-	virtual std::string GetFormatString() = 0;						// return format string
+	virtual char *GetFormatString() = 0;						// return format string
 };
 
 // concrete class used for extracting script args
@@ -408,7 +366,7 @@ public:
 	virtual bool Arg(argType asType, void* outResult);
 	virtual bool SkipArgs(UInt32 numToSkip);
 	virtual bool HasMoreArgs();
-	virtual std::string GetFormatString();
+	virtual char *GetFormatString();
 
 	ScriptFormatStringArgs(UInt32 _numArgs, UInt8* _scriptData, Script* _scriptObj, ScriptEventList* _eventList);
 	UInt32 GetNumArgs();
@@ -418,89 +376,17 @@ private:
 	UInt32			numArgs;
 	UInt8			* scriptData;
 	Script			* scriptObj;
-	ScriptEventList	* eventList;
-	std::string fmtString;
+	ScriptEventList		* eventList;
 };
 bool SCRIPT_ASSERT(bool expr, Script* script, const char * errorMsg, ...);
 
-bool ExtractSetStatementVar(Script* script, ScriptEventList* eventList, void* scriptDataIn, double* outVarData, UInt8* outModIndex = NULL, bool shortPath = false);
+bool ExtractSetStatementVar(Script* script, ScriptEventList* eventList, void* scriptDataIn, double* outVarData, bool* makeTemporary, UInt32* opcodeOffsetPtr, UInt8* outModIndex = NULL);
 bool ExtractFormattedString(FormatStringArgs& args, char* buffer);
 
 class ChangesMap;
 class InteriorCellNewReferencesMap;
 class ExteriorCellNewReferencesMap;
 class NumericIDBufferMap;
-
-class NiBinaryStream
-{
-public:
-	NiBinaryStream();
-	~NiBinaryStream();
-
-	virtual void	Destructor(bool freeMemory);		// 00
-	virtual void	Unk_01(void);						// 04
-	virtual void	SeekCur(SInt32 delta);				// 08
-	virtual void	GetBufferSize(void);				// 0C
-	virtual void	InitReadWriteProcs(bool useAlt);	// 10
-
-//	void	** m_vtbl;		// 000
-	UInt32	m_offset;		// 004
-	void	* m_readProc;	// 008 - function pointer
-	void	* m_writeProc;	// 00C - function pointer
-};
-
-class NiFile: public NiBinaryStream
-{
-public:
-	NiFile();
-	~NiFile();
-
-	virtual UInt32	SetOffset(UInt32 newOffset, UInt32 arg2);	// 14
-	virtual UInt32	GetFilename(void);	// 18
-	virtual UInt32	GetSize();			// 1C
-
-	UInt32	m_bufSize;	// 010
-	UInt32	m_unk014;	// 014 - Total read in buffer
-	UInt32	m_unk018;	// 018 - Consumed from buffer
-	UInt32	m_unk01C;	// 01C
-	void*	m_buffer;	// 020
-	FILE*	m_File;		// 024
-};
-
-// 158
-class BSFile : public NiFile
-{
-public:
-	BSFile();
-	~BSFile();
-
-	virtual bool	Reset(bool arg1, bool arg2);	// 20
-	virtual bool	Unk_09(UInt32 arg1);	// 24
-	virtual UInt32	Unk_0A();	// 28
-	virtual UInt32	Unk_0B(String *string, UInt32 arg2);	// 2C
-	virtual UInt32	Unk_0C(void *ptr, UInt32 arg2);	// 30
-	virtual UInt32	ReadBufDelim(void *bufferPtr, UInt32 bufferSize, short delim);		// 34
-	virtual UInt32	Unk_0E(void *ptr, UInt8 arg2);	// 38
-	virtual UInt32	Unk_0F(void *ptr, UInt8 arg2);	// 3C
-	virtual bool	IsReadable();	// 40
-	virtual UInt32	ReadBuf(void *bufferPtr, UInt32 numBytes);	// 44
-	virtual UInt32	WriteBuf(void *bufferPtr, UInt32 numBytes);	// 48
-
-	UInt32		m_modeReadWriteAppend;	// 028
-	UInt8		m_good;					// 02C
-	UInt8		pad02D[3];				// 02D
-	UInt8		m_unk030;				// 030
-	UInt8		pad031[3];				// 031
-	UInt32		m_unk034;				// 034
-	UInt32		m_unk038;				// 038 - init'd to FFFFFFFF
-	UInt32		m_unk03C;				// 038
-	UInt32		m_unk040;				// 038
-	char		m_path[0x104];			// 044
-	UInt32		m_unk148;				// 148
-	UInt32		m_unk14C;				// 14C
-	UInt32		m_fileSize;				// 150
-	UInt32		m_unk154;				// 154
-};
 
 //
 struct ToBeNamed
@@ -628,7 +514,6 @@ union preloadData
 
 class BGSLoadGameBuffer
 {
-public:
 	BGSLoadGameBuffer();
 	~BGSLoadGameBuffer();
 
@@ -657,7 +542,6 @@ struct	BGSSaveLoadChangesMap
 // 030
 class BGSLoadFormBuffer: public BGSLoadGameBuffer
 {
-public:
 	BGSLoadFormBuffer();
 	~BGSLoadFormBuffer();
 
@@ -683,8 +567,6 @@ class BGSSaveFormBuffer: public BGSLoadGameBuffer
 {
 	BGSSaveFormBuffer();
 	~BGSSaveFormBuffer();
-public:
-	UInt32 count010;
 
 };	// in BGSSaveGameBuffer there is a 010, which look like a counter (ChunkCount ?), then the Header
 
@@ -740,11 +622,23 @@ public:
 	static TESSaveLoadGame* Get();
 
 	MEMBER_FN_PREFIX(TESSaveLoadGame);
+#if RUNTIME
 	DEFINE_MEMBER_FN(AddCreatedForm, UInt32, 0x00861780, TESForm * pForm);
+#endif
 };
 
+#if RUNTIME
 const UInt32 _SaveGameManager_ConstructSavegameFilename = 0x0084FF90;
 const UInt32 _SaveGameManager_ConstructSavegamePath		= 0x0084FF30;
+#endif
+
+template <typename T_Key, typename T_Data>
+class NiTMap : public NiTMapBase<T_Key, T_Data>
+{
+public:
+	NiTMap();
+	~NiTMap();
+};
 
 class BGSCellNumericIDArrayMap;
 class BGSLoadGameSubBuffer;
@@ -761,8 +655,8 @@ public:
 	typedef UInt32	IndexRefID;
 	struct RefIDIndexMapping	// reversible map between refID and loaded form index
 	{
-		NiTMapBase<RefID, IndexRefID>	refIDToIndex;	// 000
-		NiTMapBase<IndexRefID, RefID>	indexToRefID;	// 010
+		NiTMap<RefID, IndexRefID>	* map000;	// 000
+		NiTMap<IndexRefID, RefID>	* map010;	// 010
 		UInt32			            countRefID;	// 020
 	};
 
@@ -791,8 +685,8 @@ public:
 	RefIDIndexMapping						* refIDmapping;			// 008
 	RefIDIndexMapping						* visitedWorldspaces;	// 00C
 	Struct010								* sct010;				// 010
-	NiTMapBase<TESForm *, BGSLoadGameSubBuffer> * maps014[3];			// 014	0 = changed Animations, 2 = changed Havok Move
-	NiTMapBase<UInt32, UInt32>					* map018;				// 018	
+	NiTMap<TESForm *, BGSLoadGameSubBuffer> * maps014[3];			// 014	0 = changed Animations, 2 = changed Havok Move
+	NiTMap<UInt32, UInt32>					* map018;				// 018	
 	BSSimpleArray<char *>					* strings;				// 01C
 	BGSReconstructFormsInAllFilesMap*		rfiafMap;				// 020
 	BSSimpleArray<BGSLoadFormBuffer *>		changedForms;			// 024
@@ -804,8 +698,7 @@ public:
 	UInt32									flg244;					// 244 bit 6 block updating player position/rotation from save, bit 2 set during save
 	UInt8									formVersion;			// 248
 	UInt8									pad249[3];				// 249
-	
-	static BGSSaveLoadGame* GetSingleton() { return *(BGSSaveLoadGame * *)0x11DDF38; };
+
 };
 
 #if RUNTIME
@@ -833,39 +726,143 @@ public:
 	};
 
 	tList<SaveGameData>		* saveList;		// 00
-	UInt32 numSaves;						// 04
-	UInt32 unk08;							// 08
-	UInt8 unk0C;							// 0C
-	UInt8 unk0D;							// 0D
-	UInt8 unk0E;							// 0E
-	UInt8 autoSaveTimer;					// 0F
-	UInt8 forceSaveTimer;					// 10
-	UInt8 systemSaveTimer;					// 11
-	UInt8 unk12;							// 12
-	UInt8 unk13;							// 13
-	UInt32 list14;							// 14
-	SInt32 unk18;							// 18
-	UInt8 unk1C;							// 1C
-	UInt8 unk1D;							// 1D
-	UInt8 pad1E[2];							// 1E
-	UInt32 unk20;							// 20
-	UInt8 unk24;							// 24
-	UInt8 unk25;							// 25
-	UInt8 unk26;							// 26
-	UInt8 unk27;							// 27
-	void* func28;							// 28
-	void* func2C;							// 2C
-	void* str30;							// 30
-	void* unk34;							// 34
-	
-	void ReloadCurrentSave() { ThisCall(0x8512F0, this); };
-	bool Save(char* name, bool isDebug) { return ThisCall<bool>(0x8503B0, this, name, -1, isDebug); };
-	bool Save(char* name) { return Save(name, false); };
+	UInt32					numSaves;		// 04
+	UInt32					unk08;			// 08
+	UInt8					unk0C;			// 0C	flag for either opened or writable or useSeparator (|)
+	UInt8					unk0D;
+	UInt8					unk0E;
+	UInt8					unk0F;
+/*
+	const char				* unk10;		// 10 name of most recently loaded/saved game?
+	UInt32					unk14;			// 14 init to -1
+	UInt8					unk18;			// 18
+	UInt8					pad19[3];
+	UInt8					unk20;			// 20 init to 1
+	UInt8					unk21;
+	UInt8					pad22[2];
+	UInt32					unk24;			// 24
+	UInt32					unk28;			// 28
+*/
 };
 
 std::string GetSavegamePath();
 
 #endif
+
+class ButtonIcon;
+
+const UInt32 FontArraySize = 8;
+
+class FontManager
+{
+public:
+	FontManager();
+	~FontManager();
+
+	// 3C
+	struct FontInfo {
+		FontInfo();
+		~FontInfo();
+
+		struct Data03C {
+			UInt32	unk000;	// 000
+			UInt16	wrd004;	// 004	Init'd to 0
+			UInt16	wrd006;	// 006	Init'd to 0x0FFFF
+		};	// 0008
+
+		struct FontData {
+			float	flt000;				// 000
+			UInt32	fontTextureCount;	// 004
+			UInt32	unk008;
+			char	unk00C[8][0x024];	// array of 8 Font Texture Name (expected in Textures\Fonts\*.tex)
+		};
+
+		struct TextReplaced {
+			String	str000;	// 000	Init'd to ""
+			UInt32	unk008;	// 008	Init'd to arg1
+			UInt32	unk00C;	// 00C	Init'd to arg2
+			UInt32	unk010;	// 010	Init'd to arg3
+			UInt32	unk014;	// 014	Init'd to arg4
+			UInt32	unk018;	// 018	Init'd to 0
+			UInt8	byt01C;	// 01C	Init'd to arg5
+			UInt8	fill[3];	
+		};	// 020
+
+		UInt16						unk000;			// 000	Init'd to 0, loaded successfully in OBSE (word bool ?)
+		UInt16						pad002;			// 002
+		char						* path;			// 004	Init'd to arg2, passed to OpenBSFile
+		UInt32						id;				// 008	1 based, up to 8 apparently
+		NiObject					* unk00C[8];	// 00C	in OBSE: NiTexturingProperty			* textureProperty
+		float						unk02C;			// 02C	Those two values seem to be computed by looping through the characters in the font (max height/weight ?)
+		float						unk030;			// 030
+		UInt32						unk034;			// 038	in OBSE: NiD3DShaderConstantMapEntry	* unk34;
+		FontData					* fontData;		// 038	Init'd to 0, might be the font content, at Unk004 we have the count of font texture
+		Data03C						dat03C;			// 03C
+		BSSimpleArray<ButtonIcon>	unk044;			// 044
+
+		static FontInfo * Load(const char* path, UInt32 ID);
+		bool GetName(char* out);	// filename stripped of path and extension
+	};	// 054
+
+	FontInfo*			fontInfos[8];		// 00
+	UInt8				byte20;				// 20
+	UInt8				pad21[3];			// 21
+	FontInfo*			extraFonts[80];	// 24
+
+	NiVector3*			GetStringDimensions(NiVector3* outDims, const char* srcString, UInt32 fontID, UInt32 maxFlt = 0x7F7FFFFF, UInt32 startIdx = 0);
+	static FontManager*	GetSingleton() { return *reinterpret_cast<FontManager**>(0x11F33F8); };
+};
+// 54
+/*struct FontInfo
+{
+	struct BufferData
+	{
+		float			lineHeight;		// 0000
+		UInt32			unk0004[73];	// 0004
+		UInt32			unk0128[458];	// 0128
+		float			baseHeight;		// 0850
+		float			flt0854;		// 0854
+		float			flt0858;		// 0858
+	};
+
+	struct ButtonIcon;
+
+	UInt8						isLoaded;	// 00
+	UInt8						pad01[3];	// 01
+	char* filePath;	// 04
+	UInt8						fontID;		// 08
+	UInt8						pad09[3];	// 09
+	NiTexturingProperty* texProp;	// 0C
+	UInt32						unk10[7];	// 10
+	float						flt2C;		// 2C
+	float						flt30;		// 30
+	UInt32						unk34;		// 34
+	BufferData* bufferData;// 38
+	UInt32						unk3C[2];	// 3C
+	BSSimpleArray<ButtonIcon>	arr44;		// 44
+};
+STATIC_ASSERT(sizeof(FontInfo) == 0x54);*/
+
+void Debug_DumpFontNames(void);
+
+//class NiMemObject
+//{
+//	NiMemObject();
+//	~NiMemObject();
+//
+//};
+
+//class NiRefObject: public NiMemObject
+//{
+//	NiRefObject();
+//	~NiRefObject();
+//
+//	virtual void		Destructor(bool freeThis);	// 00
+//	virtual void		Free(void);					// 01 calls Destructor(true);
+//
+////	void		** _vtbl;		// 000
+//	UInt32		m_uiRefCount;	// 004 - name known (in OBSE)
+//};
 
 enum Coords
 {
@@ -874,6 +871,11 @@ enum Coords
 	kCoords_Z,		// 02
 	kCoords_Max		// 03
 };
+
+struct NavMeshVertex
+{
+	float coords[kCoords_Max];	// 000
+};	// 00C
 
 enum Vertices
 {
@@ -926,7 +928,7 @@ struct NavMeshCloseDoorInfo
 };	// Alloc'd to 0x08
 
 struct NavMeshPOVData;
-class ObstacleData;
+struct ObstacleData;
 struct ObstacleUndoData;
 
 struct NavMeshStaticAvoidNode
@@ -942,6 +944,41 @@ struct NavMeshStaticAvoidNode
 	UInt32	unk020;	// 20
 	UInt32	unk024;	// 24
 };	// Alloc'd to 0x28
+
+
+// represents the currently executing script context
+class ScriptRunner
+{
+public:
+	static const UInt32	kStackDepth = 10;
+
+	enum
+	{
+		kStackFlags_IF = 1 << 0,
+		kStackFlags_ELSEIF = 1 << 1,
+		/* ELSE and ENDIF modify the above flags*/
+	};
+
+	// members
+	/*00*/ TESObjectREFR* containingObj; // set when executing scripts on inventory objects
+	/*04*/ TESForm* callingRefBaseForm;
+	/*08*/ ScriptEventList* eventList;
+	/*0C*/ UInt32 unk0C;
+	/*10*/ UInt32 unk10; // pointer? set to NULL before executing an instruction
+	/*14*/ Script* script;
+	/*18*/ UInt32 unk18; // set to 6 after a failed expression evaluation
+	/*1C*/ UInt32 unk1C; // set to Expression::errorCode
+	/*20*/ UInt32 ifStackDepth;
+	/*24*/ UInt32 ifStack[kStackDepth];	// stores flags
+	/*4C*/ UInt32 unk4C[(0xA0 - 0x4C) >> 2];
+	/*A0*/ UInt8 invalidReferences;	// set when the dot operator fails to resolve a reference (inside the error message handler)
+	/*A1*/ UInt8 unkA1;	// set when the executing CommandInfo's 2nd flag bit (+0x25) is set
+	/*A2*/ UInt16 padA2;
+};
+STATIC_ASSERT(sizeof(ScriptRunner) == 0xA4);
+
+// Gets the real script data ptr, as it can be a pointer to a buffer on the stack in case of vanilla expressions in set and if statements
+UInt8* GetScriptDataPosition(Script* script, void* scriptDataIn, const UInt32* opcodeOffsetPtrIn);
 
 /* I need to port NiTypes 
 
@@ -995,3 +1032,85 @@ class NavMeshInfoMap: public TESForm
 };
 
 */
+
+struct Timer
+{
+	UInt8 disableCounter;		// 00
+	UInt8 gap01[3];				// 01
+	float fpsClamp;				// 04
+	float fpsClampRemainder;	// 08
+	float secondsPassed;		// 0C
+	float lastSecondsPassed;	// 10
+	UInt32 msPassed;			// 14
+	UInt32 unk18;				// 18
+	byte isChangeTimeMultSlowly;// 1C
+	byte unk1D;					// 1D
+	byte unk1E;					// 1E
+	byte unk1F;					// 1F
+};
+
+struct TimeGlobal : Timer
+{
+	float unk20;  // 020
+	float unk24;  // 024
+	float unk28;  // 028
+};
+
+class ConsoleManager
+{
+public:
+#if RUNTIME
+	MEMBER_FN_PREFIX(ConsoleManager);
+	DEFINE_MEMBER_FN(Print, void, s_Console__Print, const char* fmt, va_list args);
+#endif
+
+	ConsoleManager();
+	~ConsoleManager();
+
+	struct TextNode
+	{
+		TextNode*			next;
+		TextNode*			prev;
+		String				text;
+	};
+
+	struct TextList
+	{
+		TextNode*			first;
+		TextNode*			last;
+		UInt32				count;
+
+		TextList*			Append(TextNode*);
+	};
+
+	struct RecordedCommand
+	{
+		char				buf[100];
+	};
+
+	void*					scriptContext;
+	TextList				printedLines;
+	TextList				inputHistory;
+	unsigned int			historyIndex;
+	unsigned int			unk020;
+	unsigned int			printedCount;
+	unsigned int			unk028;
+	unsigned int			lineHeight;
+	int						textXPos;
+	int						textYPos;
+	UInt8					isConsoleOpen;
+	UInt8					unk39;
+	UInt8					isBatchRecording;
+	UInt8					unk3B;
+	unsigned int			numRecordedCommands;
+	RecordedCommand			recordedCommands[20];
+	char					scofPath[260];
+	
+	static ConsoleManager*	GetSingleton(void);
+	void					AppendToSentHistory(const char*);
+
+	static char*			GetConsoleOutputFilename(void);
+	static bool				HasConsoleOutputFilename(void);
+};
+
+bool ExtractArgsEx(ParamInfo* paramInfo, void* scriptDataIn, UInt32* scriptDataOffset, Script* scriptObj, ScriptEventList* eventList, ...);

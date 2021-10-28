@@ -10,7 +10,7 @@
 #include "GameRTTI.h"
 #include "GameData.h"
 
-//#include "EventManager.h"
+#include "EventManager.h"
 #include "FunctionScripts.h"
 //#include "ModTable.h"
 
@@ -23,9 +23,11 @@ enum EScriptMode {
 static bool GetScript_Execute(COMMAND_ARGS, EScriptMode eMode)
 {
 	*result = 0;
-	TESForm* form = 0;
+	TESForm* form = NULL;
 
 	ExtractArgsEx(EXTRACT_ARGS_EX, &form);
+	bool parmForm = form ? true : false;
+
 	form = form->TryGetREFRParent();
 	if (!form) {
 		if (!thisObj) return true;
@@ -33,7 +35,15 @@ static bool GetScript_Execute(COMMAND_ARGS, EScriptMode eMode)
 	}
 
 	TESScriptableForm* scriptForm = DYNAMIC_CAST(form, TESForm, TESScriptableForm);
-	Script* script = (scriptForm) ? scriptForm->script : NULL;
+	Script* script = NULL;
+	EffectSetting* effect = NULL;
+	if (!scriptForm)	// Let's try for a MGEF
+	{
+		effect = DYNAMIC_CAST(form, TESForm, EffectSetting);
+		if (effect)
+			script = effect->GetScript();
+	} else
+		script = (scriptForm) ? scriptForm->script : NULL;
 
 	switch(eMode) {
 		case eScript_HasScript: {
@@ -51,10 +61,16 @@ static bool GetScript_Execute(COMMAND_ARGS, EScriptMode eMode)
 			// simply forget about the script
 			if (script) {
 				UInt32* refResult = (UInt32*)result;
-				*refResult = scriptForm->script->refID;
+				*refResult = script->refID;
 			}
 			if (scriptForm)
 				scriptForm->script = NULL;
+			else if (effect)
+				effect->RemoveScript();
+			if (!parmForm && thisObj) {
+				// Remove ExtraScript entry - otherwise the script will keep running until the reference is reloaded.
+				thisObj->extraDataList.RemoveByType(kExtraData_Script);
+			}
 			break;
 		}
 	}
@@ -82,9 +98,12 @@ bool Cmd_SetScript_Execute(COMMAND_ARGS)
 	UInt32* refResult = (UInt32*)result;
 
 	TESForm* form = NULL;
+	TESForm* pForm = NULL;
 	TESForm* scriptArg = NULL;
 
 	ExtractArgsEx(EXTRACT_ARGS_EX, &scriptArg, &form);
+	bool parmForm = form ? true : false;
+
 	form = form->TryGetREFRParent();
 	if (!form) {
 		if (!thisObj) return true;
@@ -92,24 +111,61 @@ bool Cmd_SetScript_Execute(COMMAND_ARGS)
 	}
 
 	TESScriptableForm* scriptForm = DYNAMIC_CAST(form, TESForm, TESScriptableForm);
-	if (!scriptForm) return true;
+	Script* oldScript = NULL;
+	EffectSetting* effect = NULL;
+	if (!scriptForm)	// Let's try for a MGEF
+	{
+		effect = DYNAMIC_CAST(form, TESForm, EffectSetting);
+		if (effect)
+			oldScript = effect->GetScript();
+		else
+			return true;
+	} else
+		oldScript = scriptForm->script;
 
 	Script* script = DYNAMIC_CAST(scriptArg, TESForm, Script);
 	if (!script) return true;
 
-	// we can't get a magic script here or an unknown script here
-	if (script->IsMagicScript() || script->IsUnkScript()) return true;
+	// we can only get a magic script here for an EffectSetting
+	if (script->IsMagicScript() && !effect) return true;
 
+	// we can't get an unknown script here
+	if (script->IsUnkScript()) return true;
 
-	if ((script->IsQuestScript() && form->typeID == kFormType_Quest) || script->IsObjectScript()) {
-		if (scriptForm->script) {
-			*refResult = scriptForm->script->refID;
-			// clean up event list here?
-		}
-		scriptForm->script = script;
+	if (script->IsMagicScript()) {
+		effect->SetScript(script);
 		// clean up event list here?
 	}
+	else
+		if (effect)	// we need a magic script and some var won't be initialized
+			return true;
 
+	if (oldScript) {
+		*refResult = oldScript->refID;
+	}
+
+	if ((script->IsQuestScript() && form->typeID == kFormType_Quest) || script->IsObjectScript()) {
+		scriptForm->script = script;
+		// clean up event list here?
+		// This is necessary in order to make sure the script uses the correct questDelayTime.
+		script->quest = DYNAMIC_CAST(form, TESForm, TESQuest);
+	}
+	if (script->IsObjectScript() && !parmForm && thisObj) {
+		// Re-building ExtraScript entry - the new script then starts running immediately (instead of only on reload).
+		thisObj->extraDataList.RemoveByType(kExtraData_Script);
+		thisObj->extraDataList.Add(ExtraScript::Create(form, true));
+
+		// Commented out until solved
+
+		//if (thisObj->extraDataList.Add(ExtraScript::Create(form, true))) {
+		//	ExtraScript* xScript = (ExtraScript*)thisObj->extraDataList.GetByType(kExtraData_Script);
+		//	DoCheckScriptRunnerAndRun(thisObj, &(thisObj->extraDataList));
+		//	//MarkBaseExtraListScriptEvent(thisObj, &(thisObj->extraDataList), ScriptEventList::kEvent_OnLoad); 
+		//	if (xScript) {
+		//		xScript->EventCreate(ScriptEventList::kEvent_OnLoad, NULL);
+		//	}
+		//}
+	}
 	return true;
 }
 
@@ -144,7 +200,7 @@ bool Cmd_IsReference_Execute(COMMAND_ARGS)
 	return true;
 }
 
-static enum {
+enum {
 	eScriptVar_Get = 1,
 	eScriptVar_GetRef,
 	eScriptVar_Has,
@@ -152,7 +208,7 @@ static enum {
 
 bool GetVariable_Execute(COMMAND_ARGS, UInt32 whichAction)
 {
-	char varName[256] = { 0 };
+	char varName[256];
 	TESQuest* quest = NULL;
 	Script* targetScript = NULL;
 	ScriptEventList* targetEventList = NULL;
@@ -179,31 +235,33 @@ bool GetVariable_Execute(COMMAND_ARGS, UInt32 whichAction)
 	if (targetScript && targetEventList)
 	{
 		VariableInfo* varInfo = targetScript->GetVariableByName(varName);
-		if (whichAction == eScriptVar_Has)
-			return varInfo ? true : false;
-		else if (varInfo)
+		if (varInfo)
 		{
-			ScriptEventList::Var* var = targetEventList->GetVariable(varInfo->idx);
-			if (var)
+			if (whichAction == eScriptVar_Has)
+				*result = 1;
+			else
 			{
-				if (whichAction == eScriptVar_Get)
-					*result = var->data;
-				else if (whichAction == eScriptVar_GetRef)
+				ScriptEventList::Var* var = targetEventList->GetVariable(varInfo->idx);
+				if (var)
 				{
-					UInt32* refResult = (UInt32*)result;
-					*refResult = (*(UInt64*)&var->data);
+					if (whichAction == eScriptVar_Get)
+						*result = var->data;
+					else if (whichAction == eScriptVar_GetRef)
+					{
+						UInt32* refResult = (UInt32*)result;
+						*refResult = (*(UInt64*)&var->data);
+					}
 				}
-				return true;
 			}
 		}
 	}
 
-	return false;
+	return true;
 }
 
 bool Cmd_SetVariable_Execute(COMMAND_ARGS)
 {
-	char varName[256] = { 0 };
+	char varName[256];
 	TESQuest* quest = NULL;
 	Script* targetScript = NULL;
 	ScriptEventList* targetEventList = NULL;
@@ -234,20 +292,16 @@ bool Cmd_SetVariable_Execute(COMMAND_ARGS)
 		if (varInfo)
 		{
 			ScriptEventList::Var* var = targetEventList->GetVariable(varInfo->idx);
-			if (var)
-			{
-				var->data = value;
-				return true;
-			}
+			if (var) var->data = value;
 		}
 	}
 
-	return false;
+	return true;
 }
 
 bool Cmd_SetRefVariable_Execute(COMMAND_ARGS)
 {
-	char varName[256] = { 0 };
+	char varName[256];
 	TESQuest* quest = NULL;
 	Script* targetScript = NULL;
 	ScriptEventList* targetEventList = NULL;
@@ -282,20 +336,16 @@ bool Cmd_SetRefVariable_Execute(COMMAND_ARGS)
 			{
 				UInt32* refResult = (UInt32*)result;
 				(*(UInt64*)&var->data) = value ? value->refID : 0 ;
-				return true;
 			}
 		}
 	}
 
-	return false;
+	return true;
 }
 
 bool Cmd_HasVariable_Execute(COMMAND_ARGS)
 {
-	*result = 0;
-	if (GetVariable_Execute(PASS_COMMAND_ARGS, eScriptVar_Has))
-		*result = 1;
-
+	GetVariable_Execute(PASS_COMMAND_ARGS, eScriptVar_Has);
 	return true;
 }
 
@@ -443,11 +493,32 @@ bool Cmd_GetNthExplicitRef_Execute(COMMAND_ARGS)
 
 bool Cmd_RunScript_Execute(COMMAND_ARGS)
 {
-	TESForm* scriptForm = NULL;
+	TESForm* form = NULL;
 
-	if (ExtractArgsEx(EXTRACT_ARGS_EX, &scriptForm))
+	if (ExtractArgsEx(EXTRACT_ARGS_EX, &form))
 	{
-		Script* script = DYNAMIC_CAST(scriptForm, TESForm, Script);
+
+		form = form->TryGetREFRParent();
+		if (!form) {
+			if (!thisObj) return true;
+			form = thisObj->baseForm;
+		}
+
+		TESScriptableForm* scriptForm = DYNAMIC_CAST(form, TESForm, TESScriptableForm);
+		Script* script = NULL;
+		EffectSetting* effect = NULL;
+		if (!scriptForm)	// Let's try for a MGEF
+		{
+			effect = DYNAMIC_CAST(form, TESForm, EffectSetting);
+			if (effect)
+				script = effect->GetScript();
+			else
+			{
+				script = DYNAMIC_CAST(form, TESForm, Script);
+			}
+		} else
+			script = scriptForm->script;
+
 		if (script)
 		{
 			bool runResult = CALL_MEMBER_FN(script, Execute)(thisObj, 0, 0, 0);
@@ -478,49 +549,37 @@ bool Cmd_GetCallingScript_Execute(COMMAND_ARGS)
 	return true;
 }
 
-#if EVENT_MANAGER
-
 bool ExtractEventCallback(ExpressionEvaluator& eval, EventManager::EventCallback* outCallback, char* outName)
 {
-	if (eval.ExtractArgs() && eval.NumArgs() >= 2) {
+	if (eval.ExtractArgs() && eval.NumArgs() >= 2)
+	{
 		const char* eventName = eval.Arg(0)->GetString();
 		Script* script = DYNAMIC_CAST(eval.Arg(1)->GetTESForm(), TESForm, Script);
-		if (eventName && script) {
+		if (eventName && script)
+		{
+			outCallback->script = script;
 			strcpy_s(outName, 0x20, eventName);
-			TESObjectREFR* sourceFilter = NULL;
-			TESForm* targetFilter = NULL;
-			TESObjectREFR* thisObjFilter = NULL;
 
 			// any filters?
-			for (UInt32 i = 2; i < eval.NumArgs(); i++) {
+			for (UInt32 i = 2; i < eval.NumArgs(); i++)
+			{
 				const TokenPair* pair = eval.Arg(i)->GetPair();
-				if (pair && pair->left && pair->right) {
+				if (pair && pair->left && pair->right)
+				{
 					const char* key = pair->left->GetString();
-					if (key) {
-						if (!_stricmp(key, "ref") || !_stricmp(key, "first")) {
-							sourceFilter = DYNAMIC_CAST(pair->right->GetTESForm(), TESForm, TESObjectREFR);
+					if (key)
+					{
+						if (!StrCompare(key, "ref") || !StrCompare(key, "first"))
+						{
+							outCallback->source = pair->right->GetTESForm();
 						}
-						else if (!_stricmp(key, "object") || !_stricmp(key, "second")) {
-							// special-case MGEF
-							if (!_stricmp(eventName, "onmagiceffecthit")) {
-								const char* effStr = pair->right->GetString();
-								if (effStr && strlen(effStr) == 4) {
-									targetFilter = EffectSetting::EffectSettingForC(*((UInt32*)effStr));
-								}
-							}
-							else if (!_stricmp(eventName, "onhealthdamage")) {
-								// special-case OnHealthDamage - don't filter by damage, do filter by damaged actor
-								thisObjFilter = DYNAMIC_CAST(pair->right->GetTESForm(), TESForm, TESObjectREFR);
-							}
-							else {
-								targetFilter = pair->right->GetTESForm();
-							}
+						else if (!StrCompare(key, "object") || !StrCompare(key, "second"))
+						{
+							outCallback->object = pair->right->GetTESForm();
 						}
 					}
 				}
 			}
-
-			*outCallback = EventManager::EventCallback(script, sourceFilter, targetFilter, thisObjFilter);
 			return true;
 		}
 	}
@@ -531,7 +590,7 @@ bool ExtractEventCallback(ExpressionEvaluator& eval, EventManager::EventCallback
 bool Cmd_SetEventHandler_Execute(COMMAND_ARGS)
 {
 	ExpressionEvaluator eval(PASS_COMMAND_ARGS);
-	EventManager::EventCallback callback(NULL);
+	EventManager::EventCallback callback;
 	char eventName[0x20];
 	if (ExtractEventCallback(eval, &callback, eventName)) {
 		if (EventManager::SetHandler(eventName, callback))
@@ -544,7 +603,7 @@ bool Cmd_SetEventHandler_Execute(COMMAND_ARGS)
 bool Cmd_RemoveEventHandler_Execute(COMMAND_ARGS)
 {
 	ExpressionEvaluator eval(PASS_COMMAND_ARGS);
-	EventManager::EventCallback callback(NULL);
+	EventManager::EventCallback callback;
 	char eventName[0x20];
 	if (ExtractEventCallback(eval, &callback, eventName)) {
 		if (EventManager::RemoveHandler(eventName, callback))
@@ -556,9 +615,7 @@ bool Cmd_RemoveEventHandler_Execute(COMMAND_ARGS)
 
 bool Cmd_GetCurrentEventName_Execute(COMMAND_ARGS)
 {
-	const char* eventName = EventManager::GetCurrentEventName().c_str();
-
-	AssignToStringVar(PASS_COMMAND_ARGS, eventName);
+	AssignToStringVar(PASS_COMMAND_ARGS, EventManager::GetCurrentEventName());
 	return true;
 }
 
@@ -587,7 +644,5 @@ bool Cmd_DispatchEvent_Execute (COMMAND_ARGS)
 	*result = EventManager::DispatchUserDefinedEvent (eventName, scriptObj, argsArrayId, senderName) ? 1.0 : 0.0;
 	return true;
 }
-
-#endif
 
 #endif

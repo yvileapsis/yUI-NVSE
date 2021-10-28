@@ -3,6 +3,12 @@
 #include "CommandTable.h"
 #include "ParamInfos.h"
 
+#if RUNTIME
+
+extern bool g_tilesDestroyed;
+
+#endif
+
 static ParamInfo kParams_SetUIStringEx[] =
 {
 	{	"component name",	kParamType_String,	0 },
@@ -17,3 +23,6 @@ DEFINE_COMMAND(SortUIListBox, sorts the items in a UI list_box, 0, 2, kParams_Tw
 
 // VATS camera
 DEFINE_COMMAND(EndVATScam, "Remove all targets and close VATS mode", false, 0, NULL)
+
+// Show LevelUp menu
+DEFINE_COMMAND(ShowLevelUpMenu, shows the LevelUp menu, 0, 0, NULL);

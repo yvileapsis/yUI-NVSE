@@ -4,27 +4,56 @@
 #include <sstream>
 #include <utility>
 
+
+#include "containers.h"
 #include "GameUI.h"
 #include "GameAPI.h"
 
-#define the_VATScamStruct	0x011F2250
-#define the_VATSunclick		0x009C88A0
-#define the_VATSexecute		0x00705780
+#define the_VATScamStruct		0x011F2250
+#define the_VATSunclick			0x009C88A0
+#define the_VATSexecute			0x00705780
+#define	the_DoShowLevelUpMenu	0x00784C80
 
 static const float fErrorReturnValue = -999;
 
-static enum eUICmdAction {
+bool g_tilesDestroyed = false;
+
+
+enum eUICmdAction {
 	kGetFloat,
 	kSetFloat,
 	kSetString,
 	kSetFormattedString,
 };
 
+static UnorderedMap<const char*, Tile::Value*> s_cachedTileValues;
+
+Tile::Value* GetCachedComponentValue(const char* component)
+{
+	if (g_tilesDestroyed)
+	{
+		g_tilesDestroyed = false;
+		s_cachedTileValues.Clear();
+	}
+	
+	Tile::Value** valPtr;
+	if (s_cachedTileValues.Insert(component, &valPtr))
+		*valPtr = nullptr;
+
+	if (!*valPtr)
+	{
+		auto* tile = InterfaceManager::GetMenuComponentValue(component);
+		if (tile)
+			*valPtr = tile;
+	}
+	return *valPtr;
+}
+
 bool GetSetUIValue_Execute(COMMAND_ARGS, eUICmdAction action)
 {
-	char component[kMaxMessageLength] = { 0 };
+	char component[kMaxMessageLength];
 	float newFloat;
-	char newStr[kMaxMessageLength] = { 0 };
+	char newStr[kMaxMessageLength];
 	*result = 0;
 
 	bool bExtracted = false;
@@ -49,7 +78,7 @@ bool GetSetUIValue_Execute(COMMAND_ARGS, eUICmdAction action)
 
 	if (bExtracted)
 	{
-		Tile::Value* val = InterfaceManager::GetMenuComponentValue(component);
+		Tile::Value* val = GetCachedComponentValue(component);
 		if (val)
 		{
 			switch (action)
@@ -101,7 +130,7 @@ bool Cmd_SetUIStringEx_Execute(COMMAND_ARGS)
 	return GetSetUIValue_Execute(PASS_COMMAND_ARGS, kSetFormattedString);
 }
 
-static enum {
+enum {
 	kReverseSort = 1,
 	kNormalizeItemNames = 2,
 	kAsFloat = 4,
@@ -266,8 +295,8 @@ static void NormalizeItemName(std::string & str)
 
 bool Cmd_SortUIListBox_Execute(COMMAND_ARGS)
 {
-	char tilePath[kMaxMessageLength] = { 0 };
-	char sortSpecStr[kMaxMessageLength] = { 0 };
+	char tilePath[kMaxMessageLength];
+	char sortSpecStr[kMaxMessageLength];
 	*result = 0;
 
 	if (!ExtractArgs(EXTRACT_ARGS, &tilePath, &sortSpecStr))
@@ -422,3 +451,11 @@ bool Cmd_EndVATScam_Execute (COMMAND_ARGS)
 	return true;
 }
 
+typedef Menu* (* _DoShowLevelUpMenu)(void);
+_DoShowLevelUpMenu DoShowLevelUpMenu = (_DoShowLevelUpMenu)the_DoShowLevelUpMenu;
+
+bool Cmd_ShowLevelUpMenu_Execute (COMMAND_ARGS)
+{
+	DoShowLevelUpMenu();
+	return true;
+}

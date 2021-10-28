@@ -6,16 +6,25 @@
 #include "Hooks_Gameplay.h"
 #include "Hooks_Script.h"
 #include "Hooks_Animation.h"
-//#include "Hooks_Dialog.h"
+#include "Hooks_Dialog.h"
+#include "Hooks_Other.h"
 #include "ThreadLocal.h"
 #include "SafeWrite.h"
 #include "Utilities.h"
 #include "Commands_Input.h"
 #include "GameAPI.h"
+#include "EventManager.h"
 
+#if RUNTIME
 IDebugLog	gLog("nvse.log");
 
+#else
+IDebugLog	gLog("nvse_editor.log");
+
+#endif
 UInt32 logLevel = IDebugLog::kLevel_Message;
+
+#if RUNTIME
 
 // fix dinput code so it doesn't acquire the keyboard/mouse in exclusive mode
 // bBackground Mouse works on startup, but when gaining focus that setting is ignored
@@ -27,27 +36,12 @@ void PatchCoopLevel(void)
 	SafeWrite8(0x00A23CAD + 1, 0x06);
 }
 
-// fix render path selection
-void PatchRenderPath(void)
-{
-	//	0	none
-	//	1	1x
-	//	2	2
-	//	3	2a (96)
-	//	4	2b (96)
-	//	5	2a
-	//	6	2b
-	//	7	3
-
-	for(UInt32 i = 0; i < 6; i++)
-		SafeWrite8(0x00B4F94D + i, 0x90);	// nop
-
-	SafeWrite32(0x00B4F953 + 6, 7);	// render path goes here
-}
+#endif
 
 UInt32 waitForDebugger;
 UInt32 createHookWindow;
 UInt32 et;
+UInt32 au3D;
 
 void WaitForDebugger(void)
 {
@@ -65,11 +59,14 @@ void NVSE_Initialize(void)
 #ifndef _DEBUG
 	__try {
 #endif
-
 		FILETIME	now;
 		GetSystemTimeAsFileTime(&now);
 
 #if RUNTIME
+		UInt32 bMousePatch;
+		if (GetNVSEConfigOption_UInt32("DEBUG", "EscapeMouse", &bMousePatch) && bMousePatch)
+			PatchCoopLevel();
+		
 		_MESSAGE("NVSE runtime: initialize (version = %d.%d.%d %08X %08X%08X)",
 			NVSE_VERSION_INTEGER, NVSE_VERSION_INTEGER_MINOR, NVSE_VERSION_INTEGER_BETA, RUNTIME_VERSION,
 			now.dwHighDateTime, now.dwLowDateTime);
@@ -85,29 +82,30 @@ void NVSE_Initialize(void)
 		if (GetNVSEConfigOption_UInt32("DEBUG", "LogLevel", &logLevel) && logLevel)
 			if (logLevel>IDebugLog::kLevel_DebugMessage)
 				logLevel = IDebugLog::kLevel_DebugMessage;
-		SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS);
+		if (GetNVSEConfigOption_UInt32("DEBUG", "AlternateUpdate3D", &au3D) && au3D)
+			alternateUpdate3D = true;
+		// SetPriorityClass(GetCurrentProcess(), IDLE_PRIORITY_CLASS);
 
 #if RUNTIME
-		PatchCoopLevel();
 		if (GetNVSEConfigOption_UInt32("RUNTIME DEBUG", "WaitForDebugger", &waitForDebugger) && waitForDebugger)
 			WaitForDebugger();
-		if (GetNVSEConfigOption_UInt32("RUNTIME DEBUG", "ExtraTraces", &et) && et)
-			extraTraces = true;
+		GetNVSEConfigOption_UInt32("FIXES", "EnablePrintDuringOnEquip", &s_CheckInsideOnActorEquipHook);
 #else
 		if (GetNVSEConfigOption_UInt32("EDITOR DEBUG", "WaitForDebugger", &waitForDebugger) && waitForDebugger)
 			WaitForDebugger();
-		if (GetNVSEConfigOption_UInt32("EDITOR DEBUG", "ExtraTraces", &et) && et)
-			extraTraces = true;
 #endif
 
 #else
+		if (GetNVSEConfigOption_UInt32("RELEASE", "AlternateUpdate3D", &au3D) && au3D)
+			alternateUpdate3D = true;
 		if (GetNVSEConfigOption_UInt32("RELEASE", "LogLevel", &logLevel) && logLevel)
 			if (logLevel>IDebugLog::kLevel_DebugMessage)
 				logLevel = IDebugLog::kLevel_DebugMessage;
 #endif
-		gLog.SetLogLevel((IDebugLog::LogLevel)logLevel);
+		_memcpy = memcpy;
+		_memmove = memmove;
 
-//		PatchRenderPath();
+		gLog.SetLogLevel((IDebugLog::LogLevel)logLevel);
 
 		MersenneTwister::init_genrand(GetTickCount());
 		CommandTable::Init();
@@ -121,7 +119,10 @@ void NVSE_Initialize(void)
 		ThreadLocalData::Init();
 		Hook_Script_Init();
 		Hook_Animation_Init();
-		//Hook_Dialog_Init();
+		OtherHooks::Hooks_Other_Init();
+		EventManager::Init();
+
+		Hook_Dialog_Init();
 #endif
 
 #if EDITOR
@@ -146,7 +147,6 @@ void NVSE_Initialize(void)
 			CreateHookWindow();
 #endif
 #endif
-
 		FlushInstructionCache(GetCurrentProcess(), NULL, 0);
 
 #ifndef _DEBUG
@@ -160,32 +160,20 @@ void NVSE_Initialize(void)
 	_MESSAGE("init complete");
 }
 
-void NVSE_DeInitialize(void)
+extern "C" 
 {
-	//
-}
-
-extern "C" {
-
-void StartNVSE(void)
-{
-	NVSE_Initialize();
-}
-
-BOOL WINAPI DllMain(HANDLE hDllHandle, DWORD dwReason, LPVOID lpreserved)
-{
-	switch(dwReason)
+	// entrypoint
+	void StartNVSE(void)
 	{
-		case DLL_PROCESS_ATTACH:
+		NVSE_Initialize();
+	}
+
+	BOOL WINAPI DllMain(HANDLE hDllHandle, DWORD dwReason, LPVOID lpreserved)
+	{
+		if (dwReason == DLL_PROCESS_ATTACH)
+		{
 			NVSE_Initialize();
-			break;
-
-		case DLL_PROCESS_DETACH:
-			NVSE_DeInitialize();
-			break;
-	};
-
-	return TRUE;
-}
-
+		}
+		return TRUE;
+	}
 };

@@ -27,6 +27,15 @@ DEFINE_COMMAND(GetNextRef, returns the next reference of a given type in the cur
 DEFINE_COMMAND(GetNumRefs, returns the number of references of a given type in the current cell, 0, 3, kParams_GetFirstRef);
 DEFINE_COMMAND(GetRefs, returns an array of references of a given type in the current cell, 0, 3, kParams_GetFirstRef);
 
+static ParamInfo kParams_GetInGrid[3] =
+{
+	{	"refr",					kParamType_ObjectRef,	1	},
+	{	"cell depth",			kParamType_Integer,		1	},
+	{	"include taken refs",	kParamType_Integer,		1	},
+};
+
+DEFINE_COMMAND(GetInGrid, returns if a specific reference is in the current cell, 0, 3, kParams_GetInGrid);
+
 static ParamInfo kParams_GetFirstRefInCell[4] =
 {
 	{	"cell",					kParamType_Cell,	0	},
@@ -38,6 +47,16 @@ static ParamInfo kParams_GetFirstRefInCell[4] =
 DEFINE_COMMAND(GetFirstRefInCell, returns the first reference of the specified type in the specified cell, 0, 4, kParams_GetFirstRefInCell);
 DEFINE_COMMAND(GetNumRefsInCell, returns the number of references of a given type in the specified cell, 0, 4, kParams_GetFirstRefInCell);
 DEFINE_COMMAND(GetRefsInCell, returns an array of references of a given type in the specified cell, 0, 4, kParams_GetFirstRefInCell);
+
+static ParamInfo kParams_GetInGridInCell[4] =
+{
+	{	"cell",					kParamType_Cell,		0	},
+	{	"refr",					kParamType_ObjectRef,	0	},
+	{	"cell depth",			kParamType_Integer,		1	},
+	{	"include taken refs",	kParamType_Integer,		1	},
+};
+
+DEFINE_COMMAND(GetInGridInCell, returns if a specific reference is in the grid centered on the specified cell, 0, 4, kParams_GetInGridInCell);
 
 DEFINE_COMMAND(GetRefCount, returns the count in a stacked reference, 1, 0, NULL);
 DEFINE_COMMAND(SetRefCount, sets the count on a stacked reference, 1, 1, kParams_OneInt);
@@ -61,6 +80,22 @@ DEFINE_COMMAND(GetActorBaseFlagsLow, returns a bitfield containing actor base fl
 DEFINE_COMMAND(SetActorBaseFlagsLow, sets actor base flags, 0, 2, kParamType_OneInt_OneOptionalActorBase);
 DEFINE_COMMAND(GetActorBaseFlagsHigh, returns a bitfield containing actor base flags, 0, 1, kParamType_OneOptionalActorBase);
 DEFINE_COMMAND(SetActorBaseFlagsHigh, sets actor base flags, 0, 2, kParamType_OneInt_OneOptionalActorBase);
+
+static ParamInfo kParamType_OneOptionalAnyForm[1] =
+{
+	{ "actor base",	kParamType_AnyForm,	1 }
+};
+
+static ParamInfo kParamType_OneInt_OneOptionalAnyForm[2] =
+{
+	{ "flags",		kParamType_Integer,	0 },
+	{ "actor base",	kParamType_AnyForm,	1 }
+};
+
+DEFINE_COMMAND(GetFlagsLow, returns a bitfield containing object flags, 0, 1, kParamType_OneOptionalAnyForm);
+DEFINE_COMMAND(SetFlagsLow, sets actor flags, 0, 2, kParamType_OneInt_OneOptionalAnyForm);
+DEFINE_COMMAND(GetFlagsHigh, returns a bitfield containing actor flags, 0, 1, kParamType_OneOptionalAnyForm);
+DEFINE_COMMAND(SetFlagsHigh, sets actor base flags, 0, 2, kParamType_OneInt_OneOptionalAnyForm);
 
 DEFINE_CMD_COND(HasOwnership, check if an NPC has direct or indirect ownership, 1, kParams_OneOptionalObjectRef);
 DEFINE_CMD_COND(IsOwned, check if an object is directly or indirectly owned by an NPC, 1, kParams_OneOptionalActorRef);
@@ -105,6 +140,18 @@ static ParamInfo kParams_SetNPCHeight[2] =
 	{	"base NPC",	kParamType_NPC,		1	},
 };
 
+static ParamInfo kParams_OneEyes_OneOptionalMask[2] =
+{
+	{	"eyes", kParamType_AnyForm,		0 }, 
+	{	"mask", kParamType_Integer,	1 }, 
+};
+
+static ParamInfo kParams_OneHair_OneOptionalMask[2] =
+{
+	{	"hair", kParamType_AnyForm,	0 }, 
+	{	"mask", kParamType_Integer,	1 }, 
+};
+
 DEFINE_COMMAND(SetEyes, set an NPCs eyes, false, 2, kParams_SetNPCBodyData);
 DEFINE_COMMAND(GetEyes, get an NPCs eyes, false, 1, kParams_OneNPC);
 DEFINE_COMMAND(SetHair, set an NPCs hair, false, 2, kParams_SetNPCBodyData);
@@ -132,3 +179,35 @@ static ParamInfo kParams_PlaceAtMe[4] =
 };
 
 DEFINE_CMD(PlaceAtMeAndKeep, calls PlaceAtMe and marks the resulting form persistent, true, kParams_PlaceAtMe);
+
+DEFINE_COMMAND(IsLoadDoor, "returns 1 if the calling reference is a load door", 1, 0, NULL);
+DEFINE_COMMAND(GetDoorTeleportX, returns x-coord to which the door teleports, 1, 0, NULL);
+DEFINE_COMMAND(GetDoorTeleportY, returns y-coord to which the door teleports, 1, 0, NULL);
+DEFINE_COMMAND(GetDoorTeleportZ, returns z-coord to which the door teleports, 1, 0, NULL);
+DEFINE_COMMAND(GetDoorTeleportRot, returns z rotation to which the door teleports, 1, 0, NULL);
+
+static ParamInfo kParams_SetDoorTeleport[5] =
+{
+	{	"linkedDoor",	kParamType_ObjectRef,	0	},
+	{	"x",			kParamType_Float,		1	},
+	{	"y",			kParamType_Float,		1	},
+	{	"z",			kParamType_Float,		1	},
+	{	"rot",			kParamType_Float,		1	},
+};
+
+DEFINE_COMMAND(SetDoorTeleport, sets the linked door and coordinates to which the door teleports, 0, 5, kParams_SetDoorTeleport);
+
+DEFINE_COMMAND(GetEyesFlags, get the flags of eyes, false, 2, kParams_OneEyes_OneOptionalMask);
+DEFINE_COMMAND(SetEyesFlags, set the flags of eyes, false, 2, kParams_OneEyes_OneOptionalMask);
+DEFINE_COMMAND(GetHairFlags, get the flags of an hair, false, 2, kParams_OneHair_OneOptionalMask);
+DEFINE_COMMAND(SetHairFlags, set the flags of an hair, false, 2, kParams_OneHair_OneOptionalMask);
+
+DEFINE_CMD_ALT_COND(GetActorFIKstatus, GetFIK, get an actor Foot IK status, true, NULL);
+DEFINE_CMD_ALT(SetActorFIKstatus, SetFIK, set an actor Foot IK status, true, 1, kParams_OneInt);
+
+static ParamInfo kParams_OneEffectShader[1] =
+{
+	{ "effectShader",	kParamType_EffectShader,	0	},
+};
+
+DEFINE_COMMAND(HasEffectShader, returns 1 if the reference is playing the effect shader, 1, 1, kParams_OneEffectShader);

@@ -6,7 +6,11 @@
 #include "utilities.h"
 #include "Core_Serialization.h"
 
+#if RUNTIME
+#include "EventManager.h"
+
 bool g_gameLoaded = false;
+bool g_gameStarted = false;	// remains true as long as a game is loaded. TBD: Should be cleared when exiting to MainMenu.
 static const char* LoadGameMessage = "---Finished loading game: %s";
 static const char* LoadingGameMessage = "***Loading game: %s (%s)";
 static const char* SaveGameMessage = "---Finished saving game: %s";
@@ -49,6 +53,7 @@ static const char* s_saveFilePath = NULL;
 
 static void __stdcall DoPreLoadGameHook(const char* saveFilePath)
 {
+	g_gameStarted = false;
 	s_saveFilePath = (const char *)saveFilePath;
 	_MESSAGE("NVSE DLL DoPreLoadGameHook: %s", saveFilePath);
 	Serialization::HandlePreLoadGame(saveFilePath);
@@ -72,8 +77,8 @@ static __declspec(naked) void PreLoadGameHook(void)
 static void __stdcall DispatchLoadGameEventToScripts(const char* saveFilePath)
 {
 	_MESSAGE("NVSE DLL DoPostLoadGameHook: %s", saveFilePath);
-//	if (saveFilePath)
-//		EventManager::HandleNVSEMessage(NVSEMessagingInterface::kMessage_LoadGame, (void*)saveFilePath);
+	if (saveFilePath)
+		EventManager::HandleNVSEMessage(NVSEMessagingInterface::kMessage_LoadGame, (void*)saveFilePath);
 }
 
 static __declspec(naked) void PostLoadGameHook(void)
@@ -99,7 +104,7 @@ static void __stdcall DoFinishLoadGame(bool bLoadedSuccessfully)
 {
 	DEBUG_MESSAGE("NVSE DLL DoFinishLoadGame() %s", bLoadedSuccessfully ? "succeeded" : "failed");
 	Serialization::HandlePostLoadGame(bLoadedSuccessfully);
-//	EventManager::HandleNVSEMessage(NVSEMessagingInterface::kMessage_PostLoadGame, (void*)bLoadedSuccessfully);
+//	handled by Dispatch_Message EventManager::HandleNVSEMessage(NVSEMessagingInterface::kMessage_PostLoadGame, (void*)bLoadedSuccessfully);
 }
 
 static __declspec(naked) void FinishLoadGameHook(void)
@@ -116,9 +121,13 @@ static __declspec(naked) void FinishLoadGameHook(void)
 	}
 }
 
+extern UnorderedSet<UInt32> s_gameLoadedInformedScripts;
+
 static void __stdcall DoLoadGameHook(const char* saveFilePath)
 {
 	g_gameLoaded = true;
+	g_gameStarted = true;
+	s_gameLoadedInformedScripts.Clear();
 
 	_MESSAGE("NVSE DLL DoLoadGameHook: %s", saveFilePath);
 	Serialization::HandleLoadGame(saveFilePath);
@@ -165,6 +174,8 @@ static void NewGameHook(void)
 	_MESSAGE("NewGameHook");
 
 	g_gameLoaded = true;
+	g_gameStarted = true;
+	s_gameLoadedInformedScripts.Clear();
 	Serialization::HandleNewGame();
 }
 
@@ -199,3 +210,4 @@ void Hook_SaveLoad_Init(void)
 	WriteRelJump(kPostLoadGameFinishedAddr, (UInt32)&FinishLoadGameHook);
 	Init_CoreSerialization_Callbacks();
 }
+#endif
