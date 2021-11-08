@@ -7,6 +7,8 @@
 #include <PluginAPI.h>
 #include <internal/DecodedUI.h>
 
+#include "file.h"
+
 extern std::deque<std::function<void()>> g_executionQueue;
 
 #define IS_TRANSITION_FIX 0
@@ -31,7 +33,7 @@ DataHandler*		g_dataHandler = nullptr;
 
 const char*			(*GetStringVar)(UInt32);
 void				(*SetStringVar)(UInt32, const char*);
-bool				(*AssignString)(ParamInfo*, void*, TESObjectREFR*, TESObjectREFR*, Script*, ScriptEventList*, double*, UInt32*, const char*);
+inline bool				(*AssignString)(ParamInfo*, void*, TESObjectREFR*, TESObjectREFR*, Script*, ScriptEventList*, double*, UInt32*, const char*);
 
 int iDoOnce = 0;
 
@@ -39,11 +41,12 @@ Tile* g_HUDMainMenu, * g_StartMenu, * g_BarterMenu, * g_ContainerMenu, * g_Repai
 
 tList<char> queuedConsoleMessages;
 
-NiTPointerMap<TESForm>** g_allFormsMap;
+inline NiTPointerMap<TESForm>** g_allFormsMap;
 
-std::unordered_set<TESForm*> map_CraftingComponents;
+inline std::vector<JSONEntryItem> g_SI_Items_JSON;
+inline std::vector<JSONEntryTag> g_SI_Tags_JSON;
 
-std::set <Tile*> map_ySI_Tag;
-std::set <Tile*> map_ySI_List;
-std::unordered_map <TESForm*, std::string> map_ySI_Item;
-std::unordered_map <std::string, Tile*> map_ySI_Icon;
+inline std::unordered_set<TESForm*> g_CraftingComponents;
+
+inline std::unordered_map <TESForm*, std::string> g_SI_Items;
+inline std::unordered_map <std::string, JSONEntryTag> g_SI_Tags;

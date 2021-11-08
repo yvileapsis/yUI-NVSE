@@ -1,7 +1,5 @@
-/*
 #pragma once
 
-#include <chrono>
 #include <chrono>
 #include <filesystem>
 #include <optional>
@@ -278,18 +276,6 @@ struct BurstState
 	BurstState() = default;
 };
 
-struct JSONAnimContext
-{
-	Script* script;
-	bool pollCondition;
-
-	void Reset()
-	{
-		memset(this, 0, sizeof JSONAnimContext);
-	}
-
-	JSONAnimContext() { Reset(); }
-};
 
 extern JSONAnimContext g_jsonContext;
 
@@ -531,4 +517,3 @@ enum class PartialLoopingReloadState
 };
 
 extern PartialLoopingReloadState g_partialLoopReloadState;
-*/

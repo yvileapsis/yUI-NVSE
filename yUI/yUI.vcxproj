@@ -120,7 +120,7 @@
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>kNVSE</TargetName>
+    <TargetName>yUI</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Debug Launch GECK|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
@@ -401,7 +401,7 @@
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release GECK|Win32'">
       </ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="file_animations.cpp" />
+    <ClCompile Include="file.cpp" />
     <ClCompile Include="GameUI.cpp" />
     <ClCompile Include="game_types.cpp" />
     <ClCompile Include="hooks.cpp" />
@@ -440,7 +440,7 @@
     <ClInclude Include="..\nvse\nvse\Utilities.h" />
     <ClInclude Include="..\nvse\nvse\utility.h" />
     <ClInclude Include="commands_animation.h" />
-    <ClInclude Include="file_animations.h" />
+    <ClInclude Include="file.h" />
     <ClInclude Include="commands.h" />
     <ClInclude Include="functions.h" />
     <ClInclude Include="patches.h" />

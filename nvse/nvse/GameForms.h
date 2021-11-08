@@ -2676,6 +2676,8 @@ public:
 	UInt32						armorFlags;		// 180
 	UInt32						unk184;			// 184
 	// 180
+
+	UInt32						GetArmorValue(UInt32);
 };
 STATIC_ASSERT(sizeof(TESObjectARMO) == 0x188);
 STATIC_ASSERT(offsetof(TESObjectARMO, damageThreshold) == 0x17C);
@@ -2981,6 +2983,7 @@ public:
 		eFlag_RumbleAlternate			= 0x400,
 		eFlag_LongBurst					= 0x800,
 		eFlag_NightVision				= 0x1000,
+		eFlag_ScopeFromMod				= 0x2000,
 	};
 
 	enum EEmbedWeapAV {
@@ -3076,6 +3079,7 @@ public:
 		eWeap_HasScope,
 		eWeap_IgnoresDTDR,
 		eWeap_SoundLevel,
+		eWeap_ClipSize,
 	};
 	
 	// bases
@@ -3098,69 +3102,69 @@ public:
 	BGSBipedModelList			bipedModelList;		// 0E0
 	BGSPickupPutdownSounds		pickupPutdownSounds;// 0E8
 
-	UInt8				eWeaponType;		// 0F4
+	UInt8				eWeaponType;			// 0F4
 	UInt8				pad[3];
-	float				animMult;			// 0F8
-	float				reach;				// 0FC
-	Bitfield8			weaponFlags1;		// 100
-	UInt8				handGrip;			// 101
-	UInt8				ammoUse;			// 102
-	UInt8				reloadAnim;			// 103
-	float				minSpread;			// 104
-	float				spread;				// 108
-	UInt32				unk10C;				// 10C
-	float				sightFOV;			// 110
-	UInt32				unk114;				// 114
-	BGSProjectile		* projectile;		// 118
-	UInt8				baseVATSChance;		// 11C
-	UInt8				attackAnim;			// 11D
-	UInt8				numProjectiles;		// 11E
-	UInt8				embedWeaponAV;		// 11F
-	float				minRange;			// 120
-	float				maxRange;			// 124
-	UInt32				onHit;				// 128
-	Bitfield32			weaponFlags2;		// 12C
-	float				animAttackMult;		// 130
-	float				fireRate;			// 134
-	float				AP;					// 138
-	float				rumbleLeftMotor;	// 13C
-	float				rumbleRightMotor;	// 140
-	float				rumbleDuration;		// 144
-	float				damageToWeaponMult;	// 148
-	float				animShotsPerSec;	// 14C
-	float				animReloadTime;		// 150
-	float				animJamTime;		// 154		
-	float				aimArc;				// 158
-	UInt32				weaponSkill;		// 15C - actor value
-	UInt32				rumblePattern;		// 160 - reload anim?
-	float				rumbleWavelength;	// 164
-	float				limbDamageMult;		// 168
-	UInt32				resistType;			// 16c - actor value
-	float				sightUsage;			// 170
+	float				animMult;				// 0F8
+	float				reach;					// 0FC
+	Bitfield8			weaponFlags1;			// 100
+	UInt8				handGrip;				// 101
+	UInt8				ammoUse;				// 102
+	UInt8				reloadAnim;				// 103
+	float				minSpread;				// 104
+	float				spread;					// 108
+	UInt32				unk10C;					// 10C
+	float				sightFOV;				// 110
+	UInt32				unk114;					// 114
+	BGSProjectile		* projectile;			// 118
+	UInt8				baseVATSChance;			// 11C
+	UInt8				attackAnim;				// 11D
+	UInt8				numProjectiles;			// 11E
+	UInt8				embedWeaponAV;			// 11F
+	float				minRange;				// 120
+	float				maxRange;				// 124
+	UInt32				onHit;					// 128
+	Bitfield32			weaponFlags2;			// 12C
+	float				animAttackMult;			// 130
+	float				fireRate;				// 134
+	float				AP;						// 138
+	float				rumbleLeftMotor;		// 13C
+	float				rumbleRightMotor;		// 140
+	float				rumbleDuration;			// 144
+	float				damageToWeaponMult;		// 148
+	float				animShotsPerSec;		// 14C
+	float				animReloadTime;			// 150
+	float				animJamTime;			// 154		
+	float				aimArc;					// 158
+	UInt32				weaponSkill;			// 15C - actor value
+	UInt32				rumblePattern;			// 160 - reload anim?
+	float				rumbleWavelength;		// 164
+	float				limbDamageMult;			// 168
+	UInt32				resistType;				// 16c - actor value
+	float				sightUsage;				// 170
 	float				semiAutoFireDelayMin;	// 174
 	float				semiAutoFireDelayMax;	// 178
-	UInt32				unk17C;				// 17C - 0-0x10: 0x8:str req 0x10: - skill req  - 0xb:kill impulse B158 - mod 1 val B15C - Mod 2 val Effects: 0x1: e(zoom) 0x2: a 0x3:0 0x4-6: Values c-e Mod Effects Val2:1-3 
-	UInt32				effectMods[3];		// 180
-	float				value1Mod[3];		// 18C
+	UInt32				unk17C;					// 17C - 0-0x10: 0x8:str req 0x10: - skill req  - 0xb:kill impulse B158 - mod 1 val B15C - Mod 2 val Effects: 0x1: e(zoom) 0x2: a 0x3:0 0x4-6: Values c-e Mod Effects Val2:1-3 
+	UInt32				effectMods[3];			// 180
+	float				value1Mod[3];			// 18C
 	UInt32				powerAttackAnimOverride;	// 198
-	UInt32				strRequired;		// 19C
-	UInt8				unk1A0;				// 1A0
-	UInt8				modReloadAnim;		// 1A1
-	UInt8				pad1A2[2];			// 1A2
-	float				regenRate;			// 1A4
-	float				killImpulse;		// 1A8
-	float				value2Mod[3];		// 1AC
-	float				impulseDist;		// 1B8
-	UInt32				skillRequirement;	// 1BC
-	UInt32				criticalDamage;		// 1C0
-	float				criticalPercent;	// 1C4
-	UInt8				critDamageFlags;	// 1C8
-	UInt8				pad1C9[3];			// 1C9
-	SpellItem			* criticalEffect;	// 1CC
-	TESModel			shellCasingModel;	// 1DO
-	TESModel			targetNIF;			// 1E8 - target NIF
-	TESModel			model200;			// 200 - could be a texture swap
-	UInt32				unk218;				// 218
+	UInt32				strRequired;			// 19C
+	UInt8				unk1A0;					// 1A0
+	UInt8				modReloadAnim;			// 1A1
+	UInt8				pad1A2[2];				// 1A2
+	float				regenRate;				// 1A4
+	float				killImpulse;			// 1A8
+	float				value2Mod[3];			// 1AC
+	float				impulseDist;			// 1B8
+	UInt32				skillRequirement	;	// 1BC
+	UInt32				criticalDamage;			// 1C0
+	float				criticalPercent;		// 1C4
+	UInt8				critDamageFlags;		// 1C8
+	UInt8				pad1C9[3];				// 1C9
+	SpellItem			* criticalEffect;		// 1CC
+	TESModel			shellCasingModel;		// 1DO
+	TESModel			targetNIF;				// 1E8 - target NIF
+	TESModel			model200;				// 200 - could be a texture swap
+	UInt32				unk218;					// 218
 	TESSound*			shoot3DSound;
 	TESSound*			shootDistSound;
 	TESSound*			shoot2DSound;
@@ -3173,37 +3177,37 @@ public:
 	TESSound*			modShoot3DSound;
 	TESSound*			modShootDistSound;
 	TESSound*			modShoot2DSound;
-	BGSImpactDataSet*	impactDataSet;	// 24C
-	TESObjectSTAT*		worldStatic;		// 250
-	TESObjectSTAT*		mod1Static;		// 254
-	TESObjectSTAT*		mod2Static;		// 258
-	TESObjectSTAT*		mod3Static;		// 25C
-	TESObjectSTAT*		mod12Static;		// 260
-	TESObjectSTAT*		mod13Static;		// 264
-	TESObjectSTAT*		mod23Static;		// 268
-	TESObjectSTAT*		mod123Static;		// 26C
-	TESModelTextureSwap	textureMod1;		// 270 Mod 1
-	TESModelTextureSwap	textureMod2;		// 290 Mod 2
-	TESModelTextureSwap	textureMod3;		// 2B0 Mod 3
-	TESModelTextureSwap	textureMod12;		// 2D0 Mod 1-2
-	TESModelTextureSwap	textureMod13;		// 2F0 Model 1-3
-	TESModelTextureSwap	textureMod23;		// 310 Model 2-3
-	TESModelTextureSwap	textureMod123;		// 330 Model 1-2-3
-	TESObjectIMOD*		itemMod1;			// 350
-	TESObjectIMOD*		itemMod2;			// 354
-	TESObjectIMOD*		itemMod3;			// 358
-	UInt32				unk35C;				// 35C
-	UInt32				unk360;				// 360
-	UInt32				soundLevel;			// 364
-	UInt32				unk368;				// 368
-	UInt32				unk36C;				// 36C
-	UInt32				unk370;				// 370
-	UInt32				unk374;				// 374
-	UInt32				unk378;				// 378
-	UInt32				unk37C;				// 37C
-	UInt32				recharge;			// 380 maybe recharge
-	UInt8				unk384;				// 384
-	UInt8				unk385[3];			// 385
+	BGSImpactDataSet*	impactDataSet;			// 24C
+	TESObjectSTAT*		worldStatic;			// 250
+	TESObjectSTAT*		mod1Static;				// 254
+	TESObjectSTAT*		mod2Static;				// 258
+	TESObjectSTAT*		mod3Static;				// 25C
+	TESObjectSTAT*		mod12Static;			// 260
+	TESObjectSTAT*		mod13Static;			// 264
+	TESObjectSTAT*		mod23Static;			// 268
+	TESObjectSTAT*		mod123Static;			// 26C
+	TESModelTextureSwap	textureMod1;			// 270 Mod 1
+	TESModelTextureSwap	textureMod2;			// 290 Mod 2
+	TESModelTextureSwap	textureMod3;			// 2B0 Mod 3
+	TESModelTextureSwap	textureMod12;			// 2D0 Mod 1-2
+	TESModelTextureSwap	textureMod13;			// 2F0 Model 1-3
+	TESModelTextureSwap	textureMod23;			// 310 Model 2-3
+	TESModelTextureSwap	textureMod123;			// 330 Model 1-2-3
+	TESObjectIMOD*		itemMod1;				// 350
+	TESObjectIMOD*		itemMod2;				// 354
+	TESObjectIMOD*		itemMod3;				// 358
+	UInt32				unk35C;					// 35C
+	UInt32				unk360;					// 360
+	UInt32				soundLevel;				// 364
+	UInt32				unk368;					// 368
+	UInt32				unk36C;					// 36C
+	UInt32				unk370;					// 370
+	UInt32				unk374;					// 374
+	UInt32				unk378;					// 378
+	UInt32				unk37C;					// 37C
+	UInt32				recharge;				// 380 maybe recharge
+	UInt8				unk384;					// 384
+	UInt8				unk385[3];				// 385
 
 
 	bool			IsAutomatic() const { return weaponFlags1.IsSet(eFlag_IsAutomatic); }
@@ -3232,6 +3236,8 @@ public:
 	bool			IgnoresDTDR() const { return weaponFlags1.IsSet(eFlag_IgnoresNormalWeapResist); }
 
 	float			GetWeaponValue(UInt32 whichVal);
+	bool			HasScopeAlt() const { return weaponFlags1.IsSet(eFlag_HasScope) && !weaponFlags2.IsSet(eFlag_ScopeFromMod); }
+
 };
 STATIC_ASSERT(offsetof(TESObjectWEAP, fullName) == 0x030);
 STATIC_ASSERT(offsetof(TESObjectWEAP, icon) == 0x5C);
@@ -3544,6 +3550,13 @@ public:
 
 	bool IsPoison();
 	bool RestoresAV(int avCode);
+	UInt32 HasBaseEffectRestoresAV(int);
+	UInt32 HasBaseEffectDamagesAV(int);
+	bool IsAddictive();
+	bool IsFood();
+	bool IsMedicine();
+	bool IsFoodAlt();
+	bool IsWaterAlt();
 };
 
 STATIC_ASSERT(sizeof(AlchemyItem) == 0xD8);

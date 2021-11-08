@@ -21,10 +21,12 @@
 #include "commands.h"
 #include "settings.h"
 #include "ySI.h"
+#include <file.h>
 
 #define yUI_VERSION 0.9
 
 #define RegisterScriptCommand(name) 	nvse->RegisterCommand(&kCommandInfo_ ##name)
+#define REG_CMD_STR(name) nvse->RegisterTypedCommand(&kCommandInfo_##name, kRetnType_String)
 
 PluginHandle	g_pluginHandle = kPluginHandle_Invalid;
 
@@ -57,9 +59,11 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 		g_allFormsMap = reinterpret_cast<NiTPointerMap<TESForm>**>(0x11C54C0);
 		FillCraftingComponents();
 		PrintAndClearQueuedConsoleMessages();
-		
+
+		if (g_ySI) LoadSIMapsFromFiles();
+
 //		LoadFileAnimPaths();
-		Console_Print("yUI%2f", yUI_VERSION);
+		Console_Print("yUI %.2f", yUI_VERSION);
 	}
 	else if (msg->type == NVSEMessagingInterface::kMessage_MainGameLoop)
 	{
@@ -76,7 +80,9 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 			if (!isMenuMode) {
 				iDoOnce++;
 
-				if (g_ySI) ySIFillMapsAlt();
+//				ySIFillIconMap();
+
+//				if (g_ySI) ySIFillTagMapAlt();
 			}
 		}
 		
@@ -150,7 +156,7 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	g_messagingInterface->RegisterListener(g_pluginHandle, "NVSE", MessageHandler);
 
 	nvse->SetOpcodeBase(0x21D0);
-	RegisterScriptCommand(ySIGetTagTrait);
+	REG_CMD_STR(ySIGetTagTrait);
 
 	
 	if (nvse->isEditor)	return true;
@@ -166,8 +172,8 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	g_dataInterface = static_cast<NVSEDataInterface*>(nvse->QueryInterface(kInterface_Data));
 
 
-	CaptureLambdaVars = static_cast<_CaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaSaveVariableList));
-	UncaptureLambdaVars = static_cast<_UncaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaUnsaveVariableList));
+//	CaptureLambdaVars = static_cast<_CaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaSaveVariableList));
+//	UncaptureLambdaVars = static_cast<_UncaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaUnsaveVariableList));
 	
 //	ApplyHooks();
 //	ApplyNiHooks();

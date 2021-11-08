@@ -18,9 +18,9 @@ void FillCraftingComponents()
 	for (auto mIter = (*g_allFormsMap)->Begin(); mIter; ++mIter)
 	{
 		if (mIter.Get()->typeID != 106) continue;
-		for (ListNode<RecipeComponent>* node = ((TESRecipe*)mIter.Get())->inputs.Head(); node; node = node->next) {
+		for (ListNode<RecipeComponent>* node = dynamic_cast<TESRecipe*>(mIter.Get())->inputs.Head(); node; node = node->next) {
 			if (node->data && node->data->item) {
-				map_CraftingComponents.emplace(node->data->item);
+				g_CraftingComponents.emplace(node->data->item);
 			}
 		}
 	}
@@ -41,7 +41,7 @@ void ConsoleQueueOrPrint(const char* str, int len)
 bool Menu::GetTemplateExists(const char* templateName)
 {
 	for (ListNode<TemplateData>* node = menuTemplates.Head(); node; node = node->next) {
-		if (node->data && (!strcmpi(node->data->templateName, templateName))) { return true; }
+		if (node->data && (!_strcmpi(node->data->templateName, templateName))) { return true; }
 	}
 	return false;
 }
@@ -255,9 +255,8 @@ float TESObjectWEAP::GetWeaponValue(UInt32 whichVal)
 		case eWeap_Spread:				return this->spread;
 		case eWeap_Proj:
 		{
-			BGSProjectile* pProj = this->projectile;
-			if (pProj) {
-				return (UInt32)pProj->refID;
+			if (BGSProjectile * pProj = this->projectile; pProj) {
+				return pProj->refID;
 			}
 		}
 		break;
@@ -270,9 +269,8 @@ float TESObjectWEAP::GetWeaponValue(UInt32 whichVal)
 		case eWeap_CritChance:			return this->criticalPercent;
 		case eWeap_CritEffect:
 		{
-			SpellItem* pSpell = this->criticalEffect;
-			if (pSpell) {
-				return (UInt32)pSpell->refID;
+			if (SpellItem * pSpell = this->criticalEffect; pSpell) {
+				return pSpell->refID;
 			}
 		}
 		break;
@@ -308,6 +306,11 @@ float TESObjectWEAP::GetWeaponValue(UInt32 whichVal)
 		case eWeap_HasScope:			return this->HasScope();
 		case eWeap_IgnoresDTDR:			return this->IgnoresDTDR();
 		case eWeap_SoundLevel:			return this->soundLevel;
+		case eWeap_ClipSize:
+		{
+			auto pClipRounds = DYNAMIC_CAST(this, TESForm, BGSClipRoundsForm);
+			if (pClipRounds) { return pClipRounds->clipRounds; }
+		}
 		default: HALT("unknown weapon value"); break;
 		}
 	}
@@ -322,27 +325,26 @@ enum EBipedFlags {
 	eBipedFlag_HeavyArmor = 0x80,
 };
 
-UInt32 GetArmorValue(TESForm* pForm, UInt32 whichVal)
+UInt32 TESObjectARMO::GetArmorValue(UInt32 whichVal)
 {
-	TESObjectARMO* pArmor = DYNAMIC_CAST(pForm, TESForm, TESObjectARMO);
-	if (pArmor) {
+	if (this) {
 		switch (whichVal) {
 		case 1: {
-			TESBipedModelForm* biped = &pArmor->bipedModel;
+			TESBipedModelForm* biped = &this->bipedModel;
 			return (biped->bipedFlags & eBipedFlag_HeavyArmor) ? 3 : ((biped->bipedFlags & eBipedFlag_MediumArmor) ? 2 : 1);
 		}
 		case 2: {
-			TESBipedModelForm* biped = &pArmor->bipedModel;
+			TESBipedModelForm* biped = &this->bipedModel;
 			return (biped->bipedFlags & eBipedFlag_PowerArmor) ? 1 : 0;
 		}
 		case 3: {
-			TESBipedModelForm* biped = &pArmor->bipedModel;
+			TESBipedModelForm* biped = &this->bipedModel;
 			return (biped->bipedFlags & eBipedFlag_HasBackPack) ? 1 : 0;
 		}
-		case 4:						return pArmor->armorRating;
-		case 5:						return static_cast<UInt32>(pArmor->damageThreshold);
+		case 4:						return this->armorRating;
+		case 5:						return static_cast<UInt32>(this->damageThreshold);
 		case 6: {
-			TESBipedModelForm* biped = &pArmor->bipedModel;
+			TESBipedModelForm* biped = &this->bipedModel;
 			return biped->partMask;
 		}
 		default: HALT("unknown weapon value"); break;
@@ -401,76 +403,45 @@ bool ContGetEquipped(ContChangesEntry* weaponInfo)
 	return 0;
 }
 
-bool HasBaseEffectRestoresAV(TESForm* form, int avCode)
+UInt32 AlchemyItem::HasBaseEffectRestoresAV(int avCode)
 {
-	AlchemyItem* item = DYNAMIC_CAST(form, TESForm, AlchemyItem);
-
-	auto iter = item->magicItem.list.list.Begin();
-	for (; !iter.End(); ++iter)
-	{
-		auto effect = iter.Get();
-		if (effect->GetSkillCode() == avCode)
-		{
-			auto setting = effect->setting;
-			if (setting && !(setting->effectFlags & EffectSetting::kDetrimental))
-			{
-				
-				return true;
-				//				if (effect->conditions.Evaluate(g_player, nullptr, &eval, false)) return true;
-			}
-		}
-	}
-	return false;
+	for (auto iter = this->magicItem.list.list.Begin(); !iter.End(); ++iter)
+		if (auto effect = iter.Get(); effect->GetSkillCode() == avCode)
+			if (const auto setting = effect->setting; setting && !(setting->effectFlags & EffectSetting::kDetrimental))
+				return effect->magnitude;
+		//				if (effect->conditions.Evaluate(g_player, nullptr, &eval, false)) return true;
+	return 0;
 }
 
-bool HasBaseEffectDamagesAV(TESForm* form, int avCode)
+UInt32 AlchemyItem::HasBaseEffectDamagesAV(const int avCode)
 {
-	AlchemyItem* item = DYNAMIC_CAST(form, TESForm, AlchemyItem);
-
-	auto iter = item->magicItem.list.list.Begin();
-	for (; !iter.End(); ++iter)
-	{
-		auto effect = iter.Get();
-		if (effect->GetSkillCode() == avCode)
-		{
-			auto setting = effect->setting;
-			if (setting && setting->effectFlags & EffectSetting::kDetrimental)
-			{
-				
-				return true;
-				//				if (effect->conditions.Evaluate(g_player, nullptr, &eval, false)) return true;
-			}
-		}
-	}
-	return false;
+	for (auto iter = this->magicItem.list.list.Begin(); !iter.End(); ++iter)
+		if (auto effect = iter.Get(); effect->GetSkillCode() == avCode)
+			if (const auto setting = effect->setting; setting && setting->effectFlags & EffectSetting::kDetrimental)
+				return effect->magnitude;
+		//				if (effect->conditions.Evaluate(g_player, nullptr, &eval, false)) return true;
+	return 0;
 }
 
-bool IsAddictive(TESForm* form)
+bool AlchemyItem::IsAddictive()
 {
-	AlchemyItem* item = DYNAMIC_CAST(form, TESForm, AlchemyItem);
-	if (item->withdrawalEffect && item->withdrawalEffect->refID) {
-		return true;
-	}
-	return false;
+	return this->withdrawalEffect && this->withdrawalEffect->refID ? true : false;
 }
 
-
-bool IsFood(TESForm* form)
+bool AlchemyItem::IsFood()
 {
-	AlchemyItem* item = DYNAMIC_CAST(form, TESForm, AlchemyItem);
-	return (item->alchFlags & 2) ? 1 : 0;
+	return (this->alchFlags & 2) ? true : false;
 }
 
-bool IsMedicine(TESForm* form)
+bool AlchemyItem::IsMedicine()
 {
-	AlchemyItem* item = DYNAMIC_CAST(form, TESForm, AlchemyItem);
-	return (item->alchFlags & 4) ? 1 : 0;
+	return (this->alchFlags & 4) ? true : false;
 }
 
 bool AlchemyItem::IsPoison()
 {
 	EffectItem* effItem;
-	EffectSetting* effSetting = NULL;
+	EffectSetting* effSetting = nullptr;
 	ListNode<EffectItem>* iter = magicItem.list.list.Head();
 	do
 	{
@@ -478,33 +449,32 @@ bool AlchemyItem::IsPoison()
 		effSetting = effItem->setting;
 		if (effSetting && !(effSetting->effectFlags & 4)) return false;
 	} while (iter = iter->next);
-	return effSetting != NULL;
+	return effSetting != nullptr;
 }
 
-bool IsPoisonous(TESForm* form)
+bool AlchemyItem::IsFoodAlt()
 {
-	AlchemyItem* item = DYNAMIC_CAST(form, TESForm, AlchemyItem);
-	return (item->IsPoison()) ? 1 : 0;
+	return this->HasBaseEffectRestoresAV(kAVCode_Hunger) && this->HasBaseEffectRestoresAV(kAVCode_Hunger) > this->HasBaseEffectRestoresAV(kAVCode_Dehydration) ? true : false;
+}
+
+bool AlchemyItem::IsWaterAlt()
+{
+	return this->HasBaseEffectRestoresAV(kAVCode_Dehydration) && this->HasBaseEffectRestoresAV(kAVCode_Hunger) == 0 ? true : false;
 }
 
 bool HasBaseEffectChangesAV(TESForm* form, int avCode)
 {
-
-	TESObjectARMO* armor = DYNAMIC_CAST(form, TESForm, TESObjectARMO);
+	auto armor = DYNAMIC_CAST(form, TESForm, TESObjectARMO);
 	TESEnchantableForm* enchantable = &armor->enchantable;
 	if (!enchantable) return false;
 	EnchantmentItem* enchantment = enchantable->enchantItem;
 	if (!enchantment) return false;
-	auto iter = enchantment->magicItem.list.list.Begin();
-	for (; !iter.End(); ++iter)
+	for (auto iter = enchantment->magicItem.list.list.Begin(); !iter.End(); ++iter)
 	{
-		auto effect = iter.Get();
-		if (effect->GetSkillCode() == avCode)
+		if (auto effect = iter.Get(); effect->GetSkillCode() == avCode)
 		{
-			auto setting = effect->setting;
-			if (setting && (setting->effectFlags & EffectSetting::kRecover))
+			if (const auto setting = effect->setting; setting && (setting->effectFlags & EffectSetting::kRecover))
 			{
-				
 				return true;
 				//				if (effect->conditions.Evaluate(g_player, nullptr, &eval, false)) return true;
 			}
@@ -528,17 +498,17 @@ __declspec(naked) TESForm* __stdcall LookupFormByRefID(UInt32 refID)
 		jz		done
 		mov		edx, [esp + 4]
 		ALIGN 16
-		iterHead:
+	iterHead:
 		cmp[eax + 4], edx
-			jz		found
-			mov		eax, [eax]
-			test	eax, eax
-			jnz		iterHead
-			retn	4
-			found:
+		jz		found
+		mov		eax, [eax]
+		test	eax, eax
+		jnz		iterHead
+		retn	4
+		found:
 		mov		eax, [eax + 8]
-			done :
-			retn	4
+	done :
+		retn	4
 	}
 }
 
@@ -549,11 +519,13 @@ TESForm* GetRefFromString(char* mod, char* id)
 	return LookupFormByRefID(itemID);
 }
 
-bool IsInListRecursive(TESForm* item, BGSListForm* list)
+bool IsInListRecursive(TESForm* item, TESForm* list)
 {
-	if (list->GetIndexOf(item) >= 0) return true;
-	for (tList<TESForm>::Iterator iter = list->list.Begin(); !iter.End(); ++iter) {
-		if (iter.Get() && iter.Get()->typeID == 85 && IsInListRecursive(item, DYNAMIC_CAST(iter.Get(), TESForm, BGSListForm))) return true;
+	if (item && list && item->refID == list->refID) return true;
+	if (list->typeID != 85) return false;
+//	if (dynamic_cast<BGSListForm*>(list)->GetIndexOf(item) >= 0) return true;
+	for (auto iter = dynamic_cast<BGSListForm*>(list)->list.Begin(); !iter.End(); ++iter) {
+		if (iter.Get() && IsInListRecursive(item, iter.Get())) return true;
 	}
 	return false;
 }
@@ -567,16 +539,7 @@ bool IsInRepairListRecursive(TESForm* item, BGSListForm* list)
 	return false;
 }
 
-bool IsInAmmoListRecursive(TESForm* item, BGSListForm* list)
-{
-	if (IS_TYPE(item, TESObjectWEAP) && ((TESObjectWEAP*)item)->ammo.ammo && list->GetIndexOf(((TESObjectWEAP*)item)->ammo.ammo) >= 0) return true;
-	for (tList<TESForm>::Iterator iter = list->list.Begin(); !iter.End(); ++iter) {
-		if (iter.Get() && iter.Get()->typeID == 85 && IsInListRecursive(item, DYNAMIC_CAST(iter.Get(), TESForm, BGSListForm))) return true;
-	}
-	return false;
-}
-
 bool IsCraftingComponent(TESForm* form)
 {
-	return (map_CraftingComponents.find(form) != map_CraftingComponents.end());
+	return (g_CraftingComponents.find(form) != g_CraftingComponents.end());
 }
