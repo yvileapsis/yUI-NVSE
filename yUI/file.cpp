@@ -298,7 +298,7 @@ void FillSIMapsFromJSON()
 		case 24: case 25: case 26: case 29: case 30: case 31: case 40: case 41: case 46: case 47: case 49: case 96:
 		case 103: case 115: case 116: case 117: {}
 		}
-		for (const auto& entry : g_SI_Items_JSON) {			
+		for (auto& entry : g_SI_Items_JSON) {			
 			if (entry.form && entry.form->refID != form->refID) continue;
 			if (entry.formType && entry.formType != form->typeID) continue;
 
@@ -346,7 +346,7 @@ void FillSIMapsFromJSON()
 				if (entry.formAid.aidIsMedicine && !aid->IsMedicine()) continue;
 			}
 			
-			g_SI_Items.emplace(form, entry.tag);
+			g_SI_Items.emplace(form, move(entry.tag));
 		}
 	}
 	g_SI_Items_JSON = std::vector<JSONEntryItem>();
