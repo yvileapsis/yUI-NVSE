@@ -18,7 +18,9 @@ void FillCraftingComponents()
 	for (auto mIter = (*g_allFormsMap)->Begin(); mIter; ++mIter)
 	{
 		if (mIter.Get()->typeID != 106) continue;
-		for (ListNode<RecipeComponent>* node = dynamic_cast<TESRecipe*>(mIter.Get())->inputs.Head(); node; node = node->next) {
+		const auto list = DYNAMIC_CAST(mIter.Get(), TESForm, TESRecipe);
+		if (!list) continue;
+		for (ListNode<RecipeComponent>* node = list->inputs.Head(); node; node = node->next) {
 			if (node->data && node->data->item) {
 				g_CraftingComponents.emplace(node->data->item);
 			}
@@ -308,7 +310,7 @@ float TESObjectWEAP::GetWeaponValue(UInt32 whichVal)
 		case eWeap_SoundLevel:			return this->soundLevel;
 		case eWeap_ClipSize:
 		{
-			auto pClipRounds = DYNAMIC_CAST(this, TESForm, BGSClipRoundsForm);
+			const auto pClipRounds = DYNAMIC_CAST(this, TESForm, BGSClipRoundsForm);
 			if (pClipRounds) { return pClipRounds->clipRounds; }
 		}
 		default: HALT("unknown weapon value"); break;
@@ -382,7 +384,7 @@ float ContGetHealthPercent(ContChangesEntry* itemInfo)
 {
 	ExtraDataList* xData = itemInfo->GetCustomExtra(kExtraData_Health);
 	if (!xData) return 0;
-	TESHealthForm* healthForm = DYNAMIC_CAST(itemInfo->type, TESForm, TESHealthForm);
+	auto* healthForm = DYNAMIC_CAST(itemInfo->type, TESForm, TESHealthForm);
 	ExtraHealth* xHealth;
 	if (healthForm)
 	{
@@ -465,6 +467,7 @@ bool AlchemyItem::IsWaterAlt()
 bool HasBaseEffectChangesAV(TESForm* form, int avCode)
 {
 	auto armor = DYNAMIC_CAST(form, TESForm, TESObjectARMO);
+	if (!armor) return false;
 	TESEnchantableForm* enchantable = &armor->enchantable;
 	if (!enchantable) return false;
 	EnchantmentItem* enchantment = enchantable->enchantItem;
@@ -524,17 +527,10 @@ bool IsInListRecursive(TESForm* item, TESForm* list)
 	if (item && list && item->refID == list->refID) return true;
 	if (list->typeID != 85) return false;
 //	if (dynamic_cast<BGSListForm*>(list)->GetIndexOf(item) >= 0) return true;
-	for (auto iter = dynamic_cast<BGSListForm*>(list)->list.Begin(); !iter.End(); ++iter) {
+	const auto bgslist = DYNAMIC_CAST(list, TESForm, BGSListForm);
+	if (!bgslist) return false;
+	for (auto iter = bgslist->list.Begin(); !iter.End(); ++iter) {
 		if (iter.Get() && IsInListRecursive(item, iter.Get())) return true;
-	}
-	return false;
-}
-
-bool IsInRepairListRecursive(TESForm* item, BGSListForm* list)
-{
-	if (IS_TYPE(item, TESObjectWEAP) && ((TESObjectWEAP*)item)->repairItemList.listForm && list->GetIndexOf(((TESObjectWEAP*)item)->repairItemList.listForm) >= 0) return true;
-	for (tList<TESForm>::Iterator iter = list->list.Begin(); !iter.End(); ++iter) {
-		if (iter.Get() && iter.Get()->typeID == 85 && IsInListRecursive(item, DYNAMIC_CAST(iter.Get(), TESForm, BGSListForm))) return true;
 	}
 	return false;
 }
@@ -559,11 +555,9 @@ void Log(const std::string& msg)
 
 void DebugLog(const std::string& msg)
 {
-#if _DEBUG
 	_MESSAGE("%s", msg.c_str());
 	if (g_logLevel == 2)
 		Console_Print("kNVSE: %s", msg.c_str());
-#endif
 }
 
 int HexStringToInt(const std::string& str)

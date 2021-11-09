@@ -9,10 +9,6 @@
 void patchRemoveTagsAddIcons()
 {
 	WriteRelJump(0x71A3D5, reinterpret_cast<UInt32>(TileSetStringValueInjectIconHook));
-	WriteRelJump(0x782516, reinterpret_cast<UInt32>(InventoryMenuSortingHook));
-	WriteRelJump(0x72F0ED, reinterpret_cast<UInt32>(BarterContainerMenuSortingHook));
-	WriteRelJump(0x75D138, reinterpret_cast<UInt32>(BarterContainerMenuSortingHook));
-
 	WriteRelJump(0x70189E, reinterpret_cast<UInt32>(TileSetStringValueHotkeyHook));
 	WriteRelJump(0x7814FA, reinterpret_cast<UInt32>(TileSetStringValueHotkeyHook2));
 }

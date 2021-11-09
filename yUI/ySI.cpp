@@ -10,7 +10,6 @@ extern std::unordered_map <std::string, JSONEntryTag> g_SI_Tags;
 
 extern TileMenu* g_InventoryMenu;
 
-
 void InjectTemplates()
 {
 	g_HUDMainMenu->InjectUIXML("data/menus/ySI/ySI.xml");
@@ -18,7 +17,6 @@ void InjectTemplates()
 	g_RepairMenu->InjectUIXML("data/menus/ySI/ySI.xml");
 	g_InventoryMenu->InjectUIXML("data/menus/ySI/ySI.xml");
 }
-
 
 void __fastcall SetStringValueInjectTile(Tile* tile, ContChangesEntry* entry, enum TileValues tilevalue, char* src, char propagate)
 {
@@ -30,30 +28,31 @@ void __fastcall SetStringValueInjectTile(Tile* tile, ContChangesEntry* entry, en
 
 	const std::string tag = g_SI_Items[entry->type];
 
-	Tile* menu = tile;
+	Tile* tilemenu = tile;
 
-	do {
-		if IS_TYPE(menu, TileMenu)
-			break;
-	} while ((menu = menu->parent));
+	do { if IS_TYPE(tilemenu, TileMenu) break;
+	} while ((tilemenu = tilemenu->parent));
 
 	if (!&g_SI_Tags[tag]) { return; }
 
-	if (!dynamic_cast<TileMenu*>(menu)->menu->GetTemplateExists(g_SI_Tags[tag].xmltemplate.c_str()))
+	auto* menu = DYNAMIC_CAST(tilemenu, Tile, TileMenu);
+
+	if (!menu || !menu->menu) return;
+	
+	if (!menu->menu->GetTemplateExists(g_SI_Tags[tag].xmltemplate.c_str()))
 	{
 		if (menu == TileMenu::GetTileMenu(kMenuType_Barter)) menu->InjectUIXML("data/menus/ySI/ySI.xml");
 		if (menu == TileMenu::GetTileMenu(kMenuType_Container)) menu->InjectUIXML("data/menus/ySI/ySI.xml");
 		if (menu == TileMenu::GetTileMenu(kMenuType_RepairServices)) menu->InjectUIXML("data/menus/ySI/ySI.xml");
 	}
 
-	if (!dynamic_cast<TileMenu*>(menu)->menu->GetTemplateExists(g_SI_Tags[tag].xmltemplate.c_str())) return;
+	if (!menu->menu->GetTemplateExists(g_SI_Tags[tag].xmltemplate.c_str())) return;
 
-	
 	Tile* text = tile->GetChild("ListItemText");
 
 	if (!text) return;
 
-	Tile* icon = dynamic_cast<TileMenu*>(menu)->menu->AddTileFromTemplate(text, g_SI_Tags[tag].xmltemplate.c_str(), 0);
+	Tile* icon = menu->menu->AddTileFromTemplate(text, g_SI_Tags[tag].xmltemplate.c_str(), 0);
 
 	if (!icon) return;
 

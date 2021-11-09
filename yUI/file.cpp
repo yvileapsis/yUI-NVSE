@@ -103,7 +103,8 @@ void HandleJson(const std::filesystem::path& path)
 								for (auto mIter = (*g_allFormsMap)->Begin(); mIter; ++mIter) {
 									TESForm* item = mIter.Get();
 									if (item->typeID != 40) continue;
-									const auto weapon = dynamic_cast<TESObjectWEAP*>(item);
+									const auto weapon = DYNAMIC_CAST(item, TESForm, TESObjectWEAP);
+									if (!weapon) continue;
 									if (!weapon->repairItemList.listForm) continue;
 									if (IsInListRecursive(weapon->repairItemList.listForm, form)) {
 										DebugLog(FormatString("Tag: '%10s', recursive form: %8X (%s), repair list: '%8X'", tag.c_str(), formId, item->GetName(), weapon->repairItemList.listForm->refID));
@@ -269,8 +270,11 @@ void HandleJson(const std::filesystem::path& path)
 
 void JSONEntryItemRecursiveEmplace(const std::string& tag, SInt16 priority, TESForm* list, UInt8 questItem)
 {
-	if (list->typeID == 85) {
-		for (auto iter = dynamic_cast<BGSListForm*>(list)->list.Begin(); !iter.End(); ++iter)
+	if (list->typeID == 85)
+	{
+		const auto bgslist = DYNAMIC_CAST(list, TESForm, BGSListForm);
+		if (!bgslist) return;
+		for (auto iter = bgslist->list.Begin(); !iter.End(); ++iter)
 			if (iter.Get()) { JSONEntryItemRecursiveEmplace(tag, priority, iter.Get(), questItem); }
 	}
 	else {
@@ -288,13 +292,21 @@ void FillSIMapsFromJSON()
 
 	for (auto mIter = (*g_allFormsMap)->Begin(); mIter; ++mIter) {
 		TESForm* form = mIter.Get();
-		for (const auto& entry : g_SI_Items_JSON) {
+		switch (form->typeID)
+		{
+		default: continue;
+		case 24: case 25: case 26: case 29: case 30: case 31: case 40: case 41: case 46: case 47: case 49: case 96:
+		case 103: case 115: case 116: case 117: {}
+		}
+		for (const auto& entry : g_SI_Items_JSON) {			
 			if (entry.form && entry.form->refID != form->refID) continue;
 			if (entry.formType && entry.formType != form->typeID) continue;
+
 			if (entry.questItem && entry.questItem != static_cast<UInt8>(form->IsQuestItem2())) continue;
 
 			if (entry.formType == 40) {
-				const auto weapon = dynamic_cast<TESObjectWEAP*>(form);
+				const auto weapon = DYNAMIC_CAST(form, TESForm, TESObjectWEAP);
+				if (!weapon) continue;
 				if (entry.formWeapon.weaponSkill && entry.formWeapon.weaponSkill != weapon->weaponSkill) continue;
 				if (entry.formWeapon.weaponType && entry.formWeapon.weaponType != weapon->eWeaponType) continue;
 				if (entry.formWeapon.weaponHandgrip && entry.formWeapon.weaponHandgrip != weapon->HandGrip()) continue;
@@ -309,7 +321,8 @@ void FillSIMapsFromJSON()
 				if (entry.formWeapon.weaponSoundLevel && entry.formWeapon.weaponSoundLevel != weapon->soundLevel) continue;
 				if (entry.formWeapon.ammo && weapon->ammo.ammo && !IsInListRecursive(entry.formWeapon.ammo, weapon->ammo.ammo)) continue;
 			} else if (entry.formType == 24) {
-				const auto armor = dynamic_cast<TESObjectARMO*>(form);
+				const auto armor = DYNAMIC_CAST(form, TESForm, TESObjectARMO);
+				if (!armor) continue;
 				if (entry.formArmor.armorSlotsMaskWL && (entry.formArmor.armorSlotsMaskWL & armor->GetArmorValue(6)) != entry.formArmor.armorSlotsMaskWL) continue;
 				if (entry.formArmor.armorSlotsMaskWL && (entry.formArmor.armorSlotsMaskBL & armor->GetArmorValue(6)) != 0) continue;
 				if (entry.formArmor.armorClass && entry.formArmor.armorClass != armor->GetArmorValue(1)) continue;
@@ -322,7 +335,8 @@ void FillSIMapsFromJSON()
 			} else if (entry.formType == 31) {
 				if (entry.formMisc.miscComponent && !IsCraftingComponent(form)) continue;
 			} else if (entry.formType == 47) {
-				const auto aid = dynamic_cast<AlchemyItem*>(form);
+				const auto aid = DYNAMIC_CAST(form, TESForm, AlchemyItem);
+				if (!aid) continue;
 				if (entry.formAid.aidRestoresAV && !aid->HasBaseEffectRestoresAV(entry.formAid.aidRestoresAV)) continue;
 				if (entry.formAid.aidDamagesAV && !aid->HasBaseEffectDamagesAV(entry.formAid.aidDamagesAV)) continue;
 				if (entry.formAid.aidIsAddictive && !aid->IsAddictive()) continue;

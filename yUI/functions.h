@@ -24,7 +24,6 @@ void FillCraftingComponents();
 
 TESForm* GetRefFromString(char*, char*);
 bool IsInListRecursive(TESForm*, TESForm*);
-bool IsInRepairListRecursive(TESForm*, BGSListForm*);
 
 UInt8 ContWeaponHasAnyMod(ContChangesEntry*);
 float ContGetHealthPercent(ContChangesEntry*);
