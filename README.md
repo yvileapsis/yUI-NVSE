@@ -5,7 +5,7 @@
   </a>
 </p>
 
-This is a yvilemunity maintained **New Vegas Script Extender** (NVSE) UI plugin. 
+This is an yvilemunity yviletained **New Vegas Script Extender** (NVSE) UI plugin. 
 
 ## Support
 
