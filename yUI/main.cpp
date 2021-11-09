@@ -132,7 +132,7 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 
 	nvse->SetOpcodeBase(0x21D0);
 	REG_CMD_STR(ySIGetTagTrait);
-
+//	RegisterScriptCommand(SwapTexatlas);
 	
 	if (nvse->isEditor)	return true;
 
@@ -149,7 +149,7 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 
 //	CaptureLambdaVars = static_cast<_CaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaSaveVariableList));
 //	UncaptureLambdaVars = static_cast<_UncaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaUnsaveVariableList));
-	
+	handleINIOptions();
 	writePatches();
 	return true;
 }

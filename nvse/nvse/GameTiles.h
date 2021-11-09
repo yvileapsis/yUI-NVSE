@@ -282,12 +282,15 @@ public:
 
 	void				SetFloat(UInt32 id, float fltVal, bool bPropagate = true);
 	void				SetString(UInt32 id, const char* strVal, bool bPropagate = true);
+	void				SetStringRecursive(UInt32, const char*, const char*);
+
 	Menu*				GetParentMenu();
 	void				DestroyAllChildren();
 	void				PokeValue(UInt32 valueID);
 	void				FakeClick();
 
 	void				Dump(void);
+	void				HandleChange(UInt32 tilevalue) { ThisCall<void>(0xA074D0, this, tilevalue); }
 
 };
 

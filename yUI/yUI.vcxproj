@@ -410,6 +410,7 @@
     <ClCompile Include="knvse.cpp" />
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="patches.cpp" />
+    <ClCompile Include="settings.cpp" />
     <ClCompile Include="ySI.cpp" />
   </ItemGroup>
   <ItemGroup>

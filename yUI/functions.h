@@ -61,3 +61,5 @@ bool IsPlayersOtherAnimData(AnimData* animData);
 AnimData* GetThirdPersonAnimData(AnimData* animData);
 
 void PatchPause(UInt32 ptr);
+
+void SetUIStringFull(char *, char* , UInt32);

@@ -5,6 +5,8 @@
 #include <nvse\nvse\CommandTable.h>
 #include <file.h>
 
+#include "functions.h"
+
 extern std::unordered_map <TESForm*, std::string> g_SI_Items;
 extern std::unordered_map <std::string, JSONEntryTag> g_SI_Tags;
 extern bool				(*AssignString)(ParamInfo*, void*, TESObjectREFR*, TESObjectREFR*, Script*, ScriptEventList*, double*, UInt32*, const char*);
@@ -37,5 +39,23 @@ bool Cmd_ySIGetTagTrait_Execute(COMMAND_ARGS)
 		const std::string icon = g_SI_Tags[tag].filename;
 		AssignString(PASS_COMMAND_ARGS, icon.c_str());
 	}
+	return true;
+}
+
+ParamInfo kParams_TwoStrings[] =
+{
+	{"String", kParamType_String, 0},
+	{"String", kParamType_String, 0},
+};
+
+DEFINE_COMMAND_PLUGIN(SwapTexatlas, , 0, 2, kParams_TwoStrings);
+
+bool Cmd_SwapTexatlas_Execute(COMMAND_ARGS)
+{
+	*result = 0;
+	char texatlas[0x100];
+	char texatlasnew[0x100];
+	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &texatlas, &texatlasnew)) return true;
+	SetUIStringFull(texatlas, texatlasnew, kTileValue_texatlas);
 	return true;
 }

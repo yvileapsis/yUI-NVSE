@@ -603,6 +603,19 @@ void PatchPause(UInt32 ptr)
 	SafeWriteBuf(ptr, "\xEB\xFE", 2);
 }
 
+void SetUIStringFull(char* tochange, char* changeto, UInt32 tileValue)
+{
+	TileMenu::GetTileMenu(kMenuType_HUDMain)->SetStringRecursive(tileValue, changeto, tochange);
+}
+
+void Tile::SetStringRecursive(const UInt32 tileValue, const char* changeto, const char* tochange) {
+//	if (!tochange || !_strcmpi(this->GetValue(tileValue)->str, tochange))
+		this->SetString(tileValue, changeto, false);
+		this->HandleChange(tileValue);
+	for (auto iter = this->children.Head(); iter; iter = iter->next)
+		iter->data->SetStringRecursive(tileValue, changeto, tochange);
+}
+
 extern TileMenu** g_tileMenuArray;
 
 
