@@ -3,6 +3,7 @@
 #include "NiNodes.h"
 #include "GameTypes.h"
 
+class TileMenu;
 typedef UInt32 (* _TraitNameToID)(const char* traitName);
 extern const _TraitNameToID TraitNameToID;
 
@@ -23,6 +24,7 @@ class NiNode;
 class Menu;
 class NiObject;
 class RefNiObject;
+
 
 // 38+
 enum eTileValue {
@@ -275,7 +277,8 @@ public:
 	Tile*				GetComponentTile(const char * componentTile);
 	Value*				GetComponentValue(const char * componentPath);
 	char*				GetComponentFullName(char *resStr);
-	Tile*				ReadXML(const char* xmlPath);
+	__forceinline Tile* ReadXML(const char* xmlPath)	{ return ThisCall<Tile*>(0xA01B00, this, xmlPath); }
+	Tile*				InjectUIXML(const char*);
 
 	void				SetFloat(UInt32 id, float fltVal, bool bPropagate = true);
 	void				SetString(UInt32 id, const char* strVal, bool bPropagate = true);
@@ -286,7 +289,6 @@ public:
 
 	void				Dump(void);
 
-	static Tile*				GetMenuTile(const UInt32);
 };
 
 // 3C
@@ -301,6 +303,9 @@ class TileMenu : public TileRect
 {
 public:
 	Menu	* menu;	// 3C - confirmed
+
+//	static TileMenu*	GetMenuTile(const UInt32);
+	static TileMenu*	GetTileMenu(UInt32 menuID);
 };
 
 // 48

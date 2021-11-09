@@ -6,14 +6,8 @@
 #include "utility.h"
 
 #include "GameData.h"
-#include "GameRTTI.h"
-#include "SafeWrite.h"
-#include "game_types.h"
 
 #include "LambdaVariableContext.h"
-#include "nihooks.h"
-#include "NiObjects.h"
-#include "SimpleINILibrary.h"
 
 #include "functions.h"
 
@@ -31,15 +25,10 @@
 PluginHandle	g_pluginHandle = kPluginHandle_Invalid;
 
 //const CommandInfo* g_TFC;
-std::deque<std::function<void()>> g_executionQueue;
+//std::deque<std::function<void()>> g_executionQueue;
 
 _CaptureLambdaVars CaptureLambdaVars;
 _UncaptureLambdaVars UncaptureLambdaVars;
-
-void HandleDebug()
-{
-
-}
 
 void MessageHandler(NVSEMessagingInterface::Message* msg)
 {
@@ -47,55 +36,41 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	{
 		g_player = PlayerCharacter::GetSingleton();
 		g_dataHandler = DataHandler::GetSingleton();
-
-		g_HUDMainMenu = Tile::GetMenuTile(kMenuType_HUDMain);
-		g_StartMenu = Tile::GetMenuTile(kMenuType_Start);
-		g_BarterMenu = Tile::GetMenuTile(kMenuType_Barter);
-		g_ContainerMenu = Tile::GetMenuTile(kMenuType_Container);
-		g_RepairMenu = Tile::GetMenuTile(kMenuType_Repair);
-		g_RepairServicesMenu = Tile::GetMenuTile(kMenuType_RepairServices);
-		g_MapMenu = Tile::GetMenuTile(kMenuType_Map);
-		g_StatsMenu = Tile::GetMenuTile(kMenuType_Stats);
+		g_tileMenuArray = *reinterpret_cast<TileMenu***>(0x11F350C);
+		
 		g_allFormsMap = reinterpret_cast<NiTPointerMap<TESForm>**>(0x11C54C0);
+
 		FillCraftingComponents();
 		PrintAndClearQueuedConsoleMessages();
 
 		if (g_ySI) LoadSIMapsFromFiles();
 
 //		LoadFileAnimPaths();
+
 		Console_Print("yUI %.2f", yUI_VERSION);
 	}
 	else if (msg->type == NVSEMessagingInterface::kMessage_MainGameLoop)
 	{
 		const auto isMenuMode = CdeclCall<bool>(0x702360);
-		if (!isMenuMode)
-		{
-
-#if _DEBUG
-			HandleDebug();
-#endif
-		}
-
 		if (iDoOnce == 0) {
 			if (!isMenuMode) {
+
 				iDoOnce++;
 
-//				ySIFillIconMap();
+				g_HUDMainMenu = TileMenu::GetTileMenu(kMenuType_HUDMain);
+				g_StartMenu = TileMenu::GetTileMenu(kMenuType_Start);
+				g_RepairMenu = TileMenu::GetTileMenu(kMenuType_Repair);
+				g_MapMenu = TileMenu::GetTileMenu(kMenuType_Map);
+				g_StatsMenu = TileMenu::GetTileMenu(kMenuType_Stats);
+				g_InventoryMenu = TileMenu::GetTileMenu(kMenuType_Inventory);
 
-//				if (g_ySI) ySIFillTagMapAlt();
+				if (g_ySI) InjectTemplates();
 			}
 		}
 		
 	}
 	else if (msg->type == NVSEMessagingInterface::kMessage_PostLoadGame)
 	{
-//		for (auto* ctx : g_clearSounds)
-//		{
-//			ctx->soundPaths->items.clear();
-//		}
-//		g_clearSounds.clear();
-//		g_partialLoopReloadState = PartialLoopingReloadState::NotSet;
-//		g_reloadTracker.clear();
 	}
 
 }
@@ -175,8 +150,6 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 //	CaptureLambdaVars = static_cast<_CaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaSaveVariableList));
 //	UncaptureLambdaVars = static_cast<_UncaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaUnsaveVariableList));
 	
-//	ApplyHooks();
-//	ApplyNiHooks();
 	writePatches();
 	return true;
 }

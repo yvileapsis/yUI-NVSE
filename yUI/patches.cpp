@@ -8,39 +8,14 @@
 
 void patchRemoveTagsAddIcons()
 {
-	WriteRelJump(0x71A3D5, UInt32(Tile__SetStringValueInjectIconHook));
-	WriteRelJump(0x782516, UInt32(InventoryMenuSortingHook));
-	WriteRelJump(0x72F0ED, UInt32(BarterContainerMenuSortingHook));
-	WriteRelJump(0x75D138, UInt32(BarterContainerMenuSortingHook));
+	WriteRelJump(0x71A3D5, reinterpret_cast<UInt32>(TileSetStringValueInjectIconHook));
+	WriteRelJump(0x782516, reinterpret_cast<UInt32>(InventoryMenuSortingHook));
+	WriteRelJump(0x72F0ED, reinterpret_cast<UInt32>(BarterContainerMenuSortingHook));
+	WriteRelJump(0x75D138, reinterpret_cast<UInt32>(BarterContainerMenuSortingHook));
 
-	WriteRelJump(0x70189E, UInt32(Tile__SetStringValueHotkeyHook));
-	WriteRelJump(0x7814FA, UInt32(Tile__SetStringValueHotkeyHook2));
-
+	WriteRelJump(0x70189E, reinterpret_cast<UInt32>(TileSetStringValueHotkeyHook));
+	WriteRelJump(0x7814FA, reinterpret_cast<UInt32>(TileSetStringValueHotkeyHook2));
 }
-
-/*void patchRemoveTagsHotkey()
-{
-	WriteRelCall(0x77DD63, UInt32(Tile__SetStringValueRemoveTag)); // HUDMainMenu Hotkey
-	WriteRelCall(0x77E06C, UInt32(Tile__SetStringValueRemoveTag));
-
-	WriteRelCall(0x70191F, UInt32(Tile__SetStringValueRemoveTag)); // PipBoy Hotkey
-	WriteRelCall(0x70195B, UInt32(Tile__SetStringValueRemoveTag));
-}
-
-void patchRemoveTagsHUDMain()
-{
-	// not unsafe but I dislike it
-	WriteRelCall(0x777231, UInt32(Tile__SetStringValueRemoveTag)); // Pick Up Prompt
-	WriteRelCall(0x776F76, UInt32(strcpy_s_Alt));
-}*/
-
-//	00769802
-
-	//	WriteRelCall(0x71A3D5, UInt32(Tile__SetStringValueInjectTile)); // Tile Creation
-	//	WriteRelCall(0x75D21E, UInt32(Tile__SetStringValueRemoveTag)); // Container
-	//	WriteRelJump(0x72F37F, UInt32(PostJazzHookBarter)); // Barter
-	//	WriteRelJump(0x7828F8, UInt32(PostJazzHookInventory)); // Inventory
-	//	WriteRelCall(0x72A9B5, UInt32(Tile__SetStringValueRemoveTag)); // Recipes
 
 void patch1080pUI()
 {

@@ -33,15 +33,16 @@ DataHandler*		g_dataHandler = nullptr;
 
 const char*			(*GetStringVar)(UInt32);
 void				(*SetStringVar)(UInt32, const char*);
-inline bool				(*AssignString)(ParamInfo*, void*, TESObjectREFR*, TESObjectREFR*, Script*, ScriptEventList*, double*, UInt32*, const char*);
+inline bool			(*AssignString)(ParamInfo*, void*, TESObjectREFR*, TESObjectREFR*, Script*, ScriptEventList*, double*, UInt32*, const char*);
 
 int iDoOnce = 0;
 
-Tile* g_HUDMainMenu, * g_StartMenu, * g_BarterMenu, * g_ContainerMenu, * g_RepairMenu, * g_RepairServicesMenu, * g_MapMenu, * g_StatsMenu;
+inline TileMenu* g_HUDMainMenu, * g_StartMenu, * g_BarterMenu, * g_ContainerMenu, * g_RepairMenu, * g_RepairServicesMenu, * g_MapMenu, * g_StatsMenu, * g_InventoryMenu;
 
 tList<char> queuedConsoleMessages;
 
 inline NiTPointerMap<TESForm>** g_allFormsMap;
+inline TileMenu** g_tileMenuArray;
 
 inline std::vector<JSONEntryItem> g_SI_Items_JSON;
 inline std::vector<JSONEntryTag> g_SI_Tags_JSON;

@@ -5,6 +5,8 @@
 #include "GameForms.h"
 #include <vector>
 
+#include "containers.h"
+
 /*    Class							     vtbl	  Type  Size
  *   ----------------------------		------		--  --
  *	ExtraAction                        ????????		0E	14

@@ -210,4 +210,3 @@ __declspec(naked) float Tile::GetValueFloat(UInt32 id)
 {
 	static const UInt32 procAddr = kAddr_TileGetFloat;
 	__asm	jmp		procAddr
-}

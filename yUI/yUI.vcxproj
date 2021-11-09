@@ -411,7 +411,6 @@
     <ClCompile Include="knvse.cpp" />
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="patches.cpp" />
-    <ClCompile Include="utility_knvse.cpp" />
     <ClCompile Include="ySI.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -456,7 +455,6 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="SimpleINILibrary.h" />
     <ClInclude Include="stack_allocator.h" />
-    <ClInclude Include="utility.h" />
     <ClInclude Include="ySI.h" />
   </ItemGroup>
   <ItemGroup>

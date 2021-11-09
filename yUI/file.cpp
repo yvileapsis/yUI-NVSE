@@ -18,7 +18,7 @@ extern std::unordered_map <std::string, JSONEntryTag> g_SI_Tags;
 
 void LogForm(const TESForm* form)
 {
-	Log(FormatString("Detected in-game form %X %s", form->refID, form->GetName()));
+	DebugLog(FormatString("Detected in-game form %X %s", form->refID, form->GetName()));
 	//, form->GetFullName() ? form->GetFullName()->name.CStr() : "<no name>")
 }
 
@@ -95,7 +95,7 @@ void HandleJson(const std::filesystem::path& path)
 							auto* form = LookupFormByID(formId);
 							if (!form) { DebugPrint(FormatString("Form %X was not found", formId)); continue; }
 							if (!formlist) {
-								Log(FormatString("Tag: '%10s', individual form: %8X (%s)", tag.c_str(), formId, form->GetName()));
+								DebugLog(FormatString("Tag: '%10s', individual form: %8X (%s)", tag.c_str(), formId, form->GetName()));
 								g_SI_Items_JSON.emplace_back(tag, priority, form, questItem);
 							} else if (formlist == 1) {
 								JSONEntryItemRecursiveEmplace(tag, priority, form, questItem);
@@ -106,7 +106,7 @@ void HandleJson(const std::filesystem::path& path)
 									const auto weapon = dynamic_cast<TESObjectWEAP*>(item);
 									if (!weapon->repairItemList.listForm) continue;
 									if (IsInListRecursive(weapon->repairItemList.listForm, form)) {
-										Log(FormatString("Tag: '%10s', recursive form: %8X (%s), repair list: '%8X'", tag.c_str(), formId, item->GetName(), weapon->repairItemList.listForm->refID));
+										DebugLog(FormatString("Tag: '%10s', recursive form: %8X (%s), repair list: '%8X'", tag.c_str(), formId, item->GetName(), weapon->repairItemList.listForm->refID));
 										g_SI_Items_JSON.emplace_back(tag, priority, item, questItem);
 									}
 								}
@@ -114,7 +114,7 @@ void HandleJson(const std::filesystem::path& path)
 						}
 					}
 					else {
-						Log(FormatString("Tag: '%10s', mod: '%s'", tag.c_str(), modName.c_str()));
+						DebugLog(FormatString("Tag: '%10s', mod: '%s'", tag.c_str(), modName.c_str()));
 						g_SI_Items_JSON.emplace_back(tag, priority, nullptr, questItem);
 					}
 				}
@@ -158,11 +158,11 @@ void HandleJson(const std::filesystem::path& path)
 						for (auto weaponType : weaponTypes)
 						{
 							weapon.weaponType = weaponType;
-							Log(FormatString("Tag: '%10s', weapon condition, type: %d", tag.c_str(), weaponType));
+							DebugLog(FormatString("Tag: '%10s', weapon condition, type: %d", tag.c_str(), weaponType));
 							g_SI_Items_JSON.emplace_back(tag, priority, formType, questItem, weapon);
 						}
 					} else {
-						Log(FormatString("Tag: '%10s', weapon condition", tag.c_str()));
+						DebugLog(FormatString("Tag: '%10s', weapon condition", tag.c_str()));
 						g_SI_Items_JSON.emplace_back(tag, priority, formType, questItem, weapon);
 					}
 				}
@@ -253,7 +253,7 @@ void HandleJson(const std::filesystem::path& path)
 				SInt64 systemcolor = 0;
 				if (elem.contains("systemcolor")) priority = elem["systemcolor"].get<SInt32>();
 				
-				Log(FormatString("Tag: '%10s', icon: '%s'",  tag.c_str(), filename.c_str()));
+				DebugLog(FormatString("Tag: '%10s', icon: '%s'",  tag.c_str(), filename.c_str()));
 				g_SI_Tags_JSON.emplace_back(tag, priority, xmltemplate, filename, texatlas, systemcolor);
 			}
 		}
@@ -274,7 +274,7 @@ void JSONEntryItemRecursiveEmplace(const std::string& tag, SInt16 priority, TESF
 			if (iter.Get()) { JSONEntryItemRecursiveEmplace(tag, priority, iter.Get(), questItem); }
 	}
 	else {
-		Log(FormatString("Tag: '%10s', recursive form: %8X (%s)", tag.c_str(), list->refID, list->GetName()));
+		DebugLog(FormatString("Tag: '%10s', recursive form: %8X (%s)", tag.c_str(), list->refID, list->GetName()));
 		g_SI_Items_JSON.emplace_back(tag, priority, list, questItem);
 	}
 }
@@ -291,20 +291,20 @@ void FillSIMapsFromJSON()
 		for (const auto& entry : g_SI_Items_JSON) {
 			if (entry.form && entry.form->refID != form->refID) continue;
 			if (entry.formType && entry.formType != form->typeID) continue;
-			if (entry.questItem && entry.questItem != form->IsQuestItem2()) continue;
+			if (entry.questItem && entry.questItem != static_cast<UInt8>(form->IsQuestItem2())) continue;
 
 			if (entry.formType == 40) {
 				const auto weapon = dynamic_cast<TESObjectWEAP*>(form);
 				if (entry.formWeapon.weaponSkill && entry.formWeapon.weaponSkill != weapon->weaponSkill) continue;
 				if (entry.formWeapon.weaponType && entry.formWeapon.weaponType != weapon->eWeaponType) continue;
-				if (entry.formWeapon.weaponHandgrip && entry.formWeapon.weaponHandgrip != weapon->handGrip) continue;
-				if (entry.formWeapon.weaponAttackAnim && entry.formWeapon.weaponAttackAnim != weapon->attackAnim) continue;
+				if (entry.formWeapon.weaponHandgrip && entry.formWeapon.weaponHandgrip != weapon->HandGrip()) continue;
+				if (entry.formWeapon.weaponAttackAnim && entry.formWeapon.weaponAttackAnim != weapon->AttackAnimation()) continue;
 				if (entry.formWeapon.weaponReloadAnim && entry.formWeapon.weaponReloadAnim != weapon->reloadAnim) continue;
 				if (entry.formWeapon.weaponType && entry.formWeapon.weaponType != weapon->eWeaponType) continue;
-				if (entry.formWeapon.weaponIsAutomatic && entry.formWeapon.weaponIsAutomatic != weapon->IsAutomatic()) continue;
-				if (entry.formWeapon.weaponHasScope && entry.formWeapon.weaponHasScope != weapon->HasScopeAlt()) continue;
-				if (entry.formWeapon.weaponIgnoresDTDR && entry.formWeapon.weaponIgnoresDTDR != weapon->IgnoresDTDR()) continue;
-				if (entry.formWeapon.weaponClipRounds && entry.formWeapon.weaponClipRounds > weapon->GetClipRounds(false)) continue;
+				if (entry.formWeapon.weaponIsAutomatic && entry.formWeapon.weaponIsAutomatic != static_cast<UInt32>(weapon->IsAutomatic())) continue;
+				if (entry.formWeapon.weaponHasScope && entry.formWeapon.weaponHasScope != static_cast<UInt32>(weapon->HasScopeAlt())) continue;
+				if (entry.formWeapon.weaponIgnoresDTDR && entry.formWeapon.weaponIgnoresDTDR != static_cast<UInt32>(weapon->IgnoresDTDR())) continue;
+				if (entry.formWeapon.weaponClipRounds && entry.formWeapon.weaponClipRounds > static_cast<UInt32>(weapon->GetClipRounds(false))) continue;
 				if (entry.formWeapon.weaponNumProjectiles && entry.formWeapon.weaponNumProjectiles > weapon->numProjectiles) continue;
 				if (entry.formWeapon.weaponSoundLevel && entry.formWeapon.weaponSoundLevel != weapon->soundLevel) continue;
 				if (entry.formWeapon.ammo && weapon->ammo.ammo && !IsInListRecursive(entry.formWeapon.ammo, weapon->ammo.ammo)) continue;
@@ -398,191 +398,5 @@ void LoadSIMapsFromFiles()
 	FillSIMapsFromJSON();
 	const auto now = std::chrono::system_clock::now();
 	const auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - then);
-	DebugPrint(FormatString("Loaded AnimGroupOverride in %d ms", diff.count()));
+	DebugPrint(FormatString("Loaded tags and icons in %d ms", diff.count()));
 }
-
-
-/*				Script* condition = nullptr;
-				auto pollCondition = false;
-				if (elem.contains("condition"))
-				{
-					const auto& condStr = elem["condition"].get<std::string>();
-					condition = CompileConditionScript(condStr, folder);
-					if (condition)
-						Log("Compiled condition script " + condStr + " successfully");
-					if (elem.contains("pollCondition"))
-						pollCondition = elem["pollCondition"].get<bool>();
-				}*/
-
-				/*
-				struct JSONAnimContext
-				{
-					Script* script;
-					bool pollCondition;
-
-					void Reset()
-					{
-						memset(this, 0, sizeof JSONAnimContext);
-					}
-
-					JSONAnimContext() { Reset(); }
-				};
-
-				JSONAnimContext g_jsonContext;*/
-
-				/*
-				template <typename T>
-				void LoadPathsForType(const std::filesystem::path& dirPath, const T identifier, bool firstPerson)
-				{
-					std::unordered_set<UInt16> variantIds;
-					for (std::filesystem::recursive_directory_iterator iter(dirPath), end; iter != end; ++iter)
-					{
-						if (_stricmp(iter->path().extension().string().c_str(), ".kf") != 0)
-							continue;
-						const auto& path = iter->path().string();
-						const auto& relPath = std::filesystem::path(path.substr(path.find("AnimGroupOverride\\")));
-						Log("Loading animation path " + dirPath.string() + "...");
-						try
-						{
-				//			if constexpr (std::is_same<T, nullptr_t>::value)
-				//				OverrideFormAnimation(nullptr, relPath, firstPerson, true, variantIds);
-				//			else if constexpr (std::is_same_v<T, const TESObjectWEAP*> || std::is_same_v<T, const Actor*> || std::is_same_v<T, const TESRace*> || std::is_same_v<T, const TESForm*>)
-				//				OverrideFormAnimation(identifier, relPath, firstPerson, true, variantIds);
-				//			else if constexpr (std::is_same_v<T, UInt8>)
-				//				OverrideModIndexAnimation(identifier, relPath, firstPerson, true, variantIds, nullptr, false);
-				//			else
-				//				static_assert(false);
-						}
-						catch (std::exception& e)
-						{
-							DebugPrint(FormatString("AnimGroupOverride Error: %s", e.what()));
-						}
-					}
-				}
-
-
-				template <typename T>
-				void LoadPathsForPOV(const std::filesystem::path& path, const T identifier)
-				{
-					for (const auto& pair : { std::make_pair("\\_male", false), std::make_pair("\\_1stperson", true) })
-					{
-						auto iterPath = path.string() + std::string(pair.first);
-						if (std::filesystem::exists(iterPath))
-							LoadPathsForType(iterPath, identifier, pair.second);
-					}
-				}
-
-				void LoadPathsForList(const std::filesystem::path& path, const BGSListForm* listForm);
-
-				bool LoadForForm(const std::filesystem::path& iterPath, const TESForm* form)
-				{
-					LogForm(form);
-					if (const auto* weapon = DYNAMIC_CAST(form, TESForm, TESObjectWEAP))
-						LoadPathsForPOV(iterPath, weapon);
-					else if (const auto* actor = DYNAMIC_CAST(form, TESForm, Actor))
-						LoadPathsForPOV(iterPath, actor);
-					else if (const auto* list = DYNAMIC_CAST(form, TESForm, BGSListForm))
-						LoadPathsForList(iterPath, list);
-					else if (const auto* race = DYNAMIC_CAST(form, TESForm, TESRace))
-						LoadPathsForPOV(iterPath, race);
-					else
-						LoadPathsForPOV(iterPath, form);
-					return true;
-				}
-
-				void LoadPathsForList(const std::filesystem::path& path, const BGSListForm* listForm)
-				{
-					for (auto iter = listForm->list.Begin(); !iter.End(); ++iter)
-					{
-						LogForm(*iter);
-						LoadForForm(path, *iter);
-					}
-				}
-
-				void LoadModAnimPaths(const std::filesystem::path& path, const ModInfo* mod)
-				{
-					LoadPathsForPOV<const UInt8>(path, mod->modIndex);
-					for (std::filesystem::directory_iterator iter(path), end; iter != end; ++iter)
-					{
-						const auto& iterPath = iter->path();
-						Log("Loading form ID " + iterPath.string());
-						if (iter->is_directory())
-						{
-							try
-							{
-								const auto& folderName = iterPath.filename().string();
-								if (folderName[0] == '_') // _1stperson, _male
-									continue;
-								const auto id = HexStringToInt(folderName);
-								if (id != -1)
-								{
-									const auto formId = (id & 0x00FFFFFF) + (mod->modIndex << 24);
-									auto* form = LookupFormByID(formId);
-									if (form)
-									{
-										LoadForForm(iterPath, form);
-									}
-									else
-									{
-										DebugPrint(FormatString("Form %X not found!", formId));
-									}
-								}
-								else
-								{
-									DebugPrint("Failed to convert " + folderName + " to a form ID");
-								}
-							}
-							catch (std::exception&) {}
-						}
-						else
-						{
-							DebugPrint("Skipping as path is not a directory...");
-						}
-					}
-				}
-				*/
-
-				// std::unordered_map<std::string, std::filesystem::path> g_jsonFolders;
-				/*
-				Script* CompileConditionScript(const std::string& condString, const std::string& folderName)
-				{
-					ScriptBuffer buffer;
-					DataHandler::GetSingleton()->DisableAssignFormIDs(true);
-					auto condition = MakeUnique<Script, 0x5AA0F0, 0x5AA1A0>();
-					DataHandler::GetSingleton()->DisableAssignFormIDs(false);
-					std::string scriptSource;
-					if (!FindStringCI(condString, "SetFunctionValue"))
-						scriptSource = FormatString("begin function{}\nSetFunctionValue (%s)\nend\n", condString.c_str());
-					else
-					{
-						auto condStr = ReplaceAll(condString, "%r", "\r\n");
-						condStr = ReplaceAll(condStr, "%R", "\r\n");
-						scriptSource = FormatString("begin function{}\n%s\nend\n", condStr.c_str());
-					}
-					buffer.scriptName.Set(("yUIConditionScript_" + folderName).c_str());
-					buffer.scriptText = scriptSource.data();
-					buffer.partialScript = true;
-					*buffer.scriptData = 0x1D;
-					buffer.dataOffset = 4;
-					buffer.currentScript = condition.get();
-					auto* ctx = ConsoleManager::GetSingleton()->scriptContext;
-					const auto patchEndOfLineCheck = [&](bool bDisableCheck)
-					{
-						// remove this when xNVSE 6.1.10/6.2 releases
-						if (bDisableCheck)
-							SafeWrite8(0x5B3A8D, 0xEB);
-						else
-							SafeWrite8(0x5B3A8D, 0x73);
-					};
-					patchEndOfLineCheck(true);
-					auto result = ThisStdCall<bool>(0x5AEB90, ctx, condition.get(), &buffer);
-					patchEndOfLineCheck(false);
-					buffer.scriptText = nullptr;
-					condition->text = nullptr;
-					if (!result)
-					{
-						DebugPrint("Failed to compile condition script " + condString);
-						return nullptr;
-					}
-					return condition.release();
-				}*/

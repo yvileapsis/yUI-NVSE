@@ -8,14 +8,14 @@ int* (__thiscall* Tile_A01000)(Tile*, enum TileValues) = (int* (__thiscall*)(Til
 void(__thiscall* TileValueSetString)(int*, char*, char) = (void(__thiscall*)(int*, char*, char))0xA0A300;
 //void(__thiscall* Tile__SetStringValue)(Tile*, enum TileValues, const char*, char) = (void(__thiscall*)(Tile*, enum TileValues, const char*, char))0xA01350;
 //void(__thiscall* Tile__SetFloatValue)(Tile*, enum TileValues, float, char) = (void(__thiscall*)(Tile*, enum TileValues, float, char))0xA012D0;
-Tile* (__cdecl* Tile__GetMenuTile)(UInt32 id) = reinterpret_cast<Tile * (*)(UInt32)>(0xA09030);
+//TileMenu* (__cdecl* Tile__GetMenuTile)(UInt32 id) = reinterpret_cast<TileMenu * (*)(UInt32)>(0xA09030);
 Menu* (__thiscall* TileList__GetMenu)(Tile*) = reinterpret_cast<Menu * (__thiscall*)(Tile*)>(0xA03C90);
 void(__thiscall* Menu__RegisterTile)(Menu*, Tile*, bool) = reinterpret_cast<void(__thiscall*)(Menu*, Tile*, bool)>(0xA1DC70);
 void(__thiscall* Menu__HideTitle)(Menu*, bool) = reinterpret_cast<void(__thiscall*)(Menu*, bool)>(0xA1DC20);
 void(__cdecl* HUDMainMenu_UpdateVisibilityState)(signed int) = reinterpret_cast<void(*)(int)>(0x771700);
 void(__cdecl* MenuButton_Downloads)() = reinterpret_cast<void(*)()>(0x7D0550);
 
-Tile* Tile::GetMenuTile(const UInt32 var) { return Tile__GetMenuTile(var); }
+extern  TileMenu** g_tileMenuArray;
 
 void MenuButton_DownloadsClick() { MenuButton_Downloads(); }
 
@@ -190,8 +190,11 @@ bool IsInStartMenu()
 }
 
 
-/* RefreshItemsList calls itemsList->FreeAllTiles() and then allocates the memory for all the tiles again
-   instead skip the calls that free/allocate */
+/*
+ * Lifted from Stewie's Tweaks
+ * RefreshItemsList calls itemsList->FreeAllTiles() and then allocates the memory for all the tiles again
+ * instead skip the calls that free/allocate
+ */
 void QuickRefreshItemList()
 {
 	SafeWriteBuf(0x78319C, "\xE8\x2F\xCE\xFF\xFF\xEB\x70", 7); // InventoryMenu, call SaveCurrentTabScrollPosition and skip reallocating tiles
@@ -273,3 +276,49 @@ FontTextReplaced::~FontTextReplaced()
 }
 
 void FontTextReplaced::GetVariableEscapedText(const char* input) { Font__CheckForVariablesInText(FontManager::GetSingleton()->fontInfos[0], input, this); }
+
+/*
+ * Lifted from JIP LN
+ */
+__declspec(naked) UInt32 InterfaceManager::GetTopVisibleMenuID()
+{
+	__asm
+	{
+		cmp		byte ptr[ecx + 0xC], 2
+		jb		retn0
+		mov		eax, [ecx + 0xD0]
+		add		ecx, 0x114
+		test	eax, eax
+		jz		stackIter
+		mov		eax, [eax + 0x20]
+		retn
+		ALIGN 16
+	stackIter:
+		add		ecx, 4
+		cmp[ecx], 0
+		jnz		stackIter
+		mov		eax, [ecx - 4]
+		cmp		eax, 1
+		jnz		done
+		mov		ecx, 0x11F3479
+		mov		eax, 0x3EA
+		cmp[ecx], 0
+		jnz		done
+		mov		al, 0xFF
+		cmp[ecx + 0x15], 0
+		jnz		done
+		mov		al, 0xEB
+		cmp[ecx + 1], 0
+		jnz		done
+		mov		eax, 0x40B
+		cmp[ecx + 0x21], 0
+		jnz		done
+		mov		al, 0x25
+		cmp[ecx + 0x3B], 0
+		jnz		done
+	retn0 :
+		xor eax, eax
+	done :
+		retn
+	}
+}

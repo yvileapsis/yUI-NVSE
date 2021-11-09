@@ -5,6 +5,17 @@
 extern std::unordered_map <TESForm*, std::string> g_SI_Items;
 extern std::unordered_map <std::string, JSONEntryTag> g_SI_Tags;
 
+extern TileMenu* g_InventoryMenu;
+
+
+void InjectTemplates()
+{
+	g_HUDMainMenu->InjectUIXML("data/menus/ySI/ySI.xml");
+	g_StartMenu->InjectUIXML("data/menus/ySI/ySI.xml");
+	g_RepairMenu->InjectUIXML("data/menus/ySI/ySI.xml");
+	g_InventoryMenu->InjectUIXML("data/menus/ySI/ySI.xml");
+}
+
 
 void __fastcall SetStringValueInjectTile(Tile* tile, ContChangesEntry* entry, enum TileValues tilevalue, char* src, char propagate)
 {
@@ -25,8 +36,16 @@ void __fastcall SetStringValueInjectTile(Tile* tile, ContChangesEntry* entry, en
 
 	if (!&g_SI_Tags[tag]) { return; }
 
-	if (!dynamic_cast<TileMenu*>(menu)->menu->GetTemplateExists(g_SI_Tags[tag].xmltemplate.c_str())) { return; }
+	if (!dynamic_cast<TileMenu*>(menu)->menu->GetTemplateExists(g_SI_Tags[tag].xmltemplate.c_str()))
+	{
+		if (menu == TileMenu::GetTileMenu(kMenuType_Barter)) menu->InjectUIXML("data/menus/ySI/ySI.xml");
+		if (menu == TileMenu::GetTileMenu(kMenuType_Container)) menu->InjectUIXML("data/menus/ySI/ySI.xml");
+		if (menu == TileMenu::GetTileMenu(kMenuType_RepairServices)) menu->InjectUIXML("data/menus/ySI/ySI.xml");
+	}
 
+	if (!dynamic_cast<TileMenu*>(menu)->menu->GetTemplateExists(g_SI_Tags[tag].xmltemplate.c_str())) return;
+
+	
 	Tile* text = tile->GetChild("ListItemText");
 
 	if (!text) return;
@@ -37,8 +56,12 @@ void __fastcall SetStringValueInjectTile(Tile* tile, ContChangesEntry* entry, en
 
 	if (!g_SI_Tags[tag].filename.empty()) icon->SetString(kTileValue_filename, g_SI_Tags[tag].filename.c_str(), propagate);
 	if (!g_SI_Tags[tag].texatlas.empty()) icon->SetString(kTileValue_texatlas, g_SI_Tags[tag].texatlas.c_str(), propagate);
-	if (!g_SI_Tags[tag].systemcolor) icon->SetFloat(kTileValue_systemcolor, g_SI_Tags[tag].systemcolor, propagate);
-
+	if (!g_SI_Tags[tag].systemcolor) {
+		icon->SetFloat(kTileValue_systemcolor, menu->GetValueFloat(kTileValue_systemcolor));
+	} else {
+		icon->SetFloat(kTileValue_systemcolor, g_SI_Tags[tag].systemcolor, propagate);
+	}
+	
 	float x = text->GetValueFloat(kTileValue_x);
 
 	if (icon->GetValue(kTileValue_user0)) x += icon->GetValueFloat(kTileValue_user0);
@@ -56,7 +79,7 @@ void __fastcall SetStringValueInjectTile(Tile* tile, ContChangesEntry* entry, en
 }
 
 
-__declspec(naked) void Tile__SetStringValueInjectIconHook() {
+__declspec(naked) void TileSetStringValueInjectIconHook() {
 	static const auto SetStringValue = reinterpret_cast<UInt32>(SetStringValueInjectTile);
 	static const UInt32 retnAddr = 0x71A3DA;
 	__asm
@@ -166,7 +189,7 @@ void __fastcall SetStringValueTagRose(Tile* tile, ContChangesEntry* entry, enum 
 	tile->SetString(tilevalue, g_SI_Tags[tag].filename.c_str(), propagate);
 }
 
-__declspec(naked) void Tile__SetStringValueHotkeyHook() {
+__declspec(naked) void TileSetStringValueHotkeyHook() {
 	static const auto SetStringValue = reinterpret_cast<UInt32>(SetStringValueTagImage);
 	static const UInt32 retnAddr = 0x7018A3;
 	__asm
@@ -177,7 +200,7 @@ __declspec(naked) void Tile__SetStringValueHotkeyHook() {
 	}
 }
 
-__declspec(naked) void Tile__SetStringValueHotkeyHook2() {
+__declspec(naked) void TileSetStringValueHotkeyHook2() {
 	static const auto SetStringValue = reinterpret_cast<UInt32>(SetStringValueTagRose);
 	static const UInt32 retnAddr = 0x7814FF;
 	static const UInt32 g_inventoryMenuSelection = 0x011D9EA8;

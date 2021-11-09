@@ -543,3 +543,76 @@ bool IsCraftingComponent(TESForm* form)
 {
 	return (g_CraftingComponents.find(form) != g_CraftingComponents.end());
 }
+
+bool FindStringCI(const std::string& strHaystack, const std::string& strNeedle)
+{
+	const auto it = ra::search(strHaystack, strNeedle, [](char ch1, char ch2) { return std::toupper(ch1) == std::toupper(ch2); }).begin();
+	return it != strHaystack.end();
+}
+
+void Log(const std::string& msg)
+{
+	_MESSAGE("%s", msg.c_str());
+	if (g_logLevel == 2)
+		Console_Print("kNVSE: %s", msg.c_str());
+}
+
+void DebugLog(const std::string& msg)
+{
+#if _DEBUG
+	_MESSAGE("%s", msg.c_str());
+	if (g_logLevel == 2)
+		Console_Print("kNVSE: %s", msg.c_str());
+#endif
+}
+
+int HexStringToInt(const std::string& str)
+{
+	char* p;
+	const auto id = strtoul(str.c_str(), &p, 16);
+	if (*p == 0)
+		return id;
+	return -1;
+}
+
+void DebugPrint(const std::string& str)
+{
+	if (g_logLevel == 1)
+		Console_Print("kNVSE: %s", str.c_str());
+	Log(str);
+}
+
+bool IsPlayersOtherAnimData(AnimData* animData)
+{
+	if (g_thePlayer->IsThirdPerson() && animData == g_thePlayer->firstPersonAnimData)
+		return true;
+	if (!g_thePlayer->IsThirdPerson() && animData == g_thePlayer->baseProcess->GetAnimData())
+		return true;
+	return false;
+}
+
+AnimData* GetThirdPersonAnimData(AnimData* animData)
+{
+	if (animData == g_thePlayer->firstPersonAnimData)
+		return g_thePlayer->baseProcess->GetAnimData();
+	return animData;
+}
+
+void PatchPause(UInt32 ptr)
+{
+	SafeWriteBuf(ptr, "\xEB\xFE", 2);
+}
+
+extern TileMenu** g_tileMenuArray;
+
+
+TileMenu* TileMenu::GetTileMenu(UInt32 menuID)
+{
+	return menuID ? g_tileMenuArray[menuID - kMenuType_Min] : nullptr;
+}
+
+
+Tile* Tile::InjectUIXML(const char* str)
+{
+	return this ? this->ReadXML(str) : nullptr;
+}

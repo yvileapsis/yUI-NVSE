@@ -456,3 +456,55 @@ void SpinLock::Leave()
 	if (owningThread && !--enterCount)
 		owningThread = 0;
 }
+
+
+std::string GetCurPath()
+{
+	char buffer[MAX_PATH] = { 0 };
+	GetModuleFileName(NULL, buffer, MAX_PATH);
+	std::string::size_type pos = std::string(buffer).find_last_of("\\/");
+	return std::string(buffer).substr(0, pos);
+}
+
+bool ends_with(std::string const& value, std::string const& ending)
+{
+	if (ending.size() > value.size()) return false;
+	return std::equal(ending.rbegin(), ending.rend(), value.rbegin());
+}
+
+std::string ReplaceAll(std::string str, const std::string& from, const std::string& to) {
+	size_t start_pos = 0;
+	while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+		str.replace(start_pos, from.length(), to);
+		start_pos += to.length(); // Handles case where 'to' is a substring of 'from'
+	}
+	return str;
+}
+
+/// Try to find in the Haystack the Needle - ignore case
+
+std::string& ToLower(std::string&& data)
+{
+	ra::transform(data, data.begin(), [](const unsigned char c) { return std::tolower(c); });
+	return data;
+}
+
+std::string& StripSpace(std::string&& data)
+{
+	std::erase_if(data, isspace);
+	return data;
+}
+
+bool StartsWith(const char* string, const char* prefix)
+{
+	size_t count = 0;
+	while (*prefix)
+	{
+		if (tolower(*prefix++) != tolower(*string++))
+			return false;
+		++count;
+	}
+	if (!count)
+		return false;
+	return true;
+}
