@@ -4,6 +4,8 @@
 int g_ySI = 1;
 int g_yCM = 0;
 
+int g_ySI_Sort = 1;
+
 /* plugins */
 /*
 extern HMODULE yUIHandle;

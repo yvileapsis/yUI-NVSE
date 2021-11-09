@@ -2,6 +2,9 @@
 
 #include "functions.h"
 
+extern int g_ySI;
+extern int g_ySI_Sort;
+
 extern std::unordered_map <TESForm*, std::string> g_SI_Items;
 extern std::unordered_map <std::string, JSONEntryTag> g_SI_Tags;
 
@@ -99,18 +102,20 @@ signed int __fastcall CompareItemsWithTags(ContChangesEntry* a2, ContChangesEntr
 
 	signed int cmp;
 
-	if (g_SI_Items[form1].empty()) {
-		if (!g_SI_Items[form2].empty()) { return 1; }
+	if (g_ySI_Sort) {
+		if (g_SI_Items[form1].empty()) {
+			if (!g_SI_Items[form2].empty()) { return 1; }
+		}
+		else if (g_SI_Items[form2].empty()) {
+			return -1;
+		}
+		else {
+			cmp = g_SI_Items[form1].compare(g_SI_Items[form2]);
+			if (cmp > 0) return 1;
+			if (cmp < 0) return -1;
+		}
 	}
-	else if (g_SI_Items[form2].empty()) {
-		return -1;
-	}
-	else {
-		cmp = g_SI_Items[form1].compare(g_SI_Items[form2]);
-		if (cmp > 0) return 1;
-		if (cmp < 0) return -1;
-	}
-
+	
 	cmp = std::string(form1->GetTheName()).compare(std::string(form2->GetTheName()));
 	if (cmp > 0) return 1;
 	if (cmp < 0) return -1;
