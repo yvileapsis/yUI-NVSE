@@ -62,3 +62,6 @@ AnimData* GetThirdPersonAnimData(AnimData* animData);
 void PatchPause(UInt32 ptr);
 
 void SetUIStringFull(char *, char* , UInt32);
+
+void __fastcall TileSetStringValueCursor(Tile* tile, void* dummyEDX, enum TileValues tilevalue, char* src, char propagate);
+void __fastcall TileSetIntValueCursor(Tile* tile, void* dummyEDX, enum TileValues tilevalue, int value);

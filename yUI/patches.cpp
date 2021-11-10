@@ -13,6 +13,13 @@ void patchRemoveTagsAddIcons()
 	WriteRelJump(0x7814FA, reinterpret_cast<UInt32>(TileSetStringValueHotkeyHook2));
 }
 
+
+void patchMatchedCursor()
+{
+	WriteRelCall(0x70B33A, reinterpret_cast<UInt32>(TileSetStringValueCursor));
+	WriteRelCall(0x70C727, reinterpret_cast<UInt32>(TileSetIntValueCursor));
+}
+
 void patch1080pUI()
 {
 

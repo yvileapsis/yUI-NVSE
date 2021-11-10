@@ -82,6 +82,7 @@ void writePatches()
 	WriteRelJump(0x75D138, reinterpret_cast<UInt32>(BarterContainerMenuSortingHook));
 	if (g_ySI) patchRemoveTagsAddIcons();
 	if (g_yCM) patchAddyCMToSettingsMenu();
+	if (g_yMC) patchMatchedCursor();
 	//	patch1080pUI();
 }
 

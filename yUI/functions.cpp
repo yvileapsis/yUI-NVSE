@@ -624,3 +624,15 @@ Tile* Tile::InjectUIXML(const char* str)
 {
 	return this ? this->ReadXML(str) : nullptr;
 }
+
+void __fastcall TileSetStringValueCursor(Tile* tile, void* dummyEDX, enum TileValues tilevalue, char* src, char propagate)
+{
+	tile->SetFloat(kTileValue_zoom, -1, propagate);
+	tile->SetFloat(kTileValue_systemcolor, 1, propagate);
+}
+
+void __fastcall TileSetIntValueCursor(Tile* tile, void* dummyEDX, enum TileValues tilevalue, int value)
+{
+	tile->SetFloat(kTileValue_visible, value, 1);
+	ThisCall(0xA0B350, InterfaceManager::GetSingleton()->cursor, 1, 0);
+}
