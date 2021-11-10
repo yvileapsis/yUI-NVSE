@@ -6,6 +6,13 @@
 #include "functions.h"
 //#include "main.h"
 
+void patchSortingHooks()
+{
+	WriteRelJump(0x782516, reinterpret_cast<UInt32>(InventoryMenuSortingHook));
+	WriteRelJump(0x72F0ED, reinterpret_cast<UInt32>(BarterContainerMenuSortingHook));
+	WriteRelJump(0x75D138, reinterpret_cast<UInt32>(BarterContainerMenuSortingHook));
+}
+
 void patchRemoveTagsAddIcons()
 {
 	WriteRelJump(0x71A3D5, reinterpret_cast<UInt32>(TileSetStringValueInjectIconHook));

@@ -77,9 +77,7 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 
 void writePatches()
 {
-	WriteRelJump(0x782516, reinterpret_cast<UInt32>(InventoryMenuSortingHook));
-	WriteRelJump(0x72F0ED, reinterpret_cast<UInt32>(BarterContainerMenuSortingHook));
-	WriteRelJump(0x75D138, reinterpret_cast<UInt32>(BarterContainerMenuSortingHook));
+	if (g_ySI || g_SortingFix) patchSortingHooks();
 	if (g_ySI) patchRemoveTagsAddIcons();
 	if (g_yCM) patchAddyCMToSettingsMenu();
 	if (g_yMC) patchMatchedCursor();
