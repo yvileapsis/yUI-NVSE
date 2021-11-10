@@ -12,6 +12,7 @@ extern TileMenu* g_InventoryMenu;
 
 void InjectTemplates()
 {
+	if (!FileExists("data/menus/ySI/ySI.xml")) return;
 	g_HUDMainMenu->InjectUIXML("data/menus/ySI/ySI.xml");
 	g_StartMenu->InjectUIXML("data/menus/ySI/ySI.xml");
 	g_RepairMenu->InjectUIXML("data/menus/ySI/ySI.xml");

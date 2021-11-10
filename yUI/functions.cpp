@@ -636,3 +636,9 @@ void __fastcall TileSetIntValueCursor(Tile* tile, void* dummyEDX, enum TileValue
 	tile->SetFloat(kTileValue_visible, value, 1);
 	ThisCall(0xA0B350, InterfaceManager::GetSingleton()->cursor, 1, 0);
 }
+
+bool __fastcall FileExists(const char* path)
+{
+	UInt32 attr = GetFileAttributes(path);
+	return (attr != INVALID_FILE_ATTRIBUTES) && !(attr & FILE_ATTRIBUTE_DIRECTORY);
+}
