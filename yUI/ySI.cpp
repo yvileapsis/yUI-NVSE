@@ -120,23 +120,29 @@ signed int __fastcall CompareItemsWithTags(ContChangesEntry* a2, ContChangesEntr
 	if (cmp < 0) return -1;
 
 	SInt16 mods1 = -1, mods2 = -1;
-	mods1 = ContWeaponHasAnyMod(a1), mods2 = ContWeaponHasAnyMod(a2);
+	mods1 = ContWeaponHasAnyMod(a1); mods2 = ContWeaponHasAnyMod(a2);
 	if (mods1 != mods2) {
 		return mods1 > mods2 ? -1 : 1;
 	}
 
 	float condition1 = -1, condition2 = -1;
-	condition1 = ContGetHealthPercent(a1), condition2 = ContGetHealthPercent(a2);
+	condition1 = ContGetHealthPercent(a1); condition2 = ContGetHealthPercent(a2);
 	if (condition1 != condition2) {
 		return condition1 > condition2 ? -1 : 1;
 	}
 
 	bool equipped1 = false, equipped2 = false;
-	equipped1 = ContGetEquipped(a1), equipped2 = ContGetEquipped(a2);
+	equipped1 = ContGetEquipped(a1); equipped2 = ContGetEquipped(a2);
 	if (equipped1 != equipped2) {
 		return equipped1 > equipped2 ? -1 : 1;
 	}
 
+	UInt32 refID1 = 0, refID2 = 0;
+	refID1 = form1->refID; refID2 = form2->refID;
+	if (refID1 != refID2) {
+		return refID1 > refID2 ? -1 : 1;
+	}
+	
 	return 0;
 }
 

@@ -13,13 +13,16 @@ void patchSortingHooks()
 	WriteRelJump(0x75D138, reinterpret_cast<UInt32>(BarterContainerMenuSortingHook));
 }
 
-void patchRemoveTagsAddIcons()
+void patchAddIcons()
 {
 	WriteRelJump(0x71A3D5, reinterpret_cast<UInt32>(TileSetStringValueInjectIconHook));
+}
+
+void patchReplaceHotkeyIcons()
+{
 	WriteRelJump(0x70189E, reinterpret_cast<UInt32>(TileSetStringValueHotkeyHook));
 	WriteRelJump(0x7814FA, reinterpret_cast<UInt32>(TileSetStringValueHotkeyHook2));
 }
-
 
 void patchMatchedCursor()
 {

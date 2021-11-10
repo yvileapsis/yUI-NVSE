@@ -17,7 +17,7 @@
 #include "ySI.h"
 #include <file.h>
 
-#define yUI_VERSION 0.9
+#define yUI_VERSION 1.0
 
 #define RegisterScriptCommand(name) 	nvse->RegisterCommand(&kCommandInfo_ ##name)
 #define REG_CMD_STR(name) nvse->RegisterTypedCommand(&kCommandInfo_##name, kRetnType_String)
@@ -43,7 +43,7 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 		FillCraftingComponents();
 		PrintAndClearQueuedConsoleMessages();
 
-		if (g_ySI) LoadSIMapsFromFiles();
+		if (g_ySI || g_ySI_Hotkeys) LoadSIMapsFromFiles();
 
 //		LoadFileAnimPaths();
 
@@ -64,7 +64,7 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 				g_StatsMenu = TileMenu::GetTileMenu(kMenuType_Stats);
 				g_InventoryMenu = TileMenu::GetTileMenu(kMenuType_Inventory);
 
-				if (g_ySI) InjectTemplates();
+				if (g_ySI || g_ySI_Hotkeys) InjectTemplates();
 			}
 		}
 		
@@ -78,7 +78,8 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 void writePatches()
 {
 	if (g_ySI || g_SortingFix) patchSortingHooks();
-	if (g_ySI) patchRemoveTagsAddIcons();
+	if (g_ySI) patchAddIcons();
+	if (g_ySI_Hotkeys) patchReplaceHotkeyIcons();
 	if (g_yCM) patchAddyCMToSettingsMenu();
 	if (g_yMC) patchMatchedCursor();
 	//	patch1080pUI();

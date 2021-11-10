@@ -2,6 +2,7 @@
 
 void patchMatchedCursor();
 void patchSortingHooks();
-void patchRemoveTagsAddIcons();
+void patchAddIcons();
+void patchReplaceHotkeyIcons();
 void patchAddyCMToSettingsMenu();
 void patch1080pUI();
