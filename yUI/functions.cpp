@@ -524,7 +524,8 @@ TESForm* GetRefFromString(char* mod, char* id)
 
 bool IsInListRecursive(TESForm* item, TESForm* list)
 {
-	if (item && list && item->refID == list->refID) return true;
+	if (!item || !list) return false;
+	if (item->refID == list->refID) return true;
 	if (list->typeID != 85) return false;
 //	if (dynamic_cast<BGSListForm*>(list)->GetIndexOf(item) >= 0) return true;
 	const auto bgslist = DYNAMIC_CAST(list, TESForm, BGSListForm);
