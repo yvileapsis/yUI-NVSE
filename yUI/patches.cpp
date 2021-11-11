@@ -6,12 +6,44 @@
 #include "functions.h"
 //#include "main.h"
 
+
+void __fastcall TileSetIntValueNop(Tile* tile, void* dummyEDX, enum TileValues tilevalue, int value)
+{
+}
+
+void __fastcall TileSetFloatValueNop(Tile* tile, void* dummyEDX, enum TileValues tilevalue, float a3, char a4)
+{
+}
+
 void patchSortingHooks()
 {
+//	WriteRelCall(0x7B7AF3, reinterpret_cast<UInt32>(TileSetIntValueNop));
+//	WriteRelCall(0x7B8AFA, reinterpret_cast<UInt32>(TileSetIntValueNop));
+//	WriteRelCall(0x7B8B0C, reinterpret_cast<UInt32>(TileSetIntValueNop));
+//	WriteRelCall(0x7B8B1E, reinterpret_cast<UInt32>(TileSetIntValueNop));
+/*	WriteRelCall(0x7B7A8F, reinterpret_cast<UInt32>(TileSetIntValueNop));
+	WriteRelCall(0x7B79B1, reinterpret_cast<UInt32>(TileSetIntValueNop));
+	WriteRelCall(0x7B79C3, reinterpret_cast<UInt32>(TileSetIntValueNop));
+	WriteRelCall(0x7B7B29, reinterpret_cast<UInt32>(TileSetIntValueNop));
+
+	WriteRelCall(0x7B7A09, reinterpret_cast<UInt32>(TileSetFloatValueNop));
+	WriteRelCall(0x7B7A28, reinterpret_cast<UInt32>(TileSetFloatValueNop));
+	WriteRelCall(0x7B7A54, reinterpret_cast<UInt32>(TileSetFloatValueNop));
+	WriteRelCall(0x7B7AC1, reinterpret_cast<UInt32>(TileSetFloatValueNop));
+*/
+//	WriteRelCall(0x700337, reinterpret_cast<UInt32>(TileSetFloatValueNop));
+
 	WriteRelJump(0x782516, reinterpret_cast<UInt32>(InventoryMenuSortingHook));
 	WriteRelJump(0x72F0ED, reinterpret_cast<UInt32>(BarterContainerMenuSortingHook));
 	WriteRelJump(0x75D138, reinterpret_cast<UInt32>(BarterContainerMenuSortingHook));
 }
+
+void patchSortingCategories()
+{
+//	WriteRelJump(0x7826E4, reinterpret_cast<UInt32>(FunnyHook));
+	WriteRelJump(0x7831C1, reinterpret_cast<UInt32>(FunnyHook2));
+}
+
 
 void patchAddIcons()
 {

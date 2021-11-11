@@ -35,7 +35,7 @@ const char*			(*GetStringVar)(UInt32);
 void				(*SetStringVar)(UInt32, const char*);
 inline bool			(*AssignString)(ParamInfo*, void*, TESObjectREFR*, TESObjectREFR*, Script*, ScriptEventList*, double*, UInt32*, const char*);
 
-int iDoOnce = 0;
+inline int iDoOnce = 0;
 
 inline TileMenu* g_HUDMainMenu, * g_StartMenu, * g_BarterMenu, * g_ContainerMenu, * g_RepairMenu, * g_RepairServicesMenu, * g_MapMenu, * g_StatsMenu, * g_InventoryMenu;
 
@@ -47,7 +47,11 @@ inline TileMenu** g_tileMenuArray;
 inline std::vector<JSONEntryItem> g_SI_Items_JSON;
 inline std::vector<JSONEntryTag> g_SI_Tags_JSON;
 
+inline std::vector<std::filesystem::path> g_XMLPaths;
+
 inline std::unordered_set<TESForm*> g_CraftingComponents;
 
 inline std::unordered_map <TESForm*, std::string> g_SI_Items;
 inline std::unordered_map <std::string, JSONEntryTag> g_SI_Tags;
+
+inline int iInjected = 0;

@@ -6,3 +6,4 @@ void patchAddIcons();
 void patchReplaceHotkeyIcons();
 void patchAddyCMToSettingsMenu();
 void patch1080pUI();
+void patchSortingCategories();

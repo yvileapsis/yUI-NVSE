@@ -15,6 +15,7 @@ extern std::vector<JSONEntryItem> g_SI_Items_JSON;
 extern std::vector<JSONEntryTag> g_SI_Tags_JSON;
 extern std::unordered_map <TESForm*, std::string> g_SI_Items;
 extern std::unordered_map <std::string, JSONEntryTag> g_SI_Tags;
+extern std::vector<std::filesystem::path> g_XMLPaths;
 
 void LogForm(const TESForm* form)
 {
@@ -375,7 +376,7 @@ void FillSIMapsFromJSON()
 
 void LoadSIMapsFromFiles()
 {
-	Log("Loading file anims");
+	Log("Loading files");
 	const auto dir = GetCurPath() + R"(\Data\menus\ySI)";
 	const auto then = std::chrono::system_clock::now();
 	if (std::filesystem::exists(dir))
@@ -402,6 +403,12 @@ void LoadSIMapsFromFiles()
 			else if (_stricmp(path.extension().string().c_str(), ".json") == 0)
 			{
 				HandleJson(iter->path());
+			}
+			else if (_stricmp(path.extension().string().c_str(), ".xml") == 0)
+			{
+				auto pathstring = iter->path().generic_string();
+				auto relativepath = pathstring.substr(pathstring.find_last_of("\\Data\\") - 3);
+				g_XMLPaths.emplace_back(std::filesystem::path(relativepath));
 			}
 		}
 	}

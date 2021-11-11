@@ -77,12 +77,15 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 
 void writePatches()
 {
-	if (g_ySI || g_SortingFix) patchSortingHooks();
 	if (g_ySI) patchAddIcons();
 	if (g_ySI_Hotkeys) patchReplaceHotkeyIcons();
+	
+	if (g_ySI || g_SortingFix) patchSortingHooks();
 	if (g_yCM) patchAddyCMToSettingsMenu();
 	if (g_yMC) patchMatchedCursor();
 	//	patch1080pUI();
+	patchSortingCategories();
+
 }
 
 bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)

@@ -642,3 +642,8 @@ bool __fastcall FileExists(const char* path)
 	UInt32 attr = GetFileAttributes(path);
 	return (attr != INVALID_FILE_ATTRIBUTES) && !(attr & FILE_ATTRIBUTE_DIRECTORY);
 }
+
+char* __fastcall StrFromINI(DWORD *address)
+{
+	return address ? reinterpret_cast<char*>(address[1]) : nullptr;
+}

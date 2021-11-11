@@ -23,3 +23,5 @@ void BarterContainerMenuSortingHook();
 void TileSetStringValueHotkeyHook();
 void TileSetStringValueHotkeyHook2();
 void InjectTemplates();
+void FunnyHook();
+void FunnyHook2();

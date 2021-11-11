@@ -7,27 +7,93 @@ extern int g_ySI_Sort;
 
 extern std::unordered_map <TESForm*, std::string> g_SI_Items;
 extern std::unordered_map <std::string, JSONEntryTag> g_SI_Tags;
+extern std::vector <std::filesystem::path> g_XMLPaths;
 
 extern TileMenu* g_InventoryMenu;
 
 void InjectTemplates()
 {
-	if (!FileExists("data/menus/ySI/ySI.xml")) return;
-	g_HUDMainMenu->InjectUIXML("data/menus/ySI/ySI.xml");
-	g_StartMenu->InjectUIXML("data/menus/ySI/ySI.xml");
-	g_RepairMenu->InjectUIXML("data/menus/ySI/ySI.xml");
-	g_InventoryMenu->InjectUIXML("data/menus/ySI/ySI.xml");
+	for (auto &iter : g_XMLPaths)
+	{
+		g_HUDMainMenu->InjectUIXML(iter.generic_string().c_str());
+		g_StartMenu->InjectUIXML(iter.generic_string().c_str());
+		g_RepairMenu->InjectUIXML(iter.generic_string().c_str());
+		g_InventoryMenu->InjectUIXML(iter.generic_string().c_str());
+	}
 }
+
+bool __fastcall ShouldHideEntry(ContChangesEntry* a1)
+{
+	if (!a1) return false;
+	if (!a1->type) return false;
+	if (a1->type->typeID == 0x2E) return true;
+}
+
+void __fastcall AddSortingCategories()
+{
+	UInt32 keys = 0;
+	const auto entryDataList = PlayerCharacter::GetSingleton()->GetContainerChangesList();
+	if (!entryDataList) return;
+	for (auto iter = entryDataList->Head(); iter; iter = iter->next)
+	{
+		if (iter->data->type->typeID == 0x2E) keys++;
+	}
+	if (keys) {
+		std::string keyringname = StrFromINI(reinterpret_cast<DWORD*>(0x011D3B20));
+		if (keys > 1)
+		{
+			keyringname += " (" + std::to_string(keys) + ")";
+		}
+		auto tile = InventoryMenu::GetSingleton()->itemsList.Insert(nullptr, keyringname.c_str(), nullptr, nullptr);
+		tile->SetFloat(kTileValue_id, 30);
+	}
+}
+
+__declspec(naked) void FunnyHook()
+{
+	static const UInt32 retnAddr1 = 0x7826EA;
+	static const UInt32 retnAddr2 = 0x7826F1;
+	static const UInt32 ShouldHide = reinterpret_cast<UInt32>(ShouldHideEntry);
+	__asm
+	{
+		mov ecx, [ebp + 0x8] // a1
+		call ShouldHide
+		test eax, eax
+		jz shouldnot
+		jmp retnAddr1
+	shouldnot:
+		jmp retnAddr2
+	}
+}
+
+__declspec(naked) void FunnyHook2()
+{
+	static const UInt32 retnAddr = 0x783213;
+	static const UInt32 AddCategories = reinterpret_cast<UInt32>(AddSortingCategories);
+	__asm
+	{
+		call AddCategories
+		jmp retnAddr
+	}
+}
+
 
 void __fastcall SetStringValueInjectTile(Tile* tile, ContChangesEntry* entry, enum TileValues tilevalue, char* src, char propagate)
 {
 	tile->SetString(tilevalue, src, propagate);
 
-	if (!entry || !entry->type) return;
-
+	std::string tag;
+	
+	if (!entry || !entry->type)
+	{
+		tag = "(jdd0)";
+	}
+	else
+	{
+		tag = g_SI_Items[entry->type];
+	}
 	//	if (g_SI_Items.find(entry->type) == g_SI_Items.end()) return;
 
-	const std::string tag = g_SI_Items[entry->type];
 
 	Tile* tilemenu = tile;
 
@@ -42,19 +108,28 @@ void __fastcall SetStringValueInjectTile(Tile* tile, ContChangesEntry* entry, en
 	
 	if (!menu->menu->GetTemplateExists(g_SI_Tags[tag].xmltemplate.c_str()))
 	{
-		if (menu == TileMenu::GetTileMenu(kMenuType_Barter)) menu->InjectUIXML("data/menus/ySI/ySI.xml");
-		if (menu == TileMenu::GetTileMenu(kMenuType_Container)) menu->InjectUIXML("data/menus/ySI/ySI.xml");
-		if (menu == TileMenu::GetTileMenu(kMenuType_RepairServices)) menu->InjectUIXML("data/menus/ySI/ySI.xml");
+		if (!FileExists("data/menus/ySI/ySI.xml")) return;
+		if (menu == TileMenu::GetTileMenu(kMenuType_Barter) || menu == TileMenu::GetTileMenu(kMenuType_Container) ||
+			menu == TileMenu::GetTileMenu(kMenuType_RepairServices))
+		{
+			for (auto& iter : g_XMLPaths) menu->InjectUIXML(iter.generic_string().c_str());			
+		}
+		if (!menu->menu->GetTemplateExists(g_SI_Tags[tag].xmltemplate.c_str())) return;
 	}
-
-	if (!menu->menu->GetTemplateExists(g_SI_Tags[tag].xmltemplate.c_str())) return;
 
 	Tile* text = tile->GetChild("ListItemText");
 
 	if (!text) return;
 
 	Tile* icon = menu->menu->AddTileFromTemplate(text, g_SI_Tags[tag].xmltemplate.c_str(), 0);
+//	Tile* icon2 = menu->menu->AddTileFromTemplate(text, g_SI_Tags[tag].xmltemplate.c_str(), 0);
+//	Tile* icon3 = menu->menu->AddTileFromTemplate(icon, g_SI_Tags[tag].xmltemplate.c_str(), 0);
+//	Tile* icon = menu->menu->AddTileFromTemplate(text->parent, g_SI_Tags[tag].xmltemplate.c_str(), 0);
 
+//	tile->children.ExchangeNodes(tile->children.Tail()->prev, tile->children.Tail());
+
+//	return;
+	
 	if (!icon) return;
 
 	if (!g_SI_Tags[tag].filename.empty()) icon->SetString(kTileValue_filename, g_SI_Tags[tag].filename.c_str(), propagate);
@@ -64,7 +139,8 @@ void __fastcall SetStringValueInjectTile(Tile* tile, ContChangesEntry* entry, en
 	} else {
 		icon->SetFloat(kTileValue_systemcolor, g_SI_Tags[tag].systemcolor, propagate);
 	}
-	
+//	icon->SetFloat(kTileValue_alpha, 255, propagate);
+
 	float x = text->GetValueFloat(kTileValue_x);
 
 	if (icon->GetValue(kTileValue_user0)) x += icon->GetValueFloat(kTileValue_user0);
@@ -79,6 +155,7 @@ void __fastcall SetStringValueInjectTile(Tile* tile, ContChangesEntry* entry, en
 
 	text->SetFloat(kTileValue_x, x, propagate);
 	text->SetFloat(kTileValue_wrapwidth, wrapwidth, propagate);
+
 }
 
 
@@ -165,7 +242,7 @@ void __fastcall SetStringValueTagImage(Tile* tile, ContChangesEntry* entry, enum
 
 	std::string tag = g_SI_Items[entry->type];
 
-	if (!&g_SI_Tags[tag]) {
+	if (g_SI_Tags[tag].filename.empty()) {
 		tile->SetString(tilevalue, src, propagate);
 		return;
 	}
@@ -192,7 +269,7 @@ void __fastcall SetStringValueTagRose(Tile* tile, ContChangesEntry* entry, enum 
 
 	std::string tag = g_SI_Items[entry->type];
 
-	if (!&g_SI_Tags[tag]) {
+	if (g_SI_Tags[tag].filename.empty()) {
 		tile->SetString(tilevalue, src, propagate);
 		return;
 	}
@@ -229,7 +306,7 @@ __declspec(naked) void InventoryMenuSortingHook()
 	_asm
 	{
 		mov eax, [ebp + 0x8] // a1
-		mov edx, [eax + 4]
+		mov edx, [eax + 0x4]
 		call CompareItems
 		mov esp, ebp
 		pop ebp
@@ -244,9 +321,9 @@ __declspec(naked) void BarterContainerMenuSortingHook()
 	{
 		pop eax
 		mov eax, [ebp + 0x8] // a1
-		mov edx, [eax + 4]
+		mov edx, [eax + 0x4]
 		mov eax, [ebp + 0xC] // a2
-		mov ecx, [eax + 4]
+		mov ecx, [eax + 0x4]
 		call CompareItems
 		mov esp, ebp
 		pop ebp
