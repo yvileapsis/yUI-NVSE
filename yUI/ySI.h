@@ -25,3 +25,5 @@ void TileSetStringValueHotkeyHook2();
 void InjectTemplates();
 void FunnyHook();
 void FunnyHook2();
+void InjectIconTileLastFix();
+//void InjectIconTile(Tile* tile, ContChangesEntry* entry);

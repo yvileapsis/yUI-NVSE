@@ -2,7 +2,7 @@
 #include <internal/DecodedUI.h>
 
 void (*ToggleMenus)(bool toggleON) = reinterpret_cast<void(*)(bool)>(0x703810);
-void (*RefreshItemListBox)(void) = reinterpret_cast<void(*)()>(0x704AF0);
+void (*RefreshItemsListBox)(void) = reinterpret_cast<void(*)()>(0x704AF0);
 bool(__cdecl* GetIsMenuMode)() = reinterpret_cast<bool(*)()>(0x702360);
 int* (__thiscall* Tile_A01000)(Tile*, enum TileValues) = (int* (__thiscall*)(Tile*, enum TileValues))0xA01000;
 void(__thiscall* TileValueSetString)(int*, char*, char) = (void(__thiscall*)(int*, char*, char))0xA0A300;
@@ -14,6 +14,12 @@ void(__thiscall* Menu__RegisterTile)(Menu*, Tile*, bool) = reinterpret_cast<void
 void(__thiscall* Menu__HideTitle)(Menu*, bool) = reinterpret_cast<void(__thiscall*)(Menu*, bool)>(0xA1DC20);
 void(__cdecl* HUDMainMenu_UpdateVisibilityState)(signed int) = reinterpret_cast<void(*)(int)>(0x771700);
 void(__cdecl* MenuButton_Downloads)() = reinterpret_cast<void(*)()>(0x7D0550);
+bool(*MenuVisible)(UINT32) = reinterpret_cast<bool(*)(UINT32)>(0x11F308F);
+void(__thiscall* RefreshContainerMenu)(ContainerMenu*, TESForm*) = reinterpret_cast<void(__thiscall*)(ContainerMenu*, TESForm*)>(0x75C280);
+void(__thiscall* RefreshBarterMenu)(BarterMenu*, TESForm*) = reinterpret_cast<void(__thiscall*)(BarterMenu*, TESForm*)>(0x72DC30);
+void(__thiscall* InitEntriesRepairServices)(RepairServicesMenu*) = reinterpret_cast<void(__thiscall*)(RepairServicesMenu*)>(0x7B8B30);
+
+bool* g_menuVisibility = (bool*)0x11F308F;
 
 extern  TileMenu** g_tileMenuArray;
 
@@ -195,7 +201,43 @@ bool IsInStartMenu()
  * RefreshItemsList calls itemsList->FreeAllTiles() and then allocates the memory for all the tiles again
  * instead skip the calls that free/allocate
  */
-void QuickRefreshItemList()
+void RefreshItemsList()
+{
+//	SafeWrite16(0x75C3F5, 0); // ContainerMenu, nop JE by changing dest
+//	SafeWrite16(0x75C443, 0x60EB); // ContainerMenu
+
+	SafeWriteBuf(0x75C588, "\xA1\x3C\xEA\x1D\x01", 5);
+	SafeWriteBuf(0x75C5AC, "\x8B\x8D\x44\xFF\xFF\xFF\x8B\x51\x74", 9);
+	RefreshItemsListBox();
+	
+//	SafeWrite16(0x75C3F5, 0x0182); // ContainerMenu
+//	SafeWrite16(0x75C443, 0x4D8B); // ContainerMenu
+}
+
+bool RefreshItemsListForm(TESForm* form)
+{
+	if (g_menuVisibility[kMenuType_Barter])
+	{
+		RefreshBarterMenu(BarterMenu::GetSingleton(), form);
+		return true;
+	}
+	else if (g_menuVisibility[kMenuType_Container])
+	{
+		RefreshContainerMenu(ContainerMenu::GetSingleton(), form);
+		return true;
+	}
+	else if (g_menuVisibility[kMenuType_RepairServices])
+	{
+		InitEntriesRepairServices(RepairServicesMenu::GetSingleton());
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
+void QuickRefreshItemsList()
 {
 	SafeWriteBuf(0x78319C, "\xE8\x2F\xCE\xFF\xFF\xEB\x70", 7); // InventoryMenu, call SaveCurrentTabScrollPosition and skip reallocating tiles
 	SafeWrite16(0x75C3F5, 0); // ContainerMenu, nop JE by changing dest
@@ -204,7 +246,7 @@ void QuickRefreshItemList()
 	SafeWrite16(0x72DC9C, 0); // BarterMenu
 	SafeWrite32(0x72DCD3, 0x0004B2E9); // BarterMenu, jump over code recalculating the selected items for trading
 
-	RefreshItemListBox();
+	RefreshItemsListBox();
 
 	SafeWriteBuf(0x78319C, "\x6A\x00\x6A\x00\x68\x50\x28", 7); // InventoryMenu
 	SafeWrite16(0x75C3F5, 0x0182); // ContainerMenu

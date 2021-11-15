@@ -15,6 +15,8 @@ extern std::vector<JSONEntryItem> g_SI_Items_JSON;
 extern std::vector<JSONEntryTag> g_SI_Tags_JSON;
 extern std::unordered_map <TESForm*, std::string> g_SI_Items;
 extern std::unordered_map <std::string, JSONEntryTag> g_SI_Tags;
+extern std::unordered_map <std::string, bool> g_SI_Categories;
+
 extern std::vector<std::filesystem::path> g_XMLPaths;
 
 void LogForm(const TESForm* form)
@@ -253,10 +255,16 @@ void HandleJson(const std::filesystem::path& path)
 				std::string texatlas;
 				if (elem.contains("texatlas")) texatlas = elem["texatlas"].get<std::string>();				
 				SInt64 systemcolor = 0;
-				if (elem.contains("systemcolor")) priority = elem["systemcolor"].get<SInt32>();
-				
+				if (elem.contains("systemcolor")) systemcolor = elem["systemcolor"].get<SInt32>();
+				std::string category;
+				if (elem.contains("category")) category = elem["category"].get<std::string>();
+				std::string name;
+				if (elem.contains("name")) name = elem["name"].get<std::string>();
+				std::string nameGMST;
+				if (elem.contains("nameGMST")) nameGMST = elem["nameGMST"].get<std::string>();
+
 				DebugLog(FormatString("Tag: '%10s', icon: '%s'",  tag.c_str(), filename.c_str()));
-				g_SI_Tags_JSON.emplace_back(tag, priority, xmltemplate, filename, texatlas, systemcolor);
+				g_SI_Tags_JSON.emplace_back(tag, priority, xmltemplate, filename, texatlas, systemcolor, category, name, nameGMST);
 			}
 		}
 		else { DebugPrint(path.string() + " does not start as a JSON array"); }
@@ -354,7 +362,10 @@ void FillSIMapsFromJSON()
 
 	ra::sort(g_SI_Tags_JSON, [&](const JSONEntryTag& entry1, const JSONEntryTag& entry2)
 		{ return entry1.priority > entry2.priority; });
-	for (auto& entry : g_SI_Tags_JSON) g_SI_Tags.emplace(entry.tag, std::move(entry));
+	for (auto& entry : g_SI_Tags_JSON) {
+		if (!entry.category.empty()) g_SI_Categories.emplace(entry.category, false);
+		g_SI_Tags.emplace(entry.tag, std::move(entry));
+	}
 	g_SI_Tags_JSON = std::vector<JSONEntryTag>();
 
 	/*	for (const auto& entry : g_SI_Items_JSON)

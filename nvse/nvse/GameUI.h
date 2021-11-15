@@ -3,6 +3,9 @@
 #include "GameTiles.h"
 #include "GameTypes.h"
 
+void QuickRefreshItemsList();
+void RefreshItemsList();
+bool RefreshItemsListForm(TESForm*);
 
 class Menu;
 class SceneGraph;

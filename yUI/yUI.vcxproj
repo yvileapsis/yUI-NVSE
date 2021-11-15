@@ -407,7 +407,6 @@
     <ClCompile Include="LambdaVariableContext.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="nihooks.cpp" />
-    <ClCompile Include="knvse.cpp" />
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="patches.cpp" />
     <ClCompile Include="settings.cpp" />
@@ -446,7 +445,6 @@
     <ClInclude Include="hooks.h" />
     <ClInclude Include="json.h" />
     <ClInclude Include="game_types.h" />
-    <ClInclude Include="knvse_version.h" />
     <ClInclude Include="LambdaVariableContext.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="MemoizedMap.h" />

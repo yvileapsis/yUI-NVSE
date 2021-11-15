@@ -18,6 +18,7 @@
 #include <file.h>
 
 #define yUI_VERSION 1.0
+#define yUI_VERSION_STR "1.0f"
 
 #define RegisterScriptCommand(name) 	nvse->RegisterCommand(&kCommandInfo_ ##name)
 #define REG_CMD_STR(name) nvse->RegisterTypedCommand(&kCommandInfo_##name, kRetnType_String)
@@ -47,25 +48,24 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 
 //		LoadFileAnimPaths();
 
-		Console_Print("yUI %.2f", yUI_VERSION);
+		Console_Print("yUI %s", yUI_VERSION_STR);
 	}
 	else if (msg->type == NVSEMessagingInterface::kMessage_MainGameLoop)
 	{
 		const auto isMenuMode = CdeclCall<bool>(0x702360);
-		if (iDoOnce == 0) {
-			if (!isMenuMode) {
+		InjectIconTileLastFix();
+		
+		if (iDoOnce == 0 && !isMenuMode) {
+			iDoOnce++;
 
-				iDoOnce++;
+			g_HUDMainMenu = TileMenu::GetTileMenu(kMenuType_HUDMain);
+			g_StartMenu = TileMenu::GetTileMenu(kMenuType_Start);
+			g_RepairMenu = TileMenu::GetTileMenu(kMenuType_Repair);
+			g_MapMenu = TileMenu::GetTileMenu(kMenuType_Map);
+			g_StatsMenu = TileMenu::GetTileMenu(kMenuType_Stats);
+			g_InventoryMenu = TileMenu::GetTileMenu(kMenuType_Inventory);
 
-				g_HUDMainMenu = TileMenu::GetTileMenu(kMenuType_HUDMain);
-				g_StartMenu = TileMenu::GetTileMenu(kMenuType_Start);
-				g_RepairMenu = TileMenu::GetTileMenu(kMenuType_Repair);
-				g_MapMenu = TileMenu::GetTileMenu(kMenuType_Map);
-				g_StatsMenu = TileMenu::GetTileMenu(kMenuType_Stats);
-				g_InventoryMenu = TileMenu::GetTileMenu(kMenuType_Inventory);
-
-				if (g_ySI || g_ySI_Hotkeys) InjectTemplates();
-			}
+			if (g_ySI || g_ySI_Hotkeys) InjectTemplates();
 		}
 		
 	}

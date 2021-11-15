@@ -16,7 +16,6 @@ void InjectTemplates()
 	for (auto &iter : g_XMLPaths)
 	{
 		g_HUDMainMenu->InjectUIXML(iter.generic_string().c_str());
-		g_StartMenu->InjectUIXML(iter.generic_string().c_str());
 		g_RepairMenu->InjectUIXML(iter.generic_string().c_str());
 		g_InventoryMenu->InjectUIXML(iter.generic_string().c_str());
 	}
@@ -77,13 +76,18 @@ __declspec(naked) void FunnyHook2()
 	}
 }
 
+ContChangesEntry* firstEntry = nullptr;
 
-void __fastcall SetStringValueInjectTile(Tile* tile, ContChangesEntry* entry, enum TileValues tilevalue, char* src, char propagate)
+void InjectIconTileLastFix()
 {
-	tile->SetString(tilevalue, src, propagate);
+	if (!firstEntry || !firstEntry->type) return;
+	if (RefreshItemsListForm(firstEntry->type))	firstEntry = nullptr;
+}
 
+void InjectIconTile(MenuItemEntryList* list, Tile* tile, ContChangesEntry* entry)
+{
 	std::string tag;
-	
+
 	if (!entry || !entry->type)
 	{
 		tag = "(jdd0)";
@@ -94,58 +98,50 @@ void __fastcall SetStringValueInjectTile(Tile* tile, ContChangesEntry* entry, en
 	}
 	//	if (g_SI_Items.find(entry->type) == g_SI_Items.end()) return;
 
-
 	Tile* tilemenu = tile;
 
-	do { if IS_TYPE(tilemenu, TileMenu) break;
+	do {
+		if IS_TYPE(tilemenu, TileMenu) break;
 	} while ((tilemenu = tilemenu->parent));
 
-	if (!&g_SI_Tags[tag]) { return; }
+	if (g_SI_Tags[tag].filename.empty()) return;
 
 	auto* menu = DYNAMIC_CAST(tilemenu, Tile, TileMenu);
 
 	if (!menu || !menu->menu) return;
-	
-	if (!menu->menu->GetTemplateExists(g_SI_Tags[tag].xmltemplate.c_str()))
-	{
-		if (!FileExists("data/menus/ySI/ySI.xml")) return;
-		if (menu == TileMenu::GetTileMenu(kMenuType_Barter) || menu == TileMenu::GetTileMenu(kMenuType_Container) ||
-			menu == TileMenu::GetTileMenu(kMenuType_RepairServices))
-		{
-			for (auto& iter : g_XMLPaths) menu->InjectUIXML(iter.generic_string().c_str());			
-		}
-		if (!menu->menu->GetTemplateExists(g_SI_Tags[tag].xmltemplate.c_str())) return;
-	}
 
 	Tile* text = tile->GetChild("ListItemText");
 
 	if (!text) return;
-
-	Tile* icon = menu->menu->AddTileFromTemplate(text, g_SI_Tags[tag].xmltemplate.c_str(), 0);
-//	Tile* icon2 = menu->menu->AddTileFromTemplate(text, g_SI_Tags[tag].xmltemplate.c_str(), 0);
-//	Tile* icon3 = menu->menu->AddTileFromTemplate(icon, g_SI_Tags[tag].xmltemplate.c_str(), 0);
-//	Tile* icon = menu->menu->AddTileFromTemplate(text->parent, g_SI_Tags[tag].xmltemplate.c_str(), 0);
-
-//	tile->children.ExchangeNodes(tile->children.Tail()->prev, tile->children.Tail());
-
-//	return;
 	
+	if (!menu->menu->GetTemplateExists(g_SI_Tags[tag].xmltemplate.c_str()))
+	{
+		if (menu == TileMenu::GetTileMenu(kMenuType_Barter) || menu == TileMenu::GetTileMenu(kMenuType_Container) ||
+			menu == TileMenu::GetTileMenu(kMenuType_RepairServices))
+			for (auto& iter : g_XMLPaths) menu->InjectUIXML(iter.generic_string().c_str());
+		firstEntry = entry;
+		if (!menu->menu->GetTemplateExists(g_SI_Tags[tag].xmltemplate.c_str())) return;
+	}
+	
+	Tile* icon = menu->menu->AddTileFromTemplate(text, g_SI_Tags[tag].xmltemplate.c_str(), 0);
+
 	if (!icon) return;
 
-	if (!g_SI_Tags[tag].filename.empty()) icon->SetString(kTileValue_filename, g_SI_Tags[tag].filename.c_str(), propagate);
-	if (!g_SI_Tags[tag].texatlas.empty()) icon->SetString(kTileValue_texatlas, g_SI_Tags[tag].texatlas.c_str(), propagate);
+	if (!g_SI_Tags[tag].filename.empty()) icon->SetString(kTileValue_filename, g_SI_Tags[tag].filename.c_str(), false);
+	if (!g_SI_Tags[tag].texatlas.empty()) icon->SetString(kTileValue_texatlas, g_SI_Tags[tag].texatlas.c_str(), false);
 	if (!g_SI_Tags[tag].systemcolor) {
 		icon->SetFloat(kTileValue_systemcolor, menu->GetValueFloat(kTileValue_systemcolor));
-	} else {
-		icon->SetFloat(kTileValue_systemcolor, g_SI_Tags[tag].systemcolor, propagate);
 	}
-//	icon->SetFloat(kTileValue_alpha, 255, propagate);
+	else {
+		icon->SetFloat(kTileValue_systemcolor, g_SI_Tags[tag].systemcolor, false);
+	}
+	//	icon->SetFloat(kTileValue_alpha, 255, propagate);
 
 	float x = text->GetValueFloat(kTileValue_x);
 
 	if (icon->GetValue(kTileValue_user0)) x += icon->GetValueFloat(kTileValue_user0);
 
-	icon->SetFloat(kTileValue_x, x, propagate);
+	icon->SetFloat(kTileValue_x, x, false);
 
 	x += icon->GetValueFloat(kTileValue_width);
 
@@ -153,9 +149,16 @@ void __fastcall SetStringValueInjectTile(Tile* tile, ContChangesEntry* entry, en
 
 	const float wrapwidth = text->GetValueFloat(kTileValue_wrapwidth) - x;
 
-	text->SetFloat(kTileValue_x, x, propagate);
-	text->SetFloat(kTileValue_wrapwidth, wrapwidth, propagate);
+	text->SetFloat(kTileValue_x, x, false);
+	text->SetFloat(kTileValue_wrapwidth, wrapwidth, false);
 
+}
+
+
+void __fastcall SetStringValueInjectTile(Tile* tile, ContChangesEntry* entry, MenuItemEntryList* list, enum TileValues tilevalue, char* src, char propagate)
+{
+	tile->SetString(tilevalue, src, propagate);
+	InjectIconTile(list, tile, entry);
 }
 
 
@@ -164,6 +167,8 @@ __declspec(naked) void TileSetStringValueInjectIconHook() {
 	static const UInt32 retnAddr = 0x71A3DA;
 	__asm
 	{
+		mov     edx, [ebp - 0x2C]
+		push	edx
 		mov		edx, [ebp + 0x8]
 		call    SetStringValue
 		jmp		retnAddr
@@ -174,49 +179,58 @@ signed int __fastcall CompareItemsWithTags(ContChangesEntry* a2, ContChangesEntr
 {
 	TESForm* form1 = a1->type, * form2 = a2->type;
 
-	if (!form1) { if (!form2) return 0; else return -1; }
-	if (!form2) { return 1; }
-
 	signed int cmp;
 
-	if (g_ySI_Sort) {
-		if (g_SI_Items[form1].empty()) {
-			if (!g_SI_Items[form2].empty()) { return 1; }
+	if (g_ySI_Sort)
+	{
+		std::string tag1, tag2;
+
+
+		
+		tag1 = g_SI_Items[form1];
+		tag2 = g_SI_Items[form2];
+		
+		if (tag1.empty())
+		{
+			if (!tag2.empty()) return 1;
 		}
-		else if (g_SI_Items[form2].empty()) {
+		else if (tag2.empty())
 			return -1;
-		}
-		else {
-			cmp = g_SI_Items[form1].compare(g_SI_Items[form2]);
+		else
+		{
+			cmp = tag1.compare(tag2);
 			if (cmp > 0) return 1;
 			if (cmp < 0) return -1;
 		}
 	}
+
+	if (!form1) return form2 ? -1 : 0;
+	if (!form2) return 1;
 	
 	cmp = std::string(form1->GetTheName()).compare(std::string(form2->GetTheName()));
 	if (cmp > 0) return 1;
 	if (cmp < 0) return -1;
 
-	SInt16 mods1 = -1, mods2 = -1;
-	mods1 = ContWeaponHasAnyMod(a1); mods2 = ContWeaponHasAnyMod(a2);
+	const SInt16 mods1 = ContWeaponHasAnyMod(a1);
+	const SInt16 mods2 = ContWeaponHasAnyMod(a2);
 	if (mods1 != mods2) {
 		return mods1 > mods2 ? -1 : 1;
 	}
 
-	float condition1 = -1, condition2 = -1;
-	condition1 = ContGetHealthPercent(a1); condition2 = ContGetHealthPercent(a2);
+	const float condition1 = ContGetHealthPercent(a1);
+	const float condition2 = ContGetHealthPercent(a2);
 	if (condition1 != condition2) {
 		return condition1 > condition2 ? -1 : 1;
 	}
 
-	bool equipped1 = false, equipped2 = false;
-	equipped1 = ContGetEquipped(a1); equipped2 = ContGetEquipped(a2);
+	const bool equipped1 = ContGetEquipped(a1);
+	const bool equipped2 = ContGetEquipped(a2);
 	if (equipped1 != equipped2) {
 		return equipped1 > equipped2 ? -1 : 1;
 	}
 
-	UInt32 refID1 = 0, refID2 = 0;
-	refID1 = form1->refID; refID2 = form2->refID;
+	const UInt32 refID1 = form1->refID;
+	const UInt32 refID2 = form2->refID;
 	if (refID1 != refID2) {
 		return refID1 > refID2 ? -1 : 1;
 	}
@@ -226,9 +240,9 @@ signed int __fastcall CompareItemsWithTags(ContChangesEntry* a2, ContChangesEntr
 
 void __fastcall SetStringValueTagImage(Tile* tile, ContChangesEntry* entry, enum TileValues tilevalue, char* src, char propagate)
 {
-	Tile* icon = tile->GetChild("HK_Icon");
+	if (!tile) return;
 
-	if (icon) {
+	if (Tile * icon = tile->GetChild("HK_Icon"); icon) {
 		icon->SetFloat(kTileValue_width, tile->GetValueFloat(kTileValue_width) - 12, propagate);
 		icon->SetFloat(kTileValue_height, tile->GetValueFloat(kTileValue_height) - 12, propagate);
 		icon->SetFloat(kTileValue_x, 6, propagate);
@@ -240,7 +254,7 @@ void __fastcall SetStringValueTagImage(Tile* tile, ContChangesEntry* entry, enum
 		return;
 	}
 
-	std::string tag = g_SI_Items[entry->type];
+	const std::string tag = g_SI_Items[entry->type];
 
 	if (g_SI_Tags[tag].filename.empty()) {
 		tile->SetString(tilevalue, src, propagate);
@@ -250,10 +264,12 @@ void __fastcall SetStringValueTagImage(Tile* tile, ContChangesEntry* entry, enum
 	tile->SetString(tilevalue, g_SI_Tags[tag].filename.c_str(), propagate);
 }
 
-float compassRoseX, compassRoseY;
+float compassRoseX = 0, compassRoseY = 0;
 
 void __fastcall SetStringValueTagRose(Tile* tile, ContChangesEntry* entry, enum TileValues tilevalue, char* src, char propagate)
 {
+	if (!tile) return;
+	
 	if (compassRoseX == 0) compassRoseX = tile->GetValueFloat(kTileValue_x);
 	if (compassRoseY == 0) compassRoseY = tile->GetValueFloat(kTileValue_y);
 
@@ -267,7 +283,7 @@ void __fastcall SetStringValueTagRose(Tile* tile, ContChangesEntry* entry, enum 
 		return;
 	}
 
-	std::string tag = g_SI_Items[entry->type];
+	const std::string tag = g_SI_Items[entry->type];
 
 	if (g_SI_Tags[tag].filename.empty()) {
 		tile->SetString(tilevalue, src, propagate);

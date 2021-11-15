@@ -101,11 +101,11 @@ public:
 			} while (iter = iter->next);
 		}
 		return NULL;
-	}
+	}*/
 
 	void Clear()
 	{
-		ListNode<ListBoxItem<Item>>* iter = list.Head();
+		ListNode<ListBoxItem<Item>>* iter = this->list.Head();
 		ListBoxItem<Item>* item;
 		do
 		{
@@ -115,17 +115,17 @@ public:
 				item->tile->Destroy(true);
 			GameHeapFree(item);
 		} while (iter = iter->next);
-		list.RemoveAll();
+		this->list.RemoveAll();
 		selected = NULL;
 		itemCount = 0;
-	}*/
+	}
 
 	typedef bool(__cdecl* FilterFunction)(Item* form);
 	void Filter(FilterFunction callback)
 	{
 		ThisCall(0x729FE0, this, callback);
 	}
-
+	
 	// Identical to Filter, but passing a value instead of a pointer
 	void FilterVal(bool(__cdecl* callback)(Item))
 	{

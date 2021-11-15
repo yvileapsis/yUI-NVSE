@@ -40,10 +40,8 @@ void patchSortingHooks()
 
 void patchSortingCategories()
 {
-//	WriteRelJump(0x7826E4, reinterpret_cast<UInt32>(FunnyHook));
 	WriteRelJump(0x7831C1, reinterpret_cast<UInt32>(FunnyHook2));
 }
-
 
 void patchAddIcons()
 {

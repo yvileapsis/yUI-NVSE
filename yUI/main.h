@@ -53,5 +53,6 @@ inline std::unordered_set<TESForm*> g_CraftingComponents;
 
 inline std::unordered_map <TESForm*, std::string> g_SI_Items;
 inline std::unordered_map <std::string, JSONEntryTag> g_SI_Tags;
+inline std::unordered_map <std::string, bool> g_SI_Categories;
 
 inline int iInjected = 0;

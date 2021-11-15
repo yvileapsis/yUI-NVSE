@@ -622,7 +622,7 @@ TileMenu* TileMenu::GetTileMenu(UInt32 menuID)
 
 Tile* Tile::InjectUIXML(const char* str)
 {
-	return this ? this->ReadXML(str) : nullptr;
+	return (FileExists(str)) ? this->ReadXML(str) : nullptr;
 }
 
 void __fastcall TileSetStringValueCursor(Tile* tile, void* dummyEDX, enum TileValues tilevalue, char* src, char propagate)

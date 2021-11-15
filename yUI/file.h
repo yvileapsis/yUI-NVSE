@@ -119,8 +119,14 @@ public:
 	std::string texatlas;
 	SInt32 systemcolor;
 	
-	JSONEntryTag(std::string tag, SInt16 priority, std::string xmltemplate, std::string filename, std::string texatlas, SInt64 systemcolor)
-		: tag(std::move(tag)), priority(priority), xmltemplate(std::move(xmltemplate)), filename(std::move(filename)), texatlas(std::move(texatlas)), systemcolor(systemcolor)
+	std::string category;
+	std::string name;
+	std::string nameGMST;
+	
+	JSONEntryTag(std::string tag, SInt16 priority, std::string xmltemplate, std::string filename, std::string texatlas,
+	             SInt64 systemcolor, std::string category, std::string name, std::string nameGMST)
+		: tag(std::move(tag)), priority(priority), xmltemplate(std::move(xmltemplate)), filename(std::move(filename)),
+		  texatlas(std::move(texatlas)), systemcolor(systemcolor), category(std::move(category)), name(std::move(name)), nameGMST(std::move(nameGMST))
 	{
 	}
 	JSONEntryTag() = default;
