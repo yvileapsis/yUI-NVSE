@@ -225,3 +225,5 @@ __declspec(naked) void Hook_##name() \
 #define APPLY_JMP(name) WriteRelJump(kAddr_##name, Hook_##name)
 
 #define _A __asm
+
+char* stristr(const char* str1, const char* str2);

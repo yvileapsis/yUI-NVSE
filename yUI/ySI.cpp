@@ -1,6 +1,5 @@
-#include "ySI.h"
-
-#include "functions.h"
+#include <ySI.h>
+#include <functions.h>
 
 extern int g_ySI;
 extern int g_ySI_Sort;
@@ -21,12 +20,30 @@ void InjectTemplates()
 	}
 }
 
-bool __fastcall ShouldHideEntry(ContChangesEntry* a1)
+extern bool* g_menuVisibility;
+std::string stringStewie;
+
+bool __fastcall ShouldHideEntry(ContChangesEntry* entry)
 {
-	if (!a1) return false;
-	if (!a1->type) return false;
-	if (a1->type->typeID == 0x2E) return true;
+	if (!entry || !entry->type) return false;
+	if (!g_SI_Items[entry->type].compare("(jdd1)")) {
+//		if (stringStewie.empty() || stringStewie._Equal("_")) return true;
+//		return stristr(entry->type->GetTheName(), stringStewie.c_str());
+		return true;
+	}
+	return false;
 }
+
+bool __cdecl KeyringFilterHook(ContChangesEntry* entry)
+{
+	if (!entry || !entry->type) return true;
+	if (!g_SI_Items[entry->type].compare("(jdd1)")) {
+		if (stringStewie.empty() || stringStewie._Equal("_")) return false;
+		return !stristr(entry->type->GetTheName(), stringStewie.c_str());
+	}
+	return true;
+}
+
 
 void __fastcall AddSortingCategories()
 {
@@ -35,7 +52,8 @@ void __fastcall AddSortingCategories()
 	if (!entryDataList) return;
 	for (auto iter = entryDataList->Head(); iter; iter = iter->next)
 	{
-		if (iter->data->type->typeID == 0x2E) keys++;
+//		if (iter->data->type->typeID == 0x2E) keys++;
+		if (!g_SI_Items[iter->data->type].compare("(jdd1)")) keys++;
 	}
 	if (keys) {
 		std::string keyringname = StrFromINI(reinterpret_cast<DWORD*>(0x011D3B20));
@@ -57,7 +75,7 @@ __declspec(naked) void FunnyHook()
 	{
 		mov ecx, [ebp + 0x8] // a1
 		call ShouldHide
-		test eax, eax
+		test al, al
 		jz shouldnot
 		jmp retnAddr1
 	shouldnot:
@@ -73,6 +91,24 @@ __declspec(naked) void FunnyHook2()
 	{
 		call AddCategories
 		jmp retnAddr
+	}
+}
+
+
+void KeyringRefreshPostStewie()
+{
+	if (CdeclCall<bool>(0x702360) && g_menuVisibility[kMenuType_Inventory] && InventoryMenu::GetSingleton()->IsKeyringOpen())
+	{
+		if (Tile* stew = InventoryMenu::GetSingleton()->tile->GetChild("IM_SearchBar"); stew)
+		{
+			if (const auto string = stew->GetValue(kTileValue_string)->str; !stringStewie._Equal(string))
+			{
+				stringStewie = string;
+				InventoryMenu::GetSingleton()->itemsList.Filter(KeyringFilterHook);
+				InventoryMenu::GetSingleton()->itemsList.ForEach((void(__cdecl*)(Tile*, ContChangesEntry*))0x780C00);
+			}
+		}
+		else stringStewie.clear();
 	}
 }
 
@@ -185,8 +221,6 @@ signed int __fastcall CompareItemsWithTags(ContChangesEntry* a2, ContChangesEntr
 	{
 		std::string tag1, tag2;
 
-
-		
 		tag1 = g_SI_Items[form1];
 		tag2 = g_SI_Items[form2];
 		

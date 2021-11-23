@@ -1,20 +1,14 @@
-#include "main.h"
-#include "PluginAPI.h"
-#include "nvse/CommandTable.h"
-//#include "commands_animation.h"
-//#include "hooks.h"
-#include "utility.h"
-
-#include "GameData.h"
-
-#include "LambdaVariableContext.h"
-
-#include "functions.h"
-
-#include "patches.h"
-#include "commands.h"
-#include "settings.h"
-#include "ySI.h"
+#include <main.h>
+#include <PluginAPI.h>
+#include <CommandTable.h>
+#include <utility.h>
+#include <GameData.h>
+#include <LambdaVariableContext.h>
+#include <functions.h>
+#include <patches.h>
+#include <commands.h>
+#include <settings.h>
+#include <ySI.h>
 #include <file.h>
 
 #define yUI_VERSION 1.0
@@ -52,10 +46,10 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	}
 	else if (msg->type == NVSEMessagingInterface::kMessage_MainGameLoop)
 	{
-		const auto isMenuMode = CdeclCall<bool>(0x702360);
-		InjectIconTileLastFix();
+		if (g_ySI_Sort || g_ySI_Icons || g_ySI_Hotkeys) InjectIconTileLastFix();
+		KeyringRefreshPostStewie();
 		
-		if (iDoOnce == 0 && !isMenuMode) {
+		if (iDoOnce == 0 && !CdeclCall<bool>(0x702360)) {
 			iDoOnce++;
 
 			g_HUDMainMenu = TileMenu::GetTileMenu(kMenuType_HUDMain);
@@ -65,7 +59,7 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 			g_StatsMenu = TileMenu::GetTileMenu(kMenuType_Stats);
 			g_InventoryMenu = TileMenu::GetTileMenu(kMenuType_Inventory);
 
-			if (g_ySI || g_ySI_Hotkeys) InjectTemplates();
+			if (g_ySI_Sort || g_ySI_Icons || g_ySI_Hotkeys) InjectTemplates();
 		}
 		
 	}
@@ -77,10 +71,9 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 
 void writePatches()
 {
-	if (g_ySI) patchAddIcons();
-	if (g_ySI_Hotkeys) patchReplaceHotkeyIcons();
-	
-	if (g_ySI || g_SortingFix) patchSortingHooks();
+	if (g_ySI_Sort || g_ySI_SortingFix) patchSortingHooks();
+	if (g_ySI_Icons) patchAddIcons();
+	if (g_ySI_Hotkeys) patchReplaceHotkeyIcons();	
 	if (g_yCM) patchAddyCMToSettingsMenu();
 	if (g_yMC) patchMatchedCursor();
 	//	patch1080pUI();
@@ -125,8 +118,6 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 	}
 	return true;
 }
-
-int g_logLevel = 0;
 
 bool NVSEPlugin_Load(const NVSEInterface* nvse)
 {

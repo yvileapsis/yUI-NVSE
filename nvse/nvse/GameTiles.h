@@ -291,6 +291,7 @@ public:
 
 	void				Dump(void);
 	void				HandleChange(UInt32 tilevalue) { ThisCall<void>(0xA074D0, this, tilevalue); }
+	Tile*				GetChildByID(UInt32 id) { return ThisCall<Tile*>(0xA03EB0, this, id); }; // THANKS STEWIE
 
 };
 

@@ -1,34 +1,17 @@
-#pragma once
-#include "functions.h"
-
+#include <functions.h>
 #include <unordered_set>
 #include <PluginAPI.h>
-#include "GameAPI.h"
+#include <GameAPI.h>
+#include <settings.h>
 
 void PrintAndClearQueuedConsoleMessages()
 {
-	for (auto iter = queuedConsoleMessages.Begin(); !iter.End(); ++iter) {
+	for (auto iter = queuedConsoleMessages.Begin(); !iter.End(); ++iter)
 		Console_Print("%s", iter.Get());
-	}
 	queuedConsoleMessages.DeleteAll();
 }
 
-void FillCraftingComponents()
-{
-	for (auto mIter = (*g_allFormsMap)->Begin(); mIter; ++mIter)
-	{
-		if (mIter.Get()->typeID != 106) continue;
-		const auto list = DYNAMIC_CAST(mIter.Get(), TESForm, TESRecipe);
-		if (!list) continue;
-		for (ListNode<RecipeComponent>* node = list->inputs.Head(); node; node = node->next) {
-			if (node->data && node->data->item) {
-				g_CraftingComponents.emplace(node->data->item);
-			}
-		}
-	}
-}
-
-void ConsoleQueueOrPrint(const char* str, int len)
+void ConsoleQueueOrPrint(const char* str, const int len)
 {
 	if (*reinterpret_cast<ConsoleManager**>(0x11D8CE8) || g_dataHandler) { // g_dataHandler will be non-null if Deferred init has been called
 		Console_Print("%s", str);
@@ -169,7 +152,7 @@ void GetLoadedType(UInt32 formType, int index, tList<TESForm>* outList, TempElem
 		TESObjectCELL** cells = g_dataHandler->cellArray.data;
 		for (UInt32 count = g_dataHandler->cellArray.Length(); count; count--, cells++)
 		{
-			if ((index != -1) && (index != (*cells)->modIndex)) continue;
+			if (index != -1 && index != (*cells)->modIndex) continue;
 			if (outList) outList->Insert(*cells);
 			else tmpElements->Append(*cells);
 		}
@@ -178,15 +161,13 @@ void GetLoadedType(UInt32 formType, int index, tList<TESForm>* outList, TempElem
 	{
 		ListNode<TESWorldSpace>* wspcIter = g_dataHandler->worldSpaceList.Head();
 		TESWorldSpace* wspc;
-		ListNode<TESObjectREFR>* refrIter;
-		TESObjectREFR* refr;
 		do
 		{
 			if (!(wspc = wspcIter->data)) continue;
-			refrIter = wspc->cell->objectList.Head();
+			ListNode<TESObjectREFR>* refrIter = wspc->cell->objectList.Head();
 			do
 			{
-				refr = refrIter->data;
+				auto refr = refrIter->data;
 				if (!refr || !refr->extraDataList.HasType(kExtraData_MapMarker) || ((index != -1) && (index != refr->modIndex))) continue;
 				if (outList) outList->Insert(refr);
 				else tmpElements->Append(refr);
@@ -247,76 +228,82 @@ void GetLoadedType(UInt32 formType, int index, tList<TESForm>* outList, TempElem
 	}
 }
 
+void FillCraftingComponents()
+{
+	for (auto mIter = (*g_allFormsMap)->Begin(); mIter; ++mIter)
+	{
+		if (mIter.Get()->typeID != 106) continue;
+		const auto list = DYNAMIC_CAST(mIter.Get(), TESForm, TESRecipe);
+		if (!list) continue;
+		for (ListNode<RecipeComponent>* node = list->inputs.Head(); node; node = node->next)
+			if (node->data && node->data->item) g_CraftingComponents.emplace(node->data->item);
+	}
+}
 
 float TESObjectWEAP::GetWeaponValue(UInt32 whichVal)
 {
-	if (this) {
-		switch (whichVal) {
-		case eWeap_Type:				return this->eWeaponType;
-		case eWeap_MinSpread:			return this->minSpread;
-		case eWeap_Spread:				return this->spread;
-		case eWeap_Proj:
-		{
-			if (BGSProjectile * pProj = this->projectile; pProj) {
-				return pProj->refID;
-			}
-		}
+	if (!this) return false;
+	switch (whichVal) {
+	case eWeap_Type:				return this->eWeaponType;
+	case eWeap_MinSpread:			return this->minSpread;
+	case eWeap_Spread:				return this->spread;
+	case eWeap_Proj:
+	{
+		if (BGSProjectile* pProj = this->projectile; pProj) return pProj->refID;
 		break;
-		case eWeap_SightFOV:			return this->sightFOV;
-		case eWeap_MinRange:			return this->minRange;
-		case eWeap_Range:				return this->maxRange;
-		case eWeap_AmmoUse:				return this->ammoUse;
-		case eWeap_APCost:				return this->AP;
-		case eWeap_CritDam:				return this->criticalDamage;
-		case eWeap_CritChance:			return this->criticalPercent;
-		case eWeap_CritEffect:
-		{
-			if (SpellItem * pSpell = this->criticalEffect; pSpell) {
-				return pSpell->refID;
-			}
-		}
-		break;
-		case eWeap_FireRate:			return this->fireRate;
-		case eWeap_AnimAttackMult:		return this->animAttackMult;
-		case eWeap_RumbleLeft:			return this->rumbleLeftMotor;
-		case eWeap_RumbleRight:			return this->rumbleRightMotor;
-		case eWeap_RumbleDuration:		return this->rumbleDuration;
-		case eWeap_RumbleWaveLength:	return this->rumbleWavelength;
-		case eWeap_AnimShotsPerSec:		return this->animShotsPerSec;
-		case eWeap_AnimReloadTime:		return this->animReloadTime;
-		case eWeap_AnimJamTime:			return this->animJamTime;
-		case eWeap_Skill:				return this->weaponSkill;
-		case eWeap_ResistType:			return this->resistType;
-		case eWeap_FireDelayMin:		return this->semiAutoFireDelayMin;
-		case eWeap_FireDelayMax:		return this->semiAutoFireDelayMax;
-		case eWeap_AnimMult:			return this->animMult;
-		case eWeap_Reach:				return this->reach;
-		case eWeap_IsAutomatic:			return this->IsAutomatic();
-		case eWeap_HandGrip:			return this->HandGrip();
-		case eWeap_ReloadAnim:			return this->reloadAnim;
-		case eWeap_VATSChance:			return this->baseVATSChance;
-		case eWeap_AttackAnim:			return this->AttackAnimation();
-		case eWeap_NumProj:				return this->numProjectiles;
-		case eWeap_AimArc:				return this->aimArc;
-		case eWeap_LimbDamageMult:		return this->limbDamageMult;
-		case eWeap_SightUsage:			return this->sightUsage;
-		case eWeap_ReqStr:				return this->strRequired;
-		case eWeap_ReqSkill:			return this->skillRequirement;
-		case eWeap_LongBursts:			return this->weaponFlags2.IsSet(TESObjectWEAP::eFlag_LongBurst);
-		case eWeap_Flags1:				return this->weaponFlags1.Get();
-		case eWeap_Flags2:				return this->weaponFlags2.Get();
-		case eWeap_HasScope:			return this->HasScope();
-		case eWeap_IgnoresDTDR:			return this->IgnoresDTDR();
-		case eWeap_SoundLevel:			return this->soundLevel;
-		case eWeap_ClipSize:
-		{
-			const auto pClipRounds = DYNAMIC_CAST(this, TESForm, BGSClipRoundsForm);
-			if (pClipRounds) { return pClipRounds->clipRounds; }
-		}
-		default: HALT("unknown weapon value"); break;
-		}
 	}
-	return true;
+	case eWeap_SightFOV:			return this->sightFOV;
+	case eWeap_MinRange:			return this->minRange;
+	case eWeap_Range:				return this->maxRange;
+	case eWeap_AmmoUse:				return this->ammoUse;
+	case eWeap_APCost:				return this->AP;
+	case eWeap_CritDam:				return this->criticalDamage;
+	case eWeap_CritChance:			return this->criticalPercent;
+	case eWeap_CritEffect:
+	{
+		if (SpellItem* pSpell = this->criticalEffect; pSpell) return pSpell->refID;
+		break;
+	}
+	case eWeap_FireRate:			return this->fireRate;
+	case eWeap_AnimAttackMult:		return this->animAttackMult;
+	case eWeap_RumbleLeft:			return this->rumbleLeftMotor;
+	case eWeap_RumbleRight:			return this->rumbleRightMotor;
+	case eWeap_RumbleDuration:		return this->rumbleDuration;
+	case eWeap_RumbleWaveLength:	return this->rumbleWavelength;
+	case eWeap_AnimShotsPerSec:		return this->animShotsPerSec;
+	case eWeap_AnimReloadTime:		return this->animReloadTime;
+	case eWeap_AnimJamTime:			return this->animJamTime;
+	case eWeap_Skill:				return this->weaponSkill;
+	case eWeap_ResistType:			return this->resistType;
+	case eWeap_FireDelayMin:		return this->semiAutoFireDelayMin;
+	case eWeap_FireDelayMax:		return this->semiAutoFireDelayMax;
+	case eWeap_AnimMult:			return this->animMult;
+	case eWeap_Reach:				return this->reach;
+	case eWeap_IsAutomatic:			return this->IsAutomatic();
+	case eWeap_HandGrip:			return this->HandGrip();
+	case eWeap_ReloadAnim:			return this->reloadAnim;
+	case eWeap_VATSChance:			return this->baseVATSChance;
+	case eWeap_AttackAnim:			return this->AttackAnimation();
+	case eWeap_NumProj:				return this->numProjectiles;
+	case eWeap_AimArc:				return this->aimArc;
+	case eWeap_LimbDamageMult:		return this->limbDamageMult;
+	case eWeap_SightUsage:			return this->sightUsage;
+	case eWeap_ReqStr:				return this->strRequired;
+	case eWeap_ReqSkill:			return this->skillRequirement;
+	case eWeap_LongBursts:			return this->weaponFlags2.IsSet(TESObjectWEAP::eFlag_LongBurst);
+	case eWeap_Flags1:				return this->weaponFlags1.Get();
+	case eWeap_Flags2:				return this->weaponFlags2.Get();
+	case eWeap_HasScope:			return this->HasScope();
+	case eWeap_IgnoresDTDR:			return this->IgnoresDTDR();
+	case eWeap_SoundLevel:			return this->soundLevel;
+	case eWeap_ClipSize:
+	{
+		if (const auto pClipRounds = DYNAMIC_CAST(this, TESForm, BGSClipRoundsForm); pClipRounds) return pClipRounds->clipRounds;
+		break;
+	}
+	default: HALT("unknown weapon value"); break;
+	}
+	return false;
 }
 
 enum EBipedFlags {
@@ -327,55 +314,37 @@ enum EBipedFlags {
 	eBipedFlag_HeavyArmor = 0x80,
 };
 
-UInt32 TESObjectARMO::GetArmorValue(UInt32 whichVal)
+UInt32 TESObjectARMO::GetArmorValue(const UInt32 whichVal)
 {
-	if (this) {
-		switch (whichVal) {
-		case 1: {
-			TESBipedModelForm* biped = &this->bipedModel;
-			return (biped->bipedFlags & eBipedFlag_HeavyArmor) ? 3 : ((biped->bipedFlags & eBipedFlag_MediumArmor) ? 2 : 1);
-		}
-		case 2: {
-			TESBipedModelForm* biped = &this->bipedModel;
-			return (biped->bipedFlags & eBipedFlag_PowerArmor) ? 1 : 0;
-		}
-		case 3: {
-			TESBipedModelForm* biped = &this->bipedModel;
-			return (biped->bipedFlags & eBipedFlag_HasBackPack) ? 1 : 0;
-		}
-		case 4:						return this->armorRating;
-		case 5:						return static_cast<UInt32>(this->damageThreshold);
-		case 6: {
-			TESBipedModelForm* biped = &this->bipedModel;
-			return biped->partMask;
-		}
-		default: HALT("unknown weapon value"); break;
-		}
+	if (!this) return false;
+	switch (whichVal) {
+	case 1:	return (&this->bipedModel)->bipedFlags & eBipedFlag_HeavyArmor ? 3 : (&this->bipedModel)->bipedFlags & eBipedFlag_MediumArmor ? 2 : 1;
+	case 2:	return (&this->bipedModel)->bipedFlags & eBipedFlag_PowerArmor ? 1 : 0;
+	case 3:	return (&this->bipedModel)->bipedFlags & eBipedFlag_HasBackPack ? 1 : 0;
+	case 4:	return this->armorRating;
+	case 5:	return static_cast<UInt32>(this->damageThreshold);
+	case 6: return (&this->bipedModel)->partMask;
+	default: HALT("unknown armor value"); break;
 	}
-	return true;
+	return false;
 }
 
 ExtraDataList* ExtraContainerChanges::EntryData::GetCustomExtra(UInt32 whichVal)
 {
 	if (extendData)
 	{
-		ExtraDataList* xData;
 		ListNode<ExtraDataList>* xdlIter = extendData->Head();
-		do
-		{
-			xData = xdlIter->data;
-			if (xData && xData->HasType(whichVal))
-				return xData;
-		} while (xdlIter = xdlIter->next);
+		do if (const auto xData = xdlIter->data; xData && xData->HasType(whichVal)) return xData;
+		while (xdlIter = xdlIter->next);
 	}
-	return NULL;
+	return nullptr;
 }
 
 UInt8 ContWeaponHasAnyMod(ContChangesEntry* weaponInfo)
 {
-	ExtraDataList* xData = weaponInfo->GetCustomExtra(kExtraData_WeaponModFlags);
+	const auto xData = weaponInfo->GetCustomExtra(kExtraData_WeaponModFlags);
 	if (!xData) return 0;
-	ExtraWeaponModFlags* xModFlags = GetExtraType((*xData), WeaponModFlags);
+	const auto xModFlags = GetExtraType((*xData), WeaponModFlags);
 	if (!xModFlags) return 0;
 	return xModFlags->flags;
 }
@@ -385,24 +354,21 @@ float ContGetHealthPercent(ContChangesEntry* itemInfo)
 	ExtraDataList* xData = itemInfo->GetCustomExtra(kExtraData_Health);
 	if (!xData) return 0;
 	auto* healthForm = DYNAMIC_CAST(itemInfo->type, TESForm, TESHealthForm);
-	ExtraHealth* xHealth;
-	if (healthForm)
-	{
-		xHealth = GetExtraType((*xData), Health);
-	}
-	float health = xHealth ? xHealth->health : (int)healthForm->health;
+	ExtraHealth* xHealth = nullptr;
+	if (healthForm) xHealth = GetExtraType((*xData), Health);
+	const float health = xHealth ? xHealth->health : static_cast<int>(healthForm->health);
 	return (health / healthForm->health);
 }
 
 bool ContGetEquipped(ContChangesEntry* weaponInfo)
 {
-	ExtraDataList* xData = weaponInfo->GetCustomExtra(kExtraData_Worn);
-	if (!xData) return 0;
-	ExtraWorn* xWorn = GetExtraType((*xData), Worn);
-	if (xWorn) return 1;
-	ExtraWornLeft* xWornLeft = GetExtraType((*xData), WornLeft);
-	if (xWornLeft) return 1;
-	return 0;
+	auto xData = weaponInfo->GetCustomExtra(kExtraData_Worn);
+	if (!xData) return false;
+	auto* xWorn = GetExtraType((*xData), Worn);
+	if (xWorn) return true;
+	auto* xWornLeft = GetExtraType((*xData), WornLeft);
+	if (xWornLeft) return true;
+	return false;
 }
 
 UInt32 AlchemyItem::HasBaseEffectRestoresAV(int avCode)
@@ -464,25 +430,18 @@ bool AlchemyItem::IsWaterAlt()
 	return this->HasBaseEffectRestoresAV(kAVCode_Dehydration) && this->HasBaseEffectRestoresAV(kAVCode_Hunger) == 0 ? true : false;
 }
 
-bool HasBaseEffectChangesAV(TESForm* form, int avCode)
+bool HasBaseEffectChangesAV(TESForm* form, const int avCode)
 {
 	auto armor = DYNAMIC_CAST(form, TESForm, TESObjectARMO);
 	if (!armor) return false;
-	TESEnchantableForm* enchantable = &armor->enchantable;
+	auto enchantable = &armor->enchantable;
 	if (!enchantable) return false;
-	EnchantmentItem* enchantment = enchantable->enchantItem;
+	auto enchantment = enchantable->enchantItem;
 	if (!enchantment) return false;
 	for (auto iter = enchantment->magicItem.list.list.Begin(); !iter.End(); ++iter)
-	{
 		if (auto effect = iter.Get(); effect->GetSkillCode() == avCode)
-		{
-			if (const auto setting = effect->setting; setting && (setting->effectFlags & EffectSetting::kRecover))
-			{
+			if (const auto setting = effect->setting; setting && setting->effectFlags & EffectSetting::kRecover)
 				return true;
-				//				if (effect->conditions.Evaluate(g_player, nullptr, &eval, false)) return true;
-			}
-		}
-	}
 	return false;
 }
 
@@ -517,8 +476,7 @@ __declspec(naked) TESForm* __stdcall LookupFormByRefID(UInt32 refID)
 
 TESForm* GetRefFromString(char* mod, char* id)
 {
-	UInt32 itemID;
-	itemID = (g_dataHandler->GetModIndex(mod) << 24) | strtoul(id, NULL, 0);
+	const auto itemID = (g_dataHandler->GetModIndex(mod) << 24) | strtoul(id, nullptr, 0);
 	return LookupFormByRefID(itemID);
 }
 
@@ -551,14 +509,14 @@ void Log(const std::string& msg)
 {
 	_MESSAGE("%s", msg.c_str());
 	if (g_logLevel == 2)
-		Console_Print("kNVSE: %s", msg.c_str());
+		Console_Print("yUI: %s", msg.c_str());
 }
 
 void DebugLog(const std::string& msg)
 {
 	_MESSAGE("%s", msg.c_str());
 	if (g_logLevel == 2)
-		Console_Print("kNVSE: %s", msg.c_str());
+		Console_Print("yUI: %s", msg.c_str());
 }
 
 int HexStringToInt(const std::string& str)
@@ -573,7 +531,7 @@ int HexStringToInt(const std::string& str)
 void DebugPrint(const std::string& str)
 {
 	if (g_logLevel == 1)
-		Console_Print("kNVSE: %s", str.c_str());
+		Console_Print("yUI: %s", str.c_str());
 	Log(str);
 }
 
@@ -614,7 +572,7 @@ void Tile::SetStringRecursive(const UInt32 tileValue, const char* changeto, cons
 extern TileMenu** g_tileMenuArray;
 
 
-TileMenu* TileMenu::GetTileMenu(UInt32 menuID)
+TileMenu* TileMenu::GetTileMenu(const UInt32 menuID)
 {
 	return menuID ? g_tileMenuArray[menuID - kMenuType_Min] : nullptr;
 }
@@ -639,7 +597,7 @@ void __fastcall TileSetIntValueCursor(Tile* tile, void* dummyEDX, enum TileValue
 
 bool __fastcall FileExists(const char* path)
 {
-	UInt32 attr = GetFileAttributes(path);
+	const auto attr = GetFileAttributes(path);
 	return (attr != INVALID_FILE_ATTRIBUTES) && !(attr & FILE_ATTRIBUTE_DIRECTORY);
 }
 

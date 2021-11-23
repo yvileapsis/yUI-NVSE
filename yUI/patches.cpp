@@ -1,11 +1,7 @@
-#include "patches.h"
-
-#include "SafeWrite.h"
-
-#include "ySI.h"
-#include "functions.h"
-//#include "main.h"
-
+#include <patches.h>
+#include <SafeWrite.h>
+#include <ySI.h>
+#include <functions.h>
 
 void __fastcall TileSetIntValueNop(Tile* tile, void* dummyEDX, enum TileValues tilevalue, int value)
 {
@@ -40,7 +36,10 @@ void patchSortingHooks()
 
 void patchSortingCategories()
 {
+	WriteRelJump(0x7826E4, reinterpret_cast<UInt32>(FunnyHook));
 	WriteRelJump(0x7831C1, reinterpret_cast<UInt32>(FunnyHook2));
+	SafeWrite32(0x78080B, reinterpret_cast<UInt32>(KeyringFilterHook));
+
 }
 
 void patchAddIcons()

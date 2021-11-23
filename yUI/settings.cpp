@@ -8,12 +8,12 @@ void handleINIOptions()
 	CSimpleIniA ini;
 	ini.SetUnicode();
 	const auto errVal = ini.LoadFile(iniPath.c_str());
-
-	g_SortingFix = ini.GetOrCreate("General", "bSortingFix", 1, "; fix the issue where items with different conditions would 'jump around' on update");
-	g_ySI = ini.GetOrCreate("General", "bSortingIcons", 0, "; enable ycons");
-	g_ySI_Hotkeys = ini.GetOrCreate("General", "bReplaceHotkeyIcons", 1, "; replace hotkey icons with ycons");
+	g_ySI = ini.GetOrCreate("General", "bSortingIcons", 1, "; enable Sorting and Icons section");
 	g_yMC = ini.GetOrCreate("General", "bMatchingCursor", 0, "; match cursor color to HUD color");
-	g_ySI_Sort = ini.GetOrCreate("Sorting Icons", "bSortInventory", 1, "; sort inventory according to tag names");
 
+	g_ySI_SortingFix = ini.GetOrCreate("Sorting and Icons", "bSortingFix", 1, "; fix the issue where items with different conditions would 'jump around' on update");
+	g_ySI_Sort = ini.GetOrCreate("Sorting and Icons", "bSortInventory", 1, "; sort inventory according to tag names supplied in .json");
+	g_ySI_Icons = ini.GetOrCreate("Sorting and Icons", "bAddInventoryIcons", 1, "; add ycons to inventory, container and barter menus");
+	g_ySI_Hotkeys = ini.GetOrCreate("Sorting and Icons", "bReplaceHotkeyIcons", 1, "; replace hotkey icons with ycons");
 	ini.SaveFile(iniPath.c_str(), false);
 }
