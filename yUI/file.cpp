@@ -231,7 +231,7 @@ void HandleJson(const std::filesystem::path& path)
 				else g_SI_Items_JSON.emplace_back(tag, priority, formType, questItem);
 			}
 		}
-		else { DebugPrint(path.string() + " does not start as a JSON array"); }
+		else { DebugPrint(path.string() + " JSON tag array not detected"); }
 
 		if (j.contains("icons") && j["icons"].is_array())
 		{
@@ -267,7 +267,7 @@ void HandleJson(const std::filesystem::path& path)
 				g_SI_Tags_JSON.emplace_back(tag, priority, xmltemplate, filename, texatlas, systemcolor, category, name, nameGMST);
 			}
 		}
-		else { DebugPrint(path.string() + " does not start as a JSON array"); }
+		else { DebugPrint(path.string() + " JSON icon array not detected"); }
 	}
 	catch (nlohmann::json::exception& e)
 	{

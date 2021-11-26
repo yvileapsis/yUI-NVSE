@@ -39,6 +39,7 @@ bool Cmd_ySIGetTagTrait_Execute(COMMAND_ARGS)
 		const std::string icon = g_SI_Tags[tag].filename;
 		AssignString(PASS_COMMAND_ARGS, icon.c_str());
 	}
+	delete[] src;
 	return true;
 }
 
@@ -57,5 +58,7 @@ bool Cmd_SwapTexatlas_Execute(COMMAND_ARGS)
 	char texatlasnew[0x100];
 	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &texatlas, &texatlasnew)) return true;
 	SetUIStringFull(texatlas, texatlasnew, kTileValue_texatlas);
+	delete[] texatlas;
+	delete[] texatlasnew;
 	return true;
 }
