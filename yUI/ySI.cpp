@@ -1,5 +1,7 @@
 #include <ySI.h>
 #include <functions.h>
+#include <filesystem>
+#include <file.h>
 
 extern int g_ySI;
 extern int g_ySI_Sort;
@@ -23,21 +25,17 @@ void InjectTemplates()
 extern bool* g_menuVisibility;
 std::string stringStewie;
 
-bool __fastcall ShouldHideEntry(ContChangesEntry* entry)
+bool __fastcall KeyringHideKeys(ContChangesEntry* entry)
 {
 	if (!entry || !entry->type) return false;
-	if (!g_SI_Items[entry->type].compare("(jdd1)")) {
-//		if (stringStewie.empty() || stringStewie._Equal("_")) return true;
-//		return stristr(entry->type->GetTheName(), stringStewie.c_str());
-		return true;
-	}
+	if (g_SI_Items[entry->type]._Equal("(jdd1)")) return true;
 	return false;
 }
 
-bool __cdecl KeyringFilterHook(ContChangesEntry* entry)
+bool __cdecl KeyringHideNonKeys(ContChangesEntry* entry)
 {
 	if (!entry || !entry->type) return true;
-	if (!g_SI_Items[entry->type].compare("(jdd1)")) {
+	if (g_SI_Items[entry->type]._Equal("(jdd1)")) {
 		if (stringStewie.empty() || stringStewie._Equal("_")) return false;
 		return !stristr(entry->type->GetTheName(), stringStewie.c_str());
 	}
@@ -53,7 +51,7 @@ void __fastcall AddSortingCategories()
 	for (auto iter = entryDataList->Head(); iter; iter = iter->next)
 	{
 //		if (iter->data->type->typeID == 0x2E) keys++;
-		if (!g_SI_Items[iter->data->type].compare("(jdd1)")) keys++;
+		if (g_SI_Items[iter->data->type]._Equal("(jdd1)")) keys++;
 	}
 	if (keys) {
 		std::string keyringname = StrFromINI(reinterpret_cast<DWORD*>(0x011D3B20));
@@ -66,11 +64,11 @@ void __fastcall AddSortingCategories()
 	}
 }
 
-__declspec(naked) void FunnyHook()
+__declspec(naked) void KeyringHideKeysHook()
 {
 	static const UInt32 retnAddr1 = 0x7826EA;
 	static const UInt32 retnAddr2 = 0x7826F1;
-	static const UInt32 ShouldHide = reinterpret_cast<UInt32>(ShouldHideEntry);
+	static const UInt32 ShouldHide = reinterpret_cast<UInt32>(KeyringHideKeys);
 	__asm
 	{
 		mov ecx, [ebp + 0x8] // a1
@@ -83,7 +81,7 @@ __declspec(naked) void FunnyHook()
 	}
 }
 
-__declspec(naked) void FunnyHook2()
+__declspec(naked) void KeyringAddCategories()
 {
 	static const UInt32 retnAddr = 0x783213;
 	static const UInt32 AddCategories = reinterpret_cast<UInt32>(AddSortingCategories);
@@ -104,7 +102,7 @@ void KeyringRefreshPostStewie()
 			if (const auto string = stew->GetValue(kTileValue_string)->str; !stringStewie._Equal(string))
 			{
 				stringStewie = string;
-				InventoryMenu::GetSingleton()->itemsList.Filter(KeyringFilterHook);
+				InventoryMenu::GetSingleton()->itemsList.Filter(KeyringHideNonKeys);
 				InventoryMenu::GetSingleton()->itemsList.ForEach((void(__cdecl*)(Tile*, ContChangesEntry*))0x780C00);
 			}
 		}
@@ -380,119 +378,3 @@ __declspec(naked) void BarterContainerMenuSortingHook()
 		ret
 	}
 }
-
-/*
-__declspec(naked) void PostJazzHookInventory()
-{
-	static const UInt32 SetStringValue = UInt32(Tile__SetStringValueRemoveTag);
-	static const UInt32 GetValueAsText = 0xA011F0;
-	static const UInt32 GetLast = 0x7B5370;
-
-	static const UInt32 retnAddr = 0x782902;
-
-	__asm
-	{
-
-		push    1
-		push    0x0FC4
-		mov     ecx, [ebp + 0x8]
-		call    GetValueAsText
-		push    eax
-		push    0x0FC4
-		mov     ecx, [ebp + 0x8]
-		add     ecx, 4
-		call    GetLast
-		mov     ecx, [eax]
-		call    SetStringValue
-
-		push	0x1D
-		push	0x0FAA
-		mov     ecx, [ebp + 8]
-		jmp		retnAddr
-	}
-}
-
-
-__declspec(naked) void PostJazzHookBarter()
-{
-	static const UInt32 SetStringValue = UInt32(Tile__SetStringValueRemoveTag);
-	static const UInt32 GetValueAsText = 0xA011F0;
-	static const UInt32 GetLast = 0x7B5370;
-
-	static const UInt32 retnAddr = 0x72F384;
-
-	__asm
-	{
-		push    1
-		push    0x0FC4
-		mov     ecx, [ebp + 0x8]
-		call    GetValueAsText
-		push    eax
-		push    0x0FC4
-		mov     ecx, [ebp + 0x8]
-		add     ecx, 4
-		call    GetLast
-		mov     ecx, [eax]
-		call    SetStringValue
-
-		push	0
-		mov		ecx, [ebp + 0xC]
-		jmp		retnAddr
-	}
-}*/
-/*
-void __fastcall Tile__SetStringValueNop(Tile* tile, void* dummyEDX, enum TileValues tilevalue, char* src, char propagate)
-{
-	ConsoleQueueOrPrint(src, strlen(src));
-}*/
-/*
-void __fastcall PostJazzHookBarterHandle(TileMenu* tile)
-{
-	char* string = ThisStdCall<char*>(0xA011F0, tile, kTileValue_string);
-	Tile* child = ThisStdCall<Tile*>(0x7B5370, tile + 0x4);
-	Tile__SetStringValueAlt(child, 0, kTileValue_string, string, 1);
-}
-
-
-__declspec(naked) void PostJazzHookBarterAlt()
-{
-	static const UInt32 SetStringValue = UInt32(PostJazzHookBarterHandle);
-
-	static const UInt32 retnAddr = 0x72F384;
-
-	__asm
-	{
-		mov     ecx, [ebp + 0x8]
-		call    PostJazzHookBarterHandle
-
-		push	0
-		mov		ecx, [ebp + 0xC]
-		jmp		retnAddr
-	}
-}
-
-
-void __fastcall Tile__SetStringValueRemoveTag(Tile* tile, void* dummyEDX, enum TileValues tilevalue, char* src, char propagate)
-{
-	for (auto& it = map_ySI_Icon.rbegin(); it != map_ySI_Icon.rend(); it++) {
-		if (std::string(src).rfind(it->first, 0) == 0) {
-			if (it->first.empty()) { break; }
-			tile->SetString(tilevalue, src + 1 + it->first.length(), propagate);
-			return;
-		}
-	};
-	tile->SetString(tilevalue, src, propagate);
-}
-
-int __cdecl strcpy_s_Alt(char* Dst, rsize_t SizeInBytes, char* src)
-{
-	for (auto& it = map_ySI_Icon.rbegin(); it != map_ySI_Icon.rend(); it++) {
-		if (std::string(src).rfind(it->first, 0) == 0) {
-			if (it->first.empty()) { break; }
-			return strcpy_s_(Dst, SizeInBytes, src + 1 + it->first.length());
-		}
-	};
-	return strcpy_s_(Dst, SizeInBytes, src);
-}
-
-*/

@@ -1,15 +1,14 @@
-#include "file.h"
+#include <file.h>
+#include <json.h>
 
 #include <filesystem>
 #include <fstream>
 #include <unordered_set>
 #include <utility>
 
-
-#include "functions.h"
-#include "utility.h"
-#include "json.h"
-#include "Utilities.h"
+#include <functions.h>
+#include <utility.h>
+#include <Utilities.h>
 
 extern std::vector<JSONEntryItem> g_SI_Items_JSON;
 extern std::vector<JSONEntryTag> g_SI_Tags_JSON;

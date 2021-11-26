@@ -1,4 +1,4 @@
-#include "GameUI.h"
+#include <GameUI.h>
 #include <internal/DecodedUI.h>
 
 void (*ToggleMenus)(bool toggleON) = reinterpret_cast<void(*)(bool)>(0x703810);

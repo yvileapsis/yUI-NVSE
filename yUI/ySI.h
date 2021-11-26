@@ -1,13 +1,7 @@
 #pragma once
-#include <filesystem>
-#include <set>
-#include <functional>
-#include "GameTiles.h"
+#include <GameTiles.h>
 #include <GameData.h>
 #include <internal/DecodedUI.h>
-
-#include "file.h"
-//#include "functions.h"
 
 //alignas(16) char s_strValBuffer[0x10000];
 
@@ -23,9 +17,9 @@ void BarterContainerMenuSortingHook();
 void TileSetStringValueHotkeyHook();
 void TileSetStringValueHotkeyHook2();
 void InjectTemplates();
-bool KeyringFilterHook(ContChangesEntry*);
-void FunnyHook();
-void FunnyHook2();
+bool KeyringHideNonKeys(ContChangesEntry*);
+void KeyringHideKeysHook();
+void KeyringAddCategories();
 void InjectIconTileLastFix();
 void KeyringRefreshPostStewie();
 //void InjectIconTile(Tile* tile, ContChangesEntry* entry);

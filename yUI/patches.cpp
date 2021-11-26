@@ -36,9 +36,9 @@ void patchSortingHooks()
 
 void patchSortingCategories()
 {
-	WriteRelJump(0x7826E4, reinterpret_cast<UInt32>(FunnyHook));
-	WriteRelJump(0x7831C1, reinterpret_cast<UInt32>(FunnyHook2));
-	SafeWrite32(0x78080B, reinterpret_cast<UInt32>(KeyringFilterHook));
+	WriteRelJump(0x7826E4, reinterpret_cast<UInt32>(KeyringHideKeysHook));
+	WriteRelJump(0x7831C1, reinterpret_cast<UInt32>(KeyringAddCategories));
+	SafeWrite32(0x78080B, reinterpret_cast<UInt32>(KeyringHideNonKeys));
 
 }
 

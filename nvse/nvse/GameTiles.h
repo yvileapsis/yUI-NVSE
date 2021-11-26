@@ -1,13 +1,11 @@
 #pragma once
-
-#include "NiNodes.h"
-#include "GameTypes.h"
+#include <NiNodes.h>
+#include <GameTypes.h>
 
 class TileMenu;
 typedef UInt32 (* _TraitNameToID)(const char* traitName);
 extern const _TraitNameToID TraitNameToID;
-
-const char * TraitIDToName(int id);	// slow
+const char* TraitIDToName(int id);	// slow
 
 //	Tile			
 //		TileRect		3C	ID=385
@@ -216,7 +214,7 @@ public:
 		virtual Value	*GetValue();
 
 		UInt32		type;		// 04
-		Action		*next;		// 08
+		Action*		next;		// 08
 	};
 
 	// 10
@@ -226,7 +224,7 @@ public:
 		RefValueAction();
 		~RefValueAction();
 
-		Value		*tileVal;	// 0C
+		Value*		tileVal;	// 0C
 	};
 
 	// 10
@@ -243,23 +241,23 @@ public:
 	struct Value
 	{
 		UInt32		id;			// 00
-		Tile		* parent;	// 04
+		Tile*		parent;		// 04
 		float		num;		// 08
-		char		* str;		// 0C
-		Action		* action;	// 10
+		char*		str;		// 0C
+		Action*		action;		// 10
 	};
 
 	struct ChildNode
 	{
-		ChildNode	* next;		// 000
-		ChildNode	* prev;		// 004
-		Tile		* child;	// 008
+		ChildNode*	next;		// 000
+		ChildNode*	prev;		// 004
+		Tile*		child;		// 008
 	};
 
-	DList<Tile>					children;		// 04
-	BSSimpleArray<Value*>		values;			// 10
+	DList<Tile>					children;	// 04
+	BSSimpleArray<Value*>		values;		// 10
 	String						name;		// 20
-	Tile*						parent;	// 28
+	Tile*						parent;		// 28
 	NiNode*						node;		// 2C
 	UInt32						flags;		// 30
 	UInt8						unk34;		// 34

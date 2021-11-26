@@ -18,7 +18,8 @@ void ConsoleQueueOrPrint(const char* str, const int len)
 	}
 	else {
 		const auto errorStr = static_cast<char*>(GameHeapAlloc(len + 1));
-		strcpy(errorStr, str);
+		// ReSharper disable once CppDeprecatedEntity
+		strcpy(errorStr, str);    // NOLINT(clang-diagnostic-deprecated-declarations)
 		queuedConsoleMessages.Append(errorStr);
 	}
 }
@@ -580,7 +581,7 @@ TileMenu* TileMenu::GetTileMenu(const UInt32 menuID)
 
 Tile* Tile::InjectUIXML(const char* str)
 {
-	return (FileExists(str)) ? this->ReadXML(str) : nullptr;
+	return FileExists(str) ? this->ReadXML(str) : nullptr;
 }
 
 void __fastcall TileSetStringValueCursor(Tile* tile, void* dummyEDX, enum TileValues tilevalue, char* src, char propagate)

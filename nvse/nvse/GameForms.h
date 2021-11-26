@@ -1,10 +1,8 @@
-
 #pragma once
-
 #include <vector>
-#include "Utilities.h"
-#include "GameTypes.h"
-#include "GameBSExtraData.h"
+#include <Utilities.h>
+#include <GameTypes.h>
+#include <GameBSExtraData.h>
 
 #define IS_ID(form, type) (form->typeID == kFormType_##type)
 

@@ -2,10 +2,9 @@
 //#include <ParamInfos1.h>
 #include <GameAPI.h>
 #include <GameObjects.h>
-#include <nvse\nvse\CommandTable.h>
+#include <CommandTable.h>
 #include <file.h>
-
-#include "functions.h"
+#include <functions.h>
 
 extern std::unordered_map <TESForm*, std::string> g_SI_Items;
 extern std::unordered_map <std::string, JSONEntryTag> g_SI_Tags;
@@ -39,7 +38,7 @@ bool Cmd_ySIGetTagTrait_Execute(COMMAND_ARGS)
 		const std::string icon = g_SI_Tags[tag].filename;
 		AssignString(PASS_COMMAND_ARGS, icon.c_str());
 	}
-	delete[] src;
+	delete[] &src;
 	return true;
 }
 
@@ -58,7 +57,7 @@ bool Cmd_SwapTexatlas_Execute(COMMAND_ARGS)
 	char texatlasnew[0x100];
 	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &texatlas, &texatlasnew)) return true;
 	SetUIStringFull(texatlas, texatlasnew, kTileValue_texatlas);
-	delete[] texatlas;
-	delete[] texatlasnew;
+	delete[] &texatlas;
+	delete[] &texatlasnew;
 	return true;
 }

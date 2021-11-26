@@ -1,7 +1,6 @@
 #pragma once
-
-#include "GameTiles.h"
-#include "GameTypes.h"
+#include <GameTiles.h>
+#include <GameTypes.h>
 
 void QuickRefreshItemsList();
 void RefreshItemsList();

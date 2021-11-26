@@ -1,5 +1,4 @@
 #pragma once
-
 #include <internal/DecodedUI.h>
 #include <GameTypes.h>
 #include <unordered_set>

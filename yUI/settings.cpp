@@ -1,6 +1,6 @@
-#include "SimpleINILibrary.h"
-#include "settings.h"
-#include "functions.h"
+#include <SimpleINILibrary.h>
+#include <settings.h>
+#include <functions.h>
 
 void handleINIOptions()
 {

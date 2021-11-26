@@ -11,8 +11,8 @@
 #include <ySI.h>
 #include <file.h>
 
-#define yUI_VERSION 1.0
-#define yUI_VERSION_STR "1.0f"
+#define yUI_VERSION 1.1
+#define yUI_VERSION_STR "1.1a"
 
 #define RegisterScriptCommand(name) 	nvse->RegisterCommand(&kCommandInfo_ ##name)
 #define REG_CMD_STR(name) nvse->RegisterTypedCommand(&kCommandInfo_##name, kRetnType_String)

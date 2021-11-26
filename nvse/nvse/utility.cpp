@@ -1,4 +1,4 @@
-#include "nvse/utility.h"
+#include <utility.h>
 
 memcpy_t _memcpy = memcpy, _memmove = memmove;
 
