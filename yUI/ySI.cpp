@@ -9,8 +9,11 @@ extern int g_ySI_Sort;
 extern std::unordered_map <TESForm*, std::string> g_SI_Items;
 extern std::unordered_map <std::string, JSONEntryTag> g_SI_Tags;
 extern std::vector <std::filesystem::path> g_XMLPaths;
+extern std::unordered_set <std::string> g_SI_Categories;
 
 extern TileMenu* g_InventoryMenu;
+
+void InjectIconTile(std::string tag, MenuItemEntryList* list, Tile* tile, ContChangesEntry* entry);
 
 void InjectTemplates()
 {
@@ -25,91 +28,6 @@ void InjectTemplates()
 extern bool* g_menuVisibility;
 std::string stringStewie;
 
-bool __fastcall KeyringHideKeys(ContChangesEntry* entry)
-{
-	if (!entry || !entry->type) return false;
-	if (g_SI_Items[entry->type]._Equal("(jdd1)")) return true;
-	return false;
-}
-
-bool __cdecl KeyringHideNonKeys(ContChangesEntry* entry)
-{
-	if (!entry || !entry->type) return true;
-	if (g_SI_Items[entry->type]._Equal("(jdd1)")) {
-		if (stringStewie.empty() || stringStewie._Equal("_")) return false;
-		return !stristr(entry->type->GetTheName(), stringStewie.c_str());
-	}
-	return true;
-}
-
-
-void __fastcall AddSortingCategories()
-{
-	UInt32 keys = 0;
-	const auto entryDataList = PlayerCharacter::GetSingleton()->GetContainerChangesList();
-	if (!entryDataList) return;
-	for (auto iter = entryDataList->Head(); iter; iter = iter->next)
-	{
-//		if (iter->data->type->typeID == 0x2E) keys++;
-		if (g_SI_Items[iter->data->type]._Equal("(jdd1)")) keys++;
-	}
-	if (keys) {
-		std::string keyringname = StrFromINI(reinterpret_cast<DWORD*>(0x011D3B20));
-		if (keys > 1)
-		{
-			keyringname += " (" + std::to_string(keys) + ")";
-		}
-		auto tile = InventoryMenu::GetSingleton()->itemsList.Insert(nullptr, keyringname.c_str(), nullptr, nullptr);
-		tile->SetFloat(kTileValue_id, 30);
-	}
-}
-
-__declspec(naked) void KeyringHideKeysHook()
-{
-	static const UInt32 retnAddr1 = 0x7826EA;
-	static const UInt32 retnAddr2 = 0x7826F1;
-	static const UInt32 ShouldHide = reinterpret_cast<UInt32>(KeyringHideKeys);
-	__asm
-	{
-		mov ecx, [ebp + 0x8] // a1
-		call ShouldHide
-		test al, al
-		jz shouldnot
-		jmp retnAddr1
-	shouldnot:
-		jmp retnAddr2
-	}
-}
-
-__declspec(naked) void KeyringAddCategories()
-{
-	static const UInt32 retnAddr = 0x783213;
-	static const UInt32 AddCategories = reinterpret_cast<UInt32>(AddSortingCategories);
-	__asm
-	{
-		call AddCategories
-		jmp retnAddr
-	}
-}
-
-
-void KeyringRefreshPostStewie()
-{
-	if (CdeclCall<bool>(0x702360) && g_menuVisibility[kMenuType_Inventory] && InventoryMenu::GetSingleton()->IsKeyringOpen())
-	{
-		if (Tile* stew = InventoryMenu::GetSingleton()->tile->GetChild("IM_SearchBar"); stew)
-		{
-			if (const auto string = stew->GetValue(kTileValue_string)->str; !stringStewie._Equal(string))
-			{
-				stringStewie = string;
-				InventoryMenu::GetSingleton()->itemsList.Filter(KeyringHideNonKeys);
-				InventoryMenu::GetSingleton()->itemsList.ForEach((void(__cdecl*)(Tile*, ContChangesEntry*))0x780C00);
-			}
-		}
-		else stringStewie.clear();
-	}
-}
-
 ContChangesEntry* firstEntry = nullptr;
 
 void InjectIconTileLastFix()
@@ -118,27 +36,15 @@ void InjectIconTileLastFix()
 	if (RefreshItemsListForm(firstEntry->type))	firstEntry = nullptr;
 }
 
-void InjectIconTile(MenuItemEntryList* list, Tile* tile, ContChangesEntry* entry)
+void InjectIconTile(const std::string tag, MenuItemEntryList* list, Tile* tile, ContChangesEntry* entry)
 {
-	std::string tag;
-
-	if (!entry || !entry->type)
-	{
-		tag = "(jdd0)";
-	}
-	else
-	{
-		tag = g_SI_Items[entry->type];
-	}
 	//	if (g_SI_Items.find(entry->type) == g_SI_Items.end()) return;
+	if (g_SI_Tags[tag].filename.empty()) return;
 
 	Tile* tilemenu = tile;
 
-	do {
-		if IS_TYPE(tilemenu, TileMenu) break;
-	} while ((tilemenu = tilemenu->parent));
-
-	if (g_SI_Tags[tag].filename.empty()) return;
+	do if IS_TYPE(tilemenu, TileMenu) break;
+	while ((tilemenu = tilemenu->parent));
 
 	auto* menu = DYNAMIC_CAST(tilemenu, Tile, TileMenu);
 
@@ -188,30 +94,19 @@ void InjectIconTile(MenuItemEntryList* list, Tile* tile, ContChangesEntry* entry
 
 }
 
-
 void __fastcall SetStringValueInjectTile(Tile* tile, ContChangesEntry* entry, MenuItemEntryList* list, enum TileValues tilevalue, char* src, char propagate)
 {
 	tile->SetString(tilevalue, src, propagate);
-	InjectIconTile(list, tile, entry);
+	if (!entry || !entry->type) return;
+	InjectIconTile(g_SI_Items[entry->type], list, tile, entry);
 }
 
-
-__declspec(naked) void TileSetStringValueInjectIconHook() {
-	static const auto SetStringValue = reinterpret_cast<UInt32>(SetStringValueInjectTile);
-	static const UInt32 retnAddr = 0x71A3DA;
-	__asm
-	{
-		mov     edx, [ebp - 0x2C]
-		push	edx
-		mov		edx, [ebp + 0x8]
-		call    SetStringValue
-		jmp		retnAddr
-	}
-}
-
-signed int __fastcall CompareItemsWithTags(ContChangesEntry* a2, ContChangesEntry* a1)
+signed int __fastcall CompareItemsWithTags(ContChangesEntry* a2, ContChangesEntry* a1, Tile* tile1, Tile* tile2)
 {
-	TESForm* form1 = a1->type, * form2 = a2->type;
+	TESForm* form1 = nullptr, * form2 = nullptr;
+
+	if (a1 && a1->type) form1 = a1->type;
+	if (a2 && a2->type) form2 = a2->type;
 
 	signed int cmp;
 
@@ -219,9 +114,12 @@ signed int __fastcall CompareItemsWithTags(ContChangesEntry* a2, ContChangesEntr
 	{
 		std::string tag1, tag2;
 
-		tag1 = g_SI_Items[form1];
-		tag2 = g_SI_Items[form2];
-		
+		if (form1) tag1 = g_SI_Items[form1];
+		if (form2) tag2 = g_SI_Items[form2];
+
+		if (tag1.empty() && tile1->GetValue(kTileValue_user16)) tag1 = tile1->GetValue(kTileValue_user16)->str;
+		if (tag2.empty() && tile2->GetValue(kTileValue_user16)) tag2 = tile2->GetValue(kTileValue_user16)->str;
+
 		if (tag1.empty())
 		{
 			if (!tag2.empty()) return 1;
@@ -235,14 +133,21 @@ signed int __fastcall CompareItemsWithTags(ContChangesEntry* a2, ContChangesEntr
 			if (cmp < 0) return -1;
 		}
 	}
+	std::string name1, name2;
+	
+	if (form1) name1 = form1->GetTheName();
+	if (form2) name2 = form2->GetTheName();
+
+	if (name1.empty() && tile1->GetValue(kTileValue_string)) name1 = tile1->GetValue(kTileValue_string)->str;
+	if (name2.empty() && tile2->GetValue(kTileValue_string)) name2 = tile2->GetValue(kTileValue_string)->str;
+
+	cmp = name1.compare(name2);
+	if (cmp > 0) return 1;
+	if (cmp < 0) return -1;
 
 	if (!form1) return form2 ? -1 : 0;
 	if (!form2) return 1;
 	
-	cmp = std::string(form1->GetTheName()).compare(std::string(form2->GetTheName()));
-	if (cmp > 0) return 1;
-	if (cmp < 0) return -1;
-
 	const SInt16 mods1 = ContWeaponHasAnyMod(a1);
 	const SInt16 mods2 = ContWeaponHasAnyMod(a2);
 	if (mods1 != mods2) {
@@ -273,12 +178,12 @@ signed int __fastcall CompareItemsWithTags(ContChangesEntry* a2, ContChangesEntr
 void __fastcall SetStringValueTagImage(Tile* tile, ContChangesEntry* entry, enum TileValues tilevalue, char* src, char propagate)
 {
 	if (!tile) return;
-
-	if (Tile * icon = tile->GetChild("HK_Icon"); icon) {
-		icon->SetFloat(kTileValue_width, tile->GetValueFloat(kTileValue_width) - 12, propagate);
-		icon->SetFloat(kTileValue_height, tile->GetValueFloat(kTileValue_height) - 12, propagate);
-		icon->SetFloat(kTileValue_x, 6, propagate);
-		icon->SetFloat(kTileValue_y, 6, propagate);
+	
+	if (Tile* icon = tile->GetChild("HK_Icon"); icon) {
+		icon->SetFloat(kTileValue_width, tile->GetValueFloat(kTileValue_width) - 16, propagate);
+		icon->SetFloat(kTileValue_height, tile->GetValueFloat(kTileValue_height) - 16, propagate);
+		icon->SetFloat(kTileValue_x, 8, propagate);
+		icon->SetFloat(kTileValue_y, 8, propagate);
 	}
 
 	if (!entry->type || g_SI_Items.find(entry->type) == g_SI_Items.end()) {
@@ -305,10 +210,10 @@ void __fastcall SetStringValueTagRose(Tile* tile, ContChangesEntry* entry, enum 
 	if (compassRoseX == 0) compassRoseX = tile->GetValueFloat(kTileValue_x);
 	if (compassRoseY == 0) compassRoseY = tile->GetValueFloat(kTileValue_y);
 
-	tile->SetFloat(kTileValue_width, 48, propagate);
-	tile->SetFloat(kTileValue_height, 48, propagate);
-	tile->SetFloat(kTileValue_x, compassRoseX + 1, propagate);
-	tile->SetFloat(kTileValue_y, compassRoseY + 1, propagate);
+	tile->SetFloat(kTileValue_width, 44, propagate);
+	tile->SetFloat(kTileValue_height, 44, propagate);
+	tile->SetFloat(kTileValue_x, compassRoseX + 3, propagate);
+	tile->SetFloat(kTileValue_y, compassRoseY + 3, propagate);
 
 	if (!entry->type || g_SI_Items.find(entry->type) == g_SI_Items.end()) {
 		tile->SetString(tilevalue, src, propagate);
@@ -325,7 +230,104 @@ void __fastcall SetStringValueTagRose(Tile* tile, ContChangesEntry* entry, enum 
 	tile->SetString(tilevalue, g_SI_Tags[tag].filename.c_str(), propagate);
 }
 
-__declspec(naked) void TileSetStringValueHotkeyHook() {
+std::string openCategory;
+
+bool __fastcall HasContainerChangesEntry(ContChangesEntry* entry)
+{
+	if (entry && entry->type) return false;
+	return true;
+}
+
+bool __fastcall KeyringShowCategories(Tile* tile)
+{
+	std::string tag;
+	if (tile->GetValue(kTileValue_user16)) tag = tile->GetValue(kTileValue_user16)->str;
+	if (g_SI_Tags[tag].tab == InventoryMenu::GetSingleton()->filter) return false;
+	return true;
+}
+
+bool __fastcall KeyringHideKeys(ContChangesEntry* entry)
+{
+	if (!entry || !entry->type) return false;
+	if (!g_SI_Tags[g_SI_Items[entry->type]].category.empty()) return true;
+	return false;
+}
+
+bool __cdecl KeyringHideNonKeys(ContChangesEntry* entry)
+{
+	if (!entry || !entry->type) return true;
+	if (g_SI_Tags[g_SI_Items[entry->type]].category._Equal(openCategory)) {
+		if (stringStewie.empty() || stringStewie._Equal("_")) return false;
+		return !stristr(entry->type->GetTheName(), stringStewie.c_str());
+	}
+	return true;
+}
+
+void __fastcall AddSortingCategories()
+{
+	const auto entryDataList = PlayerCharacter::GetSingleton()->GetContainerChangesList();
+	for (auto& entry : g_SI_Categories)
+	{
+		UInt32 keys = 0;
+		if (!entryDataList) return;
+		for (auto iter = entryDataList->Head(); iter; iter = iter->next)
+			if (iter->data && iter->data->type && g_SI_Tags[g_SI_Items[iter->data->type]].category._Equal(entry)) keys++;
+		if (keys) {
+			//	std::string keyringname = StrFromINI(reinterpret_cast<DWORD*>(0x011D3B20));
+			std::string keyringname = g_SI_Tags[entry].name;
+			if (keyringname.find("&-") == 0)
+			{
+				keyringname = keyringname.substr(2, keyringname.length() - 3);
+				keyringname = GetStringFromGameSettingFromString(keyringname);
+			}
+			; //g_SI_Tags[entry].name;
+			if (keys > 1) keyringname += " (" + std::to_string(keys) + ")";
+			auto tile = InventoryMenu::GetSingleton()->itemsList.Insert(nullptr, keyringname.c_str(), nullptr, nullptr);
+			tile->SetFloat(kTileValue_id, 30);
+			tile->SetString(kTileValue_user16, entry.c_str());
+			InjectIconTile(entry, &InventoryMenu::GetSingleton()->itemsList, tile, nullptr);
+		}
+	}
+}
+
+void __fastcall HideNonKeysGetTile(InventoryMenu* invmenu, Tile* tile)
+{
+	if (tile && tile->GetValue(kTileValue_user16)) openCategory = tile->GetValue(kTileValue_user16)->str;
+	invmenu->itemsList.Filter(KeyringHideNonKeys);
+	invmenu->itemsList.ForEach((void(__cdecl*)(Tile*, ContChangesEntry*))0x780C00);
+	invmenu->ResetInventorySelectionAndHideDataTile();
+}
+
+void KeyringRefreshPostStewie()
+{
+	if (CdeclCall<bool>(0x702360) && g_menuVisibility[kMenuType_Inventory] && InventoryMenu::GetSingleton()->IsKeyringOpen())
+	{
+		if (Tile* stew = InventoryMenu::GetSingleton()->tile->GetChild("IM_SearchBar"); stew)
+		{
+			if (const auto string = stew->GetValue(kTileValue_string)->str; !stringStewie._Equal(string))
+			{
+				stringStewie = string;
+				InventoryMenu::GetSingleton()->itemsList.Filter(KeyringHideNonKeys);
+				InventoryMenu::GetSingleton()->itemsList.ForEach((void(__cdecl*)(Tile*, ContChangesEntry*))0x780C00);
+			}
+		}
+		else stringStewie.clear();
+	}
+}
+
+__declspec(naked) void IconInjectTileSetStringValueHook() {
+	static const auto SetStringValue = reinterpret_cast<UInt32>(SetStringValueInjectTile);
+	static const UInt32 retnAddr = 0x71A3DA;
+	__asm
+	{
+		mov     edx, [ebp - 0x2C]
+		push	edx
+		mov		edx, [ebp + 0x8]
+		call    SetStringValue
+		jmp		retnAddr
+	}
+}
+__declspec(naked) void IconHotkeyHUDTileSetStringValueHook() {
 	static const auto SetStringValue = reinterpret_cast<UInt32>(SetStringValueTagImage);
 	static const UInt32 retnAddr = 0x7018A3;
 	__asm
@@ -336,7 +338,7 @@ __declspec(naked) void TileSetStringValueHotkeyHook() {
 	}
 }
 
-__declspec(naked) void TileSetStringValueHotkeyHook2() {
+__declspec(naked) void IconHotkeyPipBoyTileSetStringValueHook() {
 	static const auto SetStringValue = reinterpret_cast<UInt32>(SetStringValueTagRose);
 	static const UInt32 retnAddr = 0x7814FF;
 	static const UInt32 g_inventoryMenuSelection = 0x011D9EA8;
@@ -348,21 +350,41 @@ __declspec(naked) void TileSetStringValueHotkeyHook2() {
 	}
 }
 
-__declspec(naked) void InventoryMenuSortingHook()
+__declspec(naked) void SortingInventoryMenuHook()
 {
-	static const auto CompareItems = reinterpret_cast<UInt32>(CompareItemsWithTags);
+	static const UInt32 CompareItems = reinterpret_cast<UInt32>(CompareItemsWithTags);
+	static const UInt32 ContChangesEntry_GetFullName = 0x4BE2D0;
+	static const UInt32 retnAddr = 0x78251B;
+
 	_asm
 	{
-		mov eax, [ebp + 0x8] // a1
-		mov edx, [eax + 0x4]
+		mov eax, [ebp + 0xC]	// a2
+		mov ecx, [eax]
+		push ecx				// tile2
+		mov ecx, [eax + 0x4]	// entry2
+		
+		mov eax, [ebp + 0x8]	// a1
+		mov edx, [eax]
+		push edx				// tile1
+		mov edx, [eax + 0x4]	// entry1
+
 		call CompareItems
+		test eax, eax
+		je got0
+		
 		mov esp, ebp
 		pop ebp
 		ret
+
+	got0:
+		mov edx, [ebp + 0xC]
+		mov ecx, [edx + 0x4]
+		call ContChangesEntry_GetFullName
+		jmp retnAddr
 	}
 }
 
-__declspec(naked) void BarterContainerMenuSortingHook()
+__declspec(naked) void SortingBarterContainerMenuHook()
 {
 	static const auto CompareItems = reinterpret_cast<UInt32>(CompareItemsWithTags);
 	_asm
@@ -377,4 +399,120 @@ __declspec(naked) void BarterContainerMenuSortingHook()
 		pop ebp
 		ret
 	}
+}
+
+
+__declspec(naked) void KeyringHideKeysHook()
+{
+	static const UInt32 retnAddr1 = 0x7826EA;
+	static const UInt32 retnAddr2 = 0x7826F1;
+	static const UInt32 ShouldHide = reinterpret_cast<UInt32>(KeyringHideKeys);
+	__asm
+	{
+		mov ecx, [ebp + 0x8] // a1
+		call ShouldHide
+		test al, al
+		jz shouldnot
+		jmp retnAddr1
+	shouldnot :
+		jmp retnAddr2
+	}
+}
+
+__declspec(naked) void KeyringHideKeysShowCategoriesHook()
+{
+	static const UInt32 retnAddr = 0x782679;
+	static const UInt32 HasContainerEntry = reinterpret_cast<UInt32>(HasContainerChangesEntry);
+	static const UInt32 ShowCategories = reinterpret_cast<UInt32>(KeyringShowCategories);
+	__asm
+	{
+		mov ecx, [ebp + 0x8] // a1
+		call HasContainerEntry
+		test al, al
+		jz hasnot
+
+		mov ecx, [ebp + 0xC]
+		call ShowCategories
+		mov esp, ebp
+		pop ebp
+		ret
+	hasnot :
+		jmp retnAddr
+	}
+}
+
+__declspec(naked) void KeyringAddCategoriesHook()
+{
+	static const UInt32 retnAddr = 0x783213;
+	static const UInt32 AddCategories = reinterpret_cast<UInt32>(AddSortingCategories);
+	__asm
+	{
+		call AddCategories
+		jmp retnAddr
+	}
+}
+
+__declspec(naked) void KeyringHideNonKeysHook()
+{
+	static const UInt32 retnAddr = 0x78083F;
+	static const UInt32 HideNonKeysAndGetTile = reinterpret_cast<UInt32>(HideNonKeysGetTile);
+	__asm
+	{
+		mov edx, [ebp + 0xC]
+		call HideNonKeysAndGetTile
+		jmp retnAddr
+	}
+}
+
+__declspec(naked) void ContainerEntryListBoxFilterHook()
+{
+	// STEWIE STEWIE STEWIE
+	static const UInt32 retnAddr = 0x730C8F;
+	__asm
+	{
+		mov ecx, [ecx] // ListBox::ListItem*
+
+		push dword ptr ds : [ecx] // ListItem->tile
+		push dword ptr ds : [ecx + 4] // ListItem->object
+		call dword ptr ss : [ebp + 8] // shouldHide
+		pop ecx // pop the extra pushed arg (ListItem->tile)
+
+		jmp retnAddr
+	}
+}
+
+__declspec(naked) void KeyringEnableEquipHook()
+{
+	static const UInt32 retnAddr = 0x78047D;
+//	static const UInt32 HideNonKeysAndGetTile = reinterpret_cast<UInt32>(HideNonKeysGetTile);
+	__asm
+	{
+		mov eax, 0
+		jmp retnAddr
+	}
+}
+
+__declspec(naked) void KeyringEnableDropHook()
+{
+	static const UInt32 retnAddr = 0x78093A;
+	//	static const UInt32 HideNonKeysAndGetTile = reinterpret_cast<UInt32>(HideNonKeysGetTile);
+	__asm
+	{
+		mov ecx, 0
+		jmp retnAddr
+	}
+}
+
+void __fastcall KeyringEnableCancelHook(Tile* tile, void* dummyEDX, enum TileValues tilevalue, signed int a1)
+{
+	tile->SetFloat(tilevalue, InventoryMenu::GetSingleton()->IsKeyringOpen(), true);
+}
+
+void __fastcall KeyringPipBoyIconHook(Tile* tile, void* dummyEDX, enum TileValues tilevalue, char * string, int propagate)
+{
+	std::string stringnew = string;
+	if (auto clickedtile = InventoryMenu::GetSingleton()->itemsList.selected; clickedtile->GetValue(kTileValue_user16)
+		&& !g_SI_Tags[clickedtile->GetValue(kTileValue_user16)->str].icon.empty()) 
+		stringnew = g_SI_Tags[clickedtile->GetValue(kTileValue_user16)->str].icon;
+	tile->SetString(tilevalue, stringnew.c_str(), true);
 }

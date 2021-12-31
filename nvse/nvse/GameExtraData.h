@@ -326,22 +326,22 @@ public:
 	class ExtendDataList: public tList<ExtraDataList>
 	{
 	public:
-		SInt32 AddAt(ExtraDataList* item, SInt32 index);
-		void RemoveAll() const;
-		ExtraDataList* RemoveNth(SInt32 n);
+		SInt32				AddAt(ExtraDataList* item, SInt32 index);
+		void				RemoveAll() const;
+		ExtraDataList*		RemoveNth(SInt32 n);
 	};
 
 	struct EntryData
 	{
-		ExtendDataList	* extendData;	// 00
-		SInt32			countDelta;		// 04
-		TESForm			* type;			// 08
+		ExtendDataList*		extendData;		// 00
+		SInt32				countDelta;		// 04
+		TESForm*			type;			// 08
 
-		void Cleanup();
-		static EntryData* Create(UInt32 refID = 0, UInt32 count = 1, ExtraContainerChanges::ExtendDataList* pExtendDataList = NULL);
-		static EntryData* Create(TESForm* pForm, UInt32 count = 1, ExtraContainerChanges::ExtendDataList* pExtendDataList = NULL);
-		ExtendDataList * Add(ExtraDataList* newList);
-		bool Remove(ExtraDataList* toRemove, bool bFree = false);
+		void				Cleanup();
+		static EntryData*	Create(UInt32 refID = 0, UInt32 count = 1, ExtraContainerChanges::ExtendDataList* pExtendDataList = NULL);
+		static EntryData*	Create(TESForm* pForm, UInt32 count = 1, ExtraContainerChanges::ExtendDataList* pExtendDataList = NULL);
+		ExtendDataList*		Add(ExtraDataList* newList);
+		bool				Remove(ExtraDataList* toRemove, bool bFree = false);
 
 		bool HasExtraLeveledItem()
 		{
@@ -351,12 +351,12 @@ public:
 			return false;
 		}
 
-		void RemoveCannotWear();
-		float GetItemHealthPerc(bool arg1 = true);
-		ExtraDataList* GetEquippedExtra();
-		ExtraDataList* GetCustomExtra(UInt32 whichVal);
-		float CalculateWeaponDamage(float condition, TESForm* ammo);
-		float GetValue();
+		void				RemoveCannotWear();
+		float				GetItemHealthPerc(bool arg1 = true);
+		ExtraDataList*		GetEquippedExtra();
+		ExtraDataList*		GetCustomExtra(UInt32 whichVal);
+		float				CalculateWeaponDamage(float condition, TESForm* ammo);
+		float				GetValue();
 	};
 
 	struct EntryDataList : tList<EntryData>

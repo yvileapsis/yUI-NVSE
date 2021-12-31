@@ -38,7 +38,7 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 		FillCraftingComponents();
 		PrintAndClearQueuedConsoleMessages();
 
-		if (g_ySI || g_ySI_Hotkeys) LoadSIMapsFromFiles();
+		if (g_ySI_Sort || g_ySI_Icons || g_ySI_Hotkeys || g_ySI_Categories) LoadSIMapsFromFiles();
 
 //		LoadFileAnimPaths();
 
@@ -46,8 +46,8 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	}
 	else if (msg->type == NVSEMessagingInterface::kMessage_MainGameLoop)
 	{
-		if (g_ySI_Sort || g_ySI_Icons || g_ySI_Hotkeys) InjectIconTileLastFix();
-		KeyringRefreshPostStewie();
+		if (g_ySI_Icons) InjectIconTileLastFix();
+		if (g_ySI_Categories) KeyringRefreshPostStewie();
 		
 		if (iDoOnce == 0 && !CdeclCall<bool>(0x702360)) {
 			iDoOnce++;
@@ -59,7 +59,7 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 			g_StatsMenu = TileMenu::GetTileMenu(kMenuType_Stats);
 			g_InventoryMenu = TileMenu::GetTileMenu(kMenuType_Inventory);
 
-			if (g_ySI_Sort || g_ySI_Icons || g_ySI_Hotkeys) InjectTemplates();
+			if (g_ySI_Icons) InjectTemplates();
 		}
 		
 	}
@@ -71,13 +71,17 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 
 void writePatches()
 {
-	if (g_ySI_Sort || g_ySI_SortingFix) patchSortingHooks();
-	if (g_ySI_Icons) patchAddIcons();
-	if (g_ySI_Hotkeys) patchReplaceHotkeyIcons();	
+	if (g_ySI)
+	{
+		if (g_ySI_Sort || g_ySI_SortingFix) patchSortingHooks();
+		if (g_ySI_Icons) patchAddIcons();
+		if (g_ySI_Hotkeys) patchReplaceHotkeyIcons();
+		if (g_ySI_Categories) patchSortingCategories();
+	}
 	if (g_yCM) patchAddyCMToSettingsMenu();
 	if (g_yMC) patchMatchedCursor();
+	patchFixDroppedItems();
 	//	patch1080pUI();
-	patchSortingCategories();
 
 }
 
@@ -129,7 +133,8 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 
 	nvse->SetOpcodeBase(0x21D0);
 	REG_CMD_STR(ySIGetTagTrait);
-//	RegisterScriptCommand(SwapTexatlas);
+	RegisterScriptCommand(SetWorldspaceDefaultWaterHeight);
+	//	RegisterScriptCommand(SwapTexatlas);
 	
 	if (nvse->isEditor)	return true;
 

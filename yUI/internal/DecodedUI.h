@@ -1130,38 +1130,40 @@ public:
 		SInt32 currentValue;
 	};
 
-	TileRect* tile028;		// 028	IM_Headline_PlayerCapsInfo
-	TileRect* tile02C;		// 02C	IM_Headline_PlayerHPInfo
-	TileRect* tile030;		// 030	IM_Headline_PlayerDRInfo
-	TileRect* tile034;		// 034	IM_Headline_PlayerWGInfo
-	TileImage* tile038;		// 038	IM_InventoryList
-	TileRect* tile03C;		// 03C	IM_HotKeyWheel
-	TileImage* tile040;		// 040	IM_EquipButton
-	TileImage* tile044;		// 044	IM_DropButton
-	TileImage* tile048;		// 048	IM_RepairButton
-	TileImage* tile04C;		// 04C	IM_HotkeyButton
-	TileImage* tile050;		// 050	IM_CancelButton
-	TileImage* tile054;		// 054	IM_ItemIcon
-	TileRect* tile058;		// 058	IM_ItemInfoRect
-	TileRect* tile05C;		// 05C	IM_Tabline
-	TileRect* tile060;		// 060	DAMInfo
-	TileRect* tile064;		// 064	DPSInfo
-	TileRect* tile068;		// 068	StrengthReqInfo
-	TileRect* tile06C;		// 06C	DamageResistInfo
-	TileRect* tile070;		// 070	DamageThresholdInfo
-	TileImage* tile074;		// 074	IM_ModButton
-	TileImage* tile078;		// 078	IM_ItemIconBadge
-	TileRect* tile07C;		// 07C	IM_Headline_PlayerDTInfo
-	TileText* tile080;		// 080	IM_StrReq
-	UInt32				filter;			// 084
-	ScrollPos	tabScrollPositions[6];	// 088, the scroll index for Weapons, Apparel, Aid, Misc, Ammo and the Keyring
-	MenuItemEntryList	itemsList;		// 0B8
-	HotKeyWheel			hotkeyWheel;	// 0E8
-	tList<ContChangesEntry> changedItemsList; // 11C
+	TileRect*				tile028;		// 028	IM_Headline_PlayerCapsInfo
+	TileRect*				tile02C;		// 02C	IM_Headline_PlayerHPInfo
+	TileRect*				tile030;		// 030	IM_Headline_PlayerDRInfo
+	TileRect*				tile034;		// 034	IM_Headline_PlayerWGInfo
+	TileImage*				tile038;		// 038	IM_InventoryList
+	TileRect*				tile03C;		// 03C	IM_HotKeyWheel
+	TileImage*				tile040;		// 040	IM_EquipButton
+	TileImage*				tile044;		// 044	IM_DropButton
+	TileImage*				tile048;		// 048	IM_RepairButton
+	TileImage*				tile04C;		// 04C	IM_HotkeyButton
+	TileImage*				tile050;		// 050	IM_CancelButton
+	TileImage*				tile054;		// 054	IM_ItemIcon
+	TileRect*				tile058;		// 058	IM_ItemInfoRect
+	TileRect*				tile05C;		// 05C	IM_Tabline
+	TileRect*				tile060;		// 060	DAMInfo
+	TileRect*				tile064;		// 064	DPSInfo
+	TileRect*				tile068;		// 068	StrengthReqInfo
+	TileRect*				tile06C;		// 06C	DamageResistInfo
+	TileRect*				tile070;		// 070	DamageThresholdInfo
+	TileImage*				tile074;		// 074	IM_ModButton
+	TileImage*				tile078;		// 078	IM_ItemIconBadge
+	TileRect*				tile07C;		// 07C	IM_Headline_PlayerDTInfo
+	TileText*				tile080;		// 080	IM_StrReq
+	UInt32					filter;			// 084
+	ScrollPos				tabScrollPositions[6];	// 088, the scroll index for Weapons, Apparel, Aid, Misc, Ammo and the Keyring
+	MenuItemEntryList		itemsList;		// 0B8
+	HotKeyWheel				hotkeyWheel;	// 0E8
+	tList<ContChangesEntry>	changedItemsList; // 11C
 
 	static InventoryMenu* GetSingleton() { return *(InventoryMenu**)0x11D9EA4; };
 	static ContChangesEntry* GetSelection() { return *(ContChangesEntry**)0x11D9EA8; };
 	bool IsKeyringOpen() const;
+	void ResetInventorySelectionAndHideDataTile() { ThisCall(0x781B10, this); }
+
 };
 STATIC_ASSERT(sizeof(InventoryMenu) == 0x124);
 

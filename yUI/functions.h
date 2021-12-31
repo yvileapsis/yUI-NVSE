@@ -59,7 +59,9 @@ void PatchPause(UInt32 ptr);
 
 void SetUIStringFull(char *, char* , UInt32);
 
-void __fastcall TileSetStringValueCursor(Tile* tile, void* dummyEDX, enum TileValues tilevalue, char* src, char propagate);
-void __fastcall TileSetIntValueCursor(Tile* tile, void* dummyEDX, enum TileValues tilevalue, int value);
+void __fastcall CursorTileSetStringValue(Tile* tile, void* dummyEDX, enum TileValues tilevalue, char* src, char propagate);
+void __fastcall CursorTileSetIntValue(Tile* tile, void* dummyEDX, enum TileValues tilevalue, int value);
 bool __fastcall FileExists(const char* path);
 char* __fastcall StrFromINI(DWORD* address);
+std::string GetStringFromGameSettingFromString(const std::string& settingName);
+void* __fastcall FixGetDroppedWeapon(ExtraDataList* extradatalist);

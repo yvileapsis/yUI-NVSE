@@ -366,17 +366,17 @@ public:
 	virtual SInt16	GetCurrentAnimAction();
 	virtual BSAnimGroupSequence* GetCurrentSequence();
 	virtual void	SetCurrentActionAndSequence(int action, BSAnimGroupSequence* sequence);
-	virtual void	Unk_FC();
-	virtual void	Unk_FD();
+	virtual void	GetForceFireWeapon();
+	virtual void	SetForceFireWeapon();
 	virtual bool	IsReadyForAnim();
 	virtual void	Unk_FF();
-	virtual void	Unk_100();
-	virtual void	Unk_101();
+	virtual void	SetIsAiming();
+	virtual void	IsAiming();
 	virtual void	Unk_102();
-	virtual void	Unk_103();
-	virtual void	Unk_104();
+	virtual void	GetKnockedState();
+	virtual void	SetKnockedState();
 	virtual void	Unk_105();
-	virtual void	Unk_106();
+	virtual void	PushActorAway();
 	virtual void	Unk_107();
 	virtual void	Unk_108();
 	virtual void	Unk_109();
@@ -769,87 +769,81 @@ public:
 	virtual void	Unk_21A();
 	virtual void	Unk_21B();
 
-	tList<TESForm*>			unk0C8;			// 0C8
-	tList<UInt32>			unk0D0;			// 0D0
-	UInt32					unk0D8[(0xE4-0xD8) >> 2];
-	BaseProcess::Data004	unk0E4;			// 0E4	I suspect interrupt package
-
-	UInt8					unk0FC[0x0C];	// 0FC	Saved as one, might be Pos/Rot given size
-
-	UInt32					unk108;			// 108
-	TESIdleForm				*idleForm;		// 10C
-	UInt32					unk110;			// 110  EntryData, also handled as part of weapon code. AmmoInfo.
-	WeaponInfo*				weaponInfo;		// 114
-	AmmoInfo*				ammoInfo;		// 118
-	QueuedFile*				unk11C;			// 11C
-	RefNiRefObject			unk120;			// 120
-	UInt8					byt124;			// 124	OneHandGrenade equipped
-	UInt8					byt125;			// 125	OneHandMine equipped
-	UInt8					byt126;			// 126	OneHandThrown equipped
-	UInt8					byt127;			// 127
-	UInt8					byt128;			// 128
-	UInt8					byt129;			// 129
-	UInt8					byt12A;			// 12A
-	UInt8					fil12B;			// 12B
-	UInt32					unk12C;			// 12C
-	UInt32					unk130;			// 130 Gets copied over during TESNPC.CopyFromBase
-	UInt8					byt134;			// 134
-	UInt8					byt135;			// 135
-	UInt8					byt136;			// 136
-	UInt8					byt137;			// 137
-
-	RefNiObject				unk138;			// 138	its an animation/bhkCharacterController. Current Animation?
-
-	UInt8					byt13C;			// 13C
-	UInt8					byt13D;			// 13D
-
-	UInt8					unk13E[(0x148-0x13E)];
-
-	Unk148					unk148;			// 148
-	
-	UInt32					unk150[8];		// 150
-	//UInt32				unk158;			
-	//UInt32				unk15C;
-	//UInt32				unk160;		// get/set.
-	//UInt8					byt168;
-
-	float					actorAlpha;		// 170
-	UInt32					unk174;			// 174
-	BSFaceGenAnimationData	*unk178;		// 178
-	UInt32					unk17C[24];		// 17C
-	//UInt8					byt18C;
-	//tList<UInt32>			unk1B0;
-	//tList<UInt32>			* unk1B8;		// get.
-	//UInt32				animation;	// 1C0
-	//UInt8					unk1C4[12];	// Cleared at the same time as the animation
-	//UInt32				unk1DA;
-
-	NiNode					*unk1DC;		// 1DC
-	NiNode					*unk1E0;		// 1E0
-	UInt32					unk1E4;			// 1E4
-	NiNode					*unk1E8;		// 1E8
-	UInt32					unk1EC;			// 1EC
-	NiNode					*unk1F0;		// 1F0
-	UInt32					unk1F4;			// 1F4
-	NiNode					*unk1F8;		// 1F8
-	UInt32					unk1FC[2];		// 1FC
-	NiNode					*unk204;		// 204
-	UInt32					unk208[4];		// 208
-	NiNode					*unk218;		// 218
-	NiNode					*unk21C;		// 21C
-	RefNiObject				unk220;			// 220
-	BSBound					*boundingBox;	// 224
-	UInt32					unk228[8];		// 228
-	BSFaceGenNiNode			*unk248;		// 248
-	BSFaceGenNiNode			*unk24C;		// 24C
-	NiTriShape				*unk250;		// 250
-	UInt32					unk254[2];		// 254
-
-	//TESPackage*			unk224;	// Set during StartConversation, package used by subject.
-
-	//Unk0254*				contains lastTarget at 0x04;	// 0254
+	tList<TESForm*>						unk0C8;				// 0C8
+	tList<UInt32>						unk0D0;				// 0D0
+	UInt32								unk0D8[3];			// 0D8
+	BaseProcess::Data004				interruptPackage;	// 0E4 InterruptPackage
+	UInt8								unk0FC[12];			// 0FC	Saved as one, might be Pos/Rot given size
+	UInt32								unk108;				// 108
+	TESIdleForm*						idleForm;			// 10C
+	UInt32								unk110;				// 110  EntryData, also handled as part of weapon code. AmmoInfo.
+	WeaponInfo*							weaponInfo;			// 114
+	AmmoInfo*							ammoInfo;			// 118
+	QueuedFile*							unk11C;				// 11C
+	RefNiRefObject						unk120;				// 120
+	UInt8								byt121;				// 121
+	UInt8								byt122;				// 122
+	UInt8								fil123;				// 123
+	UInt8								isUsingOneHandGrenade;
+	UInt8								isUsingOneHandMine;
+	UInt8								isUsingOneHandThrown;
+	UInt8								isWearingHeavyArmor;
+	UInt8								isWearingPowerArmorTorso;
+	UInt8								isWearingPowerArmorHelmet;
+	UInt8								isWearingBackpack;	// 12A
+	UInt8								gap12B;				// 12B
+	NiNode*								node12C;			// 12C
+	NiNode*								projectileNode;		// 130  Gets copied over during TESNPC.CopyFromBase
+	UInt8								byt134;				// 134
+	bool								isWeaponOut;		// 135
+	UInt8								byt136;				// 136
+	UInt8								byt137;				// 137
+	bhkCharacterController*				charCtrl;			// 138 its an animation/bhkCharacterController. Current Animation?
+	UInt8								knockedState;		// 13C
+	UInt8								unk13D[3];			// 13D
+	UInt32								unk140[8];			// 140
+	MagicItem*							magicItem160;		// 160 get/set.
+	UInt32								unk164[3];			// 164
+	float								actorAlpha;			// 170
+	UInt32								unk174;				// 174
+	BSFaceGenAnimationData*				unk178;				// 178
+	UInt8								byte17C;			// 17C
+	UInt8								byte17D;			// 17D
+	UInt8								byte17E;			// 17E
+	UInt8								byte17F;			// 17F
+	UInt32								unk180[3];			// 180
+	UInt8								byte18C;			// 18C
+	UInt8								byte18D[3];			// 18D
+	UInt32								unk190[10];			// 190
+	void*								unk1B8;				// 1B8
+	void*								magicTarget1BC;		// 1BC MagicTarget*
+	AnimData*							animData;			// 1C0
+	BSAnimGroupSequence*				animSequence[3];	// 1C4 	Cleared at the same time as the animation
+	float								angle1D0;			// 1D0
+	float								unk1D4;				// 1D4
+	UInt8								byte1D8;			// 1D8
+	UInt8								byte1D9;			// 1D9
+	UInt8								gap1DA[2];			// 1DA
+	NiNode*								limbNodes[15];		// 1DC
+	NiNode*								unk218;				// 218
+	NiNode*								unk21C;				// 21C
+	RefNiObject							unk220;				// 220
+	BSBound*							boundingBox;		// 224
+	UInt8								isAiming;			// 228
+	UInt8								byte229;			// 229
+	UInt16								byte22A;			// 22A
+	UInt32								unk22C;				// 22C
+	tList<void*>						queuedEquipItems;	// 230	ContChangesEntry*
+	float								rads238;			// 238
+	float								waterRadsSec;		// 23C
+	void*								hitData240;			// 240 ActorHitData*
+	UInt32								unk244;				// 244
+	BSFaceGenNiNode*					unk248;				// 248
+	BSFaceGenNiNode*					unk24C;				// 24C
+	NiTriShape*							unk250;				// 250
+	void*								hitData254;			// 254 ActorHitData*
+	UInt32								unk258;				// 258
 };
-
 
 class AnimIdle : public NiRefObject
 {

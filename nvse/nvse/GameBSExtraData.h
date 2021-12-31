@@ -1,8 +1,10 @@
 #pragma once
 
 // Added to remove a cyclic dependency between GameForms.h and GameExtraData.h
+#include "GameTypes.h"
 #include "Utilities.h"
 
+class TESObjectREFR;
 class TESForm;
 
 // C+?
@@ -79,3 +81,10 @@ struct ExtraDataList : public BaseExtraList
 
 STATIC_ASSERT(offsetof(BaseExtraList, m_presenceBitfield) == 0x008);
 STATIC_ASSERT(sizeof(ExtraDataList) == 0x020);
+
+
+class ExtraDroppedItemList : public BSExtraData
+{
+public:
+	tList<TESObjectREFR>	itemRefs;	// 0C
+};

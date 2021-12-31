@@ -121,12 +121,13 @@ public:
 	
 	std::string category;
 	std::string name;
-	std::string nameGMST;
+	std::string icon;
+	UInt32 tab;
 	
 	JSONEntryTag(std::string tag, SInt16 priority, std::string xmltemplate, std::string filename, std::string texatlas,
-	             SInt64 systemcolor, std::string category, std::string name, std::string nameGMST)
+	             SInt64 systemcolor, std::string category, std::string name, std::string icon, UInt32 tab)
 		: tag(std::move(tag)), priority(priority), xmltemplate(std::move(xmltemplate)), filename(std::move(filename)),
-		  texatlas(std::move(texatlas)), systemcolor(systemcolor), category(std::move(category)), name(std::move(name)), nameGMST(std::move(nameGMST))
+		  texatlas(std::move(texatlas)), systemcolor(systemcolor), category(std::move(category)), name(std::move(name)), icon(std::move(icon)), tab(tab)
 	{
 	}
 	JSONEntryTag() = default;

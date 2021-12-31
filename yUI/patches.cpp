@@ -3,60 +3,60 @@
 #include <ySI.h>
 #include <functions.h>
 
-void __fastcall TileSetIntValueNop(Tile* tile, void* dummyEDX, enum TileValues tilevalue, int value)
-{
-}
-
-void __fastcall TileSetFloatValueNop(Tile* tile, void* dummyEDX, enum TileValues tilevalue, float a3, char a4)
-{
-}
-
 void patchSortingHooks()
 {
-//	WriteRelCall(0x7B7AF3, reinterpret_cast<UInt32>(TileSetIntValueNop));
-//	WriteRelCall(0x7B8AFA, reinterpret_cast<UInt32>(TileSetIntValueNop));
-//	WriteRelCall(0x7B8B0C, reinterpret_cast<UInt32>(TileSetIntValueNop));
-//	WriteRelCall(0x7B8B1E, reinterpret_cast<UInt32>(TileSetIntValueNop));
-/*	WriteRelCall(0x7B7A8F, reinterpret_cast<UInt32>(TileSetIntValueNop));
-	WriteRelCall(0x7B79B1, reinterpret_cast<UInt32>(TileSetIntValueNop));
-	WriteRelCall(0x7B79C3, reinterpret_cast<UInt32>(TileSetIntValueNop));
-	WriteRelCall(0x7B7B29, reinterpret_cast<UInt32>(TileSetIntValueNop));
-
-	WriteRelCall(0x7B7A09, reinterpret_cast<UInt32>(TileSetFloatValueNop));
-	WriteRelCall(0x7B7A28, reinterpret_cast<UInt32>(TileSetFloatValueNop));
-	WriteRelCall(0x7B7A54, reinterpret_cast<UInt32>(TileSetFloatValueNop));
-	WriteRelCall(0x7B7AC1, reinterpret_cast<UInt32>(TileSetFloatValueNop));
-*/
-//	WriteRelCall(0x700337, reinterpret_cast<UInt32>(TileSetFloatValueNop));
-
-	WriteRelJump(0x782516, reinterpret_cast<UInt32>(InventoryMenuSortingHook));
-	WriteRelJump(0x72F0ED, reinterpret_cast<UInt32>(BarterContainerMenuSortingHook));
-	WriteRelJump(0x75D138, reinterpret_cast<UInt32>(BarterContainerMenuSortingHook));
-}
-
-void patchSortingCategories()
-{
-	WriteRelJump(0x7826E4, reinterpret_cast<UInt32>(KeyringHideKeysHook));
-	WriteRelJump(0x7831C1, reinterpret_cast<UInt32>(KeyringAddCategories));
-	SafeWrite32(0x78080B, reinterpret_cast<UInt32>(KeyringHideNonKeys));
-
+	WriteRelJump(0x782516, reinterpret_cast<UInt32>(SortingInventoryMenuHook));
+	WriteRelJump(0x72F0ED, reinterpret_cast<UInt32>(SortingBarterContainerMenuHook));
+	WriteRelJump(0x75D138, reinterpret_cast<UInt32>(SortingBarterContainerMenuHook));
 }
 
 void patchAddIcons()
 {
-	WriteRelJump(0x71A3D5, reinterpret_cast<UInt32>(TileSetStringValueInjectIconHook));
+	WriteRelJump(0x71A3D5, reinterpret_cast<UInt32>(IconInjectTileSetStringValueHook));
 }
 
 void patchReplaceHotkeyIcons()
 {
-	WriteRelJump(0x70189E, reinterpret_cast<UInt32>(TileSetStringValueHotkeyHook));
-	WriteRelJump(0x7814FA, reinterpret_cast<UInt32>(TileSetStringValueHotkeyHook2));
+	WriteRelJump(0x70189E, reinterpret_cast<UInt32>(IconHotkeyHUDTileSetStringValueHook));
+	WriteRelJump(0x7814FA, reinterpret_cast<UInt32>(IconHotkeyPipBoyTileSetStringValueHook));
+}
+
+void patchSortingCategories()
+{
+	WriteRelJump(0x730C81, reinterpret_cast<UInt32>(ContainerEntryListBoxFilterHook));
+
+	WriteRelJump(0x7824F6, reinterpret_cast<UInt32>(SortingInventoryMenuHook));
+	WriteRelJump(0x78250B, reinterpret_cast<UInt32>(SortingInventoryMenuHook));
+
+	WriteRelJump(0x7831C1, reinterpret_cast<UInt32>(KeyringAddCategoriesHook));
+	
+	WriteRelJump(0x7826E4, reinterpret_cast<UInt32>(KeyringHideKeysHook));
+	WriteRelJump(0x78083A, reinterpret_cast<UInt32>(KeyringHideNonKeysHook));
+
+	WriteRelJump(0x782665, reinterpret_cast<UInt32>(KeyringHideKeysShowCategoriesHook));
+
+	WriteRelJump(0x780478, reinterpret_cast<UInt32>(KeyringEnableEquipHook));
+	WriteRelJump(0x780934, reinterpret_cast<UInt32>(KeyringEnableDropHook));
+
+	WriteRelCall(0x782F42, reinterpret_cast<UInt32>(KeyringEnableCancelHook));
+
+	WriteRelCall(0x7815A6, reinterpret_cast<UInt32>(KeyringPipBoyIconHook));
+}
+
+//bool __fastcall FFFNOP()
+//{
+//	return false;
+//}
+///	WriteRelCall(0x780488, reinterpret_cast<UInt32>(FFFNOP));	   
+void patchFixDroppedItems()
+{
+	WriteRelCall(0x75C793, reinterpret_cast<UInt32>(FixGetDroppedWeapon));
 }
 
 void patchMatchedCursor()
 {
-	WriteRelCall(0x70B33A, reinterpret_cast<UInt32>(TileSetStringValueCursor));
-	WriteRelCall(0x70C727, reinterpret_cast<UInt32>(TileSetIntValueCursor));
+	WriteRelCall(0x70B33A, reinterpret_cast<UInt32>(CursorTileSetStringValue));
+	WriteRelCall(0x70C727, reinterpret_cast<UInt32>(CursorTileSetIntValue));
 }
 
 void patch1080pUI()
@@ -123,7 +123,7 @@ void patchAddyCMToSettingsMenu()
 		SafeWriteBuf(0x7CC044, "\x0F\x1F\x44\x00\x00", 5);
 		SafeWriteBuf(0x7CC416, "\x0F\x1F\x44\x00\x00", 5);
 		SafeWriteBuf(0x7CC582, "\x0F\x1F\x44\x00\x00", 5);*/
-		//	SafeWriteBuf(0x7CBF59, "\x0F\x1F\x44\x00\x00", 5);
-		//	SafeWriteBuf(0x7CC01F, "\x0F\x1F\x44\x00\x00", 5);
+	//	SafeWriteBuf(0x7CBF59, "\x0F\x1F\x44\x00\x00", 5);
+	//	SafeWriteBuf(0x7CC01F, "\x0F\x1F\x44\x00\x00", 5);
 
 }

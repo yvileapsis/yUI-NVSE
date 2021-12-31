@@ -14,7 +14,7 @@ extern std::vector<JSONEntryItem> g_SI_Items_JSON;
 extern std::vector<JSONEntryTag> g_SI_Tags_JSON;
 extern std::unordered_map <TESForm*, std::string> g_SI_Items;
 extern std::unordered_map <std::string, JSONEntryTag> g_SI_Tags;
-extern std::unordered_map <std::string, bool> g_SI_Categories;
+extern std::unordered_set <std::string> g_SI_Categories;
 
 extern std::vector<std::filesystem::path> g_XMLPaths;
 
@@ -42,7 +42,8 @@ void HandleJson(const std::filesystem::path& path)
 	{
 		std::ifstream i(path);
 		nlohmann::json j;
-		i >> j;
+		j = nlohmann::json::parse(i, nullptr, true, true);
+//		i >> j;
 		if (j.contains("tags") && j["tags"].is_array())
 		{
 			for (auto& elem : j["tags"])
@@ -259,11 +260,13 @@ void HandleJson(const std::filesystem::path& path)
 				if (elem.contains("category")) category = elem["category"].get<std::string>();
 				std::string name;
 				if (elem.contains("name")) name = elem["name"].get<std::string>();
-				std::string nameGMST;
-				if (elem.contains("nameGMST")) nameGMST = elem["nameGMST"].get<std::string>();
-
+				std::string icon;
+				if (elem.contains("icon")) icon = elem["icon"].get<std::string>();
+				UInt32 tab = 0;
+				if (elem.contains("tab")) tab = elem["tab"].get<UInt32>();
+				
 				DebugLog(FormatString("Tag: '%10s', icon: '%s'",  tag.c_str(), filename.c_str()));
-				g_SI_Tags_JSON.emplace_back(tag, priority, xmltemplate, filename, texatlas, systemcolor, category, name, nameGMST);
+				g_SI_Tags_JSON.emplace_back(tag, priority, xmltemplate, filename, texatlas, systemcolor, category, name, icon, tab);
 			}
 		}
 		else { DebugPrint(path.string() + " JSON icon array not detected"); }
@@ -362,7 +365,7 @@ void FillSIMapsFromJSON()
 	ra::sort(g_SI_Tags_JSON, [&](const JSONEntryTag& entry1, const JSONEntryTag& entry2)
 		{ return entry1.priority > entry2.priority; });
 	for (auto& entry : g_SI_Tags_JSON) {
-		if (!entry.category.empty()) g_SI_Categories.emplace(entry.category, false);
+		if (!entry.name.empty()) g_SI_Categories.emplace(entry.tag);
 		g_SI_Tags.emplace(entry.tag, std::move(entry));
 	}
 	g_SI_Tags_JSON = std::vector<JSONEntryTag>();

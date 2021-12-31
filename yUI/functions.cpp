@@ -1,8 +1,10 @@
 #include <functions.h>
 #include <unordered_set>
+#include <utility>
 #include <PluginAPI.h>
 #include <GameAPI.h>
 #include <settings.h>
+#include <GameSettings.h>
 
 void PrintAndClearQueuedConsoleMessages()
 {
@@ -584,13 +586,13 @@ Tile* Tile::InjectUIXML(const char* str)
 	return FileExists(str) ? this->ReadXML(str) : nullptr;
 }
 
-void __fastcall TileSetStringValueCursor(Tile* tile, void* dummyEDX, enum TileValues tilevalue, char* src, char propagate)
+void __fastcall CursorTileSetStringValue(Tile* tile, void* dummyEDX, enum TileValues tilevalue, char* src, char propagate)
 {
 	tile->SetFloat(kTileValue_zoom, -1, propagate);
 	tile->SetFloat(kTileValue_systemcolor, 1, propagate);
 }
 
-void __fastcall TileSetIntValueCursor(Tile* tile, void* dummyEDX, enum TileValues tilevalue, int value)
+void __fastcall CursorTileSetIntValue(Tile* tile, void* dummyEDX, enum TileValues tilevalue, int value)
 {
 	tile->SetFloat(kTileValue_visible, value, 1);
 	ThisCall(0xA0B350, InterfaceManager::GetSingleton()->cursor, 1, 0);
@@ -605,4 +607,45 @@ bool __fastcall FileExists(const char* path)
 char* __fastcall StrFromINI(DWORD *address)
 {
 	return address ? reinterpret_cast<char*>(address[1]) : nullptr;
+}
+
+Setting* GameSettingFromString(const std::string& settingName)
+{
+	Setting* setting = nullptr;
+	if (auto gmsts = GameSettingCollection::GetSingleton(); gmsts && gmsts->GetGameSetting(settingName.c_str(), &setting) && setting) return setting;
+}
+
+std::string GetStringGameSetting(Setting* setting)
+{
+	if (setting->GetType() == Setting::kSetting_String)	return std::string(setting->data.str);
+}
+
+std::string GetStringFromGameSettingFromString(const std::string& settingName)
+{
+	if (const auto setting = GameSettingFromString(settingName); setting)
+		return GetStringGameSetting(setting);
+}
+
+void* __fastcall FixGetDroppedWeapon(ExtraDataList* extradatalist)
+{
+	auto* xDropped = (ExtraDroppedItemList*)(extradatalist->GetByType(kExtraData_DroppedItemList));
+	if (!xDropped) return nullptr;
+	for (auto iter = xDropped->itemRefs.Head(); iter; iter = iter->next)
+	{
+		auto worldref = iter->data;
+		auto entry = ContChangesEntry::Create(worldref->baseForm, 1);
+		ContainerMenu::GetSingleton()->rightItems.Insert(entry, worldref->GetTheName());
+		
+//		entry->extendData = tList::Init(8)
+//		tList::Init()
+//		ThisCall(0x41DE40, *&entry, worldref);
+		
+/*		TESHealthForm* healthForm = DYNAMIC_CAST(worldref->baseForm, TESForm, TESHealthForm);
+		ExtraHealth* xHealth = nullptr;
+		if (healthForm)	xHealth = (ExtraHealth*)worldref->extraDataList.GetByType(kExtraData_Health);
+		//(float) entry->GetCustomExtra(kExtraData_Health)-> = xHealth->health;
+		ThisCall(0x419970, *&entry, xHealth->health);*/
+		
+	}
+	return nullptr;
 }

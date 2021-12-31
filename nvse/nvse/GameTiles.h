@@ -275,7 +275,7 @@ public:
 	Tile*				GetComponentTile(const char * componentTile);
 	Value*				GetComponentValue(const char * componentPath);
 	char*				GetComponentFullName(char *resStr);
-	__forceinline Tile* ReadXML(const char* xmlPath)	{ return ThisCall<Tile*>(0xA01B00, this, xmlPath); }
+	__forceinline Tile* ReadXML(const char* xmlPath) { return ThisCall<Tile*>(0xA01B00, this, xmlPath); }
 	Tile*				InjectUIXML(const char*);
 
 	void				SetFloat(UInt32 id, float fltVal, bool bPropagate = true);
