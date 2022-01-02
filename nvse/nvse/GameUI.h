@@ -41,14 +41,15 @@ public:
 	InterfaceManager();
 	~InterfaceManager();
 
-	static InterfaceManager* GetSingleton(void) { return *(InterfaceManager * *)(0x11D8A80); };
+	static InterfaceManager*	GetSingleton(void) { return *(InterfaceManager * *)(0x11D8A80); };
 	static bool					IsMenuVisible(UInt32 menuType);
 	static Menu *				GetMenuByType(UInt32 menuType);
 	static Menu *				TempMenuByType(UInt32 menuType);
-	//static TileMenu *			GetMenuByPath(const char * componentPath, const char ** slashPos);
-	//static Tile::Value *		GetMenuComponentValue(const char * componentPath);
-	//static Tile *				GetMenuComponentTile(const char * componentPath);
-
+	static TileMenu*			GetMenuByPath(const char* componentPath, const char** slashPos);
+	static Tile::Value*			GetMenuComponentValue(const char* componentPath);
+	static Tile*				GetMenuComponentTile(const char* componentPath);
+	static Tile::Value*			GetMenuComponentValueAlt(const char* componentPath);
+	
 	UInt32 GetTopVisibleMenuID();
 	Tile *GetActiveTile();
 
@@ -204,10 +205,10 @@ public:
 	NiNode					*niNode080;			// 080
 	NiNode					*niNode084;			// 084
 	UInt32					unk088;				// 088
-	void		*shaderAccum08C;	// 08C
-	void		*shaderAccum090;	// 090
-	void			*shadowScene094;	// 094
-	void			*shadowScene098;	// 098
+	void					*shaderAccum08C;	// 08C
+	void					*shaderAccum090;	// 090
+	void					*shadowScene094;	// 094
+	void					*shadowScene098;	// 098
 	Tile					*menuRoot;			// 09C
 	Tile					*globalsTile;		// 0A0	globals.xml
 	NiNode					*unk0A4;			// 0A4 saw Tile? seen NiNode
@@ -271,7 +272,7 @@ public:
 	UInt8					byte4B7;			// 4B7
 	UInt32					queuedPipboyTabToSwitchTo;	// 4B8
 	UInt32					pipBoyMode;			// 4BC
-	void (*onPipboyOpenCallback)(void);			// 4C0
+	void					(*onPipboyOpenCallback)(void);			// 4C0
 	UInt32					unk4C4[2];			// 4C4
 	UInt8					byte4CC;			// 4CC
 	UInt8					byte4CD;			// 4CD

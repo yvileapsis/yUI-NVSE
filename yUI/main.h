@@ -22,7 +22,7 @@ NVSEStringVarInterface*		g_stringInterface = nullptr;
 NVSEArrayVarInterface*		g_arrayInterface = nullptr;
 NVSEMessagingInterface*		g_messagingInterface = nullptr;
 NVSEScriptInterface*		g_scriptInterface = nullptr;
-NVSECommandTableInterface*	g_commandTableInterface = nullptr;
+NVSECommandTableInterface*	g_commandInterface = nullptr;
 NVSEDataInterface*			g_dataInterface = nullptr;
 
 //DIHookControl* g_DIHook = nullptr;

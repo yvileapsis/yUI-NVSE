@@ -11,8 +11,8 @@
 #include <ySI.h>
 #include <file.h>
 
-#define yUI_VERSION 1.1
-#define yUI_VERSION_STR "1.1a"
+#define yUI_VERSION 1.2
+#define yUI_VERSION_STR "1.2"
 
 #define RegisterScriptCommand(name) 	nvse->RegisterCommand(&kCommandInfo_ ##name)
 #define REG_CMD_STR(name) nvse->RegisterTypedCommand(&kCommandInfo_##name, kRetnType_String)
@@ -80,8 +80,8 @@ void writePatches()
 	}
 	if (g_yCM) patchAddyCMToSettingsMenu();
 	if (g_yMC) patchMatchedCursor();
-	patchFixDroppedItems();
-	//	patch1080pUI();
+//	patchFixDroppedItems();
+//	patch1080pUI();
 
 }
 
@@ -132,12 +132,12 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	g_messagingInterface->RegisterListener(g_pluginHandle, "NVSE", MessageHandler);
 
 	nvse->SetOpcodeBase(0x21D0);
-	REG_CMD_STR(ySIGetTagTrait);
-	RegisterScriptCommand(SetWorldspaceDefaultWaterHeight);
-	//	RegisterScriptCommand(SwapTexatlas);
+	REG_CMD_STR(ySIGetTrait);
+	RegisterScriptCommand(ySISetTrait);
+//	RegisterScriptCommand(SetWorldspaceDefaultWaterHeight);
+//	RegisterScriptCommand(SwapTexatlas);
 	
 	if (nvse->isEditor)	return true;
-
 
 	g_stringInterface = static_cast<NVSEStringVarInterface*>(nvse->QueryInterface(kInterface_StringVar));
 	GetStringVar = g_stringInterface->GetString;
@@ -148,7 +148,23 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	g_scriptInterface = static_cast<NVSEScriptInterface*>(nvse->QueryInterface(kInterface_Script));
 	g_dataInterface = static_cast<NVSEDataInterface*>(nvse->QueryInterface(kInterface_Data));
 
+	g_commandInterface = static_cast<NVSECommandTableInterface*>(nvse->QueryInterface(kInterface_CommandTable));
 
+/*
+	RegisterCommand GetModINISetting (21C0)
+	RegisterCommand SetModINISetting (21C1)
+	RegisterCommand GetMCMFloat (21C2)
+	RegisterCommand SetMCMFloat (21C3)
+	RegisterCommand SetMCMString (21C4)
+	RegisterCommand SetMCMFloatMass (21C5)
+	RegisterCommand SetMCMStringMass (21C6)
+	RegisterCommand SetMCMModList (21C7)
+	RegisterCommand GetMCMListWidth (21C8)
+ */
+
+//	auto cmdInfo = g_commandInterface->GetByOpcode(0x21C2);
+//	cmdInfo->execute = Cmd_GetyCMFloat_Execute;
+	
 //	CaptureLambdaVars = static_cast<_CaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaSaveVariableList));
 //	UncaptureLambdaVars = static_cast<_UncaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaUnsaveVariableList));
 	handleINIOptions();
