@@ -12,7 +12,7 @@
 #include <file.h>
 
 #define yUI_VERSION 1.2
-#define yUI_VERSION_STR "1.2"
+#define yUI_VERSION_STR "1.2b"
 
 #define RegisterScriptCommand(name) 	nvse->RegisterCommand(&kCommandInfo_ ##name)
 #define REG_CMD_STR(name) nvse->RegisterTypedCommand(&kCommandInfo_##name, kRetnType_String)
@@ -71,9 +71,9 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 
 void writePatches()
 {
+	if (g_SortingFix || (g_ySI && g_ySI_Sort)) patchSortingHooks();
 	if (g_ySI)
 	{
-		if (g_ySI_Sort || g_ySI_SortingFix) patchSortingHooks();
 		if (g_ySI_Icons) patchAddIcons();
 		if (g_ySI_Hotkeys) patchReplaceHotkeyIcons();
 		if (g_ySI_Categories) patchSortingCategories();
@@ -110,10 +110,7 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 			_ERROR("yUI: NoGore is not supported");
 			return false;
 		}
-	}
-
-	else
-	{
+	} else {
 		if (nvse->editorVersion < CS_VERSION_1_4_0_518)
 		{
 			_ERROR("yUI: incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518);

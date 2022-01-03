@@ -2,9 +2,10 @@
 
 inline int g_logLevel = 0;
 
-inline int g_ySI = 1;
+inline int g_SortingFix = 1;
 
-inline int g_ySI_SortingFix = 1;
+inline int g_ySI = 0;
+
 inline int g_ySI_Sort = 1;
 inline int g_ySI_Icons = 1;
 inline int g_ySI_Hotkeys = 1;

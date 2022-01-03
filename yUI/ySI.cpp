@@ -5,7 +5,7 @@
 
 extern int g_ySI;
 extern int g_ySI_Sort;
-
+extern int g_ySI_Categories;
 extern std::unordered_map <TESForm*, std::string> g_SI_Items;
 extern std::unordered_map <std::string, JSONEntryTag> g_SI_Tags;
 extern std::vector <std::filesystem::path> g_XMLPaths;
@@ -110,15 +110,18 @@ signed int __fastcall CompareItemsWithTags(ContChangesEntry* a2, ContChangesEntr
 
 	signed int cmp;
 
-	if (g_ySI_Sort)
-	{
+	if (g_ySI_Sort && !g_SI_Items.empty())
+	{	
 		std::string tag1, tag2;
 
 		if (form1) tag1 = g_SI_Items[form1];
 		if (form2) tag2 = g_SI_Items[form2];
 
-		if (tag1.empty() && tile1->GetValue(kTileValue_user16)) tag1 = tile1->GetValue(kTileValue_user16)->str;
-		if (tag2.empty() && tile2->GetValue(kTileValue_user16)) tag2 = tile2->GetValue(kTileValue_user16)->str;
+		if (g_ySI_Categories && !g_SI_Categories.empty())
+		{
+			if (tag1.empty() && tile1 && tile1->GetValue(kTileValue_user16)) tag1 = tile1->GetValue(kTileValue_user16)->str;
+			if (tag2.empty() && tile2 && tile2->GetValue(kTileValue_user16)) tag2 = tile2->GetValue(kTileValue_user16)->str;
+		}
 
 		if (tag1.empty())
 		{

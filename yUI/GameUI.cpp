@@ -365,7 +365,7 @@ __declspec(naked) UInt32 InterfaceManager::GetTopVisibleMenuID()
 	}
 }
 
-std::unordered_map<const char*, UInt32> s_menuNameToID({ {"MessageMenu", kMenuType_Message}, {"InventoryMenu", kMenuType_Inventory}, {"StatsMenu", kMenuType_Stats},
+std::unordered_map<std::string, UInt32> s_menuNameToID({ {"MessageMenu", kMenuType_Message}, {"InventoryMenu", kMenuType_Inventory}, {"StatsMenu", kMenuType_Stats},
 	{"HUDMainMenu", kMenuType_HUDMain}, {"LoadingMenu", kMenuType_Loading}, {"ContainerMenu", kMenuType_Container}, {"DialogMenu", kMenuType_Dialog},
 	{"SleepWaitMenu", kMenuType_SleepWait}, {"StartMenu", kMenuType_Start}, {"LockpickMenu", kMenuType_LockPick}, {"QuantityMenu", kMenuType_Quantity},
 	{"MapMenu", kMenuType_Map}, {"BookMenu", kMenuType_Book}, {"LevelUpMenu", kMenuType_LevelUp}, {"RepairMenu", kMenuType_Repair},
@@ -381,7 +381,7 @@ TileMenu* InterfaceManager::GetMenuByPath(const char* componentPath, const char*
 	char* slashPos = SlashPos(componentPath);
 	if (slashPos) *slashPos = 0;
 	*pSlashPos = slashPos;
-	const UInt32 menuID = s_menuNameToID[componentPath];
+	const UInt32 menuID = s_menuNameToID[std::string(componentPath)];
 	return menuID ? g_tileMenuArray[menuID - kMenuType_Min] : nullptr;
 }
 
