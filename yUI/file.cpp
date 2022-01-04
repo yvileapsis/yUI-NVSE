@@ -306,8 +306,22 @@ void FillSIMapsFromJSON()
 		switch (form->typeID)
 		{
 		default: continue;
-		case 24: case 25: case 26: case 29: case 30: case 31: case 40: case 41: case 46: case 47: case 49: case 96:
-		case 103: case 108: case 115: case 116: case 117: {}
+		case kFormType_TESObjectARMO:
+		case kFormType_TESObjectBOOK:
+		case kFormType_TESObjectCLOT:
+		case kFormType_IngredientItem:
+		case kFormType_TESObjectLIGH:
+		case kFormType_TESObjectMISC:
+		case kFormType_TESObjectWEAP:
+		case kFormType_TESAmmo:
+		case kFormType_TESKey:
+		case kFormType_AlchemyItem:
+		case kFormType_BGSNote:
+		case kFormType_TESObjectARMA:
+		case kFormType_TESObjectIMOD:
+		case kFormType_TESCasinoChips:
+		case kFormType_TESCaravanCard:
+		case kFormType_TESCaravanMoney: {}
 		}
 		for (const auto& entry : g_SI_Items_JSON) {			
 			if (entry.form && entry.form->refID != form->refID) continue;
