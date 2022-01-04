@@ -8,7 +8,6 @@
 #include <patches.h>
 #include <commands.h>
 #include <settings.h>
-#include <ySI.h>
 #include <file.h>
 
 #define yUI_VERSION 1.2
@@ -159,8 +158,11 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	RegisterCommand GetMCMListWidth (21C8)
  */
 
-//	auto cmdInfo = g_commandInterface->GetByOpcode(0x21C2);
-//	cmdInfo->execute = Cmd_GetyCMFloat_Execute;
+	auto cmdInfo = g_commandInterface->GetByOpcode(0x21C2);
+	cmdInfo->execute = Cmd_GetyCMFloat_Execute;
+
+	cmdInfo = g_commandInterface->GetByOpcode(0x21C3);
+	cmdInfo->execute = Cmd_SetyCMFloat_Execute;
 	
 //	CaptureLambdaVars = static_cast<_CaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaSaveVariableList));
 //	UncaptureLambdaVars = static_cast<_UncaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaUnsaveVariableList));

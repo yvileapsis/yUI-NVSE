@@ -9,6 +9,10 @@
 
 #include "file.h"
 
+#include <ySI.h>
+#include <yCM.h>
+
+
 extern std::deque<std::function<void()>> g_executionQueue;
 
 #define IS_TRANSITION_FIX 0
@@ -56,3 +60,5 @@ inline std::unordered_map <std::string, JSONEntryTag> g_SI_Tags;
 inline std::unordered_set <std::string> g_SI_Categories;
 
 inline int iInjected = 0;
+
+inline yCM g_yCM_Manager;

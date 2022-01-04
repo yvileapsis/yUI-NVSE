@@ -410,6 +410,7 @@
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="patches.cpp" />
     <ClCompile Include="settings.cpp" />
+    <ClCompile Include="yCM.cpp" />
     <ClCompile Include="ySI.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -440,6 +441,7 @@
     <ClInclude Include="file.h" />
     <ClInclude Include="commands.h" />
     <ClInclude Include="functions.h" />
+    <ClInclude Include="yCM.h" />
     <ClInclude Include="patches.h" />
     <ClInclude Include="settings.h" />
     <ClInclude Include="hooks.h" />
