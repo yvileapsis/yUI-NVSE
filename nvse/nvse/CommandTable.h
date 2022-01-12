@@ -118,6 +118,7 @@ struct ParamInfo
 #define EXTRACT_ARGS		paramInfo, scriptData, opcodeOffsetPtr, thisObj, containingObj, scriptObj, eventList
 #define COMMAND_ARGS_EVAL	TESObjectREFR * thisObj, void * arg1, void * arg2, double * result
 #define PASS_CMD_ARGS_EVAL	thisObj, arg1, arg2, result
+#define COMMAND_ARGS_EX		ParamInfo *paramInfo, void *scriptData, UInt32 *opcodeOffsetPtr, Script *scriptObj, ScriptEventList *eventList
 #define EXTRACT_ARGS_EX		paramInfo, scriptData, opcodeOffsetPtr, scriptObj, eventList
 #define PASS_FMTSTR_ARGS	paramInfo, scriptData, opcodeOffsetPtr, scriptObj, eventList
 

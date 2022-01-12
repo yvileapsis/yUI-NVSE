@@ -393,10 +393,16 @@ __declspec(naked) void SortingBarterContainerMenuHook()
 	_asm
 	{
 		pop eax
-		mov eax, [ebp + 0x8] // a1
-		mov edx, [eax + 0x4]
-		mov eax, [ebp + 0xC] // a2
-		mov ecx, [eax + 0x4]
+		mov eax, [ebp + 0xC]	// a2
+		mov ecx, [eax]
+		push ecx				// tile2
+		mov ecx, [eax + 0x4]	// entry2
+		
+		mov eax, [ebp + 0x8]	// a1
+		mov edx, [eax]
+		push edx				// tile1
+		mov edx, [eax + 0x4]	// entry1
+
 		call CompareItems
 		mov esp, ebp
 		pop ebp

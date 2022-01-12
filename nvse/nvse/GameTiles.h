@@ -266,7 +266,7 @@ public:
 
 	static UInt32		TraitNameToID(const char * traitName);
 	static UInt32		TraitNameToIDAdd(const char* traitName);
-	Value*				GetValue(UInt32 typeID);
+	Value* __fastcall	GetValue(UInt32 typeID);
 	Value*				GetValueName(const char * valueName);
 	float				GetValueFloat(UInt32 id);
 	DListNode<Tile>*	GetNthChild(UInt32 index);

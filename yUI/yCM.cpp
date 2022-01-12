@@ -8,53 +8,47 @@ bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS)
 	SInt64 grandchild = 0;
 	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &child, &grandchild, &src)) return true;
 
-	std::string path;
-
-	if (child == 0) {
-		path = "StartMenu/MCM/" + std::string(src);
-	}
+	std::string path = "StartMenu/MCM/";
+	if (child == 0) {}
 	else if (child == 1) {
-		if (grandchild == 0) {
-			path = "StartMenu/MCM/MCM_Options/" + std::string(src);
-		}
-		else {
-			path = "StartMenu/MCM/MCM_Options/Option" + std::to_string(grandchild) + "/" + std::string(src);
+		path += "MCM_Options/";
+		if (grandchild != 0) {
+			path += "Option" + std::to_string(grandchild) + "/";
 		}
 	}
 	else if (child == 2) {
-		path = "StartMenu/MCM/MCM_Scale/" + std::string(src);
+		path += "MCM_Scale/";
 	}
 	else if (child == 3) {
-		if (grandchild == 0) {
-			path = "StartMenu/MCM/MCM_List/" + std::string(src);
-		}
-		else {
-			path = "StartMenu/MCM/MCM_List/Item" + std::to_string(grandchild) + "/" + std::string(src);;
+		path += "MCM_List/";
+		if (grandchild != 0) {
+			path += "Item" + std::to_string(grandchild) + "/";
 		}
 	}
 	else if (child == 4) {
-		path = "StartMenu/MCM/MCM_Trigger/" + std::string(src);
+		path += "MCM_Trigger/";
 	}
 	else if (child == 5) {
-		if (grandchild == 0) {
-			path = "StartMenu/MCM/MCM_ModList/" + std::string(src);
-		}
+		path += "MCM_ModList/";
+		if (grandchild == 0) {}
 		else if (grandchild <= 23) {
-			path = "StartMenu/MCM/MCM_ModList/Mod" + std::to_string(grandchild) + "/" + std::string(src);
+			path += "Mod" + std::to_string(grandchild) + "/";
 		}
 		else {
-			path = "StartMenu/MCM/MCM_ModList/SubMenu" + std::to_string(grandchild - 23) + "/" + std::string(src);
+			path += "SubMenu" + std::to_string(grandchild - 23) + "/";
 		}
 	}
 	else if (child == 9) {
-		path = "StartMenu/MCM/MCM_Info/" + std::string(src);
+		path += "MCM_Info/";
 	}
 	else if (child == 15) {
-		path = "StartMenu/MCM/MCM_Input/" + std::string(src);
+		path += "MCM_Input/";
 	}
 	else if (child == 17) {
-		path = "StartMenu/MCM/MCM_Images/" + std::string(src);
+		path += "MCM_Images/";
 	}
+	path += std::string(src);
+	
 	//	 = "StartMenu/MCM/*:" + std::to_string(child) + "/*:" + std::to_string(grandchild) + "/" + std::string(src);
 
 	/*	if (child == 0 && grandchild == 0 && std::string(src) == "_MCM")
@@ -76,6 +70,11 @@ bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS)
 		*/
 	Tile::Value* val = InterfaceManager::GetMenuComponentValue(path.c_str());
 	if (val) *result = val->num;
+	else
+	{
+		path = "GetMCMFloat " + std::to_string(child) + " " + std::to_string(grandchild) + " " + std::string(src);
+		Console_Print(path.c_str());
+	}
 
 	return true;
 }
@@ -90,81 +89,61 @@ bool Cmd_SetyCMFloat_Execute(COMMAND_ARGS)
 	char src[0x100];
 	SInt64 child = 0;
 	SInt64 grandchild = 0;
-	float value;
+	float value = 0;
 	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &child, &grandchild, &src, &value)) return true;
-	Console_Print("%d %d %d", child, grandchild, value);
-	Console_Print(src);
-	std::string path;
-
-	if (child == 0) {
-		path = "StartMenu/MCM/" + std::string(src);
-
-		if (std::string(src) == "_ActiveMod")
-		{
-			activeMod = value;
-		}
-
-		if (std::string(src) == "_ActiveSubMenu")
-		{
-			activeSubMenu = value;
-		}
-
-		if (std::string(src) == "_ActiveOption")
-		{
-			activeSubMenu = value;
-		}
-		
-	}
+//	Console_Print("%d %d %d", child, grandchild, value);
+//	Console_Print(src);
+	std::string path = "StartMenu/MCM/";
+	if (child == 0) {}
 	else if (child == 1) {
-		if (grandchild == 0) {
-			path = "StartMenu/MCM/MCM_Options/" + std::string(src);
+		path += "MCM_Options/";
+		if (grandchild != 0) {
+			path += "Option" + std::to_string(grandchild) + "/";
 		}
-		else {
-			path = "StartMenu/MCM/MCM_Options/Option" + std::to_string(grandchild) + "/" + std::string(src);
-		}
-
-
-		
 	}
 	else if (child == 2) {
-		path = "StartMenu/MCM/MCM_Scale/" + std::string(src);
+		path += "MCM_Scale/";
 	}
 	else if (child == 3) {
-		if (grandchild == 0) {
-			path = "StartMenu/MCM/MCM_List/" + std::string(src);
-		}
-		else {
-			path = "StartMenu/MCM/MCM_List/Item" + std::to_string(grandchild) + "/" + std::string(src);;
+		path += "MCM_List/";
+		if (grandchild != 0) {
+			path += "Item" + std::to_string(grandchild) + "/";
 		}
 	}
 	else if (child == 4) {
-		path = "StartMenu/MCM/MCM_Trigger/" + std::string(src);
+		path += "MCM_Trigger/";
 	}
 	else if (child == 5) {
-		if (grandchild == 0) {
-			path = "StartMenu/MCM/MCM_ModList/" + std::string(src);
-		}
+		path += "MCM_ModList/";
+		if (grandchild == 0) {}
 		else if (grandchild <= 23) {
-			path = "StartMenu/MCM/MCM_ModList/Mod" + std::to_string(grandchild) + "/" + std::string(src);
+			path += "Mod" + std::to_string(grandchild) + "/";
 		}
 		else {
-			path = "StartMenu/MCM/MCM_ModList/SubMenu" + std::to_string(grandchild - 23) + "/" + std::string(src);
+			path += "SubMenu" + std::to_string(grandchild - 23) + "/";
 		}
 	}
 	else if (child == 9) {
-		path = "StartMenu/MCM/MCM_Info/" + std::string(src);
+		path += "MCM_Info/";
 	}
 	else if (child == 15) {
-		path = "StartMenu/MCM/MCM_Input/" + std::string(src);
+		path += "MCM_Input/";
 	}
 	else if (child == 17) {
-		path = "StartMenu/MCM/MCM_Images/" + std::string(src);
+		path += "MCM_Images/";
 	}
+	path += std::string(src);
 
+	auto path2 = path;
 	Tile::Value* val = InterfaceManager::GetMenuComponentValue(path.c_str());
 	if (val) {
 		*result = 1;
 		val->parent->SetFloat(val->id, value);
+	} else
+	{
+//		Console_Print(path2.c_str());
+		path = "SetMCMFloat " + std::to_string(child) + " " + std::to_string(grandchild) + " " + std::string(src) + " " + std::to_string(value);
+		Console_Print(path.c_str());
 	}
 	return true;
 }

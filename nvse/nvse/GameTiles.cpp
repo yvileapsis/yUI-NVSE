@@ -13,7 +13,7 @@ UInt32 Tile::TraitNameToID(const char * traitName)
 	return ::TraitNameToID(traitName);
 }
 
-__declspec(naked) Tile::Value *Tile::GetValue(UInt32 typeID)
+__declspec(naked) Tile::Value* __fastcall Tile::GetValue(UInt32 typeID)
 {
 	__asm
 	{
@@ -23,7 +23,7 @@ __declspec(naked) Tile::Value *Tile::GetValue(UInt32 typeID)
 		mov		ebx, [ecx+0x14]
 		xor		esi, esi
 		mov		edi, [ecx+0x18]
-		mov		edx, [esp+0x10]
+		ALIGN 16
 	iterHead:
 		cmp		esi, edi
 		jz		iterEnd
@@ -35,6 +35,7 @@ __declspec(naked) Tile::Value *Tile::GetValue(UInt32 typeID)
 		jb		isLT
 		mov		edi, ecx
 		jmp		iterHead
+		ALIGN 16
 	isLT:
 		lea		esi, [ecx+1]
 		jmp		iterHead
@@ -44,7 +45,7 @@ __declspec(naked) Tile::Value *Tile::GetValue(UInt32 typeID)
 		pop		edi
 		pop		esi
 		pop		ebx
-		retn	4
+		retn
 	}
 }
 

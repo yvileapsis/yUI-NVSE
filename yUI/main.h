@@ -11,7 +11,7 @@
 
 #include <ySI.h>
 #include <yCM.h>
-
+#include <CommandTable.h>
 
 extern std::deque<std::function<void()>> g_executionQueue;
 

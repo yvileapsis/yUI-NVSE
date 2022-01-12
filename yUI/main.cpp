@@ -11,7 +11,7 @@
 #include <file.h>
 
 #define yUI_VERSION 1.2
-#define yUI_VERSION_STR "1.2b"
+#define yUI_VERSION_STR "1.2c"
 
 #define RegisterScriptCommand(name) 	nvse->RegisterCommand(&kCommandInfo_ ##name)
 #define REG_CMD_STR(name) nvse->RegisterTypedCommand(&kCommandInfo_##name, kRetnType_String)
@@ -139,12 +139,14 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	GetStringVar = g_stringInterface->GetString;
 	SetStringVar = g_stringInterface->SetString;
 	AssignString = g_stringInterface->Assign;
-
+	
 	g_arrayInterface = static_cast<NVSEArrayVarInterface*>(nvse->QueryInterface(kInterface_ArrayVar));
 	g_scriptInterface = static_cast<NVSEScriptInterface*>(nvse->QueryInterface(kInterface_Script));
 	g_dataInterface = static_cast<NVSEDataInterface*>(nvse->QueryInterface(kInterface_Data));
 
 	g_commandInterface = static_cast<NVSECommandTableInterface*>(nvse->QueryInterface(kInterface_CommandTable));
+
+	ExtractArgsEx = g_scriptInterface->ExtractArgsEx;
 
 /*
 	RegisterCommand GetModINISetting (21C0)

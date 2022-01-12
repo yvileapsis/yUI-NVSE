@@ -1,5 +1,6 @@
 #pragma once
 
+#include "CommandTable.h"
 #include "GameTypes.h"
 #include "NiNodes.h"
 #include "GameScript.h"
@@ -83,17 +84,9 @@ extern const _QueueUIMessage QueueUIMessage;
 
 const UInt32 kMaxMessageLength = 0x4000;
 
-#if NVSE_CORE
-bool ExtractArgsEx(ParamInfo * paramInfo, void * scriptData, UInt32 * scriptDataOffset, Script * scriptObj, ScriptEventList * eventList, ...);
-extern bool ExtractFormatStringArgs(UInt32 fmtStringPos, char* buffer, ParamInfo * paramInfo, void * scriptDataIn, UInt32 * scriptDataOffset, Script * scriptObj, ScriptEventList * eventList, UInt32 maxParams, ...);
-#endif
-
 void ShowCompilerError(ScriptLineBuffer* lineBuf, const char* fmt, ...);
 
 #else
-
-
-
 
 typedef void (__cdecl *_ShowCompilerError)(ScriptBuffer* Buffer, const char* format, ...);
 extern const _ShowCompilerError		ShowCompilerError;
@@ -109,7 +102,6 @@ struct NVSEStringVarInterface;
 	//  this would break existing plugins
 	// Instead allow plugins to register their NVSEStringVarInterface for use
 	// I'm sure there is a better way to do this but I haven't found it
-void RegisterStringVarInterface(NVSEStringVarInterface* intfc);
 
 // only records individual objects if there's a block that matches it
 // ### how can it tell?
@@ -243,8 +235,6 @@ struct ExtractedParam
 	} data;
 };
 
-bool ExtractArgsRaw(ParamInfo * paramInfo, void * scriptDataIn, UInt32 * scriptDataOffset, Script * scriptObj, ScriptEventList * eventList, ...);
-
 enum EActorVals {
 	eActorVal_Aggression			= 0,
 	eActorVal_Confidence			= 1,
@@ -358,30 +348,6 @@ public:
 	virtual bool HasMoreArgs() = 0;
 	virtual char *GetFormatString() = 0;						// return format string
 };
-
-// concrete class used for extracting script args
-class ScriptFormatStringArgs : public FormatStringArgs
-{
-public:
-	virtual bool Arg(argType asType, void* outResult);
-	virtual bool SkipArgs(UInt32 numToSkip);
-	virtual bool HasMoreArgs();
-	virtual char *GetFormatString();
-
-	ScriptFormatStringArgs(UInt32 _numArgs, UInt8* _scriptData, Script* _scriptObj, ScriptEventList* _eventList);
-	UInt32 GetNumArgs();
-	UInt8* GetScriptData();
-
-private:
-	UInt32			numArgs;
-	UInt8			* scriptData;
-	Script			* scriptObj;
-	ScriptEventList		* eventList;
-};
-bool SCRIPT_ASSERT(bool expr, Script* script, const char * errorMsg, ...);
-
-bool ExtractSetStatementVar(Script* script, ScriptEventList* eventList, void* scriptDataIn, double* outVarData, bool* makeTemporary, UInt32* opcodeOffsetPtr, UInt8* outModIndex = NULL);
-bool ExtractFormattedString(FormatStringArgs& args, char* buffer);
 
 class ChangesMap;
 class InteriorCellNewReferencesMap;
@@ -845,25 +811,6 @@ STATIC_ASSERT(sizeof(FontInfo) == 0x54);*/
 
 void Debug_DumpFontNames(void);
 
-//class NiMemObject
-//{
-//	NiMemObject();
-//	~NiMemObject();
-//
-//};
-
-//class NiRefObject: public NiMemObject
-//{
-//	NiRefObject();
-//	~NiRefObject();
-//
-//	virtual void		Destructor(bool freeThis);	// 00
-//	virtual void		Free(void);					// 01 calls Destructor(true);
-//
-////	void		** _vtbl;		// 000
-//	UInt32		m_uiRefCount;	// 004 - name known (in OBSE)
-//};
-
 enum Coords
 {
 	kCoords_X = 0,	// 00
@@ -980,59 +927,6 @@ STATIC_ASSERT(sizeof(ScriptRunner) == 0xA4);
 // Gets the real script data ptr, as it can be a pointer to a buffer on the stack in case of vanilla expressions in set and if statements
 UInt8* GetScriptDataPosition(Script* script, void* scriptDataIn, const UInt32* opcodeOffsetPtrIn);
 
-/* I need to port NiTypes 
-
-class NavMesh: public TESForm
-{
-	NavMesh();
-	~NavMesh();
-
-	struct NavMeshGridCells
-	{
-		UInt32					cellCount;	// 00
-		BSSimpleArray<UInt16>	cells[1];	// 04
-	};	// 4 + cellCount*0x10
-
-	struct NavMeshGrid
-	{
-		UInt32	size;					// 000 = 0
-		float	unk004;					// 004
-		float	unk008;					// 008
-		float	flt00C;					// 00C Init'd to MAXFLOAT
-		float	unk010;					// 010
-		float	unk014;					// 014
-		float	unk018;					// 018
-		float	unk01C;					// 01C
-		float	unk020;					// 020
-		NavMeshGridCells	* cells;	// 024 = 0, array of size size*size
-	};
-
-	TESChildCell								childCell;				// 018
-	NiRefObject									niro;					// 01C
-	TESObjectCELL								* cell;					// 024
-	BSSimpleArray<NavMeshVertex>				vertices;				// 028
-	BSSimpleArray<NavMeshTriangle>				triangles;				// 038
-	BSSimpleArray<EdgeExtraInfo>				edgesExtraInfo;			// 048
-	BSSimpleArray<NavMeshTriangleDoorPortal>	trianglesDoorPortal;	// 058
-	BSSimpleArray<NavMeshClosedDoorInfo>		closedDoorsInfo;		// 068
-	BSSimpleArray<UInt16>						arr07NVCA;				// 078
-	NiTMap<ushort,NavMeshPOVData>				povDataMap;				// 088
-	BSSimpleArray<UInt8>						arr098;					// 098
-	NavMeshGrid									grid;					// 0A8
-	BSSimpleArray<NiTPointer<ObstacleUndoData>>	obstaclesUndoData;		// 0D0
-	NiTMap<ushort,NiPointer<ObstacleData>>		* obstaclesData;		// 0E0
-	BSSimpleArray<UInt8>						arr0E4;					// 0E4
-	BSSimpleArray<NavMeshStaticAvoidNode>		staticAvoidNodes;		// 0F4
-};
-
-class NavMeshInfoMap: public TESForm
-{
-	// 1C is NiTPointerMap indexed by NavMesh refID
-	// 2C is a map of map indexed by Worldspace/Cell refID
-};
-
-*/
-
 struct Timer
 {
 	UInt8 disableCounter;		// 00
@@ -1113,4 +1007,4 @@ public:
 	static bool				HasConsoleOutputFilename(void);
 };
 
-bool ExtractArgsEx(ParamInfo* paramInfo, void* scriptDataIn, UInt32* scriptDataOffset, Script* scriptObj, ScriptEventList* eventList, ...);
+inline bool (*ExtractArgsEx)(COMMAND_ARGS_EX, ...);
