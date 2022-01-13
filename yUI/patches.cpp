@@ -5,42 +5,42 @@
 
 void patchSortingHooks()
 {
-	WriteRelJump(0x782516, reinterpret_cast<UInt32>(SortingInventoryMenuHook));
-	WriteRelJump(0x72F0ED, reinterpret_cast<UInt32>(SortingBarterContainerMenuHook));
-	WriteRelJump(0x75D138, reinterpret_cast<UInt32>(SortingBarterContainerMenuHook));
+	WriteRelJump(0x782516, reinterpret_cast<UInt32>(SI_Hooks::SortingInventoryMenuHook));
+	WriteRelJump(0x72F0ED, reinterpret_cast<UInt32>(SI_Hooks::SortingBarterContainerMenuHook));
+	WriteRelJump(0x75D138, reinterpret_cast<UInt32>(SI_Hooks::SortingBarterContainerMenuHook));
 }
 
 void patchAddIcons()
 {
-	WriteRelJump(0x71A3D5, reinterpret_cast<UInt32>(IconInjectTileSetStringValueHook));
+	WriteRelJump(0x71A501, reinterpret_cast<UInt32>(SI_Hooks::IconInjectTileSetStringValueHook));
 }
 
 void patchReplaceHotkeyIcons()
 {
-	WriteRelJump(0x70189E, reinterpret_cast<UInt32>(IconHotkeyHUDTileSetStringValueHook));
-	WriteRelJump(0x7814FA, reinterpret_cast<UInt32>(IconHotkeyPipBoyTileSetStringValueHook));
+	WriteRelJump(0x70189E, reinterpret_cast<UInt32>(SI_Hooks::IconHotkeyHUDTileSetStringValueHook));
+	WriteRelJump(0x7814FA, reinterpret_cast<UInt32>(SI_Hooks::IconHotkeyPipBoyTileSetStringValueHook));
 }
 
 void patchSortingCategories()
 {
-	WriteRelJump(0x730C81, reinterpret_cast<UInt32>(ContainerEntryListBoxFilterHook));
+	WriteRelJump(0x730C81, reinterpret_cast<UInt32>(SI_Hooks::ContainerEntryListBoxFilterHook));
 
-	WriteRelJump(0x7824F6, reinterpret_cast<UInt32>(SortingInventoryMenuHook));
-	WriteRelJump(0x78250B, reinterpret_cast<UInt32>(SortingInventoryMenuHook));
+	WriteRelJump(0x7824F6, reinterpret_cast<UInt32>(SI_Hooks::SortingInventoryMenuHook));
+	WriteRelJump(0x78250B, reinterpret_cast<UInt32>(SI_Hooks::SortingInventoryMenuHook));
 
-	WriteRelJump(0x7831C1, reinterpret_cast<UInt32>(KeyringAddCategoriesHook));
+	WriteRelJump(0x7831C1, reinterpret_cast<UInt32>(SI_Hooks::KeyringAddCategoriesHook));
 	
-	WriteRelJump(0x7826E4, reinterpret_cast<UInt32>(KeyringHideKeysHook));
-	WriteRelJump(0x78083A, reinterpret_cast<UInt32>(KeyringHideNonKeysHook));
+	WriteRelJump(0x7826E4, reinterpret_cast<UInt32>(SI_Hooks::KeyringHideKeysHook));
+	WriteRelJump(0x78083A, reinterpret_cast<UInt32>(SI_Hooks::KeyringHideNonKeysHook));
 
-	WriteRelJump(0x782665, reinterpret_cast<UInt32>(KeyringHideKeysShowCategoriesHook));
+	WriteRelJump(0x782665, reinterpret_cast<UInt32>(SI_Hooks::KeyringHideKeysShowCategoriesHook));
 
-	WriteRelJump(0x780478, reinterpret_cast<UInt32>(KeyringEnableEquipHook));
-	WriteRelJump(0x780934, reinterpret_cast<UInt32>(KeyringEnableDropHook));
+	WriteRelJump(0x780478, reinterpret_cast<UInt32>(SI_Hooks::KeyringEnableEquipHook));
+	WriteRelJump(0x780934, reinterpret_cast<UInt32>(SI_Hooks::KeyringEnableDropHook));
 
-	WriteRelCall(0x782F42, reinterpret_cast<UInt32>(KeyringEnableCancelHook));
+	WriteRelCall(0x782F42, reinterpret_cast<UInt32>(SI_Hooks::KeyringEnableCancelHook));
 
-	WriteRelCall(0x7815A6, reinterpret_cast<UInt32>(KeyringPipBoyIconHook));
+	WriteRelCall(0x7815A6, reinterpret_cast<UInt32>(SI_Hooks::KeyringPipBoyIconHook));
 }
 
 //bool __fastcall FFFNOP()

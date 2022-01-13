@@ -6,8 +6,14 @@
 #include <file.h>
 #include <functions.h>
 
-extern std::unordered_map <TESForm*, std::string> g_SI_Items;
-extern std::unordered_map <std::string, JSONEntryTag> g_SI_Tags;
+#include "ySI.h"
+
+namespace SI
+{
+	extern std::unordered_map <TESForm*, std::string>		g_Items;
+	extern std::unordered_map <std::string, JSONEntryTag>	g_Tags;
+}
+
 extern bool				(*AssignString)(ParamInfo*, void*, TESObjectREFR*, TESObjectREFR*, Script*, ScriptEventList*, double*, UInt32*, const char*);
 
 #define GetExtraType(xDataList, Type) (Extra ## Type*)xDataList.GetByType(kExtraData_ ## Type)
@@ -31,11 +37,11 @@ bool Cmd_ySIGetTrait_Execute(COMMAND_ARGS)
 	if (!form) return true;
 	const auto tochange = std::string(src);
 	if (tochange == "tag" || tochange == "string") {
-		const std::string tag = g_SI_Items[form];
+		const std::string tag = SI::GetTagForItem(form);
 		AssignString(PASS_COMMAND_ARGS, tag.c_str());
 	} else if (tochange == "icon" || tochange == "filename") {
-		const std::string tag = g_SI_Items[form];
-		const std::string icon = g_SI_Tags[tag].filename;
+		const std::string tag = SI::GetTagForItem(form);
+		const std::string icon = SI::g_Tags[tag].filename;
 		AssignString(PASS_COMMAND_ARGS, icon.c_str());
 	}
 	return true;
@@ -61,11 +67,11 @@ bool Cmd_ySISetTrait_Execute(COMMAND_ARGS)
 	if (!form) return true;
 	const auto tochange = std::string(src);
 	if (tochange == "tag" || tochange == "string") {
-		g_SI_Items[form] = std::string(newstring);
+		SI::g_Items[form] = std::string(newstring);
 		*result = 1;
 	} else if (tochange == "icon" || tochange == "filename") {
-		const std::string tag = g_SI_Items[form];
-		g_SI_Tags[tag].filename = std::string(newstring);
+		const std::string tag = SI::GetTagForItem(form);
+		SI::g_Tags[tag].filename = std::string(newstring);
 		*result = 1;
 	}
 	return true;

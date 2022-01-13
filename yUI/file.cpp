@@ -10,13 +10,19 @@
 #include <utility.h>
 #include <Utilities.h>
 
-extern std::vector<JSONEntryItem> g_SI_Items_JSON;
-extern std::vector<JSONEntryTag> g_SI_Tags_JSON;
-extern std::unordered_map <TESForm*, std::string> g_SI_Items;
-extern std::unordered_map <std::string, JSONEntryTag> g_SI_Tags;
-extern std::unordered_set <std::string> g_SI_Categories;
+namespace SI_Files
+{
+	extern std::vector<JSONEntryItem> g_Items_JSON;
+	extern std::vector<JSONEntryTag> g_Tags_JSON;
+}
 
-extern std::vector<std::filesystem::path> g_XMLPaths;
+namespace SI
+{
+	extern std::unordered_map <TESForm*, std::string> g_Items;
+	extern std::unordered_map <std::string, JSONEntryTag> g_Tags;
+	extern std::unordered_set <std::string>  g_Categories;
+	extern std::vector<std::filesystem::path> g_XMLPaths;
+}
 
 void LogForm(const TESForm* form)
 {
@@ -99,7 +105,7 @@ void HandleJson(const std::filesystem::path& path)
 							if (!form) { DebugPrint(FormatString("Form %X was not found", formId)); continue; }
 							if (!formlist) {
 								DebugLog(FormatString("Tag: '%10s', individual form: %08X (%50s)", tag.c_str(), formId, form->GetName()));
-								g_SI_Items_JSON.emplace_back(tag, priority, form, questItem);
+								SI_Files::g_Items_JSON.emplace_back(tag, priority, form, questItem);
 							} else if (formlist == 1) {
 								JSONEntryItemRecursiveEmplace(tag, priority, form, questItem);
 							} else if (formlist == 2) {
@@ -111,7 +117,7 @@ void HandleJson(const std::filesystem::path& path)
 									if (!weapon->repairItemList.listForm) continue;
 									if (IsInListRecursive(weapon->repairItemList.listForm, form)) {
 										DebugLog(FormatString("Tag: '%10s', recursive form: %08X (%50s), repair list: '%08X'", tag.c_str(), formId, item->GetName(), weapon->repairItemList.listForm->refID));
-										g_SI_Items_JSON.emplace_back(tag, priority, item, questItem);
+										SI_Files::g_Items_JSON.emplace_back(tag, priority, item, questItem);
 									}
 								}
 							}
@@ -119,7 +125,7 @@ void HandleJson(const std::filesystem::path& path)
 					}
 					else {
 						DebugLog(FormatString("Tag: '%10s', mod: '%s'", tag.c_str(), modName.c_str()));
-						g_SI_Items_JSON.emplace_back(tag, priority, nullptr, questItem);
+						SI_Files::g_Items_JSON.emplace_back(tag, priority, nullptr, questItem);
 					}
 				}
 				else if (formType == 40 || elem.contains("weaponSkill") || elem.contains("weaponType"))
@@ -163,11 +169,11 @@ void HandleJson(const std::filesystem::path& path)
 						{
 							weapon.weaponType = weaponType;
 							DebugLog(FormatString("Tag: '%10s', weapon condition, type: %d", tag.c_str(), weaponType));
-							g_SI_Items_JSON.emplace_back(tag, priority, formType, questItem, weapon);
+							SI_Files::g_Items_JSON.emplace_back(tag, priority, formType, questItem, weapon);
 						}
 					} else {
 						DebugLog(FormatString("Tag: '%10s', weapon condition", tag.c_str()));
-						g_SI_Items_JSON.emplace_back(tag, priority, formType, questItem, weapon);
+						SI_Files::g_Items_JSON.emplace_back(tag, priority, formType, questItem, weapon);
 					}
 				}
 				else if (formType == 24)
@@ -205,14 +211,14 @@ void HandleJson(const std::filesystem::path& path)
 					if (elem.contains("armorDR"))			armor.armorDR = elem["armorDR"].get<UInt16>();
 					if (elem.contains("armorChangesAV"))	armor.armorChangesAV = elem["armorChangesAV"].get<UInt16>();
 
-					g_SI_Items_JSON.emplace_back(tag, priority, formType, questItem, armor);
+					SI_Files::g_Items_JSON.emplace_back(tag, priority, formType, questItem, armor);
 				}
 				else if (formType == 31 || elem.contains("miscComponent"))
 				{
 					formType = 31;
 					JSONEntryItemMisc misc{};
 					if (elem.contains("miscComponent"))	misc.miscComponent = elem["miscComponent"].get<UInt8>();
-					g_SI_Items_JSON.emplace_back(tag, priority, formType, questItem, misc);
+					SI_Files::g_Items_JSON.emplace_back(tag, priority, formType, questItem, misc);
 				}
 				else if (formType == 47 || elem.contains("IsFood") || elem.contains("IsMedicine"))
 				{
@@ -226,9 +232,9 @@ void HandleJson(const std::filesystem::path& path)
 					if (elem.contains("aidIsWater"))			aid.aidIsWater = elem["aidIsWater"].get<UInt8>();
 					if (elem.contains("aidIsMedicine"))			aid.aidIsMedicine = elem["aidIsMedicine"].get<UInt8>();
 					if (elem.contains("aidIsPoisonous"))		aid.aidIsPoisonous = elem["aidIsPoisonous"].get<UInt8>();
-					g_SI_Items_JSON.emplace_back(tag, priority, formType, questItem, aid);
+					SI_Files::g_Items_JSON.emplace_back(tag, priority, formType, questItem, aid);
 				}
-				else g_SI_Items_JSON.emplace_back(tag, priority, formType, questItem);
+				else SI_Files::g_Items_JSON.emplace_back(tag, priority, formType, questItem);
 			}
 		}
 		else { DebugPrint(path.string() + " JSON tag array not detected"); }
@@ -266,7 +272,7 @@ void HandleJson(const std::filesystem::path& path)
 				if (elem.contains("tab")) tab = elem["tab"].get<UInt32>();
 				
 				DebugLog(FormatString("Tag: '%10s', icon: '%s'",  tag.c_str(), filename.c_str()));
-				g_SI_Tags_JSON.emplace_back(tag, priority, xmltemplate, filename, texatlas, systemcolor, category, name, icon, tab);
+				SI_Files::g_Tags_JSON.emplace_back(tag, priority, xmltemplate, filename, texatlas, systemcolor, category, name, icon, tab);
 			}
 		}
 		else { DebugPrint(path.string() + " JSON icon array not detected"); }
@@ -290,7 +296,7 @@ void JSONEntryItemRecursiveEmplace(const std::string& tag, SInt16 priority, TESF
 	}
 	else {
 		DebugLog(FormatString("Tag: '%10s', recursive form: %08X (%50s)", tag.c_str(), list->refID, list->GetName()));
-		g_SI_Items_JSON.emplace_back(tag, priority, list, questItem);
+		SI_Files::g_Items_JSON.emplace_back(tag, priority, list, questItem);
 	}
 }
 
@@ -298,8 +304,8 @@ extern NiTPointerMap<TESForm>** g_allFormsMap;
 
 void FillSIMapsFromJSON()
 {
-	ra::sort(g_SI_Items_JSON, [&](const JSONEntryItem& entry1, const JSONEntryItem& entry2)
-		{ return entry1.priority > entry2.priority; });
+	ra::sort(SI_Files::g_Items_JSON, [&](const JSONEntryItem& entry1, const JSONEntryItem& entry2)
+	         { return entry1.priority > entry2.priority; });
 
 	for (auto mIter = (*g_allFormsMap)->Begin(); mIter; ++mIter) {
 		TESForm* form = mIter.Get();
@@ -323,7 +329,7 @@ void FillSIMapsFromJSON()
 		case kFormType_TESCaravanCard:
 		case kFormType_TESCaravanMoney: {}
 		}
-		for (const auto& entry : g_SI_Items_JSON) {			
+		for (const auto& entry : SI_Files::g_Items_JSON) {			
 			if (entry.form && entry.form->refID != form->refID) continue;
 			if (entry.formType && entry.formType != form->typeID) continue;
 
@@ -371,20 +377,20 @@ void FillSIMapsFromJSON()
 				if (entry.formAid.aidIsMedicine && !aid->IsMedicine()) continue;
 			}
 			
-			g_SI_Items.emplace(form, entry.tag);
+			SI::g_Items.emplace(form, entry.tag);
 		}
 	}
-	g_SI_Items_JSON = std::vector<JSONEntryItem>();
+	SI_Files::g_Items_JSON = std::vector<JSONEntryItem>();
 
-	ra::sort(g_SI_Tags_JSON, [&](const JSONEntryTag& entry1, const JSONEntryTag& entry2)
-		{ return entry1.priority > entry2.priority; });
-	for (auto& entry : g_SI_Tags_JSON) {
-		if (!entry.name.empty()) g_SI_Categories.emplace(entry.tag);
-		g_SI_Tags.emplace(entry.tag, std::move(entry));
+	ra::sort(SI_Files::g_Tags_JSON, [&](const JSONEntryTag& entry1, const JSONEntryTag& entry2)
+	         { return entry1.priority > entry2.priority; });
+	for (auto& entry : SI_Files::g_Tags_JSON) {
+		if (!entry.name.empty()) SI::g_Categories.emplace(entry.tag);
+		SI::g_Tags.emplace(entry.tag, std::move(entry));
 	}
-	g_SI_Tags_JSON = std::vector<JSONEntryTag>();
+	SI_Files::g_Tags_JSON = std::vector<JSONEntryTag>();
 
-	/*	for (const auto& entry : g_SI_Items_JSON)
+	/*	for (const auto& entry : g_Items_JSON)
  {
 		g_jsonContext.script = entry.conditionScript;
 		g_jsonContext.pollCondition = entry.pollCondition;
@@ -435,7 +441,7 @@ void LoadSIMapsFromFiles()
 			{
 				auto pathstring = iter->path().generic_string();
 				auto relativepath = pathstring.substr(pathstring.find_last_of("\\Data\\") - 3);
-				g_XMLPaths.emplace_back(std::filesystem::path(relativepath));
+				SI::g_XMLPaths.emplace_back(std::filesystem::path(relativepath));
 			}
 		}
 	}

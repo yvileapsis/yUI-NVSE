@@ -5,29 +5,42 @@
 
 //alignas(16) char s_strValBuffer[0x10000];
 
-extern TileMenu* g_HUDMainMenu, * g_StartMenu, * g_BarterMenu, * g_ContainerMenu, * g_RepairMenu, * g_RepairServicesMenu, * g_MapMenu, * g_StatsMenu;
+extern TileMenu* g_HUDMainMenu, * g_StartMenu, * g_BarterMenu, * g_ContainerMenu, * g_RepairMenu, * g_RepairServicesMenu, * g_MapMenu, * g_StatsMenu, * g_InventoryMenu;
 
 extern tList<char> queuedConsoleMessages;
 extern DataHandler* g_dataHandler;
 extern NiTPointerMap<TESForm>** g_allFormsMap;
 
-void IconInjectTileSetStringValueHook();
-void SortingInventoryMenuHook();
-void SortingBarterContainerMenuHook();
-void IconHotkeyHUDTileSetStringValueHook();
-void IconHotkeyPipBoyTileSetStringValueHook();
-void InjectTemplates();
-bool KeyringHideNonKeys(ContChangesEntry*);
-void KeyringHideKeysHook();
-void KeyringHideKeysShowCategoriesHook();
-void KeyringHideNonKeysHook();
-void KeyringAddCategoriesHook();
-void InjectIconTileLastFix();
-void KeyringRefreshPostStewie();
-void ContainerEntryListBoxFilterHook();
-void KeyringEnableEquipHook();
-void KeyringEnableDropHook();
-void __fastcall KeyringEnableCancelHook(Tile* tile, void* dummyEDX, enum TileValues tilevalue, signed int a1);
-void __fastcall KeyringPipBoyIconHook(Tile* tile, void* dummyEDX, enum TileValues tilevalue, char * string, int propagate);
+namespace SI
+{
+	void InjectTemplates();
+	void KeyringRefreshPostStewie();
+	std::string GetTagForItem(TESForm* form);
+	std::string GetTagForItem(ContChangesEntry* entry);
+	bool KeyringHideNonKeys(ContChangesEntry*);
+	void InjectIconTileLastFix();
+}
+
+namespace SI_Hooks
+{
+	void IconInjectTileSetStringValueHook();
+	void SortingInventoryMenuHook();
+	void SortingBarterContainerMenuHook();
+	void IconHotkeyHUDTileSetStringValueHook();
+	void IconHotkeyPipBoyTileSetStringValueHook();
+
+	void KeyringHideKeysHook();
+	void KeyringHideKeysShowCategoriesHook();
+	void KeyringHideNonKeysHook();
+	void KeyringAddCategoriesHook();
+
+	void ContainerEntryListBoxFilterHook();
+	void KeyringEnableEquipHook();
+	void KeyringEnableDropHook();
+
+
+	void __fastcall KeyringEnableCancelHook(Tile* tile, void* dummyEDX, enum TileValues tilevalue, signed int a1);
+	void __fastcall KeyringPipBoyIconHook(Tile* tile, void* dummyEDX, enum TileValues tilevalue, char* string, int propagate);
+}
 
 //void InjectIconTile(Tile* tile, ContChangesEntry* entry);

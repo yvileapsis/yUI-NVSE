@@ -10,11 +10,11 @@
 #include <settings.h>
 #include <file.h>
 
-#define yUI_VERSION 1.2
-#define yUI_VERSION_STR "1.2c"
+#define yUI_VERSION 1.3
+#define yUI_VERSION_STR "1.3"
 
-#define RegisterScriptCommand(name) 	nvse->RegisterCommand(&kCommandInfo_ ##name)
-#define REG_CMD_STR(name) nvse->RegisterTypedCommand(&kCommandInfo_##name, kRetnType_String)
+#define RegisterScriptCommand(name) nvse->RegisterCommand(&kCommandInfo_ ##name)
+#define REG_CMD_STR(name)			nvse->RegisterTypedCommand(&kCommandInfo_##name, kRetnType_String)
 
 PluginHandle	g_pluginHandle = kPluginHandle_Invalid;
 
@@ -45,8 +45,8 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	}
 	else if (msg->type == NVSEMessagingInterface::kMessage_MainGameLoop)
 	{
-		if (g_ySI_Icons) InjectIconTileLastFix();
-		if (g_ySI_Categories) KeyringRefreshPostStewie();
+		if (g_ySI_Icons) SI::InjectIconTileLastFix();
+		if (g_ySI_Categories) SI::KeyringRefreshPostStewie();
 		
 		if (iDoOnce == 0 && !CdeclCall<bool>(0x702360)) {
 			iDoOnce++;
@@ -58,7 +58,7 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 			g_StatsMenu = TileMenu::GetTileMenu(kMenuType_Stats);
 			g_InventoryMenu = TileMenu::GetTileMenu(kMenuType_Inventory);
 
-			if (g_ySI_Icons) InjectTemplates();
+			if (g_ySI_Icons) SI::InjectTemplates();
 		}
 		
 	}

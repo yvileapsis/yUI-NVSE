@@ -17,9 +17,7 @@ extern std::deque<std::function<void()>> g_executionQueue;
 
 #define IS_TRANSITION_FIX 0
 
-bool IsGodMode();
-
-IDebugLog		gLog("yUI.log");
+IDebugLog					gLog("yUI.log");
 
 NVSEInterface*				g_nvseInterface = nullptr;
 NVSEStringVarInterface*		g_stringInterface = nullptr;
@@ -30,10 +28,10 @@ NVSECommandTableInterface*	g_commandInterface = nullptr;
 NVSEDataInterface*			g_dataInterface = nullptr;
 
 //DIHookControl* g_DIHook = nullptr;
-PlayerCharacter*	g_player = nullptr;
-ActorValueOwner*	g_playerAVOwner = nullptr;
-BaseProcess*		g_playerProcess = nullptr;
-DataHandler*		g_dataHandler = nullptr;
+PlayerCharacter*			g_player = nullptr;
+ActorValueOwner*			g_playerAVOwner = nullptr;
+BaseProcess*				g_playerProcess = nullptr;
+DataHandler*				g_dataHandler = nullptr;
 
 const char*			(*GetStringVar)(UInt32);
 void				(*SetStringVar)(UInt32, const char*);
@@ -46,19 +44,22 @@ inline TileMenu* g_HUDMainMenu, * g_StartMenu, * g_BarterMenu, * g_ContainerMenu
 tList<char> queuedConsoleMessages;
 
 inline NiTPointerMap<TESForm>** g_allFormsMap;
-inline TileMenu** g_tileMenuArray;
-
-inline std::vector<JSONEntryItem> g_SI_Items_JSON;
-inline std::vector<JSONEntryTag> g_SI_Tags_JSON;
-
-inline std::vector<std::filesystem::path> g_XMLPaths;
-
 inline std::unordered_set<TESForm*> g_CraftingComponents;
 
-inline std::unordered_map <TESForm*, std::string> g_SI_Items;
-inline std::unordered_map <std::string, JSONEntryTag> g_SI_Tags;
-inline std::unordered_set <std::string> g_SI_Categories;
+inline TileMenu** g_tileMenuArray;
 
-inline int iInjected = 0;
+namespace SI_Files
+{
+	inline std::vector<JSONEntryItem>						g_Items_JSON;
+	inline std::vector<JSONEntryTag>						g_Tags_JSON;
+}
+
+namespace SI
+{
+	inline std::unordered_map <TESForm*, std::string>		g_Items;
+	inline std::unordered_map <std::string, JSONEntryTag>	g_Tags;
+	inline std::unordered_set <std::string>					g_Categories;
+	inline std::vector<std::filesystem::path>				g_XMLPaths;
+}
 
 inline yCM g_yCM_Manager;
