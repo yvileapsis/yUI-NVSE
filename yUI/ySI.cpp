@@ -97,7 +97,7 @@ void InjectIconTile(const std::string tag, MenuItemEntryList* list, Tile* tile, 
 void __fastcall SetStringValueInjectTile(Tile* tile, ContChangesEntry* entry, MenuItemEntryList* list, enum TileValues tilevalue, char* src, char propagate)
 {
 	tile->SetString(tilevalue, src, propagate);
-	if (!entry || !entry->type) return;
+	if (!entry || !entry->type || !entry->type->typeID) return;
 	InjectIconTile(g_SI_Items[entry->type], list, tile, entry);
 }
 

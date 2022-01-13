@@ -1,5 +1,7 @@
 #include <yCM.h>
 
+extern yCM g_yCM_Manager;
+
 bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS)
 {
 	*result = -999;
@@ -79,9 +81,6 @@ bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS)
 	return true;
 }
 
-UInt32 activeMod;
-UInt32 activeSubMenu;
-UInt32 activeOption;
 
 bool Cmd_SetyCMFloat_Execute(COMMAND_ARGS)
 {
@@ -94,7 +93,21 @@ bool Cmd_SetyCMFloat_Execute(COMMAND_ARGS)
 //	Console_Print("%d %d %d", child, grandchild, value);
 //	Console_Print(src);
 	std::string path = "StartMenu/MCM/";
-	if (child == 0) {}
+	if (child == 0)
+	{
+		if (std::string(src) == "_ActiveMod")
+		{
+			g_yCM_Manager.activeMod = value;
+		}
+		if (std::string(src) == "_ActiveSubMenu")
+		{
+			g_yCM_Manager.activeSubMenu = value;
+		}
+		if (std::string(src) == "_ActiveOption")
+		{
+			g_yCM_Manager.activeSubMenu = value;
+		}
+	}
 	else if (child == 1) {
 		path += "MCM_Options/";
 		if (grandchild != 0) {

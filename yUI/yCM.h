@@ -72,5 +72,8 @@ public:
 class yCM
 {
 public:
+	UInt32 activeMod;
+	UInt32 activeSubMenu;
+	UInt32 activeOption;
 	std::unordered_map<UInt32, yCM_Option*>			mods;
 };
