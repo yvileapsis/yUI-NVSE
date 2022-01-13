@@ -32,7 +32,7 @@ ContChangesEntry* firstEntry = nullptr;
 
 void InjectIconTileLastFix()
 {
-	if (!firstEntry || !firstEntry->type) return;
+	if (!firstEntry || !firstEntry->type || !firstEntry->type->typeID) return;
 	if (RefreshItemsListForm(firstEntry->type))	firstEntry = nullptr;
 }
 
