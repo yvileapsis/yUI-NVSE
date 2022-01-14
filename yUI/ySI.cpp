@@ -9,6 +9,7 @@ extern int g_ySI_Categories;
 
 extern bool* g_menuVisibility;
 
+
 namespace SI
 {
 	extern std::unordered_map <TESForm*, std::string> g_Items;
@@ -23,7 +24,76 @@ namespace SI
 	float compassRoseX = 0, compassRoseY = 0;
 
 	ContChangesEntry* firstEntry;
+}
+
+namespace SI_Files
+{
+	extern std::vector<JSONEntryItem> g_Items_JSON;
+	extern std::vector<JSONEntryTag> g_Tags_JSON;
 	
+	bool AssignTagToItem(TESForm* form)
+	{
+		for (const auto& entry : g_Items_JSON) {
+			if (entry.form && entry.form->refID != form->refID) continue;
+			if (entry.formType && entry.formType != form->typeID) continue;
+
+			if (entry.questItem && entry.questItem != static_cast<UInt8>(form->IsQuestItem2())) continue;
+
+			if (entry.formType == 40) {
+				const auto weapon = DYNAMIC_CAST(form, TESForm, TESObjectWEAP);
+				if (!weapon) continue;
+				if (entry.formWeapon.weaponSkill && entry.formWeapon.weaponSkill != weapon->weaponSkill) continue;
+				if (entry.formWeapon.weaponType && entry.formWeapon.weaponType != weapon->eWeaponType) continue;
+				if (entry.formWeapon.weaponHandgrip && entry.formWeapon.weaponHandgrip != weapon->HandGrip()) continue;
+				if (entry.formWeapon.weaponAttackAnim && entry.formWeapon.weaponAttackAnim != weapon->AttackAnimation()) continue;
+				if (entry.formWeapon.weaponReloadAnim && entry.formWeapon.weaponReloadAnim != weapon->reloadAnim) continue;
+				if (entry.formWeapon.weaponType && entry.formWeapon.weaponType != weapon->eWeaponType) continue;
+				if (entry.formWeapon.weaponIsAutomatic && entry.formWeapon.weaponIsAutomatic != static_cast<UInt32>(weapon->IsAutomatic())) continue;
+				if (entry.formWeapon.weaponHasScope && entry.formWeapon.weaponHasScope != static_cast<UInt32>(weapon->HasScopeAlt())) continue;
+				if (entry.formWeapon.weaponIgnoresDTDR && entry.formWeapon.weaponIgnoresDTDR != static_cast<UInt32>(weapon->IgnoresDTDR())) continue;
+				if (entry.formWeapon.weaponClipRounds && entry.formWeapon.weaponClipRounds > static_cast<UInt32>(weapon->GetClipRounds(false))) continue;
+				if (entry.formWeapon.weaponNumProjectiles && entry.formWeapon.weaponNumProjectiles > weapon->numProjectiles) continue;
+				if (entry.formWeapon.weaponSoundLevel && entry.formWeapon.weaponSoundLevel != weapon->soundLevel) continue;
+				if (entry.formWeapon.ammo && !IsInListRecursive(entry.formWeapon.ammo, weapon->ammo.ammo)) continue;
+			}
+			else if (entry.formType == 24) {
+				const auto armor = DYNAMIC_CAST(form, TESForm, TESObjectARMO);
+				if (!armor) continue;
+				if (entry.formArmor.armorSlotsMaskWL && (entry.formArmor.armorSlotsMaskWL & armor->GetArmorValue(6)) != entry.formArmor.armorSlotsMaskWL) continue;
+				if (entry.formArmor.armorSlotsMaskWL && (entry.formArmor.armorSlotsMaskBL & armor->GetArmorValue(6)) != 0) continue;
+				if (entry.formArmor.armorClass && entry.formArmor.armorClass != armor->GetArmorValue(1)) continue;
+				if (entry.formArmor.armorPower && entry.formArmor.armorPower != armor->GetArmorValue(2)) continue;
+				if (entry.formArmor.armorHasBackpack && entry.formArmor.armorHasBackpack != armor->GetArmorValue(3)) continue;
+
+				if (entry.formArmor.armorDT && entry.formArmor.armorDT > armor->damageThreshold) continue;
+				if (entry.formArmor.armorDR && entry.formArmor.armorDR > armor->armorRating) continue;
+				//			if (entry.formArmor.armorChangesAV && entry.formArmor.armorChangesAV > armor->armorRating) continue;
+			}
+			else if (entry.formType == 31) {
+				if (entry.formMisc.miscComponent && !IsCraftingComponent(form)) continue;
+			}
+			else if (entry.formType == 47) {
+				const auto aid = DYNAMIC_CAST(form, TESForm, AlchemyItem);
+				if (!aid) continue;
+				if (entry.formAid.aidRestoresAV && !aid->HasBaseEffectRestoresAV(entry.formAid.aidRestoresAV)) continue;
+				if (entry.formAid.aidDamagesAV && !aid->HasBaseEffectDamagesAV(entry.formAid.aidDamagesAV)) continue;
+				if (entry.formAid.aidIsAddictive && !aid->IsAddictive()) continue;
+				if (entry.formAid.aidIsFood && !aid->IsFood()) continue;
+				if (entry.formAid.aidIsWater && !aid->IsWaterAlt()) continue;
+				if (entry.formAid.aidIsPoisonous && !aid->IsPoison()) continue;
+				if (entry.formAid.aidIsMedicine && !aid->IsMedicine()) continue;
+			}
+
+			SI::g_Items.emplace(form, entry.tag);
+			return true;
+		}
+		return false;
+	}
+
+}
+
+namespace SI
+{
 	void InjectTemplates()
 	{
 		for (auto& iter : g_XMLPaths)
@@ -51,24 +121,39 @@ namespace SI
 		}
 	}
 
+	bool TryGetTypeOfFirstEntry()
+	{
+		__try {
+			switch (*reinterpret_cast<UInt32*>(firstEntry->type)) {
+			case kVtbl_TESObjectARMO:
+			case kVtbl_TESObjectBOOK:
+			case kVtbl_TESObjectLIGH:
+			case kVtbl_TESObjectMISC:
+			case kVtbl_TESObjectWEAP:
+			case kVtbl_IngredientItem:
+			case kVtbl_TESAmmo:
+				return true;
+			default: 
+				return static_cast<bool>(firstEntry->type->typeID && firstEntry->type->IsInventoryObject());
+			}
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+			return false;
+		}
+		return false;
+	}
+	
 	void InjectIconTileLastFix()
 	{
 		if (!firstEntry || !firstEntry->type) return;
+		if (!TryGetTypeOfFirstEntry())
+		{
+			Console_Print("yUI: PEPECRI!!!!!!! VERY IMPORTANT PING YVILE");
+			Log("yUI: PEPECRI!!!!!!! VERY IMPORTANT PING YVILE");
+			firstEntry = nullptr;
+			return;
+		}
 		if (RefreshItemsListForm(firstEntry->type))	firstEntry = nullptr;
-	}
-
-	void InjectIconTile(const std::string& tag, MenuItemEntryList* list, Tile* tile, ContChangesEntry* entry);
-
-	std::string GetTagForItem(TESForm* form)
-	{
-		if (!form) return "";
-		return g_Items[form];
-	}
-	
-	std::string GetTagForItem(ContChangesEntry* entry)
-	{
-		if (!entry || !entry->type) return "";
-		return g_Items[entry->type];
 	}
 
 	bool IsTagForItem(TESForm* form)
@@ -83,6 +168,19 @@ namespace SI
 		return false;
 	}
 	
+	std::string GetTagForItem(TESForm* form)
+	{
+		if (!form) return "";
+		if (!IsTagForItem(form)) SI_Files::AssignTagToItem(form);
+		return g_Items[form];
+	}
+
+	std::string GetTagForItem(ContChangesEntry* entry)
+	{
+		if (!entry || !entry->type) return "";
+		if (!IsTagForItem(entry)) SI_Files::AssignTagToItem(entry->type);
+		return g_Items[entry->type];
+	}
 	void InjectIconTile(const std::string& tag, MenuItemEntryList* list, Tile* tile, ContChangesEntry* entry)
 	{
 		//	if (g_Items.find(entry->type) == g_Items.end()) return;
@@ -108,6 +206,7 @@ namespace SI
 			{
 				for (auto& iter : g_XMLPaths) menu->InjectUIXML(iter.generic_string().c_str());
 				firstEntry = entry;
+//				menu->menu->AddTileFromTemplate(text->parent->parent, g_Tags[tag].xmltemplate.c_str(), 0);
 			}
 			if (!menu->menu->GetTemplateExists(g_Tags[tag].xmltemplate.c_str())) return;
 		}
@@ -244,12 +343,7 @@ namespace SI
 
 		const std::string tag = GetTagForItem(entry);
 
-		if (g_Tags[tag].filename.empty()) {
-			tile->SetString(tilevalue, src, propagate);
-			return;
-		}
-
-		tile->SetString(tilevalue, g_Tags[tag].filename.c_str(), propagate);
+		tile->SetString(tilevalue, g_Tags[tag].filename.empty() ? src : g_Tags[tag].filename.c_str(), propagate);
 	}
 
 	void __fastcall SetStringValueTagRose(Tile* tile, ContChangesEntry* entry, enum TileValues tilevalue, char* src, char propagate)
@@ -271,12 +365,7 @@ namespace SI
 
 		const std::string tag = GetTagForItem(entry);
 
-		if (g_Tags[tag].filename.empty()) {
-			tile->SetString(tilevalue, src, propagate);
-			return;
-		}
-
-		tile->SetString(tilevalue, g_Tags[tag].filename.c_str(), propagate);
+		tile->SetString(tilevalue, g_Tags[tag].filename.empty() ? src : g_Tags[tag].filename.c_str(), propagate);
 	}
 
 	bool __fastcall HasContainerChangesEntry(ContChangesEntry* entry)
@@ -330,10 +419,7 @@ namespace SI
 			if (keys) {
 				std::string keyringname = g_Tags[entry].name;
 				if (keyringname.find("&-") == 0)
-				{
-					keyringname = keyringname.substr(2, keyringname.length() - 3);
-					keyringname = GetStringFromGameSettingFromString(keyringname);
-				}
+					keyringname = GetStringFromGameSettingFromString(keyringname.substr(2, keyringname.length() - 3));
 				if (keys > 1) keyringname += " (" + std::to_string(keys) + ")";
 				auto tile = InventoryMenu::GetSingleton()->itemsList.Insert(nullptr, keyringname.c_str(), nullptr, nullptr);
 				tile->SetFloat(kTileValue_id, 30);
@@ -343,7 +429,6 @@ namespace SI
 		}
 	}
 }
-
 
 namespace SI_Hooks
 {

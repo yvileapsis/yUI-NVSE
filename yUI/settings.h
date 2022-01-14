@@ -10,6 +10,7 @@ inline int g_ySI_Sort = 1;
 inline int g_ySI_Icons = 1;
 inline int g_ySI_Hotkeys = 1;
 inline int g_ySI_Categories = 1;
+inline int g_ySI_JustInTime = 1;
 
 inline int g_yCM = 0;
 

@@ -652,3 +652,32 @@ void* __fastcall FixGetDroppedWeapon(ExtraDataList* extradatalist)
 	}
 	return nullptr;
 }
+
+bool IsInventoryItem(TESForm* form)
+{
+	if (!form) return false;
+	switch (form->typeID)
+	{
+	case kFormType_TESObjectARMO:
+	case kFormType_TESObjectBOOK:
+	case kFormType_TESObjectCLOT:
+	case kFormType_IngredientItem:
+	case kFormType_TESObjectMISC:
+	case kFormType_TESObjectWEAP:
+	case kFormType_TESAmmo:
+	case kFormType_TESKey:
+	case kFormType_AlchemyItem:
+	case kFormType_BGSNote:
+	case kFormType_TESObjectARMA:
+	case kFormType_TESObjectIMOD:
+	case kFormType_TESCasinoChips:
+	case kFormType_TESCaravanCard:
+	case kFormType_TESCaravanMoney:
+		return true;
+	case kFormType_TESObjectLIGH:
+		if (const auto light = DYNAMIC_CAST(form, TESForm, TESObjectLIGH))
+			if (light->lightFlags & 2)
+				return true;
+	default: return false;
+	}
+}

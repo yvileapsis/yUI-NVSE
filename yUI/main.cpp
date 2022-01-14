@@ -86,7 +86,7 @@ void writePatches()
 
 bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 {
-	_MESSAGE("query");
+	_MESSAGE("yUI query");
 
 	// fill out the info structure
 	info->infoVersion = PluginInfo::kInfoVersion;

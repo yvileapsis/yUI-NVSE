@@ -21,6 +21,11 @@ namespace SI
 	void InjectIconTileLastFix();
 }
 
+namespace SI_Files
+{
+	bool AssignTagToItem(TESForm* form);
+}
+
 namespace SI_Hooks
 {
 	void IconInjectTileSetStringValueHook();

@@ -65,3 +65,5 @@ bool __fastcall FileExists(const char* path);
 char* __fastcall StrFromINI(DWORD* address);
 std::string GetStringFromGameSettingFromString(const std::string& settingName);
 void* __fastcall FixGetDroppedWeapon(ExtraDataList* extradatalist);
+
+bool IsInventoryItem(TESForm* form);

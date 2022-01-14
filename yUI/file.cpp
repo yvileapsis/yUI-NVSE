@@ -10,6 +10,9 @@
 #include <utility.h>
 #include <Utilities.h>
 
+#include "settings.h"
+#include "ySI.h"
+
 namespace SI_Files
 {
 	extern std::vector<JSONEntryItem> g_Items_JSON;
@@ -307,80 +310,15 @@ void FillSIMapsFromJSON()
 	ra::sort(SI_Files::g_Items_JSON, [&](const JSONEntryItem& entry1, const JSONEntryItem& entry2)
 	         { return entry1.priority > entry2.priority; });
 
-	for (auto mIter = (*g_allFormsMap)->Begin(); mIter; ++mIter) {
-		TESForm* form = mIter.Get();
-		switch (form->typeID)
-		{
-		default: continue;
-		case kFormType_TESObjectARMO:
-		case kFormType_TESObjectBOOK:
-		case kFormType_TESObjectCLOT:
-		case kFormType_IngredientItem:
-		case kFormType_TESObjectLIGH:
-		case kFormType_TESObjectMISC:
-		case kFormType_TESObjectWEAP:
-		case kFormType_TESAmmo:
-		case kFormType_TESKey:
-		case kFormType_AlchemyItem:
-		case kFormType_BGSNote:
-		case kFormType_TESObjectARMA:
-		case kFormType_TESObjectIMOD:
-		case kFormType_TESCasinoChips:
-		case kFormType_TESCaravanCard:
-		case kFormType_TESCaravanMoney: {}
+	if (g_ySI_JustInTime)
+	{
+		for (auto mIter = (*g_allFormsMap)->Begin(); mIter; ++mIter) {
+			TESForm* form = mIter.Get();
+			if (!IsInventoryItem(form)) continue;
+			SI_Files::AssignTagToItem(form);
 		}
-		for (const auto& entry : SI_Files::g_Items_JSON) {			
-			if (entry.form && entry.form->refID != form->refID) continue;
-			if (entry.formType && entry.formType != form->typeID) continue;
-
-			if (entry.questItem && entry.questItem != static_cast<UInt8>(form->IsQuestItem2())) continue;
-
-			if (entry.formType == 40) {
-				const auto weapon = DYNAMIC_CAST(form, TESForm, TESObjectWEAP);
-				if (!weapon) continue;
-				if (entry.formWeapon.weaponSkill && entry.formWeapon.weaponSkill != weapon->weaponSkill) continue;
-				if (entry.formWeapon.weaponType && entry.formWeapon.weaponType != weapon->eWeaponType) continue;
-				if (entry.formWeapon.weaponHandgrip && entry.formWeapon.weaponHandgrip != weapon->HandGrip()) continue;
-				if (entry.formWeapon.weaponAttackAnim && entry.formWeapon.weaponAttackAnim != weapon->AttackAnimation()) continue;
-				if (entry.formWeapon.weaponReloadAnim && entry.formWeapon.weaponReloadAnim != weapon->reloadAnim) continue;
-				if (entry.formWeapon.weaponType && entry.formWeapon.weaponType != weapon->eWeaponType) continue;
-				if (entry.formWeapon.weaponIsAutomatic && entry.formWeapon.weaponIsAutomatic != static_cast<UInt32>(weapon->IsAutomatic())) continue;
-				if (entry.formWeapon.weaponHasScope && entry.formWeapon.weaponHasScope != static_cast<UInt32>(weapon->HasScopeAlt())) continue;
-				if (entry.formWeapon.weaponIgnoresDTDR && entry.formWeapon.weaponIgnoresDTDR != static_cast<UInt32>(weapon->IgnoresDTDR())) continue;
-				if (entry.formWeapon.weaponClipRounds && entry.formWeapon.weaponClipRounds > static_cast<UInt32>(weapon->GetClipRounds(false))) continue;
-				if (entry.formWeapon.weaponNumProjectiles && entry.formWeapon.weaponNumProjectiles > weapon->numProjectiles) continue;
-				if (entry.formWeapon.weaponSoundLevel && entry.formWeapon.weaponSoundLevel != weapon->soundLevel) continue;
-				if (entry.formWeapon.ammo && !IsInListRecursive(entry.formWeapon.ammo, weapon->ammo.ammo)) continue;
-			} else if (entry.formType == 24) {
-				const auto armor = DYNAMIC_CAST(form, TESForm, TESObjectARMO);
-				if (!armor) continue;
-				if (entry.formArmor.armorSlotsMaskWL && (entry.formArmor.armorSlotsMaskWL & armor->GetArmorValue(6)) != entry.formArmor.armorSlotsMaskWL) continue;
-				if (entry.formArmor.armorSlotsMaskWL && (entry.formArmor.armorSlotsMaskBL & armor->GetArmorValue(6)) != 0) continue;
-				if (entry.formArmor.armorClass && entry.formArmor.armorClass != armor->GetArmorValue(1)) continue;
-				if (entry.formArmor.armorPower && entry.formArmor.armorPower != armor->GetArmorValue(2)) continue;
-				if (entry.formArmor.armorHasBackpack && entry.formArmor.armorHasBackpack != armor->GetArmorValue(3)) continue;
-
-				if (entry.formArmor.armorDT && entry.formArmor.armorDT > armor->damageThreshold) continue;
-				if (entry.formArmor.armorDR && entry.formArmor.armorDR > armor->armorRating) continue;
-//				if (entry.formArmor.armorChangesAV && entry.formArmor.armorChangesAV > armor->armorRating) continue;
-			} else if (entry.formType == 31) {
-				if (entry.formMisc.miscComponent && !IsCraftingComponent(form)) continue;
-			} else if (entry.formType == 47) {
-				const auto aid = DYNAMIC_CAST(form, TESForm, AlchemyItem);
-				if (!aid) continue;
-				if (entry.formAid.aidRestoresAV && !aid->HasBaseEffectRestoresAV(entry.formAid.aidRestoresAV)) continue;
-				if (entry.formAid.aidDamagesAV && !aid->HasBaseEffectDamagesAV(entry.formAid.aidDamagesAV)) continue;
-				if (entry.formAid.aidIsAddictive && !aid->IsAddictive()) continue;
-				if (entry.formAid.aidIsFood && !aid->IsFood()) continue;
-				if (entry.formAid.aidIsWater && !aid->IsWaterAlt()) continue;
-				if (entry.formAid.aidIsPoisonous && !aid->IsPoison()) continue;
-				if (entry.formAid.aidIsMedicine && !aid->IsMedicine()) continue;
-			}
-			
-			SI::g_Items.emplace(form, entry.tag);
-		}
+		SI_Files::g_Items_JSON = std::vector<JSONEntryItem>();
 	}
-	SI_Files::g_Items_JSON = std::vector<JSONEntryItem>();
 
 	ra::sort(SI_Files::g_Tags_JSON, [&](const JSONEntryTag& entry1, const JSONEntryTag& entry2)
 	         { return entry1.priority > entry2.priority; });
@@ -389,23 +327,23 @@ void FillSIMapsFromJSON()
 		SI::g_Tags.emplace(entry.tag, std::move(entry));
 	}
 	SI_Files::g_Tags_JSON = std::vector<JSONEntryTag>();
-
-	/*	for (const auto& entry : g_Items_JSON)
- {
-		g_jsonContext.script = entry.conditionScript;
-		g_jsonContext.pollCondition = entry.pollCondition;
-		if (entry.form)
-			Log(FormatString("JSON: Loading animations for form %X in path %s", entry.form->refID, entry.folderName.c_str()));
-		else
-			Log("JSON: Loading animations for global override in path " + entry.folderName);
-		const auto path = GetCurPath() + R"(\Data\menus\ySI\)" + entry.folderName;
-		if (!entry.form) // global
-			LoadPathsForPOV(path, nullptr);
-		else if (!LoadForForm(path, entry.form))
-			Log(FormatString("Loaded from JSON folder %s to form %X", path.c_str(), entry.form->refID));
-		g_jsonContext.Reset();
-	}*/
 }
+
+/*	for (const auto& entry : g_Items_JSON)
+{
+	g_jsonContext.script = entry.conditionScript;
+	g_jsonContext.pollCondition = entry.pollCondition;
+	if (entry.form)
+	   Log(FormatString("JSON: Loading animations for form %X in path %s", entry.form->refID, entry.folderName.c_str()));
+	else
+	   Log("JSON: Loading animations for global override in path " + entry.folderName);
+	const auto path = GetCurPath() + R"(\Data\menus\ySI\)" + entry.folderName;
+	if (!entry.form) // global
+	   LoadPathsForPOV(path, nullptr);
+	else if (!LoadForForm(path, entry.form))
+	   Log(FormatString("Loaded from JSON folder %s to form %X", path.c_str(), entry.form->refID));
+	g_jsonContext.Reset();
+}*/
 
 void LoadSIMapsFromFiles()
 {
