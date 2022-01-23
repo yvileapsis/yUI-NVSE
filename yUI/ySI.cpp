@@ -134,13 +134,12 @@ namespace SI
 			case kVtbl_TESAmmo:
 				return true;
 			default: 
-				return static_cast<bool>(firstEntry->type->typeID && firstEntry->type->IsInventoryObject());
+				return static_cast<bool>(firstEntry->type->typeID);
 			}
 		}
 		__except (EXCEPTION_EXECUTE_HANDLER) {
 			return false;
 		}
-		return false;
 	}
 	
 	void InjectIconTileLastFix()
@@ -148,8 +147,8 @@ namespace SI
 		if (!firstEntry || !firstEntry->type) return;
 		if (!TryGetTypeOfFirstEntry())
 		{
-			Console_Print("yUI: PEPECRI!!!!!!! VERY IMPORTANT PING YVILE");
-			Log("yUI: PEPECRI!!!!!!! VERY IMPORTANT PING YVILE");
+//			Console_Print("yUI: PEPECRI!!!!!!! VERY IMPORTANT PING YVILE");
+//			Log("yUI: PEPECRI!!!!!!! VERY IMPORTANT PING YVILE");
 			firstEntry = nullptr;
 			return;
 		}
@@ -195,7 +194,7 @@ namespace SI
 
 		if (!menu || !menu->menu) return;
 
-		Tile* text = tile->GetChild("ListItemText");
+		auto text = tile->GetChild("ListItemText");
 
 		if (!text) return;
 
@@ -211,7 +210,7 @@ namespace SI
 			if (!menu->menu->GetTemplateExists(g_Tags[tag].xmltemplate.c_str())) return;
 		}
 
-		Tile* icon = menu->menu->AddTileFromTemplate(text, g_Tags[tag].xmltemplate.c_str(), 0);
+		auto icon = menu->menu->AddTileFromTemplate(text, g_Tags[tag].xmltemplate.c_str(), 0);
 
 		if (!icon) return;
 
@@ -241,11 +240,10 @@ namespace SI
 
 	}
 
-	int __fastcall ListGetCountInjectTile(MenuItemEntryList* list, ContChangesEntry* entry, Tile* tile)
+	void __fastcall ListGetCountInjectTile(Tile* tile, ContChangesEntry* entry, MenuItemEntryList* list, UInt32 tilevalue, char* tileText, bool propagate)
 	{
-		if (entry && entry->type)
-			InjectIconTile(GetTagForItem(entry), list, tile, entry);
-		return list->list.Count();
+		tile->SetString(tilevalue, tileText, propagate);
+		if (entry && entry->type) InjectIconTile(GetTagForItem(entry), list, tile, entry);
 	}
 
 	signed int __fastcall CompareItemsWithTags(ContChangesEntry* a2, ContChangesEntry* a1, Tile* tile1, Tile* tile2)
@@ -300,27 +298,19 @@ namespace SI
 
 		const SInt16 mods1 = ContWeaponHasAnyMod(a1);
 		const SInt16 mods2 = ContWeaponHasAnyMod(a2);
-		if (mods1 != mods2) {
-			return mods1 > mods2 ? -1 : 1;
-		}
+		if (mods1 != mods2) return mods1 > mods2 ? -1 : 1;
 
 		const float condition1 = ContGetHealthPercent(a1);
 		const float condition2 = ContGetHealthPercent(a2);
-		if (condition1 != condition2) {
-			return condition1 > condition2 ? -1 : 1;
-		}
+		if (condition1 != condition2) return condition1 > condition2 ? -1 : 1;
 
 		const bool equipped1 = ContGetEquipped(a1);
 		const bool equipped2 = ContGetEquipped(a2);
-		if (equipped1 != equipped2) {
-			return equipped1 > equipped2 ? -1 : 1;
-		}
+		if (equipped1 != equipped2) return equipped1 > equipped2 ? -1 : 1;
 
 		const UInt32 refID1 = form1->refID;
 		const UInt32 refID2 = form2->refID;
-		if (refID1 != refID2) {
-			return refID1 > refID2 ? -1 : 1;
-		}
+		if (refID1 != refID2) return refID1 > refID2 ? -1 : 1;
 
 		return 0;
 	}
@@ -378,8 +368,21 @@ namespace SI
 	{
 		std::string tag;
 		if (tile->GetValue(kTileValue_user16)) tag = tile->GetValue(kTileValue_user16)->str;
-		if (g_Tags[tag].tab == InventoryMenu::GetSingleton()->filter) return false;
-		return true;
+		if (g_Tags[tag].tab != InventoryMenu::GetSingleton()->filter) return true;
+
+		const auto entryDataList = PlayerCharacter::GetSingleton()->GetContainerChangesList();
+		UInt32 keys = 0;
+		if (!entryDataList) return true;
+		for (auto iter = entryDataList->Head(); iter; iter = iter->next)
+			if (iter->data && iter->data->type && g_Tags[GetTagForItem(iter->data)].category._Equal(tag)) keys += iter->data->countDelta;
+		if (!keys) return true;
+		std::string keyringname = g_Tags[tag].name;
+		if (keyringname.find("&-") == 0)
+			keyringname = GetStringFromGameSettingFromString(keyringname.substr(2, keyringname.length() - 3));
+		if (keys > 1) keyringname += " (" + std::to_string(keys) + ")";
+
+//		tile->SetString(kTileValue_string, keyringname.c_str(), false);
+		return false;
 	}
 
 	bool __fastcall KeyringHideKeys(ContChangesEntry* entry)
@@ -415,7 +418,19 @@ namespace SI
 			UInt32 keys = 0;
 			if (!entryDataList) return;
 			for (auto iter = entryDataList->Head(); iter; iter = iter->next)
-				if (iter->data && iter->data->type && g_Tags[GetTagForItem(iter->data)].category._Equal(entry)) keys++;
+			{
+				if (!iter->data || !iter->data->type) continue;
+				auto tag = g_Tags[GetTagForItem(iter->data)];
+				if (!tag.category._Equal(entry)) continue;
+				if (g_Tags[entry].count == 0) {
+					keys = 1;
+					break;
+				}
+				else if (g_Tags[entry].count == 1)
+					keys += 1;
+				else if (g_Tags[entry].count == 2)
+					keys += iter->data->countDelta;
+			}
 			if (keys) {
 				std::string keyringname = g_Tags[entry].name;
 				if (keyringname.find("&-") == 0)
@@ -434,10 +449,12 @@ namespace SI_Hooks
 {
 	__declspec(naked) void IconInjectTileSetStringValueHook() {
 		static const auto SetStringValue = reinterpret_cast<UInt32>(SI::ListGetCountInjectTile);
-		static const UInt32 retnAddr = 0x71A506;
+		static const UInt32 retnAddr = 0x71A3DA;
 		__asm
 		{
-			mov		edx, [ebp - 0x10]	//tile
+//			mov		edx, [ebp - 0x10]	//tile
+//			push	edx
+			mov		edx, [ebp - 0x2C]	//menu item entry list
 			push	edx
 			mov		edx, [ebp + 0x8]	//entry
 			call    SetStringValue
@@ -537,7 +554,7 @@ namespace SI_Hooks
 			test al, al
 			jz shouldnot
 			jmp retnAddr1
-			shouldnot :
+		shouldnot :
 			jmp retnAddr2
 		}
 	}
@@ -559,7 +576,7 @@ namespace SI_Hooks
 			mov esp, ebp
 			pop ebp
 			ret
-			hasnot :
+		hasnot :
 			jmp retnAddr
 		}
 	}
@@ -587,23 +604,40 @@ namespace SI_Hooks
 		}
 	}
 
-	__declspec(naked) void ContainerEntryListBoxFilterHook()
+	__declspec(naked) void ContainerEntryListBoxFilterHookPre()
 	{
-		// STEWIE STEWIE STEWIE
-		static const UInt32 retnAddr = 0x730C8F;
+		// push additional arg to filter function
+		static const UInt32 retnAddr = 0x730C8C;
+		__asm
+		{			
+			mov ecx, [ecx]					// ListBox::ListItem*
+			push dword ptr ds : [ecx]		// ListItem->tile
+			push dword ptr ds : [ecx + 4]	// ListItem->object	
+			jmp retnAddr
+//			call dword ptr ss : [ebp + 8] // shouldHide
+//			pop		ecx // pop the extra pushed arg (ListItem->tile)
+		}
+	}
+
+	__declspec(naked) void ContainerEntryListBoxFilterHookPost()
+	{
+		// fix stack
+		static const UInt32 retnAddr = 0x730CA9;
 		__asm
 		{
-			mov ecx, [ecx] // ListBox::ListItem*
-
-			push dword ptr ds : [ecx] // ListItem->tile
-			push dword ptr ds : [ecx + 4] // ListItem->object
-			call dword ptr ss : [ebp + 8] // shouldHide
-			pop ecx // pop the extra pushed arg (ListItem->tile)
-
+			add esp, 4
+			test al, al
+			jz wah
+			mov [ebp-0x24], 1
+			jmp retnAddr
+		wah:
+			mov[ebp - 0x24], 0
 			jmp retnAddr
 		}
 	}
 
+
+	
 	__declspec(naked) void KeyringEnableEquipHook()
 	{
 		static const UInt32 retnAddr = 0x78047D;

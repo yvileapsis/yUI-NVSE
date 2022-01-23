@@ -212,3 +212,26 @@ __declspec(naked) float Tile::GetValueFloat(UInt32 id)
 	static const UInt32 procAddr = kAddr_TileGetFloat;
 	__asm	jmp		procAddr
 }
+
+__declspec(naked) void __fastcall Tile::PokeValue(UInt32 valueID)
+{
+	__asm
+	{
+		call	Tile::GetValue
+		test	eax, eax
+		jz		done
+		push	eax
+		push	0
+		push	0x3F800000
+		mov		ecx, eax
+		mov		eax, 0xA0A270
+		call	eax
+		pop		ecx
+		push	0
+		push	0
+		mov		eax, 0xA0A270
+		call	eax
+	done :
+		retn
+	}
+}

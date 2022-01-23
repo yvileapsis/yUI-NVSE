@@ -123,11 +123,12 @@ public:
 	std::string name;
 	std::string icon;
 	UInt32 tab;
+	UInt32 count;
 	
 	JSONEntryTag(std::string tag, SInt16 priority, std::string xmltemplate, std::string filename, std::string texatlas,
-	             SInt64 systemcolor, std::string category, std::string name, std::string icon, UInt32 tab)
+	             SInt64 systemcolor, std::string category, std::string name, std::string icon, UInt32 tab, UInt32 count)
 		: tag(std::move(tag)), priority(priority), xmltemplate(std::move(xmltemplate)), filename(std::move(filename)),
-		  texatlas(std::move(texatlas)), systemcolor(systemcolor), category(std::move(category)), name(std::move(name)), icon(std::move(icon)), tab(tab)
+		  texatlas(std::move(texatlas)), systemcolor(systemcolor), category(std::move(category)), name(std::move(name)), icon(std::move(icon)), tab(tab), count(count)
 	{
 	}
 	JSONEntryTag() = default;

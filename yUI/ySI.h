@@ -39,7 +39,8 @@ namespace SI_Hooks
 	void KeyringHideNonKeysHook();
 	void KeyringAddCategoriesHook();
 
-	void ContainerEntryListBoxFilterHook();
+	void ContainerEntryListBoxFilterHookPre();
+	void ContainerEntryListBoxFilterHookPost();
 	void KeyringEnableEquipHook();
 	void KeyringEnableDropHook();
 

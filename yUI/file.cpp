@@ -273,9 +273,11 @@ void HandleJson(const std::filesystem::path& path)
 				if (elem.contains("icon")) icon = elem["icon"].get<std::string>();
 				UInt32 tab = 0;
 				if (elem.contains("tab")) tab = elem["tab"].get<UInt32>();
+				UInt32 count = 0;
+				if (elem.contains("count")) count = elem["count"].get<UInt32>();
 				
 				DebugLog(FormatString("Tag: '%10s', icon: '%s'",  tag.c_str(), filename.c_str()));
-				SI_Files::g_Tags_JSON.emplace_back(tag, priority, xmltemplate, filename, texatlas, systemcolor, category, name, icon, tab);
+				SI_Files::g_Tags_JSON.emplace_back(tag, priority, xmltemplate, filename, texatlas, systemcolor, category, name, icon, tab, count);
 			}
 		}
 		else { DebugPrint(path.string() + " JSON icon array not detected"); }
@@ -317,7 +319,7 @@ void FillSIMapsFromJSON()
 			if (!IsInventoryItem(form)) continue;
 			SI_Files::AssignTagToItem(form);
 		}
-		SI_Files::g_Items_JSON = std::vector<JSONEntryItem>();
+//		SI_Files::g_Items_JSON = std::vector<JSONEntryItem>();
 	}
 
 	ra::sort(SI_Files::g_Tags_JSON, [&](const JSONEntryTag& entry1, const JSONEntryTag& entry2)

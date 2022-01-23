@@ -245,6 +245,8 @@ public:
 		float		num;		// 08
 		char*		str;		// 0C
 		Action*		action;		// 10
+		
+		void __thiscall Refresh(bool string) { ThisCall<void>(0xA09410, this, string); };
 	};
 
 	struct ChildNode
@@ -284,7 +286,7 @@ public:
 
 	Menu*				GetParentMenu();
 	void				DestroyAllChildren();
-	void				PokeValue(UInt32 valueID);
+	void __fastcall		PokeValue(UInt32 valueID);
 	void				FakeClick();
 
 	void				Dump(void);

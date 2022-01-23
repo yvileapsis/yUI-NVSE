@@ -12,7 +12,7 @@ void patchSortingHooks()
 
 void patchAddIcons()
 {
-	WriteRelJump(0x71A501, reinterpret_cast<UInt32>(SI_Hooks::IconInjectTileSetStringValueHook));
+	WriteRelJump(0x71A3D5, reinterpret_cast<UInt32>(SI_Hooks::IconInjectTileSetStringValueHook));
 }
 
 void patchReplaceHotkeyIcons()
@@ -23,7 +23,8 @@ void patchReplaceHotkeyIcons()
 
 void patchSortingCategories()
 {
-	WriteRelJump(0x730C81, reinterpret_cast<UInt32>(SI_Hooks::ContainerEntryListBoxFilterHook));
+	WriteRelJump(0x730C81, reinterpret_cast<UInt32>(SI_Hooks::ContainerEntryListBoxFilterHookPre));
+	WriteRelJump(0x730C97, reinterpret_cast<UInt32>(SI_Hooks::ContainerEntryListBoxFilterHookPost));
 
 	WriteRelJump(0x7824F6, reinterpret_cast<UInt32>(SI_Hooks::SortingInventoryMenuHook));
 	WriteRelJump(0x78250B, reinterpret_cast<UInt32>(SI_Hooks::SortingInventoryMenuHook));
