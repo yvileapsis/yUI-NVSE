@@ -46,6 +46,8 @@ tList<char> queuedConsoleMessages;
 inline NiTPointerMap<TESForm>** g_allFormsMap;
 inline std::unordered_set<TESForm*> g_CraftingComponents;
 
+bool* g_menuVisibility;
+
 inline TileMenu** g_tileMenuArray;
 
 namespace SI_Files

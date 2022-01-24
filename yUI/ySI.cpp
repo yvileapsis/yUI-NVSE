@@ -23,7 +23,7 @@ namespace SI
 
 	float compassRoseX = 0, compassRoseY = 0;
 
-	ContChangesEntry* firstEntry;
+	TESForm* firstEntry = nullptr;
 }
 
 namespace SI_Files
@@ -106,6 +106,7 @@ namespace SI
 
 	void KeyringRefreshPostStewie()
 	{
+
 		if (CdeclCall<bool>(0x702360) && g_menuVisibility[kMenuType_Inventory] && InventoryMenu::GetSingleton()->IsKeyringOpen())
 		{
 			if (Tile* stew = InventoryMenu::GetSingleton()->tile->GetChild("IM_SearchBar"); stew)
@@ -124,7 +125,7 @@ namespace SI
 	bool TryGetTypeOfFirstEntry()
 	{
 		__try {
-			switch (*reinterpret_cast<UInt32*>(firstEntry->type)) {
+			switch (*reinterpret_cast<UInt32*>(firstEntry)) {
 			case kVtbl_TESObjectARMO:
 			case kVtbl_TESObjectBOOK:
 			case kVtbl_TESObjectLIGH:
@@ -133,8 +134,9 @@ namespace SI
 			case kVtbl_IngredientItem:
 			case kVtbl_TESAmmo:
 				return true;
-			default: 
-				return static_cast<bool>(firstEntry->type->typeID);
+			default:
+				bool whaa = static_cast<bool>(firstEntry->typeID);
+				return whaa;
 			}
 		}
 		__except (EXCEPTION_EXECUTE_HANDLER) {
@@ -144,15 +146,12 @@ namespace SI
 	
 	void InjectIconTileLastFix()
 	{
-		if (!firstEntry || !firstEntry->type) return;
-		if (!TryGetTypeOfFirstEntry())
-		{
-//			Console_Print("yUI: PEPECRI!!!!!!! VERY IMPORTANT PING YVILE");
-//			Log("yUI: PEPECRI!!!!!!! VERY IMPORTANT PING YVILE");
+		if (!firstEntry) return;
+		if (!TryGetTypeOfFirstEntry()) {
 			firstEntry = nullptr;
 			return;
 		}
-		if (RefreshItemsListForm(firstEntry->type))	firstEntry = nullptr;
+		if (RefreshItemsListForm(firstEntry)) firstEntry = nullptr;
 	}
 
 	bool IsTagForItem(TESForm* form)
@@ -204,7 +203,7 @@ namespace SI
 				menu == TileMenu::GetTileMenu(kMenuType_RepairServices))
 			{
 				for (auto& iter : g_XMLPaths) menu->InjectUIXML(iter.generic_string().c_str());
-				firstEntry = entry;
+				firstEntry = entry->type;
 //				menu->menu->AddTileFromTemplate(text->parent->parent, g_Tags[tag].xmltemplate.c_str(), 0);
 			}
 			if (!menu->menu->GetTemplateExists(g_Tags[tag].xmltemplate.c_str())) return;

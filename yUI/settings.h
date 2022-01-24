@@ -2,7 +2,9 @@
 
 inline int g_logLevel = 0;
 
-inline int g_SortingFix = 1;
+inline int g_FixIndefiniteSorting = 1;
+inline int g_FixDroppedItems = 1;
+inline int g_FixTablineSelected = 1;
 
 inline int g_ySI = 0;
 

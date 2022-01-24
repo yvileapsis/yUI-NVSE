@@ -51,7 +51,8 @@ void patchSortingCategories()
 ///	WriteRelCall(0x780488, reinterpret_cast<UInt32>(FFFNOP));	   
 void patchFixDroppedItems()
 {
-	WriteRelCall(0x75C793, reinterpret_cast<UInt32>(FixGetDroppedWeapon));
+	WriteRelCall(0x75C793, reinterpret_cast<UInt32>(FixGetDroppedWeaponPre));
+	WriteRelJump(0x75C9AB, reinterpret_cast<UInt32>(FixGetDroppedWeaponPost));
 }
 
 void patchMatchedCursor()

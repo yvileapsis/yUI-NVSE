@@ -6,6 +6,8 @@
 #include <settings.h>
 #include <GameSettings.h>
 
+extern bool* g_menuVisibility;
+
 void PrintAndClearQueuedConsoleMessages()
 {
 	for (auto iter = queuedConsoleMessages.Begin(); !iter.End(); ++iter)
@@ -13,8 +15,9 @@ void PrintAndClearQueuedConsoleMessages()
 	queuedConsoleMessages.DeleteAll();
 }
 
-void ConsoleQueueOrPrint(const char* str, const int len)
+void ConsoleQueueOrPrint(const char* str, int len = 0)
 {
+	if (len == 0) len = strlen(str);
 	if (*reinterpret_cast<ConsoleManager**>(0x11D8CE8) || g_dataHandler) { // g_dataHandler will be non-null if Deferred init has been called
 		Console_Print("%s", str);
 	}
@@ -629,29 +632,39 @@ std::string GetStringFromGameSettingFromString(const std::string& settingName)
 	return "";
 }
 
-void* __fastcall FixGetDroppedWeapon(ExtraDataList* extradatalist)
+tList<TESObjectREFR>::_Node* iterDroppedItem;
+
+void* __fastcall FixGetDroppedWeaponPre(ExtraDataList* extradatalist)
 {
-	auto* xDropped = (ExtraDroppedItemList*)(extradatalist->GetByType(kExtraData_DroppedItemList));
+	const auto xDropped = static_cast<ExtraDroppedItemList*>(extradatalist->GetByType(kExtraData_DroppedItemList));
 	if (!xDropped) return nullptr;
-	for (auto iter = xDropped->itemRefs.Head(); iter; iter = iter->next)
-	{
-		auto worldref = iter->data;
-		auto entry = ContChangesEntry::Create(worldref->baseForm, 1);
-		ContainerMenu::GetSingleton()->rightItems.Insert(entry, worldref->GetTheName());
-		
-//		entry->extendData = tList::Init(8)
-//		tList::Init()
-//		ThisCall(0x41DE40, *&entry, worldref);
-		
-/*		TESHealthForm* healthForm = DYNAMIC_CAST(worldref->baseForm, TESForm, TESHealthForm);
-		ExtraHealth* xHealth = nullptr;
-		if (healthForm)	xHealth = (ExtraHealth*)worldref->extraDataList.GetByType(kExtraData_Health);
-		//(float) entry->GetCustomExtra(kExtraData_Health)-> = xHealth->health;
-		ThisCall(0x419970, *&entry, xHealth->health);*/
-		
-	}
-	return nullptr;
+	iterDroppedItem = xDropped->itemRefs.Head();
+	if (!iterDroppedItem) return nullptr;
+	return iterDroppedItem->data;
 }
+
+void* __fastcall FixGetDroppedWeaponMid()
+{
+	iterDroppedItem = iterDroppedItem->next;
+	if (!iterDroppedItem) return nullptr;
+	return iterDroppedItem->data;
+}
+
+__declspec(naked) void FixGetDroppedWeaponPost()
+{
+	static const UInt32 retnAddr = 0x75C798;
+	static const UInt32 UpdateExtraHealth = 0x419970;
+	static const auto GetNextWeapon = reinterpret_cast<UInt32>(FixGetDroppedWeaponMid);
+	__asm
+	{
+		mov eax, [ecx] // dereference
+		mov ecx, [eax] // this
+		call UpdateExtraHealth
+		call GetNextWeapon
+		jmp retnAddr
+	}
+}
+
 
 bool IsInventoryItem(TESForm* form)
 {
@@ -679,5 +692,46 @@ bool IsInventoryItem(TESForm* form)
 			if (light->lightFlags & 2)
 				return true;
 	default: return false;
+	}
+}
+
+void (*RegTraitID)(const char*, UInt32) = (void (*)(const char*, UInt32))0x9FF8A0;
+void RegisterTraitID(const char* var1, UInt32 var2) { RegTraitID(var1, var2);  }
+
+void purefun()
+{
+	ConsoleQueueOrPrint("AAAAA");
+}
+
+__declspec(naked) void funpatch()
+{
+	static const UInt32 retnAddr = 0xA095D8;
+	static const auto purefun2 = reinterpret_cast<UInt32>(purefun);
+	__asm
+	{
+		cmp [ebp - 0x30], 2032
+		jne welp
+		call purefun2
+	welp :
+		cmp [ebp - 0x30], 0x7E8
+		jmp retnAddr
+
+	}
+}
+
+bool fixTablineSelected = false;
+
+void FixTablineSelected()
+{
+	if (CdeclCall<bool>(0x702360) && g_menuVisibility[kMenuType_Inventory])	{
+		if (fixTablineSelected)	{
+			fixTablineSelected = false;
+			auto tabline = InventoryMenu::GetSingleton()->tile->GetChild("GLOW_BRANCH")->GetChild("IM_Tabline");
+			if (!tabline) return;
+			for (auto iter = tabline->children.Head(); iter; iter = iter->next)
+				iter->data->SetFloat(kTileValue_mouseover, 0, false);
+		}
+	} else {
+		fixTablineSelected = true;
 	}
 }

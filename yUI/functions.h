@@ -64,6 +64,11 @@ void __fastcall CursorTileSetIntValue(Tile* tile, void* dummyEDX, enum TileValue
 bool __fastcall FileExists(const char* path);
 char* __fastcall StrFromINI(DWORD* address);
 std::string GetStringFromGameSettingFromString(const std::string& settingName);
-void* __fastcall FixGetDroppedWeapon(ExtraDataList* extradatalist);
+void* __fastcall FixGetDroppedWeaponPre(ExtraDataList* extradatalist);
+void FixGetDroppedWeaponPost();
 
 bool IsInventoryItem(TESForm* form);
+void RegisterTraitID(const char* var1, UInt32 var2);
+void funpatch();
+
+void FixTablineSelected();

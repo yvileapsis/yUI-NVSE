@@ -33,7 +33,8 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 		g_tileMenuArray = *reinterpret_cast<TileMenu***>(0x11F350C);
 		
 		g_allFormsMap = reinterpret_cast<NiTPointerMap<TESForm>**>(0x11C54C0);
-
+		g_menuVisibility = reinterpret_cast<bool*>(0x11F308F);
+		
 		FillCraftingComponents();
 		PrintAndClearQueuedConsoleMessages();
 
@@ -45,6 +46,8 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	}
 	else if (msg->type == NVSEMessagingInterface::kMessage_MainGameLoop)
 	{
+		if (g_FixTablineSelected) FixTablineSelected();
+		
 		if (g_ySI_Icons) SI::InjectIconTileLastFix();
 		if (g_ySI_Categories) SI::KeyringRefreshPostStewie();
 		
@@ -70,7 +73,8 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 
 void writePatches()
 {
-	if (g_SortingFix || (g_ySI && g_ySI_Sort)) patchSortingHooks();
+	if (g_FixIndefiniteSorting || (g_ySI && g_ySI_Sort)) patchSortingHooks();
+	if (g_FixDroppedItems) patchFixDroppedItems();
 	if (g_ySI)
 	{
 		if (g_ySI_Icons) patchAddIcons();
@@ -147,7 +151,11 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	g_commandInterface = static_cast<NVSECommandTableInterface*>(nvse->QueryInterface(kInterface_CommandTable));
 
 	ExtractArgsEx = g_scriptInterface->ExtractArgsEx;
-
+/*
+	RegisterTraitID("&runsnig;", 2032);
+	RegisterTraitID("runsnig", 2032);
+	WriteRelJump(0xA095D1, reinterpret_cast<UInt32>(funpatch));
+*/
 /*
 	RegisterCommand GetModINISetting (21C0)
 	RegisterCommand SetModINISetting (21C1)

@@ -19,9 +19,8 @@ void(__thiscall* RefreshContainerMenu)(ContainerMenu*, TESForm*) = reinterpret_c
 void(__thiscall* RefreshBarterMenu)(BarterMenu*, TESForm*) = reinterpret_cast<void(__thiscall*)(BarterMenu*, TESForm*)>(0x72DC30);
 void(__thiscall* InitEntriesRepairServices)(RepairServicesMenu*) = reinterpret_cast<void(__thiscall*)(RepairServicesMenu*)>(0x7B8B30);
 
-bool* g_menuVisibility = (bool*)0x11F308F;
-
 extern  TileMenu** g_tileMenuArray;
+extern bool* g_menuVisibility;
 
 void MenuButton_DownloadsClick() { MenuButton_Downloads(); }
 

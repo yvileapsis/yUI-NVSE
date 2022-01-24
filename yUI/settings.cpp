@@ -12,7 +12,9 @@ void HandleINIForPath(const std::string& iniPath, const bool isDefault = false)
 	
 	if (isDefault)
 	{
-		g_SortingFix = ini.GetOrCreate("General", "bSortingFix", 1, "; fix the issue where items with different conditions would 'jump around' on update");
+		g_FixIndefiniteSorting = ini.GetOrCreate("General", "bFixIndefiniteSorting", 1, "; fix the issue where items with different conditions would 'jump around' on update");
+		g_FixDroppedItems = ini.GetOrCreate("General", "bFixDroppedItems", 1, "; fix the issue where Container Menu would display only a single dropped item at a time");
+		g_FixTablineSelected = ini.GetOrCreate("General", "bFixTablineSelected", 1, "; fix the issue where Inventory Menu tabline shows up with buttons already selected");
 
 		g_ySI = ini.GetOrCreate("General", "bSortingIcons", 0, "; enable Sorting and Icons section which controls ySI, don't enable this if you don't have ySI installed unless you know what you are doing");
 		g_ySI_Sort = ini.GetOrCreate("Sorting and Icons", "bSortInventory", 1, "; sort inventory according to tag names supplied in .json");
