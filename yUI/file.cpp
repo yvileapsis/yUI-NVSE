@@ -316,7 +316,7 @@ void FillSIMapsFromJSON()
 	{
 		for (auto mIter = (*g_allFormsMap)->Begin(); mIter; ++mIter) {
 			TESForm* form = mIter.Get();
-			if (!IsInventoryItem(form)) continue;
+			if (!form || !form->IsInventoryObjectAlt()) continue;
 			SI_Files::AssignTagToItem(form);
 		}
 //		SI_Files::g_Items_JSON = std::vector<JSONEntryItem>();

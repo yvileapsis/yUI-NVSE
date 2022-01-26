@@ -29,6 +29,8 @@ namespace SI_Files
 namespace SI_Hooks
 {
 	void IconInjectTileSetStringValueHook();
+//	void IconInjectTileSetStringValueHook2();
+//	void IconInjectTileSetStringValueHook3();
 	void SortingInventoryMenuHook();
 	void SortingBarterContainerMenuHook();
 	void IconHotkeyHUDTileSetStringValueHook();

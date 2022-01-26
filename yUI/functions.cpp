@@ -665,36 +665,6 @@ __declspec(naked) void FixGetDroppedWeaponPost()
 	}
 }
 
-
-bool IsInventoryItem(TESForm* form)
-{
-	if (!form) return false;
-	switch (form->typeID)
-	{
-	case kFormType_TESObjectARMO:
-	case kFormType_TESObjectBOOK:
-	case kFormType_TESObjectCLOT:
-	case kFormType_IngredientItem:
-	case kFormType_TESObjectMISC:
-	case kFormType_TESObjectWEAP:
-	case kFormType_TESAmmo:
-	case kFormType_TESKey:
-	case kFormType_AlchemyItem:
-	case kFormType_BGSNote:
-	case kFormType_TESObjectARMA:
-	case kFormType_TESObjectIMOD:
-	case kFormType_TESCasinoChips:
-	case kFormType_TESCaravanCard:
-	case kFormType_TESCaravanMoney:
-		return true;
-	case kFormType_TESObjectLIGH:
-		if (const auto light = DYNAMIC_CAST(form, TESForm, TESObjectLIGH))
-			if (light->lightFlags & 2)
-				return true;
-	default: return false;
-	}
-}
-
 void (*RegTraitID)(const char*, UInt32) = (void (*)(const char*, UInt32))0x9FF8A0;
 void RegisterTraitID(const char* var1, UInt32 var2) { RegTraitID(var1, var2);  }
 

@@ -70,7 +70,7 @@ public:
 	float			unk20;				// 20
 	float			storedListIndex;	// 24
 	float			storedCurrentValue;	// 28
-	UInt16			unk2C;				// 2C
+	UInt16			flags;				// 2C
 	UInt16			pad2E;				// 2E
 
 /*	Item* GetSelected()

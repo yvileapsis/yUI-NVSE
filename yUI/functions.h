@@ -67,7 +67,6 @@ std::string GetStringFromGameSettingFromString(const std::string& settingName);
 void* __fastcall FixGetDroppedWeaponPre(ExtraDataList* extradatalist);
 void FixGetDroppedWeaponPost();
 
-bool IsInventoryItem(TESForm* form);
 void RegisterTraitID(const char* var1, UInt32 var2);
 void funpatch();
 

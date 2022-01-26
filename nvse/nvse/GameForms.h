@@ -609,6 +609,8 @@ public:
 	// return a new base form which is the clone of this form
 	TESForm*		CloneForm(bool bPersist = true) const;
 
+	bool			IsInventoryObjectAlt(); 
+	
 	MEMBER_FN_PREFIX(TESForm);
 #if RUNTIME
 	DEFINE_MEMBER_FN(MarkAsTemporary, void, 0x00484490);	// probably a member of TESForm

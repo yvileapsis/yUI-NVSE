@@ -122,22 +122,11 @@ namespace SI
 		}
 	}
 
-	bool TryGetTypeOfFirstEntry()
+	bool TryGetTypeOfForm(TESForm* entry)
 	{
 		__try {
-			switch (*reinterpret_cast<UInt32*>(firstEntry)) {
-			case kVtbl_TESObjectARMO:
-			case kVtbl_TESObjectBOOK:
-			case kVtbl_TESObjectLIGH:
-			case kVtbl_TESObjectMISC:
-			case kVtbl_TESObjectWEAP:
-			case kVtbl_IngredientItem:
-			case kVtbl_TESAmmo:
-				return true;
-			default:
-				bool whaa = static_cast<bool>(firstEntry->typeID);
-				return whaa;
-			}
+			const auto whaa = entry->typeID && entry->refID;
+			return whaa;
 		}
 		__except (EXCEPTION_EXECUTE_HANDLER) {
 			return false;
@@ -147,7 +136,7 @@ namespace SI
 	void InjectIconTileLastFix()
 	{
 		if (!firstEntry) return;
-		if (!TryGetTypeOfFirstEntry()) {
+		if (!TryGetTypeOfForm(firstEntry)) {
 			firstEntry = nullptr;
 			return;
 		}
@@ -239,10 +228,10 @@ namespace SI
 
 	}
 
-	void __fastcall ListGetCountInjectTile(Tile* tile, ContChangesEntry* entry, MenuItemEntryList* list, UInt32 tilevalue, char* tileText, bool propagate)
+	void __fastcall SetTileStringInjectTile(Tile* tile, ContChangesEntry* entry, MenuItemEntryList* list, UInt32 tilevalue, char* tileText, bool propagate)
 	{
 		tile->SetString(tilevalue, tileText, propagate);
-		if (entry && entry->type) InjectIconTile(GetTagForItem(entry), list, tile, entry);
+		if (entry && entry->type && TryGetTypeOfForm(entry->type)) InjectIconTile(GetTagForItem(entry), list, tile, entry);
 	}
 
 	signed int __fastcall CompareItemsWithTags(ContChangesEntry* a2, ContChangesEntry* a1, Tile* tile1, Tile* tile2)
@@ -447,7 +436,7 @@ namespace SI
 namespace SI_Hooks
 {
 	__declspec(naked) void IconInjectTileSetStringValueHook() {
-		static const auto SetStringValue = reinterpret_cast<UInt32>(SI::ListGetCountInjectTile);
+		static const auto SetStringValue = reinterpret_cast<UInt32>(SI::SetTileStringInjectTile);
 		static const UInt32 retnAddr = 0x71A3DA;
 		__asm
 		{
@@ -460,6 +449,7 @@ namespace SI_Hooks
 			jmp		retnAddr
 		}
 	}
+
 	__declspec(naked) void IconHotkeyHUDTileSetStringValueHook() {
 		static const auto SetStringValue = reinterpret_cast<UInt32>(SI::SetStringValueTagImage);
 		static const UInt32 retnAddr = 0x7018A3;
