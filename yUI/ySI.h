@@ -18,7 +18,6 @@ namespace SI
 	std::string GetTagForItem(TESForm* form);
 	std::string GetTagForItem(ContChangesEntry* entry);
 	bool KeyringHideNonKeys(ContChangesEntry*);
-	void InjectIconTileLastFix();
 }
 
 namespace SI_Files

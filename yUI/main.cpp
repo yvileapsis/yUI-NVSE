@@ -48,7 +48,7 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	{
 		if (g_FixTablineSelected) FixTablineSelected();
 		
-		if (g_ySI_Icons) SI::InjectIconTileLastFix();
+//		if (g_ySI_Icons) SI::InjectIconTileLastFix();
 		if (g_ySI_Categories) SI::KeyringRefreshPostStewie();
 		
 		if (iDoOnce == 0 && !CdeclCall<bool>(0x702360)) {

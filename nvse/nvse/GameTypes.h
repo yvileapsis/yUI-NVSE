@@ -536,7 +536,7 @@ public:
 	Node* Head() { return first; }
 	Node* Tail() { return last; }
 	UInt32 Size() const { return count; }
-	void ExchangeNodes(Node*, Node*);
+	void ExchangeNodeData(Node*, Node*);
 	
 	template <typename F>
 	void ForEach(const F& f)
@@ -551,23 +551,16 @@ public:
 };
 
 template <class Item>
-void DList<Item>::ExchangeNodes(Node* node1, Node* node2)
+void DList<Item>::ExchangeNodeData(Node* node1, Node* node2)
 {
-	if (node1->prev) node1->prev->next = node2; else this->first = node2;
-	if (node1->next) node1->next->prev = node2; else this->last = node2;
-	if (node2->prev) node2->prev->next = node1; else this->first = node1;
-	if (node2->next) node2->next->prev = node1; else this->last = node1;
-
-	Node* tmp;
-	tmp = node1->prev;
-	node1->prev = node2->prev;
-	node2->prev = tmp;
-
-	tmp = node1->next;
-	node1->next = node2->next;
-	node2->next = tmp;
-
+	auto tmpdata = node1->data;
+	node1->data = node2->data;
+	node2->data = tmpdata;
 }
+
+enum KeyboardMenuInputCode;
+class Tile;
+class Menu;
 
 // 010
 template <class T>
@@ -577,7 +570,16 @@ public:
 	BSSimpleList<T>();
 	~BSSimpleList<T>();
 
-	void** _vtbl;	// 000
+	virtual bool	SetSelectedTile(Tile* tile) { return false; };
+	virtual Tile*	GetSelectedTile(void) { return nullptr; };
+	virtual Tile*	HandleKeyboardInput(KeyboardMenuInputCode code) { return nullptr; };
+	virtual bool	IsMenuEqual(Menu* that) { return false; };
+	virtual void	ScrollToHighlight(void) {};
+	virtual Tile*	GetTileByIndex(int index, char isNotTileListIndex) { return nullptr; };
+	virtual void	Destructor(bool doFree) {};
+	virtual void	FreeAllTiles(void) {};
+	virtual void	Sort(signed int(__cdecl*)(T*, T*)) {};
+	
 	tList<T>	list;	// 004
 };	// 00C
 STATIC_ASSERT(sizeof(BSSimpleList<void*>) == 0xC);

@@ -23,7 +23,6 @@ namespace SI
 
 	float compassRoseX = 0, compassRoseY = 0;
 
-	TESForm* firstEntry = nullptr;
 }
 
 namespace SI_Files
@@ -132,16 +131,6 @@ namespace SI
 			return false;
 		}
 	}
-	
-	void InjectIconTileLastFix()
-	{
-		if (!firstEntry) return;
-		if (!TryGetTypeOfForm(firstEntry)) {
-			firstEntry = nullptr;
-			return;
-		}
-		if (RefreshItemsListForm(firstEntry)) firstEntry = nullptr;
-	}
 
 	bool IsTagForItem(TESForm* form)
 	{
@@ -182,24 +171,26 @@ namespace SI
 
 		if (!menu || !menu->menu) return;
 
-		auto text = tile->GetChild("ListItemText");
+		auto text = tile->children.Tail()->data;
 
 		if (!text) return;
 
 		if (!menu->menu->GetTemplateExists(g_Tags[tag].xmltemplate.c_str()))
 		{
-			if (menu == TileMenu::GetTileMenu(kMenuType_Barter) || menu == TileMenu::GetTileMenu(kMenuType_Container) ||
-				menu == TileMenu::GetTileMenu(kMenuType_RepairServices))
-			{
-				for (auto& iter : g_XMLPaths) menu->InjectUIXML(iter.generic_string().c_str());
-				firstEntry = entry->type;
-//				menu->menu->AddTileFromTemplate(text->parent->parent, g_Tags[tag].xmltemplate.c_str(), 0);
-			}
+			if (menu != TileMenu::GetTileMenu(kMenuType_Barter) && menu != TileMenu::GetTileMenu(kMenuType_Container) &&
+				menu != TileMenu::GetTileMenu(kMenuType_RepairServices)) return;
+			for (auto& iter : g_XMLPaths) menu->InjectUIXML(iter.generic_string().c_str());
 			if (!menu->menu->GetTemplateExists(g_Tags[tag].xmltemplate.c_str())) return;
 		}
 
-		auto icon = menu->menu->AddTileFromTemplate(text, g_Tags[tag].xmltemplate.c_str(), 0);
+		const auto last = tile->children.Head();
+		
+		auto icon = menu->menu->AddTileFromTemplate(tile, g_Tags[tag].xmltemplate.c_str(), 0);
 
+		const auto icondata = tile->children.Head();
+
+		tile->children.ExchangeNodeData(icondata, last);
+		
 		if (!icon) return;
 
 		if (!g_Tags[tag].filename.empty()) icon->SetString(kTileValue_filename, g_Tags[tag].filename.c_str(), false);
@@ -362,14 +353,24 @@ namespace SI
 		UInt32 keys = 0;
 		if (!entryDataList) return true;
 		for (auto iter = entryDataList->Head(); iter; iter = iter->next)
-			if (iter->data && iter->data->type && g_Tags[GetTagForItem(iter->data)].category._Equal(tag)) keys += iter->data->countDelta;
+			if (iter->data && iter->data->type && g_Tags[GetTagForItem(iter->data)].category._Equal(tag))
+			{
+				if (g_Tags[tag].count == 0) {
+					keys = 1;
+					break;
+				}
+				else if (g_Tags[tag].count == 1)
+					keys += 1;
+				else if (g_Tags[tag].count == 2)
+					keys += iter->data->countDelta;
+			}
 		if (!keys) return true;
 		std::string keyringname = g_Tags[tag].name;
 		if (keyringname.find("&-") == 0)
 			keyringname = GetStringFromGameSettingFromString(keyringname.substr(2, keyringname.length() - 3));
 		if (keys > 1) keyringname += " (" + std::to_string(keys) + ")";
 
-//		tile->SetString(kTileValue_string, keyringname.c_str(), false);
+		tile->SetString(kTileValue_string, keyringname.c_str(), false);
 		return false;
 	}
 
@@ -624,8 +625,6 @@ namespace SI_Hooks
 			jmp retnAddr
 		}
 	}
-
-
 	
 	__declspec(naked) void KeyringEnableEquipHook()
 	{

@@ -69,13 +69,13 @@ public:
 	UInt16			pad1E;				// 1E
 	float			unk20;				// 20
 	float			storedListIndex;	// 24
-	float			storedCurrentValue;	// 28
+	float			storedScrollbarPos;	// 28
 	UInt16			flags;				// 2C
 	UInt16			pad2E;				// 2E
 
-/*	Item* GetSelected()
+	Item* GetSelected()
 	{
-		ListNode<ListBoxItem<Item>>* iter = list.Head();
+		ListNode<ListBoxItem<Item>>* iter = this->list.Head();
 		ListBoxItem<Item>* item;
 		do
 		{
@@ -90,7 +90,7 @@ public:
 	{
 		if (index >= 0)
 		{
-			ListNode<ListBoxItem<Item>>* iter = list.Head();
+			ListNode<ListBoxItem<Item>>* iter = this->list.Head();
 			do
 			{
 				if (!index)
@@ -101,7 +101,7 @@ public:
 			} while (iter = iter->next);
 		}
 		return NULL;
-	}*/
+	}
 
 	void Clear()
 	{
