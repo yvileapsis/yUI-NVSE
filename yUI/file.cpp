@@ -107,7 +107,7 @@ void HandleJson(const std::filesystem::path& path)
 							auto* form = LookupFormByID(formId);
 							if (!form) { DebugPrint(FormatString("Form %X was not found", formId)); continue; }
 							if (!formlist) {
-								DebugLog(FormatString("Tag: '%10s', individual form: %08X (%50s)", tag.c_str(), formId, form->GetName()));
+								DebugLog(FormatString("Tag: '%10s', form: %08X (%50s), individual", tag.c_str(), formId, form->GetName()));
 								SI_Files::g_Items_JSON.emplace_back(tag, priority, form, questItem);
 							} else if (formlist == 1) {
 								JSONEntryItemRecursiveEmplace(tag, priority, form, questItem);
@@ -119,7 +119,7 @@ void HandleJson(const std::filesystem::path& path)
 									if (!weapon) continue;
 									if (!weapon->repairItemList.listForm) continue;
 									if (IsInListRecursive(weapon->repairItemList.listForm, form)) {
-										DebugLog(FormatString("Tag: '%10s', recursive form: %08X (%50s), repair list: '%08X'", tag.c_str(), formId, item->GetName(), weapon->repairItemList.listForm->refID));
+										DebugLog(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", tag.c_str(), formId, item->GetName(), weapon->repairItemList.listForm->refID));
 										SI_Files::g_Items_JSON.emplace_back(tag, priority, item, questItem);
 									}
 								}
@@ -300,7 +300,7 @@ void JSONEntryItemRecursiveEmplace(const std::string& tag, SInt16 priority, TESF
 			if (iter.Get()) { JSONEntryItemRecursiveEmplace(tag, priority, iter.Get(), questItem); }
 	}
 	else {
-		DebugLog(FormatString("Tag: '%10s', recursive form: %08X (%50s)", tag.c_str(), list->refID, list->GetName()));
+		DebugLog(FormatString("Tag: '%10s', form: %08X (%50s), recursive", tag.c_str(), list->refID, list->GetName()));
 		SI_Files::g_Items_JSON.emplace_back(tag, priority, list, questItem);
 	}
 }

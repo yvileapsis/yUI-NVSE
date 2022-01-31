@@ -39,6 +39,7 @@ void SafeWriteBuf(UInt32 addr, const char* data, UInt32 len)
 void WriteRelCall(UInt32 jumpSrc, UInt32 jumpTgt)
 {
 	// call rel32
+	
 	SafeWrite8(jumpSrc, 0xE8);
 	SafeWrite32(jumpSrc + 1, jumpTgt - jumpSrc - 1 - 4);
 }

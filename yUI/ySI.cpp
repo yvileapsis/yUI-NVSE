@@ -105,13 +105,9 @@ namespace SI
 
 	void KeyringRefreshPostStewie()
 	{
-
-		if (CdeclCall<bool>(0x702360) && g_menuVisibility[kMenuType_Inventory] && InventoryMenu::GetSingleton()->IsKeyringOpen())
-		{
-			if (Tile* stew = InventoryMenu::GetSingleton()->tile->GetChild("IM_SearchBar"); stew)
-			{
-				if (const auto string = stew->GetValue(kTileValue_string)->str; !stringStewie._Equal(string))
-				{
+		if (CdeclCall<bool>(0x702360) && g_menuVisibility[kMenuType_Inventory] && InventoryMenu::GetSingleton()->IsKeyringOpen()) {
+			if (Tile* stew = InventoryMenu::GetSingleton()->tile->GetChild("IM_SearchBar"); stew) {
+				if (const auto string = stew->GetValue(kTileValue_string)->str; !stringStewie._Equal(string)) {
 					stringStewie = string;
 					InventoryMenu::GetSingleton()->itemsList.Filter(KeyringHideNonKeys);
 					InventoryMenu::GetSingleton()->itemsList.ForEach((void(__cdecl*)(Tile*, ContChangesEntry*))0x780C00);
@@ -157,6 +153,7 @@ namespace SI
 		if (!IsTagForItem(entry)) SI_Files::AssignTagToItem(entry->type);
 		return g_Items[entry->type];
 	}
+	
 	void InjectIconTile(const std::string& tag, MenuItemEntryList* list, Tile* tile, ContChangesEntry* entry)
 	{
 		//	if (g_Items.find(entry->type) == g_Items.end()) return;
@@ -167,13 +164,13 @@ namespace SI
 		do if IS_TYPE(tilemenu, TileMenu) break;
 		while ((tilemenu = tilemenu->parent));
 
-		auto* menu = DYNAMIC_CAST(tilemenu, Tile, TileMenu);
+		auto menu = DYNAMIC_CAST(tilemenu, Tile, TileMenu);
 
 		if (!menu || !menu->menu) return;
 
 		auto text = tile->children.Tail()->data;
 
-		if (!text) return;
+		if (!text || !std::string("ListItemText")._Equal(text->name.CStr())) return;
 
 		if (!menu->menu->GetTemplateExists(g_Tags[tag].xmltemplate.c_str()))
 		{
@@ -216,7 +213,6 @@ namespace SI
 
 		text->SetFloat(kTileValue_x, x, false);
 		text->SetFloat(kTileValue_wrapwidth, wrapwidth, false);
-
 	}
 
 	void __fastcall SetTileStringInjectTile(Tile* tile, ContChangesEntry* entry, MenuItemEntryList* list, UInt32 tilevalue, char* tileText, bool propagate)
@@ -346,7 +342,8 @@ namespace SI
 	bool __fastcall KeyringShowCategories(Tile* tile)
 	{
 		std::string tag;
-		if (tile->GetValue(kTileValue_user16)) tag = tile->GetValue(kTileValue_user16)->str;
+		//&& *((UInt32*)0x78028E) == (UInt32)0x782620 && stringStewie.empty()
+		if (tile && tile->GetValue(kTileValue_user16)) tag = tile->GetValue(kTileValue_user16)->str;
 		if (g_Tags[tag].tab != InventoryMenu::GetSingleton()->filter) return true;
 
 		const auto entryDataList = PlayerCharacter::GetSingleton()->GetContainerChangesList();
@@ -393,7 +390,7 @@ namespace SI
 
 	void __fastcall HideNonKeysGetTile(InventoryMenu* invmenu, Tile* tile)
 	{
-		if (tile && tile->GetValue(kTileValue_user16)) openCategory = tile->GetValue(kTileValue_user16)->str;
+		if (tile && tile->GetValue(kTileValue_user16)) openCategory = tile->GetValue(kTileValue_user16)->str; else openCategory = "";
 		invmenu->itemsList.Filter(KeyringHideNonKeys);
 		invmenu->itemsList.ForEach((void(__cdecl*)(Tile*, ContChangesEntry*))0x780C00);
 		invmenu->ResetInventorySelectionAndHideDataTile();
@@ -436,216 +433,28 @@ namespace SI
 
 namespace SI_Hooks
 {
-	__declspec(naked) void IconInjectTileSetStringValueHook() {
-		static const auto SetStringValue = reinterpret_cast<UInt32>(SI::SetTileStringInjectTile);
-		static const UInt32 retnAddr = 0x71A3DA;
-		__asm
-		{
-//			mov		edx, [ebp - 0x10]	//tile
-//			push	edx
-			mov		edx, [ebp - 0x2C]	//menu item entry list
-			push	edx
-			mov		edx, [ebp + 0x8]	//entry
-			call    SetStringValue
-			jmp		retnAddr
-		}
-	}
-
-	__declspec(naked) void IconHotkeyHUDTileSetStringValueHook() {
-		static const auto SetStringValue = reinterpret_cast<UInt32>(SI::SetStringValueTagImage);
-		static const UInt32 retnAddr = 0x7018A3;
-		__asm
-		{
-			mov		edx, [ebp - 0x24]
-			call    SetStringValue
-			jmp		retnAddr
-		}
-	}
-
-	__declspec(naked) void IconHotkeyPipBoyTileSetStringValueHook() {
-		static const auto SetStringValue = reinterpret_cast<UInt32>(SI::SetStringValueTagRose);
-		static const UInt32 retnAddr = 0x7814FF;
-		static const UInt32 g_inventoryMenuSelection = 0x011D9EA8;
-		__asm
-		{
-			mov edx, dword ptr ds : [0x011D9EA8]
-			call    SetStringValue
-			jmp		retnAddr
-		}
-	}
-
-	__declspec(naked) void SortingInventoryMenuHook()
-	{
-		static const auto CompareItems = reinterpret_cast<UInt32>(SI::CompareItemsWithTags);
-		static const UInt32 ContChangesEntry_GetFullName = 0x4BE2D0;
-		static const UInt32 retnAddr = 0x78251B;
-
-		_asm
-		{
-			mov eax, [ebp + 0xC]	// a2
-			mov ecx, [eax]
-			push ecx				// tile2
-			mov ecx, [eax + 0x4]	// entry2
-
-			mov eax, [ebp + 0x8]	// a1
-			mov edx, [eax]
-			push edx				// tile1
-			mov edx, [eax + 0x4]	// entry1
-
-			call CompareItems
-			test eax, eax
-			je got0
-
-			mov esp, ebp
-			pop ebp
-			ret
-
-			got0 :
-			mov edx, [ebp + 0xC]
-				mov ecx, [edx + 0x4]
-				call ContChangesEntry_GetFullName
-				jmp retnAddr
-		}
-	}
-
 	__declspec(naked) void SortingBarterContainerMenuHook()
 	{
 		static const auto CompareItems = reinterpret_cast<UInt32>(SI::CompareItemsWithTags);
 		_asm
 		{
-			pop eax
-			mov eax, [ebp + 0xC]	// a2
-			mov ecx, [eax]
-			push ecx				// tile2
-			mov ecx, [eax + 0x4]	// entry2
+			pop		eax
+			mov		eax, [ebp + 0xC]	// a2
+			mov		ecx, [eax]
+			push	ecx					// tile2
+			mov		ecx, [eax + 0x4]	// entry2
 
-			mov eax, [ebp + 0x8]	// a1
-			mov edx, [eax]
-			push edx				// tile1
-			mov edx, [eax + 0x4]	// entry1
+			mov		eax, [ebp + 0x8]	// a1
+			mov		edx, [eax]
+			push	edx					// tile1
+			mov		edx, [eax + 0x4]	// entry1
 
-			call CompareItems
-			mov esp, ebp
-			pop ebp
+			call	CompareItems
+			mov		esp, ebp
+			pop		ebp
 			ret
 		}
 	}
-
-
-	__declspec(naked) void KeyringHideKeysHook()
-	{
-		static const UInt32 retnAddr1 = 0x7826EA;
-		static const UInt32 retnAddr2 = 0x7826F1;
-		static const auto ShouldHide = reinterpret_cast<UInt32>(SI::KeyringHideKeys);
-		__asm
-		{
-			mov ecx, [ebp + 0x8] // a1
-			call ShouldHide
-			test al, al
-			jz shouldnot
-			jmp retnAddr1
-		shouldnot :
-			jmp retnAddr2
-		}
-	}
-
-	__declspec(naked) void KeyringHideKeysShowCategoriesHook()
-	{
-		static const UInt32 retnAddr = 0x782679;
-		static const auto HasContainerEntry = reinterpret_cast<UInt32>(SI::HasContainerChangesEntry);
-		static const auto ShowCategories = reinterpret_cast<UInt32>(SI::KeyringShowCategories);
-		__asm
-		{
-			mov ecx, [ebp + 0x8] // a1
-			call HasContainerEntry
-			test al, al
-			jz hasnot
-
-			mov ecx, [ebp + 0xC]
-			call ShowCategories
-			mov esp, ebp
-			pop ebp
-			ret
-		hasnot :
-			jmp retnAddr
-		}
-	}
-
-	__declspec(naked) void KeyringAddCategoriesHook()
-	{
-		static const UInt32 retnAddr = 0x783213;
-		static const auto AddCategories = reinterpret_cast<UInt32>(SI::AddSortingCategories);
-		__asm
-		{
-			call AddCategories
-			jmp retnAddr
-		}
-	}
-
-	__declspec(naked) void KeyringHideNonKeysHook()
-	{
-		static const UInt32 retnAddr = 0x78083F;
-		static const auto HideNonKeysAndGetTile = reinterpret_cast<UInt32>(SI::HideNonKeysGetTile);
-		__asm
-		{
-			mov edx, [ebp + 0xC]
-			call HideNonKeysAndGetTile
-			jmp retnAddr
-		}
-	}
-
-	__declspec(naked) void ContainerEntryListBoxFilterHookPre()
-	{
-		// push additional arg to filter function
-		static const UInt32 retnAddr = 0x730C8C;
-		__asm
-		{			
-			mov ecx, [ecx]					// ListBox::ListItem*
-			push dword ptr ds : [ecx]		// ListItem->tile
-			push dword ptr ds : [ecx + 4]	// ListItem->object	
-			jmp retnAddr
-//			call dword ptr ss : [ebp + 8] // shouldHide
-//			pop		ecx // pop the extra pushed arg (ListItem->tile)
-		}
-	}
-
-	__declspec(naked) void ContainerEntryListBoxFilterHookPost()
-	{
-		// fix stack
-		static const UInt32 retnAddr = 0x730CA9;
-		__asm
-		{
-			add esp, 4
-			test al, al
-			jz wah
-			mov [ebp-0x24], 1
-			jmp retnAddr
-		wah:
-			mov[ebp - 0x24], 0
-			jmp retnAddr
-		}
-	}
-	
-	__declspec(naked) void KeyringEnableEquipHook()
-	{
-		static const UInt32 retnAddr = 0x78047D;
-		__asm
-		{
-			mov eax, 0
-			jmp retnAddr
-		}
-	}
-
-	__declspec(naked) void KeyringEnableDropHook()
-	{
-		static const UInt32 retnAddr = 0x78093A;
-		__asm
-		{
-			mov ecx, 0
-			jmp retnAddr
-		}
-	}
-
 	void __fastcall KeyringEnableCancelHook(Tile* tile, void* dummyEDX, enum TileValues tilevalue, signed int a1)
 	{
 		tile->SetFloat(tilevalue, InventoryMenu::GetSingleton()->IsKeyringOpen(), true);

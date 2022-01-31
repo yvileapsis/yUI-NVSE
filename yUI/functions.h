@@ -64,8 +64,24 @@ void __fastcall CursorTileSetIntValue(Tile* tile, void* dummyEDX, enum TileValue
 bool __fastcall FileExists(const char* path);
 char* __fastcall StrFromINI(DWORD* address);
 std::string GetStringFromGameSettingFromString(const std::string& settingName);
+
 void* __fastcall FixGetDroppedWeaponPre(ExtraDataList* extradatalist);
-void FixGetDroppedWeaponPost();
+void* __fastcall FixGetDroppedWeaponMid();
+
+template <UInt32 retn> __declspec(naked) void FixGetDroppedWeaponPost()
+{
+	static const UInt32 retnAddr = retn;
+	static const UInt32 UpdateExtraHealth = 0x419970;
+	static const auto GetNextWeapon = reinterpret_cast<UInt32>(FixGetDroppedWeaponMid);
+	__asm
+	{
+		mov eax, [ecx] // dereference
+		mov ecx, [eax] // this
+		call UpdateExtraHealth
+		call GetNextWeapon
+		jmp retnAddr
+	}
+}
 
 void RegisterTraitID(const char* var1, UInt32 var2);
 void funpatch();

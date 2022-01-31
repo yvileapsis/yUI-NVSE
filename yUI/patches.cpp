@@ -5,43 +5,43 @@
 
 void patchSortingHooks()
 {
-	WriteRelJump(0x782516, reinterpret_cast<UInt32>(SI_Hooks::SortingInventoryMenuHook));
-	WriteRelJump(0x72F0ED, reinterpret_cast<UInt32>(SI_Hooks::SortingBarterContainerMenuHook));
-	WriteRelJump(0x75D138, reinterpret_cast<UInt32>(SI_Hooks::SortingBarterContainerMenuHook));
+	WriteRelJump(0x782516, SI_Hooks::SortingInventoryMenuHook<0x78251B>);
+	WriteRelJump(0x72F0ED, SI_Hooks::SortingBarterContainerMenuHook);
+	WriteRelJump(0x75D138, SI_Hooks::SortingBarterContainerMenuHook);
 }
 
 void patchAddIcons()
 {
-	WriteRelJump(0x71A3D5, reinterpret_cast<UInt32>(SI_Hooks::IconInjectTileSetStringValueHook));
+	WriteRelJump(0x71A3D5, SI_Hooks::IconInjectTileSetStringValueHook<0x71A3DA>);
 }
 
 void patchReplaceHotkeyIcons()
 {
-	WriteRelJump(0x70189E, reinterpret_cast<UInt32>(SI_Hooks::IconHotkeyHUDTileSetStringValueHook));
-	WriteRelJump(0x7814FA, reinterpret_cast<UInt32>(SI_Hooks::IconHotkeyPipBoyTileSetStringValueHook));
+	WriteRelJump(0x70189E, SI_Hooks::IconHotkeyHUDTileSetStringValueHook<0x7018A3>);
+	WriteRelJump(0x7814FA, SI_Hooks::IconHotkeyPipBoyTileSetStringValueHook<0x7814FF>);
 }
 
 void patchSortingCategories()
 {
-	WriteRelJump(0x730C81, reinterpret_cast<UInt32>(SI_Hooks::ContainerEntryListBoxFilterHookPre));
-	WriteRelJump(0x730C97, reinterpret_cast<UInt32>(SI_Hooks::ContainerEntryListBoxFilterHookPost));
+	WriteRelJump(0x730C81, SI_Hooks::ContainerEntryListBoxFilterHookPre<0x730C8C>);
+	WriteRelJump(0x730C97, SI_Hooks::ContainerEntryListBoxFilterHookPost<0x730CA9>);
 
-	WriteRelJump(0x7824F6, reinterpret_cast<UInt32>(SI_Hooks::SortingInventoryMenuHook));
-	WriteRelJump(0x78250B, reinterpret_cast<UInt32>(SI_Hooks::SortingInventoryMenuHook));
+	WriteRelJump(0x7824F6, SI_Hooks::SortingInventoryMenuHook<0x78251B>);
+	WriteRelJump(0x78250B, SI_Hooks::SortingInventoryMenuHook<0x78251B>);
 
-	WriteRelJump(0x7831C1, reinterpret_cast<UInt32>(SI_Hooks::KeyringAddCategoriesHook));
+	WriteRelJump(0x7831C1, SI_Hooks::KeyringAddCategoriesHook<0x783213>);
 	
-	WriteRelJump(0x7826E4, reinterpret_cast<UInt32>(SI_Hooks::KeyringHideKeysHook));
-	WriteRelJump(0x78083A, reinterpret_cast<UInt32>(SI_Hooks::KeyringHideNonKeysHook));
+	WriteRelJump(0x7826E4, SI_Hooks::KeyringHideKeysHook<0x7826EA, 0x7826F1>);
+	WriteRelJump(0x78083A, SI_Hooks::KeyringHideNonKeysHook<0x78083F>);
 
-	WriteRelJump(0x782665, reinterpret_cast<UInt32>(SI_Hooks::KeyringHideKeysShowCategoriesHook));
+	WriteRelJump(0x782665, SI_Hooks::KeyringHideKeysShowCategoriesHook<0x782679>);
 
-	WriteRelJump(0x780478, reinterpret_cast<UInt32>(SI_Hooks::KeyringEnableEquipHook));
-	WriteRelJump(0x780934, reinterpret_cast<UInt32>(SI_Hooks::KeyringEnableDropHook));
+	WriteRelJump(0x780478, SI_Hooks::KeyringEnableEquipDropHook<0x78047D>);
+	WriteRelJump(0x780934, SI_Hooks::KeyringEnableEquipDropHook<0x78093A>);
 
-	WriteRelCall(0x782F42, reinterpret_cast<UInt32>(SI_Hooks::KeyringEnableCancelHook));
+	WriteRelCall(0x782F42, SI_Hooks::KeyringEnableCancelHook);
 
-	WriteRelCall(0x7815A6, reinterpret_cast<UInt32>(SI_Hooks::KeyringPipBoyIconHook));
+	WriteRelCall(0x7815A6, SI_Hooks::KeyringPipBoyIconHook);
 }
 
 //bool __fastcall FFFNOP()
@@ -51,14 +51,14 @@ void patchSortingCategories()
 ///	WriteRelCall(0x780488, reinterpret_cast<UInt32>(FFFNOP));	   
 void patchFixDroppedItems()
 {
-	WriteRelCall(0x75C793, reinterpret_cast<UInt32>(FixGetDroppedWeaponPre));
-	WriteRelJump(0x75C9AB, reinterpret_cast<UInt32>(FixGetDroppedWeaponPost));
+	WriteRelCall(0x75C793, FixGetDroppedWeaponPre);
+	WriteRelJump(0x75C9AB, FixGetDroppedWeaponPost<0x75C798>);
 }
 
 void patchMatchedCursor()
 {
-	WriteRelCall(0x70B33A, reinterpret_cast<UInt32>(CursorTileSetStringValue));
-	WriteRelCall(0x70C727, reinterpret_cast<UInt32>(CursorTileSetIntValue));
+	WriteRelCall(0x70B33A, CursorTileSetStringValue);
+	WriteRelCall(0x70C727, CursorTileSetIntValue);
 }
 
 void patch1080pUI()

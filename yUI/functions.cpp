@@ -650,21 +650,6 @@ void* __fastcall FixGetDroppedWeaponMid()
 	return iterDroppedItem->data;
 }
 
-__declspec(naked) void FixGetDroppedWeaponPost()
-{
-	static const UInt32 retnAddr = 0x75C798;
-	static const UInt32 UpdateExtraHealth = 0x419970;
-	static const auto GetNextWeapon = reinterpret_cast<UInt32>(FixGetDroppedWeaponMid);
-	__asm
-	{
-		mov eax, [ecx] // dereference
-		mov ecx, [eax] // this
-		call UpdateExtraHealth
-		call GetNextWeapon
-		jmp retnAddr
-	}
-}
-
 void (*RegTraitID)(const char*, UInt32) = (void (*)(const char*, UInt32))0x9FF8A0;
 void RegisterTraitID(const char* var1, UInt32 var2) { RegTraitID(var1, var2);  }
 

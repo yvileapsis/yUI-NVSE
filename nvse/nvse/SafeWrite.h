@@ -1,5 +1,7 @@
 #pragma once
 
+inline std::unordered_map <UInt32, UInt32> g_SafeWriteData;
+
 void SafeWrite8(UInt32 addr, UInt32 data);
 void SafeWrite16(UInt32 addr, UInt32 data);
 void SafeWrite32(UInt32 addr, UInt32 data);
