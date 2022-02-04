@@ -3,62 +3,122 @@
 #include <ySI.h>
 #include <functions.h>
 
-void patchSortingHooks()
+void patchSortingHooks(const bool bEnable)
 {
-	WriteRelJump(0x782516, SI_Hooks::SortingInventoryMenuHook<0x78251B>);
-	WriteRelJump(0x72F0ED, SI_Hooks::SortingBarterContainerMenuHook);
-	WriteRelJump(0x75D138, SI_Hooks::SortingBarterContainerMenuHook);
+	if (bEnable)
+	{
+		WriteRelJump(0x782516, SI_Hooks::SortingInventoryMenuHook<0x78251B>);
+		WriteRelJump(0x72F0ED, SI_Hooks::SortingBarterContainerMenuHook);
+		WriteRelJump(0x75D138, SI_Hooks::SortingBarterContainerMenuHook);
+	}
+	else
+	{
+		UndoSafeWrite(0x782516);
+		UndoSafeWrite(0x72F0ED);
+		UndoSafeWrite(0x75D138);
+	}
 }
 
-void patchAddIcons()
+void patchAddIcons(const bool bEnable)
 {
-	WriteRelJump(0x71A3D5, SI_Hooks::IconInjectTileSetStringValueHook<0x71A3DA>);
+	if (bEnable)
+	{
+		WriteRelJump(0x71A3D5, SI_Hooks::IconInjectTileSetStringValueHook<0x71A3DA>);
+	}
+	else
+	{
+		UndoSafeWrite(0x71A3D5);
+	}
 }
 
-void patchReplaceHotkeyIcons()
+void patchReplaceHotkeyIcons(const bool bEnable)
 {
-	WriteRelJump(0x70189E, SI_Hooks::IconHotkeyHUDTileSetStringValueHook<0x7018A3>);
-	WriteRelJump(0x7814FA, SI_Hooks::IconHotkeyPipBoyTileSetStringValueHook<0x7814FF>);
+	if (bEnable)
+	{
+		WriteRelJump(0x70189E, SI_Hooks::IconHotkeyHUDTileSetStringValueHook<0x7018A3>);
+		WriteRelJump(0x7814FA, SI_Hooks::IconHotkeyPipBoyTileSetStringValueHook<0x7814FF>);
+	}
+	else
+	{
+		UndoSafeWrite(0x70189E);
+		UndoSafeWrite(0x7814FA);
+	}
 }
 
-void patchSortingCategories()
+void patchSortingCategories(const bool bEnable)
 {
-	WriteRelJump(0x730C81, SI_Hooks::ContainerEntryListBoxFilterHookPre<0x730C8C>);
-	WriteRelJump(0x730C97, SI_Hooks::ContainerEntryListBoxFilterHookPost<0x730CA9>);
+	if (bEnable)
+	{
+		WriteRelJump(0x730C81, SI_Hooks::ContainerEntryListBoxFilterHookPre<0x730C8C>);
+		WriteRelJump(0x730C97, SI_Hooks::ContainerEntryListBoxFilterHookPost<0x730CA9>);
 
-	WriteRelJump(0x7824F6, SI_Hooks::SortingInventoryMenuHook<0x78251B>);
-	WriteRelJump(0x78250B, SI_Hooks::SortingInventoryMenuHook<0x78251B>);
+		WriteRelJump(0x7824F6, SI_Hooks::SortingInventoryMenuHook<0x78251B>);
+		WriteRelJump(0x78250B, SI_Hooks::SortingInventoryMenuHook<0x78251B>);
 
-	WriteRelJump(0x7831C1, SI_Hooks::KeyringAddCategoriesHook<0x783213>);
-	
-	WriteRelJump(0x7826E4, SI_Hooks::KeyringHideKeysHook<0x7826EA, 0x7826F1>);
-	WriteRelJump(0x78083A, SI_Hooks::KeyringHideNonKeysHook<0x78083F>);
+		WriteRelJump(0x7831C1, SI_Hooks::KeyringAddCategoriesHook<0x783213>);
 
-	WriteRelJump(0x782665, SI_Hooks::KeyringHideKeysShowCategoriesHook<0x782679>);
+		WriteRelJump(0x7826E4, SI_Hooks::KeyringHideKeysHook<0x7826EA, 0x7826F1>);
+		WriteRelJump(0x78083A, SI_Hooks::KeyringHideNonKeysHook<0x78083F>);
 
-	WriteRelJump(0x780478, SI_Hooks::KeyringEnableEquipDropHook<0x78047D>);
-	WriteRelJump(0x780934, SI_Hooks::KeyringEnableEquipDropHook<0x78093A>);
+		WriteRelJump(0x782665, SI_Hooks::KeyringHideKeysShowCategoriesHook<0x782679>);
 
-	WriteRelCall(0x782F42, SI_Hooks::KeyringEnableCancelHook);
+		WriteRelJump(0x780478, SI_Hooks::KeyringEnableEquipDropHook<0x78047D>);
+		WriteRelJump(0x780934, SI_Hooks::KeyringEnableEquipDropHook<0x78093A>);
 
-	WriteRelCall(0x7815A6, SI_Hooks::KeyringPipBoyIconHook);
+		WriteRelCall(0x782F42, SI_Hooks::KeyringEnableCancelHook);
+
+		WriteRelCall(0x7815A6, SI_Hooks::KeyringPipBoyIconHook);
+	}
+	else
+	{
+		UndoSafeWrite(0x730C81);
+		UndoSafeWrite(0x730C97);
+
+		UndoSafeWrite(0x7824F6);
+		UndoSafeWrite(0x78250B);
+
+		UndoSafeWrite(0x7831C1);
+
+		UndoSafeWrite(0x7826E4);
+		UndoSafeWrite(0x78083A);
+
+		UndoSafeWrite(0x782665);
+
+		UndoSafeWrite(0x780478);
+		UndoSafeWrite(0x780934);
+
+		UndoSafeWrite(0x782F42);
+
+		UndoSafeWrite(0x7815A6);
+	}
 }
 
-//bool __fastcall FFFNOP()
-//{
-//	return false;
-//}
-///	WriteRelCall(0x780488, reinterpret_cast<UInt32>(FFFNOP));	   
-void patchFixDroppedItems()
+void patchFixDroppedItems(const bool bEnable)
 {
-	WriteRelCall(0x75C793, FixGetDroppedWeaponPre);
-	WriteRelJump(0x75C9AB, FixGetDroppedWeaponPost<0x75C798>);
+	if (bEnable)
+	{
+		WriteRelCall(0x75C793, FixGetDroppedWeaponPre);
+		WriteRelJump(0x75C9AB, FixGetDroppedWeaponPost<0x75C798>);
+	}
+	else
+	{
+		UndoSafeWrite(0x75C793);
+		UndoSafeWrite(0x75C9AB);
+	}
 }
 
-void patchMatchedCursor()
+void patchMatchedCursor(const bool bEnable)
 {
-	WriteRelCall(0x70B33A, CursorTileSetStringValue);
-	WriteRelCall(0x70C727, CursorTileSetIntValue);
+	if (bEnable)
+	{
+		WriteRelCall(0x70B33A, CursorTileSetStringValue);
+		WriteRelCall(0x70C727, CursorTileSetIntValue);
+	}
+	else
+	{
+		UndoSafeWrite(0x70B33A);
+		UndoSafeWrite(0x70C727);
+	}
 }
 
 void patch1080pUI()

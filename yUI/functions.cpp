@@ -23,8 +23,7 @@ void ConsoleQueueOrPrint(const char* str, int len = 0)
 	}
 	else {
 		const auto errorStr = static_cast<char*>(GameHeapAlloc(len + 1));
-		// ReSharper disable once CppDeprecatedEntity
-		strcpy(errorStr, str);    // NOLINT(clang-diagnostic-deprecated-declarations)
+		strcpy_s(errorStr, strlen(str), str);
 		queuedConsoleMessages.Append(errorStr);
 	}
 }

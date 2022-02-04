@@ -182,7 +182,7 @@ bool GetNVSEConfigOption_UInt32(const char * section, const char * key, UInt32 *
 	if(data.empty())
 		return false;
 
-	return (sscanf(data.c_str(), "%lu", dataOut) == 1);
+	return (sscanf_s(data.c_str(), "%lu", dataOut) == 1);
 }
 
 namespace MersenneTwister

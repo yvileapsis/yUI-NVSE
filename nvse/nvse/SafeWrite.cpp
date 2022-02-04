@@ -36,12 +36,31 @@ void SafeWriteBuf(UInt32 addr, const char* data, UInt32 len)
 	VirtualProtect((void *)addr, len, oldProtect, &oldProtect);
 }
 
+void WriteRelJump(UInt32 jumpSrc, UInt32 jumpTgt)
+{
+	// jmp rel32
+	auto patch = std::vector(reinterpret_cast<std::byte*>(jumpSrc), reinterpret_cast<std::byte*>(jumpSrc) + sizeof(jumpTgt) + 1);
+	g_SafeWriteData.emplace(jumpSrc, patch);
+	
+	SafeWrite8(jumpSrc, 0xE9);
+	SafeWrite32(jumpSrc + 1, jumpTgt - jumpSrc - 1 - 4);
+}
+
 void WriteRelCall(UInt32 jumpSrc, UInt32 jumpTgt)
 {
 	// call rel32
+	auto patch = std::vector(reinterpret_cast<std::byte*>(jumpSrc), reinterpret_cast<std::byte*>(jumpSrc) + sizeof(jumpTgt) + 1);
+	g_SafeWriteData.emplace(jumpSrc, patch);
 	
 	SafeWrite8(jumpSrc, 0xE8);
 	SafeWrite32(jumpSrc + 1, jumpTgt - jumpSrc - 1 - 4);
+}
+
+void WriteVirtualCall(UInt32 jumpSrc, UInt32 jumpTgt)
+{
+	SafeWrite8(jumpSrc - 6, 0xB8); // mov eax
+	SafeWrite32(jumpSrc - 5, jumpTgt);
+	SafeWrite8(jumpSrc - 1, 0x90); // nop
 }
 
 void WriteRelJnz(UInt32 jumpSrc, UInt32 jumpTgt)
@@ -56,6 +75,19 @@ void WriteRelJle(UInt32 jumpSrc, UInt32 jumpTgt)
 	// jle rel32
 	SafeWrite16(jumpSrc, 0x8E0F);
 	SafeWrite32(jumpSrc + 2, jumpTgt - jumpSrc - 2 - 4);
+}
+
+void UndoSafeWrite(UInt32 addr)
+{
+	if (g_SafeWriteData.find(addr) == g_SafeWriteData.end()) return;
+	UInt32	oldProtect;
+	VirtualProtect((void*)addr, g_SafeWriteData[addr].size(), PAGE_EXECUTE_READWRITE, &oldProtect);
+	for (UInt32 addroffset = 0; auto iter : g_SafeWriteData[addr])
+	{
+		*((UInt8*)addr + addroffset) = std::to_integer<UInt8>(iter);
+		addroffset++;
+	}
+	VirtualProtect((void*)addr, g_SafeWriteData[addr].size(), oldProtect, &oldProtect);
 }
 
 void PatchMemoryNop(ULONG_PTR Address, SIZE_T Size)
