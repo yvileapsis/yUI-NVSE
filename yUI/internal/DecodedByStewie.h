@@ -1,7 +1,8 @@
 #pragma once
 
-/* This huge file consists solely of Stewie's hard work,
- * the amount of decoding he has done is impossible to underestimate.
+/* This huge file is lifted from Stewie's Tweaks,
+ * It consists of hard work of the community over the past 10 years.
+ * The amount of decoding Stewie and others have done is impossible to underestimate.
  * Truly, this is a testament to humanity's will and determination.*/
 
 #include <Hooks_DirectInput8Create.h>
