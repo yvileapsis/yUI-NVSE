@@ -1,8 +1,12 @@
 #pragma once
+#include <filesystem>
 #include <GameTiles.h>
 #include <GameData.h>
 #include <GameUI.h>
 #include <GameExtraData.h>
+#include <unordered_set>
+
+#include "file.h"
 
 //alignas(16) char s_strValBuffer[0x10000];
 
@@ -14,6 +18,12 @@ extern NiTPointerMap<TESForm>** g_allFormsMap;
 
 namespace SI
 {
+	inline std::unordered_map <TESForm*, std::string>		g_Items;
+	inline std::unordered_map <std::string, JSONEntryTag>	g_Tags;
+	inline std::unordered_set<std::string>					g_Categories;
+	inline std::vector<std::filesystem::path>				g_XMLPaths;
+
+	
 	void InjectTemplates();
 	void KeyringRefreshPostStewie();
 	std::string GetTagForItem(TESForm* form);
@@ -34,6 +44,9 @@ namespace SI
 
 namespace SI_Files
 {
+	inline std::vector<JSONEntryItem>						g_Items_JSON;
+	inline std::vector<JSONEntryTag>						g_Tags_JSON;
+	
 	bool AssignTagToItem(TESForm* form);
 }
 

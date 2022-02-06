@@ -6,8 +6,9 @@
 
 extern tList<char> queuedConsoleMessages;
 extern DataHandler* g_dataHandler;
-extern NiTPointerMap<TESForm>** g_allFormsMap;
-extern std::unordered_set<TESForm*> g_CraftingComponents;
+
+inline NiTPointerMap<TESForm>** g_allFormsMap;
+inline std::unordered_set<TESForm*> g_CraftingComponents;
 
 void UIWidth();
 void UIHeight();

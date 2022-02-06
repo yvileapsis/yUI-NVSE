@@ -1,11 +1,8 @@
 #pragma once
 
-#include "nvse/CommandTable.h"
-#include "nvse/Utilities.h"
-
-#if RUNTIME
+#include "CommandTable.h"
+#include "Utilities.h"
 #include "GameAPI.h"
-#endif
 
 struct CommandInfo;
 struct ParamInfo;

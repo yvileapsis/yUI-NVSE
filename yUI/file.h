@@ -69,18 +69,18 @@ class JSONEntryItem
 {
 public:
 	std::string tag;
-	SInt16 priority;
+	SInt16 priority = 0;
 
-	TESForm* form;
+	TESForm* form = nullptr;
 
-	UInt32 formType;
+	UInt32 formType = 0;
 
-	UInt8 questItem;
+	UInt8 questItem = 0;
 	
-	JSONEntryItemWeapon formWeapon;
-	JSONEntryItemArmor formArmor;
-	JSONEntryItemAid formAid;
-	JSONEntryItemMisc formMisc;
+	JSONEntryItemWeapon formWeapon{};
+	JSONEntryItemArmor formArmor{};
+	JSONEntryItemAid formAid{};
+	JSONEntryItemMisc formMisc{};
 //	Script* conditionScript;
 //	bool pollCondition;
 
@@ -112,18 +112,18 @@ class JSONEntryTag
 {
 public:
 	std::string tag;
-	SInt16 priority;
+	SInt16 priority = 0;
 
 	std::string xmltemplate;
 	std::string filename;
 	std::string texatlas;
-	SInt32 systemcolor;
+	SInt32 systemcolor = 0;
 	
 	std::string category;
 	std::string name;
 	std::string icon;
-	UInt32 tab;
-	UInt32 count;
+	UInt32 tab = 0;
+	UInt32 count = 0;
 	
 	JSONEntryTag(std::string tag, SInt16 priority, std::string xmltemplate, std::string filename, std::string texatlas,
 	             SInt64 systemcolor, std::string category, std::string name, std::string icon, UInt32 tab, UInt32 count)

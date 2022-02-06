@@ -1,7 +1,5 @@
 #include <yCM.h>
 
-extern yCM g_yCM_Manager;
-
 bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS)
 {
 	*result = -999;

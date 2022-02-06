@@ -802,17 +802,17 @@ public:
 		DList<TemplateInstance>	instances;		// 08
 	};
 	
-	TileMenu*			tile;			// 04
-	tList<TemplateData>	menuTemplates;	// 08
-	UInt32				unk10;			// 10
-	UInt32				unk14;			// 14	Same as id (20)
-	UInt32				unk18;			// 18
-	UInt8				byte1C;			// 1C
-	UInt8				byte1D;			// 1D
-	UInt8				byte1E;			// 1E
-	UInt8				byte1F;			// 1F
-	UInt32				id;				// 20
-	UInt32				visibilityState;// 24 :: Initialised to 4
+	TileMenu*			tile{};				// 04
+	tList<TemplateData>	menuTemplates;		// 08
+	UInt32				unk10{};			// 10
+	UInt32				unk14{};			// 14	Same as id (20)
+	UInt32				unk18{};			// 18
+	UInt8				byte1C{};			// 1C
+	UInt8				byte1D{};			// 1D
+	UInt8				byte1E{};			// 1E
+	UInt8				byte1F{};			// 1F
+	UInt32				id{};				// 20
+	UInt32				visibilityState{};	// 24 :: Initialised to 4
 	// check 1 at 0xA0B174, 0x70D529, 0x70D592 :: set at 0x712224
 	// check 2 at 0x711FF1 :: set 2 at 0xA1D987 (when closes menu), 0xA1DA41
 	// check 4 at 0xA1D9EC (when closing menu) :: set at 0x7036A4, 0x71204D
@@ -3579,10 +3579,10 @@ struct __declspec(align(4)) FontTextReplaced
 	UInt8 gap1D[3];
 	tList<void> lineWidths;
 
-	FontTextReplaced()
+	FontTextReplaced(): gap1D{}
 	{
 		str.m_bufLen = 0;
-		str.m_data = 0;
+		str.m_data = nullptr;
 		str.m_dataLen = 0;
 		wrapWidth = 0;
 		wrapLimit = 0;
@@ -3591,7 +3591,8 @@ struct __declspec(align(4)) FontTextReplaced
 		length = 0;
 		newLineCharacter = 0;
 		lineWidths.Init();
-	};
+	}
+	;
 
 	~FontTextReplaced()
 	{

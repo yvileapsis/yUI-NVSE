@@ -1,14 +1,10 @@
 #include <main.h>
-#include <PluginAPI.h>
-#include <CommandTable.h>
-#include <Utilities.h>
-#include <GameData.h>
 #include <LambdaVariableContext.h>
 #include <functions.h>
 #include <patches.h>
 #include <commands.h>
 #include <settings.h>
-#include <file.h>
+#include <ySI.h>
 
 #define yUI_VERSION 1.4
 #define yUI_VERSION_STR "1.4"
@@ -17,9 +13,6 @@
 #define REG_CMD_STR(name)			nvse->RegisterTypedCommand(&kCommandInfo_##name, kRetnType_String)
 
 PluginHandle	g_pluginHandle = kPluginHandle_Invalid;
-
-//const CommandInfo* g_TFC;
-//std::deque<std::function<void()>> g_executionQueue;
 
 _CaptureLambdaVars CaptureLambdaVars;
 _UncaptureLambdaVars UncaptureLambdaVars;
@@ -38,15 +31,11 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 
 		if (g_ySI_Sort || g_ySI_Icons || g_ySI_Hotkeys || g_ySI_Categories) LoadSIMapsFromFiles();
 
-//		LoadFileAnimPaths();
-
 		Console_Print("yUI %s", yUI_VERSION_STR);
 	}
 	else if (msg->type == NVSEMessagingInterface::kMessage_MainGameLoop)
 	{
 		if (g_FixTablineSelected) FixTablineSelected();
-		
-//		if (g_ySI_Icons) SI::InjectIconTileLastFix();
 		if (g_ySI_Categories) SI::KeyringRefreshPostStewie();
 		
 		if (iDoOnce == 0 && !CdeclCall<bool>(0x702360)) {
@@ -81,9 +70,6 @@ void writePatches()
 	}
 	if (g_yCM) patchAddyCMToSettingsMenu();
 	if (g_yMC) patchMatchedCursor();
-//	patchFixDroppedItems();
-//	patch1080pUI();
-
 }
 
 bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
@@ -125,7 +111,6 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 
 bool NVSEPlugin_Load(const NVSEInterface* nvse)
 {
-
 	g_pluginHandle = nvse->GetPluginHandle();
 	g_nvseInterface = const_cast<NVSEInterface*>(nvse);
 	g_messagingInterface = static_cast<NVSEMessagingInterface*>(nvse->QueryInterface(kInterface_Messaging));

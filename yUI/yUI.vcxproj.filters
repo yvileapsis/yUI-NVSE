@@ -65,6 +65,7 @@
       <Filter>nvse</Filter>
     </ClCompile>
     <ClCompile Include="nihooks.cpp" />
+    <ClCompile Include="commands.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="file.h" />
@@ -151,6 +152,15 @@
     </ClInclude>
     <ClInclude Include="commands.h" />
     <ClInclude Include="..\nvse\CommandTable.h">
+      <Filter>nvse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nvse\prefix.h">
+      <Filter>nvse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nvse\PluginManager.h">
+      <Filter>nvse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nvse\PluginAPI.h">
       <Filter>nvse</Filter>
     </ClInclude>
   </ItemGroup>

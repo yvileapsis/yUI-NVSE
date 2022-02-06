@@ -127,6 +127,7 @@
     <ClCompile Include="..\nvse\printf.cpp" />
     <ClCompile Include="..\nvse\SafeWrite.cpp" />
     <ClCompile Include="..\nvse\Utilities.cpp" />
+    <ClCompile Include="commands.cpp" />
     <ClCompile Include="dllmain.c">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ForcedIncludeFiles>
@@ -166,6 +167,9 @@
     <ClInclude Include="..\nvse\NiNodes.h" />
     <ClInclude Include="..\nvse\NiObjects.h" />
     <ClInclude Include="..\nvse\NiTypes.h" />
+    <ClInclude Include="..\nvse\PluginAPI.h" />
+    <ClInclude Include="..\nvse\PluginManager.h" />
+    <ClInclude Include="..\nvse\prefix.h" />
     <ClInclude Include="..\nvse\SafeWrite.h" />
     <ClInclude Include="..\nvse\Utilities.h" />
     <ClInclude Include="file.h" />

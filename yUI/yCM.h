@@ -6,6 +6,7 @@
 #include <unordered_set>
 #include <utility>
 
+
 bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS);
 bool Cmd_SetyCMFloat_Execute(COMMAND_ARGS);
 
@@ -55,8 +56,10 @@ public:
 class yCM
 {
 public:
-	UInt32 activeMod;
-	UInt32 activeSubMenu;
-	UInt32 activeOption;
+	UInt32 activeMod = 0;
+	UInt32 activeSubMenu = 0;
+	UInt32 activeOption = 0;
 	std::unordered_map<UInt32, yCM_Option*>			mods;
 };
+
+yCM g_yCM_Manager;

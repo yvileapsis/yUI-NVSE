@@ -466,10 +466,10 @@ STATIC_ASSERT(sizeof(PlayingMusic) == 0x288);
 // 0C
 struct Sound
 {
-	UInt32		soundKey;	// 00
-	UInt8		byte04;		// 04
-	UInt8		pad05[3];	// 05
-	UInt32		unk08;		// 08
+	UInt32		soundKey{};		// 00
+	UInt8		byte04{};		// 04
+	UInt8		pad05[3]{};		// 05
+	UInt32		unk08{};		// 08
 
 	Sound() : soundKey(0xFFFFFFFF), byte04(0), unk08(0) {}
 

@@ -905,7 +905,8 @@ struct CoordXY
 	float	x;
 	float	y;
 
-	CoordXY() {}
+	CoordXY(): x(0), y(0)	{}
+
 	CoordXY(float _x, float _y) : x(_x), y(_y) {}
 
 	inline CoordXY& operator =(const CoordXY& rhs)
