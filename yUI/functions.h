@@ -1,7 +1,8 @@
 #pragma once
-#include <internal/DecodedUI.h>
 #include <GameTypes.h>
+#include <GameData.h>
 #include <unordered_set>
+#include <GameExtraData.h>
 
 extern tList<char> queuedConsoleMessages;
 extern DataHandler* g_dataHandler;
@@ -16,8 +17,6 @@ void UIWidth3();
 void UIHeight3();
 void __fastcall AddyCMToSettingsMenu(BSSimpleArray<StartMenuOption*>*, void*, StartMenuOption**);
 
-
-void PrintAndClearQueuedConsoleMessages();
 void FillCraftingComponents();
 
 TESForm* GetRefFromString(char*, char*);
@@ -31,7 +30,6 @@ bool IsFood(TESForm*);
 bool IsMedicine(TESForm*);
 bool IsPoisonous(TESForm*);
 bool HasBaseEffectChangesAV(TESForm*, int);
-TESForm* __stdcall LookupFormByRefID(UInt32);
 bool IsCraftingComponent(TESForm*);
 
 std::string GetCurPath();
@@ -43,12 +41,7 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 /// Try to find in the Haystack the Needle - ignore case
 bool FindStringCI(const std::string& strHaystack, const std::string& strNeedle);
 
-void Log(const std::string& msg);
-void DebugLog(const std::string& msg);
-
 int HexStringToInt(const std::string& str);
-
-void DebugPrint(const std::string& str);
 
 // if player is in third person, returns true if anim data is the first person and vice versa
 bool IsPlayersOtherAnimData(AnimData* animData);
@@ -61,7 +54,7 @@ void SetUIStringFull(char *, char* , UInt32);
 
 void __fastcall CursorTileSetStringValue(Tile* tile, void* dummyEDX, enum TileValues tilevalue, char* src, char propagate);
 void __fastcall CursorTileSetIntValue(Tile* tile, void* dummyEDX, enum TileValues tilevalue, int value);
-bool __fastcall FileExists(const char* path);
+
 char* __fastcall StrFromINI(DWORD* address);
 std::string GetStringFromGameSettingFromString(const std::string& settingName);
 

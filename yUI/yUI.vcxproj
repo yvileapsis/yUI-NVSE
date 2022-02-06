@@ -1,28 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
-    <ProjectConfiguration Include="Debug GECK|Win32">
-      <Configuration>Debug GECK</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Debug ng|Win32">
-      <Configuration>Debug ng</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
     <ProjectConfiguration Include="Debug|Win32">
       <Configuration>Debug</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release Debug Launch GECK|Win32">
-      <Configuration>Release Debug Launch GECK</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release GECK|Win32">
-      <Configuration>Release GECK</Configuration>
-      <Platform>Win32</Platform>
-    </ProjectConfiguration>
-    <ProjectConfiguration Include="Release ng|Win32">
-      <Configuration>Release ng</Configuration>
       <Platform>Win32</Platform>
     </ProjectConfiguration>
     <ProjectConfiguration Include="Release|Win32">
@@ -37,30 +17,7 @@
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release ng|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug ng|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Debug Launch GECK|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release GECK|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
@@ -71,33 +28,13 @@
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug GECK|Win32'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
-  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release ng|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug ng|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release Debug Launch GECK|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release GECK|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
-    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-  </ImportGroup>
-  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug GECK|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
@@ -110,46 +47,16 @@
     <LinkIncremental>true</LinkIncremental>
     <TargetName>yUI</TargetName>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug GECK|Win32'">
-    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
-    <IntDir>$(Configuration)\</IntDir>
-    <LinkIncremental>true</LinkIncremental>
-    <TargetName>kNVSE</TargetName>
-  </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>yUI</TargetName>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release Debug Launch GECK|Win32'">
-    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
-    <IntDir>$(Configuration)\</IntDir>
-    <LinkIncremental>false</LinkIncremental>
-    <TargetName>kNVSE</TargetName>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release GECK|Win32'">
-    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
-    <IntDir>$(Configuration)\</IntDir>
-    <LinkIncremental>false</LinkIncremental>
-    <TargetName>kNVSE</TargetName>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug ng|Win32'">
-    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
-    <IntDir>$(Configuration)\</IntDir>
-    <LinkIncremental>true</LinkIncremental>
-    <TargetName>kNVSE</TargetName>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release ng|Win32'">
-    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
-    <IntDir>$(Configuration)\</IntDir>
-    <LinkIncremental>false</LinkIncremental>
-    <TargetName>kNVSE</TargetName>
-  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\..\nvse;$(SolutionDir)\..\nvse\nvse;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\..\nvse;$(SolutionDir)\..\libraries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;yUI_EXPORTS;RUNTIME_VERSION=0x040020D0;RUNTIME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -175,38 +82,9 @@
       <Command>copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\NVSE\Plugins\$(ProjectName).dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug GECK|Win32'">
-    <ClCompile>
-      <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\..\nvse;$(SolutionDir)\..\nvse\nvse;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;yUI_EXPORTS;EDITOR;EDITOR_VERSION=0x04002060;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>false</MinimalRebuild>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <ForcedIncludeFiles>nvse/prefix.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
-    </ClCompile>
-    <Link>
-      <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
-      <TargetMachine>MachineX86</TargetMachine>
-    </Link>
-    <PostBuildEvent>
-      <Message>Installing DLL...</Message>
-      <Command>copy "$(TargetPath)" "$(FalloutNVPath)\Data\NVSE\Plugins\$(TargetFileName)"</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\..\nvse;$(SolutionDir)\..\nvse\nvse;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\..\nvse;$(SolutionDir)\..\libraries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;yUI_EXPORTS;RUNTIME_VERSION=0x040020D0;RUNTIME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
@@ -230,180 +108,32 @@
       <Command>copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\NVSE\Plugins\$(ProjectName).dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release Debug Launch GECK|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\..\nvse;$(SolutionDir)\..\nvse\nvse;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;yUI_EXPORTS;RUNTIME_VERSION=0x040020D0;RUNTIME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <ForcedIncludeFiles>nvse/prefix.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
-    </ClCompile>
-    <Link>
-      <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
-      <OptimizeReferences>true</OptimizeReferences>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
-      <TargetMachine>MachineX86</TargetMachine>
-    </Link>
-    <PostBuildEvent>
-      <Message>Installing DLL...</Message>
-      <Command>copy "$(TargetPath)" "$(FalloutNVPath)\Data\NVSE\Plugins\$(TargetFileName)"</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release GECK|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\..\nvse;$(SolutionDir)\..\nvse\nvse;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;yUI_EXPORTS;EDITOR;EDITOR_VERSION=0x04002060;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <PrecompiledHeader>
-      </PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <ForcedIncludeFiles>nvse/prefix.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
-    </ClCompile>
-    <Link>
-      <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
-      <OptimizeReferences>true</OptimizeReferences>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention>
-      </DataExecutionPrevention>
-      <TargetMachine>MachineX86</TargetMachine>
-    </Link>
-    <PostBuildEvent>
-      <Message>Installing DLL...</Message>
-      <Command>copy "$(TargetPath)" "$(FalloutNVPath)\Data\NVSE\Plugins\$(TargetFileName)"</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug ng|Win32'">
-    <ClCompile>
-      <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\..\nvse;$(SolutionDir)\..\nvse\nvse;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;yUI_EXPORTS;NOGORE;RUNTIME_VERSION=0x040020D1;RUNTIME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <MinimalRebuild>false</MinimalRebuild>
-      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
-      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <PrecompiledHeader />
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <ForcedIncludeFiles>nvse/prefix.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
-    </ClCompile>
-    <Link>
-      <OutputFile>$(OutDir)$(ProjectName)_ng.dll</OutputFile>
-      <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention />
-      <TargetMachine>MachineX86</TargetMachine>
-    </Link>
-    <PostBuildEvent>
-      <Message>Installing DLL...</Message>
-      <Command>copy "$(TargetPath)" "$(FalloutNVPathD)\Data\NVSE\Plugins\$(TargetFileName)"</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release ng|Win32'">
-    <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\..\nvse;$(SolutionDir)\..\nvse\nvse;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;yUI_EXPORTS;NOGORE;RUNTIME_VERSION=0x040020D1;RUNTIME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <PrecompiledHeader />
-      <WarningLevel>Level3</WarningLevel>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <ForcedIncludeFiles>nvse/prefix.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
-      <LanguageStandard>stdcpplatest</LanguageStandard>
-    </ClCompile>
-    <Link>
-      <OutputFile>$(OutDir)$(ProjectName)_ng.dll</OutputFile>
-      <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
-      <SubSystem>Windows</SubSystem>
-      <OptimizeReferences>true</OptimizeReferences>
-      <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <RandomizedBaseAddress>false</RandomizedBaseAddress>
-      <DataExecutionPrevention />
-      <TargetMachine>MachineX86</TargetMachine>
-    </Link>
-    <PostBuildEvent>
-      <Message>Installing DLL...</Message>
-      <Command>copy "$(TargetPath)" "$(FalloutNVPath)\Data\NVSE\Plugins\$(TargetFileName)"</Command>
-    </PostBuildEvent>
-  </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\nvse\nvse\containers.cpp" />
-    <ClCompile Include="..\nvse\nvse\GameAPI.cpp" />
-    <ClCompile Include="..\nvse\nvse\GameBSExtraData.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release GECK|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug GECK|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\nvse\nvse\GameData.cpp" />
-    <ClCompile Include="..\nvse\nvse\GameExtraData.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release GECK|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug GECK|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\nvse\nvse\GameForms.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release GECK|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug GECK|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\nvse\nvse\GameObjects.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release GECK|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug GECK|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\nvse\nvse\GameOSDepend.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release GECK|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug GECK|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\nvse\nvse\GameRTTI.cpp" />
-    <ClCompile Include="..\nvse\nvse\GameScript.cpp" />
-    <ClCompile Include="..\nvse\nvse\GameSettings.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release GECK|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug GECK|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\nvse\nvse\GameTasks.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug GECK|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release GECK|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\nvse\nvse\GameTiles.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release GECK|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug GECK|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\nvse\nvse\GameTypes.cpp" />
-    <ClCompile Include="..\nvse\nvse\printf.cpp" />
-    <ClCompile Include="..\nvse\nvse\SafeWrite.cpp" />
-    <ClCompile Include="..\nvse\nvse\Utilities.cpp" />
-    <ClCompile Include="..\nvse\nvse\utility.cpp" />
+    <ClCompile Include="..\nvse\GameAPI.cpp" />
+    <ClCompile Include="..\nvse\GameBSExtraData.cpp" />
+    <ClCompile Include="..\nvse\GameData.cpp" />
+    <ClCompile Include="..\nvse\GameExtraData.cpp" />
+    <ClCompile Include="..\nvse\GameForms.cpp" />
+    <ClCompile Include="..\nvse\GameObjects.cpp" />
+    <ClCompile Include="..\nvse\GameOSDepend.cpp" />
+    <ClCompile Include="..\nvse\GameRTTI.cpp" />
+    <ClCompile Include="..\nvse\GameScript.cpp" />
+    <ClCompile Include="..\nvse\GameSettings.cpp" />
+    <ClCompile Include="..\nvse\GameTasks.cpp" />
+    <ClCompile Include="..\nvse\GameTiles.cpp" />
+    <ClCompile Include="..\nvse\GameTypes.cpp" />
+    <ClCompile Include="..\nvse\GameUI.cpp" />
+    <ClCompile Include="..\nvse\GameSound.cpp" />
+    <ClCompile Include="..\nvse\printf.cpp" />
+    <ClCompile Include="..\nvse\SafeWrite.cpp" />
+    <ClCompile Include="..\nvse\Utilities.cpp" />
     <ClCompile Include="dllmain.c">
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug ng|Win32'">
-      </ForcedIncludeFiles>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug GECK|Win32'">
-      </ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release ng|Win32'">
       </ForcedIncludeFiles>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release Debug Launch GECK|Win32'">
-      </ForcedIncludeFiles>
-      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release GECK|Win32'">
-      </ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="file.cpp" />
-    <ClCompile Include="GameUI.cpp" />
-    <ClCompile Include="game_types.cpp" />
-    <ClCompile Include="hooks.cpp" />
     <ClCompile Include="LambdaVariableContext.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="nihooks.cpp" />
@@ -414,59 +144,46 @@
     <ClCompile Include="ySI.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\nvse\nvse\CommandTable.h" />
-    <ClInclude Include="..\nvse\nvse\containers.h" />
-    <ClInclude Include="..\nvse\nvse\GameAPI.h" />
-    <ClInclude Include="..\nvse\nvse\GameBSExtraData.h" />
-    <ClInclude Include="..\nvse\nvse\GameData.h" />
-    <ClInclude Include="..\nvse\nvse\GameEffects.h" />
-    <ClInclude Include="..\nvse\nvse\GameExtraData.h" />
-    <ClInclude Include="..\nvse\nvse\GameForms.h" />
-    <ClInclude Include="..\nvse\nvse\GameObjects.h" />
-    <ClInclude Include="..\nvse\nvse\GameOSDepend.h" />
-    <ClInclude Include="..\nvse\nvse\GameProcess.h" />
-    <ClInclude Include="..\nvse\nvse\GameRTTI.h" />
-    <ClInclude Include="..\nvse\nvse\GameScript.h" />
-    <ClInclude Include="..\nvse\nvse\GameSettings.h" />
-    <ClInclude Include="..\nvse\nvse\GameTasks.h" />
-    <ClInclude Include="..\nvse\nvse\GameTiles.h" />
-    <ClInclude Include="..\nvse\nvse\GameTypes.h" />
-    <ClInclude Include="..\nvse\nvse\NiNodes.h" />
-    <ClInclude Include="..\nvse\nvse\NiObjects.h" />
-    <ClInclude Include="..\nvse\nvse\NiTypes.h" />
-    <ClInclude Include="..\nvse\nvse\ParamInfos1.h" />
-    <ClInclude Include="..\nvse\nvse\SafeWrite.h" />
-    <ClInclude Include="..\nvse\nvse\Utilities.h" />
-    <ClInclude Include="..\nvse\nvse\utility.h" />
+    <ClInclude Include="..\libraries\json.h" />
+    <ClInclude Include="..\nvse\CommandTable.h" />
+    <ClInclude Include="..\nvse\GameAPI.h" />
+    <ClInclude Include="..\nvse\GameBSExtraData.h" />
+    <ClInclude Include="..\nvse\GameData.h" />
+    <ClInclude Include="..\nvse\GameEffects.h" />
+    <ClInclude Include="..\nvse\GameExtraData.h" />
+    <ClInclude Include="..\nvse\GameForms.h" />
+    <ClInclude Include="..\nvse\GameObjects.h" />
+    <ClInclude Include="..\nvse\GameOSDepend.h" />
+    <ClInclude Include="..\nvse\GameProcess.h" />
+    <ClInclude Include="..\nvse\GameRTTI.h" />
+    <ClInclude Include="..\nvse\GameScript.h" />
+    <ClInclude Include="..\nvse\GameSettings.h" />
+    <ClInclude Include="..\nvse\GameSound.h" />
+    <ClInclude Include="..\nvse\GameTasks.h" />
+    <ClInclude Include="..\nvse\GameTiles.h" />
+    <ClInclude Include="..\nvse\GameTypes.h" />
+    <ClInclude Include="..\nvse\GameUI.h" />
+    <ClInclude Include="..\nvse\NiNodes.h" />
+    <ClInclude Include="..\nvse\NiObjects.h" />
+    <ClInclude Include="..\nvse\NiTypes.h" />
+    <ClInclude Include="..\nvse\SafeWrite.h" />
+    <ClInclude Include="..\nvse\Utilities.h" />
     <ClInclude Include="file.h" />
     <ClInclude Include="commands.h" />
     <ClInclude Include="functions.h" />
     <ClInclude Include="yCM.h" />
     <ClInclude Include="patches.h" />
     <ClInclude Include="settings.h" />
-    <ClInclude Include="hooks.h" />
-    <ClInclude Include="json.h" />
-    <ClInclude Include="game_types.h" />
     <ClInclude Include="LambdaVariableContext.h" />
     <ClInclude Include="main.h" />
-    <ClInclude Include="MemoizedMap.h" />
     <ClInclude Include="nihooks.h" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="SimpleINILibrary.h" />
-    <ClInclude Include="stack_allocator.h" />
+    <ClInclude Include="..\libraries\SimpleINILibrary.h" />
     <ClInclude Include="ySI.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\nvse\GameRTTI.inc" />
     <None Include="exports.def" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\common\common_vc9.vcxproj">
-      <Project>{20c6411c-596f-4b85-be4e-8bc91f59d8a6}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Natvis Include="GameTypes.natvis" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="yUI.rc" />

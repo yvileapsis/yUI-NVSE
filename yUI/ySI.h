@@ -1,7 +1,8 @@
 #pragma once
 #include <GameTiles.h>
 #include <GameData.h>
-#include <internal/DecodedUI.h>
+#include <GameUI.h>
+#include <GameExtraData.h>
 
 //alignas(16) char s_strValBuffer[0x10000];
 

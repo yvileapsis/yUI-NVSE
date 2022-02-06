@@ -1,13 +1,15 @@
 #include <ySI.h>
+#include <GameObjects.h>
 #include <functions.h>
 #include <filesystem>
 #include <file.h>
+
 
 extern int g_ySI;
 extern int g_ySI_Sort;
 extern int g_ySI_Categories;
 
-extern bool* g_menuVisibility;
+extern UInt8* g_menuVisibility;
 
 
 namespace SI

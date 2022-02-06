@@ -1,32 +1,16 @@
 #include <functions.h>
 #include <unordered_set>
-#include <utility>
+#include <Utilities.h>
 #include <PluginAPI.h>
 #include <GameAPI.h>
 #include <settings.h>
 #include <GameSettings.h>
-
-extern bool* g_menuVisibility;
-
-void PrintAndClearQueuedConsoleMessages()
-{
-	for (auto iter = queuedConsoleMessages.Begin(); !iter.End(); ++iter)
-		Console_Print("%s", iter.Get());
-	queuedConsoleMessages.DeleteAll();
-}
-
-void ConsoleQueueOrPrint(const char* str, int len = 0)
-{
-	if (len == 0) len = strlen(str);
-	if (*reinterpret_cast<ConsoleManager**>(0x11D8CE8) || g_dataHandler) { // g_dataHandler will be non-null if Deferred init has been called
-		Console_Print("%s", str);
-	}
-	else {
-		const auto errorStr = static_cast<char*>(GameHeapAlloc(len + 1));
-		strcpy_s(errorStr, strlen(str), str);
-		queuedConsoleMessages.Append(errorStr);
-	}
-}
+#include <GameRTTI.h>
+#include <GameUI.h>
+#include <GameObjects.h>
+#include <SafeWrite.h>
+#include <GameProcess.h>
+#include <algorithm>
 
 bool Menu::GetTemplateExists(const char* templateName)
 {
@@ -126,7 +110,7 @@ void __fastcall AddyCMToSettingsMenu(BSSimpleArray<StartMenuOption*>* settingsMe
 
 }
 
-typedef Vector<ArrayElementL> TempElements;
+typedef std::vector<ArrayElementL> TempElements;
 __declspec(noinline) TempElements* GetTempElements()
 {
 	thread_local TempElements s_tempElements(0x100);
@@ -159,7 +143,7 @@ void GetLoadedType(UInt32 formType, int index, tList<TESForm>* outList, TempElem
 		{
 			if (index != -1 && index != (*cells)->modIndex) continue;
 			if (outList) outList->Insert(*cells);
-			else tmpElements->Append(*cells);
+			else tmpElements->push_back(*cells);
 		}
 	}
 	else if (formType == 301)
@@ -175,7 +159,7 @@ void GetLoadedType(UInt32 formType, int index, tList<TESForm>* outList, TempElem
 				auto refr = refrIter->data;
 				if (!refr || !refr->extraDataList.HasType(kExtraData_MapMarker) || ((index != -1) && (index != refr->modIndex))) continue;
 				if (outList) outList->Insert(refr);
-				else tmpElements->Append(refr);
+				else tmpElements->push_back(refr);
 			} while (refrIter = refrIter->next);
 		} while (wspcIter = wspcIter->next);
 	}
@@ -192,7 +176,7 @@ void GetLoadedType(UInt32 formType, int index, tList<TESForm>* outList, TempElem
 				refr = refrIter->data;
 				if (!refr || !refr->extraDataList.HasType(kExtraData_RadioData) || ((index != -1) && (index != refr->modIndex))) continue;
 				if (outList) outList->Insert(refr);
-				else tmpElements->Append(refr);
+				else tmpElements->push_back(refr);
 			} while (refrIter = refrIter->next);
 		}
 	}
@@ -208,7 +192,7 @@ void GetLoadedType(UInt32 formType, int index, tList<TESForm>* outList, TempElem
 				form = iter->data;
 				if (!form || ((index != -1) && (index != form->modIndex))) continue;
 				if (outList) outList->Insert(form);
-				else tmpElements->Append(form);
+				else tmpElements->push_back(form);
 			} while (iter = iter->next);
 		}
 		else if (kTypeListJmpTbl[formType] == 0x80)
@@ -217,7 +201,7 @@ void GetLoadedType(UInt32 formType, int index, tList<TESForm>* outList, TempElem
 			{
 				if ((object->typeID != formType) || ((index != -1) && (index != object->modIndex))) continue;
 				if (outList) outList->Insert(object);
-				else tmpElements->Append(object);
+				else tmpElements->push_back(object);
 			}
 		}
 		else
@@ -227,7 +211,7 @@ void GetLoadedType(UInt32 formType, int index, tList<TESForm>* outList, TempElem
 				form = mIter.Get();
 				if (!form || (form->typeID != formType) || ((index != -1) && (index != form->modIndex))) continue;
 				if (outList) outList->Insert(form);
-				else tmpElements->Append(form);
+				else tmpElements->push_back(form);
 			}
 		}
 	}
@@ -450,35 +434,6 @@ bool HasBaseEffectChangesAV(TESForm* form, const int avCode)
 	return false;
 }
 
-
-__declspec(naked) TESForm* __stdcall LookupFormByRefID(UInt32 refID)
-{
-	__asm
-	{
-		mov		ecx, ds: [0x11C54C0]
-		mov		eax, [esp + 4]
-		xor edx, edx
-		div		dword ptr[ecx + 4]
-		mov		eax, [ecx + 8]
-		mov		eax, [eax + edx * 4]
-		test	eax, eax
-		jz		done
-		mov		edx, [esp + 4]
-		ALIGN 16
-	iterHead:
-		cmp[eax + 4], edx
-		jz		found
-		mov		eax, [eax]
-		test	eax, eax
-		jnz		iterHead
-		retn	4
-		found:
-		mov		eax, [eax + 8]
-	done :
-		retn	4
-	}
-}
-
 TESForm* GetRefFromString(char* mod, char* id)
 {
 	const auto itemID = (g_dataHandler->GetModIndex(mod) << 24) | strtoul(id, nullptr, 0);
@@ -510,20 +465,6 @@ bool FindStringCI(const std::string& strHaystack, const std::string& strNeedle)
 	return it != strHaystack.end();
 }
 
-void Log(const std::string& msg)
-{
-	_MESSAGE("%s", msg.c_str());
-	if (g_logLevel == 2)
-		Console_Print("yUI: %s", msg.c_str());
-}
-
-void DebugLog(const std::string& msg)
-{
-	_MESSAGE("%s", msg.c_str());
-	if (g_logLevel == 2)
-		Console_Print("yUI: %s", msg.c_str());
-}
-
 int HexStringToInt(const std::string& str)
 {
 	char* p;
@@ -531,13 +472,6 @@ int HexStringToInt(const std::string& str)
 	if (*p == 0)
 		return id;
 	return -1;
-}
-
-void DebugPrint(const std::string& str)
-{
-	if (g_logLevel == 1)
-		Console_Print("yUI: %s", str.c_str());
-	Log(str);
 }
 
 bool IsPlayersOtherAnimData(AnimData* animData)
@@ -574,15 +508,6 @@ void Tile::SetStringRecursive(const UInt32 tileValue, const char* changeto, cons
 		iter->data->SetStringRecursive(tileValue, changeto, tochange);
 }
 
-extern TileMenu** g_tileMenuArray;
-
-
-TileMenu* TileMenu::GetTileMenu(const UInt32 menuID)
-{
-	return menuID ? g_tileMenuArray[menuID - kMenuType_Min] : nullptr;
-}
-
-
 Tile* Tile::InjectUIXML(const char* str)
 {
 	return FileExists(str) ? this->ReadXML(str) : nullptr;
@@ -598,12 +523,6 @@ void __fastcall CursorTileSetIntValue(Tile* tile, void* dummyEDX, enum TileValue
 {
 	tile->SetFloat(kTileValue_visible, value, 1);
 	ThisCall(0xA0B350, InterfaceManager::GetSingleton()->cursor, 1, 0);
-}
-
-bool __fastcall FileExists(const char* path)
-{
-	const auto attr = GetFileAttributes(path);
-	return (attr != INVALID_FILE_ATTRIBUTES) && !(attr & FILE_ATTRIBUTE_DIRECTORY);
 }
 
 char* __fastcall StrFromINI(DWORD *address)
@@ -677,7 +596,7 @@ bool fixTablineSelected = false;
 
 void FixTablineSelected()
 {
-	if (CdeclCall<bool>(0x702360) && g_menuVisibility[kMenuType_Inventory])	{
+	if (CdeclCall<bool>(0x702360) && InterfaceManager::IsMenuVisible(kMenuType_Inventory))	{
 		if (fixTablineSelected)	{
 			fixTablineSelected = false;
 			auto tabline = InventoryMenu::GetSingleton()->tile->GetChild("GLOW_BRANCH")->GetChild("IM_Tabline");

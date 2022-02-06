@@ -7,7 +7,6 @@
 #include <utility>
 
 #include <functions.h>
-#include <utility.h>
 #include <Utilities.h>
 
 #include "settings.h"
@@ -29,7 +28,7 @@ namespace SI
 
 void LogForm(const TESForm* form)
 {
-	DebugLog(FormatString("Detected in-game form %X %s", form->refID, form->GetName()));
+	Log(FormatString("Detected in-game form %X %s", form->refID, form->GetName()));
 	//, form->GetFullName() ? form->GetFullName()->name.CStr() : "<no name>")
 }
 
@@ -43,7 +42,7 @@ void HandleJson(const std::filesystem::path& path)
 		const auto formId = HexStringToInt(formIdStr);
 		if (formId == -1)
 		{
-			DebugPrint("Form field was incorrectly formatted, got " + formIdStr);
+			Log("Form field was incorrectly formatted, got " + formIdStr);
 		}
 		return formId;
 	};
@@ -59,7 +58,7 @@ void HandleJson(const std::filesystem::path& path)
 			{
 				if (!elem.is_object())
 				{
-					DebugPrint("JSON error: expected object with mod, form and folder fields");
+					Log("JSON error: expected object with mod, form and folder fields");
 					continue;
 				}
 
@@ -81,7 +80,7 @@ void HandleJson(const std::filesystem::path& path)
 					const auto* mod = !modName.empty() ? DataHandler::GetSingleton()->LookupModByName(modName.c_str()) : nullptr;
 					if (!mod && !modName.empty())
 					{
-						DebugPrint("Mod name " + modName + " was not found");
+						Log("Mod name " + modName + " was not found");
 						continue;
 					}
 
@@ -105,9 +104,9 @@ void HandleJson(const std::filesystem::path& path)
 						{
 							formId = (mod->modIndex << 24) + (formId & 0x00FFFFFF);
 							auto* form = LookupFormByID(formId);
-							if (!form) { DebugPrint(FormatString("Form %X was not found", formId)); continue; }
+							if (!form) { Log(FormatString("Form %X was not found", formId)); continue; }
 							if (!formlist) {
-								DebugLog(FormatString("Tag: '%10s', form: %08X (%50s), individual", tag.c_str(), formId, form->GetName()));
+								Log(FormatString("Tag: '%10s', form: %08X (%50s), individual", tag.c_str(), formId, form->GetName()));
 								SI_Files::g_Items_JSON.emplace_back(tag, priority, form, questItem);
 							} else if (formlist == 1) {
 								JSONEntryItemRecursiveEmplace(tag, priority, form, questItem);
@@ -119,7 +118,7 @@ void HandleJson(const std::filesystem::path& path)
 									if (!weapon) continue;
 									if (!weapon->repairItemList.listForm) continue;
 									if (IsInListRecursive(weapon->repairItemList.listForm, form)) {
-										DebugLog(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", tag.c_str(), formId, item->GetName(), weapon->repairItemList.listForm->refID));
+										Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", tag.c_str(), formId, item->GetName(), weapon->repairItemList.listForm->refID));
 										SI_Files::g_Items_JSON.emplace_back(tag, priority, item, questItem);
 									}
 								}
@@ -127,7 +126,7 @@ void HandleJson(const std::filesystem::path& path)
 						}
 					}
 					else {
-						DebugLog(FormatString("Tag: '%10s', mod: '%s'", tag.c_str(), modName.c_str()));
+						Log(FormatString("Tag: '%10s', mod: '%s'", tag.c_str(), modName.c_str()));
 						SI_Files::g_Items_JSON.emplace_back(tag, priority, nullptr, questItem);
 					}
 				}
@@ -171,11 +170,11 @@ void HandleJson(const std::filesystem::path& path)
 						for (auto weaponType : weaponTypes)
 						{
 							weapon.weaponType = weaponType;
-							DebugLog(FormatString("Tag: '%10s', weapon condition, type: %d", tag.c_str(), weaponType));
+							Log(FormatString("Tag: '%10s', weapon condition, type: %d", tag.c_str(), weaponType));
 							SI_Files::g_Items_JSON.emplace_back(tag, priority, formType, questItem, weapon);
 						}
 					} else {
-						DebugLog(FormatString("Tag: '%10s', weapon condition", tag.c_str()));
+						Log(FormatString("Tag: '%10s', weapon condition", tag.c_str()));
 						SI_Files::g_Items_JSON.emplace_back(tag, priority, formType, questItem, weapon);
 					}
 				}
@@ -240,7 +239,7 @@ void HandleJson(const std::filesystem::path& path)
 				else SI_Files::g_Items_JSON.emplace_back(tag, priority, formType, questItem);
 			}
 		}
-		else { DebugPrint(path.string() + " JSON tag array not detected"); }
+		else { Log(path.string() + " JSON tag array not detected"); }
 
 		if (j.contains("icons") && j["icons"].is_array())
 		{
@@ -248,7 +247,7 @@ void HandleJson(const std::filesystem::path& path)
 			{
 			if (!elem.is_object())
 				{
-					DebugPrint("JSON error: expected object with mod, form and folder fields");
+					Log("JSON error: expected object with mod, form and folder fields");
 					continue;
 				}
 
@@ -276,16 +275,16 @@ void HandleJson(const std::filesystem::path& path)
 				UInt32 count = 0;
 				if (elem.contains("count")) count = elem["count"].get<UInt32>();
 				
-				DebugLog(FormatString("Tag: '%10s', icon: '%s'",  tag.c_str(), filename.c_str()));
+				Log(FormatString("Tag: '%10s', icon: '%s'",  tag.c_str(), filename.c_str()));
 				SI_Files::g_Tags_JSON.emplace_back(tag, priority, xmltemplate, filename, texatlas, systemcolor, category, name, icon, tab, count);
 			}
 		}
-		else { DebugPrint(path.string() + " JSON icon array not detected"); }
+		else { Log(path.string() + " JSON icon array not detected"); }
 	}
 	catch (nlohmann::json::exception& e)
 	{
-		DebugPrint("The JSON is incorrectly formatted! It will not be applied.");
-		DebugPrint(FormatString("JSON error: %s\n", e.what()));
+		Log("The JSON is incorrectly formatted! It will not be applied.");
+		Log(FormatString("JSON error: %s\n", e.what()));
 	}
 
 }
@@ -300,7 +299,7 @@ void JSONEntryItemRecursiveEmplace(const std::string& tag, SInt16 priority, TESF
 			if (iter.Get()) { JSONEntryItemRecursiveEmplace(tag, priority, iter.Get(), questItem); }
 	}
 	else {
-		DebugLog(FormatString("Tag: '%10s', form: %08X (%50s), recursive", tag.c_str(), list->refID, list->GetName()));
+		Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive", tag.c_str(), list->refID, list->GetName()));
 		SI_Files::g_Items_JSON.emplace_back(tag, priority, list, questItem);
 	}
 }
@@ -367,7 +366,7 @@ void LoadSIMapsFromFiles()
 				if (mod) {}
 //					LoadModAnimPaths(path, mod);
 				else if (_stricmp(fileName.extension().string().c_str(), ".esp") == 0 || _stricmp(fileName.extension().string().c_str(), ".esm") == 0)
-					DebugPrint(FormatString("Mod with name %s is not loaded!", fileName.string().c_str()));
+					Log(FormatString("Mod with name %s is not loaded!", fileName.string().c_str()));
 				else if (_stricmp(fileName.string().c_str(), "_male") != 0 && _stricmp(fileName.string().c_str(), "_1stperson") != 0)
 				{
 					Log("Found anim folder " + fileName.string() + " which can be used in JSON");
@@ -392,5 +391,5 @@ void LoadSIMapsFromFiles()
 	FillSIMapsFromJSON();
 	const auto now = std::chrono::system_clock::now();
 	const auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - then);
-	DebugPrint(FormatString("Loaded tags and icons in %d ms", diff.count()));
+	Log(FormatString("Loaded tags and icons in %d ms", diff.count()));
 }

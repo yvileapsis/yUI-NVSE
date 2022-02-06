@@ -5,8 +5,7 @@
 #include <set>
 #include <unordered_set>
 #include <PluginAPI.h>
-#include <internal/DecodedUI.h>
-
+#include <Utilities.h>
 #include "file.h"
 
 #include <ySI.h>
@@ -17,7 +16,7 @@ extern std::deque<std::function<void()>> g_executionQueue;
 
 #define IS_TRANSITION_FIX 0
 
-IDebugLog					gLog("yUI.log");
+DebugLog					gLog;
 
 NVSEInterface*				g_nvseInterface = nullptr;
 NVSEStringVarInterface*		g_stringInterface = nullptr;
@@ -41,14 +40,8 @@ inline int iDoOnce = 0;
 
 inline TileMenu* g_HUDMainMenu, * g_StartMenu, * g_BarterMenu, * g_ContainerMenu, * g_RepairMenu, * g_RepairServicesMenu, * g_MapMenu, * g_StatsMenu, * g_InventoryMenu;
 
-tList<char> queuedConsoleMessages;
-
 inline NiTPointerMap<TESForm>** g_allFormsMap;
 inline std::unordered_set<TESForm*> g_CraftingComponents;
-
-bool* g_menuVisibility;
-
-inline TileMenu** g_tileMenuArray;
 
 namespace SI_Files
 {

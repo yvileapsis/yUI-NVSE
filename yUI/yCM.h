@@ -1,30 +1,13 @@
 #pragma once
-#include <internal/DecodedUI.h>
 #include <GameTypes.h>
+#include <GameUI.h>
+#include "CommandTable.h"
+
 #include <unordered_set>
 #include <utility>
-#include "CommandTable.h"
 
 bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS);
 bool Cmd_SetyCMFloat_Execute(COMMAND_ARGS);
-
-union Color
-{
-	UInt32 rgba;
-	struct
-	{
-		UInt8 a, b, g, r;
-	};
-};
-
-union RGB
-{
-	UInt32 rgb;
-	struct
-	{
-		UInt8 b, g, r;
-	};
-};
 
 union yCM_Option_Value
 {
