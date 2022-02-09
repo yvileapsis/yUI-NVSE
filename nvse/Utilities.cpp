@@ -5,14 +5,18 @@
 #include <unordered_set>
 #include <vector>
 
-#include "GameData.h"
-#include "PluginAPI.h"
-#include "PluginManager.h"
+#include <GameData.h>
+#include <PluginAPI.h>
+#include <PluginManager.h>
 
-#include "GameAPI.h"
-#include "GameForms.h"
-#include "GameScript.h"
-#include "settings.h"
+#include <GameAPI.h>
+#include <GameForms.h>
+#include <GameScript.h>
+#include <settings.h>
+
+//#include <codecvt>
+//#include <locale>
+#include <stringapiset.h>
 
 std::vector<std::string> queuedConsoleMessages;
 
@@ -76,19 +80,19 @@ bool __fastcall FileExists(const char* path)
 
 bool FileStream::Open(const char* filePath)
 {
-	theFile = CreateFile(filePath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	theFile = CreateFile(filePath, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 	if (theFile == INVALID_HANDLE_VALUE)
 		return false;
-	streamLength = GetFileSize(theFile, NULL);
+	streamLength = GetFileSize(theFile, nullptr);
 	return true;
 }
 
 bool FileStream::OpenAt(const char* filePath, UInt32 inOffset)
 {
-	theFile = CreateFile(filePath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	theFile = CreateFile(filePath, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
 	if (theFile == INVALID_HANDLE_VALUE)
 		return false;
-	streamLength = GetFileSize(theFile, NULL);
+	streamLength = GetFileSize(theFile, nullptr);
 	streamOffset = inOffset;
 	if (streamOffset >= streamLength)
 	{
@@ -96,23 +100,23 @@ bool FileStream::OpenAt(const char* filePath, UInt32 inOffset)
 		return false;
 	}
 	if (streamOffset)
-		SetFilePointer(theFile, streamOffset, NULL, FILE_BEGIN);
+		SetFilePointer(theFile, streamOffset, nullptr, FILE_BEGIN);
 	return true;
 }
 
 bool FileStream::OpenWrite(const char* filePath)
 {
-	theFile = CreateFile(filePath, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	theFile = CreateFile(filePath, GENERIC_WRITE, 0, nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 	if (theFile == INVALID_HANDLE_VALUE)
 		return false;
-	streamOffset = streamLength = GetFileSize(theFile, NULL);
-	SetFilePointer(theFile, streamLength, NULL, FILE_BEGIN);
+	streamOffset = streamLength = GetFileSize(theFile, nullptr);
+	SetFilePointer(theFile, streamLength, nullptr, FILE_BEGIN);
 	return true;
 }
 
 bool FileStream::Create(const char* filePath)
 {
-	theFile = CreateFile(filePath, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	theFile = CreateFile(filePath, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
 	return theFile != INVALID_HANDLE_VALUE;
 }
 
@@ -139,13 +143,13 @@ void FileStream::SetOffset(UInt32 inOffset)
 	if (inOffset > streamLength)
 		streamOffset = streamLength;
 	else streamOffset = inOffset;
-	SetFilePointer(theFile, streamOffset, NULL, FILE_BEGIN);
+	SetFilePointer(theFile, streamOffset, nullptr, FILE_BEGIN);
 }
 
 void FileStream::ReadBuf(void* outData, UInt32 inLength)
 {
 	UInt32 bytesRead;
-	ReadFile(theFile, outData, inLength, &bytesRead, NULL);
+	if (!ReadFile(theFile, outData, inLength, &bytesRead, nullptr)) Log("Filestream Failure!");
 	streamOffset += bytesRead;
 }
 
@@ -154,7 +158,7 @@ void FileStream::WriteBuf(const void* inData, UInt32 inLength)
 	if (streamOffset > streamLength)
 		SetEndOfFile(theFile);
 	UInt32 bytesWritten;
-	WriteFile(theFile, inData, inLength, &bytesWritten, NULL);
+	WriteFile(theFile, inData, inLength, &bytesWritten, nullptr);
 	streamOffset += bytesWritten;
 	if (streamLength < streamOffset)
 		streamLength = streamOffset;
@@ -168,7 +172,7 @@ void FileStream::MakeAllDirs(char* fullPath)
 		if ((curr == '\\') || (curr == '/'))
 		{
 			*traverse = 0;
-			CreateDirectory(fullPath, NULL);
+			CreateDirectory(fullPath, nullptr);
 			*traverse = '\\';
 		}
 		traverse++;
@@ -177,7 +181,7 @@ void FileStream::MakeAllDirs(char* fullPath)
 bool DebugLog::Create(const char* filePath)
 {
 	theFile = _fsopen(filePath, "wb", 0x20);
-	return theFile != NULL;
+	return theFile != nullptr;
 }
 
 const char kIndentLevelStr[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
@@ -244,12 +248,12 @@ void DumpClass(void* theClassPtr, UInt32 nIntsToDump)
 	if (!theClassPtr) return;
 	for (UInt32 ix = 0; ix < nIntsToDump; ix++) {
 		UInt32* curPtr = basePtr + ix;
-		const char* curPtrName = NULL;
+		const char* curPtrName = nullptr;
 		UInt32 otherPtr = 0;
 		float otherFloat = 0.0;
-		const char* otherPtrName = NULL;
+		const char* otherPtrName = nullptr;
 		if (curPtr) {
-			curPtrName = GetObjectClassName((void*)curPtr);
+			curPtrName = GetObjectClassName(curPtr);
 
 			__try
 			{
@@ -387,7 +391,7 @@ std::string GetNVSEConfigOption(const char * section, const char * key)
 		char	resultBuf[256];
 		resultBuf[0] = 0;
 
-		UInt32	resultLen = GetPrivateProfileString(section, key, NULL, resultBuf, 255, configPath.c_str());
+		UInt32	resultLen = GetPrivateProfileString(section, key, nullptr, resultBuf, 255, configPath.c_str());
 
 		result = resultBuf;
 	}
@@ -828,7 +832,7 @@ void ErrOutput::vShow(const char* msg, va_list args)
 void ShowErrorMessageBox(const char* message)
 {
 	int msgboxID = MessageBox(
-		NULL,
+		nullptr,
 		message,
 		"Error",
 		MB_ICONWARNING | MB_OK
@@ -851,6 +855,8 @@ const char* GetModName(Script* script)
 
 void ShowRuntimeError(Script* script, const char* fmt, ...)
 {
+	if (!script) return;
+	
 	va_list args;
 	va_start(args, fmt);
 
@@ -899,7 +905,7 @@ std::string FormatString(const char* fmt, ...)
 std::vector<void*> GetCallStack(int i)
 {
 	std::vector<void*> vecTrace(i, nullptr);
-	CaptureStackBackTrace(0, i, reinterpret_cast<PVOID*>(vecTrace.data()), nullptr);
+	CaptureStackBackTrace(0, i, vecTrace.data(), nullptr);
 	return vecTrace;
 }
 
@@ -1193,11 +1199,11 @@ void __fastcall StrToLower(char* str)
 char* __fastcall SubStrCI(const char* srcStr, const char* subStr)
 {
 	int srcLen = StrLen(srcStr);
-	if (!srcLen) return NULL;
+	if (!srcLen) return nullptr;
 	int subLen = StrLen(subStr);
-	if (!subLen) return NULL;
+	if (!subLen) return nullptr;
 	srcLen -= subLen;
-	if (srcLen < 0) return NULL;
+	if (srcLen < 0) return nullptr;
 	int index;
 	do
 	{
@@ -1211,12 +1217,12 @@ char* __fastcall SubStrCI(const char* srcStr, const char* subStr)
 		}
 		srcStr++;
 	} while (--srcLen >= 0);
-	return NULL;
+	return nullptr;
 }
 
 char* __fastcall SlashPos(const char* str)
 {
-	if (!str) return NULL;
+	if (!str) return nullptr;
 	char curr;
 	while (curr = *str)
 	{
@@ -1224,7 +1230,7 @@ char* __fastcall SlashPos(const char* str)
 			return const_cast<char*>(str);
 		str++;
 	}
-	return NULL;
+	return nullptr;
 }
 
 __declspec(naked) char* __fastcall CopyString(const char* key)
@@ -1352,7 +1358,7 @@ __declspec(naked) UInt32 __fastcall StrHashCI(const char* inKey)
 std::string GetCurPath()
 {
 	char buffer[MAX_PATH] = { 0 };
-	GetModuleFileName(NULL, buffer, MAX_PATH);
+	GetModuleFileName(nullptr, buffer, MAX_PATH);
 	std::string::size_type pos = std::string(buffer).find_last_of("\\/");
 	return std::string(buffer).substr(0, pos);
 }
@@ -1404,13 +1410,13 @@ char* stristr(const char* str1, const char* str2)
 {
 	const char* p1 = str1;
 	const char* p2 = str2;
-	const char* r = *p2 == 0 ? str1 : 0;
+	const char* r = *p2 == 0 ? str1 : nullptr;
 
 	while (*p1 != 0 && *p2 != 0)
 	{
 		if (tolower((unsigned char)*p1) == tolower((unsigned char)*p2))
 		{
-			if (r == 0)
+			if (r == nullptr)
 			{
 				r = p1;
 			}
@@ -1420,7 +1426,7 @@ char* stristr(const char* str1, const char* str2)
 		else
 		{
 			p2 = str2;
-			if (r != 0)
+			if (r != nullptr)
 			{
 				p1 = r + 1;
 			}
@@ -1432,14 +1438,14 @@ char* stristr(const char* str1, const char* str2)
 			}
 			else
 			{
-				r = 0;
+				r = nullptr;
 			}
 		}
 
 		p1++;
 	}
 
-	return *p2 == 0 ? (char*)r : 0;
+	return *p2 == 0 ? (char*)r : nullptr;
 }
 
 #include <cstdlib>
@@ -1447,7 +1453,7 @@ char* stristr(const char* str1, const char* str2)
 __declspec(noreturn) static void IErrors_Halt(void)
 {
 	// crash
-	*((int*)0) = 0xDEADBEEF;
+	*((int*)nullptr) = 0xDEADBEEF;
 }
 
 /**
@@ -1498,4 +1504,26 @@ void _AssertionFailed_ErrCode(const char* file, unsigned long line, const char* 
 	PrintLog("Assertion failed in %s (%d): %s (code = %s)", file, line, desc, code);
 
 	IErrors_Halt();
+}
+
+std::string UTF8toANSI(const std::string& str)
+{	
+	const char* pszCode = str.c_str();
+
+	auto nLength = MultiByteToWideChar(CP_UTF8, 0, pszCode, strlen(pszCode) + 1, nullptr, NULL);
+	const auto bstrWide = SysAllocStringLen(nullptr, nLength);
+
+	if (bstrWide == nullptr) return "ERROR!! SOMETHING WENT WRONG.";
+	
+	MultiByteToWideChar(CP_UTF8, 0, pszCode, strlen(pszCode) + 1, bstrWide, nLength);
+
+	nLength = WideCharToMultiByte(CP_ACP, 0, bstrWide, -1, nullptr, 0, nullptr, nullptr);
+	const auto pszAnsi = new char[nLength];
+
+	WideCharToMultiByte(CP_ACP, 0, bstrWide, -1, pszAnsi, nLength, nullptr, nullptr);
+	SysFreeString(bstrWide);
+
+	std::string rstr(pszAnsi);
+	delete[] pszAnsi;
+	return rstr;
 }

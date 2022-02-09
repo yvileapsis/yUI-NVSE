@@ -267,7 +267,7 @@ void HandleJson(const std::filesystem::path& path)
 				std::string category;
 				if (elem.contains("category")) category = elem["category"].get<std::string>();
 				std::string name;
-				if (elem.contains("name")) name = elem["name"].get<std::string>();
+				if (elem.contains("name")) name = UTF8toANSI(elem["name"].get<std::string>());
 				std::string icon;
 				if (elem.contains("icon")) icon = elem["icon"].get<std::string>();
 				UInt32 tab = 0;
