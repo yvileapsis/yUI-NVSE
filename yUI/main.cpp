@@ -5,6 +5,7 @@
 #include <commands.h>
 #include <settings.h>
 #include <ySI.h>
+#include <yCM.h>
 
 #define yUI_VERSION 1.4
 #define yUI_VERSION_STR "1.4"
@@ -52,10 +53,6 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 		}
 		
 	}
-	else if (msg->type == NVSEMessagingInterface::kMessage_PostLoadGame)
-	{
-	}
-
 }
 
 void writePatches()
@@ -76,7 +73,7 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 {
 	gLog.Create("yUI.log");
 
-	PrintLog("yUI query");
+	PrintLog("yUI: Query");
 
 	// fill out the info structure
 	info->infoVersion = PluginInfo::kInfoVersion;
@@ -84,7 +81,13 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 	info->version = yUI_VERSION;
 
 	// version checks
-	if (!nvse->isEditor) {
+	if (nvse->isEditor) {
+		if (nvse->editorVersion < CS_VERSION_1_4_0_518)
+		{
+			PrintLog("yUI: incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518);
+			return false;
+		}
+	} else {
 		if (nvse->nvseVersion < PACKED_NVSE_VERSION) {
 			PrintLog("yUI: NVSE version too old (got %X expected at least %X). Plugin will NOT load! Install the latest version here: https://github.com/xNVSE/NVSE/releases/", nvse->nvseVersion, PACKED_NVSE_VERSION);
 			return false;
@@ -97,12 +100,6 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 
 		if (nvse->isNogore) {
 			PrintLog("yUI: NoGore is not supported");
-			return false;
-		}
-	} else {
-		if (nvse->editorVersion < CS_VERSION_1_4_0_518)
-		{
-			PrintLog("yUI: incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518);
 			return false;
 		}
 	}
@@ -119,8 +116,6 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	nvse->SetOpcodeBase(0x21D0);
 	REG_CMD_STR(ySIGetTrait);
 	RegisterScriptCommand(ySISetTrait);
-//	RegisterScriptCommand(SetWorldspaceDefaultWaterHeight);
-//	RegisterScriptCommand(SwapTexatlas);
 	
 	if (nvse->isEditor)	return true;
 
@@ -141,27 +136,12 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	RegisterTraitID("runsnig", 2032);
 	WriteRelJump(0xA095D1, reinterpret_cast<UInt32>(funpatch));
 */
-/*
-	RegisterCommand GetModINISetting (21C0)
-	RegisterCommand SetModINISetting (21C1)
-	RegisterCommand GetMCMFloat (21C2)
-	RegisterCommand SetMCMFloat (21C3)
-	RegisterCommand SetMCMString (21C4)
-	RegisterCommand SetMCMFloatMass (21C5)
-	RegisterCommand SetMCMStringMass (21C6)
-	RegisterCommand SetMCMModList (21C7)
-	RegisterCommand GetMCMListWidth (21C8)
- */
+	writeMCMHooks();
 
-//	auto cmdInfo = g_commandInterface->GetByOpcode(0x21C2);
-//	cmdInfo->execute = Cmd_GetyCMFloat_Execute;
-
-//	cmdInfo = g_commandInterface->GetByOpcode(0x21C3);
-//	cmdInfo->execute = Cmd_SetyCMFloat_Execute;
-	
 //	CaptureLambdaVars = static_cast<_CaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaSaveVariableList));
 //	UncaptureLambdaVars = static_cast<_UncaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaUnsaveVariableList));
 	handleINIOptions();
 	writePatches();
+
 	return true;
 }
