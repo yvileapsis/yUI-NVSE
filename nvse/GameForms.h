@@ -897,7 +897,6 @@ public:
 	//	UInt32 CopyItemFrom(EffectItemList& fromList, UInt32 whichItem);
 	//	bool RemoveItem(UInt32 whichItem);
 };
-
 STATIC_ASSERT(sizeof(EffectItemList) == 0x10);
 
 // 1C

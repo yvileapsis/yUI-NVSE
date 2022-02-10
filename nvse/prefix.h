@@ -22,9 +22,9 @@
 
 // these have to be macros so they can be used in the .rc
 #define NVSE_VERSION_INTEGER		6
-#define NVSE_VERSION_INTEGER_MINOR	1
-#define NVSE_VERSION_INTEGER_BETA	7
-#define NVSE_VERSION_VERSTRING		"0, 6, 0, 7"
+#define NVSE_VERSION_INTEGER_MINOR	2
+#define NVSE_VERSION_INTEGER_BETA	5
+#define NVSE_VERSION_VERSTRING		"0, 6, 2, 5"
 #define NVSE_VERSION_PADDEDSTRING	"0006"
 
 // build numbers do not appear to follow the same format as with oblivion
@@ -84,14 +84,7 @@ template <bool x> struct StaticAssertFailure;
 template <> struct StaticAssertFailure <true> { enum { a = 1 }; };
 template <int x> struct static_assert_test { };
 
-#define __MACRO_JOIN__(a, b)		__MACRO_JOIN_2__(a, b)
-#define __MACRO_JOIN_2__(a, b)		__MACRO_JOIN_3__(a, b)
-#define __MACRO_JOIN_3__(a, b)		a##b
-#define __PREPRO_TOKEN_STR2__(a)	#a
-#define __PREPRO_TOKEN_STR__(a)		__PREPRO_TOKEN_STR2__(a)
-#define __LOC__						__FILE__ "("__PREPRO_TOKEN_STR__(__LINE__)") : "
-
-#define STATIC_ASSERT(a)	typedef static_assert_test <sizeof(StaticAssertFailure<(bool)(a)>)> __MACRO_JOIN__(static_assert_typedef_, __COUNTER__)
+#define STATIC_ASSERT(a) static_assert(a)
 
 #define VERSION_CODE(primary, secondary, sub)	(((primary & 0xFFF) << 20) | ((secondary & 0xFFF) << 8) | ((sub & 0xFF) << 0))
 #define VERSION_CODE_PRIMARY(in)				((in >> 20) & 0xFFF)

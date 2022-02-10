@@ -421,6 +421,7 @@ bool TESForm::IsInventoryObjectAlt()
 		if (const auto light = DYNAMIC_CAST(this, TESForm, TESObjectLIGH))
 			if (light->lightFlags & 2)
 				return true;
+	[[fallthrough]];
 	default: return false;
 	}
 }
