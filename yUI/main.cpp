@@ -10,9 +10,6 @@
 #define yUI_VERSION 1.4
 #define yUI_VERSION_STR "1.4"
 
-#define RegisterScriptCommand(name) nvse->RegisterCommand(&kCommandInfo_ ##name)
-#define REG_CMD_STR(name)			nvse->RegisterTypedCommand(&kCommandInfo_##name, kRetnType_String)
-
 PluginHandle	g_pluginHandle = kPluginHandle_Invalid;
 
 _CaptureLambdaVars CaptureLambdaVars;
@@ -24,9 +21,9 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	{
 		g_player = PlayerCharacter::GetSingleton();
 		g_dataHandler = DataHandler::GetSingleton();
-		
+
 		g_allFormsMap = reinterpret_cast<NiTPointerMap<TESForm>**>(0x11C54C0);
-		
+
 		FillCraftingComponents();
 		PrintAndClearQueuedConsoleMessages();
 
@@ -41,13 +38,6 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 		
 		if (iDoOnce == 0 && !CdeclCall<bool>(0x702360)) {
 			iDoOnce++;
-
-			g_HUDMainMenu = TileMenu::GetTileMenu(kMenuType_HUDMain);
-			g_StartMenu = TileMenu::GetTileMenu(kMenuType_Start);
-			g_RepairMenu = TileMenu::GetTileMenu(kMenuType_Repair);
-			g_MapMenu = TileMenu::GetTileMenu(kMenuType_Map);
-			g_StatsMenu = TileMenu::GetTileMenu(kMenuType_Stats);
-			g_InventoryMenu = TileMenu::GetTileMenu(kMenuType_Inventory);
 
 			if (g_ySI_Icons) SI::InjectTemplates();
 		}
@@ -116,7 +106,7 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	nvse->SetOpcodeBase(0x21D0);
 	REG_CMD_STR(ySIGetTrait);
 	RegisterScriptCommand(ySISetTrait);
-	
+
 	if (nvse->isEditor)	return true;
 
 	g_stringInterface = static_cast<NVSEStringVarInterface*>(nvse->QueryInterface(kInterface_StringVar));

@@ -1,10 +1,8 @@
 #pragma once
-#include <deque>
-#include <Utilities.h>
+#include <SafeWrite.h>
 #include <PluginAPI.h>
+#include <GameUI.h>
 #include <GameData.h>
-
-extern std::deque<std::function<void()>> g_executionQueue;
 
 inline DebugLog						gLog;
 
@@ -20,10 +18,6 @@ inline DIHookControl*				g_DIHook = nullptr;
 inline PlayerCharacter*				g_player = nullptr;
 inline ActorValueOwner*				g_playerAVOwner = nullptr;
 inline BaseProcess*					g_playerProcess = nullptr;
-inline DataHandler*					g_dataHandler = nullptr;
+DataHandler*						g_dataHandler = nullptr;
 
-const char*			(*GetStringVar)(UInt32);
-void				(*SetStringVar)(UInt32, const char*);
-inline bool			(*AssignString)(ParamInfo*, void*, TESObjectREFR*, TESObjectREFR*, Script*, ScriptEventList*, double*, UInt32*, const char*);
-
-inline int iDoOnce = 0;
+inline int iDoOnce;

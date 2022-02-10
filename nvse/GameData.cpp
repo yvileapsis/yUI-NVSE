@@ -1,20 +1,10 @@
 #include "GameData.h"
 
-#if RUNTIME
 DataHandler* DataHandler::GetSingleton()
 {
-	DataHandler** g_dataHandler = (DataHandler**)0x011C3F2C;
+	const auto g_dataHandler = reinterpret_cast<DataHandler**>(0x011C3F2C);
 	return *g_dataHandler;
 }
-#else
-
-DataHandler* DataHandler::Get()
-{
-	DataHandler** g_dataHandler = (DataHandler**)0xED3B0C;
-	return *g_dataHandler;
-}
-
-#endif
 
 class LoadedModFinder
 {

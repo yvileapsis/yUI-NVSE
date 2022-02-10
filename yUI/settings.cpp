@@ -1,6 +1,6 @@
-#include <SimpleINILibrary.h>
 #include <settings.h>
-#include <functions.h>
+#include <SimpleINILibrary.h>
+#include <Utilities.h>
 
 void HandleINIForPath(const std::string& iniPath, const bool isDefault = false)
 {

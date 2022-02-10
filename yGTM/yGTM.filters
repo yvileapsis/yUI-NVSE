@@ -1,24 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="dllmain.c" />
-    <ClCompile Include="file.cpp" />
-    <ClCompile Include="LambdaVariableContext.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="functions.cpp" />
-    <ClCompile Include="patches.cpp" />
-    <ClCompile Include="settings.cpp" />
-    <ClCompile Include="yCM.cpp" />
-    <ClCompile Include="ySI.cpp" />
-    <ClCompile Include="..\nvse\printf.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
-    <ClCompile Include="..\nvse\SafeWrite.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
-    <ClCompile Include="..\nvse\Utilities.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
+    <Filter Include="nvse">
+      <UniqueIdentifier>{92a4f350-f2ec-4fca-bdd3-927732d91b34}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
     <ClCompile Include="..\nvse\GameAPI.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
@@ -64,17 +51,26 @@
     <ClCompile Include="..\nvse\GameUI.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="commands.cpp" />
+    <ClCompile Include="..\nvse\SafeWrite.cpp">
+      <Filter>nvse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\nvse\Utilities.cpp">
+      <Filter>nvse</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.c" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="settings.cpp" />
+    <ClCompile Include="..\nvse\containers.cpp">
+      <Filter>nvse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\nvse\utility.cpp">
+      <Filter>nvse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\nvse\printf.cpp">
+      <Filter>nvse</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="file.h" />
-    <ClInclude Include="functions.h" />
-    <ClInclude Include="yCM.h" />
-    <ClInclude Include="patches.h" />
-    <ClInclude Include="settings.h" />
-    <ClInclude Include="LambdaVariableContext.h" />
-    <ClInclude Include="main.h" />
-    <ClInclude Include="ySI.h" />
     <ClInclude Include="..\nvse\GameAPI.h">
       <Filter>nvse</Filter>
     </ClInclude>
@@ -99,21 +95,15 @@
     <ClInclude Include="..\nvse\GameOSDepend.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\nvse\GameProcess.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
     <ClInclude Include="..\nvse\GameRTTI.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\GameScript.h">
       <Filter>nvse</Filter>
     </ClInclude>
     <ClInclude Include="..\nvse\GameSettings.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\nvse\GameSound.h">
+    <ClCompile Include="..\nvse\GameSound.cpp">
       <Filter>nvse</Filter>
-    </ClInclude>
+    </ClCompile>
     <ClInclude Include="..\nvse\GameTasks.h">
       <Filter>nvse</Filter>
     </ClInclude>
@@ -123,17 +113,35 @@
     <ClInclude Include="..\nvse\GameTypes.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\nvse\GameUI.h">
+    <ClCompile Include="..\nvse\GameUI.cpp">
+      <Filter>nvse</Filter>
+    </ClCompile>
+    <ClInclude Include="..\nvse\SafeWrite.h">
       <Filter>nvse</Filter>
     </ClInclude>
     <ClInclude Include="..\nvse\Utilities.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\libraries\SimpleINILibrary.h">
-      <Filter>libraries</Filter>
+    <ClInclude Include="..\nvse\containers.h">
+      <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\libraries\json.h">
-      <Filter>libraries</Filter>
+    <ClInclude Include="..\nvse\utility.h">
+      <Filter>nvse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nvse\CommandTable.h">
+      <Filter>nvse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nvse\GameScript.h">
+      <Filter>nvse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nvse\GameProcess.h">
+      <Filter>nvse</Filter>
+    </ClInclude>
+    <ClInclude Include="utility.h" />
+    <ClInclude Include="..\libraries\json.h" />
+    <ClInclude Include="..\libraries\SimpleINILibrary.h" />
+    <ClInclude Include="..\nvse\NiNodes.h">
+      <Filter>nvse</Filter>
     </ClInclude>
     <ClInclude Include="..\nvse\NiTypes.h">
       <Filter>nvse</Filter>
@@ -141,38 +149,16 @@
     <ClInclude Include="..\nvse\NiObjects.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\nvse\NiNodes.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\SafeWrite.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="commands.h" />
-    <ClInclude Include="..\nvse\CommandTable.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\prefix.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\PluginManager.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\PluginAPI.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
+    <ClInclude Include="main.h" />
+    <ClInclude Include="settings.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
-    <None Include="..\nvse\GameRTTI.inc">
-      <Filter>nvse</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="nvse">
-      <UniqueIdentifier>{f1afc55a-6e0f-43b8-86b1-67dbd88c1490}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="libraries">
-      <UniqueIdentifier>{42cf9c9c-4ade-4f54-8cfd-9a8c9c5a321f}</UniqueIdentifier>
-    </Filter>
+    <Natvis Include="GameTypes.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="yGTM.rc" />
   </ItemGroup>
 </Project>

@@ -854,6 +854,11 @@ struct TimeGlobal : Timer
 	float unk20;  // 020
 	float unk24;  // 024
 	float unk28;  // 028
+
+	static TimeGlobal*	GetSingleton();
+	void				Set(float, char);
+	static float		Get();
+	static float		GetTarget();
 };
 
 class ConsoleManager

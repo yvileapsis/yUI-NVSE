@@ -491,7 +491,16 @@ UInt8* GetScriptDataPosition(Script* script, void* scriptDataIn, const UInt32* o
 	return static_cast<UInt8*>(scriptDataIn) + *opcodeOffsetPtrIn;
 }
 
-TimeGlobal* g_timeGlobal = reinterpret_cast<TimeGlobal*>(0x11F6394);
+TimeGlobal* TimeGlobal::GetSingleton() { return reinterpret_cast<TimeGlobal*>(0x11F6394); }
+
+void TimeGlobal::Set(const float value, const char isImmediateChange)
+{
+	ThisCall<void>(0xAA4DB0, this, value, isImmediateChange);
+}
+
+float TimeGlobal::Get() { return *reinterpret_cast<float*>(0x11AC3A0); }
+float TimeGlobal::GetTarget() { return *reinterpret_cast<float*>(0x11AC3A4); }
+
 /*
 void ConsoleManager::AppendToSentHistory(const char* str)
 {
