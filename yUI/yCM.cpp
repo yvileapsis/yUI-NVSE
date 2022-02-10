@@ -1,9 +1,14 @@
 #include <yCM.h>
 
+#include "PluginAPI.h"
+
+yCM g_yCM_Manager;
+
+
 bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS)
 {
 	*result = -999;
-	char src[0x100];
+	char src[0x100] = "\0";
 	SInt64 child = 0;
 	SInt64 grandchild = 0;
 	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &child, &grandchild, &src)) return true;
@@ -83,7 +88,7 @@ bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS)
 bool Cmd_SetyCMFloat_Execute(COMMAND_ARGS)
 {
 	*result = 0;
-	char src[0x100];
+	char src[0x100] = "\0";
 	SInt64 child = 0;
 	SInt64 grandchild = 0;
 	float value = 0;
@@ -160,10 +165,27 @@ bool Cmd_SetyCMFloat_Execute(COMMAND_ARGS)
 }
 
 yCM_Option_Value::yCM_Option_Value()
-{
-	floatValue = 0;
-}
+= default;
 
 yCM_Option_Value::~yCM_Option_Value()
+= default;
+
+extern NVSECommandTableInterface* g_commandInterface;
+
+void writeMCMHooks()
 {
+/*
+	RegisterCommand GetModINISetting (21C0)
+	RegisterCommand SetModINISetting (21C1)
+	RegisterCommand GetMCMFloat (21C2)
+	RegisterCommand SetMCMFloat (21C3)
+	RegisterCommand SetMCMString (21C4)
+	RegisterCommand SetMCMFloatMass (21C5)
+	RegisterCommand SetMCMStringMass (21C6)
+	RegisterCommand SetMCMModList (21C7)
+	RegisterCommand GetMCMListWidth (21C8)
+ */
+
+	g_commandInterface->GetByOpcode(0x21C2)->execute = Cmd_GetyCMFloat_Execute;
+	g_commandInterface->GetByOpcode(0x21C3)->execute = Cmd_SetyCMFloat_Execute;
 }

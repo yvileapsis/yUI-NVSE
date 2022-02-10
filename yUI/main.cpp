@@ -5,6 +5,7 @@
 #include <commands.h>
 #include <settings.h>
 #include <ySI.h>
+#include <yCM.h>
 
 #define yUI_VERSION 1.4
 #define yUI_VERSION_STR "1.4"
@@ -42,10 +43,6 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 		}
 		
 	}
-	else if (msg->type == NVSEMessagingInterface::kMessage_PostLoadGame)
-	{
-	}
-
 }
 
 void writePatches()
@@ -129,10 +126,12 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	RegisterTraitID("runsnig", 2032);
 	WriteRelJump(0xA095D1, reinterpret_cast<UInt32>(funpatch));
 */
+	writeMCMHooks();
 
 //	CaptureLambdaVars = static_cast<_CaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaSaveVariableList));
 //	UncaptureLambdaVars = static_cast<_UncaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaUnsaveVariableList));
 	handleINIOptions();
 	writePatches();
+
 	return true;
 }
