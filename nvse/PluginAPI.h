@@ -1,8 +1,7 @@
 #pragma once
-
-#include "CommandTable.h"
-#include "Utilities.h"
-#include "GameAPI.h"
+#include <CommandTable.h>
+#include <GameAPI.h>
+#include <Utilities.h>
 
 struct CommandInfo;
 struct ParamInfo;
@@ -15,6 +14,9 @@ namespace PluginAPI { class ArrayAPI; }
 struct PluginInfo;
 
 typedef UInt32	PluginHandle;	// treat this as an opaque type
+
+#define RegisterScriptCommand(name) nvse->RegisterCommand(&kCommandInfo_ ##name)
+#define REG_CMD_STR(name)			nvse->RegisterTypedCommand(&kCommandInfo_##name, kRetnType_String)
 
 enum
 {

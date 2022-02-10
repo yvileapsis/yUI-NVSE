@@ -9,9 +9,6 @@
 #define yUI_VERSION 1.4
 #define yUI_VERSION_STR "1.4"
 
-#define RegisterScriptCommand(name) nvse->RegisterCommand(&kCommandInfo_ ##name)
-#define REG_CMD_STR(name)			nvse->RegisterTypedCommand(&kCommandInfo_##name, kRetnType_String)
-
 PluginHandle	g_pluginHandle = kPluginHandle_Invalid;
 
 _CaptureLambdaVars CaptureLambdaVars;
@@ -23,9 +20,9 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	{
 		g_player = PlayerCharacter::GetSingleton();
 		g_dataHandler = DataHandler::GetSingleton();
-		
+
 		g_allFormsMap = reinterpret_cast<NiTPointerMap<TESForm>**>(0x11C54C0);
-		
+
 		FillCraftingComponents();
 		PrintAndClearQueuedConsoleMessages();
 
@@ -40,13 +37,6 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 		
 		if (iDoOnce == 0 && !CdeclCall<bool>(0x702360)) {
 			iDoOnce++;
-
-			g_HUDMainMenu = TileMenu::GetTileMenu(kMenuType_HUDMain);
-			g_StartMenu = TileMenu::GetTileMenu(kMenuType_Start);
-			g_RepairMenu = TileMenu::GetTileMenu(kMenuType_Repair);
-			g_MapMenu = TileMenu::GetTileMenu(kMenuType_Map);
-			g_StatsMenu = TileMenu::GetTileMenu(kMenuType_Stats);
-			g_InventoryMenu = TileMenu::GetTileMenu(kMenuType_Inventory);
 
 			if (g_ySI_Icons) SI::InjectTemplates();
 		}
@@ -84,7 +74,13 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 	info->version = yUI_VERSION;
 
 	// version checks
-	if (!nvse->isEditor) {
+	if (nvse->isEditor) {
+		if (nvse->editorVersion < CS_VERSION_1_4_0_518)
+		{
+			PrintLog("yUI: incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518);
+			return false;
+		}
+	} else {
 		if (nvse->nvseVersion < PACKED_NVSE_VERSION) {
 			PrintLog("yUI: NVSE version too old (got %X expected at least %X). Plugin will NOT load! Install the latest version here: https://github.com/xNVSE/NVSE/releases/", nvse->nvseVersion, PACKED_NVSE_VERSION);
 			return false;
@@ -97,12 +93,6 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 
 		if (nvse->isNogore) {
 			PrintLog("yUI: NoGore is not supported");
-			return false;
-		}
-	} else {
-		if (nvse->editorVersion < CS_VERSION_1_4_0_518)
-		{
-			PrintLog("yUI: incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518);
 			return false;
 		}
 	}
@@ -119,9 +109,7 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	nvse->SetOpcodeBase(0x21D0);
 	REG_CMD_STR(ySIGetTrait);
 	RegisterScriptCommand(ySISetTrait);
-//	RegisterScriptCommand(SetWorldspaceDefaultWaterHeight);
-//	RegisterScriptCommand(SwapTexatlas);
-	
+
 	if (nvse->isEditor)	return true;
 
 	g_stringInterface = static_cast<NVSEStringVarInterface*>(nvse->QueryInterface(kInterface_StringVar));
@@ -141,24 +129,7 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	RegisterTraitID("runsnig", 2032);
 	WriteRelJump(0xA095D1, reinterpret_cast<UInt32>(funpatch));
 */
-/*
-	RegisterCommand GetModINISetting (21C0)
-	RegisterCommand SetModINISetting (21C1)
-	RegisterCommand GetMCMFloat (21C2)
-	RegisterCommand SetMCMFloat (21C3)
-	RegisterCommand SetMCMString (21C4)
-	RegisterCommand SetMCMFloatMass (21C5)
-	RegisterCommand SetMCMStringMass (21C6)
-	RegisterCommand SetMCMModList (21C7)
-	RegisterCommand GetMCMListWidth (21C8)
- */
 
-//	auto cmdInfo = g_commandInterface->GetByOpcode(0x21C2);
-//	cmdInfo->execute = Cmd_GetyCMFloat_Execute;
-
-//	cmdInfo = g_commandInterface->GetByOpcode(0x21C3);
-//	cmdInfo->execute = Cmd_SetyCMFloat_Execute;
-	
 //	CaptureLambdaVars = static_cast<_CaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaSaveVariableList));
 //	UncaptureLambdaVars = static_cast<_UncaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaUnsaveVariableList));
 	handleINIOptions();

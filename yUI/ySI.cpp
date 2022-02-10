@@ -4,34 +4,21 @@
 #include <filesystem>
 #include <file.h>
 
-
 extern int g_ySI;
 extern int g_ySI_Sort;
 extern int g_ySI_Categories;
 
 extern UInt8* g_menuVisibility;
 
-
 namespace SI
 {
-	extern std::unordered_map <TESForm*, std::string> g_Items;
-	extern std::unordered_map <std::string, JSONEntryTag> g_Tags;
-	extern std::vector <std::filesystem::path> g_XMLPaths;
-	extern std::unordered_set <std::string> g_Categories;
-
 	std::string stringStewie;
-
 	std::string openCategory;
-
 	float compassRoseX = 0, compassRoseY = 0;
-
 }
 
 namespace SI_Files
 {
-	extern std::vector<JSONEntryItem> g_Items_JSON;
-	extern std::vector<JSONEntryTag> g_Tags_JSON;
-	
 	bool AssignTagToItem(TESForm* form)
 	{
 		for (const auto& entry : g_Items_JSON) {
@@ -99,9 +86,9 @@ namespace SI
 	{
 		for (auto& iter : g_XMLPaths)
 		{
-			g_HUDMainMenu->InjectUIXML(iter.generic_string().c_str());
-			g_RepairMenu->InjectUIXML(iter.generic_string().c_str());
-			g_InventoryMenu->InjectUIXML(iter.generic_string().c_str());
+			HUDMainMenu::GetSingleton()->tile->InjectUIXML(iter.generic_string().c_str());
+			RepairMenu::GetSingleton()->tile->InjectUIXML(iter.generic_string().c_str());
+			InventoryMenu::GetSingleton()->tile->InjectUIXML(iter.generic_string().c_str());
 		}
 	}
 
@@ -112,7 +99,7 @@ namespace SI
 				if (const auto string = stew->GetValue(kTileValue_string)->str; !stringStewie._Equal(string)) {
 					stringStewie = string;
 					InventoryMenu::GetSingleton()->itemsList.Filter(KeyringHideNonKeys);
-					InventoryMenu::GetSingleton()->itemsList.ForEach((void(__cdecl*)(Tile*, ContChangesEntry*))0x780C00);
+					InventoryMenu::GetSingleton()->itemsList.ForEach(reinterpret_cast<void(*)(Tile*, ContChangesEntry*)>(0x780C00));
 				}
 			}
 			else stringStewie.clear();
@@ -176,8 +163,8 @@ namespace SI
 
 		if (!menu->menu->GetTemplateExists(g_Tags[tag].xmltemplate.c_str()))
 		{
-			if (menu != TileMenu::GetTileMenu(kMenuType_Barter) && menu != TileMenu::GetTileMenu(kMenuType_Container) &&
-				menu != TileMenu::GetTileMenu(kMenuType_RepairServices)) return;
+			if (menu != BarterMenu::GetSingleton()->tile && menu != ContainerMenu::GetSingleton()->tile &&
+				menu != RepairServicesMenu::GetSingleton()->tile) return;
 			for (auto& iter : g_XMLPaths) menu->InjectUIXML(iter.generic_string().c_str());
 			if (!menu->menu->GetTemplateExists(g_Tags[tag].xmltemplate.c_str())) return;
 		}

@@ -1,5 +1,5 @@
-#include "Utilities.h"
-#include "SafeWrite.h"
+#include <Utilities.h>
+#include <SafeWrite.h>
 #include <string>
 #include <algorithm>
 #include <unordered_set>
@@ -214,14 +214,14 @@ void PrintLog(const char* fmt, ...)
 	va_end(args);
 }
 
-extern DataHandler* g_dataHandler;
-
 void PrintAndClearQueuedConsoleMessages()
 {
 	for (const auto iter : queuedConsoleMessages)
 		Console_Print("yUI: %s", iter.c_str());
 	queuedConsoleMessages.clear();
 }
+
+extern DataHandler* g_dataHandler;
 
 void ConsoleQueueOrPrint(const std::string& msg)
 {
@@ -1524,4 +1524,23 @@ std::string UTF8toANSI(const std::string& str)
 	std::string rstr(pszAnsi);
 	delete[] pszAnsi;
 	return rstr;
+}
+
+// jazz code
+__declspec(naked) bool IsConsoleOpen()
+{
+	__asm
+	{
+		mov		al, byte ptr ds : [0x11DEA2E]
+		test	al, al
+		jz		done
+		mov		eax, fs : [0x2C]
+		mov		edx, ds : [0x126FD98]
+		mov		eax, [eax + edx * 4]
+		test	eax, eax
+		jz		done
+		mov		al, [eax + 0x268]
+	done :
+		 retn
+	}
 }

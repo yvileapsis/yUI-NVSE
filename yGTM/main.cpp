@@ -1,19 +1,32 @@
-#pragma warning( disable : 4996 4800 4102 4100 4725 4201 4610 4510)
-#include <CommandTable.h>
 #include <main.h>
+#include <commands.h>
+#include <patches.h>
+
+#define yGTM_VERSION 3.0
+#define yGTM_VERSION_STR "3.0"
 
 PluginHandle	g_pluginHandle = kPluginHandle_Invalid;
 
-static ParamInfo kParams_OneOptionalInt[1] =
-{
-	{	"int", kParamType_Integer, 1 },
-};
+typedef void (*_HasScriptCommand)(Script* script, CommandInfo* info, CommandInfo* eventBlock);
+_HasScriptCommand HasScriptCommand;
 
-static ParamInfo kParams_OneOptionalFloat_OneOptionalInt[2] =
+void MessageHandler(NVSEMessagingInterface::Message* msg)
 {
-	{	"float", kParamType_Float, 1 },
-	{	"int", kParamType_Integer, 1 },
-};
+	if (msg->type == NVSEMessagingInterface::kMessage_DeferredInit)
+	{
+		PrintAndClearQueuedConsoleMessages();
+	}
+	else if (msg->type == NVSEMessagingInterface::kMessage_MainGameLoop)
+	{
+		if (iDoOnce == 0 && !CdeclCall<bool>(0x702360)) {
+			iDoOnce++;
+		}
+	}
+	else if (msg->type == NVSEMessagingInterface::kMessage_PostLoadGame)
+	{
+	}
+
+}
 
 bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 {
@@ -22,40 +35,57 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 
 	info->infoVersion = PluginInfo::kInfoVersion;
 	info->name = "yGTM";
-	info->version = 2;
+	info->version = yGTM_VERSION;
 
-	if (nvse->isNogore)
-	{
-		PrintLog("NoGore is not supported");
-		return false;
+	if (nvse->isEditor) {
+		if (nvse->editorVersion < CS_VERSION_1_4_0_518)
+		{
+			PrintLog("yGTM: incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518);
+			return false;
+		}
 	}
+	else {
+		if (nvse->nvseVersion < PACKED_NVSE_VERSION) {
+			PrintLog("yGTM: NVSE version too old (got %X expected at least %X). Plugin will NOT load! Install the latest version here: https://github.com/xNVSE/NVSE/releases/", nvse->nvseVersion, PACKED_NVSE_VERSION);
+			return false;
+		}
 
+		if (nvse->runtimeVersion < RUNTIME_VERSION_1_4_0_525) {
+			PrintLog("yGTM: incorrect runtime version (got %08X need at least %08X)", nvse->runtimeVersion, RUNTIME_VERSION_1_4_0_525);
+			return false;
+		}
+
+		if (nvse->isNogore) {
+			PrintLog("yGTM: NoGore is not supported");
+			return false;
+		}
+	}
 	return true;
 }
 
-typedef void (*_HasScriptCommand)(Script* script, CommandInfo* info, CommandInfo* eventBlock);
-_HasScriptCommand HasScriptCommand;
+void writePatch()
+{
+	if (1) patchTimeMult();
+}
 
 bool NVSEPlugin_Load(const NVSEInterface* nvse)
 {
 	g_pluginHandle = nvse->GetPluginHandle();
+	g_nvseInterface = const_cast<NVSEInterface*>(nvse);
+	g_messagingInterface = static_cast<NVSEMessagingInterface*>(nvse->QueryInterface(kInterface_Messaging));
+	g_messagingInterface->RegisterListener(g_pluginHandle, "NVSE", MessageHandler);
 
 	g_nvseInterface = const_cast<NVSEInterface*>(nvse);
 
-	auto* cmdTable = static_cast<NVSECommandTableInterface*>(nvse->QueryInterface(kInterface_CommandTable));
+	const auto cmdTable = static_cast<NVSECommandTableInterface*>(nvse->QueryInterface(kInterface_CommandTable));
 
-	CommandInfo* cmdInfo = cmdTable->GetByOpcode(0x22B0);
-	cmdInfo->numParams = 1;
-	cmdInfo->params = kParams_OneOptionalInt;
+	cmdTable->GetByOpcode(0x22B0)->numParams = 1;
+	cmdTable->GetByOpcode(0x22B0)->params = kParams_OneOptionalInt;
 
-	cmdInfo = cmdTable->GetByOpcode(0x1186);
-	cmdInfo->numParams = 2;
-	cmdInfo->params = kParams_OneOptionalFloat_OneOptionalInt;
+	cmdTable->GetByOpcode(0x1186)->numParams = 2;
+	cmdTable->GetByOpcode(0x1186)->params = kParams_OneOptionalFloat_OneOptionalInt;
 	
-	if (nvse->isEditor)
-	{
-		return true;
-	}
+	if (nvse->isEditor)	return true;
 
 	g_dataInterface = static_cast<NVSEDataInterface*>(nvse->QueryInterface(kInterface_Data));
 	HasScriptCommand = static_cast<_HasScriptCommand>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaSaveVariableList));
@@ -63,11 +93,8 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	g_scriptInterface = static_cast<NVSEScriptInterface*>(nvse->QueryInterface(kInterface_Script));
 	ExtractArgsEx = g_scriptInterface->ExtractArgsEx;
 	
-	cmdInfo = cmdTable->GetByOpcode(0x22B0);
-	cmdInfo->execute = Cmd_GetGlobalTimeMultiplierAlt_Execute;
-
-	cmdInfo = cmdTable->GetByOpcode(0x1186);
-	cmdInfo->execute = Cmd_SetGlobalTimeMultiplierAlt_Execute;
+	cmdTable->GetByOpcode(0x22B0)->execute = Cmd_GetGlobalTimeMultiplierAlt_Execute;
+	cmdTable->GetByOpcode(0x1186)->execute = Cmd_SetGlobalTimeMultiplierAlt_Execute;
 
 	writePatch();
 

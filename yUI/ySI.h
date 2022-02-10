@@ -10,8 +10,6 @@
 
 //alignas(16) char s_strValBuffer[0x10000];
 
-extern TileMenu* g_HUDMainMenu, * g_StartMenu, * g_BarterMenu, * g_ContainerMenu, * g_RepairMenu, * g_RepairServicesMenu, * g_MapMenu, * g_StatsMenu, * g_InventoryMenu;
-
 extern tList<char> queuedConsoleMessages;
 extern DataHandler* g_dataHandler;
 extern NiTPointerMap<TESForm>** g_allFormsMap;
@@ -39,7 +37,6 @@ namespace SI
 	signed int __fastcall CompareItemsWithTags(ContChangesEntry* a2, ContChangesEntry* a1, Tile* tile1, Tile* tile2);
 	void __fastcall SetStringValueTagImage(Tile* tile, ContChangesEntry* entry, enum TileValues tilevalue, char* src, char propagate);
 	void __fastcall SetStringValueTagRose(Tile* tile, ContChangesEntry* entry, enum TileValues tilevalue, char* src, char propagate);
-
 }
 
 namespace SI_Files

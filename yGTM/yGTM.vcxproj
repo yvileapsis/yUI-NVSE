@@ -127,6 +127,7 @@
     <ClCompile Include="..\nvse\printf.cpp" />
     <ClCompile Include="..\nvse\SafeWrite.cpp" />
     <ClCompile Include="..\nvse\Utilities.cpp" />
+    <ClCompile Include="commands.cpp" />
     <ClCompile Include="dllmain.c">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ForcedIncludeFiles>
@@ -135,6 +136,8 @@
     </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="settings.cpp" />
+    <ClCompile Include="patches.cpp" />
+    <ClCompile Include="timemult.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\libraries\json.h" />
@@ -165,8 +168,11 @@
     <ClInclude Include="..\nvse\prefix.h" />
     <ClInclude Include="..\nvse\SafeWrite.h" />
     <ClInclude Include="..\nvse\Utilities.h" />
+    <ClInclude Include="commands.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="patches.h" />
     <ClInclude Include="settings.h" />
+    <ClInclude Include="timemult.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\nvse\GameRTTI.inc" />
