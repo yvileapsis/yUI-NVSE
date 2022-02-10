@@ -76,7 +76,7 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 {
 	gLog.Create("yUI.log");
 
-	PrintLog("yUI query");
+	PrintLog("yUI: Query");
 
 	// fill out the info structure
 	info->infoVersion = PluginInfo::kInfoVersion;

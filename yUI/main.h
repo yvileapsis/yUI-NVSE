@@ -6,21 +6,21 @@
 
 extern std::deque<std::function<void()>> g_executionQueue;
 
-DebugLog					gLog;
+inline DebugLog						gLog;
 
-NVSEInterface*				g_nvseInterface = nullptr;
-NVSEStringVarInterface*		g_stringInterface = nullptr;
-NVSEArrayVarInterface*		g_arrayInterface = nullptr;
-NVSEMessagingInterface*		g_messagingInterface = nullptr;
-NVSEScriptInterface*		g_scriptInterface = nullptr;
-NVSECommandTableInterface*	g_commandInterface = nullptr;
-NVSEDataInterface*			g_dataInterface = nullptr;
+inline NVSEInterface*				g_nvseInterface = nullptr;
+inline NVSEStringVarInterface*		g_stringInterface = nullptr;
+inline NVSEArrayVarInterface*		g_arrayInterface = nullptr;
+inline NVSEMessagingInterface*		g_messagingInterface = nullptr;
+inline NVSEScriptInterface*			g_scriptInterface = nullptr;
+inline NVSECommandTableInterface*	g_commandInterface = nullptr;
+inline NVSEDataInterface*			g_dataInterface = nullptr;
 
-//DIHookControl* g_DIHook = nullptr;
-PlayerCharacter*			g_player = nullptr;
-ActorValueOwner*			g_playerAVOwner = nullptr;
-BaseProcess*				g_playerProcess = nullptr;
-DataHandler*				g_dataHandler = nullptr;
+inline DIHookControl*				g_DIHook = nullptr;
+inline PlayerCharacter*				g_player = nullptr;
+inline ActorValueOwner*				g_playerAVOwner = nullptr;
+inline BaseProcess*					g_playerProcess = nullptr;
+inline DataHandler*					g_dataHandler = nullptr;
 
 const char*			(*GetStringVar)(UInt32);
 void				(*SetStringVar)(UInt32, const char*);

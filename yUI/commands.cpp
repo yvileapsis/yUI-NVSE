@@ -1,16 +1,13 @@
-#pragma warning(disable: 6054)
 #include <file.h>
 #include <functions.h>
 #include <ySI.h>
 
-extern bool				(*AssignString)(ParamInfo*, void*, TESObjectREFR*, TESObjectREFR*, Script*, ScriptEventList*, double*, UInt32*, const char*);
-
-#define GetExtraType(xDataList, Type) (Extra ## Type*)xDataList.GetByType(kExtraData_ ## Type)
+extern bool	(*AssignString)(ParamInfo*, void*, TESObjectREFR*, TESObjectREFR*, Script*, ScriptEventList*, double*, UInt32*, const char*);
 
 extern bool Cmd_ySIGetTrait_Execute(COMMAND_ARGS)
 {
 	*result = 0;
-	char src[0x100];
+	char src[0x100] = "\0";
 	TESForm* form = nullptr;
 	AssignString(PASS_COMMAND_ARGS, "");
 	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &src, &form)) return true;
@@ -31,8 +28,8 @@ extern bool Cmd_ySIGetTrait_Execute(COMMAND_ARGS)
 extern bool Cmd_ySISetTrait_Execute(COMMAND_ARGS)
 {
 	*result = 0;
-	char src[0x100];
-	char newstring[0x100];
+	char src[0x100] = "\0";
+	char newstring[0x100] = "\0";
 	TESForm* form = nullptr;
 	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &src, &newstring, &form)) return true;
 	if (!form && thisObj) form = thisObj->baseForm;

@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{AE7CFEE7-4058-4E3C-ADC2-AE7480EE2028}</ProjectGuid>
-    <RootNamespace>yUI</RootNamespace>
+    <RootNamespace>yGTM</RootNamespace>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
@@ -45,19 +45,19 @@
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>yUI</TargetName>
+    <TargetName>yGTM</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>yUI</TargetName>
+    <TargetName>yGTM</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\..\nvse;$(SolutionDir)\..\libraries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;yUI_EXPORTS;RUNTIME_VERSION=0x040020D0;RUNTIME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;yGTM_EXPORTS;RUNTIME_VERSION=0x040020D0;RUNTIME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -79,13 +79,13 @@
     </Link>
     <PostBuildEvent>
       <Message>Installing DLL...</Message>
-      <Command>copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\NVSE\Plugins\$(ProjectName).dll"</Command>
+      <Command>copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yGTM\NVSE\Plugins\$(ProjectName).dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\..\nvse;$(SolutionDir)\..\libraries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;yUI_EXPORTS;RUNTIME_VERSION=0x040020D0;RUNTIME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;yGTM_EXPORTS;RUNTIME_VERSION=0x040020D0;RUNTIME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
@@ -105,7 +105,7 @@
     </Link>
     <PostBuildEvent>
       <Message>Installing DLL...</Message>
-      <Command>copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\NVSE\Plugins\$(ProjectName).dll"</Command>
+      <Command>copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yGTM\NVSE\Plugins\$(ProjectName).dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -127,24 +127,18 @@
     <ClCompile Include="..\nvse\printf.cpp" />
     <ClCompile Include="..\nvse\SafeWrite.cpp" />
     <ClCompile Include="..\nvse\Utilities.cpp" />
-    <ClCompile Include="commands.cpp" />
     <ClCompile Include="dllmain.c">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ForcedIncludeFiles>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="file.cpp" />
-    <ClCompile Include="LambdaVariableContext.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="functions.cpp" />
-    <ClCompile Include="patches.cpp" />
     <ClCompile Include="settings.cpp" />
-    <ClCompile Include="yCM.cpp" />
-    <ClCompile Include="ySI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\libraries\json.h" />
+    <ClInclude Include="..\libraries\SimpleINILibrary.h" />
     <ClInclude Include="..\nvse\CommandTable.h" />
     <ClInclude Include="..\nvse\GameAPI.h" />
     <ClInclude Include="..\nvse\GameBSExtraData.h" />
@@ -171,16 +165,8 @@
     <ClInclude Include="..\nvse\prefix.h" />
     <ClInclude Include="..\nvse\SafeWrite.h" />
     <ClInclude Include="..\nvse\Utilities.h" />
-    <ClInclude Include="file.h" />
-    <ClInclude Include="commands.h" />
-    <ClInclude Include="functions.h" />
-    <ClInclude Include="yCM.h" />
-    <ClInclude Include="patches.h" />
-    <ClInclude Include="settings.h" />
-    <ClInclude Include="LambdaVariableContext.h" />
     <ClInclude Include="main.h" />
-    <ClInclude Include="..\libraries\SimpleINILibrary.h" />
-    <ClInclude Include="ySI.h" />
+    <ClInclude Include="settings.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\nvse\GameRTTI.inc" />

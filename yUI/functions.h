@@ -33,8 +33,6 @@ bool IsPoisonous(TESForm*);
 bool HasBaseEffectChangesAV(TESForm*, int);
 bool IsCraftingComponent(TESForm*);
 
-std::string GetCurPath();
-
 bool ends_with(std::string const& value, std::string const& ending);
 
 std::string ReplaceAll(std::string str, const std::string& from, const std::string& to);

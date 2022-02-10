@@ -2,14 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="dllmain.c" />
-    <ClCompile Include="file.cpp" />
-    <ClCompile Include="LambdaVariableContext.cpp" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="functions.cpp" />
-    <ClCompile Include="patches.cpp" />
-    <ClCompile Include="settings.cpp" />
-    <ClCompile Include="yCM.cpp" />
-    <ClCompile Include="ySI.cpp" />
     <ClCompile Include="..\nvse\printf.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
@@ -64,17 +56,10 @@
     <ClCompile Include="..\nvse\GameUI.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="commands.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="settings.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="file.h" />
-    <ClInclude Include="functions.h" />
-    <ClInclude Include="yCM.h" />
-    <ClInclude Include="patches.h" />
-    <ClInclude Include="settings.h" />
-    <ClInclude Include="LambdaVariableContext.h" />
-    <ClInclude Include="main.h" />
-    <ClInclude Include="ySI.h" />
     <ClInclude Include="..\nvse\GameAPI.h">
       <Filter>nvse</Filter>
     </ClInclude>
@@ -147,7 +132,6 @@
     <ClInclude Include="..\nvse\SafeWrite.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="commands.h" />
     <ClInclude Include="..\nvse\CommandTable.h">
       <Filter>nvse</Filter>
     </ClInclude>
@@ -160,6 +144,8 @@
     <ClInclude Include="..\nvse\PluginAPI.h">
       <Filter>nvse</Filter>
     </ClInclude>
+    <ClInclude Include="main.h" />
+    <ClInclude Include="settings.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />

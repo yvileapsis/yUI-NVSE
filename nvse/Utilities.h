@@ -576,3 +576,4 @@ StackVector<T*, Size> Filter(S& s, F&& f)
 }
 
 std::string UTF8toANSI(const std::string& str);
+std::string GetCurPath();

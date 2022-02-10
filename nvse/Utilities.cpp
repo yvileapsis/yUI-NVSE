@@ -1353,8 +1353,6 @@ __declspec(naked) UInt32 __fastcall StrHashCI(const char* inKey)
 	}
 }
 
-
-
 std::string GetCurPath()
 {
 	char buffer[MAX_PATH] = { 0 };
