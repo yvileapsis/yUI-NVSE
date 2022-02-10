@@ -57,20 +57,12 @@
     <ClCompile Include="..\nvse\Utilities.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="dllmain.c" />
-    <ClCompile Include="main.cpp" />
-    <ClCompile Include="..\nvse\containers.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
-    <ClCompile Include="..\nvse\utility.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
     <ClCompile Include="..\nvse\printf.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="hooks.cpp" />
+    <ClCompile Include="dllmain.c" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="LambdaVariableContext.cpp" />
-    <ClCompile Include="nihooks.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\nvse\GameAPI.h">
@@ -124,30 +116,15 @@
     <ClInclude Include="..\nvse\Utilities.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\nvse\containers.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\utility.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
     <ClInclude Include="..\nvse\CommandTable.h">
       <Filter>nvse</Filter>
     </ClInclude>
     <ClInclude Include="..\nvse\GameScript.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="hooks.h" />
-    <ClInclude Include="commands_animation.h" />
     <ClInclude Include="..\nvse\GameProcess.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="utility.h" />
-    <ClInclude Include="file_animations.h" />
-    <ClInclude Include="..\libraries\json.h" />
-    <ClInclude Include="game_types.h" />
-    <ClInclude Include="MemoizedMap.h" />
-    <ClInclude Include="stack_allocator.h" />
-    <ClInclude Include="..\libraries\SimpleINILibrary.h" />
     <ClInclude Include="..\nvse\NiNodes.h">
       <Filter>nvse</Filter>
     </ClInclude>
@@ -157,18 +134,15 @@
     <ClInclude Include="..\nvse\NiObjects.h">
       <Filter>nvse</Filter>
     </ClInclude>
+    <ClInclude Include="..\libraries\json.h" />
+    <ClInclude Include="..\libraries\SimpleINILibrary.h" />
     <ClInclude Include="main.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="LambdaVariableContext.h" />
-    <ClInclude Include="nihooks.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="GameTypes.natvis" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="yUI.rc" />
   </ItemGroup>
 </Project>

@@ -7,7 +7,6 @@ void SetGlobalTimeMultiplier(TimeGlobal* timeGlobal, char isImmediateChange)
 	timeGlobal->Set(timeMult, isImmediateChange);
 }
 
-
 void Time_ModifyMap(const float timeMult, const UInt16 mod) {
 
 	if (timeMult < -1) {}
