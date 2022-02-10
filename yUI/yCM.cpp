@@ -1,9 +1,12 @@
 #include <yCM.h>
 
+yCM g_yCM_Manager;
+
+
 bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS)
 {
 	*result = -999;
-	char src[0x100];
+	char src[0x100] = "\0";
 	SInt64 child = 0;
 	SInt64 grandchild = 0;
 	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &child, &grandchild, &src)) return true;
@@ -83,7 +86,7 @@ bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS)
 bool Cmd_SetyCMFloat_Execute(COMMAND_ARGS)
 {
 	*result = 0;
-	char src[0x100];
+	char src[0x100] = "\0";
 	SInt64 child = 0;
 	SInt64 grandchild = 0;
 	float value = 0;
@@ -160,10 +163,7 @@ bool Cmd_SetyCMFloat_Execute(COMMAND_ARGS)
 }
 
 yCM_Option_Value::yCM_Option_Value()
-{
-	floatValue = 0;
-}
+= default;
 
 yCM_Option_Value::~yCM_Option_Value()
-{
-}
+= default;

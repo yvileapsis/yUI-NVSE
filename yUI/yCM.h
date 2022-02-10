@@ -62,4 +62,3 @@ public:
 	std::unordered_map<UInt32, yCM_Option*>			mods;
 };
 
-yCM g_yCM_Manager;
