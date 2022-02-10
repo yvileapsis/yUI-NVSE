@@ -5,7 +5,9 @@
   </a>
 </p>
 
-This is an yvilemunity yviletained **New Vegas Script Extender** (NVSE) plugin. 
+This is a repository of **New Vegas Script Extender** (NVSE) plugins developed and maintained by me, yvileapsis.
+
+This repository consists of multiple projects, external libraries and NVSE files, allowing for interaction with NVSE API and game's classes.
 
 ## Support
 
@@ -17,15 +19,11 @@ This NVSE plugin is developed by yvileapsis with liberal borrowing of code from 
 
 This plugin wouldn't exist without efforts of many community members such as LuthienAnarion, JazzIsParis, lStewieAl, c6, carxt, korri123 and Demorome and many others.
 
-# yUI-NVSE
-NVSE plugin aiming to fix UI issues and add additional UI features.
+## yUI
+NVSE plugin aiming to fix UI issues and add additional UI features. Currently includes several bugfixes and Sorting and Icons module.
 
-# yGTM-NVSE
-NVSE plugin aiming to resolve issues with global time multiplier. 
-
-hooks a few places, changes a few functions
-
-Contains code from lStewieAl's Tweaks, nvse-example-plugin and JIP-LN-NVSE.
+## yGTM-NVSE
+NVSE plugin aiming to resolve issues with global time multiplier. Mainly this is achieved by adding local time multipliers for each mod that changes timescale with SGTM command.
 
 (float) GetGlobalTimeMultiplier *modIndex:int*
 
