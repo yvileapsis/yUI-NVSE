@@ -11,12 +11,6 @@
 #include <filesystem>
 #include <fstream>
 
-void LogForm(const TESForm* form)
-{
-	Log(FormatString("Detected in-game form %X %s", form->refID, form->GetName()));
-	//, form->GetFullName() ? form->GetFullName()->name.CStr() : "<no name>")
-}
-
 void JSONEntryItemRecursiveEmplace(const std::string&, SInt16, TESForm*, UInt8);
 
 void HandleJson(const std::filesystem::path& path)

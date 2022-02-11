@@ -380,6 +380,7 @@ bool BGSListForm::ContainsRecursive(TESForm* form)
 
 bool FormContainsRecusive(TESForm* parent, TESForm* child)
 {
+	if (!parent || !child) return false;
 	if (parent->refID == child->refID) return true;
 	if (parent->typeID == kFormType_BGSListForm)
 	{

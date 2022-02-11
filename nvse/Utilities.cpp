@@ -841,7 +841,7 @@ void ShowErrorMessageBox(const char* message)
 
 std::unordered_set<UInt32> g_warnedScripts;
 
-const char* GetModName(const Script* script)
+const char* GetModName(const TESForm* script)
 {
 	const char* modName = "In-game console";
 	if (script->modIndex != 0xFF)

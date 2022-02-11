@@ -11,8 +11,12 @@ namespace TimeMult
 	{
 		for (auto iter = g_dataHandler->scriptList.Begin(); !iter.End(); ++iter)
 		{
-			if (g_specialMods.contains(iter.Get()->modIndex)) return;
-			if (HasScriptCommand(iter.Get(), GetByOpcode(0x1186), nullptr)) g_specialMods.emplace(iter.Get()->modIndex);
+			if (g_specialMods.contains(iter.Get()->modIndex)) continue;
+			if (HasScriptCommand(iter.Get(), GetByOpcode(0x1186), nullptr))
+			{
+				g_specialMods.emplace(iter.Get()->modIndex);
+				Log(FormatString("Found SGTM use in mod: %02X (%50s), form: %08X (%50s)", iter.Get()->modIndex, GetModName(iter.Get()), iter.Get()->refID, iter.Get()->GetName()));
+			}
 		}
 	}
 

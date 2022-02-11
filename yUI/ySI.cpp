@@ -169,8 +169,7 @@ namespace SI
 
 		if (!menu->menu->GetTemplateExists(g_Tags[tag].xmltemplate.c_str()))
 		{
-			if (menu != BarterMenu::GetSingleton()->tile && menu != ContainerMenu::GetSingleton()->tile &&
-				menu != RepairServicesMenu::GetSingleton()->tile) return;
+			if (menu != TileMenu::GetTileMenu(kMenuType_Barter) && menu != TileMenu::GetTileMenu(kMenuType_Container) && menu != TileMenu::GetTileMenu(kMenuType_RepairServices)) return;
 			for (auto& iter : g_XMLPaths) menu->InjectUIXML(iter.generic_string().c_str());
 			if (!menu->menu->GetTemplateExists(g_Tags[tag].xmltemplate.c_str())) return;
 		}

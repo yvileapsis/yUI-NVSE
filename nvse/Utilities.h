@@ -292,7 +292,7 @@ public:
 void ShowErrorMessageBox(const char* message);
 void ShowRuntimeError(Script* script, const char* fmt, ...);
 
-const char* GetModName(const Script* script);
+const char* GetModName(const TESForm* script);
 
 std::string FormatString(const char* fmt, ...);
 

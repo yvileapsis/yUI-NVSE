@@ -11,7 +11,7 @@ extern inline bool Cmd_SetGlobalTimeMultiplierAlt_Execute(COMMAND_ARGS)
 	*result = 0;
 	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &timeMult, &mod)) return true;
 
-	if (mod == 0) mod = scriptObj->GetModIndex();
+	if (mod == 0) mod = scriptObj->modIndex;
 
 	TimeMult::ModifyMap(timeMult, mod);
 	TimeMult::Set();
