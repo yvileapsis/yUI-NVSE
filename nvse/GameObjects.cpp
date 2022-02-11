@@ -276,6 +276,98 @@ __declspec(naked) ExtraContainerChanges::EntryDataList* TESObjectREFR::GetContai
 	}
 }
 
+__declspec(naked) float __vectorcall GetDistance3D(TESObjectREFR* ref1, TESObjectREFR* ref2)
+{
+	__asm
+	{
+		movups	xmm0, [ecx + 0x2C]
+		psrldq	xmm0, 4
+		movups	xmm1, [edx + 0x2C]
+		psrldq	xmm1, 4
+		subps	xmm0, xmm1
+		mulps	xmm0, xmm0
+		haddps	xmm0, xmm0
+		haddps	xmm0, xmm0
+		sqrtss	xmm0, xmm0
+		retn
+	}
+}
+
+__declspec(naked) float __vectorcall GetDistance2D(TESObjectREFR* ref1, TESObjectREFR* ref2)
+{
+	__asm
+	{
+		movq	xmm0, qword ptr[ecx + 0x30]
+		movq	xmm1, qword ptr[edx + 0x30]
+		subps	xmm0, xmm1
+		mulps	xmm0, xmm0
+		haddps	xmm0, xmm0
+		sqrtss	xmm0, xmm0
+		retn
+	}
+}
+
+__declspec(naked) bool TESObjectREFR::GetInSameCellOrWorld(TESObjectREFR *target)
+{
+	__asm
+	{
+		mov		eax, [ecx+0x40]
+		test	eax, eax
+		jnz		hasCell1
+		push	edx
+		push	kExtraData_PersistentCell
+		add		ecx, 0x44
+		call	BaseExtraList::GetByType
+		pop		edx
+		test	eax, eax
+		jz		done
+		mov		eax, [eax+0xC]
+	hasCell1:
+		mov		ecx, [edx+0x40]
+		test	ecx, ecx
+		jnz		hasCell2
+		push	eax
+		push	kExtraData_PersistentCell
+		lea		ecx, [edx+0x44]
+		call	BaseExtraList::GetByType
+		pop		edx
+		test	eax, eax
+		jz		done
+		mov		ecx, [eax+0xC]
+		mov		eax, edx
+	hasCell2:
+		cmp		eax, ecx
+		jz		retnTrue
+		mov		eax, [eax+0xC0]
+		test	eax, eax
+		jz		done
+		cmp		eax, [ecx+0xC0]
+	retnTrue:
+		setz	al
+	done:
+		retn
+	}
+}
+
+__declspec(naked) float __vectorcall TESObjectREFR::GetDistance(TESObjectREFR* target)
+{
+	__asm
+	{
+		push	ecx
+		push	edx
+		call	TESObjectREFR::GetInSameCellOrWorld
+		pop		edx
+		pop		ecx
+		test	al, al
+		jz		fltMax
+		jmp		GetDistance3D
+	fltMax:
+		mov		eax, 0x7F7FFFFF
+		movd	xmm0, eax
+		retn
+	}
+}
+
 /*__declspec(naked) ContChangesEntry* ExtraContainerChanges::EntryDataList::FindForItem(TESForm* item)
 {
 	__asm

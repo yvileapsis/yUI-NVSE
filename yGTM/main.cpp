@@ -67,6 +67,7 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 void writePatch()
 {
 	if (g_yTM) patchTimeMult();
+	patchFixExplosionPushDirection();
 }
 
 bool NVSEPlugin_Load(const NVSEInterface* nvse)

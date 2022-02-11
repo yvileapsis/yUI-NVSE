@@ -171,7 +171,8 @@ public:
 	bool					GetInventoryItems(UInt8 typeID);
 	TESObjectCELL*			GetParentCell();
 	TESWorldSpace*			GetParentWorld();
-	float					GetDistance(TESObjectREFR* target);
+	bool					GetInSameCellOrWorld(TESObjectREFR* target);
+	float __vectorcall		GetDistance(TESObjectREFR* target);
 	void					SetPos(NiVector3& posVector);
 	void					SetAngle(NiVector3& rotVector);
 	bool					MoveToCell(TESForm* worldOrCell, NiVector3& posVector);

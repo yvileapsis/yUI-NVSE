@@ -1,45 +1,48 @@
 #include "SafeWrite.h"
 
-void SafeWrite8(UInt32 addr, UInt32 data)
+void SafeWrite8(UInt32 addr, UInt8 data)
 {
 	UInt32	oldProtect;
 
-	VirtualProtect((void *)addr, 4, PAGE_EXECUTE_READWRITE, &oldProtect);
-	*((UInt8 *)addr) = data;
-	VirtualProtect((void *)addr, 4, oldProtect, &oldProtect);
+	VirtualProtect(reinterpret_cast<void*>(addr), 4, PAGE_EXECUTE_READWRITE, &oldProtect);
+	*reinterpret_cast<UInt8*>(addr) = data;
+	VirtualProtect(reinterpret_cast<void*>(addr), 4, oldProtect, &oldProtect);
 }
 
-void SafeWrite16(UInt32 addr, UInt32 data)
+void SafeWrite16(UInt32 addr, UInt16 data)
 {
 	UInt32	oldProtect;
 
-	VirtualProtect((void *)addr, 4, PAGE_EXECUTE_READWRITE, &oldProtect);
-	*((UInt16 *)addr) = data;
-	VirtualProtect((void *)addr, 4, oldProtect, &oldProtect);
+	VirtualProtect(reinterpret_cast<void*>(addr), 4, PAGE_EXECUTE_READWRITE, &oldProtect);
+	*reinterpret_cast<UInt16*>(addr) = data;
+	VirtualProtect(reinterpret_cast<void*>(addr), 4, oldProtect, &oldProtect);
 }
 
 void SafeWrite32(UInt32 addr, UInt32 data)
 {
 	UInt32	oldProtect;
 
-	VirtualProtect((void *)addr, 4, PAGE_EXECUTE_READWRITE, &oldProtect);
-	*((UInt32 *)addr) = data;
-	VirtualProtect((void *)addr, 4, oldProtect, &oldProtect);
+	VirtualProtect(reinterpret_cast<void*>(addr), 4, PAGE_EXECUTE_READWRITE, &oldProtect);
+	*reinterpret_cast<UInt32*>(addr) = data;
+	VirtualProtect(reinterpret_cast<void*>(addr), 4, oldProtect, &oldProtect);
 }
 
 void SafeWriteBuf(UInt32 addr, const char* data, UInt32 len)
 {
 	UInt32	oldProtect;
 
-	VirtualProtect((void *)addr, len, PAGE_EXECUTE_READWRITE, &oldProtect);
-	memcpy((void *)addr, data, len);
-	VirtualProtect((void *)addr, len, oldProtect, &oldProtect);
+	auto patch = std::vector(reinterpret_cast<std::byte*>(addr), reinterpret_cast<std::byte*>(addr) + len);
+	if (!g_SafeWriteData.contains(addr)) g_SafeWriteData.emplace(addr, patch);
+
+	VirtualProtect(reinterpret_cast<void*>(addr), len, PAGE_EXECUTE_READWRITE, &oldProtect);
+	memcpy(reinterpret_cast<void*>(addr), data, len);
+	VirtualProtect(reinterpret_cast<void*>(addr), len, oldProtect, &oldProtect);
 }
 
 void WriteRelJump(UInt32 jumpSrc, UInt32 jumpTgt)
 {
 	// jmp rel32
-	auto patch = std::vector(reinterpret_cast<std::byte*>(jumpSrc), reinterpret_cast<std::byte*>(jumpSrc) + sizeof(jumpTgt) + 1);
+	auto patch = std::vector(reinterpret_cast<std::byte*>(jumpSrc), reinterpret_cast<std::byte*>(jumpSrc) + sizeof jumpTgt + 1);
 	if (!g_SafeWriteData.contains(jumpSrc)) g_SafeWriteData.emplace(jumpSrc, patch);
 	
 	SafeWrite8(jumpSrc, 0xE9);
@@ -49,7 +52,7 @@ void WriteRelJump(UInt32 jumpSrc, UInt32 jumpTgt)
 void WriteRelCall(UInt32 jumpSrc, UInt32 jumpTgt)
 {
 	// call rel32
-	auto patch = std::vector(reinterpret_cast<std::byte*>(jumpSrc), reinterpret_cast<std::byte*>(jumpSrc) + sizeof(jumpTgt) + 1);
+	auto patch = std::vector(reinterpret_cast<std::byte*>(jumpSrc), reinterpret_cast<std::byte*>(jumpSrc) + sizeof jumpTgt + 1);
 	if (!g_SafeWriteData.contains(jumpSrc)) g_SafeWriteData.emplace(jumpSrc, patch);
 	
 	SafeWrite8(jumpSrc, 0xE8);
@@ -81,13 +84,13 @@ void UndoSafeWrite(UInt32 addr)
 {
 	if (!g_SafeWriteData.contains(addr)) return;
 	UInt32	oldProtect;
-	VirtualProtect((void*)addr, g_SafeWriteData[addr].size(), PAGE_EXECUTE_READWRITE, &oldProtect);
-	for (UInt32 addroffset = 0; auto iter : g_SafeWriteData[addr])
+	VirtualProtect(reinterpret_cast<void*>(addr), g_SafeWriteData[addr].size(), PAGE_EXECUTE_READWRITE, &oldProtect);
+	for (UInt32 addroffset = 0; const auto iter : g_SafeWriteData[addr])
 	{
-		*((UInt8*)addr + addroffset) = std::to_integer<UInt8>(iter);
+		*(reinterpret_cast<UInt8*>(addr) + addroffset) = std::to_integer<UInt8>(iter);
 		addroffset++;
 	}
-	VirtualProtect((void*)addr, g_SafeWriteData[addr].size(), oldProtect, &oldProtect);
+	VirtualProtect(reinterpret_cast<void*>(addr), g_SafeWriteData[addr].size(), oldProtect, &oldProtect);
 }
 
 void PatchMemoryNop(ULONG_PTR Address, SIZE_T Size)

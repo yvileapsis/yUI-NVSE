@@ -1069,8 +1069,8 @@ struct ActorHitData
 	Actor* target;		// 04
 	union								// 08
 	{
-		void* projectile;
-		void* explosion;
+		MobileObject* projectile;
+		MobileObject* explosion;
 	};
 	UInt32				weaponAV;		// 0C
 	SInt32				hitLocation;	// 10

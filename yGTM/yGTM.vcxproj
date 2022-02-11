@@ -134,6 +134,7 @@
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ForcedIncludeFiles>
     </ClCompile>
+    <ClCompile Include="gameplay.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="settings.cpp" />
     <ClCompile Include="patches.cpp" />
@@ -169,6 +170,7 @@
     <ClInclude Include="..\nvse\SafeWrite.h" />
     <ClInclude Include="..\nvse\Utilities.h" />
     <ClInclude Include="commands.h" />
+    <ClInclude Include="gameplay.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="patches.h" />
     <ClInclude Include="settings.h" />

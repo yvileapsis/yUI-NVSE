@@ -61,6 +61,7 @@
     <ClCompile Include="timeMult.cpp" />
     <ClCompile Include="patches.cpp" />
     <ClCompile Include="commands.cpp" />
+    <ClCompile Include="gameplay.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\nvse\GameAPI.h">
@@ -152,6 +153,7 @@
     <ClInclude Include="timeMult.h" />
     <ClInclude Include="patches.h" />
     <ClInclude Include="commands.h" />
+    <ClInclude Include="gameplay.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
