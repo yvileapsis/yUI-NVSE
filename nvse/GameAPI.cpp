@@ -501,6 +501,7 @@ void TimeGlobal::Set(const float value, const char isImmediateChange)
 float TimeGlobal::Get() { return *reinterpret_cast<float*>(0x11AC3A0); }
 float TimeGlobal::GetTarget() { return *reinterpret_cast<float*>(0x11AC3A4); }
 
+NiTPointerMap<TESForm>* GetAllForms() { return *reinterpret_cast<NiTPointerMap<TESForm>**>(0x11C54C0); }
 /*
 void ConsoleManager::AppendToSentHistory(const char* str)
 {

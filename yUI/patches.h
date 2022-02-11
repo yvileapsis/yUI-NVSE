@@ -1,4 +1,5 @@
 #pragma once
+#include <prefix.h>
 
 void patchSortingHooks(const bool bEnable = true);
 void patchAddIcons(const bool bEnable = true);

@@ -39,7 +39,7 @@ ScriptEventList* TESObjectREFR::GetEventList() const
 			return xScript->eventList;
 	}
 
-	return 0;
+	return nullptr;
 }
 
 PlayerCharacter* g_thePlayer = nullptr;
@@ -65,7 +65,7 @@ TESContainer* TESObjectREFR::GetContainer()
 		return &((TESActorBase*)baseForm)->container;
 	if (baseForm->typeID == kFormType_TESObjectCONT)
 		return &((TESObjectCONT*)baseForm)->container;
-	return NULL;
+	return nullptr;
 }
 
 bool TESObjectREFR::IsMapMarker()
@@ -114,66 +114,14 @@ bool PlayerCharacter::SetSkeletonPath(const char* newPath)
 		return false;
 	}
 
-#ifdef NVSE_CORE
-#ifdef _DEBUG
-	// store parent of current niNode
-	/*NiNode* niParent = (NiNode*)(renderState->niNode->m_parent);
-
-	if (renderState->niNode) renderState->niNode->Dump(0, "");
-
-	// set niNode to NULL via BASE CLASS Set3D() method
-	ThisStdCall(s_TESObjectREFR_Set3D, this, NULL, true);
-
-	// modify model path
-	if (newPath) {
-		TESNPC* base = DYNAMIC_CAST(baseForm, TESForm, TESNPC);
-		base->model.SetPath(newPath);
-	}
-
-	// create new NiNode, add to parent
-	//*(g_bUpdatePlayerModel) = 1;
-
-	// s_PlayerCharacter_GenerateNiNode = (MobileObject::Func0053 in Oblivion)
-	NiNode* newNode = (NiNode*)ThisStdCall(s_PlayerCharacter_GenerateNiNode, this, false);	// got a body WITHOUT the head :)
-
-	if (newNode) newNode->Dump(0, "");
-
-	if (niParent)
-		niParent->AddObject(newNode, 1);	// no complaints
-	//*(g_bUpdatePlayerModel) = 0;
-
-	newNode->SetName("Player");	// no complaints
-
-	if (newNode) newNode->Dump(0, "");
-
-	if (playerNode) playerNode->Dump(0, "");
-
-	// get and store camera node
-	// ### TODO: pretty this up
-	UInt32 vtbl = *((UInt32*)newNode);				// ok
-	UInt32 vfunc = *((UInt32*)(vtbl + 0x9C));		// ok
-	NiObject* cameraNode = (NiObject*)ThisStdCall(vfunc, newNode, "Camera3rd");				// returns NULL !!!
-	*g_3rdPersonCameraNode = cameraNode;
-
-	cameraNode = (NiObject*)ThisStdCall(vfunc, (NiNode*)this->playerNode, "Camera1st");		// returns NULL !!!
-	*g_1stPersonCameraNode = cameraNode;
-
-	AnimateNiNode();*/
-#endif
-#endif
 	return true;
 }
 
 bool TESObjectREFR::Update3D()
 {
 	if (this == g_thePlayer) {
-#ifdef _DEBUG
-		TESModel* model = DYNAMIC_CAST(baseForm, TESForm, TESModel);
-		return (g_thePlayer)->SetSkeletonPath(model->GetModelPath());
-#else
 		// Lets try to allow unloading the player3D never the less...
 		SafeWrite8(kPlayerUpdate3Dpatch, kPlayerUpdate3DpatchTo);
-#endif
 	}
 
 	Set3D(NULL, true);
@@ -183,9 +131,9 @@ bool TESObjectREFR::Update3D()
 
 TESActorBase* Actor::GetActorBase()
 {
-	if (baseForm->GetModIndex() == 0xFF)
+	if (modIndex == 0xFF)
 	{
-		auto* xLvlCre = GetExtraType(extraDataList, LeveledCreature);
+		const auto xLvlCre = GetExtraType(extraDataList, LeveledCreature);
 		if (xLvlCre) return xLvlCre->actorBase;
 	}
 	return static_cast<TESActorBase*>(baseForm);

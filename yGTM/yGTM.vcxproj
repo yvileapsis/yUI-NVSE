@@ -137,7 +137,7 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="settings.cpp" />
     <ClCompile Include="patches.cpp" />
-    <ClCompile Include="timemult.cpp" />
+    <ClCompile Include="timeMult.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\libraries\json.h" />
@@ -172,7 +172,7 @@
     <ClInclude Include="main.h" />
     <ClInclude Include="patches.h" />
     <ClInclude Include="settings.h" />
-    <ClInclude Include="timemult.h" />
+    <ClInclude Include="timeMult.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\nvse\GameRTTI.inc" />

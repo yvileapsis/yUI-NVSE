@@ -1,10 +1,7 @@
 #pragma once
-#include <GameTypes.h>
 #include <GameUI.h>
-#include "CommandTable.h"
-
+#include <CommandTable.h>
 #include <unordered_set>
-#include <utility>
 
 
 bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS);

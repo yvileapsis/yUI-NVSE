@@ -1,61 +1,44 @@
-#include <timemult.h>
+#include <timeMult.h>
 #include <GameAPI.h>
+#include <GameData.h>
+#include <settings.h>
 
-void SetGlobalTimeMultiplier(TimeGlobal* timeGlobal, char isImmediateChange)
+extern DataHandler* g_dataHandler;
+
+namespace TimeMult
 {
-	const auto timeMult = globalTimeMultMin * globalTimeMultMax;
-	timeGlobal->Set(timeMult, isImmediateChange);
-}
-
-void Time_ModifyMap(const float timeMult, const UInt16 mod) {
-
-	if (timeMult < -1) {}
-	else if (timeMult == -1) {
-		map_yGTM_LocalTimeMultsMin.clear();
-		map_yGTM_LocalTimeMultsMax.clear();
-		globalTimeMultMin = 1.0;
-		globalTimeMultMax = 1.0;
-	}
-	else if (timeMult <= 0) {}
-	else if (timeMult < 1.0) {
-		map_yGTM_LocalTimeMultsMin[mod] = timeMult;
-		if (const auto it = map_yGTM_LocalTimeMultsMax.find(mod); it != map_yGTM_LocalTimeMultsMax.end()) {
-			map_yGTM_LocalTimeMultsMax.erase(it);
-			globalTimeMultMax = 1.0;
-			for (const auto iter : map_yGTM_LocalTimeMultsMax)
-				if (globalTimeMultMax < iter.second) globalTimeMultMax = iter.second;
+	void FillMaps()
+	{
+		for (auto iter = g_dataHandler->scriptList.Begin(); !iter.End(); ++iter)
+		{
+			if (g_specialMods.contains(iter.Get()->modIndex)) return;
+			if (HasScriptCommand(iter.Get(), GetByOpcode(0x1186), nullptr)) g_specialMods.emplace(iter.Get()->modIndex);
 		}
-
-		globalTimeMultMin = 1.0;
-		for (const auto iter : map_yGTM_LocalTimeMultsMin)
-			if (globalTimeMultMin > iter.second) globalTimeMultMin = iter.second;
 	}
-	else if (timeMult > 1.0) {
-		map_yGTM_LocalTimeMultsMax[mod] = timeMult;
-		if (const auto it = map_yGTM_LocalTimeMultsMin.find(mod); it != map_yGTM_LocalTimeMultsMin.end()) {
-			map_yGTM_LocalTimeMultsMin.erase(it);
-			globalTimeMultMin = 1.0;
-			for (const auto iter : map_yGTM_LocalTimeMultsMin)
-				if (globalTimeMultMin > iter.second) globalTimeMultMin = iter.second;
+
+	void Set(TimeGlobal* timeGlobal, char isImmediateChange)
+	{
+		timeGlobal->Set(g_timeMult, isImmediateChange);
+	}
+
+	void ModifyMap(const Float64 timeMult, const UInt16 mod)
+	{
+		g_localMults.erase(mod);
+		if (timeMult != 1) g_localMults.emplace(mod, timeMult);
+		if (timeMult == 0) g_localMults.clear();
+
+		g_timeMult = 1;
+
+		if (g_yTM_MinMax == 0)
+			for (const auto it : g_localMults) g_timeMult *= it.second;
+		else if (g_yTM_MinMax == 1) {
+			Float64 min, max;
+			min = max = 1.0;
+			for (const auto it : g_localMults) {
+				if (it.second < min) min = it.second;
+				if (it.second > max) max = it.second;
+			}
+			g_timeMult = min * max;
 		}
-
-		globalTimeMultMax = 1.0;
-		for (const auto iter : map_yGTM_LocalTimeMultsMax)
-			if (globalTimeMultMax < iter.second) globalTimeMultMax = iter.second;
-	}
-	else {
-		globalTimeMultMin = globalTimeMultMax = 1.0;
-
-		auto it = map_yGTM_LocalTimeMultsMin.find(mod);
-		if (it != map_yGTM_LocalTimeMultsMin.end()) map_yGTM_LocalTimeMultsMin.erase(it);
-
-		for (const auto iter : map_yGTM_LocalTimeMultsMin)
-			if (globalTimeMultMin > iter.second) globalTimeMultMin = iter.second;
-
-		it = map_yGTM_LocalTimeMultsMax.find(mod);
-		if (it != map_yGTM_LocalTimeMultsMax.end()) map_yGTM_LocalTimeMultsMax.erase(it);
-
-		for (const auto iter : map_yGTM_LocalTimeMultsMax)
-			if (globalTimeMultMax < iter.second) globalTimeMultMax = iter.second;
 	}
 }

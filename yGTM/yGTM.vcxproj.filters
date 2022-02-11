@@ -58,7 +58,7 @@
     </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="settings.cpp" />
-    <ClCompile Include="timemult.cpp" />
+    <ClCompile Include="timeMult.cpp" />
     <ClCompile Include="patches.cpp" />
     <ClCompile Include="commands.cpp" />
   </ItemGroup>
@@ -149,7 +149,7 @@
     </ClInclude>
     <ClInclude Include="main.h" />
     <ClInclude Include="settings.h" />
-    <ClInclude Include="timemult.h" />
+    <ClInclude Include="timeMult.h" />
     <ClInclude Include="patches.h" />
     <ClInclude Include="commands.h" />
   </ItemGroup>

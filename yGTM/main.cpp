@@ -1,20 +1,25 @@
 #include <main.h>
+#include <GameObjects.h>
 #include <commands.h>
 #include <patches.h>
+#include <settings.h>
+#include <timeMult.h>
 
 #define yGTM_VERSION 3.0
 #define yGTM_VERSION_STR "3.0"
 
 PluginHandle	g_pluginHandle = kPluginHandle_Invalid;
 
-typedef void (*_HasScriptCommand)(Script* script, CommandInfo* info, CommandInfo* eventBlock);
-_HasScriptCommand HasScriptCommand;
-
 void MessageHandler(NVSEMessagingInterface::Message* msg)
 {
 	if (msg->type == NVSEMessagingInterface::kMessage_DeferredInit)
 	{
+		g_player = PlayerCharacter::GetSingleton();
+		g_dataHandler = DataHandler::GetSingleton();
+
 		PrintAndClearQueuedConsoleMessages();
+		TimeMult::FillMaps();
+
 	}
 	else if (msg->type == NVSEMessagingInterface::kMessage_MainGameLoop)
 	{
@@ -22,10 +27,6 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 			iDoOnce++;
 		}
 	}
-	else if (msg->type == NVSEMessagingInterface::kMessage_PostLoadGame)
-	{
-	}
-
 }
 
 bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
@@ -65,7 +66,7 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 
 void writePatch()
 {
-	if (1) patchTimeMult();
+	if (g_yTM) patchTimeMult();
 }
 
 bool NVSEPlugin_Load(const NVSEInterface* nvse)
@@ -79,22 +80,24 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 
 	const auto cmdTable = static_cast<NVSECommandTableInterface*>(nvse->QueryInterface(kInterface_CommandTable));
 
-	cmdTable->GetByOpcode(0x22B0)->numParams = 1;
-	cmdTable->GetByOpcode(0x22B0)->params = kParams_OneOptionalInt;
+	GetByOpcode = cmdTable->GetByOpcode;
 
-	cmdTable->GetByOpcode(0x1186)->numParams = 2;
-	cmdTable->GetByOpcode(0x1186)->params = kParams_OneOptionalFloat_OneOptionalInt;
+	GetByOpcode(0x22B0)->numParams = 1;
+	GetByOpcode(0x22B0)->params = kParams_OneOptionalInt;
+
+	GetByOpcode(0x1186)->numParams = 2;
+	GetByOpcode(0x1186)->params = kParams_OneOptionalFloat_OneOptionalInt;
 	
 	if (nvse->isEditor)	return true;
 
 	g_dataInterface = static_cast<NVSEDataInterface*>(nvse->QueryInterface(kInterface_Data));
-	HasScriptCommand = static_cast<_HasScriptCommand>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaSaveVariableList));
+	HasScriptCommand = static_cast<_HasScriptCommand>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_HasScriptCommand));
 	
 	g_scriptInterface = static_cast<NVSEScriptInterface*>(nvse->QueryInterface(kInterface_Script));
 	ExtractArgsEx = g_scriptInterface->ExtractArgsEx;
 	
-	cmdTable->GetByOpcode(0x22B0)->execute = Cmd_GetGlobalTimeMultiplierAlt_Execute;
-	cmdTable->GetByOpcode(0x1186)->execute = Cmd_SetGlobalTimeMultiplierAlt_Execute;
+	GetByOpcode(0x22B0)->execute = Cmd_GetGlobalTimeMultiplierAlt_Execute;
+	GetByOpcode(0x1186)->execute = Cmd_SetGlobalTimeMultiplierAlt_Execute;
 
 	writePatch();
 

@@ -1,12 +1,15 @@
-
 #pragma once
+#include <deque>
+#include <functional>
+extern std::deque<std::function<void()>> g_executionQueue;
 
 class Script;
 
 typedef void (*_CaptureLambdaVars)(Script* scriptLambda);
-extern _CaptureLambdaVars CaptureLambdaVars;
 typedef void (*_UncaptureLambdaVars)(Script* scriptLambda);
-extern _UncaptureLambdaVars UncaptureLambdaVars;
+
+_CaptureLambdaVars CaptureLambdaVars;
+_UncaptureLambdaVars UncaptureLambdaVars;
 
 class LambdaVariableContext
 {

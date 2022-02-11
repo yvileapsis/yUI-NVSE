@@ -1,50 +1,148 @@
 #pragma once
-#include <filesystem>
-#include <GameTiles.h>
-#include <GameData.h>
 #include <GameUI.h>
-#include <GameExtraData.h>
+#include <filesystem>
 #include <unordered_set>
+#include <unordered_map>
 
-#include "file.h"
+namespace SI_Files
+{
+	struct JSONEntryItemWeapon
+	{
+		UInt32 weaponSkill;
+		UInt32 weaponType;
+		UInt32 weaponHandgrip;
+		UInt32 weaponAttackAnim;
+		UInt32 weaponReloadAnim;
+		UInt32 weaponIsAutomatic;
+		UInt32 weaponHasScope;
+		UInt32 weaponIgnoresDTDR;
+		UInt32 weaponClipRounds;
+		UInt32 weaponNumProjectiles;
+		UInt32 weaponSoundLevel;
 
-//alignas(16) char s_strValBuffer[0x10000];
+		TESForm* ammo;
 
-extern tList<char> queuedConsoleMessages;
-extern DataHandler* g_dataHandler;
-extern NiTPointerMap<TESForm>** g_allFormsMap;
+		JSONEntryItemWeapon()
+			: weaponSkill(0), weaponType(0), weaponHandgrip(0), weaponAttackAnim(0), weaponReloadAnim(0), weaponIsAutomatic(0),
+			weaponHasScope(0), weaponIgnoresDTDR(0), weaponClipRounds(0), weaponNumProjectiles(0), weaponSoundLevel(0), ammo(nullptr)
+		{}
+
+	};
+
+	struct JSONEntryItemArmor
+	{
+		UInt32 armorSlotsMaskWL;
+		UInt32 armorSlotsMaskBL;
+
+		UInt16 armorClass;
+		SInt8 armorPower;
+		SInt8 armorHasBackpack;
+
+		float armorDT;
+		UInt16 armorDR;
+		UInt16 armorChangesAV;
+
+		JSONEntryItemArmor() = default;
+	};
+
+	struct JSONEntryItemAid
+	{
+		UInt8 aidRestoresAV;
+		UInt8 aidDamagesAV;
+		UInt8 aidIsAddictive;
+		UInt8 aidIsWater;
+		UInt8 aidIsFood;
+		UInt8 aidIsMedicine;
+		UInt8 aidIsPoisonous;
+		JSONEntryItemAid() = default;
+	};
+
+
+	struct JSONEntryItemMisc
+	{
+		UInt8 miscComponent;
+		JSONEntryItemMisc() = default;
+	};
+
+
+	class JSONEntryItem
+	{
+	public:
+		std::string		tag;
+		SInt16			priority		= 0;
+		TESForm*		form			= nullptr;
+		UInt32			formType		= 0;
+		UInt8			questItem		= 0;
+
+		JSONEntryItemWeapon		formWeapon{};
+		JSONEntryItemArmor		formArmor{};
+		JSONEntryItemAid		formAid{};
+		JSONEntryItemMisc		formMisc{};
+		
+		JSONEntryItem(std::string tag, SInt16 priority, TESForm* form, UInt8 questItem) : tag(std::move(tag)), priority(priority), form(form), formType(0), questItem(questItem) {}
+		JSONEntryItem(std::string tag, SInt16 priority, UInt32 formType, UInt8 questItem, JSONEntryItemWeapon weapon) : tag(std::move(tag)), priority(priority), formType(formType), formWeapon(weapon), form(nullptr), questItem(questItem) {}
+		JSONEntryItem(std::string tag, SInt16 priority, UInt32 formType, UInt8 questItem) : tag(std::move(tag)), priority(priority), form(nullptr), formType(formType), questItem(questItem) {}
+		JSONEntryItem(std::string tag, SInt16 priority, UInt32 formType, UInt8 questItem, JSONEntryItemMisc misc) : tag(std::move(tag)), priority(priority), form(nullptr), formType(formType), questItem(questItem), formMisc(misc) {}
+		JSONEntryItem(std::string tag, SInt16 priority, UInt32 formType, UInt8 questItem, JSONEntryItemArmor armor) : tag(std::move(tag)), priority(priority), form(nullptr), formType(formType), questItem(questItem), formArmor(armor) {}
+		JSONEntryItem(std::string tag, SInt16 priority, UInt32 formType, UInt8 questItem, JSONEntryItemAid aid) : tag(std::move(tag)), priority(priority), form(nullptr), formType(formType), questItem(questItem), formAid(aid) {}
+	};
+
+	class JSONEntryTag
+	{
+	public:
+		std::string tag;
+		SInt16 priority = 0;
+
+		std::string xmltemplate;
+		std::string filename;
+		std::string texatlas;
+		SInt32 systemcolor = 0;
+
+		std::string category;
+		std::string name;
+		std::string icon;
+		UInt32 tab = 0;
+		UInt32 count = 0;
+
+		JSONEntryTag(std::string tag, SInt16 priority, std::string xmltemplate, std::string filename, std::string texatlas,
+			SInt64 systemcolor, std::string category, std::string name, std::string icon, UInt32 tab, UInt32 count)
+			: tag(std::move(tag)), priority(priority), xmltemplate(std::move(xmltemplate)), filename(std::move(filename)),
+			texatlas(std::move(texatlas)), systemcolor(systemcolor), category(std::move(category)), name(std::move(name)), icon(std::move(icon)), tab(tab), count(count)
+		{}
+		JSONEntryTag() = default;
+	};
+
+	inline std::vector<JSONEntryItem>						g_Items_JSON;
+	inline std::vector<JSONEntryTag>						g_Tags_JSON;
+
+	bool AssignTagToItem(TESForm* form);
+
+	void FillSIMapsFromJSON();
+}
 
 namespace SI
 {
-	inline std::unordered_map <TESForm*, std::string>		g_Items;
-	inline std::unordered_map <std::string, JSONEntryTag>	g_Tags;
-	inline std::unordered_set<std::string>					g_Categories;
-	inline std::vector<std::filesystem::path>				g_XMLPaths;
+	inline std::unordered_map<TESForm*, std::string>				g_Items;
+	inline std::unordered_map<std::string, SI_Files::JSONEntryTag>	g_Tags;
+	inline std::unordered_set<std::string>							g_Categories;
+	inline std::vector<std::filesystem::path>						g_XMLPaths;
 
-	
+
 	void InjectTemplates();
 	void KeyringRefreshPostStewie();
 	std::string GetTagForItem(TESForm* form);
 	std::string GetTagForItem(ContChangesEntry* entry);
 	bool KeyringHideNonKeys(ContChangesEntry*);
 
-	void __fastcall SetTileStringInjectTile(Tile* tile, ContChangesEntry* entry, MenuItemEntryList* list, UInt32 tilevalue, char* tileText, bool propagate);
+	void __fastcall SetTileStringInjectTile(Tile* tile, ContChangesEntry* entry, MenuItemEntryList* list, eTileValue tilevalue, char* tileText, bool propagate);
 	bool __fastcall HasContainerChangesEntry(ContChangesEntry* entry);
 	bool __fastcall KeyringShowCategories(Tile* tile);
 	void __fastcall AddSortingCategories();
 	bool __fastcall KeyringHideKeys(ContChangesEntry* entry);
 	void __fastcall HideNonKeysGetTile(InventoryMenu* invmenu, Tile* tile);
 	signed int __fastcall CompareItemsWithTags(ContChangesEntry* a2, ContChangesEntry* a1, Tile* tile1, Tile* tile2);
-	void __fastcall SetStringValueTagImage(Tile* tile, ContChangesEntry* entry, enum TileValues tilevalue, char* src, char propagate);
-	void __fastcall SetStringValueTagRose(Tile* tile, ContChangesEntry* entry, enum TileValues tilevalue, char* src, char propagate);
-}
-
-namespace SI_Files
-{
-	inline std::vector<JSONEntryItem>						g_Items_JSON;
-	inline std::vector<JSONEntryTag>						g_Tags_JSON;
-	
-	bool AssignTagToItem(TESForm* form);
+	void __fastcall SetStringValueTagImage(Tile* tile, ContChangesEntry* entry, eTileValue tilevalue, char* src, char propagate);
+	void __fastcall SetStringValueTagRose(Tile* tile, ContChangesEntry* entry, eTileValue tilevalue, char* src, char propagate);
 }
 
 namespace SI_Hooks
@@ -226,8 +324,6 @@ namespace SI_Hooks
 		}
 	}
 
-	void __fastcall KeyringEnableCancelHook(Tile* tile, void* dummyEDX, enum TileValues tilevalue, signed int a1);
-	void __fastcall KeyringPipBoyIconHook(Tile* tile, void* dummyEDX, enum TileValues tilevalue, char* string, int propagate);
+	void __fastcall KeyringEnableCancelHook(Tile* tile, void* dummyEDX, enum eTileValue tilevalue, signed int a1);
+	void __fastcall KeyringPipBoyIconHook(Tile* tile, void* dummyEDX, enum eTileValue tilevalue, char* string, int propagate);
 }
-
-//void InjectIconTile(Tile* tile, ContChangesEntry* entry);

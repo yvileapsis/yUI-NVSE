@@ -1,6 +1,5 @@
 #pragma once
-
-#include "GameAPI.h"
+#include <GameAPI.h>
 
 // 0C
 class Setting
@@ -144,3 +143,7 @@ STATIC_ASSERT(sizeof(IniSettingCollection) == 0x114);
 bool GetNumericGameSetting(char * settingName, double * result);
 bool GetNumericIniSetting(char * settingName, double * result);
 bool GetIniSetting(const char* settingName, Setting** out);
+
+Setting* GameSettingFromString(const std::string& settingName);
+std::string GetStringGameSetting(Setting* setting);
+std::string GetStringFromGameSettingFromString(const std::string& settingName);

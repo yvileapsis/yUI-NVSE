@@ -292,7 +292,7 @@ public:
 void ShowErrorMessageBox(const char* message);
 void ShowRuntimeError(Script* script, const char* fmt, ...);
 
-const char* GetModName(Script* script);
+const char* GetModName(const Script* script);
 
 std::string FormatString(const char* fmt, ...);
 
@@ -578,3 +578,5 @@ StackVector<T*, Size> Filter(S& s, F&& f)
 std::string UTF8toANSI(const std::string& str);
 std::string GetCurPath();
 bool IsConsoleOpen();
+
+int HexStringToInt(const std::string& str);

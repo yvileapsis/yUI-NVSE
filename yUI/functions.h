@@ -1,13 +1,8 @@
 #pragma once
-#include <GameTypes.h>
-#include <GameData.h>
-#include <unordered_set>
+#include <GameTiles.h>
 #include <GameExtraData.h>
+#include <unordered_set>
 
-extern tList<char> queuedConsoleMessages;
-extern DataHandler* g_dataHandler;
-
-inline NiTPointerMap<TESForm>** g_allFormsMap;
 inline std::unordered_set<TESForm*> g_CraftingComponents;
 
 void UIWidth();
@@ -21,7 +16,6 @@ void __fastcall AddyCMToSettingsMenu(BSSimpleArray<StartMenuOption*>*, void*, St
 void FillCraftingComponents();
 
 TESForm* GetRefFromString(char*, char*);
-bool IsInListRecursive(TESForm*, TESForm*);
 
 UInt8 ContWeaponHasAnyMod(ContChangesEntry*);
 float ContGetHealthPercent(ContChangesEntry*);
@@ -40,8 +34,6 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 /// Try to find in the Haystack the Needle - ignore case
 bool FindStringCI(const std::string& strHaystack, const std::string& strNeedle);
 
-int HexStringToInt(const std::string& str);
-
 // if player is in third person, returns true if anim data is the first person and vice versa
 bool IsPlayersOtherAnimData(AnimData* animData);
 
@@ -51,8 +43,10 @@ void PatchPause(UInt32 ptr);
 
 void SetUIStringFull(char *, char* , UInt32);
 
-void __fastcall CursorTileSetStringValue(Tile* tile, void* dummyEDX, enum TileValues tilevalue, char* src, char propagate);
-void __fastcall CursorTileSetIntValue(Tile* tile, void* dummyEDX, enum TileValues tilevalue, int value);
+bool TryGetTypeOfForm(TESForm* form);
+
+void __fastcall CursorTileSetStringValue(Tile* tile, void* dummyEDX, eTileValue tilevalue, char* src, char propagate);
+void __fastcall CursorTileSetIntValue(Tile* tile, void* dummyEDX, eTileValue tilevalue, int value);
 
 char* __fastcall StrFromINI(DWORD* address);
 std::string GetStringFromGameSettingFromString(const std::string& settingName);

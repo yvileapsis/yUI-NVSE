@@ -1,14 +1,8 @@
 #include <ySI.h>
-#include <GameObjects.h>
+#include <GameRTTI.h>
+#include <settings.h>
 #include <functions.h>
 #include <filesystem>
-#include <file.h>
-
-extern int g_ySI;
-extern int g_ySI_Sort;
-extern int g_ySI_Categories;
-
-extern UInt8* g_menuVisibility;
 
 namespace SI
 {
@@ -42,7 +36,7 @@ namespace SI_Files
 				if (entry.formWeapon.weaponClipRounds && entry.formWeapon.weaponClipRounds > static_cast<UInt32>(weapon->GetClipRounds(false))) continue;
 				if (entry.formWeapon.weaponNumProjectiles && entry.formWeapon.weaponNumProjectiles > weapon->numProjectiles) continue;
 				if (entry.formWeapon.weaponSoundLevel && entry.formWeapon.weaponSoundLevel != weapon->soundLevel) continue;
-				if (entry.formWeapon.ammo && !IsInListRecursive(entry.formWeapon.ammo, weapon->ammo.ammo)) continue;
+				if (entry.formWeapon.ammo && !FormContainsRecusive(entry.formWeapon.ammo, weapon->ammo.ammo)) continue;
 			}
 			else if (entry.formType == 24) {
 				const auto armor = DYNAMIC_CAST(form, TESForm, TESObjectARMO);
@@ -78,6 +72,29 @@ namespace SI_Files
 		return false;
 	}
 
+	void FillSIMapsFromJSON()
+	{
+		ra::sort(g_Items_JSON, [&](const JSONEntryItem& entry1, const JSONEntryItem& entry2)
+		         { return entry1.priority > entry2.priority; });
+
+		if (g_ySI_JustInTime)
+		{
+			for (auto mIter = GetAllForms()->Begin(); mIter; ++mIter) {
+				TESForm* form = mIter.Get();
+				if (!form || !form->IsInventoryObjectAlt()) continue;
+				AssignTagToItem(form);
+			}
+			//		SI_Files::g_Items_JSON = std::vector<JSONEntryItem>();
+		}
+
+		ra::sort(g_Tags_JSON, [&](const JSONEntryTag& entry1, const JSONEntryTag& entry2)
+		         { return entry1.priority > entry2.priority; });
+		for (auto& entry : g_Tags_JSON) {
+			if (!entry.name.empty()) SI::g_Categories.emplace(entry.tag);
+			SI::g_Tags.emplace(entry.tag, std::move(entry));
+		}
+		g_Tags_JSON = std::vector<JSONEntryTag>();
+	}
 }
 
 namespace SI
@@ -94,7 +111,7 @@ namespace SI
 
 	void KeyringRefreshPostStewie()
 	{
-		if (CdeclCall<bool>(0x702360) && g_menuVisibility[kMenuType_Inventory] && InventoryMenu::GetSingleton()->IsKeyringOpen()) {
+		if (CdeclCall<bool>(0x702360) && InterfaceManager::IsMenuVisible(kMenuType_Inventory) && InventoryMenu::GetSingleton()->IsKeyringOpen()) {
 			if (Tile* stew = InventoryMenu::GetSingleton()->tile->GetChild("IM_SearchBar"); stew) {
 				if (const auto string = stew->GetValue(kTileValue_string)->str; !stringStewie._Equal(string)) {
 					stringStewie = string;
@@ -106,26 +123,15 @@ namespace SI
 		}
 	}
 
-	bool TryGetTypeOfForm(TESForm* entry)
-	{
-		__try {
-			const auto whaa = entry->typeID && entry->refID;
-			return whaa;
-		}
-		__except (EXCEPTION_EXECUTE_HANDLER) {
-			return false;
-		}
-	}
-
 	bool IsTagForItem(TESForm* form)
 	{
-		if (form && g_Items.find(form) != g_Items.end()) return true;
+		if (form && g_Items.contains(form)) return true;
 		return false;
 	}
 
 	bool IsTagForItem(ContChangesEntry* entry)
 	{
-		if (entry && entry->type && g_Items.find(entry->type) != g_Items.end()) return true;
+		if (entry && entry->type && g_Items.contains(entry->type)) return true;
 		return false;
 	}
 	
@@ -153,11 +159,11 @@ namespace SI
 		do if IS_TYPE(tilemenu, TileMenu) break;
 		while ((tilemenu = tilemenu->parent));
 
-		auto menu = DYNAMIC_CAST(tilemenu, Tile, TileMenu);
+		const auto menu = DYNAMIC_CAST(tilemenu, Tile, TileMenu);
 
 		if (!menu || !menu->menu) return;
 
-		auto text = tile->children.Tail()->data;
+		const auto text = tile->children.Tail()->data;
 
 		if (!text || !std::string("ListItemText")._Equal(text->name.CStr())) return;
 
@@ -170,8 +176,8 @@ namespace SI
 		}
 
 		const auto last = tile->children.Head();
-		
-		auto icon = menu->menu->AddTileFromTemplate(tile, g_Tags[tag].xmltemplate.c_str(), 0);
+
+		const auto icon = menu->menu->AddTileFromTemplate(tile, g_Tags[tag].xmltemplate.c_str(), 0);
 
 		const auto icondata = tile->children.Head();
 
@@ -204,7 +210,7 @@ namespace SI
 		text->SetFloat(kTileValue_wrapwidth, wrapwidth, false);
 	}
 
-	void __fastcall SetTileStringInjectTile(Tile* tile, ContChangesEntry* entry, MenuItemEntryList* list, UInt32 tilevalue, char* tileText, bool propagate)
+	void __fastcall SetTileStringInjectTile(Tile* tile, ContChangesEntry* entry, MenuItemEntryList* list, eTileValue tilevalue, char* tileText, bool propagate)
 	{
 		tile->SetString(tilevalue, tileText, propagate);
 		if (entry && entry->type && TryGetTypeOfForm(entry->type)) InjectIconTile(GetTagForItem(entry), list, tile, entry);
@@ -279,7 +285,7 @@ namespace SI
 		return 0;
 	}
 
-	void __fastcall SetStringValueTagImage(Tile* tile, ContChangesEntry* entry, enum TileValues tilevalue, char* src, char propagate)
+	void __fastcall SetStringValueTagImage(Tile* tile, ContChangesEntry* entry, eTileValue tilevalue, char* src, char propagate)
 	{
 		if (!tile) return;
 
@@ -300,7 +306,7 @@ namespace SI
 		tile->SetString(tilevalue, g_Tags[tag].filename.empty() ? src : g_Tags[tag].filename.c_str(), propagate);
 	}
 
-	void __fastcall SetStringValueTagRose(Tile* tile, ContChangesEntry* entry, enum TileValues tilevalue, char* src, char propagate)
+	void __fastcall SetStringValueTagRose(Tile* tile, ContChangesEntry* entry, eTileValue tilevalue, char* src, char propagate)
 	{
 		if (!tile) return;
 
@@ -444,15 +450,15 @@ namespace SI_Hooks
 			ret
 		}
 	}
-	void __fastcall KeyringEnableCancelHook(Tile* tile, void* dummyEDX, enum TileValues tilevalue, signed int a1)
+	void __fastcall KeyringEnableCancelHook(Tile* tile, void* dummyEDX, eTileValue tilevalue, signed int a1)
 	{
 		tile->SetFloat(tilevalue, InventoryMenu::GetSingleton()->IsKeyringOpen(), true);
 	}
 
-	void __fastcall KeyringPipBoyIconHook(Tile* tile, void* dummyEDX, enum TileValues tilevalue, char* string, int propagate)
+	void __fastcall KeyringPipBoyIconHook(Tile* tile, void* dummyEDX, eTileValue tilevalue, char* string, int propagate)
 	{
 		std::string stringnew = string;
-		if (auto clickedtile = InventoryMenu::GetSingleton()->itemsList.selected; clickedtile->GetValue(kTileValue_user16)
+		if (const auto clickedtile = InventoryMenu::GetSingleton()->itemsList.selected; clickedtile->GetValue(kTileValue_user16)
 			&& !SI::g_Tags[clickedtile->GetValue(kTileValue_user16)->str].icon.empty())
 			stringnew = SI::g_Tags[clickedtile->GetValue(kTileValue_user16)->str].icon;
 		tile->SetString(tilevalue, stringnew.c_str(), true);

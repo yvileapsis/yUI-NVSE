@@ -40,7 +40,7 @@ void WriteRelJump(UInt32 jumpSrc, UInt32 jumpTgt)
 {
 	// jmp rel32
 	auto patch = std::vector(reinterpret_cast<std::byte*>(jumpSrc), reinterpret_cast<std::byte*>(jumpSrc) + sizeof(jumpTgt) + 1);
-	g_SafeWriteData.emplace(jumpSrc, patch);
+	if (!g_SafeWriteData.contains(jumpSrc)) g_SafeWriteData.emplace(jumpSrc, patch);
 	
 	SafeWrite8(jumpSrc, 0xE9);
 	SafeWrite32(jumpSrc + 1, jumpTgt - jumpSrc - 1 - 4);
@@ -50,7 +50,7 @@ void WriteRelCall(UInt32 jumpSrc, UInt32 jumpTgt)
 {
 	// call rel32
 	auto patch = std::vector(reinterpret_cast<std::byte*>(jumpSrc), reinterpret_cast<std::byte*>(jumpSrc) + sizeof(jumpTgt) + 1);
-	g_SafeWriteData.emplace(jumpSrc, patch);
+	if (!g_SafeWriteData.contains(jumpSrc)) g_SafeWriteData.emplace(jumpSrc, patch);
 	
 	SafeWrite8(jumpSrc, 0xE8);
 	SafeWrite32(jumpSrc + 1, jumpTgt - jumpSrc - 1 - 4);
@@ -79,7 +79,7 @@ void WriteRelJle(UInt32 jumpSrc, UInt32 jumpTgt)
 
 void UndoSafeWrite(UInt32 addr)
 {
-	if (g_SafeWriteData.find(addr) == g_SafeWriteData.end()) return;
+	if (!g_SafeWriteData.contains(addr)) return;
 	UInt32	oldProtect;
 	VirtualProtect((void*)addr, g_SafeWriteData[addr].size(), PAGE_EXECUTE_READWRITE, &oldProtect);
 	for (UInt32 addroffset = 0; auto iter : g_SafeWriteData[addr])

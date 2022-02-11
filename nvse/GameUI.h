@@ -330,8 +330,8 @@ public:
 	};
 	
 	UInt32					flags;				// 000
-	SceneGraph				*sceneGraph004;		// 004
-	SceneGraph				*sceneGraph008;		// 008
+	SceneGraph*				sceneGraph004;		// 004
+	SceneGraph*				sceneGraph008;		// 008
 	UInt32					currentMode;		// 00C	1 = GameMode; 2 = MenuMode
 	// checked for 1 at 0x70BA97
 	// set to 2 at 0x70BA8D
@@ -347,7 +347,7 @@ public:
 	UInt8					byte022;			// 022
 	UInt8					byte023;			// 023
 	UInt32					unk024;				// 024
-	TileImage				*cursor;			// 028
+	TileImage*				cursor;				// 028
 	float					flt02C;				// 02C
 	float					flt030;				// 030
 	float					flt034;				// 034
@@ -356,7 +356,7 @@ public:
 	float					cursorY;			// 040
 	float					mouseWheel;			// 044	-120.0 = down; 120.0 = up
 	float					flt048;				// 048
-	Tile					*draggedTile;		// 04C
+	Tile*					draggedTile;		// 04C
 	int						unk050;				// 050
 	float					flt054;				// 054
 	float					flt058;				// 058
@@ -370,18 +370,18 @@ public:
 	UInt8					byte07D;			// 07D
 	UInt8					byte07E;			// 07E
 	UInt8					byte07F;			// 07F
-	NiNode					*niNode080;			// 080
-	NiNode					*niNode084;			// 084
+	NiNode*					niNode080;			// 080
+	NiNode*					niNode084;			// 084
 	UInt32					unk088;				// 088
-	void					*shaderAccum08C;	// 08C
-	void					*shaderAccum090;	// 090
-	void					*shadowScene094;	// 094
-	void					*shadowScene098;	// 098
-	Tile					*menuRoot;			// 09C
-	Tile					*globalsTile;		// 0A0	globals.xml
-	NiNode					*unk0A4;			// 0A4 saw Tile? seen NiNode
+	void*					shaderAccum08C;		// 08C
+	void*					shaderAccum090;		// 090
+	void*					shadowScene094;		// 094
+	void*					shadowScene098;		// 098
+	Tile*					menuRoot;			// 09C
+	Tile*					globalsTile;		// 0A0	globals.xml
+	NiNode*					unk0A4;				// 0A4 saw Tile? seen NiNode
 	UInt32					unk0A8;				// 0A8
-	NiObject				*unk0AC;			// 0AC seen NiAlphaProperty
+	NiObject*				unk0AC;				// 0AC seen NiAlphaProperty
 	UInt32					unk0B0[3];			// 0B0
 	Tile					*activeTileAlt;		// 0BC
 	UInt32					unk0C0;				// 0C0
@@ -390,10 +390,10 @@ public:
 	UInt8					byte0C9;			// 0C9
 	UInt8					byte0CA;			// 0CA
 	UInt8					byte0CB;			// 0CB
-	Tile					*activeTile;		// 0CC
-	Menu					*activeMenu;		// 0D0
-	Tile					*tile0D4;			// 0D4
-	Menu					*menu0D8;			// 0D8
+	Tile*					activeTile;			// 0CC
+	Menu*					activeMenu;			// 0D0
+	Tile*					tile0D4;			// 0D4
+	Menu*					menu0D8;			// 0D8
 	UInt32					unk0DC[2];			// 0DC
 	UInt8					msgBoxButton;		// 0E4 -1 if no button pressed
 	UInt8					byte0E5;			// 0E5
@@ -404,15 +404,15 @@ public:
 	UInt8					hasMouseMoved;		// 0ED
 	UInt8					byte0EE;			// 0EE
 	UInt8					byte0EF;			// 0EF
-	TESObjectREFR			*debugSelection;	// 0F0	compared to activated object during Activate
+	TESObjectREFR*			debugSelection;		// 0F0	compared to activated object during Activate
 	UInt32					unk0F4;				// 0F4
 	UInt32					unk0F8;				// 0F8
-	TESObjectREFR			*crosshairRef;		// 0FC
+	TESObjectREFR*			crosshairRef;		// 0FC
 	UInt32					unk100[4];			// 100
 	UInt8					byte110;			// 110
 	UInt8					pad111[3];			// 111
 	UInt32					menuStack[10];		// 114
-	void					*ptr13C;			// 13C	Points to a struct, possibly. First member is *bhkSimpleShapePhantom
+	void*					ptr13C;				// 13C	Points to a struct, possibly. First member is *bhkSimpleShapePhantom
 	UInt32					unk140;				// 140
 	UInt32					unk144;				// 144
 	UInt8					byte148;			// 148
@@ -429,7 +429,7 @@ public:
 	UInt8					byte171;			// 171
 	UInt8					byte172;			// 172
 	UInt8					byte173;			// 173
-	FOPipboyManager			*pipboyManager;		// 174
+	FOPipboyManager*		pipboyManager;		// 174
 	Struct0178				unk178;				// 178
 	VATSHighlightData		vatsHighlightData;	// 1DC
 	float					scale4AC;			// 4AC
@@ -438,9 +438,9 @@ public:
 	UInt8					byte4B5;			// 4B5
 	UInt8					byte4B6;			// 4B6
 	UInt8					byte4B7;			// 4B7
-	UInt32					queuedPipboyTabToSwitchTo;	// 4B8
+	UInt32					queuedPipboyTabToSwitchTo;			// 4B8
 	UInt32					pipBoyMode;			// 4BC
-	void					(*onPipboyOpenCallback)(void);			// 4C0
+	void					(*onPipboyOpenCallback)(void);		// 4C0
 	UInt32					unk4C4[2];			// 4C4
 	UInt8					byte4CC;			// 4CC
 	UInt8					byte4CD;			// 4CD
@@ -836,8 +836,6 @@ public:
 
 	void RegisterTile(Tile* tile, bool noAppendToMenuStack) { ThisCall(0xA1DC70, this, tile, noAppendToMenuStack); };
 	void HideTitle(bool noFadeIn) { ThisCall(0xA1DC20, this, noFadeIn); };
-
-	bool IsMenuVisible(UInt32 menutype);
 };
 
 typedef ListBox<ContChangesEntry> MenuItemEntryList;

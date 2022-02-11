@@ -136,6 +136,11 @@ char *Tile::GetComponentFullName(char *resStr)
 	return fullName;
 }
 
+Tile* Tile::InjectUIXML(const char* str)
+{
+	return FileExists(str) ? this->ReadXML(str) : nullptr;
+}
+
 void Tile::Dump(void)
 {
 	PrintLog("%s", name.m_data);

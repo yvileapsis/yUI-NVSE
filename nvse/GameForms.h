@@ -574,7 +574,6 @@ public:
 	// Looks like there is another DWord here, used as a byte: LastLoaded or Active or Selected ? 
 
 	TESForm*		TryGetREFRParent(void);
-	UInt8			GetModIndex() const;
 	TESFullName*	GetFullName() const;
 	const char*		GetTheName();
 	bool			IsCloned() const;
@@ -603,7 +602,7 @@ public:
 	bool			IsDeleted() { return flags & kFormFlags_Deleted; };
 	
 	// adds a new form to the game (from CloneForm or LoadForm)
-	void			DoAddForm(TESForm* newForm, bool bPersist = true, bool record = true) const;
+	static void			DoAddForm(TESForm* newForm, bool bPersist = true, bool record = true);
 	// return a new base form which is the clone of this form
 	TESForm*		CloneForm(bool bPersist = true) const;
 
@@ -1143,7 +1142,7 @@ public:
 	~TESBipedModelForm();
 
 	// bit indices starting from lsb
-	enum EPartBit {
+	enum ePartBit {
 		ePart_Head = 0,
 		ePart_Hair,
 		ePart_UpperBody,
@@ -2648,6 +2647,13 @@ public:
 	TESObjectARMO();
 	~TESObjectARMO();
 
+	enum eBipedFlags {
+		eBipedFlag_HasBackPack = 0x4,
+		eBipedFlag_MediumArmor = 0x8,
+		eBipedFlag_PowerArmor = 0x20,
+		eBipedFlag_NonPlayable = 0x40,
+		eBipedFlag_HeavyArmor = 0x80,
+	};
 	// children
 	TESFullName					fullName;		// 030
 	TESScriptableForm			scriptable;		// 03C
@@ -4101,7 +4107,7 @@ public:
 	TESPackage();
 	~TESPackage();
 
-	enum	// From OBSE and FNVEdit
+	enum ePackageFlag	// From OBSE and FNVEdit
 	{
 		kPackageFlag_OffersServices =			1 << 0,
 		kPackageFlag_MustReachLocation =		1 << 1,
@@ -4137,9 +4143,10 @@ public:
 		kPackageFlag_Unk31 =					1 << 31
 	};
 
-	enum	// From OBSE and FNVEdit. Runtimes has 0x24 types!
+	enum ePackageType	// From OBSE and FNVEdit. Runtimes has 0x24 types!
 	{
-		kPackageType_Find =	0,		// 00
+		kPackageType_Min		= 0,
+		kPackageType_Find		= 0,		// 00
 		kPackageType_Follow,
 		kPackageType_Escort,
 		kPackageType_Eat,
@@ -4160,7 +4167,7 @@ public:
 		// unless shown otherwise kPackageType_CombatController,	// Actor::GetCombatController returns package only if type matches this
 		// start conversation can lead to a package of type 1C, which is recorded in PlayerCharacter::Unk0224
 
-		kPackType_MAX
+		kPackageType_Max
 	};
 
 	// 8
@@ -4227,17 +4234,11 @@ public:
 		static bool IsValidDate(UInt8 d) { return d <= 31; }
 	};
 
-	union ObjectType
-	{
-		TESForm			* form;
-		TESObjectREFR	* refr;
-		UInt32			objectCode;
-	};
-
 	// order only somewhat related to kFormType_XXX (values off by 17, 20, or 21)
-	enum	// From OBSE and FNVEdit
-	{	
-		kObjectType_None	=	0,
+	enum eObjectType// From OBSE and FNVEdit
+	{
+		kObjectType_Min		= 0,
+		kObjectType_None	= 0,
 		kObjectType_Activators,
 		kObjectType_Armor,
 		kObjectType_Books,
@@ -4270,9 +4271,18 @@ public:
 		kObjectType_Max,						//	1E
 	};
 
+	union ObjectType
+	{
+		TESForm*		form;
+		TESObjectREFR*	refr;
+		eObjectType		objectCode;
+	};
+
+
 	struct LocationData
 	{
-		enum {
+		enum ePackageLocation {
+			kPackLocation_Min				= 0,
 			kPackLocation_NearReference		= 0,
 			kPackLocation_InCell			= 1,
 			kPackLocation_CurrentLocation	= 2,
@@ -4290,7 +4300,7 @@ public:
 		ObjectType  object;			// 008
 
 		static LocationData* Create();
-		static const char* StringForLocationCode(UInt8 locCode);
+		static const char* StringForLocationCode(ePackageLocation locCode);
 		const char* StringForLocationCodeAndData(void);
 		static UInt8 LocationCodeForString(const char* locStr);
 		static bool IsValidLocationType(UInt8 locCode) { return locCode < kPackLocation_Max; }
@@ -4322,7 +4332,8 @@ public:
 
 
 	enum eProcedure {			// UInt32	// Checked the Geck Wiki. Not consistent with s_procNames (which has a diffferent order and 0x37 procedures)
-		kProcedure_TRAVEL = 0,
+		kProcedure_Min		= 0,
+		kProcedure_TRAVEL	= 0,
 		kProcedure_ACTIVATE,
 		kProcedure_ACQUIRE,
 		kProcedure_WAIT,
@@ -4351,6 +4362,8 @@ public:
 		kProcedure_UNK01A,
 		kProcedure_ACCOMPANY,
 		kProcedure_USE_ITEM_AT,
+		kProcedure_AIM,
+		kProcedure_NOTIFY,
 		kProcedure_SANDMAN,
 		kProcedure_WAIT_AMBUSH,
 		kProcedure_SURFACE,					// 0x20
@@ -4374,7 +4387,7 @@ public:
 		kProcedure_MOVEMENT_BLOCKED,
 		kProcedure_CANIBAL_FEED,			// 0x32
 
-		kProcedure_MAX						// 0x33
+		kProcedure_Max						// 0x33
 	};
 
 	// In DialoguePackage, there are 0x58 virtual functions (including 0x4E from TESForm)
@@ -4398,7 +4411,7 @@ public:
 
 	void SetTarget(TESObjectREFR* refr);
 	void SetTarget(TESForm* baseForm, UInt32 count);
-	void SetTarget(UInt8 typeCode, UInt32 count);
+	void SetTarget(eObjectType typeCode, UInt32 count);
 	void SetCount(UInt32 aCount);
 	void SetDistance(UInt32 aDistance) { SetCount(aDistance); }
 	TargetData* GetTargetData();
@@ -4407,11 +4420,12 @@ public:
 	bool IsFlagSet(UInt32 flag);
 	void SetFlag(UInt32 flag, bool bSet);
 
-	static const char* StringForPackageType(UInt32 pkgType);
-	static const char* StringForObjectCode(UInt8 objCode);
+	static const char* StringForPackageType(ePackageType pkgType);
+	static const char* StringForObjectCode(eObjectType objCode);
 	static UInt8 ObjectCodeForString(const char* objString);
 	static bool IsValidObjectCode(UInt8 o) { return o < kObjectType_Max; }
 	static const char* StringForProcedureCode(eProcedure proc);
+	static const char* StringForProcedureCode(eProcedure proc, bool bRemovePrefix);
 };
 
 STATIC_ASSERT(sizeof(TESPackage) == 0x80);
@@ -4896,9 +4910,13 @@ public:
 	{
 		return (idx >= 0) && (idx < numAddedObjects);
 	}
-};
 
+	bool Contains(TESForm* form);
+	bool ContainsRecursive(TESForm* form);
+};
 STATIC_ASSERT(sizeof(BGSListForm) == 0x024);
+
+bool FormContainsRecusive(TESForm* parent, TESForm* child);
 
 // 08
 class BGSPerkEntry

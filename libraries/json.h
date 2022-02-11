@@ -6734,7 +6734,7 @@ namespace nlohmann
                         }
                     }
                 }
-
+                [[fallthrough]];
                 // multi-line comments skip input until */ is read
                 case '*':
                 {
@@ -6769,7 +6769,8 @@ namespace nlohmann
                         }
                     }
                 }
-
+                [[fallthrough]];
+\
                 // unexpected character after reading '/'
                 default:
                 {

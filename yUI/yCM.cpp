@@ -4,7 +4,6 @@
 
 yCM g_yCM_Manager;
 
-
 bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS)
 {
 	*result = -999;
@@ -188,4 +187,32 @@ void writeMCMHooks()
 
 	g_commandInterface->GetByOpcode(0x21C2)->execute = Cmd_GetyCMFloat_Execute;
 	g_commandInterface->GetByOpcode(0x21C3)->execute = Cmd_SetyCMFloat_Execute;
+}
+
+
+StartMenuOption* yCM1;
+
+void __cdecl yCMCallback()
+{
+	MenuButton_DownloadsClick();
+	//	ThisCall(0x7D74F0, (void *)( 0x11DAAC0 + 0x0B4), 0);
+	//	static StartMenu* g_StartMenu = StartMenu::GetSingleton();
+	//	((Tile*)(&(g_StartMenu->settingsSubMenu) + 0xC))->SetFloat(TraitNameToID("_enabled"), 1);
+	//	g_StartMenu->GetChild("yCM")->GetChild("yCM")->SetFloat(kTileValue_visible, 0, 0);
+}
+
+void __fastcall AddyCMToSettingsMenu(BSSimpleArray<StartMenuOption*>* settingsMenuOptions, void* edx, StartMenuOption** menuDownloads)
+{
+	//		(*HUDColorSetting)->onSelection = HUDColorSettingCallback;
+	//	(*menuDownloads)->displayString = "Mods";
+	//	(*menuDownloads)->callback = yCMCallback;
+	//	(*menuDownloads)->data = StartMenuOption::kMainMenu + StartMenuOption::kPauseMenu;
+
+	yCM1 = StartMenuOption::Create("Mods", yCMCallback, StartMenuOption::kMainMenu + StartMenuOption::kPauseMenu);
+	settingsMenuOptions->Append(&yCM1);
+	settingsMenuOptions->Append(menuDownloads);
+
+
+	//yCM = StartMenuOption::Create("Mods", yCMCallback, StartMenuOption::kMainMenu);
+
 }

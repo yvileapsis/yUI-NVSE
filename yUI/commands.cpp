@@ -1,8 +1,4 @@
-#include <file.h>
-#include <functions.h>
 #include <ySI.h>
-
-extern bool	(*AssignString)(ParamInfo*, void*, TESObjectREFR*, TESObjectREFR*, Script*, ScriptEventList*, double*, UInt32*, const char*);
 
 extern bool Cmd_ySIGetTrait_Execute(COMMAND_ARGS)
 {

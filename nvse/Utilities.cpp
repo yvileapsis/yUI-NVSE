@@ -647,7 +647,7 @@ const char GetSeparatorChar(Script * script)
 {
 	if(IsConsoleMode())
 	{
-		if(script && script->GetModIndex() != 0xFF)
+		if(script && script->modIndex != 0xFF)
 			return '|';
 		else
 			return '@';
@@ -660,7 +660,7 @@ const char * GetSeparatorChars(Script * script)
 {
 	if(IsConsoleMode())
 	{
-		if(script && script->GetModIndex() != 0xFF)
+		if(script && script->modIndex != 0xFF)
 			return "|";
 		else
 			return "@";
@@ -841,12 +841,12 @@ void ShowErrorMessageBox(const char* message)
 
 std::unordered_set<UInt32> g_warnedScripts;
 
-const char* GetModName(Script* script)
+const char* GetModName(const Script* script)
 {
 	const char* modName = "In-game console";
-	if (script->GetModIndex() != 0xFF)
+	if (script->modIndex != 0xFF)
 	{
-		modName = DataHandler::GetSingleton()->GetNthModName(script->GetModIndex());
+		modName = DataHandler::GetSingleton()->GetNthModName(script->modIndex);
 		if (!modName || !modName[0])
 			modName = "Unknown";
 	}
@@ -1543,4 +1543,13 @@ __declspec(naked) bool IsConsoleOpen()
 	done :
 		 retn
 	}
+}
+
+int HexStringToInt(const std::string& str)
+{
+	char* p;
+	const auto id = strtoul(str.c_str(), &p, 16);
+	if (*p == 0)
+		return id;
+	return -1;
 }

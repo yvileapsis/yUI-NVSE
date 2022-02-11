@@ -1,30 +1,15 @@
 #include <file.h>
 #include <json.h>
 
-#include <filesystem>
-#include <fstream>
-#include <unordered_set>
-#include <utility>
-
-#include <functions.h>
+#include <GameData.h>
+#include <GameAPI.h>
+#include <GameRTTI.h>
 #include <Utilities.h>
 
-#include "settings.h"
-#include "ySI.h"
+#include <ySI.h>
 
-namespace SI_Files
-{
-	extern std::vector<JSONEntryItem> g_Items_JSON;
-	extern std::vector<JSONEntryTag> g_Tags_JSON;
-}
-
-namespace SI
-{
-	extern std::unordered_map <TESForm*, std::string> g_Items;
-	extern std::unordered_map <std::string, JSONEntryTag> g_Tags;
-	extern std::unordered_set <std::string>  g_Categories;
-	extern std::vector<std::filesystem::path> g_XMLPaths;
-}
+#include <filesystem>
+#include <fstream>
 
 void LogForm(const TESForm* form)
 {
@@ -37,7 +22,7 @@ void JSONEntryItemRecursiveEmplace(const std::string&, SInt16, TESForm*, UInt8);
 void HandleJson(const std::filesystem::path& path)
 {
 	Log("\nReading from JSON file " + path.string());
-	const auto strToFormID = [](const std::string& formIdStr)
+	constexpr auto strToFormID = [](const std::string& formIdStr)
 	{
 		const auto formId = HexStringToInt(formIdStr);
 		if (formId == -1)
@@ -111,13 +96,13 @@ void HandleJson(const std::filesystem::path& path)
 							} else if (formlist == 1) {
 								JSONEntryItemRecursiveEmplace(tag, priority, form, questItem);
 							} else if (formlist == 2) {
-								for (auto mIter = (*g_allFormsMap)->Begin(); mIter; ++mIter) {
-									TESForm* item = mIter.Get();
-									if (item->typeID != 40) continue;
+								for (auto mIter = GetAllForms()->Begin(); mIter; ++mIter) {
+									auto item = mIter.Get();
+									if (item->typeID != kFormType_TESObjectWEAP) continue;
 									const auto weapon = DYNAMIC_CAST(item, TESForm, TESObjectWEAP);
 									if (!weapon) continue;
 									if (!weapon->repairItemList.listForm) continue;
-									if (IsInListRecursive(weapon->repairItemList.listForm, form)) {
+									if (weapon->repairItemList.listForm->ContainsRecursive(form)) {
 										Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", tag.c_str(), formId, item->GetName(), weapon->repairItemList.listForm->refID));
 										SI_Files::g_Items_JSON.emplace_back(tag, priority, item, questItem);
 									}
@@ -133,18 +118,18 @@ void HandleJson(const std::filesystem::path& path)
 				else if (formType == 40 || elem.contains("weaponSkill") || elem.contains("weaponType"))
 				{
 					formType = 40;
-					JSONEntryItemWeapon weapon{};
+					SI_Files::JSONEntryItemWeapon weapon{};
 
-					if (elem.contains("weaponSkill"))			weapon.weaponSkill = elem["weaponSkill"].get<UInt32>();
-					if (elem.contains("weaponHandgrip"))		weapon.weaponHandgrip = elem["weaponHandgrip"].get<UInt32>();
-					if (elem.contains("weaponAttackAnim"))		weapon.weaponAttackAnim = elem["weaponAttackAnim"].get<UInt32>();
-					if (elem.contains("weaponReloadAnim"))		weapon.weaponReloadAnim = elem["weaponReloadAnim"].get<UInt32>();
-					if (elem.contains("weaponIsAutomatic"))		weapon.weaponIsAutomatic = elem["weaponIsAutomatic"].get<UInt32>();
-					if (elem.contains("weaponHasScope"))		weapon.weaponHasScope = elem["weaponHasScope"].get<UInt32>();
-					if (elem.contains("weaponIgnoresDTDR"))		weapon.weaponIgnoresDTDR = elem["weaponIgnoresDTDR"].get<UInt32>();
-					if (elem.contains("weaponClipRounds"))		weapon.weaponClipRounds = elem["weaponClipRounds"].get<UInt32>();
-					if (elem.contains("weaponNumProjectiles"))	weapon.weaponNumProjectiles = elem["weaponNumProjectiles"].get<UInt32>();
-					if (elem.contains("weaponSoundLevel"))		weapon.weaponSoundLevel = elem["weaponSoundLevel"].get<UInt32>();
+					if (elem.contains("weaponSkill"))			weapon.weaponSkill			= elem["weaponSkill"].get<UInt32>();
+					if (elem.contains("weaponHandgrip"))		weapon.weaponHandgrip		= elem["weaponHandgrip"].get<UInt32>();
+					if (elem.contains("weaponAttackAnim"))		weapon.weaponAttackAnim		= elem["weaponAttackAnim"].get<UInt32>();
+					if (elem.contains("weaponReloadAnim"))		weapon.weaponReloadAnim		= elem["weaponReloadAnim"].get<UInt32>();
+					if (elem.contains("weaponIsAutomatic"))		weapon.weaponIsAutomatic	= elem["weaponIsAutomatic"].get<UInt32>();
+					if (elem.contains("weaponHasScope"))		weapon.weaponHasScope		= elem["weaponHasScope"].get<UInt32>();
+					if (elem.contains("weaponIgnoresDTDR"))		weapon.weaponIgnoresDTDR	= elem["weaponIgnoresDTDR"].get<UInt32>();
+					if (elem.contains("weaponClipRounds"))		weapon.weaponClipRounds		= elem["weaponClipRounds"].get<UInt32>();
+					if (elem.contains("weaponNumProjectiles"))	weapon.weaponNumProjectiles	= elem["weaponNumProjectiles"].get<UInt32>();
+					if (elem.contains("weaponSoundLevel"))		weapon.weaponSoundLevel		= elem["weaponSoundLevel"].get<UInt32>();
 
 					if (elem.contains("ammoMod") && elem.contains("ammoForm"))
 					{
@@ -181,59 +166,59 @@ void HandleJson(const std::filesystem::path& path)
 				else if (formType == 24)
 				{
 					formType = 24;
-					JSONEntryItemArmor armor{};
+					SI_Files::JSONEntryItemArmor armor{};
 
-					if (elem.contains("armorHead")) 		(elem["armorHead"].get<SInt8>() == 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1;
-					if (elem.contains("armorHair")) 		(elem["armorHair"].get<SInt8>() == 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 1;
-					if (elem.contains("armorUpperBody")) 	(elem["armorUpperBody"].get<SInt8>() == 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 2;
-					if (elem.contains("armorLeftHand")) 	(elem["armorLeftHand"].get<SInt8>() == 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 3;
-					if (elem.contains("armorRightHand")) 	(elem["armorRightHand"].get<SInt8>() == 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 4;
-					if (elem.contains("armorWeapon")) 		(elem["armorWeapon"].get<SInt8>() == 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 5;
-					if (elem.contains("armorPipBoy")) 		(elem["armorPipBoy"].get<SInt8>() == 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 6;
-					if (elem.contains("armorBackpack")) 	(elem["armorBackpack"].get<SInt8>() == 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 7;
-					if (elem.contains("armorNecklace")) 	(elem["armorNecklace"].get<SInt8>() == 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 8;
-					if (elem.contains("armorHeadband")) 	(elem["armorHeadband"].get<SInt8>() == 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 9;
-					if (elem.contains("armorHat")) 			(elem["armorHat"].get<SInt8>() == 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 10;
-					if (elem.contains("armorEyeglasses")) 	(elem["armorEyeglasses"].get<SInt8>() == 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 11;
-					if (elem.contains("armorNosering")) 	(elem["armorNosering"].get<SInt8>() == 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 12;
-					if (elem.contains("armorEarrings")) 	(elem["armorEarrings"].get<SInt8>() == 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 13;
-					if (elem.contains("armorMask")) 		(elem["armorMask"].get<SInt8>() == 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 14;
-					if (elem.contains("armorChoker")) 		(elem["armorChoker"].get<SInt8>() == 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 15;
-					if (elem.contains("armorMouthObject"))	(elem["armorMouthObject"].get<SInt8>() == 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 16;
-					if (elem.contains("armorBodyAddon1"))	(elem["armorBodyAddon1"].get<SInt8>() == 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 17;
-					if (elem.contains("armorBodyAddon2"))	(elem["armorBodyAddon2"].get<SInt8>() == 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 18;
-					if (elem.contains("armorBodyAddon3"))	(elem["armorBodyAddon3"].get<SInt8>() == 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 19;
+					if (elem.contains("armorHead")) 		(elem["armorHead"].get<SInt8>()			== 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1;
+					if (elem.contains("armorHair")) 		(elem["armorHair"].get<SInt8>()			== 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 1;
+					if (elem.contains("armorUpperBody")) 	(elem["armorUpperBody"].get<SInt8>()	== 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 2;
+					if (elem.contains("armorLeftHand")) 	(elem["armorLeftHand"].get<SInt8>()		== 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 3;
+					if (elem.contains("armorRightHand")) 	(elem["armorRightHand"].get<SInt8>()	== 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 4;
+					if (elem.contains("armorWeapon")) 		(elem["armorWeapon"].get<SInt8>()		== 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 5;
+					if (elem.contains("armorPipBoy")) 		(elem["armorPipBoy"].get<SInt8>()		== 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 6;
+					if (elem.contains("armorBackpack")) 	(elem["armorBackpack"].get<SInt8>()		== 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 7;
+					if (elem.contains("armorNecklace")) 	(elem["armorNecklace"].get<SInt8>()		== 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 8;
+					if (elem.contains("armorHeadband")) 	(elem["armorHeadband"].get<SInt8>()		== 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 9;
+					if (elem.contains("armorHat")) 			(elem["armorHat"].get<SInt8>()			== 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 10;
+					if (elem.contains("armorEyeglasses")) 	(elem["armorEyeglasses"].get<SInt8>()	== 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 11;
+					if (elem.contains("armorNosering")) 	(elem["armorNosering"].get<SInt8>()		== 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 12;
+					if (elem.contains("armorEarrings")) 	(elem["armorEarrings"].get<SInt8>()		== 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 13;
+					if (elem.contains("armorMask")) 		(elem["armorMask"].get<SInt8>()			== 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 14;
+					if (elem.contains("armorChoker")) 		(elem["armorChoker"].get<SInt8>()		== 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 15;
+					if (elem.contains("armorMouthObject"))	(elem["armorMouthObject"].get<SInt8>()	== 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 16;
+					if (elem.contains("armorBodyAddon1"))	(elem["armorBodyAddon1"].get<SInt8>()	== 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 17;
+					if (elem.contains("armorBodyAddon2"))	(elem["armorBodyAddon2"].get<SInt8>()	== 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 18;
+					if (elem.contains("armorBodyAddon3"))	(elem["armorBodyAddon3"].get<SInt8>()	== 1 ? armor.armorSlotsMaskWL : armor.armorSlotsMaskBL) += 1 << 19;
 
 
-					if (elem.contains("armorClass"))		armor.armorClass = elem["armorClass"].get<UInt16>();
-					if (elem.contains("armorPower"))		armor.armorPower = elem["armorPower"].get<SInt8>();
-					if (elem.contains("armorHasBackpack"))	armor.armorHasBackpack = elem["armorHasBackpack"].get<SInt8>();
+					if (elem.contains("armorClass"))		armor.armorClass		= elem["armorClass"].get<UInt16>();
+					if (elem.contains("armorPower"))		armor.armorPower		= elem["armorPower"].get<SInt8>();
+					if (elem.contains("armorHasBackpack"))	armor.armorHasBackpack	= elem["armorHasBackpack"].get<SInt8>();
 
-					if (elem.contains("armorDT"))			armor.armorDT = elem["armorDT"].get<float>();
-					if (elem.contains("armorDR"))			armor.armorDR = elem["armorDR"].get<UInt16>();
-					if (elem.contains("armorChangesAV"))	armor.armorChangesAV = elem["armorChangesAV"].get<UInt16>();
+					if (elem.contains("armorDT"))			armor.armorDT			= elem["armorDT"].get<float>();
+					if (elem.contains("armorDR"))			armor.armorDR			= elem["armorDR"].get<UInt16>();
+					if (elem.contains("armorChangesAV"))	armor.armorChangesAV	= elem["armorChangesAV"].get<UInt16>();
 
 					SI_Files::g_Items_JSON.emplace_back(tag, priority, formType, questItem, armor);
 				}
 				else if (formType == 31 || elem.contains("miscComponent"))
 				{
 					formType = 31;
-					JSONEntryItemMisc misc{};
+					SI_Files::JSONEntryItemMisc misc{};
 					if (elem.contains("miscComponent"))	misc.miscComponent = elem["miscComponent"].get<UInt8>();
 					SI_Files::g_Items_JSON.emplace_back(tag, priority, formType, questItem, misc);
 				}
 				else if (formType == 47 || elem.contains("IsFood") || elem.contains("IsMedicine"))
 				{
 					formType = 47;
-					JSONEntryItemAid aid{};
+					SI_Files::JSONEntryItemAid aid{};
 
-					if (elem.contains("aidRestoresAV"))			aid.aidRestoresAV = elem["aidRestoresAV"].get<UInt8>();
-					if (elem.contains("aidDamagesAV"))			aid.aidDamagesAV = elem["aidDamagesAV"].get<UInt8>();
-					if (elem.contains("aidIsAddictive"))		aid.aidIsAddictive = elem["aidIsAddictive"].get<UInt8>();
-					if (elem.contains("aidIsFood"))				aid.aidIsFood = elem["aidIsFood"].get<UInt8>();
-					if (elem.contains("aidIsWater"))			aid.aidIsWater = elem["aidIsWater"].get<UInt8>();
-					if (elem.contains("aidIsMedicine"))			aid.aidIsMedicine = elem["aidIsMedicine"].get<UInt8>();
-					if (elem.contains("aidIsPoisonous"))		aid.aidIsPoisonous = elem["aidIsPoisonous"].get<UInt8>();
+					if (elem.contains("aidRestoresAV"))			aid.aidRestoresAV	= elem["aidRestoresAV"].get<UInt8>();
+					if (elem.contains("aidDamagesAV"))			aid.aidDamagesAV	= elem["aidDamagesAV"].get<UInt8>();
+					if (elem.contains("aidIsAddictive"))		aid.aidIsAddictive	= elem["aidIsAddictive"].get<UInt8>();
+					if (elem.contains("aidIsFood"))				aid.aidIsFood		= elem["aidIsFood"].get<UInt8>();
+					if (elem.contains("aidIsWater"))			aid.aidIsWater		= elem["aidIsWater"].get<UInt8>();
+					if (elem.contains("aidIsMedicine"))			aid.aidIsMedicine	= elem["aidIsMedicine"].get<UInt8>();
+					if (elem.contains("aidIsPoisonous"))		aid.aidIsPoisonous	= elem["aidIsPoisonous"].get<UInt8>();
 					SI_Files::g_Items_JSON.emplace_back(tag, priority, formType, questItem, aid);
 				}
 				else SI_Files::g_Items_JSON.emplace_back(tag, priority, formType, questItem);
@@ -291,7 +276,7 @@ void HandleJson(const std::filesystem::path& path)
 
 void JSONEntryItemRecursiveEmplace(const std::string& tag, SInt16 priority, TESForm* list, UInt8 questItem)
 {
-	if (list->typeID == 85)
+	if (list->typeID == kFormType_BGSListForm)
 	{
 		const auto bgslist = DYNAMIC_CAST(list, TESForm, BGSListForm);
 		if (!bgslist) return;
@@ -302,32 +287,6 @@ void JSONEntryItemRecursiveEmplace(const std::string& tag, SInt16 priority, TESF
 		Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive", tag.c_str(), list->refID, list->GetName()));
 		SI_Files::g_Items_JSON.emplace_back(tag, priority, list, questItem);
 	}
-}
-
-extern NiTPointerMap<TESForm>** g_allFormsMap;
-
-void FillSIMapsFromJSON()
-{
-	ra::sort(SI_Files::g_Items_JSON, [&](const JSONEntryItem& entry1, const JSONEntryItem& entry2)
-	         { return entry1.priority > entry2.priority; });
-
-	if (g_ySI_JustInTime)
-	{
-		for (auto mIter = (*g_allFormsMap)->Begin(); mIter; ++mIter) {
-			TESForm* form = mIter.Get();
-			if (!form || !form->IsInventoryObjectAlt()) continue;
-			SI_Files::AssignTagToItem(form);
-		}
-//		SI_Files::g_Items_JSON = std::vector<JSONEntryItem>();
-	}
-
-	ra::sort(SI_Files::g_Tags_JSON, [&](const JSONEntryTag& entry1, const JSONEntryTag& entry2)
-	         { return entry1.priority > entry2.priority; });
-	for (auto& entry : SI_Files::g_Tags_JSON) {
-		if (!entry.name.empty()) SI::g_Categories.emplace(entry.tag);
-		SI::g_Tags.emplace(entry.tag, std::move(entry));
-	}
-	SI_Files::g_Tags_JSON = std::vector<JSONEntryTag>();
 }
 
 /*	for (const auto& entry : g_Items_JSON)
@@ -388,7 +347,7 @@ void LoadSIMapsFromFiles()
 	{
 		Log(dir + " does not exist.");
 	}
-	FillSIMapsFromJSON();
+	SI_Files::FillSIMapsFromJSON();
 	const auto now = std::chrono::system_clock::now();
 	const auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - then);
 	Log(FormatString("Loaded tags and icons in %d ms", diff.count()));

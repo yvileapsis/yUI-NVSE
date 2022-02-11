@@ -1,7 +1,7 @@
 #include <patches.h>
 #include <SafeWrite.h>
-#include <ySI.h>
 #include <functions.h>
+#include <ySI.h>
 
 void patchSortingHooks(const bool bEnable)
 {

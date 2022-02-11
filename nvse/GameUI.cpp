@@ -174,6 +174,15 @@ Tile* Menu::AddTileFromTemplate(Tile* destTile, const char* templateName, UInt32
 	return ThisCall<Tile*>(0xA1DDB0, this, destTile, templateName, 0);
 }
 
+
+bool Menu::GetTemplateExists(const char* templateName)
+{
+	for (ListNode<TemplateData>* node = menuTemplates.Head(); node; node = node->next) {
+		if (node->data && (!_strcmpi(node->data->templateName, templateName))) { return true; }
+	}
+	return false;
+}
+
 DIHookControl* g_DIHook = nullptr;
 
 __declspec(naked) bool IsShiftHeld()

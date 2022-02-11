@@ -1,19 +1,16 @@
 #include <main.h>
-#include <LambdaVariableContext.h>
 #include <functions.h>
 #include <patches.h>
 #include <commands.h>
 #include <settings.h>
 #include <ySI.h>
 #include <yCM.h>
+#include <file.h>
 
 #define yUI_VERSION 1.4
 #define yUI_VERSION_STR "1.4"
 
 PluginHandle	g_pluginHandle = kPluginHandle_Invalid;
-
-_CaptureLambdaVars CaptureLambdaVars;
-_UncaptureLambdaVars UncaptureLambdaVars;
 
 void MessageHandler(NVSEMessagingInterface::Message* msg)
 {
@@ -22,10 +19,8 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 		g_player = PlayerCharacter::GetSingleton();
 		g_dataHandler = DataHandler::GetSingleton();
 
-		g_allFormsMap = reinterpret_cast<NiTPointerMap<TESForm>**>(0x11C54C0);
-
-		FillCraftingComponents();
 		PrintAndClearQueuedConsoleMessages();
+		FillCraftingComponents();
 
 		if (g_ySI_Sort || g_ySI_Icons || g_ySI_Hotkeys || g_ySI_Categories) LoadSIMapsFromFiles();
 
@@ -47,16 +42,13 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 
 void writePatches()
 {
-	if (g_FixIndefiniteSorting || (g_ySI && g_ySI_Sort)) patchSortingHooks();
-	if (g_FixDroppedItems) patchFixDroppedItems();
-	if (g_ySI)
-	{
-		if (g_ySI_Icons) patchAddIcons();
-		if (g_ySI_Hotkeys) patchReplaceHotkeyIcons();
-		if (g_ySI_Categories) patchSortingCategories();
-	}
-	if (g_yCM) patchAddyCMToSettingsMenu();
-	if (g_yMC) patchMatchedCursor();
+	patchSortingHooks(g_FixIndefiniteSorting || (g_ySI && g_ySI_Sort));
+	patchFixDroppedItems(g_FixDroppedItems);
+	patchAddIcons(g_ySI && g_ySI_Icons);
+	patchReplaceHotkeyIcons(g_ySI && g_ySI_Hotkeys);
+	patchSortingCategories(g_ySI && g_ySI_Categories);
+//	patchAddyCMToSettingsMenu(g_yCM);
+	patchMatchedCursor(g_yMC);
 }
 
 bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)

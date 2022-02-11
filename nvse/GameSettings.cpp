@@ -202,3 +202,23 @@ bool GetNumericIniSetting(char * settingName, double * result)
 
 	return bResult;
 }
+
+Setting* GameSettingFromString(const std::string& settingName)
+{
+	Setting* setting = nullptr;
+	if (const auto gmsts = GameSettingCollection::GetSingleton(); gmsts && gmsts->GetGameSetting(settingName.c_str(), &setting) && setting) return setting;
+	return nullptr;
+}
+
+std::string GetStringGameSetting(Setting* setting)
+{
+	if (setting->GetType() == Setting::kSetting_String)	return setting->data.str;
+	return "";
+}
+
+std::string GetStringFromGameSettingFromString(const std::string& settingName)
+{
+	if (const auto setting = GameSettingFromString(settingName); setting)
+		return GetStringGameSetting(setting);
+	return "";
+}

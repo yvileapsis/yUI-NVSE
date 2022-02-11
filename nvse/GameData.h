@@ -183,8 +183,6 @@ struct ModInfo		// referred to by game as TESFile
 STATIC_ASSERT(sizeof(WIN32_FIND_DATA) == 0x140);
 STATIC_ASSERT(sizeof(ModInfo) == 0x42C);
 
-
-
 struct ModList
 {
 	tList<ModInfo>		modInfoList;		// 00
@@ -201,7 +199,7 @@ public:
 	~DataHandler();
 
 	UInt32							unk00;					// 000
-	BoundObjectListHead				* boundObjectList;		// 004
+	BoundObjectListHead*			boundObjectList;		// 004
 	tList<TESPackage>				packageList;			// 008
 	tList<TESWorldSpace>			worldSpaceList;			// 010
 	tList<TESClimate>				climateList;			// 019
@@ -260,7 +258,7 @@ public:
 	tList<TESLoadScreenType>		loadScreenTypeList;		// 1C0
 	tList<MediaSet>					mediaSetList;			// 1C8
 	tList<MediaLocationController>	mediaLocControllerList;	// 1D0
-	TESRegionList					* regionList;			// 1D8
+	TESRegionList*					regionList;				// 1D8
 	NiTArray<TESObjectCELL*>		cellArray;				// 1DC
 	NiTArray<BGSAddonNode*>			addonArray;				// 1EC
 
@@ -296,9 +294,7 @@ public:
 	void DisableAssignFormIDs(bool shouldAsssign);
 
 	MEMBER_FN_PREFIX(DataHandler);
-#if RUNTIME
 	DEFINE_MEMBER_FN(DoAddForm, UInt32, 0x004603B0, TESForm * pForm);	// stupid name is because AddForm is redefined in windows header files
-#endif
 
 	TESQuest* GetQuestByName(const char* questName);
 };
