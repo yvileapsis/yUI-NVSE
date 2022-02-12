@@ -131,7 +131,7 @@ namespace SI
 
 	bool IsTagForItem(ContChangesEntry* entry)
 	{
-		if (entry && entry->type && g_Items.contains(entry->type)) return true;
+		if (entry && entry->form && g_Items.contains(entry->form)) return true;
 		return false;
 	}
 	
@@ -144,9 +144,9 @@ namespace SI
 
 	std::string GetTagForItem(ContChangesEntry* entry)
 	{
-		if (!entry || !entry->type) return "";
-		if (!IsTagForItem(entry)) SI_Files::AssignTagToItem(entry->type);
-		return g_Items[entry->type];
+		if (!entry || !entry->form) return "";
+		if (!IsTagForItem(entry)) SI_Files::AssignTagToItem(entry->form);
+		return g_Items[entry->form];
 	}
 	
 	void InjectIconTile(const std::string& tag, MenuItemEntryList* list, Tile* tile, ContChangesEntry* entry)
@@ -212,15 +212,15 @@ namespace SI
 	void __fastcall SetTileStringInjectTile(Tile* tile, ContChangesEntry* entry, MenuItemEntryList* list, eTileValue tilevalue, char* tileText, bool propagate)
 	{
 		tile->SetString(tilevalue, tileText, propagate);
-		if (entry && entry->type && TryGetTypeOfForm(entry->type)) InjectIconTile(GetTagForItem(entry), list, tile, entry);
+		if (entry && entry->form && TryGetTypeOfForm(entry->form)) InjectIconTile(GetTagForItem(entry), list, tile, entry);
 	}
 
 	signed int __fastcall CompareItemsWithTags(ContChangesEntry* a2, ContChangesEntry* a1, Tile* tile1, Tile* tile2)
 	{
 		TESForm* form1 = nullptr, * form2 = nullptr;
 
-		if (a1 && a1->type) form1 = a1->type;
-		if (a2 && a2->type) form2 = a2->type;
+		if (a1 && a1->form) form1 = a1->form;
+		if (a2 && a2->form) form2 = a2->form;
 
 		signed int cmp;
 
@@ -329,7 +329,7 @@ namespace SI
 
 	bool __fastcall HasContainerChangesEntry(ContChangesEntry* entry)
 	{
-		if (entry && entry->type) return false;
+		if (entry && entry->form) return false;
 		return true;
 	}
 
@@ -344,7 +344,7 @@ namespace SI
 		UInt32 keys = 0;
 		if (!entryDataList) return true;
 		for (auto iter = entryDataList->Head(); iter; iter = iter->next)
-			if (iter->data && iter->data->type && g_Tags[GetTagForItem(iter->data)].category._Equal(tag))
+			if (iter->data && iter->data->form && g_Tags[GetTagForItem(iter->data)].category._Equal(tag))
 			{
 				if (g_Tags[tag].count == 0) {
 					keys = 1;
@@ -367,17 +367,17 @@ namespace SI
 
 	bool __fastcall KeyringHideKeys(ContChangesEntry* entry)
 	{
-		if (!entry || !entry->type) return false;
+		if (!entry || !entry->form) return false;
 		if (!g_Tags[GetTagForItem(entry)].category.empty()) return true;
 		return false;
 	}
 
 	bool __cdecl KeyringHideNonKeys(ContChangesEntry* entry)
 	{
-		if (!entry || !entry->type) return true;
+		if (!entry || !entry->form) return true;
 		if (g_Tags[GetTagForItem(entry)].category._Equal(openCategory)) {
 			if (stringStewie.empty() || stringStewie._Equal("_")) return false;
-			return !stristr(entry->type->GetTheName(), stringStewie.c_str());
+			return !stristr(entry->form->GetTheName(), stringStewie.c_str());
 		}
 		return true;
 	}
@@ -399,7 +399,7 @@ namespace SI
 			if (!entryDataList) return;
 			for (auto iter = entryDataList->Head(); iter; iter = iter->next)
 			{
-				if (!iter->data || !iter->data->type) continue;
+				if (!iter->data || !iter->data->form) continue;
 				auto tag = g_Tags[GetTagForItem(iter->data)];
 				if (!tag.category._Equal(entry)) continue;
 				if (g_Tags[entry].count == 0) {

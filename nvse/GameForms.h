@@ -5213,10 +5213,10 @@ public:
 
 	struct Data
 	{
-		float		effectDuration;		// 000
+		Float32		effectDuration;		// 000
 		UInt32		effectorientation;	// 004	Surface Normal, Projectile vector, Projectile reflection
-		float		angleThreshold;		// 008
-		float		placementRadius;	// 00C
+		Float32		angleThreshold;		// 008
+		Float32		placementRadius;	// 00C
 		UInt32		soundLevel;			// 010	enum
 		UInt32		flags;				// 014	No decal data
 	};	// 018
@@ -5238,7 +5238,7 @@ public:
 	~BGSImpactDataSet();
 
 	BGSPreloadable	preloadable;				// 018
-	UInt32			unk01C[(0x4C - 0x1C) >> 2];	// 01C
+	UInt32			impactDatas[12];			// 01C
 };
 STATIC_ASSERT(sizeof(BGSImpactDataSet) == 0x4C);
 

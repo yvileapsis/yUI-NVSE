@@ -777,7 +777,7 @@ public:
 	Projectile();
 	~Projectile();
 
-	tList<void>			impactDataList;		// 0x088
+	tList<BGSImpactData>impactDataList;		// 0x088
 	UInt8				hasImpacted;		// 0x08C
 	UInt8				pad091[3];
 	UInt32				unk094[13];

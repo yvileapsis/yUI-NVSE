@@ -74,7 +74,7 @@ public:
 	{
 		ExtendDataList*		extendData;		// 00
 		SInt32				countDelta;		// 04
-		TESForm*			type;			// 08
+		TESForm*			form;			// 08
 
 		void				Cleanup();
 		static EntryData*	Create(UInt32 refID = 0, UInt32 count = 1, ExtendDataList* pExtendDataList = NULL);
@@ -203,7 +203,7 @@ class ItemInEntryDataListMatcher
 public:
 	ItemInEntryDataListMatcher(TESForm* match) : m_toMatch(match) { }
 
-	bool Accept(ContChangesEntry* match) { return (match && m_toMatch == match->type); }
+	bool Accept(ContChangesEntry* match) { return (match && m_toMatch == match->form); }
 };
 
 // Finds an Item from its base form in an EntryDataList
@@ -213,7 +213,7 @@ class BaseInEntryDataLastMatcher
 public:
 	BaseInEntryDataLastMatcher(TESForm* match) : m_toMatch(match) { }
 
-	bool Accept(ContChangesEntry* match) { return (match && match->type && m_toMatch == match->type->TryGetREFRParent()); }
+	bool Accept(ContChangesEntry* match) { return (match && match->form && m_toMatch == match->form->TryGetREFRParent()); }
 };
 
 // Finds an item by refID in an EntryDataList
@@ -223,7 +223,7 @@ class RefIDInEntryDataListMatcher
 public:
 	RefIDInEntryDataListMatcher(UInt32 match) : m_toMatch(match) { }
 
-	bool Accept(ContChangesEntry* match) { return (match && match->type && m_toMatch == match->type->refID); }
+	bool Accept(ContChangesEntry* match) { return (match && match->form && m_toMatch == match->form->refID); }
 };
 
 // Finds an item by the refID of its base form in an EntryDataList
@@ -233,7 +233,7 @@ class BaseIDInEntryDataListMatcher
 public:
 	BaseIDInEntryDataListMatcher(UInt32 match) : m_toMatch(match) { }
 
-	bool Accept(ContChangesEntry* match) { return (match && match->type && match->type->TryGetREFRParent() && m_toMatch == match->type->TryGetREFRParent()->refID); }
+	bool Accept(ContChangesEntry* match) { return (match && match->form && match->form->TryGetREFRParent() && m_toMatch == match->form->TryGetREFRParent()->refID); }
 };
 
 typedef ExtraContainerChanges::FoundEquipData EquipData;
