@@ -1,10 +1,10 @@
-#include "GameObjects.h"
-#include "GameRTTI.h"
-#include "GameExtraData.h"
-#include "GameTasks.h"
-#include "GameUI.h"
-#include "SafeWrite.h"
-#include "NiObjects.h"
+#include <GameObjects.h>
+#include <GameRTTI.h>
+#include <GameExtraData.h>
+#include <GameTasks.h>
+#include <GameUI.h>
+#include <SafeWrite.h>
+#include <NiObjects.h>
 
 static const UInt32 s_TESObject_REFR_init	= 0x0055A2F0;	// TESObject_REFR initialization routine (first reference to s_TESObject_REFR_vtbl)
 static const UInt32	s_Actor_EquipItem		= 0x0088C650;	// maybe, also, would be: 007198E0 for FOSE	4th call from the end of TESObjectREFR::RemoveItem (func5F)
@@ -31,63 +31,22 @@ static NiObject **	g_1stPersonCameraNode =				(NiObject**)kg_Camera1st;
 
 ScriptEventList* TESObjectREFR::GetEventList() const
 {
-	BSExtraData* xData = extraDataList.GetByType(kExtraData_Script);
-	if (xData)
-	{
-		ExtraScript* xScript = DYNAMIC_CAST(xData, BSExtraData, ExtraScript);
-		if (xScript)
+	if (BSExtraData* xData = extraDataList.GetByType(kExtraData_Script))
+		if (const ExtraScript* xScript = DYNAMIC_CAST(xData, BSExtraData, ExtraScript))
 			return xScript->eventList;
-	}
-
 	return nullptr;
-}
-
-PlayerCharacter* g_thePlayer = nullptr;
-
-PlayerCharacter* PlayerCharacter::GetSingleton()
-{
-	return *(PlayerCharacter **)0x011DEA3C;
-}
-
-QuestObjectiveTargets* PlayerCharacter::GetCurrentQuestObjectiveTargets()
-{
-	return (QuestObjectiveTargets *)ThisStdCall(s_PlayerCharacter_GetCurrentQuestTargets, this);
-}
-
-HighProcess* PlayerCharacter::GetHighProcess()
-{
-	return reinterpret_cast<HighProcess*>(baseProcess);
 }
 
 TESContainer* TESObjectREFR::GetContainer()
 {
 	if (IsActor())
-		return &((TESActorBase*)baseForm)->container;
+		return &static_cast<TESActorBase*>(baseForm)->container;
 	if (baseForm->typeID == kFormType_TESObjectCONT)
-		return &((TESObjectCONT*)baseForm)->container;
+		return &static_cast<TESObjectCONT*>(baseForm)->container;
 	return nullptr;
 }
 
-bool TESObjectREFR::IsMapMarker()
-{
-	if (baseForm) {
-		return baseForm->refID == 0x010;	// Read from the geck. Why is OBSE looking for a pointer ?
-	}
-	else {
-		return false;
-	}
-}
-
-// Less worse version as used by some modders 
-bool PlayerCharacter::SetSkeletonPath_v1c(const char* newPath)
-{
-	if (!thirdPersonConsistent) {
-		// ###TODO: enable in first person
-		return false;
-	}
-
-	return true;
-}
+bool TESObjectREFR::IsMapMarker() { return baseForm ? baseForm->refID == 0x010 : false; }
 
 bool TESObjectREFR::Update3D_v1c()
 {
@@ -101,19 +60,8 @@ bool TESObjectREFR::Update3D_v1c()
 		SafeWrite8(kPlayerUpdate3Dpatch, kPlayerUpdate3DpatchTo);
 	}
 
-	Set3D(NULL, true);
+	Set3D(nullptr, true);
 	ModelLoader::GetSingleton()->QueueReference(this, 1, 0);
-	return true;
-}
-
-// Current basically not functioning version, but should show some progress in the end.. I hope
-bool PlayerCharacter::SetSkeletonPath(const char* newPath)
-{
-	if (!thirdPersonConsistent) {
-		// ###TODO: enable in first person
-		return false;
-	}
-
 	return true;
 }
 
@@ -132,36 +80,26 @@ bool TESObjectREFR::Update3D()
 TESActorBase* Actor::GetActorBase()
 {
 	if (modIndex == 0xFF)
-	{
-		const auto xLvlCre = GetExtraType(extraDataList, LeveledCreature);
-		if (xLvlCre) return xLvlCre->actorBase;
-	}
+		if (const auto xLvlCre = GetExtraType(extraDataList, LeveledCreature)) return xLvlCre->actorBase;
 	return static_cast<TESActorBase*>(baseForm);
 }
 
 TESObjectREFR* TESObjectREFR::Create(bool bTemp)
 {
-	TESObjectREFR* refr = (TESObjectREFR*)FormHeap_Allocate(sizeof(TESObjectREFR));
+	const auto refr = static_cast<TESObjectREFR*>(FormHeap_Allocate(sizeof(TESObjectREFR)));
 	ThisStdCall(s_TESObject_REFR_init, refr);
-	if (bTemp)
-		CALL_MEMBER_FN(refr, MarkAsTemporary)();
+	if (bTemp) CALL_MEMBER_FN(refr, MarkAsTemporary)();
 	return refr;
 }
 
 TESForm* GetPermanentBaseForm(TESObjectREFR* thisObj)	// For LevelledForm, find real baseForm, not temporary one.
 {
-	ExtraLeveledCreature * pXCreatureData = NULL;
-
-	if (thisObj) {
-		pXCreatureData = GetByTypeCast(thisObj->extraDataList, LeveledCreature);
-		if (pXCreatureData && pXCreatureData->baseForm) {
+	if (thisObj)
+		if (const auto pXCreatureData = GetByTypeCast(thisObj->extraDataList, LeveledCreature); pXCreatureData && pXCreatureData->baseForm)
 			return pXCreatureData->baseForm;
-		}
-	}
-	if (thisObj && thisObj->baseForm) {
+	if (thisObj && thisObj->baseForm)
 		return thisObj->baseForm;
-	}
-	return NULL;
+	return nullptr;
 }
 
 void Actor::EquipItem(TESForm * objType, UInt32 equipCount, ExtraDataList* itemExtraList, UInt32 unk3, bool lockEquip, UInt32 unk5)
@@ -177,41 +115,30 @@ void Actor::UnequipItem(TESForm* objType, UInt32 unk1, ExtraDataList* itemExtraL
 EquippedItemsList Actor::GetEquippedItems()
 {
 	EquippedItemsList itemList;
-	ExtraContainerDataArray outEntryData;
-	ExtraContainerExtendDataArray outExtendData;
-
-	ExtraContainerChanges	* xChanges = static_cast <ExtraContainerChanges *>(extraDataList.GetByType(kExtraData_ContainerChanges));
-	if(xChanges) {
-		UInt32 count = xChanges->GetAllEquipped(outEntryData, outExtendData);
-		for (UInt32 i = 0; i < count ; i++)
-			itemList.push_back(outEntryData[i]->type);
-
+	if (const auto xChanges = static_cast<ExtraContainerChanges *>(extraDataList.GetByType(kExtraData_ContainerChanges))) {
+		ContChangesArray outEntryData;
+		ContChangesExtendArray outExtendData;
+		const UInt32 count = xChanges->GetAllEquipped(outEntryData, outExtendData);
+		for (UInt32 i = 0; i < count ; i++) itemList.push_back(outEntryData[i]->type);
 	}
-
 	return itemList;
 }
 
-ExtraContainerDataArray	Actor::GetEquippedEntryDataList()
+ContChangesArray Actor::GetEquippedEntryDataList()
 {
-	ExtraContainerDataArray itemArray;
-	ExtraContainerExtendDataArray outExtendData;
-
-	ExtraContainerChanges	* xChanges = static_cast <ExtraContainerChanges *>(extraDataList.GetByType(kExtraData_ContainerChanges));
-	if(xChanges)
+	ContChangesArray itemArray;
+	ContChangesExtendArray outExtendData;
+	if(const auto xChanges = static_cast<ExtraContainerChanges *>(extraDataList.GetByType(kExtraData_ContainerChanges)))
 		xChanges->GetAllEquipped(itemArray, outExtendData);
-
 	return itemArray;
 }
 
-ExtraContainerExtendDataArray	Actor::GetEquippedExtendDataList()
+ContChangesExtendArray	Actor::GetEquippedExtendDataList()
 {
-	ExtraContainerDataArray itemArray;
-	ExtraContainerExtendDataArray outExtendData;
-
-	ExtraContainerChanges	* xChanges = static_cast <ExtraContainerChanges *>(extraDataList.GetByType(kExtraData_ContainerChanges));
-	if(xChanges)
+	ContChangesArray itemArray;
+	ContChangesExtendArray outExtendData;
+	if(const auto xChanges = static_cast<ExtraContainerChanges *>(extraDataList.GetByType(kExtraData_ContainerChanges)))
 		xChanges->GetAllEquipped(itemArray, outExtendData);
-
 	return outExtendData;
 }
 
@@ -219,21 +146,20 @@ bool TESObjectREFR::GetInventoryItems(InventoryItemsMap &invItems)
 {
 	TESContainer *container = GetContainer();
 	if (!container) return false;
-	ExtraContainerChanges *xChanges = (ExtraContainerChanges*)extraDataList.GetByType(kExtraData_ContainerChanges);
-	ExtraContainerChanges::EntryDataList *entryList = (xChanges && xChanges->data) ? xChanges->data->objList : NULL;
+	const auto xChanges = static_cast<ExtraContainerChanges*>(extraDataList.GetByType(kExtraData_ContainerChanges));
+	ContChangesList *entryList = (xChanges && xChanges->data) ? xChanges->data->objList : nullptr;
 	if (!entryList) return false;
 
 	TESForm *item;
-	SInt32 contCount, countDelta;
-	ExtraContainerChanges::EntryData *entry;
+	SInt32 countDelta;
+	ContChangesEntry *entry;
 
 	for (auto contIter = container->formCountList.Begin(); !contIter.End(); ++contIter)
 	{
 		item = contIter->form;
-		if ((item->typeID == kFormType_TESObjectCONT) || invItems.find(item) != invItems.end())
-			continue;
-		contCount = container->GetCountForForm(item);
-		if (entry = entryList->FindForItem(item))
+		if (item->typeID == kFormType_TESObjectCONT || invItems.contains(item)) continue;
+		SInt32 contCount = container->GetCountForForm(item);
+		if ((entry = entryList->FindForItem(item)))
 		{
 			countDelta = entry->countDelta;
 			if (entry->HasExtraLeveledItem())
@@ -248,8 +174,7 @@ bool TESObjectREFR::GetInventoryItems(InventoryItemsMap &invItems)
 	{
 		entry = xtraIter.Get();
 		item = entry->type;
-		if (invItems.find(item) != invItems.end())
-			continue;
+		if (invItems.contains(item)) continue;
 		countDelta = entry->countDelta;
 		if (countDelta > 0)
 			invItems.emplace(item, InventoryItemData(countDelta, entry));
@@ -258,7 +183,7 @@ bool TESObjectREFR::GetInventoryItems(InventoryItemsMap &invItems)
 	return !invItems.empty();
 }
 
-__declspec(naked) ExtraContainerChanges::EntryDataList* TESObjectREFR::GetContainerChangesList()
+__declspec(naked) ContChangesList* TESObjectREFR::GetContainerChangesList()
 {
 	__asm
 	{
@@ -368,23 +293,29 @@ __declspec(naked) float __vectorcall TESObjectREFR::GetDistance(TESObjectREFR* t
 	}
 }
 
-/*__declspec(naked) ContChangesEntry* ExtraContainerChanges::EntryDataList::FindForItem(TESForm* item)
+__declspec(naked) ContChangesEntry* ContChangesList::FindForItem(TESForm* item)
 {
 	__asm
 	{
 		mov		edx, [esp + 4]
-		listIter:
+	listIter:
 		mov		eax, [ecx]
-			test	eax, eax
-			jz		listNext
-			cmp[eax + 8], edx
-			jz		done
-			listNext :
+		test	eax, eax
+		jz		listNext
+		cmp[eax + 8], edx
+		jz		done
+	listNext :
 		mov		ecx, [ecx + 4]
-			test	ecx, ecx
-			jnz		listIter
-			xor eax, eax
-			done :
+		test	ecx, ecx
+		jnz		listIter
+		xor eax, eax
+	done :
 		retn	4
 	}
-}*/
+}
+
+PlayerCharacter* g_thePlayer = nullptr;
+
+PlayerCharacter*		PlayerCharacter::GetSingleton() { return *reinterpret_cast<PlayerCharacter**>(0x011DEA3C); }
+QuestObjectiveTargets*	PlayerCharacter::GetCurrentQuestObjectiveTargets() { return ThisStdCall<QuestObjectiveTargets*>(s_PlayerCharacter_GetCurrentQuestTargets, this); }
+HighProcess*			PlayerCharacter::GetHighProcess() { return reinterpret_cast<HighProcess*>(baseProcess); }

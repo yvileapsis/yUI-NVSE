@@ -1,7 +1,7 @@
 #pragma once
 #include <unordered_map>
 #include <unordered_set>
-#include "GameAPI.h"
+#include <GameAPI.h>
 
 namespace TimeMult
 {

@@ -14,7 +14,7 @@ struct GetMatchingEquipped {
 		m_found.pExtraData = NULL;
 	}
 
-	bool Accept(ExtraContainerChanges::EntryData* pEntryData) {
+	bool Accept(ContChangesEntry* pEntryData) {
 		if (pEntryData) {
 			// quick check - needs an extendData or can't be equipped
 			ExtraContainerChanges::ExtendDataList* pExtendList = pEntryData->extendData;
@@ -51,16 +51,6 @@ EquipData ExtraContainerChanges::FindEquipped(FormMatcher& matcher) const
 	}
 	return equipData;
 };
-
-STATIC_ASSERT(sizeof(ExtraHealth) == 0x10);
-STATIC_ASSERT(sizeof(ExtraLock) == 0x10);
-STATIC_ASSERT(sizeof(ExtraCount) == 0x10);
-STATIC_ASSERT(sizeof(ExtraTeleport) == 0x10);
-
-STATIC_ASSERT(sizeof(ExtraWorn) == 0x0C);
-STATIC_ASSERT(sizeof(ExtraWornLeft) == 0x0C);
-STATIC_ASSERT(sizeof(ExtraCannotWear) == 0x0C);
-STATIC_ASSERT(sizeof(ExtraContainerChanges::EntryData) == 0x0C);
 
 #if RUNTIME
 static const UInt32 s_ExtraContainerChangesVtbl					= 0x01015BB8;	//	0x0100fb78;
@@ -200,7 +190,7 @@ static bool ExtraContainerChangesExtendDataListRemove(ExtraContainerChanges::Ext
 	return false;
 }
 
-void ExtraContainerChanges::EntryData::Cleanup()
+void ContChangesEntry::Cleanup()
 {
 	// Didn't find the hook, let's fake it
 	if (extendData) {
@@ -221,11 +211,11 @@ void ExtraContainerChanges::EntryData::Cleanup()
 }
 
 #ifdef RUNTIME
-ExtraContainerChanges::EntryData* ExtraContainerChanges::EntryData::Create(UInt32 refID, UInt32 count, ExtraContainerChanges::ExtendDataList* pExtendDataList)
+ContChangesEntry* ContChangesEntry::Create(UInt32 refID, UInt32 count, ExtraContainerChanges::ExtendDataList* pExtendDataList)
 {
-	ExtraContainerChanges::EntryData* xData = (ExtraContainerChanges::EntryData*)FormHeap_Allocate(sizeof(ExtraContainerChanges::EntryData));
+	ContChangesEntry* xData = (ContChangesEntry*)FormHeap_Allocate(sizeof(ContChangesEntry));
 	if (xData) {
-		memset(xData, 0, sizeof(ExtraContainerChanges::EntryData));
+		memset(xData, 0, sizeof(ContChangesEntry));
 		if (refID) {
 			TESForm * pForm = LookupFormByID(refID);
 			if (pForm) {
@@ -243,11 +233,11 @@ ExtraContainerChanges::EntryData* ExtraContainerChanges::EntryData::Create(UInt3
 }
 #endif
 
-ExtraContainerChanges::EntryData* ExtraContainerChanges::EntryData::Create(TESForm* pForm, UInt32 count, ExtraContainerChanges::ExtendDataList* pExtendDataList)
+ContChangesEntry* ContChangesEntry::Create(TESForm* pForm, UInt32 count, ExtraContainerChanges::ExtendDataList* pExtendDataList)
 {
-	ExtraContainerChanges::EntryData* xData = (ExtraContainerChanges::EntryData*)FormHeap_Allocate(sizeof(ExtraContainerChanges::EntryData));
+	ContChangesEntry* xData = (ContChangesEntry*)FormHeap_Allocate(sizeof(ContChangesEntry));
 	if (xData) {
-		memset(xData, 0, sizeof(ExtraContainerChanges::EntryData));
+		memset(xData, 0, sizeof(ContChangesEntry));
 		if (pForm) {
 			xData->type = pForm;
 			xData->countDelta = count;
@@ -257,7 +247,7 @@ ExtraContainerChanges::EntryData* ExtraContainerChanges::EntryData::Create(TESFo
 	return xData;
 }
 
-ExtraContainerChanges::ExtendDataList* ExtraContainerChanges::EntryData::Add(ExtraDataList* newList)
+ExtraContainerChanges::ExtendDataList* ContChangesEntry::Add(ExtraDataList* newList)
 {
 	if (extendData)
 		extendData->AddAt(newList, eListEnd);
@@ -268,7 +258,7 @@ ExtraContainerChanges::ExtendDataList* ExtraContainerChanges::EntryData::Add(Ext
 	return extendData;
 }
 
-bool ExtraContainerChanges::EntryData::Remove(ExtraDataList* toRemove, bool bFree)
+bool ContChangesEntry::Remove(ExtraDataList* toRemove, bool bFree)
 {
 	if (extendData && toRemove) {
 		SInt32 index = extendData->GetIndexOf(ExtraDataListInExtendDataListMatcher(toRemove));
@@ -289,7 +279,15 @@ bool ExtraContainerChanges::EntryData::Remove(ExtraDataList* toRemove, bool bFre
 	return false;
 }
 
-void ExtraContainerChangesEntryDataFree(ExtraContainerChanges::EntryData* xData, bool bFreeList) {
+bool ContChangesEntry::HasExtraLeveledItem()
+{
+	if (!extendData) return false;
+	for (auto iter = extendData->Begin(); !iter.End(); ++iter)
+		if (iter->HasType(kExtraData_LeveledItem)) return true;
+	return false;
+}
+
+void ExtraContainerChangesEntryDataFree(ContChangesEntry* xData, bool bFreeList) {
 	if (xData) {
 		if (xData->extendData) {
 			ExtraContainerChangesExtendDataListFree(xData->extendData, bFreeList);
@@ -298,13 +296,13 @@ void ExtraContainerChangesEntryDataFree(ExtraContainerChanges::EntryData* xData,
 	}
 }
 
-ExtraContainerChanges::EntryDataList* ExtraContainerChangesEntryDataListCreate(UInt32 refID, UInt32 count, ExtraContainerChanges::ExtendDataList* pExtendDataList)
+ContChangesList* ExtraContainerChangesEntryDataListCreate(UInt32 refID, UInt32 count, ExtraContainerChanges::ExtendDataList* pExtendDataList)
 {
 #ifdef RUNTIME
-	ExtraContainerChanges::EntryDataList* xData = (ExtraContainerChanges::EntryDataList*)FormHeap_Allocate(sizeof(ExtraContainerChanges::EntryDataList));
+	ContChangesList* xData = (ContChangesList*)FormHeap_Allocate(sizeof(ContChangesList));
 	if (xData) {
-		memset(xData, 0, sizeof(ExtraContainerChanges::EntryDataList));
-		xData->AddAt(ExtraContainerChanges::EntryData::Create(refID, count, pExtendDataList), eListEnd);
+		memset(xData, 0, sizeof(ContChangesList));
+		xData->AddAt(ContChangesEntry::Create(refID, count, pExtendDataList), eListEnd);
 	}
 	return xData;
 #else
@@ -312,10 +310,10 @@ ExtraContainerChanges::EntryDataList* ExtraContainerChangesEntryDataListCreate(U
 #endif
 }
 
-void ExtraContainerChangesEntryDataListFree(ExtraContainerChanges::EntryDataList* xData, bool bFreeList) {
+void ExtraContainerChangesEntryDataListFree(ContChangesList* xData, bool bFreeList) {
 	if (xData) {
 		UInt32 i = 0;
-		ExtraContainerChanges::EntryData* pX = xData->GetNthItem(i);
+		ContChangesEntry* pX = xData->GetNthItem(i);
 		if (pX) {
 			ExtraContainerChangesEntryDataFree(pX, bFreeList);
 			i++;
@@ -455,7 +453,7 @@ bool ExtraContainerChanges::Remove(TESForm* obj, ExtraDataList* dataList, bool b
 {
 	for (UInt32 i = 0; i < data->objList->Count(); i++)
 		if (data->objList->GetNthItem(i)->type == obj) {
-			ExtraContainerChanges::EntryData* found = data->objList->GetNthItem(i);
+			ContChangesEntry* found = data->objList->GetNthItem(i);
 			if (dataList && found->extendData) {
 				for (UInt32 j = 0; j < found->extendData->Count(); j++)
 					if (found->extendData->GetNthItem(j) == dataList)
@@ -476,7 +474,7 @@ void ExtraContainerChanges::DebugDump()
 
 	if (data && data->objList)
 	{
-		for (ExtraContainerChanges::EntryDataList::Iterator entry = data->objList->Begin(); !entry.End(); ++entry)
+		for (ContChangesList::Iterator entry = data->objList->Begin(); !entry.End(); ++entry)
 		{
 			PrintLog("Type: %s CountDelta: %d [%08X]", GetFullName(entry.Get()->type), entry.Get()->countDelta, entry.Get());
 			gLog.Indent();
@@ -522,7 +520,7 @@ UInt32 ExtraContainerChanges::GetAllEquipped(std::vector<EntryData*>& outEntryDa
 {
 	if (data && data->objList)
 	{
-		for (ExtraContainerChanges::EntryDataList::Iterator entry = data->objList->Begin(); !entry.End(); ++entry)
+		for (ContChangesList::Iterator entry = data->objList->Begin(); !entry.End(); ++entry)
 		{
 			if (entry.Get() && entry.Get()->extendData)
 			{

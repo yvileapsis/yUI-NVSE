@@ -1,21 +1,7 @@
 #pragma once
 #include "NiNodes.h"
-//#include "GameTasks.h"
 #include "GameForms.h"
 #include "GameExtraData.h"
-
-/*
-class TESAmmo;
-class TESObjectWEAP;
-struct AnimData;
-
-class QueuedFile;
-class bhkCharacterController;
-class BSFaceGenAnimationData;
-class BSBound;
-class NiTriShape;
-*/
-class BSBound;
 
 enum AnimAction : SInt16
 {
@@ -235,7 +221,7 @@ public:
 	virtual void	Unk_57(void);
 	virtual void	Unk_58(void);
 	virtual void	Unk_59(void);
-	virtual void	UpdateAmmoInfo(ExtraContainerChanges::EntryData*);
+	virtual void	UpdateAmmoInfo(ContChangesEntry*);
 	virtual void	Unk_5B(void);
 	virtual void	Unk_5C(void);
 	virtual void	Unk_5D(void);	// Called by 5E with count itemExtraList item

@@ -1,9 +1,7 @@
 #pragma once
-#include "Utilities.h"
-#include "NiTypes.h"
-#include "GameOSDepend.h"
+#include <NiTypes.h>
+#include <GameOSDepend.h>
 
-// 8
 class String
 {
 public:
@@ -13,29 +11,30 @@ public:
 	char*			m_data;
 	UInt16			m_dataLen;
 	UInt16			m_bufLen;
-
-	void	Init(UInt32 bufSize);
-	bool	Set(const char* src);
-	bool	Includes(const char* toFind) const;
-	bool	Replace(const char* toReplace, const char* replaceWith); // replaces instance of toReplace with replaceWith
-	bool	Append(const char* toAppend);
-	double	Compare(const String& compareTo, bool caseSensitive = false);
+	
+	void		Init(UInt32 bufSize);
+	bool		Set(const char* src);
+	bool		Includes(const char* toFind) const;
+	bool		Replace(const char* toReplace, const char* replaceWith); // replaces instance of toReplace with replaceWith
+	bool		Append(const char* toAppend);
+	double		Compare(const String& compareTo, bool caseSensitive = false);
 
 	const char* CStr(void);
 
-	void AppendChar(char toAppend);
-	void InsertChar(char toInsert, UInt32 index);
-	void EraseAt(UInt32 index);
-	void EraseAfter(UInt32 index);
-	int EraseWord(UInt32 index);
-	void EraseNextWord(UInt32 index);
-	void RemoveLastChar();
+	void		AppendChar(char toAppend);
+	void		InsertChar(char toInsert, UInt32 index);
+	void		EraseAt(UInt32 index);
+	void		EraseAfter(UInt32 index);
+	int			EraseWord(UInt32 index);
+	void		EraseNextWord(UInt32 index);
+	void		RemoveLastChar();
 };
+STATIC_ASSERT(sizeof(String) == 0x8);
 
 enum {
-	eListCount = -3,
-	eListEnd = -2,
-	eListInvalid = -1,
+	eListCount		= -3,
+	eListEnd		= -2,
+	eListInvalid	= -1,
 };
 
 typedef void* (*_FormHeap_Allocate)(UInt32 size);
@@ -956,26 +955,26 @@ struct MouseFilter
 
 enum class IsDXKeyState
 {
-	IsHeld = 0x0,
-	IsPressed = 0x1,
-	IsDepressed = 0x2,
-	IsChanged = 0x3,
+	IsHeld		= 0x0,
+	IsPressed	= 0x1,
+	IsDepressed	= 0x2,
+	IsChanged	= 0x3,
 };
 
 class  TESObjectREFR;
 
 struct PackageInfo
 {
-	TESPackage* package;		// 00
-	union
+	TESPackage*			package;		// 00
+	union								// 04
 	{
-		TESPackageData* packageData;	// 04
-		void* actorPkgData;
+		TESPackageData* packageData;
+		void*			actorPkgData;
 	};
-	TESObjectREFR* targetRef;		// 08
-	UInt32			unk0C;			// 0C	Initialized to 0FFFFFFFFh, set to 0 on start
-	float			unk10;			// 10	Initialized to -1.0	. Set to GameHour on start so some time
-	UInt32			flags;			// 14	Flags, bit0 would be not created and initialized
+	TESObjectREFR*		targetRef;		// 08
+	UInt32				unk0C;			// 0C	Initialized to 0FFFFFFFFh, set to 0 on start
+	float				unk10;			// 10	Initialized to -1.0	. Set to GameHour on start so some time
+	UInt32				flags;			// 14	Flags, bit0 would be not created and initialized
 };
 
 enum ControlType
@@ -988,13 +987,13 @@ enum ControlType
 
 enum AnimState
 {
-	kAnimState_Inactive = 0x0,
-	kAnimState_Animating = 0x1,
-	kAnimState_EaseIn = 0x2,
-	kAnimState_EaseOut = 0x3,
-	kAnimState_TransSource = 0x4,
-	kAnimState_TransDest = 0x5,
-	kAnimState_MorphSource = 0x6,
+	kAnimState_Inactive		= 0x0,
+	kAnimState_Animating	= 0x1,
+	kAnimState_EaseIn		= 0x2,
+	kAnimState_EaseOut		= 0x3,
+	kAnimState_TransSource	= 0x4,
+	kAnimState_TransDest	= 0x5,
+	kAnimState_MorphSource	= 0x6,
 };
 
 enum class ControlCode
@@ -1051,26 +1050,26 @@ struct ActorHitData
 {
 	enum HitFlags
 	{
-		kFlag_TargetIsBlocking = 1,
-		kFlag_TargetWeaponOut = 2,
-		kFlag_IsCritical = 4,
-		kFlag_OnDeathCritEffect = 8,
-		kFlag_IsFatal = 0x10,
-		kFlag_DismemberLimb = 0x20,
-		kFlag_ExplodeLimb = 0x40,
-		kFlag_CrippleLimb = 0x80,
-		kFlag_BreakWeaponNonEmbedded = 0x100,
-		kFlag_BreakWeaponEmbedded = 0x200,
-		kFlag_IsSneakAttack = 0x400,
-		kFlag_ArmorPenetrated = 0x80000000	// JIP only
+		kFlag_TargetIsBlocking			= 1 << 0,
+		kFlag_TargetWeaponOut			= 1 << 1,
+		kFlag_IsCritical				= 1 << 2,
+		kFlag_OnDeathCritEffect			= 1 << 3,
+		kFlag_IsFatal					= 1 << 4,
+		kFlag_DismemberLimb				= 1 << 5,
+		kFlag_ExplodeLimb				= 1 << 6,
+		kFlag_CrippleLimb				= 1 << 7,
+		kFlag_BreakWeaponNonEmbedded	= 1 << 8,
+		kFlag_BreakWeaponEmbedded		= 1 << 9,
+		kFlag_IsSneakAttack				= 1 << 10,
+		kFlag_ArmorPenetrated			= 0x80000000	// JIP only
 	};
 
-	Actor* source;		// 00
-	Actor* target;		// 04
+	Actor*				source;			// 00
+	Actor*				target;			// 04
 	union								// 08
 	{
-		MobileObject* projectile;
-		MobileObject* explosion;
+		Projectile*		projectile;
+		Explosion*		explosion;
 	};
 	UInt32				weaponAV;		// 0C
 	SInt32				hitLocation;	// 10
@@ -1081,12 +1080,12 @@ struct ActorHitData
 	float				blockDTMod;		// 24
 	float				armorDmg;		// 28
 	float				weaponDmg;		// 2C
-	TESObjectWEAP* weapon;		// 30
+	TESObjectWEAP*		weapon;			// 30
 	float				healthPerc;		// 34
 	NiVector3			impactPos;		// 38
 	NiVector3			impactAngle;	// 44
 	UInt32				unk50;			// 50
-	void* ptr54;			// 54
+	void*				ptr54;			// 54
 	UInt32				flags;			// 58
 	float				dmgMult;		// 5C
 	SInt32				unk60;			// 60	Unused; rigged by CopyHitDataHook to store hitLocation
@@ -1220,8 +1219,8 @@ struct __declspec(align(4)) VATSQueuedAction
 
 enum AnimMoveTypes
 {
-	kAnimMoveType_Walking = 0x0,
-	kAnimMoveType_Sneaking = 0x1,
-	kAnimMoveType_Swimming = 0x2,
-	kAnimMoveType_Flying = 0x3,
+	kAnimMoveType_Walking	= 0x0,
+	kAnimMoveType_Sneaking	= 0x1,
+	kAnimMoveType_Swimming	= 0x2,
+	kAnimMoveType_Flying	= 0x3,
 };

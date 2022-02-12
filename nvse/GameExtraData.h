@@ -1,5 +1,4 @@
 #pragma once
-
 #include <GameBSExtraData.h>
 #include <GameTypes.h>
 #include <GameForms.h>
@@ -7,27 +6,27 @@
 #include <vector>
 
 #define GetByTypeCast(xDataList, Type) DYNAMIC_CAST(xDataList.GetByType(kExtraData_ ## Type), BSExtraData, Extra ## Type)
-extern char * GetExtraDataValue(BSExtraData* traverse);
-extern const char * GetExtraDataName(UInt8 ExtraDataType);
+extern char*		GetExtraDataValue(BSExtraData* traverse);
+extern const char*	GetExtraDataName(UInt8 ExtraDataType);
+SInt32				GetCountForExtraDataList(ExtraDataList* list);
 
-// 018
 class ExtraSound : public BSExtraData
 {
 public:
 	ExtraSound();
 	~ExtraSound();
 
-	Sound	sound; // 00C
+	Sound	sound; // 0x0C
 };
+STATIC_ASSERT(sizeof(ExtraSound) == 0x18);
 
 class ExtraDroppedItemList : public BSExtraData
 {
 public:
-	tList<TESObjectREFR>	itemRefs;	// 0C
+	tList<TESObjectREFR>	itemRefs;	// 0x0C
 };
+STATIC_ASSERT(sizeof(ExtraDroppedItemList) == 0x14);
 
-
-// 014
 class ExtraAction : public BSExtraData
 {
 public:
@@ -37,28 +36,26 @@ public:
 	UInt8			flags0C;	// 00C	some kind of status or flags: 
 								//		if not RunOnActivateBlock: bit0 and bit1 are set before TESObjectREF::Activate, bit0 is preserved, bit1 is cleared after returning.
 	UInt8			fill0D[3];	// 00D
-	TESForm		*	actionRef;	// 010
+	TESForm*		actionRef;	// 010
 
 	static ExtraAction* Create();
 };
+STATIC_ASSERT(sizeof(ExtraAction) == 0x14);
 
-// 014
 class ExtraScript : public BSExtraData
 {
 public:
 	ExtraScript();
 	virtual ~ExtraScript();
 
-	Script			* script;		// 00C
-	ScriptEventList	* eventList;	// 010
+	Script*				script;		// 00C
+	ScriptEventList*	eventList;	// 010
 
-	static ExtraScript* Create(TESForm* baseForm = NULL, bool create = true, TESObjectREFR* container = NULL);
-	void EventCreate(UInt32 eventCode, TESObjectREFR* container);
+	static ExtraScript*		Create(TESForm* baseForm = NULL, bool create = true, TESObjectREFR* container = NULL);
+	void					EventCreate(UInt32 eventCode, TESObjectREFR* container);
 };
+STATIC_ASSERT(sizeof(ExtraScript) == 0x14);
 
-SInt32 GetCountForExtraDataList(ExtraDataList* list);
-
-// 010
 class ExtraContainerChanges : public BSExtraData
 {
 public:
@@ -80,19 +77,11 @@ public:
 		TESForm*			type;			// 08
 
 		void				Cleanup();
-		static EntryData*	Create(UInt32 refID = 0, UInt32 count = 1, ExtraContainerChanges::ExtendDataList* pExtendDataList = NULL);
-		static EntryData*	Create(TESForm* pForm, UInt32 count = 1, ExtraContainerChanges::ExtendDataList* pExtendDataList = NULL);
+		static EntryData*	Create(UInt32 refID = 0, UInt32 count = 1, ExtendDataList* pExtendDataList = NULL);
+		static EntryData*	Create(TESForm* pForm, UInt32 count = 1, ExtendDataList* pExtendDataList = NULL);
 		ExtendDataList*		Add(ExtraDataList* newList);
 		bool				Remove(ExtraDataList* toRemove, bool bFree = false);
-
-		bool HasExtraLeveledItem()
-		{
-			if (!extendData) return false;
-			for (auto iter = extendData->Begin(); !iter.End(); ++iter)
-				if (iter->HasType(kExtraData_LeveledItem)) return true;
-			return false;
-		}
-
+		bool				HasExtraLeveledItem();
 		void				RemoveCannotWear();
 		float				GetItemHealthPerc(bool arg1 = true);
 		ExtraDataList*		GetEquippedExtra();
@@ -103,12 +92,13 @@ public:
 
 	struct EntryDataList : tList<EntryData>
 	{
-		EntryData *FindForItem(TESForm *item)
-		{
-			for (auto iter = Begin(); !iter.End(); ++iter)
-				if (iter->type == item) return iter.Get();
-			return NULL;
-		}
+		EntryData* FindForItem(TESForm* item);
+	};
+
+	// find the equipped item whose form matches the passed matcher
+	struct FoundEquipData {
+		TESForm*		pForm;
+		ExtraDataList*	pExtraData;
 	};
 
 	typedef std::vector<EntryData*> DataArray;
@@ -116,56 +106,53 @@ public:
 
 	struct Data
 	{
-		EntryDataList	* objList;	// 000
-		TESObjectREFR	* owner;	// 004
+		EntryDataList*	objList;	// 000
+		TESObjectREFR*	owner;		// 004
 		float			unk2;		// 008	OnEquip: at the begining, stored into unk3 and forced to -1.0 before checking owner
 		float			unk3;		// 00C
 		UInt8			byte10;		// 010	referenced in relation to scripts in container
 		UInt8			pad[3];
 
-		static Data* Create(TESObjectREFR* owner);
+		static Data*	Create(TESObjectREFR* owner);
 	};
 
-	Data	* data;	// 00C
+	Data*				data;	// 00C
 
-	EntryData *	GetByType(TESForm * type);
-
-	void DebugDump();
-	void Cleanup();	// clean up unneeded extra data from each EntryData
-	ExtendDataList * Add(TESForm* form, ExtraDataList* dataList = NULL);
-	bool Remove(TESForm* form, ExtraDataList* dataList = NULL, bool bFree = false);
-	ExtraDataList* SetEquipped(TESForm* obj, bool bEquipped, bool bForce = false);
-
+	EntryData*						GetByType(TESForm * type);
+	void							DebugDump();
+	void							Cleanup();	// clean up unneeded extra data from each EntryData
+	ExtendDataList*					Add(TESForm* form, ExtraDataList* dataList = NULL);
+	bool							Remove(TESForm* form, ExtraDataList* dataList = NULL, bool bFree = false);
+	ExtraDataList*					SetEquipped(TESForm* obj, bool bEquipped, bool bForce = false);
 	// get EntryData and ExtendData for all equipped objects, return num objects equipped
-	UInt32 GetAllEquipped(DataArray& outEntryData, ExtendDataArray& outExtendData);
-
-	static ExtraContainerChanges* Create();
-	static ExtraContainerChanges* Create(TESObjectREFR* thisObj, UInt32 refID = 0, UInt32 count = 1,
-		ExtraContainerChanges::ExtendDataList* pExtendDataList = NULL);
-	static ExtraContainerChanges* GetForRef(TESObjectREFR* refr);
-
-	// find the equipped item whose form matches the passed matcher
-	struct FoundEquipData{
-		TESForm* pForm;
-		ExtraDataList* pExtraData;
-	};
-	FoundEquipData FindEquipped(FormMatcher& matcher) const;
-
-	EntryDataList* GetEntryDataList() const {
-		return data ? data->objList : NULL;
-	}
+	UInt32							GetAllEquipped(DataArray& outEntryData, ExtendDataArray& outExtendData);
+	static ExtraContainerChanges*	Create();
+	static ExtraContainerChanges*	Create(TESObjectREFR* thisObj, UInt32 refID = 0, UInt32 count = 1,
+	                                     ExtendDataList* pExtendDataList = NULL);
+	static ExtraContainerChanges*	GetForRef(TESObjectREFR* refr);
+	FoundEquipData					FindEquipped(FormMatcher& matcher) const;
+	EntryDataList*					GetEntryDataList() const { return data ? data->objList : nullptr; }
 };
-typedef ExtraContainerChanges::DataArray ExtraContainerDataArray;
-typedef ExtraContainerChanges::ExtendDataArray ExtraContainerExtendDataArray;
+STATIC_ASSERT(sizeof(ExtraContainerChanges) == 0x10);
+
+typedef ExtraContainerChanges::ExtendDataArray ContChangesExtendArray;
+
 typedef ExtraContainerChanges::EntryData ContChangesEntry;
+STATIC_ASSERT(sizeof(ContChangesEntry) == 0xC);
+
+typedef ExtraContainerChanges::DataArray ContChangesArray;
+
+typedef ExtraContainerChanges::EntryDataList ContChangesList;
+STATIC_ASSERT(sizeof(ContChangesList) == 0x8);
 
 struct InventoryItemData
 {
 	SInt32								count;
-	ExtraContainerChanges::EntryData	*entry;
+	ContChangesEntry*					entry;
 
-	InventoryItemData(SInt32 _count, ExtraContainerChanges::EntryData *_entry) : count(_count), entry(_entry) {}
+	InventoryItemData(SInt32 _count, ContChangesEntry* _entry) : count(_count), entry(_entry) {}
 };
+STATIC_ASSERT(sizeof(InventoryItemData) == 0x08);
 
 typedef std::unordered_map<TESForm*, InventoryItemData> InventoryItemsMap;
 
@@ -176,10 +163,7 @@ class ExtraDataListInExtendDataListMatcher
 public:
 	ExtraDataListInExtendDataListMatcher(ExtraDataList* match) : m_toMatch(match) { }
 
-	bool Accept(ExtraDataList* match)
-	{
-		return (m_toMatch == match);
-	}
+	bool Accept(ExtraDataList* match) { return (m_toMatch == match); }
 };
 
 // Finds an ExtraDataList in an ExtendDataList embedded in one of the EntryData from an EntryDataList
@@ -189,7 +173,7 @@ class ExtraDataListInEntryDataListMatcher
 public:
 	ExtraDataListInEntryDataListMatcher(ExtraDataList* match) : m_toMatch(match) { }
 
-	bool Accept(ExtraContainerChanges::EntryData* match);
+	bool Accept(ContChangesEntry* match);
 };
 
 // Finds an ExtendDataList in an EntryDataList
@@ -199,26 +183,17 @@ class ExtendDataListInEntryDataListMatcher
 public:
 	ExtendDataListInEntryDataListMatcher(ExtraContainerChanges::ExtendDataList* match) : m_toMatch(match) { }
 
-	bool Accept(ExtraContainerChanges::EntryData* match)
-	{
-		if (match && match->extendData)
-			return (match->extendData == m_toMatch);
-		else
-			return false;
-	}
+	bool Accept(ContChangesEntry* match) { return match && match->extendData ? match->extendData == m_toMatch : false; }
 };
 
 // Finds an EntryData in an EntryDataList
 class EntryDataInEntryDataListMatcher
 {
-	ExtraContainerChanges::EntryData* m_toMatch;
+	ContChangesEntry* m_toMatch;
 public:
-	EntryDataInEntryDataListMatcher(ExtraContainerChanges::EntryData* match) : m_toMatch(match) { }
+	EntryDataInEntryDataListMatcher(ContChangesEntry* match) : m_toMatch(match) { }
 
-	bool Accept(ExtraContainerChanges::EntryData* match)
-	{
-		return (m_toMatch == match);
-	}
+	bool Accept(ContChangesEntry* match) { return (m_toMatch == match); }
 };
 
 // Finds an Item (type) in an EntryDataList
@@ -228,10 +203,7 @@ class ItemInEntryDataListMatcher
 public:
 	ItemInEntryDataListMatcher(TESForm* match) : m_toMatch(match) { }
 
-	bool Accept(ExtraContainerChanges::EntryData* match)
-	{
-		return (match && m_toMatch == match->type);
-	}
+	bool Accept(ContChangesEntry* match) { return (match && m_toMatch == match->type); }
 };
 
 // Finds an Item from its base form in an EntryDataList
@@ -241,10 +213,7 @@ class BaseInEntryDataLastMatcher
 public:
 	BaseInEntryDataLastMatcher(TESForm* match) : m_toMatch(match) { }
 
-	bool Accept(ExtraContainerChanges::EntryData* match)
-	{
-		return (match && match->type && m_toMatch == match->type->TryGetREFRParent());
-	}
+	bool Accept(ContChangesEntry* match) { return (match && match->type && m_toMatch == match->type->TryGetREFRParent()); }
 };
 
 // Finds an item by refID in an EntryDataList
@@ -254,10 +223,7 @@ class RefIDInEntryDataListMatcher
 public:
 	RefIDInEntryDataListMatcher(UInt32 match) : m_toMatch(match) { }
 
-	bool Accept(ExtraContainerChanges::EntryData* match)
-	{
-		return (match && match->type && m_toMatch == match->type->refID);
-	}
+	bool Accept(ContChangesEntry* match) { return (match && match->type && m_toMatch == match->type->refID); }
 };
 
 // Finds an item by the refID of its base form in an EntryDataList
@@ -267,10 +233,7 @@ class BaseIDInEntryDataListMatcher
 public:
 	BaseIDInEntryDataListMatcher(UInt32 match) : m_toMatch(match) { }
 
-	bool Accept(ExtraContainerChanges::EntryData* match)
-	{
-		return (match && match->type && match->type->TryGetREFRParent() && m_toMatch == match->type->TryGetREFRParent()->refID);
-	}
+	bool Accept(ContChangesEntry* match) { return (match && match->type && match->type->TryGetREFRParent() && m_toMatch == match->type->TryGetREFRParent()->refID); }
 };
 
 typedef ExtraContainerChanges::FoundEquipData EquipData;
@@ -280,14 +243,13 @@ extern void ExtraContainerChangesExtendDataListFree(ExtraContainerChanges::Exten
 extern bool ExtraContainerChangesExtendDataListAdd(ExtraContainerChanges::ExtendDataList* xData, ExtraDataList* xList);
 extern bool ExtraContainerChangesExtendDataListRemove(ExtraContainerChanges::ExtendDataList* xData, ExtraDataList* xList, bool bFreeList = false);
 
-extern void ExtraContainerChangesEntryDataFree(ExtraContainerChanges::EntryData* xData, bool bFreeList = false);
+extern void ExtraContainerChangesEntryDataFree(ContChangesEntry* xData, bool bFreeList = false);
 
-extern ExtraContainerChanges::EntryDataList* ExtraContainerChangesEntryDataListCreate(UInt32 refID = 0, UInt32 count = 1, ExtraContainerChanges::ExtendDataList* pExtendDataList = NULL);
-extern void ExtraContainerChangesEntryDataListFree(ExtraContainerChanges::EntryDataList* xData, bool bFreeList = false);
+extern ContChangesList* ExtraContainerChangesEntryDataListCreate(UInt32 refID = 0, UInt32 count = 1, ExtraContainerChanges::ExtendDataList* pExtendDataList = NULL);
+extern void ExtraContainerChangesEntryDataListFree(ContChangesList* xData, bool bFreeList = false);
 
 extern void ExtraContainerChangesFree(ExtraContainerChanges* xData, bool bFreeList = false);
 
-// 010
 class ExtraHealth : public BSExtraData
 {
 public:
@@ -297,8 +259,8 @@ public:
 
 	static ExtraHealth* Create();
 };
+STATIC_ASSERT(sizeof(ExtraHealth) == 0x10);
 
-// 00C
 class ExtraWorn : public BSExtraData	// Item is equipped
 {
 public:
@@ -307,18 +269,18 @@ public:
 
 	static ExtraWorn* Create();
 };
+STATIC_ASSERT(sizeof(ExtraWorn) == 0x0C);
 
-// 00C
 class ExtraWornLeft : public BSExtraData	// haven't seen used yet
 {
 public:
 	ExtraWornLeft();
 	virtual ~ExtraWornLeft();
 
-	//static ExtraWornLeft* Create();
+	static ExtraWornLeft* Create();
 };
+STATIC_ASSERT(sizeof(ExtraWornLeft) == 0x0C);
 
-// 00C
 class ExtraCannotWear : public BSExtraData	//	Seen used as ForceEquip ! Unused as forceUnequip (bug?)
 {
 public:
@@ -327,8 +289,8 @@ public:
 
 	static ExtraCannotWear* Create();
 };
+STATIC_ASSERT(sizeof(ExtraCannotWear) == 0x0C);
 
-// 010
 class ExtraHotkey : public BSExtraData
 {
 public:
@@ -339,8 +301,8 @@ public:
 
 	static ExtraHotkey* Create();
 };
+STATIC_ASSERT(sizeof(ExtraHotkey) == 0x10);
 
-// 010
 class ExtraCount : public BSExtraData
 {
 public:
@@ -352,8 +314,8 @@ public:
 
 	static ExtraCount* Create(UInt32 count = 0);	
 };
+STATIC_ASSERT(sizeof(ExtraCount) == 0x10);
 
-// 010
 class ExtraLock : public BSExtraData
 {
 public:
@@ -374,8 +336,8 @@ public:
 
 	static ExtraLock* Create();
 };
+STATIC_ASSERT(sizeof(ExtraLock) == 0x10);
 
-// 010
 class ExtraUses : public BSExtraData
 {
 public:
@@ -386,8 +348,8 @@ public:
 
 	static ExtraUses* Create();
 };
+STATIC_ASSERT(sizeof(ExtraUses) == 0x10);
 
-// 010
 class ExtraTeleport : public BSExtraData
 {
 public:
@@ -407,12 +369,12 @@ public:
 		UInt8			pad01D[3];	// 1D
 	};
 
-	Data *	data;
+	Data*	data;
 
 	static ExtraTeleport* Create();
 };
+STATIC_ASSERT(sizeof(ExtraTeleport) == 0x10);
 
-// 010
 class ExtraRandomTeleportMarker : public BSExtraData
 {
 public:
@@ -421,31 +383,31 @@ public:
 
 	TESObjectREFR *	teleportRef;
 };
+STATIC_ASSERT(sizeof(ExtraRandomTeleportMarker) == 0x10);
 
-// 014
 class ExtraAmmo : public BSExtraData
 {
 public:
 	ExtraAmmo();
 	~ExtraAmmo();
 
-	TESAmmo* ammo;
-	UInt32 unk4;
+	TESAmmo*	ammo;	// 0xC
+	UInt32		count;	// 0x10
 };
+STATIC_ASSERT(sizeof(ExtraAmmo) == 0x14);
 
-// 010
 class ExtraOwnership : public BSExtraData
 {
 public:
 	ExtraOwnership();
 	virtual ~ExtraOwnership();
 
-	TESForm	* owner;	// maybe this should be a union {TESFaction*; TESNPC*} but it would be more unwieldy to access and modify
+	TESForm*	owner;	// maybe this should be a union {TESFaction*; TESNPC*} but it would be more unwieldy to access and modify
 
 	static ExtraOwnership* Create();
 };
+STATIC_ASSERT(sizeof(ExtraOwnership) == 0x10);
 
-// 010
 class ExtraRank : public BSExtraData
 {
 public:
@@ -456,8 +418,8 @@ public:
 
 	static ExtraRank* Create();
 };
+STATIC_ASSERT(sizeof(ExtraRank) == 0x10);
 
-// 010
 class ExtraGlobal : public BSExtraData
 {								//ownership data, stored separately from ExtraOwnership
 public:
@@ -466,8 +428,8 @@ public:
 
 	TESGlobal*	globalVar;	// 00C
 };
+STATIC_ASSERT(sizeof(ExtraGlobal) == 0x10);
 
-// 010
 class ExtraWeaponModFlags : public BSExtraData
 {
 public:
@@ -478,6 +440,7 @@ public:
 
 	static ExtraWeaponModFlags* Create();
 };
+STATIC_ASSERT(sizeof(ExtraWeaponModFlags) == 0x10);
 
 class ExtraFactionChanges : public BSExtraData
 {
@@ -487,19 +450,17 @@ public:
 
 	struct FactionListData
 	{
-		TESFaction	* faction;
-		UInt8		rank;
-		UInt8		pad[3];
+		TESFaction*		faction;
+		UInt8			rank;
+		UInt8			pad[3];
 	};
 
 	typedef tList<FactionListData> FactionListEntry;
-	FactionListEntry* data;
+	FactionListEntry*	data;
 
-	void		DebugDump();
-
+	void						DebugDump();
 	static ExtraFactionChanges* Create();
 };
-
 STATIC_ASSERT(sizeof(ExtraFactionChanges) == 0x10);
 
 class ExtraFactionChangesMatcher
@@ -508,14 +469,12 @@ class ExtraFactionChangesMatcher
 	ExtraFactionChanges* xFactionChanges;
 public:
 	ExtraFactionChangesMatcher(TESFaction* faction, ExtraFactionChanges* FactionChanges) : pFaction(faction), xFactionChanges(FactionChanges) {}
-	bool Accept(ExtraFactionChanges::FactionListData* data) {
-		return (data->faction == pFaction) ? true : false;
-	}
+	bool Accept(const ExtraFactionChanges::FactionListData* data) { return data->faction == pFaction ? true : false; }
 };
 
-ExtraFactionChanges::FactionListEntry* GetExtraFactionList(BaseExtraList& xDataList);
-SInt8 GetExtraFactionRank(BaseExtraList& xDataList, TESFaction * faction);
-void SetExtraFactionRank(BaseExtraList& xDataList, TESFaction * faction, SInt8 rank);
+ExtraFactionChanges::FactionListEntry*	GetExtraFactionList(BaseExtraList& xDataList);
+SInt8									GetExtraFactionRank(BaseExtraList& xDataList, TESFaction * faction);
+void									SetExtraFactionRank(BaseExtraList& xDataList, TESFaction * faction, SInt8 rank);
 
 class ExtraLeveledCreature : public BSExtraData
 {
@@ -523,10 +482,9 @@ public:
 	ExtraLeveledCreature();
 	virtual ~ExtraLeveledCreature();
 
-	TESActorBase* baseForm;	// 00C
-	TESActorBase* actorBase;		// 010
+	TESActorBase*		baseForm;		// 00C
+	TESActorBase*		actorBase;		// 010
 };
-
 STATIC_ASSERT(sizeof(ExtraLeveledCreature) == 0x14);
 
 // PackageStartLocation = Worldspace or Cell / PosX / PosY / PosZ / and 4 bytes
@@ -537,8 +495,9 @@ public:
 	ExtraCombatStyle();
 	virtual ~ExtraCombatStyle();
 
-	TESCombatStyle*	combatStyle;		// 00C
+	TESCombatStyle*		combatStyle;	// 00C
 };
+STATIC_ASSERT(sizeof(ExtraCombatStyle) == 0x10);
 
 class ExtraReferencePointer : public BSExtraData
 {
@@ -546,8 +505,9 @@ public:
 	ExtraReferencePointer();
 	virtual ~ExtraReferencePointer();
 
-	TESObjectREFR* refr;		// 00C
+	TESObjectREFR*		refr;			// 00C
 };
+STATIC_ASSERT(sizeof(ExtraReferencePointer) == 0x10);
 
 // Provided by "Luthien Anarion"
 class ExtraMapMarker : BSExtraData
@@ -583,21 +543,22 @@ public:
 
     struct MarkerData
     {
-        TESFullName fullName;            // not all markers have this
-        UInt16 flags;
-        UInt16 type;
-        TESForm* reputation;            // not all markers have this
+        TESFullName		fullName;            // not all markers have this
+        UInt16			flags;
+        UInt16			type;
+        TESForm*		reputation;            // not all markers have this
     };
-    MarkerData    *data;
+    MarkerData*			data;
 
     // flag member functions
-    bool IsVisible() {return (data->flags & kFlag_Visible) == kFlag_Visible;}
-    bool CanTravel() {return (data->flags & kFlag_CanTravel) == kFlag_CanTravel;}
-    bool IsHidden() {return (data->flags & kFlag_Hidden) == kFlag_Hidden;}
-    void SetVisible(bool visible) {data->flags = (visible) ? (data->flags | kFlag_Visible) : (data->flags & ~kFlag_Visible);}
-    void SetCanTravel(bool travel) {data->flags = (travel) ? (data->flags | kFlag_CanTravel) : (data->flags & ~kFlag_CanTravel);}
-    void SetHidden(bool hidden) {data->flags = (hidden) ? (data->flags | kFlag_Hidden) : (data->flags & ~kFlag_Hidden);}
+	bool IsVisible()				{ return (data->flags & kFlag_Visible) == kFlag_Visible; }
+	bool CanTravel()				{ return (data->flags & kFlag_CanTravel) == kFlag_CanTravel; }
+	bool IsHidden()					{ return (data->flags & kFlag_Hidden) == kFlag_Hidden; }
+	void SetVisible(bool visible)	{ data->flags = visible ? data->flags | kFlag_Visible : data->flags & ~kFlag_Visible; }
+	void SetCanTravel(bool travel)	{ data->flags = travel ? data->flags | kFlag_CanTravel : data->flags & ~kFlag_CanTravel; }
+	void SetHidden(bool hidden)		{ data->flags = hidden ? data->flags | kFlag_Hidden : data->flags & ~kFlag_Hidden; }
 };
+STATIC_ASSERT(sizeof(ExtraMapMarker) == 0x10);
 
 class ExtraNorthRotation : public BSExtraData
 {
@@ -605,8 +566,9 @@ public:
 	ExtraNorthRotation();
 	virtual ~ExtraNorthRotation();
 
-	UInt32 angle;		// 00C
+	UInt32				angle;		// 00C
 };
+STATIC_ASSERT(sizeof(ExtraNorthRotation) == 0x10);
 
 class ExtraSeenData : public BSExtraData
 {
@@ -616,6 +578,7 @@ public:
 
 	UInt8 unk[0x24 - 0x0C];		// 00C
 };
+STATIC_ASSERT(sizeof(ExtraSeenData) == 0x24);
 
 class ExtraIntSeenData : public ExtraSeenData
 {
@@ -628,19 +591,18 @@ public:
 	UInt8				filler[2];	// 026
 	ExtraIntSeenData*	next;		// 028
 };
+STATIC_ASSERT(sizeof(ExtraIntSeenData) == 0x2C);
 
 // ExtraUsedMarkers is a bitmask of 30 bits.
 
-// 10
 class ExtraPersistentCell : public BSExtraData
 {
 public:
 	ExtraPersistentCell();
 	virtual ~ExtraPersistentCell();
 
-	TESObjectCELL	*persistentCell;	// 0C
+	TESObjectCELL*		persistentCell;	// 0C
 };
-
 STATIC_ASSERT(sizeof(ExtraPersistentCell) == 0x10);
 
 class ExtraTerminalState : public BSExtraData
@@ -658,6 +620,7 @@ public:
 	UInt8	lockLevel;
 	UInt8	filler[2];
 };
+STATIC_ASSERT(sizeof(ExtraTerminalState) == 0x10);
 
 class ExtraAnim : public BSExtraData
 {
@@ -669,5 +632,6 @@ public:
 	{
 	};	// 013C
 
-	Animation* data;	// 0C
-};	// 10
+	Animation*	data;	// 0C
+};
+STATIC_ASSERT(sizeof(ExtraAnim) == 0x10);
