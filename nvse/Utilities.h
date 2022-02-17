@@ -135,18 +135,21 @@ public:
 
 class DebugLog
 {
-	FILE* theFile;
+	FILE*			theFile;
 	UInt32			indent;
+	std::string		modString;
 
 public:
 	DebugLog() : theFile(nullptr), indent(40) {}
 	~DebugLog() { if (theFile) fclose(theFile); }
 
-	bool Create(const char* filePath);
-	void Message(const char* msgStr);
-	void FmtMessage(const char* fmt, va_list args);
-	void Indent() { if (indent) indent--; }
-	void Outdent() { if (indent < 40) indent++; }
+	bool		Create(const char* filePath);
+	void		Message(const char* msgStr);
+	void		FmtMessage(const char* fmt, va_list args);
+	void		Indent() { if (indent) indent--; }
+	void		Outdent() { if (indent < 40) indent++; }
+	std::string	GetModString();
+	void		SetModString(const std::string& string);
 };
 
 extern DebugLog gLog;
@@ -154,7 +157,7 @@ extern DebugLog gLog;
 void PrintLog(const char* fmt, ...);
 void PrintAndClearQueuedConsoleMessages();
 void ConsoleQueueOrPrint(const std::string& msg);
-void Log(const std::string& msg);
+void Log(const std::string& msg, UInt32 loglevel = 0);
 
 class Script;
 

@@ -206,6 +206,16 @@ void DebugLog::FmtMessage(const char* fmt, va_list args)
 	fflush(theFile);
 }
 
+std::string DebugLog::GetModString()
+{
+	return modString;
+}
+
+void DebugLog::SetModString(const std::string& string)
+{
+	modString = string;
+}
+
 void PrintLog(const char* fmt, ...)
 {
 	va_list args;
@@ -216,8 +226,8 @@ void PrintLog(const char* fmt, ...)
 
 void PrintAndClearQueuedConsoleMessages()
 {
-	for (const auto iter : queuedConsoleMessages)
-		Console_Print("yUI: %s", iter.c_str());
+	for (const auto& iter : queuedConsoleMessages)
+		PrintConsole("%s: %s", gLog.GetModString().c_str(), iter.c_str());
 	queuedConsoleMessages.clear();
 }
 
@@ -226,16 +236,16 @@ extern DataHandler* g_dataHandler;
 void ConsoleQueueOrPrint(const std::string& msg)
 {
 	if (*reinterpret_cast<ConsoleManager**>(0x11D8CE8) || g_dataHandler) // g_dataHandler will be non-null if Deferred init has been called
-		Console_Print("yUI: %s", msg.c_str());
+		PrintConsole("%s: %s", gLog.GetModString().c_str(), msg.c_str());
 	else
 		queuedConsoleMessages.push_back(msg);
 }
 
-void Log(const std::string& msg)
+void Log(const std::string& msg, UInt32 loglevel)
 {
-	PrintLog("%s", msg.c_str());
-	if (g_logLevel == 2)
-		ConsoleQueueOrPrint(msg);
+	if (loglevel == 0) loglevel = g_logLevel;
+	if (loglevel >= 1) PrintLog("%s", msg.c_str());
+	if (loglevel >= 2) ConsoleQueueOrPrint(msg);
 }
 
 void DumpClass(void* theClassPtr, UInt32 nIntsToDump)
@@ -673,9 +683,9 @@ void Console_Print_Long(const std::string& str)
 {
 	UInt32 numLines = str.length() / 500;
 	for (UInt32 i = 0; i < numLines; i++)
-		Console_Print("%s ...", str.substr(i*500, 500).c_str());
+		PrintConsole("%s ...", str.substr(i*500, 500).c_str());
 
-	Console_Print("%s", str.substr(numLines*500, str.length() - numLines*500).c_str());
+	PrintConsole("%s", str.substr(numLines*500, str.length() - numLines*500).c_str());
 }
 
 #endif
@@ -886,7 +896,7 @@ void ShowRuntimeError(Script* script, const char* fmt, ...)
 			QueueUIMessage(message, 0, reinterpret_cast<const char*>(0x1049638), nullptr, 2.5F, false);
 	}
 
-	Console_Print(errorHeader);
+	PrintConsole(errorHeader);
 	PrintLog(errorHeader);
 
 	va_end(args);

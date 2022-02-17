@@ -4629,10 +4629,7 @@ public:
 	float	powerAttackFatigueModBase;		// 100
 	float	powerAttackFatigueModMult;		// 104
 
-	void SetFlag(UInt32 pFlag, bool bMod)
-	{
-		csFlags = bMod ? (csFlags | pFlag) : (csFlags & ~pFlag);
-	}
+	void SetFlag(UInt32 pFlag, bool bMod) { csFlags = bMod ? (csFlags | pFlag) : (csFlags & ~pFlag); }
 };
 STATIC_ASSERT(sizeof(TESCombatStyle) == 0x108);
 
@@ -4644,16 +4641,14 @@ public:
 	~TESRecipeCategory();
 
 	TESFullName			fullName;	// 18
-
 	UInt32				flags;		// 24
 };
-
 STATIC_ASSERT(sizeof(TESRecipeCategory) == 0x28);
 
 struct RecipeComponent
 {
 	UInt32		quantity;
-	TESForm*	item;
+	TESForm* item;
 };
 
 // 5C
@@ -4674,10 +4669,9 @@ public:
 	tList<RecipeComponent>	outputs;		// 44
 	UInt32					unk4C;			// 4C
 	UInt32					unk50;			// 50
-	TESRecipeCategory		*category;		// 54
-	TESRecipeCategory		*subCategory;	// 58
+	TESRecipeCategory*		category;		// 54
+	TESRecipeCategory*		subCategory;	// 58
 };
-
 STATIC_ASSERT(sizeof(TESRecipe) == 0x5C);
 
 // TESLoadScreen (3C)
@@ -4756,18 +4750,18 @@ public:
 	TESImageSpaceModifiableForm	imageSpaceModForm;	// 068
 
 	TESForm*					placedObj;			// 070
-	float						force;				// 074
-	float						damage;				// 078
-	float						radius;				// 07C
+	Float32						force;				// 074
+	Float32						damage;				// 078
+	Float32						radius;				// 07C
 	TESObjectLIGH*				light;				// 080
 	TESSound*					sound1;				// 084
 	UInt32						explFlags;			// 088
-	float						ISradius;			// 08C
+	Float32						ISradius;			// 08C
 	BGSImpactDataSet*			impactDataSet;		// 090
 	TESSound*					sound2;				// 094
-	float						RADlevel;			// 098
-	float						dissipationTime;	// 09C
-	float						RADradius;			// 0A0
+	Float32						RADlevel;			// 098
+	Float32						dissipationTime;	// 09C
+	Float32						RADradius;			// 0A0
 
 	void SetFlag(UInt32 flag, bool val) { explFlags = val ? (explFlags | flag) : (explFlags & ~flag); }
 };

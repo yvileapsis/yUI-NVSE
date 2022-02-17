@@ -19,8 +19,8 @@ extern inline bool Cmd_SetGlobalTimeMultiplierAlt_Execute(COMMAND_ARGS)
 	BSAudioManager::GetSingleton()->ignoreTimescale = 0;
 
 	if (IsConsoleOpen()) {
-		Console_Print("Global Time Multiplier >> '%0.2f'", TimeMult::g_timeMult);
-		Console_Print("Local Time Multiplier >> '%0.2f'", TimeMult::g_localMults.contains(mod) ? TimeMult::g_localMults[mod] : 1.0);
+		PrintConsole("Global Time Multiplier >> '%0.2f'", TimeMult::g_timeMult);
+		PrintConsole("Local Time Multiplier >> '%0.2f'", TimeMult::g_localMults.contains(mod) ? TimeMult::g_localMults[mod] : 1.0);
 	}
 	*result = 1;
 	return true;
@@ -43,8 +43,8 @@ extern inline bool Cmd_GetGlobalTimeMultiplierAlt_Execute(COMMAND_ARGS)
 	}
 
 	if (IsConsoleOpen()) {
-		Console_Print("Global Time Multiplier >> '%0.2f'", TimeMult::g_timeMult);
-		Console_Print("Local Time Multiplier >> '%0.2f'", TimeMult::g_localMults.contains(mod) ? TimeMult::g_localMults[mod] : 1.0);
+		PrintConsole("Global Time Multiplier >> '%0.2f'", TimeMult::g_timeMult);
+		PrintConsole("Local Time Multiplier >> '%0.2f'", TimeMult::g_localMults.contains(mod) ? TimeMult::g_localMults[mod] : 1.0);
 	}
 
 	return true;

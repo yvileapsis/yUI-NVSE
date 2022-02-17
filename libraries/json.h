@@ -6770,7 +6770,6 @@ namespace nlohmann
                     }
                 }
                 [[fallthrough]];
-\
                 // unexpected character after reading '/'
                 default:
                 {

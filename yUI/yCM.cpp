@@ -77,7 +77,7 @@ bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS)
 	else
 	{
 		path = "GetMCMFloat " + std::to_string(child) + " " + std::to_string(grandchild) + " " + std::string(src);
-		Console_Print(path.c_str());
+		PrintConsole(path.c_str());
 	}
 
 	return true;
@@ -158,7 +158,7 @@ bool Cmd_SetyCMFloat_Execute(COMMAND_ARGS)
 	{
 //		Console_Print(path2.c_str());
 		path = "SetMCMFloat " + std::to_string(child) + " " + std::to_string(grandchild) + " " + std::string(src) + " " + std::to_string(value);
-		Console_Print(path.c_str());
+		PrintConsole(path.c_str());
 	}
 	return true;
 }

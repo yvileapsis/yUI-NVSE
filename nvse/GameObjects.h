@@ -490,7 +490,18 @@ public:
 	UInt8								isSwimming;						// 14D
 	UInt8								unk14E;							// 14E
 	UInt8								unk14F;							// 14F
-	UInt32								unk150[(0x190-0x150) >> 2];		// 150	-	if Actor and not player: 0160 receives a copy of Pos[X,Y,Z] and Rot if 0170 is null during Func011B. 0170 receive ParentCell if Interior, Worldspace otherwize
+	UInt32								unk150;							// 150	-	if Actor and not player: 0160 receives a copy of Pos[X,Y,Z] and Rot if 0170 is null during Func011B. 0170 receive ParentCell if Interior, Worldspace otherwize
+	UInt32								unk154;
+	UInt32								unk158;
+	UInt32								unk15C;
+	UInt32								unk160;							// 160 if Actor and not player: 0160 receives a copy of Pos[X,Y,Z] and Rot if 0170 is null during Func011B
+	UInt32								unk164;
+	UInt32								unk168;
+	UInt32								unk16C;
+	UInt32								unk170;							// 170 receive ParentCell if Interior, Worldspace otherwize
+	UInt32								unk174;
+	Float32								flt178;
+	UInt32								unk17C[(0x190 - 0x17C) >> 2];	// 17C	 
 	ActorMover*							actorMover;						// 190
 
 	UInt32								unk194[(0x1B0-0x194) >> 2];		// 184 Byt018D = PlayerTeammate, 1AC is a list (or not! I have it loaded from a byte)

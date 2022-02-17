@@ -2,30 +2,26 @@
 #include <GameObjects.h>
 #include <GameRTTI.h>
 
-double __cdecl AdjustPushForceAlt(Actor* target, ActorHitData* hitdata, ActorValueOwner* owner, int force)
+#include "GameSettings.h"
+
+Float64 __cdecl AdjustPushForceAlt(Actor* target, ActorHitData* hitdata, ActorValueOwner* owner, SInt32 force)
 {
-	double scale = 1.0;
+	Float64 scale = 1.0;
 	if (hitdata->explosion && hitdata->explosion->baseForm)
 	{
 		const auto explosion = DYNAMIC_CAST(hitdata->explosion->baseForm, TESForm, BGSExplosion);
-		scale = CdeclCall<double>(0x647920, hitdata->explosion->radius, hitdata->explosion->GetDistance(target));
+		scale = CdeclCall<Float64>(0x647920, hitdata->explosion->radius, hitdata->explosion->GetDistance(target));
 		scale *= explosion->force / 100.0;
 	}
-	return scale * CdeclCall<double>(0x646580, owner, force);
+	return scale * CdeclCall<Float64>(0x646580, owner, force);
 }
 
-__declspec(naked) void HitKnockbackHook()
-{
-	static const UInt32 retnAddr = 0x89C8D4;
-	static const UInt32 AdjustPushForce = reinterpret_cast<UInt32>(AdjustPushForceAlt);
-	_asm
-	{
-		mov		eax, [ebx + 0x8] // hitData
-		push	eax
-		mov     eax, [ebp - 0x18] // target
-		push	eax
-		call	AdjustPushForce
-		add		esp, 8
-		jmp		retnAddr
-	}
+Float32 __fastcall SetSpreadForActor(Actor* actor) {
+	const auto conditionTier = ThisStdCall<SInt32>(0x92B9E0, actor->baseProcess, actor);
+    if (conditionTier > 9) return 0.5;
+    const auto spreadArray = reinterpret_cast<Setting**>(0x119B2BC);
+    const Setting* spreadSetting = spreadArray[conditionTier + 10];
+    const float result = spreadSetting->data.f;
+	actor->flt178 = result;
+    return result;
 }

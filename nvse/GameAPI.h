@@ -21,7 +21,7 @@ extern bool alternateUpdate3D;
 extern bool s_InsideOnActorEquipHook;
 extern UInt32 s_CheckInsideOnActorEquipHook;
 
-void Console_Print(const char * fmt, ...);
+void PrintConsole(const char * fmt, ...);
 
 //typedef void * (* _FormHeap_Allocate)(UInt32 size);
 //extern const _FormHeap_Allocate FormHeap_Allocate;
@@ -855,9 +855,9 @@ struct TimeGlobal : Timer
 	float unk28;  // 028
 
 	static TimeGlobal*	GetSingleton();
-	void				Set(float, char);
-	static float		Get();
-	static float		GetTarget();
+	void				Set(Float32, char);
+	static Float32		Get();
+	static Float32		GetTarget();
 };
 
 NiTPointerMap<TESForm>* GetAllForms();

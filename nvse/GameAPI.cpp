@@ -156,11 +156,9 @@ bool ConsoleManager::HasConsoleOutputFilename(void) {
 bool s_InsideOnActorEquipHook = false;
 UInt32 s_CheckInsideOnActorEquipHook = 1;
 
-void Console_Print(const char * fmt, ...)
+void PrintConsole(const char * fmt, ...)
 {
-	//if (!s_CheckInsideOnActorEquipHook || !s_InsideOnActorEquipHook) {
-	ConsoleManager	* mgr = ConsoleManager::GetSingleton();
-	if(mgr)
+	if (ConsoleManager * mgr = ConsoleManager::GetSingleton())
 	{
 		va_list	args;
 
@@ -170,7 +168,6 @@ void Console_Print(const char * fmt, ...)
 
 		va_end(args);
 	}
-	//}
 }
 
 TESSaveLoadGame * TESSaveLoadGame::Get()
@@ -228,7 +225,7 @@ void ScriptEventList::Dump(void)
 		Event* pEvent = m_eventList->GetNthItem(n);
 		if(pEvent)
 		{
-			Console_Print("%08X (%s) %08X", pEvent->object, GetObjectClassName(pEvent->object), pEvent->eventMask);
+			PrintConsole("%08X (%s) %08X", pEvent->object, GetObjectClassName(pEvent->object), pEvent->eventMask);
 		}
 	}
 }
@@ -382,7 +379,7 @@ void ShowCompilerError(ScriptLineBuffer* lineBuf, const char * fmt, ...)
 	vsprintf_s(errorMsg, 0x200, fmt, args);
 
 	strcat_s(errorHeader, 0x400, errorMsg);
-	Console_Print(errorHeader);
+	PrintConsole(errorHeader);
 	PrintLog(errorHeader);
 
 	va_end(args);
@@ -493,13 +490,13 @@ UInt8* GetScriptDataPosition(Script* script, void* scriptDataIn, const UInt32* o
 
 TimeGlobal* TimeGlobal::GetSingleton() { return reinterpret_cast<TimeGlobal*>(0x11F6394); }
 
-void TimeGlobal::Set(const float value, const char isImmediateChange)
+void TimeGlobal::Set(const Float32 value, const char isImmediateChange)
 {
 	ThisCall<void>(0xAA4DB0, this, value, isImmediateChange);
 }
 
-float TimeGlobal::Get() { return *reinterpret_cast<float*>(0x11AC3A0); }
-float TimeGlobal::GetTarget() { return *reinterpret_cast<float*>(0x11AC3A4); }
+Float32 TimeGlobal::Get() { return *reinterpret_cast<Float32*>(0x11AC3A0); }
+Float32 TimeGlobal::GetTarget() { return *reinterpret_cast<Float32*>(0x11AC3A4); }
 
 NiTPointerMap<TESForm>* GetAllForms() { return *reinterpret_cast<NiTPointerMap<TESForm>**>(0x11C54C0); }
 /*

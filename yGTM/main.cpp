@@ -7,6 +7,7 @@
 
 #define yGTM_VERSION 3.0
 #define yGTM_VERSION_STR "3.0"
+#define yGTM_STR "yGTM"
 
 PluginHandle	g_pluginHandle = kPluginHandle_Invalid;
 
@@ -16,13 +17,12 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	{
 		g_player = PlayerCharacter::GetSingleton();
 		g_dataHandler = DataHandler::GetSingleton();
+		Log(FormatString("%s", yGTM_VERSION_STR), 1);
 
 		PrintAndClearQueuedConsoleMessages();
 		TimeMult::FillMaps();
 
-	}
-	else if (msg->type == NVSEMessagingInterface::kMessage_MainGameLoop)
-	{
+	} else if (msg->type == NVSEMessagingInterface::kMessage_MainGameLoop) {
 		if (iDoOnce == 0 && !CdeclCall<bool>(0x702360)) {
 			iDoOnce++;
 		}
@@ -32,32 +32,33 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 {
 	gLog.Create("yGTM.log");
-	PrintLog("yGTM: Query");
+	gLog.SetModString(yGTM_STR);
+	Log("Query", 1);
 
 	info->infoVersion = PluginInfo::kInfoVersion;
 	info->name = "yGTM";
-	info->version = yGTM_VERSION;
+	info->version = yGTM_VERSION * 100;
 
 	if (nvse->isEditor) {
 		if (nvse->editorVersion < CS_VERSION_1_4_0_518)
 		{
-			PrintLog("yGTM: incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518);
+			Log(FormatString("yGTM: incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518));
 			return false;
 		}
 	}
 	else {
 		if (nvse->nvseVersion < PACKED_NVSE_VERSION) {
-			PrintLog("yGTM: NVSE version too old (got %X expected at least %X). Plugin will NOT load! Install the latest version here: https://github.com/xNVSE/NVSE/releases/", nvse->nvseVersion, PACKED_NVSE_VERSION);
+			Log(FormatString("yGTM: NVSE version too old (got %X expected at least %X). Plugin will NOT load! Install the latest version here: https://github.com/xNVSE/NVSE/releases/", nvse->nvseVersion, PACKED_NVSE_VERSION));
 			return false;
 		}
 
 		if (nvse->runtimeVersion < RUNTIME_VERSION_1_4_0_525) {
-			PrintLog("yGTM: incorrect runtime version (got %08X need at least %08X)", nvse->runtimeVersion, RUNTIME_VERSION_1_4_0_525);
+			Log(FormatString("yGTM: incorrect runtime version (got %08X need at least %08X)", nvse->runtimeVersion, RUNTIME_VERSION_1_4_0_525));
 			return false;
 		}
 
 		if (nvse->isNogore) {
-			PrintLog("yGTM: NoGore is not supported");
+			Log(FormatString("yGTM: NoGore is not supported"));
 			return false;
 		}
 	}
@@ -66,8 +67,9 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 
 void writePatch()
 {
-	if (g_yTM) patchTimeMult();
-	patchFixExplosionPushDirection();
+	patchTimeMult(g_yTM);
+	patchFixExplosionPushForce(g_FixExplosionPushForce);
+	patchRestoreSpreadGameSettings(g_RestoreSpreadGameSettings);
 }
 
 bool NVSEPlugin_Load(const NVSEInterface* nvse)
@@ -100,6 +102,7 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	GetByOpcode(0x22B0)->execute = Cmd_GetGlobalTimeMultiplierAlt_Execute;
 	GetByOpcode(0x1186)->execute = Cmd_SetGlobalTimeMultiplierAlt_Execute;
 
+	handleINIOptions();
 	writePatch();
 
 	return true;

@@ -1,4 +1,5 @@
 #pragma once
 
-void patchTimeMult();
-void patchFixExplosionPushDirection();
+void patchTimeMult(const bool bEnable = true);
+void patchFixExplosionPushForce(const bool bEnable = true);
+void patchRestoreSpreadGameSettings(const bool bEnable = true);

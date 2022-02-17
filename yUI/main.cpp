@@ -9,6 +9,7 @@
 
 #define yUI_VERSION 1.4
 #define yUI_VERSION_STR "1.4b"
+#define yUI_STR "yUI"
 
 PluginHandle	g_pluginHandle = kPluginHandle_Invalid;
 
@@ -18,13 +19,12 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	{
 		g_player = PlayerCharacter::GetSingleton();
 		g_dataHandler = DataHandler::GetSingleton();
+		Log(FormatString("%s", yUI_VERSION_STR), 2);
 
 		PrintAndClearQueuedConsoleMessages();
 		FillCraftingComponents();
 
 		if (g_ySI_Sort || g_ySI_Icons || g_ySI_Hotkeys || g_ySI_Categories) LoadSIMapsFromFiles();
-
-		Console_Print("yUI %s", yUI_VERSION_STR);
 	}
 	else if (msg->type == NVSEMessagingInterface::kMessage_MainGameLoop)
 	{
@@ -54,8 +54,8 @@ void writePatches()
 bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 {
 	gLog.Create("yUI.log");
-
-	PrintLog("yUI: Query");
+	gLog.SetModString(yUI_STR);
+	Log("Query", 1);
 
 	// fill out the info structure
 	info->infoVersion = PluginInfo::kInfoVersion;
@@ -66,22 +66,22 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 	if (nvse->isEditor) {
 		if (nvse->editorVersion < CS_VERSION_1_4_0_518)
 		{
-			PrintLog("yUI: incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518);
+			Log(FormatString("yUI: incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518), 1);
 			return false;
 		}
 	} else {
 		if (nvse->nvseVersion < PACKED_NVSE_VERSION) {
-			PrintLog("yUI: NVSE version too old (got %X expected at least %X). Plugin will NOT load! Install the latest version here: https://github.com/xNVSE/NVSE/releases/", nvse->nvseVersion, PACKED_NVSE_VERSION);
+			Log(FormatString("yUI: NVSE version too old (got %X expected at least %X). Plugin will NOT load! Install the latest version here: https://github.com/xNVSE/NVSE/releases/", nvse->nvseVersion, PACKED_NVSE_VERSION), 1);
 			return false;
 		}
 
 		if (nvse->runtimeVersion < RUNTIME_VERSION_1_4_0_525) {
-			PrintLog("yUI: incorrect runtime version (got %08X need at least %08X)", nvse->runtimeVersion, RUNTIME_VERSION_1_4_0_525);
+			Log(FormatString("yUI: incorrect runtime version (got %08X need at least %08X)", nvse->runtimeVersion, RUNTIME_VERSION_1_4_0_525), 1);
 			return false;
 		}
 
 		if (nvse->isNogore) {
-			PrintLog("yUI: NoGore is not supported");
+			Log(FormatString("yUI: NoGore is not supported"), 1);
 			return false;
 		}
 	}
