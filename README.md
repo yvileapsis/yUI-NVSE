@@ -15,9 +15,9 @@ For support and bug reports, contact me in the [xNVSE Discord server](https://di
 
 ## Credits
 
-This NVSE plugin is developed by yvileapsis with liberal borrowing of code from lStewieAl's Tweaks by lStewieAl and kNVSE by korri123.
+These NVSE plugins are developed by yvileapsis with liberal borrowing of code from lStewieAl's Tweaks by lStewieAl and kNVSE by korri123.
 
-This plugin wouldn't exist without efforts of many community members such as LuthienAnarion, JazzIsParis, lStewieAl, c6, carxt, korri123 and Demorome and many others.
+These plugins wouldn't exist without efforts of many community members such as LuthienAnarion, JazzIsParis, lStewieAl, c6, carxt, korri123 and Demorome and many others.
 
 ## yUI
 NVSE plugin aiming to fix UI issues and add additional UI features. Currently includes several bugfixes and Sorting and Icons module.
