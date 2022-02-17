@@ -44,9 +44,7 @@ modIndex:
     257   - Turbo.
     
 multiplier:
-
-     -1   - Removes all Local Time Multipliers.
     
-     0    - Default - Does nothing. (No crash)
+     0    - Default - Removes all Local Time Multipliers. (No crash)
      
      1    - Removes Local Time Multiplier of the current mod.
