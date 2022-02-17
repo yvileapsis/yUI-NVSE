@@ -1,6 +1,6 @@
 #include "SafeWrite.h"
 
-void SafeWrite8(UInt32 addr, UInt8 data)
+void SafeWrite8(UInt32 addr, UInt32 data)
 {
 	UInt32	oldProtect;
 
@@ -9,7 +9,7 @@ void SafeWrite8(UInt32 addr, UInt8 data)
 	VirtualProtect(reinterpret_cast<void*>(addr), 4, oldProtect, &oldProtect);
 }
 
-void SafeWrite16(UInt32 addr, UInt16 data)
+void SafeWrite16(UInt32 addr, UInt32 data)
 {
 	UInt32	oldProtect;
 

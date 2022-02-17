@@ -3302,9 +3302,9 @@ public:
 	NiCamera* camera;
 	NiRefObject* PlayerFaceLights01;
 	NiNode* playerParentNode;
-	NiVector3 playerNodeTranslate;
+	NiPoint3 playerNodeTranslate;
 	NiMatrix33 playerNodeRotate;
-	NiVector3 bip01Translate;
+	NiPoint3 bip01Translate;
 	UInt8 isPlayerNodeVisible;
 	UInt8 gap14D[3];
 	UInt32 unk150;
@@ -3558,7 +3558,7 @@ public:
 	UInt8				pad21[3];			// 21
 	FontInfo* extraFonts[80];	// 24
 
-	NiVector3* GetStringDimensions(NiVector3* outDims, const char* srcString, UInt32 fontID, UInt32 maxFlt = 0x7F7FFFFF, UInt32 startIdx = 0);
+	NiPoint3* GetStringDimensions(NiPoint3* outDims, const char* srcString, UInt32 fontID, UInt32 maxFlt = 0x7F7FFFFF, UInt32 startIdx = 0);
 	static FontManager* GetSingleton() { return *reinterpret_cast<FontManager**>(0x11F33F8); };
 };
 

@@ -394,7 +394,7 @@ void InterfaceManager::VATSHighlightData::ResetRefs()
 
 __declspec(naked) void Tile::SetFloat(UInt32 id, float fltVal, bool bPropagate)
 {
-	static const UInt32 procAddr = 0xA012D0;
+	static constexpr UInt32 procAddr = 0xA012D0;
 	__asm	jmp		procAddr
 }
 

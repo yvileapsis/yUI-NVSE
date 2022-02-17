@@ -64,7 +64,7 @@ class NiAVObject : public NiObjectNET
 {
 public:
 	/*08C*/virtual void		Unk_23(UInt32 arg1);
-	/*090*/virtual void		Unk_24(NiMatrix33* arg1, NiVector3* arg2, bool arg3);
+	/*090*/virtual void		Unk_24(NiMatrix33* arg1, NiPoint3* arg2, bool arg3);
 	/*094*/virtual void		Unk_25(UInt32 arg1);
 	/*098*/virtual void		Unk_26(UInt32 arg1);
 	/*09C*/virtual NiAVObject* GetObjectByName(void* objName);
@@ -120,17 +120,13 @@ public:
 		kNiFlag_IsInserted = 0x80000000	//	JIP only
 	};
 
-	NiNode* m_parent;				// 18
-	void* m_collisionObject;		// 1C
-	NiSphere* m_kWorldBound;			// 20
+	NiNode*					m_parent;				// 18
+	void*					m_collisionObject;		// 1C
+	NiSphere*				m_kWorldBound;			// 20
 	DList<NiProperty>		m_propertyList;			// 24
 	UInt32					m_flags;				// 30
-	NiMatrix33				m_localRotate;			// 34
-	NiVector3				m_localTranslate;		// 58
-	float					m_localScale;			// 64
-	NiMatrix33				m_worldRotate;			// 68
-	NiVector3				m_worldTranslate;		// 8C
-	float					m_worldScale;			// 98
+	NiTransform				m_localTransform;		// 34
+	NiTransform				m_worldTransform;		// 68
 
 	void Update();
 	UInt32 GetIndex();
@@ -188,7 +184,7 @@ public:
 
 	enum { kType = 1 };
 
-	NiVector3	m_direction;	// 108
+	NiPoint3	m_direction;	// 108
 };
 
 // 114
@@ -218,7 +214,7 @@ public:
 
 	enum { kType = 3 };
 
-	NiVector3	m_kWorldDir;		// 114
+	NiPoint3	m_kWorldDir;		// 114
 	float		m_fSpotAngle;		// 120
 	float		m_fSpotExponent;	// 124
 };
@@ -260,9 +256,9 @@ public:
 	};
 
 	NiMatrix33	m_kModelProjMat;	// 0DC
-	NiVector3	m_kModelProjTrans;	// 100
+	NiPoint3	m_kModelProjTrans;	// 100
 	NiMatrix33	m_kWorldProjMat;	// 10C
-	NiVector3	m_kWorldProjTrans;	// 130
+	NiPoint3	m_kWorldProjTrans;	// 130
 	NiObject	* m_texture;		// 13C
 	UInt32		m_eFilter;			// 140 - see NiTexturingProperty::kFilterMode_* without the shift
 	UInt32		m_eClamp;			// 144 - see NiTexturingProperty::kClampMode_* without the shift
@@ -301,7 +297,7 @@ public:
 	void BulkSetMaterialPropertyTraitValue(UInt32 traitID, float value);
 	bool HasPhantom();
 	void GetBodyMass(float* totalMass);
-	void ApplyForce(NiVector4* forceVector);
+	void ApplyForce(NiPoint4* forceVector);
 	void Dump();
 };
 STATIC_ASSERT(sizeof(NiNode) == 0xAC);
@@ -640,7 +636,7 @@ public:
 	~NiTriBasedGeom();
 
 	// use this API for SUPER MAX SPEED
-	virtual void	GetTri(UInt32 idx, NiVector3 ** a, NiVector3 ** b, NiVector3 ** c) = 0;
+	virtual void	GetTri(UInt32 idx, NiPoint3 ** a, NiPoint3 ** b, NiPoint3 ** c) = 0;
 };
 
 // C0

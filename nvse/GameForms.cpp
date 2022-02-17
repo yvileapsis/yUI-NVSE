@@ -367,14 +367,14 @@ bool BGSListForm::Contains(TESForm* form)
 	return false;
 }
 
-bool BGSListForm::ContainsRecursive(TESForm* form)
+bool BGSListForm::ContainsRecursive(TESForm* form, UInt32 reclvl)
 {
-	if (this->Contains(form)) return true;
 	if (!form) return false;
-	for (auto iter = this->list.Begin(); !iter.End(); ++iter) {
+	if (this->Contains(form)) return true;
+	if (reclvl > 100) return false; [[unlikely]]
+	for (auto iter = this->list.Begin(); !iter.End(); ++iter)
 		if (iter.Get()->typeID == kFormType_BGSListForm)
-			if (const auto list = DYNAMIC_CAST(this, TESForm, BGSListForm);  list && list->ContainsRecursive(form)) return true;
-	}
+			if (const auto list = DYNAMIC_CAST(this, TESForm, BGSListForm);  list && list->ContainsRecursive(form, reclvl++)) return true;
 	return false;
 }
 

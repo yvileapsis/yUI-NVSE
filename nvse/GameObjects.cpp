@@ -119,7 +119,7 @@ EquippedItemsList Actor::GetEquippedItems()
 		ContChangesArray outEntryData;
 		ContChangesExtendArray outExtendData;
 		const UInt32 count = xChanges->GetAllEquipped(outEntryData, outExtendData);
-		for (UInt32 i = 0; i < count ; i++) itemList.push_back(outEntryData[i]->type);
+		for (UInt32 i = 0; i < count ; i++) itemList.push_back(outEntryData[i]->form);
 	}
 	return itemList;
 }
@@ -173,7 +173,7 @@ bool TESObjectREFR::GetInventoryItems(InventoryItemsMap &invItems)
 	for (auto xtraIter = entryList->Begin(); !xtraIter.End(); ++xtraIter)
 	{
 		entry = xtraIter.Get();
-		item = entry->type;
+		item = entry->form;
 		if (invItems.contains(item)) continue;
 		countDelta = entry->countDelta;
 		if (countDelta > 0)

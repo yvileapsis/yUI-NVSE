@@ -3,9 +3,6 @@
 #include <Utilities.h>
 #include <GameTypes.h>
 
-class BSAudioManagerThread;
-class MediaLocationController;
-
 // 254
 class BSSoundInfo
 {
@@ -14,7 +11,7 @@ public:
 	~BSSoundInfo();
 
 	UInt32			unk000[72];		// 000
-	const char* filePath;		// 120
+	const char*		filePath;		// 120
 	UInt32			unk124[76];		// 124
 };
 
@@ -22,34 +19,34 @@ public:
 class BSGameSound
 {
 public:
-	virtual BSGameSound* Destroy(bool doFree);
-	virtual bool	CheckStateFlagsBit5();
-	virtual bool	CheckStateFlagsBit19();
-	virtual bool	CheckStateFlagsBit6();
-	virtual float	GetVolume();
-	virtual void	SetIsLooping(bool doSet);
-	virtual void	Unk_06(void);
-	virtual void	Unk_07(void);
-	virtual void	Unk_08(void);
-	virtual void	Unk_09(void);
-	virtual void	Unk_0A(void);
-	virtual void	CopyFrom(BSGameSound* source, bool arg2);
-	virtual void	Unk_0C(void);
-	virtual bool	Unk_0D(void);
-	virtual bool	Unk_0E(void);
-	virtual bool	SetVolume(float inVol);
-	virtual void	Unk_10(void);
-	virtual bool	Unk_11(void);
-	virtual void	Unk_12(void);
-	virtual void	Unk_13(float arg1, float arg2, float arg3);
-	virtual void	Unk_14(float arg1, float arg2, float arg3);
-	virtual void	Unk_15(NiVector3& arg1);
-	virtual void	Unk_16(void);
-	virtual void	Unk_17(float arg1, float arg2);
-	virtual void	Unk_18(UInt16 arg1, UInt16 arg2, UInt16 arg3, UInt16 arg4, UInt16 arg5);
-	virtual bool	SetFrameFrequencyPerc(float freqPerc);
-	virtual float	GetFrameFrequencyPerc();
-	virtual void	Seek(UInt32 timePoint);
+	virtual BSGameSound*	Destroy(bool doFree);
+	virtual bool			CheckStateFlagsBit5();
+	virtual bool			CheckStateFlagsBit19();
+	virtual bool			CheckStateFlagsBit6();
+	virtual float			GetVolume();
+	virtual void			SetIsLooping(bool doSet);
+	virtual void			Unk_06();
+	virtual void			Unk_07();
+	virtual void			Unk_08();
+	virtual void			Unk_09();
+	virtual void			Unk_0A();
+	virtual void			CopyFrom(BSGameSound* source, bool arg2);
+	virtual void			Unk_0C();
+	virtual bool			Unk_0D();
+	virtual bool			Unk_0E();
+	virtual bool			SetVolume(float inVol);
+	virtual void			Unk_10();
+	virtual bool			Unk_11();
+	virtual void			Unk_12();
+	virtual void			Unk_13(float arg1, float arg2, float arg3);
+	virtual void			Unk_14(float arg1, float arg2, float arg3);
+	virtual void			Unk_15(NiPoint3& arg1);
+	virtual void			Unk_16();
+	virtual void			Unk_17(float arg1, float arg2);
+	virtual void			Unk_18(UInt16 arg1, UInt16 arg2, UInt16 arg3, UInt16 arg4, UInt16 arg5);
+	virtual bool			SetFrameFrequencyPerc(float freqPerc);
+	virtual float			GetFrameFrequencyPerc();
+	virtual void			Seek(UInt32 timePoint);
 
 	enum SoundFlags
 	{
@@ -114,7 +111,7 @@ public:
 	UInt32			unk030;					// 030
 	UInt16			baseSamplingFreq;		// 034
 	char			filePath[254];			// 036	Originally: filePath[260]
-	TESSound* sourceSound;			// 134	"Stolen" from filePath
+	TESSound*		sourceSound;			// 134	"Stolen" from filePath
 	float			frequencyMod;			// 138	^
 	float			maxAttenuationDist;		// 13C
 	float			minAttenuationDist;		// 140
@@ -143,13 +140,13 @@ class BSWin32GameSound : public BSGameSound
 {
 public:
 	UInt32			unk198;					// 198
-	UInt32*			ptr19C;				// 19C	DirectSound func table
+	UInt32*			ptr19C;					// 19C	DirectSound func table
 	UInt32			unk1A0[5];				// 1A0
-	UInt32*			ptr1B4;				// 1B4	DirectSound func table
+	UInt32*			ptr1B4;					// 1B4	DirectSound func table
 	UInt32			unk1B8[5];				// 1B8
-	UInt32*			ptr1CC;				// 1CC	DirectSound func table
+	UInt32*			ptr1CC;					// 1CC	DirectSound func table
 	UInt32			unk1D0;					// 1D0
-	UInt32*			ptr1D4;				// 1D4	DirectSound func table
+	UInt32*			ptr1D4;					// 1D4	DirectSound func table
 	UInt32			unk1D8[13];				// 1D8
 	UInt16			word20C;				// 20C
 	UInt16			word20E;				// 20E
@@ -157,7 +154,7 @@ public:
 	UInt16			word212;				// 212
 	UInt16			word214;				// 214
 	UInt16			word216;				// 216
-	NiVector3		originWorldPos;			// 218
+	NiPoint3		originWorldPos;			// 218
 	UInt32			unk224[3];				// 224
 };
 STATIC_ASSERT(sizeof(BSWin32GameSound) == 0x230);
@@ -202,8 +199,8 @@ struct AudioRequestData
 	UInt32				soundKey;	// 04
 	FunctionArg			value1;		// 08
 	FunctionArg			value2;		// 0C
-	NiNode* niNode;	// 10
-	NiVector3			pos;		// 14
+	NiNode*				niNode;		// 10
+	NiPoint3			pos;		// 14
 };
 
 // 188
@@ -258,7 +255,7 @@ public:
 		UInt32				count;			// 00
 		UInt8				byte04;			// 04
 		UInt8				pad05[3];		// 05
-		AudioRequestData* requestData;	// 08
+		AudioRequestData*	requestData;	// 08
 		UInt32				tickCount;		// 0C
 	};
 
@@ -271,8 +268,8 @@ public:
 
 	UInt32 unk004;
 	UInt32 unk008;
-	BSAudioManager::UnkC unk00C;
-	BSAudioManager::UnkC unk018;
+	UnkC						unk00C;
+	UnkC						unk018;
 	AudioRequest				request024;			// 024
 	AudioRequest				request034;			// 034
 	AudioRequest				request044;			// 044
@@ -284,18 +281,18 @@ public:
 	UInt32						unk0A0;				// 0A0
 	UInt32						unk0A4;				// 0A4
 	float						flt0A8;				// 0A8
-	_RTL_CRITICAL_SECTION criticalSectionAC;
-	_RTL_CRITICAL_SECTION criticalSectionC4;
-	_RTL_CRITICAL_SECTION criticalSectionDC;
-	_RTL_CRITICAL_SECTION criticalSectionF4;
-	_RTL_CRITICAL_SECTION criticalSection10C;
+	_RTL_CRITICAL_SECTION		criticalSectionAC;
+	_RTL_CRITICAL_SECTION		criticalSectionC4;
+	_RTL_CRITICAL_SECTION		criticalSectionDC;
+	_RTL_CRITICAL_SECTION		criticalSectionF4;
+	_RTL_CRITICAL_SECTION		criticalSection10C;
 	DList<void>					list124;			// 124
 	UInt32						lastTickCount;		// 130
 	UInt8						byte134;			// 134
 	UInt8						byte135;			// 135
 	UInt8						pad136[2];			// 136
 	UInt32						threadID;			// 138
-	BSAudioManagerThread* audioMgrThread;	// 13C
+	BSAudioManagerThread*		audioMgrThread;		// 13C
 	float						volumes[12];		// 140
 	//	0	Master
 	//	1	Foot
@@ -310,14 +307,14 @@ public:
 	UInt32						unk178;				// 178
 	UInt32						unk17C;				// 17C
 	UInt32						nextMapKey;			// 180
-	UInt8 ignoreTimescale;
-	UInt8 byte185;
-	UInt8 byte186;
-	UInt8 byte187;
+	UInt8						ignoreTimescale;
+	UInt8						byte185;
+	UInt8						byte186;
+	UInt8						byte187;
 
 	void AddRequest(UInt32 type, UInt32 soundID, UInt32 intValue, UInt32 next, UInt32 a6, float posX = 0, float posY = 0, float posZ = 0) { ThisCall(0xADB1A0, this, type, soundID, intValue, next, a6, posX, posY, posZ); };
 
-	static BSAudioManager* GetSingleton() { return (BSAudioManager*)0x11F6EF0; };
+	static BSAudioManager* GetSingleton() { return reinterpret_cast<BSAudioManager*>(0x11F6EF0); };
 };
 STATIC_ASSERT(sizeof(BSAudioManager) == 0x188);
 
@@ -326,13 +323,13 @@ class BSAudioListener
 public:
 	virtual void	Destroy(bool doFree);
 	virtual void	Unk_01(void);
-	virtual void	SetOriginWorldPos(NiVector3* pos);
+	virtual void	SetOriginWorldPos(NiPoint3* pos);
 	virtual void	Unk_03(void);
 	virtual void	UpdatePositionAndOrientation();
-	virtual void	SetFrontAndTopOrientation(NiVector3* front, NiVector3* top);
+	virtual void	SetFrontAndTopOrientation(NiPoint3* front, NiPoint3* top);
 	virtual void	Unk_06(void);
 	virtual void	Unk_07(void);
-	virtual void	SetVelocity(NiVector3* pVelocity);
+	virtual void	SetVelocity(NiPoint3* pVelocity);
 	virtual void	Unk_09(void);
 	virtual void	Unk_0A(void);
 	virtual void	Unk_0B(void);
@@ -345,17 +342,17 @@ class IDirectSound3DListener;
 class BSWin32AudioListener : public BSAudioListener
 {
 public:
-	NiVector3				originWorldPos;		// 04
+	NiPoint3				originWorldPos;		// 04
 	UInt32					unk10[6];			// 10
-	NiVector3				velocity;			// 28
+	NiPoint3				velocity;			// 28
 	UInt32					sysTime;			// 34
 	float					flt38;				// 38
 	float					flt3C;				// 3C
 	float					flt40;				// 40
 	UInt32					unk44;				// 44
 	IDirectSound3DListener** ptr48;			// 48
-	NiVector3				topOrientation;		// 4C
-	NiVector3				frontOrientation;	// 58
+	NiPoint3				topOrientation;		// 4C
+	NiPoint3				frontOrientation;	// 58
 };
 STATIC_ASSERT(sizeof(BSWin32AudioListener) == 0x64);
 
@@ -366,14 +363,14 @@ class IDirectSoundBuffer;
 class BSWin32Audio
 {
 public:
-	virtual void	Destroy(bool doFree);
-	virtual void	CreateAudioListener(HWND _window);
-	virtual void	Unk_02(void);
-	virtual void	Unk_03(void);	// Does nothing
-	virtual void	Unk_04(void);	// Does nothing
-	virtual BSGameSound* CreateGameSound(const char* filePath);
-	virtual void	InsertPathPrefix(char* filePath);	// Prefixes path with data\\sound\\ if fx\\ or song\\.
-	virtual void	Unk_07(void);	// Does nothing
+	virtual void			Destroy(bool doFree);
+	virtual void			CreateAudioListener(HWND _window);
+	virtual void			Unk_02(void);
+	virtual void			Unk_03(void);	// Does nothing
+	virtual void			Unk_04(void);	// Does nothing
+	virtual BSGameSound*	CreateGameSound(const char* filePath);
+	virtual void			InsertPathPrefix(char* filePath);	// Prefixes path with data\\sound\\ if fx\\ or song\\.
+	virtual void			Unk_07(void);	// Does nothing
 
 	UInt8					byte04;			// 04
 	UInt8					byte05;			// 05
@@ -387,11 +384,11 @@ public:
 	bool					(*GetSoundDataFromRefID)(UInt32 refID, char* outFilePath, UInt32* outFlags, TESSound** outSound);	// 20	0x82D150
 	bool					(*GetSoundDataFromEDID)(const char* EDIDstr, char* outFilePath, UInt32* outFlags, TESSound** outSound);	// 24	0x82D280
 	bool					(*PickSoundFileFromFolder)(char* outFilePath);	// 28	0x5E3630
-	UInt32(*FillGameSoundProps)(UInt32* mapKey, TESSound* soundForm, UInt32* outFlags0C);	// 2C	0x82D400
+	UInt32					(*FillGameSoundProps)(UInt32* mapKey, TESSound* soundForm, UInt32* outFlags0C);	// 2C	0x82D400
 	void					(*sub_832C40)(void);	// 30
 	void					(*sub_832C80)(void);	// 34
-	IDirectSound8** ptr38;				// 38
-	IDirectSoundBuffer* ptr3C;					// 3C
+	IDirectSound8**			ptr38;					// 38
+	IDirectSoundBuffer*		ptr3C;					// 3C
 	UInt32					unk40[24];				// 40
 	HWND					window;					// A0
 
@@ -436,28 +433,28 @@ struct PlayingMusic
 		kNone = 9,
 	};
 
-	char					track1Path[MAX_PATH];	// 000
-	FAMThread* famThread;				// 104
-	char					track2Path[MAX_PATH];	// 108
-	UInt32					unk20C;					// 20C
-	float					flt210;					// 210
-	float					flt214;					// 214
-	float					flt218;					// 218
-	float					track1Volume;			// 21C
-	UInt8					track1Flags;			// 220
-	UInt8					track2Flags;			// 221
-	UInt8					pad222[2];				// 222
-	UInt32					track1Type;				// 224
-	UInt32					unk228[8];				// 228
-	float					flt248;					// 248
-	float					flt24C;					// 24C
-	float					flt250;					// 250
-	float					track2Volume;			// 254
-	UInt32					track2Type;				// 258
-	UInt32					unk25C[8];				// 25C
-	UInt32					track1Active;			// 27C
-	UInt32					unk280;					// 280
-	MediaLocationController* medLocCtrl;			// 284
+	char						track1Path[MAX_PATH];	// 000
+	FAMThread*					famThread;				// 104
+	char						track2Path[MAX_PATH];	// 108
+	UInt32						unk20C;					// 20C
+	float						flt210;					// 210
+	float						flt214;					// 214
+	float						flt218;					// 218
+	float						track1Volume;			// 21C
+	UInt8						track1Flags;			// 220
+	UInt8						track2Flags;			// 221
+	UInt8						pad222[2];				// 222
+	UInt32						track1Type;				// 224
+	UInt32						unk228[8];				// 228
+	float						flt248;					// 248
+	float						flt24C;					// 24C
+	float						flt250;					// 250
+	float						track2Volume;			// 254
+	UInt32						track2Type;				// 258
+	UInt32						unk25C[8];				// 25C
+	UInt32						track1Active;			// 27C
+	UInt32						unk280;					// 280
+	MediaLocationController*	medLocCtrl;				// 284
 
 	static PlayingMusic* GetSingleton() { return (PlayingMusic*)0x11DD0F0; }
 };
@@ -473,45 +470,16 @@ struct Sound
 
 	Sound() : soundKey(0xFFFFFFFF), byte04(0), unk08(0) {}
 
-	Sound(const char* soundPath, UInt32 flags)
-	{
-		ThisCall(0xAD7550, BSWin32Audio::GetSingleton(), this, soundPath, flags);
-	}
+	Sound(const char* soundPath, UInt32 flags) { ThisCall(0xAD7550, BSWin32Audio::GetSingleton(), this, soundPath, flags); }
 
-	void Play()
-	{
-		ThisCall(0xAD8830, this, 1);
-	}
+	void Play() { ThisCall(0xAD8830, this, 1); }
+	void SetNiNode(NiNode* node) { ThisCall(0xAD8F20, this, node); }
+	void SetVolume(float volume) { ThisCall(0xAD89E0, this, volume); }
+	void PlayDelayed(int delayMS, int unused) { ThisCall(0xAD8870, this, delayMS, unused); }
 
-	void SetNiNode(NiNode* node)
-	{
-		ThisCall(0xAD8F20, this, node);
-	}
-
-	void SetVolume(float volume)
-	{
-		ThisCall(0xAD89E0, this, volume);
-	}
-
-	void PlayDelayed(int delayMS, int unused)
-	{
-		ThisCall(0xAD8870, this, delayMS, unused);
-	}
-
-	void SetPos(float x, float y, float z)
-	{
-		ThisCall(0xAD8B60, this, x, y, z);
-	}
-
-	void SetPos(const NiVector3* posVec)
-	{
-		ThisCall(0xAD8B60, this, posVec->x, posVec->y, posVec->z);
-	}
-
-	void SetPos(const NiVector3 posVec)
-	{
-		ThisCall(0xAD8B60, this, posVec.x, posVec.y, posVec.z);
-	}
+	void SetPos(float x, float y, float z) { ThisCall(0xAD8B60, this, x, y, z); }
+	void SetPos(const NiPoint3* posVec) { ThisCall(0xAD8B60, this, posVec->x, posVec->y, posVec->z); }
+	void SetPos(const NiPoint3 posVec) { ThisCall(0xAD8B60, this, posVec.x, posVec.y, posVec.z); }
 
 	Sound& operator= (Sound other)
 	{
@@ -520,10 +488,7 @@ struct Sound
 		unk08 = other.unk08;
 	}
 
-	bool IsPlaying()
-	{
-		return ThisCall<bool>(0xAD8930, this);
-	}
+	bool IsPlaying() { return ThisCall<bool>(0xAD8930, this); }
 
 	static void PlayEDID(const char* soundEDID, UInt32 flags, TESObjectREFR* refr);
 	static void PlayFile(const char* filePath, UInt32 flags, TESObjectREFR* refr);
@@ -546,16 +511,16 @@ struct VoiceEntry
 {
 	struct Response
 	{
-		String str;
-		char* fileName;
+		String		str;
+		char*		fileName;
 	};
 
-	tList<void> list00;
-	Response* response;
-	TESTopicInfo* topicInfo;
-	TESTopic* topic;
-	TESQuest* quest;
-	Actor* actor;
+	tList<void>		list00;
+	Response*		response;
+	TESTopicInfo*	topicInfo;
+	TESTopic*		topic;
+	TESQuest*		quest;
+	Actor*			actor;
 };
 
 namespace Radio
@@ -566,25 +531,25 @@ namespace Radio
 		{
 			struct Struct00
 			{
-				tList<VoiceEntry> voiceEntries;
-				Struct00* next;
+				tList<VoiceEntry>	voiceEntries;
+				Struct00*			next;
 			};
 
-			Struct00* unk00;
-			UInt32 unk04;
-			UInt32 rng08;
-			UInt32 soundTimeRemaining0C;
-			UInt8 byte10;
-			UInt8 byte11;
-			UInt8 gap12[2];
-			UInt32 flags;
+			Struct00*	unk00;
+			UInt32		unk04;
+			UInt32		rng08;
+			UInt32		soundTimeRemaining0C;
+			UInt8		byte10;
+			UInt8		byte11;
+			UInt8		gap12[2];
+			UInt32		flags;
 			tList<void> list18;
 		};
 
-		TESObjectREFR* radioRef;
-		Struct04 unk04;
+		TESObjectREFR*	radioRef;
+		Struct04		unk04;
 
-		static RadioEntry* GetSingleton() { return *(RadioEntry**)0x11DD42C; }
+		static RadioEntry* GetSingleton() { return *reinterpret_cast<RadioEntry**>(0x11DD42C); }
 	};
 
 	TESObjectREFR* GetCurrentStation();

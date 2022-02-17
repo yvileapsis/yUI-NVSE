@@ -8,9 +8,9 @@ public:
 	String();
 	~String();
 
-	char*			m_data;
-	UInt16			m_dataLen;
-	UInt16			m_bufLen;
+	char*		m_data;
+	UInt16		m_dataLen;
+	UInt16		m_bufLen;
 	
 	void		Init(UInt32 bufSize);
 	bool		Set(const char* src);
@@ -637,8 +637,6 @@ void DList<Item>::ExchangeNodeData(Node* node1, Node* node2)
 }
 
 enum KeyboardMenuInputCode;
-class Tile;
-class Menu;
 
 // 010
 template <class T>
@@ -1082,8 +1080,8 @@ struct ActorHitData
 	float				weaponDmg;		// 2C
 	TESObjectWEAP*		weapon;			// 30
 	float				healthPerc;		// 34
-	NiVector3			impactPos;		// 38
-	NiVector3			impactAngle;	// 44
+	NiPoint3			impactPos;		// 38
+	NiPoint3			impactAngle;	// 44
 	UInt32				unk50;			// 50
 	void*				ptr54;			// 54
 	UInt32				flags;			// 58

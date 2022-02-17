@@ -8,9 +8,7 @@ double __cdecl AdjustPushForceAlt(Actor* target, ActorHitData* hitdata, ActorVal
 	if (hitdata->explosion && hitdata->explosion->baseForm)
 	{
 		const auto explosion = DYNAMIC_CAST(hitdata->explosion->baseForm, TESForm, BGSExplosion);
-		scale = 1 - hitdata->explosion->GetDistance(target) / hitdata->explosion->radius;
-		if (scale < 0) scale = 0;
-		scale *= scale;
+		scale = CdeclCall<double>(0x647920, hitdata->explosion->radius, hitdata->explosion->GetDistance(target));
 		scale *= explosion->force / 100.0;
 	}
 	return scale * CdeclCall<double>(0x646580, owner, force);

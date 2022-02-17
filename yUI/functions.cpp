@@ -191,7 +191,7 @@ float ContGetHealthPercent(ContChangesEntry* itemInfo)
 {
 	const auto xData = itemInfo->GetCustomExtra(kExtraData_Health);
 	if (!xData) return 0;
-	const auto healthForm = DYNAMIC_CAST(itemInfo->type, TESForm, TESHealthForm);
+	const auto healthForm = DYNAMIC_CAST(itemInfo->form, TESForm, TESHealthForm);
 	if (!healthForm) return 0;
 	const auto xHealth = GetExtraType((*xData), Health);
 	const float health = xHealth ? xHealth->health : static_cast<int>(healthForm->health);

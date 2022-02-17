@@ -19,10 +19,7 @@ void HandleJson(const std::filesystem::path& path)
 	constexpr auto strToFormID = [](const std::string& formIdStr)
 	{
 		const auto formId = HexStringToInt(formIdStr);
-		if (formId == -1)
-		{
-			Log("Form field was incorrectly formatted, got " + formIdStr);
-		}
+		if (formId == -1) Log("Form field was incorrectly formatted, got " + formIdStr);
 		return formId;
 	};
 	try
@@ -30,7 +27,6 @@ void HandleJson(const std::filesystem::path& path)
 		std::ifstream i(path);
 		nlohmann::json j;
 		j = nlohmann::json::parse(i, nullptr, true, true);
-//		i >> j;
 		if (j.contains("tags") && j["tags"].is_array())
 		{
 			for (auto& elem : j["tags"])
@@ -82,7 +78,7 @@ void HandleJson(const std::filesystem::path& path)
 						for (auto formId : formIds)
 						{
 							formId = (mod->modIndex << 24) + (formId & 0x00FFFFFF);
-							auto* form = LookupFormByID(formId);
+							auto form = LookupFormByID(formId);
 							if (!form) { Log(FormatString("Form %X was not found", formId)); continue; }
 							if (!formlist) {
 								Log(FormatString("Tag: '%10s', form: %08X (%50s), individual", tag.c_str(), formId, form->GetName()));
@@ -96,8 +92,8 @@ void HandleJson(const std::filesystem::path& path)
 									const auto weapon = DYNAMIC_CAST(item, TESForm, TESObjectWEAP);
 									if (!weapon) continue;
 									if (!weapon->repairItemList.listForm) continue;
-									if (weapon->repairItemList.listForm->ContainsRecursive(form)) {
-										Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", tag.c_str(), formId, item->GetName(), weapon->repairItemList.listForm->refID));
+									if (weapon->repairItemList.listForm->refID == form->refID || weapon->repairItemList.listForm->ContainsRecursive(form)) {
+										Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", tag.c_str(), item->refID, item->GetName(), formId));
 										SI_Files::g_Items_JSON.emplace_back(tag, priority, item, questItem);
 									}
 								}
@@ -314,7 +310,7 @@ void LoadSIMapsFromFiles()
 			{
 				Log(iter->path().string() + " found");
 
-				const auto* mod = DataHandler::GetSingleton()->LookupModByName(fileName.string().c_str());
+				const auto mod = DataHandler::GetSingleton()->LookupModByName(fileName.string().c_str());
 
 				if (mod) {}
 //					LoadModAnimPaths(path, mod);

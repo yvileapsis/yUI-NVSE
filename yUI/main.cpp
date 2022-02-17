@@ -8,7 +8,7 @@
 #include <file.h>
 
 #define yUI_VERSION 1.4
-#define yUI_VERSION_STR "1.4"
+#define yUI_VERSION_STR "1.4b"
 
 PluginHandle	g_pluginHandle = kPluginHandle_Invalid;
 
@@ -60,7 +60,7 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 	// fill out the info structure
 	info->infoVersion = PluginInfo::kInfoVersion;
 	info->name = "yUI";
-	info->version = yUI_VERSION;
+	info->version = yUI_VERSION * 100;
 
 	// version checks
 	if (nvse->isEditor) {
@@ -118,7 +118,7 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	RegisterTraitID("runsnig", 2032);
 	WriteRelJump(0xA095D1, reinterpret_cast<UInt32>(funpatch));
 */
-	writeMCMHooks();
+//	writeMCMHooks();
 
 //	CaptureLambdaVars = static_cast<_CaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaSaveVariableList));
 //	UncaptureLambdaVars = static_cast<_UncaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaUnsaveVariableList));

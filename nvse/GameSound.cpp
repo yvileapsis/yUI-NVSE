@@ -22,7 +22,7 @@ void Sound::PlayFile(const char* filePath, UInt32 flags, TESObjectREFR* refr)
 	ThisCall(0xAD7480, BSWin32Audio::GetSingleton(), &sound, filePath, flags, nullptr);
 	if (sound.soundKey != 0xFFFFFFFF)
 	{
-		sound.SetPos(refrNode->m_worldTranslate);
+		sound.SetPos(refrNode->m_worldTransform.pos);
 		sound.SetNiNode(refrNode);
 		sound.Play();
 	}
@@ -38,7 +38,7 @@ void Sound::PlayTESSound(TESSound* gameSound, UInt32 flags, TESObjectREFR* refr)
 	ThisCall(0xAD7480, BSWin32Audio::GetSingleton(), &sound, filePath, flags, gameSound);
 	if (sound.soundKey != 0xFFFFFFFF)
 	{
-		sound.SetPos(refrNode->m_worldTranslate);
+		sound.SetPos(refrNode->m_worldTransform.pos);
 		sound.SetNiNode(refrNode);
 		sound.Play();
 	}
@@ -68,8 +68,8 @@ namespace Radio
 		CdeclCall(0x4FF1A0, PlayerCharacter::GetSingleton(), dst, nullptr);
 	}
 
-	tList<TESObjectREFR>* GetFoundStations() { return (tList<TESObjectREFR>*)0x11DD59C; };
-	bool GetEnabled() { return *(UInt8*)0x11DD434; }
+	tList<TESObjectREFR>* GetFoundStations() { return reinterpret_cast<tList<TESObjectREFR>*>(0x11DD59C); };
+	bool GetEnabled() { return *reinterpret_cast<UInt8*>(0x11DD434); }
 	void SetActiveStation(TESObjectREFR* station)
 	{
 		if (GetEnabled())

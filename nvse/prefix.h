@@ -516,3 +516,5 @@ struct ValidBip01Names;
 struct VATSCameraData;
 struct VATSTargetBodyPartData;
 struct VATSTargetInfo;
+class BSAudioManagerThread;
+class MediaLocationController;

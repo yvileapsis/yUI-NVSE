@@ -18,12 +18,12 @@ struct GetMatchingEquipped {
 		if (pEntryData) {
 			// quick check - needs an extendData or can't be equipped
 			ExtraContainerChanges::ExtendDataList* pExtendList = pEntryData->extendData;
-			if (pExtendList && m_matcher.Matches(pEntryData->type)) { 
+			if (pExtendList && m_matcher.Matches(pEntryData->form)) { 
 				SInt32 n = 0;
 				ExtraDataList* pExtraDataList = pExtendList->GetNthItem(n);
 				while (pExtraDataList) {
 					if (pExtraDataList->HasType(kExtraData_Worn) || pExtraDataList->HasType(kExtraData_WornLeft)) {
-						m_found.pForm = pEntryData->type;
+						m_found.pForm = pEntryData->form;
 						m_found.pExtraData = pExtraDataList;
 						return false;
 					}
@@ -194,7 +194,7 @@ void ContChangesEntry::Cleanup()
 {
 	// Didn't find the hook, let's fake it
 	if (extendData) {
-		ExtraContainerChanges::ExtendDataList::Iterator iter = extendData->Begin();
+		ExtendDataList::Iterator iter = extendData->Begin();
 		while (!iter.End())
 			if (iter.Get()) {
 				ExtraCount* xCount = (ExtraCount*)iter.Get()->GetByType(kExtraData_Count);
@@ -211,7 +211,7 @@ void ContChangesEntry::Cleanup()
 }
 
 #ifdef RUNTIME
-ContChangesEntry* ContChangesEntry::Create(UInt32 refID, UInt32 count, ExtraContainerChanges::ExtendDataList* pExtendDataList)
+ContChangesEntry* ContChangesEntry::Create(UInt32 refID, UInt32 count, ExtendDataList* pExtendDataList)
 {
 	ContChangesEntry* xData = (ContChangesEntry*)FormHeap_Allocate(sizeof(ContChangesEntry));
 	if (xData) {
@@ -219,7 +219,7 @@ ContChangesEntry* ContChangesEntry::Create(UInt32 refID, UInt32 count, ExtraCont
 		if (refID) {
 			TESForm * pForm = LookupFormByID(refID);
 			if (pForm) {
-				xData->type = pForm;
+				xData->form = pForm;
 				xData->countDelta = count;
 				xData->extendData = pExtendDataList;
 			}
@@ -233,13 +233,13 @@ ContChangesEntry* ContChangesEntry::Create(UInt32 refID, UInt32 count, ExtraCont
 }
 #endif
 
-ContChangesEntry* ContChangesEntry::Create(TESForm* pForm, UInt32 count, ExtraContainerChanges::ExtendDataList* pExtendDataList)
+ContChangesEntry* ContChangesEntry::Create(TESForm* pForm, UInt32 count, ExtendDataList* pExtendDataList)
 {
 	ContChangesEntry* xData = (ContChangesEntry*)FormHeap_Allocate(sizeof(ContChangesEntry));
 	if (xData) {
 		memset(xData, 0, sizeof(ContChangesEntry));
 		if (pForm) {
-			xData->type = pForm;
+			xData->form = pForm;
 			xData->countDelta = count;
 			xData->extendData = pExtendDataList;
 		}
@@ -365,11 +365,11 @@ ExtraContainerChanges::Data* ExtraContainerChanges::Data::Create(TESObjectREFR* 
 	return data;
 }
 
-ExtraContainerChanges* ExtraContainerChanges::Create(TESObjectREFR* thisObj, UInt32 refID, UInt32 count, ExtraContainerChanges::ExtendDataList* pExtendDataList)
+ExtraContainerChanges* ExtraContainerChanges::Create(TESObjectREFR* thisObj, UInt32 refID, UInt32 count, ExtendDataList* pExtendDataList)
 {
 	ExtraContainerChanges* xData = (ExtraContainerChanges*)BSExtraData::Create(kExtraData_ContainerChanges, sizeof(ExtraContainerChanges), s_ExtraContainerChangesVtbl);
 	if (xData) {
-		xData->data = ExtraContainerChanges::Data::Create(thisObj);
+		xData->data = Data::Create(thisObj);
 		if (refID) {
 			xData->data->objList = ExtraContainerChangesEntryDataListCreate(refID, count, pExtendDataList);
 		}
@@ -452,7 +452,7 @@ ExtraDataList* ExtraContainerChanges::SetEquipped(TESForm* obj, bool bEquipped, 
 bool ExtraContainerChanges::Remove(TESForm* obj, ExtraDataList* dataList, bool bFree)
 {
 	for (UInt32 i = 0; i < data->objList->Count(); i++)
-		if (data->objList->GetNthItem(i)->type == obj) {
+		if (data->objList->GetNthItem(i)->form == obj) {
 			ContChangesEntry* found = data->objList->GetNthItem(i);
 			if (dataList && found->extendData) {
 				for (UInt32 j = 0; j < found->extendData->Count(); j++)
@@ -476,13 +476,13 @@ void ExtraContainerChanges::DebugDump()
 	{
 		for (ContChangesList::Iterator entry = data->objList->Begin(); !entry.End(); ++entry)
 		{
-			PrintLog("Type: %s CountDelta: %d [%08X]", GetFullName(entry.Get()->type), entry.Get()->countDelta, entry.Get());
+			PrintLog("Type: %s CountDelta: %d [%08X]", GetFullName(entry.Get()->form), entry.Get()->countDelta, entry.Get());
 			gLog.Indent();
 			if (!entry.Get() || !entry.Get()->extendData)
 				PrintLog("* No extend data *");
 			else
 			{
-				for (ExtraContainerChanges::ExtendDataList::Iterator extendData = entry.Get()->extendData->Begin(); !extendData.End(); ++extendData)
+				for (ExtendDataList::Iterator extendData = entry.Get()->extendData->Begin(); !extendData.End(); ++extendData)
 				{
 					PrintLog("Extend Data: [%08X]", extendData.Get());
 					gLog.Indent();
@@ -510,7 +510,7 @@ ExtraContainerChanges* ExtraContainerChanges::GetForRef(TESObjectREFR* refr)
 {
 	ExtraContainerChanges* xChanges = (ExtraContainerChanges*)refr->extraDataList.GetByType(kExtraData_ContainerChanges);
 	if (!xChanges) {
-		xChanges = ExtraContainerChanges::Create();
+		xChanges = Create();
 		refr->extraDataList.Add(xChanges);
 	}
 	return xChanges;
@@ -524,7 +524,7 @@ UInt32 ExtraContainerChanges::GetAllEquipped(std::vector<EntryData*>& outEntryDa
 		{
 			if (entry.Get() && entry.Get()->extendData)
 			{
-				for (ExtraContainerChanges::ExtendDataList::Iterator extendData = entry.Get()->extendData->Begin(); !extendData.End(); ++extendData)
+				for (ExtendDataList::Iterator extendData = entry.Get()->extendData->Begin(); !extendData.End(); ++extendData)
 				{
 					if (extendData.Get()->IsWorn()) {
 						outEntryData.push_back(entry.Get());
@@ -575,8 +575,8 @@ ExtraCannotWear* ExtraCannotWear::Create()
 ExtraLock* ExtraLock::Create()
 {
 	ExtraLock* xLock = (ExtraLock*)BSExtraData::Create(kExtraData_Lock, sizeof(ExtraLock), s_ExtraLockVtbl);
-	ExtraLock::Data* lockData = (ExtraLock::Data*)FormHeap_Allocate(sizeof(ExtraLock::Data));
-	memset(lockData, 0, sizeof(ExtraLock::Data));
+	Data* lockData = (Data*)FormHeap_Allocate(sizeof(Data));
+	memset(lockData, 0, sizeof(Data));
 	xLock->data = lockData;
 	return xLock;
 }
@@ -593,7 +593,7 @@ ExtraTeleport* ExtraTeleport::Create()
 	ExtraTeleport* tele = (ExtraTeleport*)BSExtraData::Create(kExtraData_Teleport, sizeof(ExtraTeleport), s_ExtraTeleportVtbl);
 	
 	// create data
-	ExtraTeleport::Data* data = (ExtraTeleport::Data*)FormHeap_Allocate(sizeof(ExtraTeleport::Data));
+	Data* data = (Data*)FormHeap_Allocate(sizeof(Data));
 	data->linkedDoor = NULL;
 	data->yRot = -0.0;
 	data->xRot = 0.0;
@@ -812,7 +812,7 @@ void ExtraScript::EventCreate(UInt32 eventCode, TESObjectREFR* container) {
 ExtraFactionChanges* ExtraFactionChanges::Create()
 {
 	ExtraFactionChanges* xFactionChanges = (ExtraFactionChanges*)BSExtraData::Create(kExtraData_FactionChanges, sizeof(ExtraFactionChanges), s_ExtraFactionChangesVtbl);
-	ExtraFactionChanges::FactionListEntry* FactionChangesData = (FactionListEntry*)FormHeap_Allocate(sizeof(FactionListEntry));
+	FactionListEntry* FactionChangesData = (FactionListEntry*)FormHeap_Allocate(sizeof(FactionListEntry));
 	memset(FactionChangesData, 0, sizeof(FactionListEntry));
 	xFactionChanges->data = FactionChangesData;
 	return xFactionChanges;

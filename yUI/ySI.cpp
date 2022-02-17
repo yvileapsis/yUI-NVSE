@@ -49,7 +49,7 @@ namespace SI_Files
 
 				if (entry.formArmor.armorDT && entry.formArmor.armorDT > armor->damageThreshold) continue;
 				if (entry.formArmor.armorDR && entry.formArmor.armorDR > armor->armorRating) continue;
-				//			if (entry.formArmor.armorChangesAV && entry.formArmor.armorChangesAV > armor->armorRating) continue;
+//				if (entry.formArmor.armorChangesAV && entry.formArmor.armorChangesAV > armor->armorRating) continue;
 			}
 			else if (entry.formType == 31) {
 				if (entry.formMisc.miscComponent && !IsCraftingComponent(form)) continue;
@@ -77,7 +77,7 @@ namespace SI_Files
 		ra::sort(g_Items_JSON, [&](const JSONEntryItem& entry1, const JSONEntryItem& entry2)
 		         { return entry1.priority > entry2.priority; });
 
-		if (g_ySI_JustInTime)
+		if (!g_ySI_JustInTime)
 		{
 			for (auto mIter = GetAllForms()->Begin(); mIter; ++mIter) {
 				TESForm* form = mIter.Get();
@@ -197,7 +197,7 @@ namespace SI
 
 		if (icon->GetValue(kTileValue_user0)) x += icon->GetValueFloat(kTileValue_user0);
 
-		icon->SetFloat(kTileValue_x, x, false);
+		icon->SetFloat(kTileValue_x, x, true);
 
 		x += icon->GetValueFloat(kTileValue_width);
 
@@ -205,8 +205,8 @@ namespace SI
 
 		const float wrapwidth = text->GetValueFloat(kTileValue_wrapwidth) - x;
 
-		text->SetFloat(kTileValue_x, x, false);
-		text->SetFloat(kTileValue_wrapwidth, wrapwidth, false);
+		text->SetFloat(kTileValue_x, x, true);
+		text->SetFloat(kTileValue_wrapwidth, wrapwidth, true);
 	}
 
 	void __fastcall SetTileStringInjectTile(Tile* tile, ContChangesEntry* entry, MenuItemEntryList* list, eTileValue tilevalue, char* tileText, bool propagate)
@@ -400,8 +400,7 @@ namespace SI
 			for (auto iter = entryDataList->Head(); iter; iter = iter->next)
 			{
 				if (!iter->data || !iter->data->form) continue;
-				auto tag = g_Tags[GetTagForItem(iter->data)];
-				if (!tag.category._Equal(entry)) continue;
+				if (auto tag = g_Tags[GetTagForItem(iter->data)]; !tag.category._Equal(entry)) continue;
 				if (g_Tags[entry].count == 0) {
 					keys = 1;
 					break;

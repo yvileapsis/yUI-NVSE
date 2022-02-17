@@ -3568,7 +3568,7 @@ public:
 		kFlags_Explosion =				1 << 1,
 		kFlags_AltTrigger =				1 << 2,
 		kFlags_MuzzleFlash =			1 << 3,
-		//				1 << 4,	
+		//								1 << 4,	
 		kFlags_CanBeDisabled =			1 << 5,
 		kFlags_CanBePicked =			1 << 6,
 		kFlags_Supersonic =				1 << 7,
@@ -3618,12 +3618,25 @@ public:
 class TESLevItem;
 class TESImageSpaceModifier;
 
+class RGBA {
+public:
+	UInt8	r;
+	UInt8	g;
+	UInt8	b;
+	UInt8	a;
+};
+STATIC_ASSERT(sizeof(RGBA) == 0x004);
+
 // 2F4
 class TESWeather : public TESForm
 {
 public:
 	TESWeather();
 	~TESWeather();
+
+	struct ColorData {
+		RGBA colors[6];
+	};
 
 	UInt32					unk018;						// 018
 	TESImageSpaceModifier	*imageSpaceMods[6];			// 01C
@@ -3645,17 +3658,16 @@ public:
 	UInt8					weatherClassification;		// 0EB
 	UInt32					lightningColor;				// 0EC
 	float					fogDistance[6];				// 0F0
-	UInt32					colors[10][6];				// 108
+	ColorData				colors[10];				// 108
 	UInt32					unk1F8[63];					// 1F8
 };
-
 STATIC_ASSERT(sizeof(TESWeather) == 0x2F4);
 
 struct WeatherEntry
 {
-	TESWeather		*weather;
+	TESWeather*		weather;
 	UInt32			chance;
-	TESGlobal		*global;
+	TESGlobal*		global;
 
 	void Set(TESWeather *pWtr, UInt32 pChn, TESGlobal *pGlb)
 	{
@@ -3740,7 +3752,7 @@ public:
 
 struct SoundType
 {
-	TESSound		*sound;
+	TESSound*		sound;
 	UInt32			flags;
 	UInt32			chance;
 };
@@ -3753,9 +3765,9 @@ public:
 	TESRegionDataSound();
 	~TESRegionDataSound();
 
-	UInt32		unk08;				// 08
-	SoundTypeList	soundTypes;			// 0C
-	UInt32		incidentalMediaSet;		// 14
+	UInt32			unk08;					// 08
+	SoundTypeList	soundTypes;				// 0C
+	UInt32			incidentalMediaSet;		// 14
 	tList<UInt32>	mediaSetEntries;		// 18
 };
 
@@ -3793,11 +3805,11 @@ public:
 	TESRegion();
 	~TESRegion();
 
-	RegionDataEntryList	*dataEntries;	// 18
-	RegionAreaEntryList	*areaEntries;	// 1C
-	TESWorldSpace		*worldSpace;	// 20
-	TESWeather			*weather;		// 24
-	UInt32				unk28[4];		// 28
+	RegionDataEntryList*	dataEntries;	// 18
+	RegionAreaEntryList*	areaEntries;	// 1C
+	TESWorldSpace*			worldSpace;		// 20
+	TESWeather*				weather;		// 24
+	UInt32					unk28[4];		// 28
 };
 
 STATIC_ASSERT(sizeof(TESRegion) == 0x38);
@@ -3822,8 +3834,8 @@ public:
 	typedef tList<TESObjectREFR> RefList;
 	struct CellCoordinates
 	{
-		UInt32	x;
-		UInt32	y;
+		UInt32				x;
+		UInt32				y;
 	}; // Exterior is 3 DWord, Interior is 5 DWord and 5 floats
 
 	TESFullName				fullName;			// 018	// 030 in GECK
@@ -3831,21 +3843,21 @@ public:
 	UInt8					flags2;				// 026	// 5 or 6 would mean cell is loaded, name based on OBSE
 	UInt8					unk027;				// 027
 	ExtraDataList			extraDataList;		// 028
-	CellCoordinates			* coords;			// 048
-	TESObjectLAND			* land;				// 04C
+	CellCoordinates*		coords;				// 048
+	TESObjectLAND*			land;				// 04C
 	float					unk050;				// 050
 	TESTexture				texture054;			// 054
-	void					* NavMeshArray;		// 060	?$BSSimpleArray@VNavMeshPtr@@$0EAA@@@
+	void*					NavMeshArray;		// 060	?$BSSimpleArray@VNavMeshPtr@@$0EAA@@@
 	UInt32					unk064[(0x0A4-0x064) >> 2];	// 064	080 is CellRefLock semaphore
 	UInt32					actorCount;			// 0A4
 	UInt16					countVisibleWhenDistant;	// 0A8
 	UInt16					unk0AA;				// 0AA
 	RefList					objectList;			// 0AC
-	NiNode					* niNode0B4;		// 0B4
-	NiNode					* niNode0B8;		// 0B8
+	NiNode*					niNode0B4;			// 0B4
+	NiNode*					niNode0B8;			// 0B8
 	UInt32					unk0BC;				// 0BC
-	TESWorldSpace			* worldSpace;		// 0C0
-	NiNode					* unk0C4;			// 0C4	structure (NiNode) containing at 20 a vector XYZT, 4C a list of scripted references, 5C a list of refer with activateRefChildren
+	TESWorldSpace*			worldSpace;			// 0C0
+	NiNode*					unk0C4;				// 0C4	structure (NiNode) containing at 20 a vector XYZT, 4C a list of scripted references, 5C a list of refer with activateRefChildren
 	float					unk0C8;				// 0C8
 	UInt32					unk0CC;				// 0CC
 	UInt32					unk0D0;				// 0D0
@@ -3853,11 +3865,9 @@ public:
 	BGSLightingTemplate*	lightingTemplate;	// 0D8
 	UInt32					unk0DC;				// 0DC
 
-	bool IsInterior() { return worldSpace == NULL; }
+	bool IsInterior() { return worldSpace == nullptr; }
 };
 STATIC_ASSERT(sizeof(TESObjectCELL) == 0xE0);
-
-// TESObjectREFR (60) - see GameObjects.h
 
 struct LODdata;	// 03C
 
@@ -3885,10 +3895,10 @@ public:
 
 	struct Offset_Data
 	{
-		UInt32	** unk000;	// 000 array of UInt32 stored in OFST record (indexed by relative CellXY).
-		CoordXY min;		// 004 NAM0
-		CoordXY max;		// 00C NAM9
-		UInt32	fileOffset;	// 014 TESWorldspace file offset in modInfo
+		UInt32**	unk000;		// 000 array of UInt32 stored in OFST record (indexed by relative CellXY).
+		CoordXY		min;		// 004 NAM0
+		CoordXY		max;		// 00C NAM9
+		UInt32		fileOffset;	// 014 TESWorldspace file offset in modInfo
 	};	// 014
 
 	struct MapData
@@ -3923,50 +3933,43 @@ public:
 		char			footstepMaterials[0x12C];	// 030
 	};
 
-	typedef NiTPointerMap<BSSimpleList<TESObjectREFR> > RefListPointerMap;
-	typedef NiTPointerMap<TESObjectCELL> CellPointerMap;
-	typedef NiTMapBase<ModInfo *,TESWorldSpace::Offset_Data *> OffsetDataMap;
+	typedef NiTPointerMap<BSSimpleList<TESObjectREFR>>	RefListPointerMap;
+	typedef NiTPointerMap<TESObjectCELL>				CellPointerMap;
+	typedef NiTMapBase<ModInfo *, Offset_Data*>			OffsetDataMap;
 
 	TESFullName			fullName;			// 018 confirmed
 	TESTexture			texture;			// 024 confirmed ICON
-	CellPointerMap		* cellMap;			// 030 confirmed
-	TESObjectCELL		* cell;				// 034 should be the Permanent cell
+	CellPointerMap*		cellMap;			// 030 confirmed
+	TESObjectCELL*		cell;				// 034 should be the Permanent cell
 	UInt32				unk038;				// 038
 	LODdata*			lodData;			// 03C looks to be the LOD data (That is what is returned when checking the parent "Use LOD data" flag)
-	TESClimate			* climate;			// 040 confirmed CNAM
-	TESImageSpace		* imageSpace;		// 044 confirmed INAM
-	ImpactData			* impacts;			// 048 confirmed
+	TESClimate*			climate;			// 040 confirmed CNAM
+	TESImageSpace*		imageSpace;			// 044 confirmed INAM
+	ImpactData*			impacts;			// 048 confirmed
 	UInt8				flags;				// 04C confirmed DATA
 	UInt8				unk04D;				// 04D filler
 	UInt16				parentFlags;		// 04E init'd to FF if has a parent. 5 is use ImageSpace, 4 is use parent climate, 3 is use parent Water, 1 is use parent LOD data, 0 is use parent LAND data
 	RefListPointerMap	pointerMap;			// 050 confirmed
 	tList<void*>		lst060;				// 060
 	tList<void*>		lst068;				// 068 confirmed as tList
-	TESWorldSpace		* parent;			// 070 confirmed
-	TESWaterForm		* waterFormFirst;	// 074 confirmed NAM2
-	TESWaterForm		* waterFormLast;	// 078 confirmed NAM3 LOD Water type for xEdit
+	TESWorldSpace*		parent;				// 070 confirmed
+	TESWaterForm*		waterFormFirst;		// 074 confirmed NAM2
+	TESWaterForm*		waterFormLast;		// 078 confirmed NAM3 LOD Water type for xEdit
 	float				waterHeight;		// 07C confirmed NAM4
 	MapData				mapData;			// 080 confirmed MNAM
 	float				worldMapScale;		// 090 confirmed ONAM for three floats
 	float				worldMapCellX;		// 094 confirmed
 	float				worldMapCellY;		// 098 confirmed
-	BGSMusicType		* music;			// 09C confirmed ZNAM
+	BGSMusicType*		music;				// 09C confirmed ZNAM
 	CoordXY				min;				// 0A0 confirmed NAM0 min of all Offset_Data.min
 	CoordXY				max;				// 0A8 confirmed NAM9 max of all Offset_data.max
 	OffsetDataMap		offsetMap;			// 0B0 guarded by an isESM
 	String				str0C0;				// 0C0
 	float				defaultLandHeight;	// 0C8 confirmed DNAM for the two
 	float				defaultWaterHeight;	// 0CC
-	BGSEncounterZone	* encounterZone;	// 0D0 confirmed	
+	BGSEncounterZone*	encounterZone;		// 0D0 confirmed	
 	TESTexture			canopyShadow;		// 0D4 confirmed NNAM
 	TESTexture			waterNoiseTexture;	// 0E0 confirmed XNAM
-
-/*
-	Character			* character;		// 060
-	UInt32				unk060;				// 060
-	RefListPointerMap	* pointerMap064;	// 064 
-	BSPortalGraph		* portalGraph;		// 068
-*/
 };	// I am seeing a tList at 60, a map at 50 indexed by XY coord !!!, another map at B0, indexed by modInfo::Unklist elements
 STATIC_ASSERT(sizeof(TESWorldSpace) == 0xEC);
 
@@ -3980,7 +3983,7 @@ struct VariableInfo
 {
 	UInt32			idx;		// 00
 	UInt32			pad04;		// 04
-	double			data;		// 08
+	Float64			data;		// 08
 	UInt8			type;		// 10
 	UInt8			pad11[3];	// 11
 	UInt32			unk14;		// 14
@@ -4255,11 +4258,11 @@ public:
 		UInt32		radius;			// 004
 		ObjectType  object;			// 008
 
-		static LocationData* Create();
-		static const char* StringForLocationCode(ePackageLocation locCode);
-		const char* StringForLocationCodeAndData(void);
-		static UInt8 LocationCodeForString(const char* locStr);
-		static bool IsValidLocationType(UInt8 locCode) { return locCode < kPackLocation_Max; }
+		static LocationData*	Create();
+		static const char*		StringForLocationCode(ePackageLocation locCode);
+		const char*				StringForLocationCodeAndData(void);
+		static UInt8			LocationCodeForString(const char* locStr);
+		static bool				IsValidLocationType(UInt8 locCode) { return locCode < kPackLocation_Max; }
 	};
 
 	enum
@@ -4279,11 +4282,11 @@ public:
 		UInt32		count;		// 08 can be distance too
 		float		unk0C;		// 0C
 
-		static TargetData* Create();
-		static const char* StringForTargetCode(UInt8 targetCode);
-		const char* StringForTargetCodeAndData(void);
-		static UInt8 TargetCodeForString(const char* targetStr);
-		static bool IsValidTargetCode(UInt8 c) { return c < TESPackage::kTargetType_Max; }
+		static TargetData*	Create();
+		static const char*	StringForTargetCode(UInt8 targetCode);
+		const char*			StringForTargetCodeAndData(void);
+		static UInt8		TargetCodeForString(const char* targetStr);
+		static bool			IsValidTargetCode(UInt8 c) { return c < TESPackage::kTargetType_Max; }
 	};
 
 
@@ -4348,40 +4351,41 @@ public:
 
 	// In DialoguePackage, there are 0x58 virtual functions (including 0x4E from TESForm)
 
-	UInt32			procedureArrayIndex;	// 018 index into array of array of eProcedure terminated by 0x2C. 
-											//	   -1 if no procedure array exists for package type.
-	UInt32				packageFlags;		// 01C
-	UInt8				type;				// 020
-	UInt8				pad021[1];			// 021
-	UInt16				behaviorFlags;		// O22
-	UInt32				specificFlags;		// 024
-	TESPackageData	*	packageData;		// 028
-	LocationData	*	location;			// 02C
-	TargetData		*	target;				// 030	target ?
-	UInt32				unk034;				// 034	idles
-	PackageTime			time;				// 038
-	UInt32 unk040[(0x80 - 0x40) >> 2];		// 040	040 is a tList of Condition, 7C is an Interlocked counter
+	UInt32				procedureArrayIndex;	// 018 index into array of array of eProcedure terminated by 0x2C. 
+												//	   -1 if no procedure array exists for package type.
+	UInt32				packageFlags;			// 01C
+	UInt8				type;					// 020
+	UInt8				pad021[1];				// 021
+	UInt16				behaviorFlags;			// O22
+	UInt32				specificFlags;			// 024
+	TESPackageData*		packageData;			// 028
+	LocationData*		location;				// 02C
+	TargetData*			target;					// 030	target ?
+	UInt32				unk034;					// 034	idles
+	PackageTime			time;					// 038
+	UInt32				unk040[(0x80 - 0x40) >> 2];
+		// 	040 is a tList of Condition, 7C is an Interlocked counter
 		//	048 is a DWord CombatStyle, 
 		//	04C, 05C and 06C are the same 4 DWord struct onBegin onEnd onChange, { TESIdle* idle; EmbeddedScript* script; Topic* topic; UInt32 unk0C; }
 		//	07C is a DWord
 
-	void SetTarget(TESObjectREFR* refr);
-	void SetTarget(TESForm* baseForm, UInt32 count);
-	void SetTarget(eObjectType typeCode, UInt32 count);
-	void SetCount(UInt32 aCount);
-	void SetDistance(UInt32 aDistance) { SetCount(aDistance); }
-	TargetData* GetTargetData();
-	LocationData* GetLocationData();
+	void				SetTarget(TESObjectREFR* refr);
+	void				SetTarget(TESForm* baseForm, UInt32 count);
+	void				SetTarget(eObjectType typeCode, UInt32 count);
+	void				SetCount(UInt32 aCount);
+	void				SetDistance(UInt32 aDistance) { SetCount(aDistance); }
+	TargetData*			GetTargetData();
+	LocationData*		GetLocationData();
 
-	bool IsFlagSet(UInt32 flag);
-	void SetFlag(UInt32 flag, bool bSet);
+	bool				IsFlagSet(UInt32 flag);
+	void				SetFlag(UInt32 flag, bool bSet);
 
-	static const char* StringForPackageType(ePackageType pkgType);
-	static const char* StringForObjectCode(eObjectType objCode);
-	static UInt8 ObjectCodeForString(const char* objString);
-	static bool IsValidObjectCode(UInt8 o) { return o < kObjectType_Max; }
-	static const char* StringForProcedureCode(eProcedure proc);
-	static const char* StringForProcedureCode(eProcedure proc, bool bRemovePrefix);
+	static const char*	StringForPackageType(ePackageType pkgType);
+	static const char*	StringForObjectCode(eObjectType objCode);
+	static UInt8		ObjectCodeForString(const char* objString);
+	static bool			IsValidObjectCode(UInt8 o) { return o < kObjectType_Max; }
+	static const char*	StringForProcedureCode(eProcedure proc);
+	static const char*	StringForProcedureCode(eProcedure proc, bool bRemovePrefix);
 };
 
 STATIC_ASSERT(sizeof(TESPackage) == 0x80);
@@ -4422,21 +4426,21 @@ public:
 	};	//	00C
 
 	Data0080	data0080;		// 080
-	TESTopic	* topic;		// 08C
+	TESTopic*	topic;			// 08C
 	float		flt090;			// 090
-	Character	* speaker;		// 094
+	Character*	speaker;		// 094
 	UInt8		unk098;			// 098
 	UInt8		unk099;			// 098
 	UInt8		unk09A;			// 098
 	UInt8		unk09B;			// 098
-	TESForm		* unk09C;		// 09C
+	TESForm*	unk09C;			// 09C
 	UInt32		unk0A0;			// 0A0
-	void *		unk0A4;			// 0A4	list of Dialogue Item and Dialogue Response, plus current item and current response
+	void*		unk0A4;			// 0A4	list of Dialogue Item and Dialogue Response, plus current item and current response
 	UInt32		unk0A8;			// 0A8
 	UInt32		unk0AC;			// 0AC
-	Character	* subject;		// 0B0
-	Character	* target;		// 0B4
-	TESForm		* unk0B8;		// 0B8
+	Character*	subject;		// 0B0
+	Character*	target;			// 0B4
+	TESForm*	unk0B8;			// 0B8
 	UInt8		unk0BC;			// 0BC
 	UInt8		unk0BD;			// 0BD
 	UInt8		unk0BE;			// 0BE
@@ -4469,8 +4473,8 @@ public:
 	UInt8			unk094;		// 094
 	UInt8			pad095[3];	// 095
 	tList<TESForm*>	list098;	// 098
-	TESForm			* unk0A0;	// 0A0
-	TESForm			* unk0A4;	// 0A4
+	TESForm*		unk0A0;		// 0A0
+	TESForm*		unk0A4;		// 0A4
 	UInt8			unk0A8;		// 0A8
 	UInt8			unk0A9;		// 0A9
 	UInt8			pad0AA[2];	// 0AA
@@ -4484,8 +4488,8 @@ public:
 
 	float		unk080;		// 080
 	UInt32		unk084;		// 084
-	TESForm		* unk088;	// 088
-	TESForm		* unk08C;	// 08C
+	TESForm*	unk088;		// 088
+	TESForm*	unk08C;		// 08C
 	UInt32		unk090;		// 090
 	UInt32		unk094;		// 094
 	UInt32		unk098;		// 098
@@ -4493,8 +4497,8 @@ public:
 
 struct SpectatorThreatInfo
 {
-	TESForm			* unk000;	// 000
-	TESForm			* unk004;	// 004
+	TESForm*		unk000;		// 000
+	TESForm*		unk004;		// 004
 	UInt32			unk008;		// 008
 	UInt32			unk00C;		// 00C	elapsed tick count
 	UInt32			unk010;		// 010
@@ -4540,14 +4544,15 @@ public:
 
 	enum
 	{
-		kFlag_ChooseAttackUsingChance		= 1,
-		kFlag_MeleeAlertOK					= 2,
-		kFlag_FleeBasedOnPersonalSurvival	= 4,
-		kFlag_IgnoreThreats					= 16,
-		kFlag_IgnoreDamagingSelf			= 32,
-		kFlag_IgnoreDamagingGroup			= 64,
-		kFlag_IgnoreDamagingSpectators		= 128,
-		kFlag_CannotUseStealthboy			= 256,
+		kFlag_ChooseAttackUsingChance		= 1 << 0,
+		kFlag_MeleeAlertOK					= 1 << 1,
+		kFlag_FleeBasedOnPersonalSurvival	= 1 << 2,
+
+		kFlag_IgnoreThreats					= 1 << 4,
+		kFlag_IgnoreDamagingSelf			= 1 << 5,
+		kFlag_IgnoreDamagingGroup			= 1 << 6,
+		kFlag_IgnoreDamagingSpectators		= 1 << 7,
+		kFlag_CannotUseStealthboy			= 1 << 8,
 	};
 
 	float	coverSearchRadius;				// 018
@@ -4648,7 +4653,7 @@ STATIC_ASSERT(sizeof(TESRecipeCategory) == 0x28);
 struct RecipeComponent
 {
 	UInt32		quantity;
-	TESForm		*item;
+	TESForm*	item;
 };
 
 // 5C
@@ -4698,7 +4703,7 @@ public:
 	~TESObjectANIO();
 
 	TESModelTextureSwap	modelSwap;		// 18
-	UInt32	unk38;						// 38
+	UInt32				unk38;			// 38
 };
 
 // TESWaterForm (190, 194 in 1.5)
@@ -4735,13 +4740,13 @@ public:
 
 	enum
 	{
-		kFlags_Unknown						=	1,
-		kFlags_AlwaysUseWorldOrientation	=	2,
-		kFlags_KnockDownAlways				=	4,
-		kFlags_KnockDownByFormula			=	8,
-		kFlags_IgnoreLOSCheck				=	16,
-		kFlags_PushSourceRefOnly			=	32,
-		kFlags_IgnoreImageSpaceSwap			=	64,
+		kFlags_Unknown						=	1 << 0,
+		kFlags_AlwaysUseWorldOrientation	=	1 << 1,
+		kFlags_KnockDownAlways				=	1 << 2,
+		kFlags_KnockDownByFormula			=	1 << 3,
+		kFlags_IgnoreLOSCheck				=	1 << 4,
+		kFlags_PushSourceRefOnly			=	1 << 5,
+		kFlags_IgnoreImageSpaceSwap			=	1 << 6,
 	};
 
 	TESFullName					fullName;			// 030
@@ -4750,26 +4755,22 @@ public:
 	BGSPreloadable				preloadable;		// 064
 	TESImageSpaceModifiableForm	imageSpaceModForm;	// 068
 
-	TESForm						*placedObj;			// 070
+	TESForm*					placedObj;			// 070
 	float						force;				// 074
 	float						damage;				// 078
 	float						radius;				// 07C
-	TESObjectLIGH				*light;				// 080
-	TESSound					*sound1;			// 084
+	TESObjectLIGH*				light;				// 080
+	TESSound*					sound1;				// 084
 	UInt32						explFlags;			// 088
 	float						ISradius;			// 08C
-	BGSImpactDataSet			*impactDataSet;		// 090
-	TESSound					*sound2;			// 094
+	BGSImpactDataSet*			impactDataSet;		// 090
+	TESSound*					sound2;				// 094
 	float						RADlevel;			// 098
 	float						dissipationTime;	// 09C
 	float						RADradius;			// 0A0
 
-	void SetFlag(UInt32 flag, bool val)
-	{
-		explFlags = val ? (explFlags | flag) : (explFlags & ~flag);
-	}
+	void SetFlag(UInt32 flag, bool val) { explFlags = val ? (explFlags | flag) : (explFlags & ~flag); }
 };
-
 STATIC_ASSERT(sizeof(BGSExplosion) == 0xA4);
 
 // BGSDebris (24)
@@ -4792,7 +4793,6 @@ public:
 
 	UInt32 unk018[(0xB0-0x18) >> 2];		// 018
 };
-
 STATIC_ASSERT(sizeof(TESImageSpace) == 0xB0);
 
 // TESImageSpaceModifier (728)
@@ -4804,7 +4804,6 @@ public:
 
 	UInt32 unk018[(0x728-0x18) >> 2];		// 018
 };
-
 STATIC_ASSERT(sizeof(TESImageSpaceModifier) == 0x728);
 
 // 24
@@ -4868,7 +4867,7 @@ public:
 	}
 
 	bool Contains(TESForm* form);
-	bool ContainsRecursive(TESForm* form);
+	bool ContainsRecursive(TESForm* form, UInt32 reclvl = 0);
 };
 STATIC_ASSERT(sizeof(BGSListForm) == 0x024);
 
@@ -5046,19 +5045,19 @@ public:
 	UInt8				explChance;				// 65
 	UInt8				explDebrisCount;		// 66
 	UInt8				pad67;					// 67
-	BGSDebris			*explDebris;			// 68
-	BGSExplosion		*explExplosion;			// 6C
+	BGSDebris*			explDebris;				// 68
+	BGSExplosion*		explExplosion;			// 6C
 	float				trackingMaxAngle;		// 70
 	float				explDebrisScale;		// 74
 	UInt8				sevrDebrisCount;		// 78
 	UInt8				pad79[3];				// 79
-	BGSDebris			*sevrDebris;			// 7C
-	BGSExplosion		*sevrExplosion;			// 80
+	BGSDebris*			sevrDebris;				// 7C
+	BGSExplosion*		sevrExplosion;			// 80
 	float				sevrDebrisScale;		// 84
 	float				goreEffTranslate[3];	// 88
 	float				goreEffRotation[3];		// 94
-	BGSImpactDataSet	*sevrImpactDS;			// A0
-	BGSImpactDataSet	*explImpactDS;			// A4
+	BGSImpactDataSet*	sevrImpactDS;			// A0
+	BGSImpactDataSet*	explImpactDS;			// A4
 	UInt8				sevrDecalCount;			// A8
 	UInt8				explDecalCount;			// A9
 	UInt8				padAA[2];				// AA
@@ -5334,7 +5333,7 @@ public:
 STATIC_ASSERT(sizeof(BGSMusicType) == 0x30);
 
 // BGSDefaultObjectManager, with help from "Luthien Anarion"
-const char kDefaultObjectNames[34][28] = {	// 0x0118C360 is an array of struct: { char * Name, UInt8 kFormType , UInt8 pad[3] }
+constexpr char kDefaultObjectNames[34][28] = {	// 0x0118C360 is an array of struct: { char * Name, UInt8 kFormType , UInt8 pad[3] }
       "Stimpack",
       "SuperStimpack",
       "RadX",

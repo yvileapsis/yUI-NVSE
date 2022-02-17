@@ -6,8 +6,8 @@
 
 inline std::unordered_map <UInt32, std::vector<std::byte>> g_SafeWriteData;
 
-void SafeWrite8(UInt32 addr, UInt8 data);
-void SafeWrite16(UInt32 addr, UInt16 data);
+void SafeWrite8(UInt32 addr, UInt32 data);
+void SafeWrite16(UInt32 addr, UInt32 data);
 void SafeWrite32(UInt32 addr, UInt32 data);
 void SafeWriteBuf(UInt32 addr, const char* data, UInt32 len);
 
