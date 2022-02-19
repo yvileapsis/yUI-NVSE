@@ -3,11 +3,11 @@
 #include <GameBSExtraData.h>
 #include <vector>
 
-#define IS_ID(form, type) (form->typeID == kFormType_##type)
-#define NOT_ID(form, type) (form->typeID != kFormType_##type)
+#define IS_ID(form, type) ((form)->typeID == kFormType_##type)
+#define NOT_ID(form, type) ((form)->typeID != kFormType_##type)
 
-#define IS_TYPE(form, type) (*(UInt32*)form == kVtbl_##type)
-#define NOT_TYPE(form, type) (*(UInt32*)form != kVtbl_##type)
+#define IS_TYPE(form, type) (*(UInt32*)(form) == kVtbl_##type)
+#define NOT_TYPE(form, type) (*(UInt32*)(form) != kVtbl_##type)
 
 enum FormType
 {
@@ -3516,8 +3516,8 @@ public:
 
 	bool IsPoison();
 	bool RestoresAV(int avCode);
-	UInt32 HasBaseEffectRestoresAV(int);
-	UInt32 HasBaseEffectDamagesAV(int);
+	UInt32 HasBaseEffectRestoresAV(SInt32);
+	UInt32 HasBaseEffectDamagesAV(SInt32);
 	bool IsAddictive();
 	bool IsFood();
 	bool IsMedicine();
@@ -5276,17 +5276,17 @@ public:
 	~BGSMessage();
 
 	struct Button {
-		String				buttonText;	// 000
-		tList<Condition>	condition;	// 008
+		String				buttonText;		// 000
+		tList<Condition>	condition;		// 008
 	};
 
-	TESFullName		fullName;			// 018
-	TESDescription	description;		// 024
+	TESFullName			fullName;			// 018
+	TESDescription		description;		// 024
 
-	BGSMenuIcon*	menuIcon;			// 2C
-	tList<Button>	buttons;			// 030
-	UInt32			messageFlags;		// 038 init'd to 1
-	Float32			displayTime;		// 03C init'd to 2
+	BGSMenuIcon*		menuIcon;			// 2C
+	tList<Button>		buttons;			// 030
+	UInt32				messageFlags;		// 038 init'd to 1
+	Float32				displayTime;		// 03C init'd to 2
 };
 STATIC_ASSERT(sizeof(BGSMessage) == 0x40);
 

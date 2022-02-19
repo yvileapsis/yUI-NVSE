@@ -105,23 +105,23 @@ public:
 	};
 
 	struct EditorData {
-		UInt32	unk00;	// 00
+		UInt32			unk00;	// 00
 	};
 	// 0C
 
-	TESChildCell	childCell;				// 018
+	TESChildCell		childCell;				// 018
 
-	TESSound*		loopSound;				// 01C
+	TESSound*			loopSound;				// 01C
 
-	TESForm*		baseForm;				// 020
+	TESForm*			baseForm;				// 020
 	
-	float			rotX, rotY, rotZ;		// 024 - either public or accessed via simple inline accessor common to all child classes
-	float			posX, posY, posZ;		// 030 - seems to be private
-	float			scale;					// 03C 
+	Float32				rotX, rotY, rotZ;		// 024 - either public or accessed via simple inline accessor common to all child classes
+	Float32				posX, posY, posZ;		// 030 - seems to be private
+	Float32				scale;					// 03C 
 
-	TESObjectCELL*	parentCell;				// 040
-	ExtraDataList	extraDataList;			// 044
-	RenderState*	renderState;			// 064	- (05C in FOSE)
+	TESObjectCELL*		parentCell;				// 040
+	ExtraDataList		extraDataList;			// 044
+	RenderState*		renderState;			// 064	- (05C in FOSE)
 
 	ScriptEventList*		GetEventList() const;
 
@@ -151,7 +151,7 @@ public:
 	TESObjectCELL*			GetParentCell();
 	TESWorldSpace*			GetParentWorld();
 	bool					GetInSameCellOrWorld(TESObjectREFR* target);
-	float __vectorcall		GetDistance(TESObjectREFR* target);
+	Float32 __vectorcall	GetDistance(TESObjectREFR* target);
 	void					SetPos(NiPoint3& posVector);
 	void					SetAngle(NiPoint3& rotVector);
 	bool					MoveToCell(TESForm* worldOrCell, NiPoint3& posVector);

@@ -76,13 +76,12 @@ __declspec(naked) void UIHeight3()
 
 void FillCraftingComponents()
 {
-	for (auto mIter = GetAllForms()->Begin(); mIter; ++mIter)
+	for (auto mIter = g_dataHandler->recipeList.Begin(); !mIter.End(); ++mIter)
 	{
-		if (mIter.Get()->typeID != 106) continue;
-		const auto list = DYNAMIC_CAST(mIter.Get(), TESForm, TESRecipe);
-		if (!list) continue;
-		for (ListNode<RecipeComponent>* node = list->inputs.Head(); node; node = node->next)
+		for (ListNode<RecipeComponent>* node = mIter.Get()->inputs.Head(); node; node = node->next)
 			if (node->data && node->data->item) g_CraftingComponents.emplace(node->data->item);
+		for (ListNode<RecipeComponent>* node = mIter.Get()->outputs.Head(); node; node = node->next)
+			if (node->data && node->data->item) g_CraftingProducts.emplace(node->data->item);
 	}
 }
 
@@ -90,58 +89,50 @@ float TESObjectWEAP::GetWeaponValue(UInt32 whichVal)
 {
 	if (!this) return false;
 	switch (whichVal) {
-	case eWeap_Type:				return this->eWeaponType;
-	case eWeap_MinSpread:			return this->minSpread;
-	case eWeap_Spread:				return this->spread;
-	case eWeap_Proj:
-	{
-		if (BGSProjectile* pProj = this->projectile; pProj) return pProj->refID;
-		break;
-	}
-	case eWeap_SightFOV:			return this->sightFOV;
-	case eWeap_MinRange:			return this->minRange;
-	case eWeap_Range:				return this->maxRange;
-	case eWeap_AmmoUse:				return this->ammoUse;
-	case eWeap_APCost:				return this->AP;
-	case eWeap_CritDam:				return this->criticalDamage;
-	case eWeap_CritChance:			return this->criticalPercent;
-	case eWeap_CritEffect:
-	{
-		if (SpellItem* pSpell = this->criticalEffect; pSpell) return pSpell->refID;
-		break;
-	}
-	case eWeap_FireRate:			return this->fireRate;
-	case eWeap_AnimAttackMult:		return this->animAttackMult;
-	case eWeap_RumbleLeft:			return this->rumbleLeftMotor;
-	case eWeap_RumbleRight:			return this->rumbleRightMotor;
-	case eWeap_RumbleDuration:		return this->rumbleDuration;
-	case eWeap_RumbleWaveLength:	return this->rumbleWavelength;
-	case eWeap_AnimShotsPerSec:		return this->animShotsPerSec;
-	case eWeap_AnimReloadTime:		return this->animReloadTime;
-	case eWeap_AnimJamTime:			return this->animJamTime;
-	case eWeap_Skill:				return this->weaponSkill;
-	case eWeap_ResistType:			return this->resistType;
-	case eWeap_FireDelayMin:		return this->semiAutoFireDelayMin;
-	case eWeap_FireDelayMax:		return this->semiAutoFireDelayMax;
-	case eWeap_AnimMult:			return this->animMult;
-	case eWeap_Reach:				return this->reach;
-	case eWeap_IsAutomatic:			return this->IsAutomatic();
-	case eWeap_HandGrip:			return this->HandGrip();
-	case eWeap_ReloadAnim:			return this->reloadAnim;
-	case eWeap_VATSChance:			return this->baseVATSChance;
-	case eWeap_AttackAnim:			return this->AttackAnimation();
-	case eWeap_NumProj:				return this->numProjectiles;
-	case eWeap_AimArc:				return this->aimArc;
-	case eWeap_LimbDamageMult:		return this->limbDamageMult;
-	case eWeap_SightUsage:			return this->sightUsage;
-	case eWeap_ReqStr:				return this->strRequired;
-	case eWeap_ReqSkill:			return this->skillRequirement;
-	case eWeap_LongBursts:			return this->weaponFlags2.IsSet(eFlag_LongBurst);
-	case eWeap_Flags1:				return this->weaponFlags1.Get();
-	case eWeap_Flags2:				return this->weaponFlags2.Get();
-	case eWeap_HasScope:			return this->HasScope();
-	case eWeap_IgnoresDTDR:			return this->IgnoresDTDR();
-	case eWeap_SoundLevel:			return this->soundLevel;
+	case eWeap_Type:				return eWeaponType;
+	case eWeap_MinSpread:			return minSpread;
+	case eWeap_Spread:				return spread;
+	case eWeap_Proj:				return projectile ? projectile->refID : false;
+	case eWeap_SightFOV:			return sightFOV;
+	case eWeap_MinRange:			return minRange;
+	case eWeap_Range:				return maxRange;
+	case eWeap_AmmoUse:				return ammoUse;
+	case eWeap_APCost:				return AP;
+	case eWeap_CritDam:				return criticalDamage;
+	case eWeap_CritChance:			return criticalPercent;
+	case eWeap_CritEffect:			return criticalEffect ? criticalEffect->refID : false;
+	case eWeap_FireRate:			return fireRate;
+	case eWeap_AnimAttackMult:		return animAttackMult;
+	case eWeap_RumbleLeft:			return rumbleLeftMotor;
+	case eWeap_RumbleRight:			return rumbleRightMotor;
+	case eWeap_RumbleDuration:		return rumbleDuration;
+	case eWeap_RumbleWaveLength:	return rumbleWavelength;
+	case eWeap_AnimShotsPerSec:		return animShotsPerSec;
+	case eWeap_AnimReloadTime:		return animReloadTime;
+	case eWeap_AnimJamTime:			return animJamTime;
+	case eWeap_Skill:				return weaponSkill;
+	case eWeap_ResistType:			return resistType;
+	case eWeap_FireDelayMin:		return semiAutoFireDelayMin;
+	case eWeap_FireDelayMax:		return semiAutoFireDelayMax;
+	case eWeap_AnimMult:			return animMult;
+	case eWeap_Reach:				return reach;
+	case eWeap_IsAutomatic:			return IsAutomatic();
+	case eWeap_HandGrip:			return HandGrip();
+	case eWeap_ReloadAnim:			return reloadAnim;
+	case eWeap_VATSChance:			return baseVATSChance;
+	case eWeap_AttackAnim:			return AttackAnimation();
+	case eWeap_NumProj:				return numProjectiles;
+	case eWeap_AimArc:				return aimArc;
+	case eWeap_LimbDamageMult:		return limbDamageMult;
+	case eWeap_SightUsage:			return sightUsage;
+	case eWeap_ReqStr:				return strRequired;
+	case eWeap_ReqSkill:			return skillRequirement;
+	case eWeap_LongBursts:			return weaponFlags2.IsSet(eFlag_LongBurst);
+	case eWeap_Flags1:				return weaponFlags1.Get();
+	case eWeap_Flags2:				return weaponFlags2.Get();
+	case eWeap_HasScope:			return HasScope();
+	case eWeap_IgnoresDTDR:			return IgnoresDTDR();
+	case eWeap_SoundLevel:			return soundLevel;
 	case eWeap_ClipSize:
 	{
 		if (const auto pClipRounds = DYNAMIC_CAST(this, TESForm, BGSClipRoundsForm); pClipRounds) return pClipRounds->clipRounds;
@@ -156,12 +147,12 @@ UInt32 TESObjectARMO::GetArmorValue(UInt32 whichVal)
 {
 	if (!this) return false;
 	switch (whichVal) {
-	case 1:	return (&this->bipedModel)->bipedFlags & eBipedFlag_HeavyArmor ? 3 : (&this->bipedModel)->bipedFlags & eBipedFlag_MediumArmor ? 2 : 1;
-	case 2:	return (&this->bipedModel)->bipedFlags & eBipedFlag_PowerArmor ? 1 : 0;
-	case 3:	return (&this->bipedModel)->bipedFlags & eBipedFlag_HasBackPack ? 1 : 0;
-	case 4:	return this->armorRating;
-	case 5:	return static_cast<UInt32>(this->damageThreshold);
-	case 6: return (&this->bipedModel)->partMask;
+	case 1:	return bipedModel.bipedFlags & eBipedFlag_HeavyArmor ? 3 : bipedModel.bipedFlags & eBipedFlag_MediumArmor ? 2 : 1;
+	case 2:	return bipedModel.bipedFlags & eBipedFlag_PowerArmor ? 1 : 0;
+	case 3:	return bipedModel.bipedFlags & eBipedFlag_HasBackPack ? 1 : 0;
+	case 4:	return armorRating;
+	case 5:	return static_cast<UInt32>(damageThreshold);
+	case 6: return bipedModel.partMask;
 	default: HALT("unknown armor value"); break;
 	}
 	return false;
@@ -173,7 +164,7 @@ ExtraDataList* ExtraContainerChanges::EntryData::GetCustomExtra(UInt32 whichVal)
 	{
 		ListNode<ExtraDataList>* xdlIter = extendData->Head();
 		do if (const auto xData = xdlIter->data; xData && xData->HasType(whichVal)) return xData;
-		while (xdlIter = xdlIter->next);
+		while ((xdlIter = xdlIter->next));
 	}
 	return nullptr;
 }
@@ -201,17 +192,15 @@ float ContGetHealthPercent(ContChangesEntry* itemInfo)
 bool ContGetEquipped(ContChangesEntry* weaponInfo)
 {
 	const auto xData = weaponInfo->GetCustomExtra(kExtraData_Worn);
-	if (!xData) return false;
-	const auto xWorn = GetExtraType((*xData), Worn);
-	if (xWorn) return true;
-	const auto xWornLeft = GetExtraType((*xData), WornLeft);
-	if (xWornLeft) return true;
+	const auto xDataLeft = weaponInfo->GetCustomExtra(kExtraData_WornLeft);
+	if (xData && GetExtraType((*xData), Worn)) return true;
+	if (xDataLeft && GetExtraType((*xDataLeft), WornLeft)) return true;
 	return false;
 }
 
-UInt32 AlchemyItem::HasBaseEffectRestoresAV(int avCode)
+UInt32 AlchemyItem::HasBaseEffectRestoresAV(const SInt32 avCode)
 {
-	for (auto iter = this->magicItem.list.list.Begin(); !iter.End(); ++iter)
+	for (auto iter = magicItem.list.list.Begin(); !iter.End(); ++iter)
 		if (auto effect = iter.Get(); effect->GetSkillCode() == avCode)
 			if (const auto setting = effect->setting; setting && !(setting->effectFlags & EffectSetting::kDetrimental))
 				return effect->magnitude;
@@ -219,10 +208,10 @@ UInt32 AlchemyItem::HasBaseEffectRestoresAV(int avCode)
 	return 0;
 }
 
-UInt32 AlchemyItem::HasBaseEffectDamagesAV(const int avCode)
+UInt32 AlchemyItem::HasBaseEffectDamagesAV(const SInt32 avCode)
 {
-	for (auto iter = this->magicItem.list.list.Begin(); !iter.End(); ++iter)
-		if (auto effect = iter.Get(); effect->GetSkillCode() == avCode)
+	for (auto iter = magicItem.list.list.Begin(); !iter.End(); ++iter)
+		if (const auto effect = iter.Get(); effect->GetSkillCode() == avCode)
 			if (const auto setting = effect->setting; setting && setting->effectFlags & EffectSetting::kDetrimental)
 				return effect->magnitude;
 		//				if (effect->conditions.Evaluate(g_player, nullptr, &eval, false)) return true;
@@ -231,17 +220,17 @@ UInt32 AlchemyItem::HasBaseEffectDamagesAV(const int avCode)
 
 bool AlchemyItem::IsAddictive()
 {
-	return this->withdrawalEffect && this->withdrawalEffect->refID ? true : false;
+	return withdrawalEffect && withdrawalEffect->refID;
 }
 
 bool AlchemyItem::IsFood()
 {
-	return (this->alchFlags & 2) ? true : false;
+	return alchFlags & 2;
 }
 
 bool AlchemyItem::IsMedicine()
 {
-	return (this->alchFlags & 4) ? true : false;
+	return alchFlags & 4;
 }
 
 bool AlchemyItem::IsPoison()
@@ -251,30 +240,28 @@ bool AlchemyItem::IsPoison()
 	const ListNode<EffectItem>* iter = magicItem.list.list.Head();
 	do
 	{
-		if (!(effItem = iter->data)) continue;
+		if (!((effItem = iter->data))) continue;
 		effSetting = effItem->setting;
 		if (effSetting && !(effSetting->effectFlags & 4)) return false;
-	} while (iter = iter->next);
+	} while ((iter = iter->next));
 	return effSetting != nullptr;
 }
 
 bool AlchemyItem::IsFoodAlt()
 {
-	return this->HasBaseEffectRestoresAV(kAVCode_Hunger) && this->HasBaseEffectRestoresAV(kAVCode_Hunger) > this->HasBaseEffectRestoresAV(kAVCode_Dehydration) ? true : false;
+	return HasBaseEffectRestoresAV(kAVCode_Hunger) && HasBaseEffectRestoresAV(kAVCode_Hunger) > HasBaseEffectRestoresAV(kAVCode_Dehydration) ? true : false;
 }
 
 bool AlchemyItem::IsWaterAlt()
 {
-	return this->HasBaseEffectRestoresAV(kAVCode_Dehydration) && this->HasBaseEffectRestoresAV(kAVCode_Hunger) == 0 ? true : false;
+	return HasBaseEffectRestoresAV(kAVCode_Dehydration) && HasBaseEffectRestoresAV(kAVCode_Hunger) == 0 ? true : false;
 }
 
 bool HasBaseEffectChangesAV(TESForm* form, const int avCode)
 {
 	const auto armor = DYNAMIC_CAST(form, TESForm, TESObjectARMO);
 	if (!armor) return false;
-	const auto enchantable = &armor->enchantable;
-	if (!enchantable) return false;
-	const auto enchantment = enchantable->enchantItem;
+	const auto enchantment = armor->enchantable.enchantItem;
 	if (!enchantment) return false;
 	for (auto iter = enchantment->magicItem.list.list.Begin(); !iter.End(); ++iter)
 		if (const auto effect = iter.Get(); effect->GetSkillCode() == avCode)
@@ -292,6 +279,11 @@ TESForm* GetRefFromString(char* mod, char* id)
 bool IsCraftingComponent(TESForm* form)
 {
 	return g_CraftingComponents.contains(form);
+}
+
+bool IsCraftingProduct(TESForm* form)
+{
+	return g_CraftingProducts.contains(form);
 }
 
 bool FindStringCI(const std::string& strHaystack, const std::string& strNeedle)
@@ -354,7 +346,7 @@ void __fastcall CursorTileSetStringValue(Tile* tile, void* dummyEDX, eTileValue 
 
 void __fastcall CursorTileSetIntValue(Tile* tile, void* dummyEDX, eTileValue tilevalue, int value)
 {
-	tile->SetFloat(kTileValue_visible, value, 1);
+	tile->SetFloat(kTileValue_visible, value, true);
 	ThisCall(0xA0B350, InterfaceManager::GetSingleton()->cursor, 1, 0);
 }
 
@@ -383,7 +375,6 @@ __declspec(naked) void funpatch()
 	welp :
 		cmp [ebp - 0x30], 0x7E8
 		jmp retnAddr
-
 	}
 }
 

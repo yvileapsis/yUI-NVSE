@@ -150,7 +150,7 @@ struct InventoryItemData
 	SInt32								count;
 	ContChangesEntry*					entry;
 
-	InventoryItemData(SInt32 _count, ContChangesEntry* _entry) : count(_count), entry(_entry) {}
+	InventoryItemData(SInt32 count, ContChangesEntry* entry) : count(count), entry(entry) {}
 };
 STATIC_ASSERT(sizeof(InventoryItemData) == 0x08);
 

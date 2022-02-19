@@ -8,8 +8,8 @@
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="patches.cpp" />
     <ClCompile Include="settings.cpp" />
-    <ClCompile Include="yCM.cpp" />
-    <ClCompile Include="ySI.cpp" />
+    <ClCompile Include="ConfigurationMenu.cpp" />
+    <ClCompile Include="SortingIcons.cpp" />
     <ClCompile Include="..\nvse\printf.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
@@ -69,12 +69,12 @@
   <ItemGroup>
     <ClInclude Include="file.h" />
     <ClInclude Include="functions.h" />
-    <ClInclude Include="yCM.h" />
+    <ClInclude Include="ConfigurationMenu.h" />
     <ClInclude Include="patches.h" />
     <ClInclude Include="settings.h" />
     <ClInclude Include="LambdaVariableContext.h" />
     <ClInclude Include="main.h" />
-    <ClInclude Include="ySI.h" />
+    <ClInclude Include="SortingIcons.h" />
     <ClInclude Include="..\nvse\GameAPI.h">
       <Filter>nvse</Filter>
     </ClInclude>

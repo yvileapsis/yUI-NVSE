@@ -4,8 +4,26 @@
 #include <unordered_set>
 #include <unordered_map>
 
-namespace SI_Files
+namespace SIFiles
 {
+	struct JSONEntryItemCommon
+	{
+		std::string		tag;
+		SInt32			priority		= 0;
+		TESForm*		form			= nullptr;
+		UInt32			formType		= 0;
+		UInt8			questItem		= 0;
+		UInt8			miscComponent	= 0;
+		UInt8			miscProduct		= 0;
+
+		JSONEntryItemCommon(std::string tag, SInt32 priority, TESForm* form, UInt8 questItem, UInt8 miscComponent,
+			UInt8 miscProduct) : tag(std::move(tag)), priority(priority), form(form), formType(0),
+			questItem(questItem), miscComponent(miscComponent), miscProduct(miscProduct)
+		{
+		}
+		JSONEntryItemCommon() = default;
+	};
+
 	struct JSONEntryItemWeapon
 	{
 		UInt32 weaponSkill;
@@ -22,11 +40,7 @@ namespace SI_Files
 
 		TESForm* ammo;
 
-		JSONEntryItemWeapon()
-			: weaponSkill(0), weaponType(0), weaponHandgrip(0), weaponAttackAnim(0), weaponReloadAnim(0), weaponIsAutomatic(0),
-			weaponHasScope(0), weaponIgnoresDTDR(0), weaponClipRounds(0), weaponNumProjectiles(0), weaponSoundLevel(0), ammo(nullptr)
-		{}
-
+		JSONEntryItemWeapon() = default;
 	};
 
 	struct JSONEntryItemArmor
@@ -60,7 +74,6 @@ namespace SI_Files
 
 	struct JSONEntryItemMisc
 	{
-		UInt8 miscComponent;
 		JSONEntryItemMisc() = default;
 	};
 
@@ -68,23 +81,19 @@ namespace SI_Files
 	class JSONEntryItem
 	{
 	public:
-		std::string		tag;
-		SInt16			priority		= 0;
-		TESForm*		form			= nullptr;
-		UInt32			formType		= 0;
-		UInt8			questItem		= 0;
 
+		JSONEntryItemCommon		formCommon{};
 		JSONEntryItemWeapon		formWeapon{};
 		JSONEntryItemArmor		formArmor{};
 		JSONEntryItemAid		formAid{};
 		JSONEntryItemMisc		formMisc{};
 		
-		JSONEntryItem(std::string tag, SInt16 priority, TESForm* form, UInt8 questItem) : tag(std::move(tag)), priority(priority), form(form), formType(0), questItem(questItem) {}
-		JSONEntryItem(std::string tag, SInt16 priority, UInt32 formType, UInt8 questItem, JSONEntryItemWeapon weapon) : tag(std::move(tag)), priority(priority), formType(formType), formWeapon(weapon), form(nullptr), questItem(questItem) {}
-		JSONEntryItem(std::string tag, SInt16 priority, UInt32 formType, UInt8 questItem) : tag(std::move(tag)), priority(priority), form(nullptr), formType(formType), questItem(questItem) {}
-		JSONEntryItem(std::string tag, SInt16 priority, UInt32 formType, UInt8 questItem, JSONEntryItemMisc misc) : tag(std::move(tag)), priority(priority), form(nullptr), formType(formType), questItem(questItem), formMisc(misc) {}
-		JSONEntryItem(std::string tag, SInt16 priority, UInt32 formType, UInt8 questItem, JSONEntryItemArmor armor) : tag(std::move(tag)), priority(priority), form(nullptr), formType(formType), questItem(questItem), formArmor(armor) {}
-		JSONEntryItem(std::string tag, SInt16 priority, UInt32 formType, UInt8 questItem, JSONEntryItemAid aid) : tag(std::move(tag)), priority(priority), form(nullptr), formType(formType), questItem(questItem), formAid(aid) {}
+		JSONEntryItem(JSONEntryItemCommon common) : formCommon(common) {}
+		JSONEntryItem(JSONEntryItemCommon common, JSONEntryItemWeapon weapon) : formCommon(common), formWeapon(weapon) {}
+		JSONEntryItem(JSONEntryItemCommon common, JSONEntryItemArmor armor) : formCommon(common), formArmor(armor) {}
+		JSONEntryItem(JSONEntryItemCommon common, JSONEntryItemAid aid) : formCommon(common), formAid(aid) {}
+		JSONEntryItem(JSONEntryItemCommon common, JSONEntryItemMisc misc) : formCommon(common), formMisc(misc) {}
+		JSONEntryItem(JSONEntryItemCommon common, TESForm* form) : formCommon(common) { formCommon.form = form; }
 	};
 
 	class JSONEntryTag
@@ -123,7 +132,7 @@ namespace SI_Files
 namespace SI
 {
 	inline std::unordered_map<TESForm*, std::string>				g_Items;
-	inline std::unordered_map<std::string, SI_Files::JSONEntryTag>	g_Tags;
+	inline std::unordered_map<std::string, SIFiles::JSONEntryTag>	g_Tags;
 	inline std::unordered_set<std::string>							g_Categories;
 	inline std::vector<std::filesystem::path>						g_XMLPaths;
 
@@ -145,7 +154,7 @@ namespace SI
 	void __fastcall SetStringValueTagRose(Tile* tile, ContChangesEntry* entry, eTileValue tilevalue, char* src, char propagate);
 }
 
-namespace SI_Hooks
+namespace SIHooks
 {
 
 	template <UInt32 retn> __declspec(naked) void IconInjectTileSetStringValueHook() {

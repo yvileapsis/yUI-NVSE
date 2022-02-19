@@ -1,4 +1,4 @@
-#include <ySI.h>
+#include <SortingIcons.h>
 #include <GameRTTI.h>
 #include <settings.h>
 #include <functions.h>
@@ -11,17 +11,19 @@ namespace SI
 	float compassRoseX = 0, compassRoseY = 0;
 }
 
-namespace SI_Files
+namespace SIFiles
 {
 	bool AssignTagToItem(TESForm* form)
 	{
 		for (const auto& entry : g_Items_JSON) {
-			if (entry.form && entry.form->refID != form->refID) continue;
-			if (entry.formType && entry.formType != form->typeID) continue;
+			if (entry.formCommon.form && entry.formCommon.form->refID != form->refID) continue;
+			if (entry.formCommon.formType && entry.formCommon.formType != form->typeID) continue;
 
-			if (entry.questItem && entry.questItem != static_cast<UInt8>(form->IsQuestItem2())) continue;
+			if (entry.formCommon.questItem && entry.formCommon.questItem != static_cast<UInt8>(form->IsQuestItem2())) continue;
+			if (entry.formCommon.miscComponent && !IsCraftingComponent(form)) continue;
+			if (entry.formCommon.miscProduct && !IsCraftingProduct(form)) continue;
 
-			if (entry.formType == 40) {
+			if (entry.formCommon.formType == 40) {
 				const auto weapon = DYNAMIC_CAST(form, TESForm, TESObjectWEAP);
 				if (!weapon) continue;
 				if (entry.formWeapon.weaponSkill && entry.formWeapon.weaponSkill != weapon->weaponSkill) continue;
@@ -38,7 +40,7 @@ namespace SI_Files
 				if (entry.formWeapon.weaponSoundLevel && entry.formWeapon.weaponSoundLevel != weapon->soundLevel) continue;
 				if (entry.formWeapon.ammo && !FormContainsRecusive(entry.formWeapon.ammo, weapon->ammo.ammo)) continue;
 			}
-			else if (entry.formType == 24) {
+			else if (entry.formCommon.formType == 24) {
 				const auto armor = DYNAMIC_CAST(form, TESForm, TESObjectARMO);
 				if (!armor) continue;
 				if (entry.formArmor.armorSlotsMaskWL && (entry.formArmor.armorSlotsMaskWL & armor->GetArmorValue(6)) != entry.formArmor.armorSlotsMaskWL) continue;
@@ -51,10 +53,9 @@ namespace SI_Files
 				if (entry.formArmor.armorDR && entry.formArmor.armorDR > armor->armorRating) continue;
 //				if (entry.formArmor.armorChangesAV && entry.formArmor.armorChangesAV > armor->armorRating) continue;
 			}
-			else if (entry.formType == 31) {
-				if (entry.formMisc.miscComponent && !IsCraftingComponent(form)) continue;
+			else if (entry.formCommon.formType == 31) {
 			}
-			else if (entry.formType == 47) {
+			else if (entry.formCommon.formType == 47) {
 				const auto aid = DYNAMIC_CAST(form, TESForm, AlchemyItem);
 				if (!aid) continue;
 				if (entry.formAid.aidRestoresAV && !aid->HasBaseEffectRestoresAV(entry.formAid.aidRestoresAV)) continue;
@@ -66,7 +67,7 @@ namespace SI_Files
 				if (entry.formAid.aidIsMedicine && !aid->IsMedicine()) continue;
 			}
 
-			SI::g_Items.emplace(form, entry.tag);
+			SI::g_Items.emplace(form, entry.formCommon.tag);
 			return true;
 		}
 		return false;
@@ -75,7 +76,7 @@ namespace SI_Files
 	void FillSIMapsFromJSON()
 	{
 		ra::sort(g_Items_JSON, [&](const JSONEntryItem& entry1, const JSONEntryItem& entry2)
-		         { return entry1.priority > entry2.priority; });
+		         { return entry1.formCommon.priority > entry2.formCommon.priority; });
 
 		if (!g_ySI_JustInTime)
 		{
@@ -84,7 +85,7 @@ namespace SI_Files
 				if (!form || !form->IsInventoryObjectAlt()) continue;
 				AssignTagToItem(form);
 			}
-			//		SI_Files::g_Items_JSON = std::vector<JSONEntryItem>();
+			//		SIFiles::g_Items_JSON = std::vector<JSONEntryItem>();
 		}
 
 		ra::sort(g_Tags_JSON, [&](const JSONEntryTag& entry1, const JSONEntryTag& entry2)
@@ -138,14 +139,14 @@ namespace SI
 	std::string GetTagForItem(TESForm* form)
 	{
 		if (!form) return "";
-		if (!IsTagForItem(form)) SI_Files::AssignTagToItem(form);
+		if (!IsTagForItem(form)) SIFiles::AssignTagToItem(form);
 		return g_Items[form];
 	}
 
 	std::string GetTagForItem(ContChangesEntry* entry)
 	{
 		if (!entry || !entry->form) return "";
-		if (!IsTagForItem(entry)) SI_Files::AssignTagToItem(entry->form);
+		if (!IsTagForItem(entry)) SIFiles::AssignTagToItem(entry->form);
 		return g_Items[entry->form];
 	}
 	
@@ -424,7 +425,7 @@ namespace SI
 	}
 }
 
-namespace SI_Hooks
+namespace SIHooks
 {
 	__declspec(naked) void SortingBarterContainerMenuHook()
 	{

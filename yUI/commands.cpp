@@ -1,4 +1,4 @@
-#include <ySI.h>
+#include <SortingIcons.h>
 
 extern bool Cmd_ySIGetTrait_Execute(COMMAND_ARGS)
 {

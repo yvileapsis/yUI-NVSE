@@ -1,33 +1,13 @@
 #pragma once
-
 #include "GameForms.h"
 #include "Utilities.h"
-
-class TESReputation;
-class TESChallenge;
-class TESRecipe;
-class TESRecipeCategory;
-class TESAmmoEffect;
-class TESCasino;
-class TESCaravanDeck;
-class TESTopicInfo;
-class BGSDehydrationStage;
-class BGSHungerStage;
-class BGSSleepDeprivationStage;
-class TESLoadScreenType;
-class MediaSet;
-class MediaLocationController;
-class TESRegionList;
-class TESRegionManager;
-class BSFile;
 
 struct ChunkAndFormType {
 	UInt32		chunkType;	// ie 
 	UInt32		formType;	// ie 0x2A
-	const char	* formName;	// ie 'NPC_'
+	const char*	formName;	// ie 'NPC_'
 };
 
-#if RUNTIME
 static const UInt32 _ModInfo_GetNextChunk = 0x004726B0; // args: none retn: UInt32 subrecordType (third call in TESObjectARMO_LoadForm)
 static const UInt32 _ModInfo_GetChunkData = 0x00472890;	// args: void* buf, UInt32 bufSize retn: bool readSucceeded (fifth call in TESObjectARMO_LoadForm)
 static const UInt32 _ModInfo_Read32		  =	0x004727F0;	// args: void* buf retn: void (find 'LPER', then next call, still in TESObjectARMO_LoadForm)
@@ -47,7 +27,6 @@ static UInt32* g_CreatedObjectSize = (UInt32*)0x011C54D0;
 		// in first call (Form_startSaveForm) in TESObjectARMO__SaveForm:
 		//		g_CreatedObjectSize is set to 18h
 		//		g_CreatedObjectData is set to the eax result of the next call
-#endif
 
 // 10
 class BoundObjectListHead
@@ -57,8 +36,8 @@ public:
 	~BoundObjectListHead();
 
 	UInt32			boundObjectCount;	// 0
-	TESBoundObject	* first;			// 4
-	TESBoundObject	* last;				// 8
+	TESBoundObject*	first;				// 4
+	TESBoundObject*	last;				// 8
 	UInt32			unkC;				// C
 };
 
@@ -106,7 +85,7 @@ struct ModInfo		// referred to by game as TESFile
 
 	struct FileHeader	// File header in FNVEdit Signature 'HEDR'
 	{
-		float version;			//	00
+		Float32	version;		//	00
 		UInt32	recordCount;	//	04
 		UInt32	nextObectID;	//	08
 	};
@@ -278,7 +257,7 @@ public:
 	UInt8							loading;				// 621	Init'd to 0 after loadForms
 	UInt8							unk622;					// 622	referenced during loading of modules. Compared with type = GameSetting but seems to always end up equal to 1.
 	UInt8							unk623;					// 623
-	TESRegionManager				* regionManager;		// 624	5B0
+	TESRegionManager*				regionManager;			// 624	5B0
 	UInt32							unk628;					// 628	5B4
 	UInt32							unk62C;					// 62C	
 	UInt32							unk630;					// 630

@@ -1,15 +1,15 @@
 #include <patches.h>
 #include <SafeWrite.h>
 #include <functions.h>
-#include <ySI.h>
+#include <SortingIcons.h>
 
 void patchSortingHooks(const bool bEnable)
 {
 	if (bEnable)
 	{
-		WriteRelJump(0x782516, SI_Hooks::SortingInventoryMenuHook<0x78251B>);
-		WriteRelJump(0x72F0ED, SI_Hooks::SortingBarterContainerMenuHook);
-		WriteRelJump(0x75D138, SI_Hooks::SortingBarterContainerMenuHook);
+		WriteRelJump(0x782516, SIHooks::SortingInventoryMenuHook<0x78251B>);
+		WriteRelJump(0x72F0ED, SIHooks::SortingBarterContainerMenuHook);
+		WriteRelJump(0x75D138, SIHooks::SortingBarterContainerMenuHook);
 	}
 	else
 	{
@@ -23,7 +23,7 @@ void patchAddIcons(const bool bEnable)
 {
 	if (bEnable)
 	{
-		WriteRelJump(0x71A3D5, SI_Hooks::IconInjectTileSetStringValueHook<0x71A3DA>);
+		WriteRelJump(0x71A3D5, SIHooks::IconInjectTileSetStringValueHook<0x71A3DA>);
 	}
 	else
 	{
@@ -35,8 +35,8 @@ void patchReplaceHotkeyIcons(const bool bEnable)
 {
 	if (bEnable)
 	{
-		WriteRelJump(0x70189E, SI_Hooks::IconHotkeyHUDTileSetStringValueHook<0x7018A3>);
-		WriteRelJump(0x7814FA, SI_Hooks::IconHotkeyPipBoyTileSetStringValueHook<0x7814FF>);
+		WriteRelJump(0x70189E, SIHooks::IconHotkeyHUDTileSetStringValueHook<0x7018A3>);
+		WriteRelJump(0x7814FA, SIHooks::IconHotkeyPipBoyTileSetStringValueHook<0x7814FF>);
 	}
 	else
 	{
@@ -49,25 +49,25 @@ void patchSortingCategories(const bool bEnable)
 {
 	if (bEnable)
 	{
-		WriteRelJump(0x730C81, SI_Hooks::ContainerEntryListBoxFilterHookPre<0x730C8C>);
-		WriteRelJump(0x730C97, SI_Hooks::ContainerEntryListBoxFilterHookPost<0x730CA9>);
+		WriteRelJump(0x730C81, SIHooks::ContainerEntryListBoxFilterHookPre<0x730C8C>);
+		WriteRelJump(0x730C97, SIHooks::ContainerEntryListBoxFilterHookPost<0x730CA9>);
 
-		WriteRelJump(0x7824F6, SI_Hooks::SortingInventoryMenuHook<0x78251B>);
-		WriteRelJump(0x78250B, SI_Hooks::SortingInventoryMenuHook<0x78251B>);
+		WriteRelJump(0x7824F6, SIHooks::SortingInventoryMenuHook<0x78251B>);
+		WriteRelJump(0x78250B, SIHooks::SortingInventoryMenuHook<0x78251B>);
 
-		WriteRelJump(0x7831C1, SI_Hooks::KeyringAddCategoriesHook<0x783213>);
+		WriteRelJump(0x7831C1, SIHooks::KeyringAddCategoriesHook<0x783213>);
 
-		WriteRelJump(0x7826E4, SI_Hooks::KeyringHideKeysHook<0x7826EA, 0x7826F1>);
-		WriteRelJump(0x78083A, SI_Hooks::KeyringHideNonKeysHook<0x78083F>);
+		WriteRelJump(0x7826E4, SIHooks::KeyringHideKeysHook<0x7826EA, 0x7826F1>);
+		WriteRelJump(0x78083A, SIHooks::KeyringHideNonKeysHook<0x78083F>);
 
-		WriteRelJump(0x782665, SI_Hooks::KeyringHideKeysShowCategoriesHook<0x782679>);
+		WriteRelJump(0x782665, SIHooks::KeyringHideKeysShowCategoriesHook<0x782679>);
 
-		WriteRelJump(0x780478, SI_Hooks::KeyringEnableEquipDropHook<0x78047D>);
-		WriteRelJump(0x780934, SI_Hooks::KeyringEnableEquipDropHook<0x78093A>);
+		WriteRelJump(0x780478, SIHooks::KeyringEnableEquipDropHook<0x78047D>);
+		WriteRelJump(0x780934, SIHooks::KeyringEnableEquipDropHook<0x78093A>);
 
-		WriteRelCall(0x782F42, SI_Hooks::KeyringEnableCancelHook);
+		WriteRelCall(0x782F42, SIHooks::KeyringEnableCancelHook);
 
-		WriteRelCall(0x7815A6, SI_Hooks::KeyringPipBoyIconHook);
+		WriteRelCall(0x7815A6, SIHooks::KeyringPipBoyIconHook);
 	}
 	else
 	{

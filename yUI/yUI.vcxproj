@@ -140,8 +140,8 @@
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="patches.cpp" />
     <ClCompile Include="settings.cpp" />
-    <ClCompile Include="yCM.cpp" />
-    <ClCompile Include="ySI.cpp" />
+    <ClCompile Include="ConfigurationMenu.cpp" />
+    <ClCompile Include="SortingIcons.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\libraries\json.h" />
@@ -174,13 +174,13 @@
     <ClInclude Include="file.h" />
     <ClInclude Include="commands.h" />
     <ClInclude Include="functions.h" />
-    <ClInclude Include="yCM.h" />
+    <ClInclude Include="ConfigurationMenu.h" />
     <ClInclude Include="patches.h" />
     <ClInclude Include="settings.h" />
     <ClInclude Include="LambdaVariableContext.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="..\libraries\SimpleINILibrary.h" />
-    <ClInclude Include="ySI.h" />
+    <ClInclude Include="SortingIcons.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\nvse\GameRTTI.inc" />

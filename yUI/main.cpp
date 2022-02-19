@@ -3,8 +3,8 @@
 #include <patches.h>
 #include <commands.h>
 #include <settings.h>
-#include <ySI.h>
-#include <yCM.h>
+#include <SortingIcons.h>
+#include <ConfigurationMenu.h>
 #include <file.h>
 
 #define yUI_VERSION 1.4

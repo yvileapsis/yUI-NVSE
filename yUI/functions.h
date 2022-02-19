@@ -4,6 +4,7 @@
 #include <unordered_set>
 
 inline std::unordered_set<TESForm*> g_CraftingComponents;
+inline std::unordered_set<TESForm*> g_CraftingProducts;
 
 void UIWidth();
 void UIHeight();
@@ -26,6 +27,7 @@ bool IsMedicine(TESForm*);
 bool IsPoisonous(TESForm*);
 bool HasBaseEffectChangesAV(TESForm*, int);
 bool IsCraftingComponent(TESForm*);
+bool IsCraftingProduct(TESForm*);
 
 bool ends_with(std::string const& value, std::string const& ending);
 
