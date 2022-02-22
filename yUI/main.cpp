@@ -8,7 +8,7 @@
 #include <file.h>
 
 #define yUI_VERSION 1.4
-#define yUI_VERSION_STR "1.4b"
+#define yUI_VERSION_STR "1.4c"
 #define yUI_STR "yUI"
 
 PluginHandle	g_pluginHandle = kPluginHandle_Invalid;
@@ -42,13 +42,12 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 
 void writePatches()
 {
-	patchSortingHooks(g_FixIndefiniteSorting || (g_ySI && g_ySI_Sort));
-	patchFixDroppedItems(g_FixDroppedItems);
-	patchAddIcons(g_ySI && g_ySI_Icons);
-	patchReplaceHotkeyIcons(g_ySI && g_ySI_Hotkeys);
-	patchSortingCategories(g_ySI && g_ySI_Categories);
-//	patchAddyCMToSettingsMenu(g_yCM);
-	patchMatchedCursor(g_yMC);
+	patchSortingHooks		(g_FixIndefiniteSorting || (g_ySI && g_ySI_Sort));
+	patchFixDroppedItems	(g_FixDroppedItems);
+	patchAddIcons			(g_ySI && g_ySI_Icons);
+	patchReplaceHotkeyIcons	(g_ySI && g_ySI_Hotkeys);
+	patchSortingCategories	(g_ySI && g_ySI_Categories);
+	patchMatchedCursor		(g_yMC);
 }
 
 bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
@@ -97,7 +96,8 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 
 	nvse->SetOpcodeBase(0x21D0);
 	REG_CMD_STR(ySIGetTrait);
-	RegisterScriptCommand(ySISetTrait);
+	REG_CMD(ySISetTrait);
+//	REG_CMD(SwapTexatlas);
 
 	if (nvse->isEditor)	return true;
 

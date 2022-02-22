@@ -176,7 +176,7 @@ public:
 	InterfaceManager();
 	~InterfaceManager();
 
-	static InterfaceManager*	GetSingleton(void) { return *(InterfaceManager * *)(0x11D8A80); };
+	static InterfaceManager*	GetSingleton(void) { return *reinterpret_cast<InterfaceManager**>(0x11D8A80); };
 	static bool					IsMenuVisible(UInt32 menuType);
 	static Menu *				GetMenuByType(UInt32 menuType);
 	static Menu *				TempMenuByType(UInt32 menuType);
@@ -933,9 +933,9 @@ public:
 	UInt32				unk0FC;			// 0FC
 	Sound				menuSound;		// 100
 
-	static ContainerMenu* GetSingleton() { return *(ContainerMenu**)(0x11D93F8); }
-	static ContChangesEntry* GetSelection() { return *(ContChangesEntry**)(0x11D93FC); }
-	static void SetSelection(ContChangesEntry* entry) { *(ContChangesEntry**)(0x11D93FC) = entry; }
+	static ContainerMenu* GetSingleton() { return *reinterpret_cast<ContainerMenu**>(0x11D93F8); }
+	static ContChangesEntry* GetSelection() { return *reinterpret_cast<ContChangesEntry**>(0x11D93FC); }
+	static void SetSelection(ContChangesEntry* entry) { *reinterpret_cast<ContChangesEntry**>(0x11D93FC) = entry; }
 };
 
 class BookMenu : public Menu
@@ -1178,7 +1178,7 @@ public:
 	tList<UInt32>				list26C;				// 26C
 	float						hudShake;				// 274
 
-	static HUDMainMenu* GetSingleton() { return *(HUDMainMenu**)(0x11D96C0); }
+	static HUDMainMenu* GetSingleton() { return *reinterpret_cast<HUDMainMenu**>(0x11D96C0); }
 	static void __cdecl SetQuestUpdateText(char* src, bool a2, bool a3) { CdeclCall(0x77A5B0, src, a2, a3); }
 	static float GetOpacity() { return *(float*)0x11D979C; };
 	void RemoveQueuedQuestAndLocationUpdates();
@@ -1279,7 +1279,7 @@ public:
 	UInt32 unk5B8;
 	UInt32 unk5BC;
 
-	static LoadingMenu* GetSingleton() { return *(LoadingMenu**)0x11DA0C0; };
+	static LoadingMenu* GetSingleton() { return *reinterpret_cast<LoadingMenu**>(0x11DA0C0); };
 };
 STATIC_ASSERT(sizeof(LoadingMenu) == 0x5C0);
 
@@ -1306,7 +1306,7 @@ public:
 	UInt8 gap056[2];
 	ListBox<UInt32> actorValues;
 
-	static CharGenMenu* GetSingleton() { return *(CharGenMenu**)0x11D920C; };
+	static CharGenMenu* GetSingleton() { return *reinterpret_cast<CharGenMenu**>(0x11D920C); };
 };
 STATIC_ASSERT(sizeof(CharGenMenu) == 0x88);
 
@@ -1440,7 +1440,7 @@ public:
 
 	bool ScrollNotes(MenuSpecialKeyboardInputCode direction, bool scaleScroll);
 
-	static StatsMenu* GetSingleton() { return *(StatsMenu**)0x11DACE0; };
+	static StatsMenu* GetSingleton() { return *reinterpret_cast<StatsMenu**>(0x11DACE0); };
 };
 
 // 88
@@ -1482,7 +1482,7 @@ public:
 	UInt8 gap75[3];
 	UInt32 time78;
 	Sound sound7C;
-	static CompanionWheelMenu* GetSingleton() { return *(CompanionWheelMenu**)0x11D92B8; };
+	static CompanionWheelMenu* GetSingleton() { return *reinterpret_cast<CompanionWheelMenu**>(0x11D92B8); };
 };
 STATIC_ASSERT(sizeof(CompanionWheelMenu) == 0x88);
 
@@ -1612,7 +1612,7 @@ public:
 	UInt8 byteE85;
 	UInt8 byteE86;
 	UInt8 padE87;
-	static CaravanMenu* GetSingleton() { return *(CaravanMenu**)0x11D917C; };
+	static CaravanMenu* GetSingleton() { return *reinterpret_cast<CaravanMenu**>(0x11D917C); };
 };
 STATIC_ASSERT(sizeof(CaravanMenu) == 0xE88);
 
@@ -1638,8 +1638,8 @@ public:
 	TileText* IMM_ModDesc;
 	MenuItemEntryList itemModList;
 
-	static ItemModMenu* GetSingleton() { return *(ItemModMenu**)0x11D9F54; };
-	static ContChangesEntry* GetTarget() { return *(ContChangesEntry**)0x11D9F58; };
+	static ItemModMenu* GetSingleton() { return *reinterpret_cast<ItemModMenu**>(0x11D9F54); };
+	static ContChangesEntry* GetTarget() { return *reinterpret_cast<ContChangesEntry**>(0x11D9F58); };
 };
 
 class TraitMenu : Menu
@@ -1662,7 +1662,7 @@ public:
 	ListBox<BGSPerk> perkListBox;
 	tList<BGSPerk> perkList;
 
-	static TraitMenu* GetSingleton() { return *(TraitMenu**)0x11DAF74; };
+	static TraitMenu* GetSingleton() { return *reinterpret_cast<TraitMenu**>(0x11DAF74); };
 };
 
 
@@ -1694,8 +1694,8 @@ public:
 	UInt8				skill;			// 9C
 	UInt8				pad9D[3];		// 9D
 
-	static RepairServicesMenu* GetSingleton() { return *(RepairServicesMenu**)0x11DA7F0; };
-	static Actor* GetActor() { return *(Actor**)0x11DA7F4; };
+	static RepairServicesMenu* GetSingleton() { return *reinterpret_cast<RepairServicesMenu**>(0x11DA7F0); };
+	static Actor* GetActor() { return *reinterpret_cast<Actor**>(0x11DA7F4); };
 };
 
 // 8C
@@ -1720,9 +1720,9 @@ public:
 	TileImage* tile58;		// 58
 	MenuItemEntryList		repairItems;	// 5C
 
-	static RepairMenu* GetSingleton() { return *(RepairMenu**)0x11DA75C; };
-	static ContChangesEntry* GetSelection() { return *(ContChangesEntry**)0x11DA760; };
-	static void SetSelection(ContChangesEntry* entry) { *(ContChangesEntry**)0x11DA760 = entry; };
+	static RepairMenu* GetSingleton() { return *reinterpret_cast<RepairMenu**>(0x11DA75C); };
+	static ContChangesEntry* GetSelection() { return *reinterpret_cast<ContChangesEntry**>(0x11DA760); };
+	static void SetSelection(ContChangesEntry* entry) { *reinterpret_cast<ContChangesEntry**>(0x11DA760) = entry; };
 };
 
 struct VATSTargetInfo
@@ -1858,8 +1858,8 @@ public:
 	UInt8 pad119[3];
 	VATSTargetInfo targetInfo;
 
-	static VATSMenu* GetSingleton() { return *(VATSMenu**)0x11DB0D4; };
-	static TESObjectREFR* GetTarget() { return *(TESObjectREFR**)0x11F21CC; };
+	static VATSMenu* GetSingleton() { return *reinterpret_cast<VATSMenu**>(0x11DB0D4); };
+	static TESObjectREFR* GetTarget() { return *reinterpret_cast<TESObjectREFR**>(0x11F21CC); };
 };
 STATIC_ASSERT(sizeof(VATSMenu) == 0x144);
 
@@ -1925,8 +1925,8 @@ public:
 	HotKeyWheel			hotkeyWheel;	// 0E8
 	tList<ContChangesEntry> changedItemsList; // 11C
 
-	static InventoryMenu* GetSingleton() { return *(InventoryMenu**)0x11D9EA4; };
-	static ContChangesEntry* GetSelection() { return *(ContChangesEntry**)0x11D9EA8; };
+	static InventoryMenu* GetSingleton() { return *reinterpret_cast<InventoryMenu**>(0x11D9EA4); };
+	static ContChangesEntry* GetSelection() { return *reinterpret_cast<ContChangesEntry**>(0x11D9EA8); };
 	bool IsKeyringOpen() const;
 	void ResetInventorySelectionAndHideDataTile() { ThisCall(0x781B10, this); }
 };
@@ -1993,7 +1993,7 @@ public:
 	BarterItemList		rightBarter;	// 114
 	UInt32				unk11C;			// 11C
 
-	static BarterMenu* GetSingleton() { return *(BarterMenu**)0x11D8FA4; }
+	static BarterMenu* GetSingleton() { return *reinterpret_cast<BarterMenu**>(0x11D8FA4); }
 };
 
 // 44
@@ -2009,7 +2009,7 @@ public:
 	TileImage* tile3C;		// 3C
 	float				currentQtt;		// 40
 
-	static QuantityMenu* GetSingleton() { return *(QuantityMenu**)0x11DA618; };
+	static QuantityMenu* GetSingleton() { return *reinterpret_cast<QuantityMenu**>(0x11DA618); };
 };
 
 // 2C
@@ -2118,7 +2118,7 @@ public:
 	UInt8 hasShownHelp;
 	UInt8 pad1DB;
 
-	static HackingMenu* GetSingleton() { return *(HackingMenu**)(0x11D95B8); }
+	static HackingMenu* GetSingleton() { return *reinterpret_cast<HackingMenu**>(0x11D95B8); }
 
 	void RemoveDud(const char* word);
 };
@@ -2192,7 +2192,7 @@ public:
 	void ShowOrAdvanceNote(BGSNote* note) { ThisCall(0x7590C0, this, note); }
 	bool IsInNote() { return remainingNoteText; };
 
-	static ComputersMenu* GetSingleton() { return *(ComputersMenu**)0x11D9334; };
+	static ComputersMenu* GetSingleton() { return *reinterpret_cast<ComputersMenu**>(0x11D9334); };
 };
 STATIC_ASSERT(sizeof(ComputersMenu) == 0xFC);
 
@@ -2425,7 +2425,7 @@ public:
 	NiSourceTexture* FilamentGlowOFF;
 	NiSourceTexture* FilamentGlowON;
 
-	static LoveTesterMenu* GetSingleton() { return *(LoveTesterMenu**)0x11DA2C8; };
+	static LoveTesterMenu* GetSingleton() { return *reinterpret_cast<LoveTesterMenu**>(0x11DA2C8); };
 };
 STATIC_ASSERT(sizeof(LoveTesterMenu) == 0x230);
 
@@ -2471,7 +2471,7 @@ public:
 	NiRefObject* unk1D4[2];
 	NiRefObject* unk1DC[2];
 
-	static SPECIALBookMenu* GetSingleton() { return *(SPECIALBookMenu**)0x11DAA38; };
+	static SPECIALBookMenu* GetSingleton() { return *reinterpret_cast<SPECIALBookMenu**>(0x11DAA38); };
 };
 
 
@@ -2749,7 +2749,7 @@ public:
 	UInt32 finalPageIndex;
 	FaceGenData faceData[2][2];
 
-	static RaceSexMenu* GetSingleton() { return *(RaceSexMenu**)0x11DA634; };
+	static RaceSexMenu* GetSingleton() { return *reinterpret_cast<RaceSexMenu**>(0x11DA634); };
 
 	void RefreshSliders();
 	void UpdateScrollButtonVisibilities() { ThisCall(0x7AF6B0, this); };
@@ -2822,7 +2822,7 @@ public:
 	char byte13B;				// 13B
 
 	bool IsNPCTalking();
-	static DialogMenu* GetSingleton() { return *(DialogMenu**)0x11D9510; };
+	static DialogMenu* GetSingleton() { return *reinterpret_cast<DialogMenu**>(0x11D9510); };
 };
 STATIC_ASSERT(sizeof(DialogMenu) == 0x13C);
 
@@ -2919,7 +2919,7 @@ public:
 	ListBox<TESChallenge>			challengeList;	// 1F0
 	BSSimpleArray<Tile>				arr220;			// 220
 
-	static MapMenu* GetSingleton() { return *(MapMenu**)0x11DA368; };
+	static MapMenu* GetSingleton() { return *reinterpret_cast<MapMenu**>(0x11DA368); };
 
 	void Zoom(bool direction, float amount);
 
@@ -2991,7 +2991,7 @@ public:
 	UInt8 pad102;			// 102
 	UInt8 pad103;			// 103
 
-	static RecipeMenu* GetSingleton() { return *(RecipeMenu**)0x11D8E90; };
+	static RecipeMenu* GetSingleton() { return *reinterpret_cast<RecipeMenu**>(0x11D8E90); };
 };
 
 struct BGSSaveLoadFileEntry
@@ -3082,7 +3082,7 @@ public:
 	UInt32 unk1CC;
 	UInt32 unk1D0;
 
-	static StartMenu* GetSingleton() { return *(StartMenu**)0x11DAAC0; };
+	static StartMenu* GetSingleton() { return *reinterpret_cast<StartMenu**>(0x11DAAC0); };
 };
 STATIC_ASSERT(sizeof(StartMenu) == 0x1D4);
 
@@ -3187,7 +3187,7 @@ public:
 	NiQuaternion			quaternionC4;	// C4
 	NiQuaternion			quaternionD4;	// D4
 
-	static LockPickMenu* GetSingleton() { return *(LockPickMenu**)0x11DA204; };
+	static LockPickMenu* GetSingleton() { return *reinterpret_cast<LockPickMenu**>(0x11DA204); };
 };
 STATIC_ASSERT(sizeof(LockPickMenu) == 0xE4);
 
@@ -3402,7 +3402,7 @@ public:
 
 	void SetCurrentPage(Pages newPage) { ThisCall(0x785830, this, newPage); }
 
-	static LevelUpMenu* GetSingleton() { return *(LevelUpMenu**)0x11D9FDC; }
+	static LevelUpMenu* GetSingleton() { return *reinterpret_cast<LevelUpMenu**>(0x11D9FDC); }
 };
 STATIC_ASSERT(sizeof(LevelUpMenu) == 0xCC);
 
@@ -3472,7 +3472,7 @@ struct SystemColorManager
 	DList<SystemColor>	sysColors;
 	UInt32				unk0C;
 
-	static SystemColorManager* GetSingleton() { return *(SystemColorManager**)0x11D8A88; };
+	static SystemColorManager* GetSingleton() { return *reinterpret_cast<SystemColorManager**>(0x11D8A88); };
 	int GetColor(SystemColorNodes node) { return ThisCall<int>(0x7190A0, this, node); };
 	void SetColor(SystemColorNodes node, UInt32 color) { ThisCall(0x719120, this, node, color); };
 };

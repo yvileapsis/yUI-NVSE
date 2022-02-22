@@ -1543,7 +1543,7 @@ public:
 	virtual float	GetSubAVMod(UInt32 avCode);
 	virtual int		GetPermanentActorValueInt(UInt32 avCode);
 	virtual float	GetPermanentActorValue(UInt32 avCode);
-	virtual Actor* GetActor();
+	virtual Actor*	GetActor();
 	virtual UInt16	GetLevel();
 
 	// SkillsCurrentValue[14] at index 20

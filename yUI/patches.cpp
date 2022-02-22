@@ -64,6 +64,7 @@ void patchSortingCategories(const bool bEnable)
 
 		WriteRelJump(0x780478, SIHooks::KeyringEnableEquipDropHook<0x78047D>);
 		WriteRelJump(0x780934, SIHooks::KeyringEnableEquipDropHook<0x78093A>);
+		WriteRelJump(0x781E6D, SIHooks::KeyringEnableEquipDropHook<0x781E72>);
 
 		WriteRelCall(0x782F42, SIHooks::KeyringEnableCancelHook);
 
@@ -86,6 +87,7 @@ void patchSortingCategories(const bool bEnable)
 
 		UndoSafeWrite(0x780478);
 		UndoSafeWrite(0x780934);
+		UndoSafeWrite(0x781E6D);
 
 		UndoSafeWrite(0x782F42);
 

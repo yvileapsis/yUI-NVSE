@@ -4,17 +4,9 @@
 #include <NiNodes.h>
 #include <GameScript.h>
 
-struct ParamInfo;
-class TESForm;
-class TESObjectREFR;
-struct BaseExtraList;
+constexpr auto playerID = 0x7;
+constexpr auto playerRefID = 0x14;
 
-#define playerID	0x7
-#define playerRefID 0x14
-
-#if RUNTIME
-	static const UInt32 s_Console__Print = 0x0071D0A0;
-#endif
 
 extern bool extraTraces;
 extern bool alternateUpdate3D;
@@ -28,8 +20,6 @@ void PrintConsole(const char * fmt, ...);
 //
 //typedef void (* _FormHeap_Free)(void * ptr);
 //extern const _FormHeap_Free FormHeap_Free;
-
-#if RUNTIME
 
 typedef bool (* _ExtractArgs)(ParamInfo * paramInfo, void * scriptData, UInt32 * arg2, TESObjectREFR * arg3, TESObjectREFR * arg4, Script * script, ScriptEventList * eventList, ...);
 extern const _ExtractArgs ExtractArgs;
@@ -84,13 +74,6 @@ extern const _QueueUIMessage QueueUIMessage;
 const UInt32 kMaxMessageLength = 0x4000;
 
 void ShowCompilerError(ScriptLineBuffer* lineBuf, const char* fmt, ...);
-
-#else
-
-typedef void (__cdecl *_ShowCompilerError)(ScriptBuffer* Buffer, const char* format, ...);
-extern const _ShowCompilerError		ShowCompilerError;
-
-#endif
 
 typedef TESForm* (__cdecl* _GetFormByID)(const char* editorID);
 extern const _GetFormByID GetFormByID;
@@ -666,7 +649,6 @@ public:
 
 };
 
-#if RUNTIME
 class SaveGameManager
 {
 public:
@@ -711,8 +693,6 @@ public:
 };
 
 std::string GetSavegamePath();
-
-#endif
 
 class ButtonIcon;
 
@@ -867,7 +847,7 @@ class ConsoleManager
 public:
 #if RUNTIME
 	MEMBER_FN_PREFIX(ConsoleManager);
-	DEFINE_MEMBER_FN(Print, void, s_Console__Print, const char* fmt, va_list args);
+	DEFINE_MEMBER_FN(Print, void, 0x0071D0A0, const char* fmt, va_list args);
 #endif
 
 	ConsoleManager();

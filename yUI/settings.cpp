@@ -6,12 +6,12 @@ void HandleINIForPath(const std::string& iniPath, const bool isDefault = false)
 {
 	CSimpleIniA ini;
 	ini.SetUnicode();
-	const auto errVal = ini.LoadFile(iniPath.c_str());
 
-	if (errVal == SI_Error::SI_FILE) { return; }
+	if (const auto errVal = ini.LoadFile(iniPath.c_str()); errVal == SI_FILE) { return; }
 	
 	if (isDefault)
 	{
+		g_logLevel = ini.GetLongValue("Debug", "iLogLevel", 1);
 		g_FixIndefiniteSorting = ini.GetOrCreate("General", "bFixIndefiniteSorting", 1, "; fix the issue where items with different conditions would 'jump around' on update");
 		g_FixDroppedItems = ini.GetOrCreate("General", "bFixDroppedItems", 1, "; fix the issue where Container Menu would display only a single dropped item at a time");
 		g_FixTablineSelected = ini.GetOrCreate("General", "bFixTablineSelected", 1, "; fix the issue where Inventory Menu tabline shows up with buttons already selected");
@@ -29,7 +29,7 @@ void HandleINIForPath(const std::string& iniPath, const bool isDefault = false)
 		if (!g_ySI) g_ySI = ini.GetLongValue("General", "bSortingIcons", 0);
 	}
 	
-	ini.SaveFile(iniPath.c_str(), false);
+	if (const auto errVal = ini.SaveFile(iniPath.c_str(), false); errVal == SI_FILE) { return; }
 
 }
 

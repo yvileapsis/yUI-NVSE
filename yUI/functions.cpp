@@ -313,9 +313,9 @@ void PatchPause(UInt32 ptr)
 	SafeWriteBuf(ptr, "\xEB\xFE", 2);
 }
 
-void SetUIStringFull(char* tochange, char* changeto, UInt32 tileValue)
+void SetUIStringFull(const char* tochange, const char* changeto, UInt32 tileValue)
 {
-	TileMenu::GetTileMenu(kMenuType_HUDMain)->SetStringRecursive(tileValue, changeto, tochange);
+	HUDMainMenu::GetSingleton()->tile->SetStringRecursive(tileValue, changeto, tochange);
 }
 
 bool TryGetTypeOfForm(TESForm* form)
@@ -331,9 +331,10 @@ bool TryGetTypeOfForm(TESForm* form)
 
 
 void Tile::SetStringRecursive(const UInt32 tileValue, const char* changeto, const char* tochange) {
-//	if (!tochange || !_strcmpi(this->GetValue(tileValue)->str, tochange))
-		this->SetString(tileValue, changeto, false);
-		this->HandleChange(tileValue);
+	if (GetValue(tileValue))// && (!tochange || !_strcmpi(GetValue(tileValue)->str, tochange)))
+	{
+		SetString(tileValue, changeto, true);
+	}
 	for (auto iter = this->children.Head(); iter; iter = iter->next)
 		iter->data->SetStringRecursive(tileValue, changeto, tochange);
 }

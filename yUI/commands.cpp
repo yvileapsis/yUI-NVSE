@@ -1,5 +1,7 @@
 #include <SortingIcons.h>
 
+#include "functions.h"
+
 extern bool Cmd_ySIGetTrait_Execute(COMMAND_ARGS)
 {
 	*result = 0;
@@ -42,10 +44,7 @@ extern bool Cmd_ySISetTrait_Execute(COMMAND_ARGS)
 	return true;
 }
 
-
 /*
-DEFINE_COMMAND_PLUGIN(SwapTexatlas, , 0, 2, kParams_TwoStrings);
-
 bool Cmd_SwapTexatlas_Execute(COMMAND_ARGS)
 {
 	*result = 0;
@@ -55,14 +54,6 @@ bool Cmd_SwapTexatlas_Execute(COMMAND_ARGS)
 	SetUIStringFull(texatlas, texatlasnew, kTileValue_texatlas);
 	return true;
 }
-
-ParamInfo kParams_OneWorldspace_OneFloat[] =
-{
-	{"Worldspace", kParamType_WorldSpace, 0},
-	{"Float", kParamType_Float, 0},
-};
-
-DEFINE_COMMAND_PLUGIN(SetWorldspaceDefaultWaterHeight, , 0, 2, kParams_OneWorldspace_OneFloat);
 
 bool Cmd_SetWorldspaceDefaultWaterHeight_Execute(COMMAND_ARGS)
 {

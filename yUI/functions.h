@@ -43,7 +43,7 @@ AnimData* GetThirdPersonAnimData(AnimData* animData);
 
 void PatchPause(UInt32 ptr);
 
-void SetUIStringFull(char *, char* , UInt32);
+void SetUIStringFull(const char *, const char* , UInt32);
 
 bool TryGetTypeOfForm(TESForm* form);
 
