@@ -1079,7 +1079,7 @@ struct ActorHitData
 	float				armorDmg;		// 28
 	float				weaponDmg;		// 2C
 	TESObjectWEAP*		weapon;			// 30
-	float				healthPerc;		// 34
+	Float32				healthPerc;		// 34
 	NiPoint3			impactPos;		// 38
 	NiPoint3			impactAngle;	// 44
 	UInt32				unk50;			// 50
@@ -1087,6 +1087,10 @@ struct ActorHitData
 	UInt32				flags;			// 58
 	float				dmgMult;		// 5C
 	SInt32				unk60;			// 60	Unused; rigged by CopyHitDataHook to store hitLocation
+
+	TESAmmo*			GetAmmo() const;
+	TESObjectWEAP*		GetWeapon() const;
+	Script*				GetAmmoScript() const;
 };
 
 

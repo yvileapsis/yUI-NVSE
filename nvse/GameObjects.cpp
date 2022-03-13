@@ -293,6 +293,116 @@ __declspec(naked) float __vectorcall TESObjectREFR::GetDistance(TESObjectREFR* t
 	}
 }
 
+__declspec(naked) NiAVObject* __fastcall NiNode::GetBlockByName(const char *nameStr)	//	str of NiFixedString
+{
+	__asm
+	{
+		movzx	eax, word ptr [ecx+0xA6]
+		test	eax, eax
+		jz		done
+		push	esi
+		push	edi
+		mov		esi, [ecx+0xA0]
+		mov		edi, eax
+		ALIGN 16
+	iterHead:
+		dec		edi
+		js		iterEnd
+		mov		eax, [esi]
+		add		esi, 4
+		test	eax, eax
+		jz		iterHead
+		cmp		[eax+8], edx
+		jz		found
+		mov		ecx, [eax]
+		cmp		dword ptr [ecx+0xC], 0x6815C0
+		jnz		iterHead
+		mov		ecx, eax
+		call	NiNode::GetBlockByName
+		test	eax, eax
+		jz		iterHead
+	found:
+		pop		edi
+		pop		esi
+		retn
+		ALIGN 16
+	iterEnd:
+		xor		eax, eax
+		pop		edi
+		pop		esi
+	done:
+		retn
+	}
+}
+__declspec(naked) NiAVObject* __fastcall NiNode::GetBlock(const char* blockName)
+{
+	__asm
+	{
+		cmp[edx], 0
+		jz		retnNULL
+		push	ecx
+		push	edx
+		__asm mov eax, 0xA5B690 __asm call eax
+		pop		ecx
+		pop		ecx
+		test	eax, eax
+		jz		done
+		lock dec dword ptr[eax - 8]
+		jz		retnNULL
+		cmp[ecx + 8], eax
+		jz		found
+		mov		edx, eax
+		call	NiNode::GetBlockByName
+		retn
+	found :
+		mov		eax, ecx
+		retn
+	retnNULL :
+		xor eax, eax
+	done :
+		retn
+	}
+}
+
+__declspec(naked) NiNode* TESObjectREFR::GetNiNode()
+{
+	__asm
+	{
+		mov		eax, [ecx + 0x64]
+		test	eax, eax
+		jz		done
+		mov		eax, [eax + 0x14]
+		cmp		dword ptr[ecx + 0xC], 0x14
+		jnz		done
+		cmp		byte ptr[ecx + 0x64A], 0
+		jnz		done
+		mov		eax, [ecx + 0x694]
+	done:
+		retn
+	}
+}
+
+__declspec(naked) NiNode* __fastcall TESObjectREFR::GetNode(const char* nodeName)
+{
+	__asm
+	{
+		call	TESObjectREFR::GetNiNode
+		test	eax, eax
+		jz		done
+		cmp[edx], 0
+		jz		done
+		mov		ecx, eax
+		call	NiNode::GetBlock
+		test	eax, eax
+		jz		done
+		xor edx, edx
+		mov		ecx, [eax]
+		cmp		dword ptr[ecx + 0xC], 0x6815C0
+		cmovnz	eax, edx
+	done :
+		retn
+	}
+}
 __declspec(naked) ContChangesEntry* ContChangesList::FindForItem(TESForm* item)
 {
 	__asm

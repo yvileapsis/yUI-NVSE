@@ -63,7 +63,7 @@ public:
 	virtual void				AnimateNiNode(void);					// same in FOSE ! identical to Func0052 in OBSE which says (inits animation-related data, and more)
 	virtual void				GenerateNiNode(bool arg0);				// same in FOSE !
 	virtual void				Set3D(NiNode* niNode, bool unloadArt);	// same in FOSE !
-	virtual NiNode *			GetNiNode(void);						// same in FOSE !
+	virtual NiNode *			GetNiNode_v(void);						// same in FOSE !
 	virtual void				Unk_75(void);
 	virtual void				Unk_76(void);
 	virtual void				Unk_77(void);
@@ -163,7 +163,7 @@ public:
 	bool					SetLinkedRef(TESObjectREFR* linkObj, UInt8 modIdx);
 	bool					ValidForHooks();
 	NiAVObject*				GetNiBlock(const char* blockName);
-	NiNode*					GetNode(const char* nodeName);
+	NiNode* __fastcall		GetNode(const char* nodeName);
 	hkpRigidBody*			GetRigidBody(const char* nodeName);
 	bool					RunScriptSource(const char* sourceStr);
 	ExtraLock::Data*		GetLockData();
@@ -171,7 +171,7 @@ public:
 	bool					IsOwnedByActor(Actor* actor, bool includeFactionOwnership) { return ThisCall<bool>(0x5785E0, this, actor, includeFactionOwnership); };
 	TESObjectREFR*			ResolveOwnership() { return ThisCall<TESObjectREFR*>(0x567790, this); };
 	bool					IsInInterior();
-	NiNode*					GetNiNodeAlt();
+	NiNode*					GetNiNode();
 
 	MEMBER_FN_PREFIX(TESObjectREFR);
 	DEFINE_MEMBER_FN_LONG(_MEMBER_FN_BASE_TYPE, Activate, bool, 0x00573170, TESObjectREFR*, UInt32, UInt32, UInt32);	// Usage Activate(actionRef, 0, 0, 1); found inside Cmd_Activate_Execute as the last call (190 bytes)
@@ -263,9 +263,41 @@ public:
 	MagicCaster();
 	~MagicCaster();
 
-	UInt32 vtabl;
-	UInt32 unk004;	// 004
-	UInt32 unk008;	// 008
+	enum State
+	{
+		kCastState_Inactive = 0,
+		kCastState_Aim = 1,
+		kCastState_Cast = 2,
+		kCastState_ReleaseCast = 3,
+		kCastState_FindTargets = 4,
+		kCastState_SpellDisabled = 5,
+		kCastState_AlreadyCasting = 6,
+		kCastState_CannotCast = 7
+	};
+
+	virtual void			AddAbility(SpellItem* splItem, bool arg2);															// 000
+	virtual void			AddAddiction(SpellItem* splItem, bool arg2);														// 004
+	virtual void			AddEffect(SpellItem* splItem, bool arg2);															// 008
+	virtual void			CastSpell(MagicItem* spell, bool arg2, MagicTarget* target, float arg4, bool arg5);/*00C*/
+	virtual void			AddDisease(SpellItem* splItem, MagicTarget* target, bool arg3);/*010*/
+	virtual void			AddFormEffects(MagicItem* magItem, MagicItemForm* itemForm, bool arg3);/*014*/
+	virtual MagicTarget*	PickMagicTarget();/*018*/
+	virtual void			Unk_07();/*01C*/
+	virtual void			Unk_08();/*020*/
+	virtual void			Unk_09(UInt32 arg1, UInt32 arg2);/*024*/
+	virtual bool			Unk_0A(UInt32 arg1, float* arg2, UInt32* arg3, UInt32 arg4);/*028*/
+	virtual Actor*			GetActor();/*02C*/
+	virtual NiNode*			GetMagicNode();/*030*/
+	virtual MagicItem*		GetMagicItem();/*034*/
+	virtual bool			Unk_0E(ActiveEffect* activeEffect);/*038*/
+	virtual float			Unk_0F(UInt8 arg1, float arg2);/*03C*/
+	virtual void			SetMagicItem(MagicItem* spell);/*040*/
+	virtual MagicTarget*	GetMagicTarget();/*044*/
+	virtual void			SetMagicTarget(MagicTarget* magicTarget);/*048*/
+	virtual ActiveEffect*	CreateActiveEffect(MagicItem* magicItem, EffectItem* effItem, TESForm* itemForm);				// 04C
+
+	void*	unk004;	// 004
+	State	state;	// 008
 };
 STATIC_ASSERT(sizeof(MagicCaster) == 0xC);
 
@@ -751,6 +783,11 @@ STATIC_ASSERT(sizeof(PlayerCharacter) == 0xE50);
 
 extern PlayerCharacter* g_thePlayer;
 
+class NonActorMagicCaster : public BSExtraData
+{
+public:
+	MagicCaster		caster;		// 0C
+};
 
 class Explosion : public MobileObject
 {
@@ -759,7 +796,7 @@ public:
 	~Explosion();
 
 	UInt32				unk088;
-	UInt32				unk08C;
+	Float32				unk08C;		// init to 3.0
 	Float32				buildTime;
 	Float32				radius;
 	Float32				ISRadius;
@@ -769,15 +806,27 @@ public:
 	Sound				sound0AC;
 	Sound				sound0B8;
 	void*				pointLight;
-	UInt32				unk0C8[2];
+	TESObjectREFR*		source;
+	union
+	{
+		TESObjectREFR*	object0CC;			// unused most of the time
+	};
 	TESObjectREFR*		object0D0;
 	UInt32				unk0D4;
 	UInt8				dontApplyExplosionIMOD;
 	UInt8				isUnderwater;
 	UInt8				byte0DA;
 	UInt8				byte0DB;
-	UInt32				unk0DC[9];
-	UInt32				unk100;
+	union										// 0DC
+	{
+		TESAmmo*				 ammo;							// unused for actors ???
+		NonActorMagicCaster*	unkCaster;		
+	};
+	TESObjectWEAP*		weapon;			// 0E0
+	UInt32				unk0E4;			// 0E4
+	NiPoint3			vec0E8;			// 0E8
+	NiPoint3			vec0F4;			// 0F4
+	Float32				unk100;			// init to -1
 };
 STATIC_ASSERT(sizeof(Explosion) == 0x104);
 
@@ -805,8 +854,12 @@ public:
 	Float32					mineBlinkTimer;		// 0x0E8
 	Float32					spreadz;			// 0x0EC
 	Float32					spreadx;			// 0x0F0
-	Float32					wpnHealthPerc;		// 0x0F4
-	TESObjectWEAP*			sourceWeap;			// 0x0F8
+	union										// 0x0F4
+	{
+		TESAmmo*			ammo;				
+		Float32				weaponHealthPercent;// set but unused
+	};
+	TESObjectWEAP*			weapon;				// 0x0F8
 	TESObjectREFR*			source;				// 0x0FC
 	TESObjectREFR*			target;				// 0x100 live grenade target
 	NiPoint3				pt104;				// 0x104

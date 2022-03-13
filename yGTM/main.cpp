@@ -70,7 +70,9 @@ void writePatch()
 	patchTimeMult(g_yTM);
 	patchFixExplosionPushForce(g_FixExplosionPushForce);
 	patchRestoreSpreadGameSettings(g_RestoreSpreadGameSettings);
+	patchCorrectAmmoEffects();
 }
+UInt32 g_exec;
 
 bool NVSEPlugin_Load(const NVSEInterface* nvse)
 {
@@ -90,7 +92,10 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 
 	GetByOpcode(0x1186)->numParams = 2;
 	GetByOpcode(0x1186)->params = kParams_OneOptionalFloat_OneOptionalInt;
-	
+
+	GetByOpcode(0x11E2)->numParams = 5;
+	GetByOpcode(0x11E2)->params = kParams_OneForm_OneOptionalForm;
+
 	if (nvse->isEditor)	return true;
 
 	g_dataInterface = static_cast<NVSEDataInterface*>(nvse->QueryInterface(kInterface_Data));
@@ -101,6 +106,7 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	
 	GetByOpcode(0x22B0)->execute = Cmd_GetGlobalTimeMultiplierAlt_Execute;
 	GetByOpcode(0x1186)->execute = Cmd_SetGlobalTimeMultiplierAlt_Execute;
+	GetByOpcode(0x11E2)->execute = Cmd_FireWeaponAlt_Execute;
 
 	handleINIOptions();
 	writePatch();

@@ -8,7 +8,7 @@
 #include <file.h>
 
 #define yUI_VERSION 1.4
-#define yUI_VERSION_STR "1.4c"
+#define yUI_VERSION_STR "1.4d"
 #define yUI_STR "yUI"
 
 PluginHandle	g_pluginHandle = kPluginHandle_Invalid;

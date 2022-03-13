@@ -71,3 +71,38 @@ void patchRestoreSpreadGameSettings(const bool bEnable)
 		
 	}
 }
+
+void patchCorrectAmmoEffects(const bool bEnable)
+{
+	SafeWriteBuf(0x9BC0C9, "\xD9\xEE", 2);								// zero the health percent
+
+	WriteRelJump(0x9BC1D7, StoreAmmoOnProjectileHook<0x9BC1F9>);		// store ammo on the projectile
+
+	WriteRelJump(0x9C36E3, StoreAmmoOnExplosionHook<0x9C36F1>);			// copy ammo from projectile to explosion
+
+	WriteRelJump(0x89ABDC, GetAmmoFromHitDataHook<0x89AC3C>);			// get ammo from projectile and explosion
+
+	WriteRelJump(0x9AC77E, FixExplosionAmmoHook1<0x9AC785>);			// HACKY HACKY HACKY
+	WriteRelJump(0x9B2662, FixExplosionAmmoHook1<0x9B2669>);			// Fix Destruct and Save so that it checks for 
+	WriteRelJump(0x9B066E, FixExplosionAmmoHook1<0x9B0675>);
+	WriteRelJump(0x9B21F7, FixExplosionAmmoHook2<0x9B2201>);			// the same things Init does
+	WriteRelJump(0x9B0681, FixExplosionAmmoHook3<0x9B0688>);
+
+	// meltdown
+
+	WriteRelJump(0x89B455, MeltdownPassHitDataWeaponHook<0x89B4CC>);	// pass current weapon not player weapon
+	WriteRelJump(0x89B670, MeltdownSetWeaponAndAmmoHook<0x89B6D0>);		// set weapon and ammo for the meltdown explosion
+
+	// jipln
+	
+	WriteRelJump(0x9B5623, PreCalculateHitDamageHook<0x9B5628>);
+	WriteRelCall(0x9B562D, PostCalculateHitDamageHook1);
+	WriteRelJump(0x9B5702, PreCalculateHitDamageHook<0x9B5707>);
+	WriteRelCall(0x9B5716, PostCalculateHitDamageHook2);
+	WriteRelJump(0x9B575C, PreCalculateHitDamageHook<0x9B5761>);
+	WriteRelCall(0x9B5764, PostCalculateHitDamageHook2);
+	WriteRelJump(0x9B58AE, PreCalculateHitDamageHook<0x9B58B3>);
+	WriteRelCall(0x9B58BE, PostCalculateHitDamageHook2);
+	WriteRelJump(0x9B5A10, PreCalculateHitDamageHook<0x9B5A15>);
+	WriteRelCall(0x9B5A18, PostCalculateHitDamageHook2);
+}

@@ -3089,7 +3089,7 @@ public:
 	UInt32				unk10C;					// 10C
 	float				sightFOV;				// 110
 	UInt32				unk114;					// 114
-	BGSProjectile		* projectile;			// 118
+	BGSProjectile*		projectile;				// 118
 	UInt8				baseVATSChance;			// 11C
 	UInt8				attackAnim;				// 11D
 	UInt8				numProjectiles;			// 11E
@@ -3134,7 +3134,7 @@ public:
 	float				criticalPercent;		// 1C4
 	UInt8				critDamageFlags;		// 1C8
 	UInt8				pad1C9[3];				// 1C9
-	SpellItem			* criticalEffect;		// 1CC
+	SpellItem*			criticalEffect;		// 1CC
 	TESModel			shellCasingModel;		// 1DO
 	TESModel			targetNIF;				// 1E8 - target NIF
 	TESModel			model200;				// 200 - could be a texture swap
@@ -3211,7 +3211,7 @@ public:
 
 	float			GetWeaponValue(UInt32 whichVal);
 	bool			HasScopeAlt() const { return weaponFlags1.IsSet(eFlag_HasScope) && !weaponFlags2.IsSet(eFlag_ScopeFromMod); }
-
+	TESAmmo*		GetEquippedAmmo(Actor* actor) { return ThisCall<TESAmmo*>(0x525980, this, actor); }
 };
 STATIC_ASSERT(sizeof(TESObjectWEAP) == 0x388);
 

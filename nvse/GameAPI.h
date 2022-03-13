@@ -809,6 +809,24 @@ public:
 };
 STATIC_ASSERT(sizeof(ScriptRunner) == 0xA4);
 
+class ScrapHeapQueue
+{
+public:
+	struct QueuedCmdCall
+	{
+		UInt32			opcode;		// 00
+		void*			cmdAddr;	// 04
+		UInt32			thisObj;	// 08	refID
+		UInt32			numArgs;	// 0C
+		FunctionArg		args[4];	// 10
+
+		QueuedCmdCall(void* _cmdAddr, UInt32 _thisObj, UInt8 _numArgs) : opcode(0x2B), cmdAddr(_cmdAddr), thisObj(_thisObj), numArgs(_numArgs) {}
+	};
+
+	static ScrapHeapQueue* GetSingleton() { return *reinterpret_cast<ScrapHeapQueue**>(0x11DF1A8); }
+	void AddQueuedCmdCall(QueuedCmdCall qCall) { ThisCall(0x87D160, this, &qCall); }
+};
+
 // Gets the real script data ptr, as it can be a pointer to a buffer on the stack in case of vanilla expressions in set and if statements
 UInt8* GetScriptDataPosition(Script* script, void* scriptDataIn, const UInt32* opcodeOffsetPtrIn);
 

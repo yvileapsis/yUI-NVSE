@@ -28,3 +28,136 @@ template <UInt32 retn> __declspec(naked) void RestoreSpreadHook() {
 		jmp retnAddr
 	}
 }
+
+void __fastcall StoreAmmoOnProjectile(Projectile* projectile);
+
+template <UInt32 retn> __declspec(naked) void StoreAmmoOnProjectileHook()
+{
+	static const auto retnAddr = retn;
+	static const auto func = reinterpret_cast<UInt32>(StoreAmmoOnProjectile);
+	_asm
+	{
+		mov		ecx, [ebp - 0x28]	// this
+		call	func
+		jmp		retnAddr
+	}
+}
+
+void __fastcall StoreAmmoOnExplosion(Projectile* projectile, Explosion* explosion);
+
+template <UInt32 retn> __declspec(naked) void StoreAmmoOnExplosionHook()
+{
+	static const auto retnAddr = retn;
+	static const auto func = reinterpret_cast<UInt32>(StoreAmmoOnExplosion);
+	_asm
+	{
+		mov     edx, [ebp - 0x3C]			// explosion
+		call	func
+		jmp		retnAddr
+	}
+}
+
+void __fastcall GetAmmoFromHitData(ActorHitData* hitData, Actor* target);
+
+template <UInt32 retn> __declspec(naked) void GetAmmoFromHitDataHook()
+{
+	static const auto retnAddr = retn;
+	static const auto func = reinterpret_cast<UInt32>(GetAmmoFromHitData);
+	_asm
+	{
+		mov		ecx, [ebx + 0x8]			// this
+		mov     edx, [ebp - 0x18]			// target
+		call	func
+		jmp		retnAddr
+	}
+}
+
+bool __fastcall GetCanNotStoreAmmo(Explosion* explosion);
+
+template <UInt32 retn> __declspec(naked) void FixExplosionAmmoHook1()
+{
+	static const auto retnAddr = retn;
+	static const auto check = reinterpret_cast<UInt32>(GetCanNotStoreAmmo);
+	_asm
+	{
+		mov     ecx, edx
+		call	check
+		test	al, al
+		jmp		retnAddr
+	}
+}
+
+template <UInt32 retn> __declspec(naked) void FixExplosionAmmoHook2()
+{
+	static const auto retnAddr = retn;
+	static const auto check = reinterpret_cast<UInt32>(GetCanNotStoreAmmo);
+	_asm
+	{
+		call	check
+		mov		dl, al
+		jmp		retnAddr
+	}
+}
+
+template <UInt32 retn> __declspec(naked) void FixExplosionAmmoHook3()
+{
+	static const auto retnAddr = retn;
+	static const auto check = reinterpret_cast<UInt32>(GetCanNotStoreAmmo);
+	_asm
+	{
+		mov     ecx, eax
+		call	check
+		test	al, al
+		jmp		retnAddr
+	}
+}
+
+TESObjectWEAP* __fastcall MeltdownPassHitDataWeapon(ActorHitData* hitData);
+
+template <UInt32 retn> __declspec(naked) void MeltdownPassHitDataWeaponHook()
+{
+	static const auto retnAddr = retn;
+	static const auto func = reinterpret_cast<UInt32>(MeltdownPassHitDataWeapon);
+	_asm
+	{
+		mov     ecx, [ebx + 8]
+		call	func
+		mov     dword ptr[ebp - 0x2CC], eax
+		jmp		retnAddr
+	}
+}
+
+void __fastcall MeltdownSetWeaponAndAmmo(ActorHitData* hitData, Explosion* explosion);
+
+template <UInt32 retn> __declspec(naked) void MeltdownSetWeaponAndAmmoHook()
+{
+	static const auto retnAddr = retn;
+	static const auto func = reinterpret_cast<UInt32>(MeltdownSetWeaponAndAmmo);
+	_asm
+	{
+		mov     edx, [ebp - 2E4h]
+		call	func
+		jmp		retnAddr
+	}
+}
+
+void __fastcall PreCalculateHitDamage1(ActorHitData* hitData);
+
+template <UInt32 retn> __declspec(naked) void PreCalculateHitDamageHook()
+{
+	static const auto retnAddr = retn;
+	static const auto func = reinterpret_cast<UInt32>(PreCalculateHitDamage1);
+	static constexpr auto CalculateHitDamage = 0x9B5A30;
+	_asm
+	{
+		push	ecx
+		call	func
+		pop		ecx
+		push	retnAddr
+		jmp		CalculateHitDamage
+	}
+}
+
+void __fastcall PostCalculateHitDamageHook1(ActorHitData* hitData, void* dummyedx, Projectile* projectile);
+void __fastcall PostCalculateHitDamageHook2(ActorHitData* hitData);
+void __fastcall PostCalculateHitDamageHook3(ActorHitData* hitData);

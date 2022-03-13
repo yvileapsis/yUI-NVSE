@@ -67,8 +67,9 @@ public:
 	BaseProcess();
 	~BaseProcess();
 
-	struct AmmoInfo
+	class AmmoInfo
 	{
+	public:
 		void*	unk00;	// 00
 		UInt32	count;	// 04
 		TESAmmo* ammo;	// 08
@@ -88,8 +89,9 @@ public:
 		UInt32	unk40;	// 40
 		TESObjectWEAP* weapon;	// 44
 	};
-	struct WeaponInfo
+	class WeaponInfo
 	{
+	public:
 		ExtraDataList	**xData;
 		UInt32			unk04;
 		TESObjectWEAP	*weapon;

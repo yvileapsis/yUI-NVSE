@@ -542,7 +542,7 @@ UInt32* g_weaponTypeToAnim = reinterpret_cast<UInt32*>(0x118A838);
 UInt16 GetActorRealAnimGroup(Actor* actor, UInt8 groupID)
 {
 	UInt8 animHandType = 0;
-	if (auto* form = actor->GetWeaponForm())
+	if (const auto* form = actor->GetWeaponForm())
 		animHandType = g_weaponTypeToAnim[form->eWeaponType];
 	auto moveFlags = actor->actorMover->GetMovementFlags();
 	UInt8 moveType = 0;
@@ -554,4 +554,30 @@ UInt16 GetActorRealAnimGroup(Actor* actor, UInt8 groupID)
 		moveType = kAnimMoveType_Sneaking;
 	const auto isPowerArmor = ThisStdCall<bool>(0x8BA3E0, actor) || ThisStdCall<bool>(0x8BA410, actor);
 	return (moveType << 12) + (isPowerArmor << 15) + (animHandType << 8) + groupID;
+}
+
+TESAmmo* ActorHitData::GetAmmo() const
+{
+	if (!projectile) return nullptr;
+	if (projectile->IsProjectile()) return projectile->ammo;
+	if (explosion->IsExplosion() && explosion->source && explosion->source->IsActor()) return explosion->ammo;
+	return nullptr;
+}
+
+TESObjectWEAP* ActorHitData::GetWeapon() const
+{
+	if (!projectile) return nullptr;
+	if (projectile->IsProjectile()) return projectile->weapon;
+	if (explosion->IsExplosion()) return explosion->weapon;
+	if (weapon) return weapon;
+	return nullptr;
+}
+
+Script* ActorHitData::GetAmmoScript() const
+{
+	const auto ammo = GetAmmo();
+	if (!ammo) return nullptr;
+	if (ammo->typeID == kFormType_TESAmmo) return ammo->scriptable.script;
+	if (ammo->typeID == kFormType_TESObjectWEAP) return reinterpret_cast<TESObjectWEAP*>(ammo)->scritpable.script;
+	return nullptr;
 }

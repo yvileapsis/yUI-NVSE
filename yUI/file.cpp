@@ -92,9 +92,9 @@ namespace SIFiles
 										const auto weapon = DYNAMIC_CAST(item, TESForm, TESObjectWEAP);
 										if (!weapon) continue;
 										if (!weapon->repairItemList.listForm) continue;
-										if (weapon->repairItemList.listForm->refID == common.form->refID || weapon->repairItemList.listForm->ContainsRecursive(common.form)) {
+										if (weapon->refID == common.form->refID || weapon->repairItemList.listForm->refID == common.form->refID || weapon->repairItemList.listForm->ContainsRecursive(common.form)) {
 											Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", common.tag.c_str(), item->refID, item->GetName(), formId));
-											g_Items_JSON.emplace_back(common);
+											g_Items_JSON.emplace_back(common, item);
 										}
 									}
 								}
