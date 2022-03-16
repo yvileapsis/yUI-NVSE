@@ -3,6 +3,8 @@
 #include <timeMult.h>
 #include <gameplay.h>
 
+#include "GameRTTI.h"
+
 void patchTimeMult(const bool bEnable)
 {
 	if (bEnable) {
@@ -65,10 +67,11 @@ void patchRestoreSpreadGameSettings(const bool bEnable)
 
 		WriteRelJump(0x8B0E54, RestoreSpreadHook<0x8B0E65>);
 
-	} else {
+	}
+	else {
 
 		UndoSafeWrite(0x8B0E54);
-		
+
 	}
 }
 
@@ -88,13 +91,8 @@ void patchCorrectAmmoEffects(const bool bEnable)
 	WriteRelJump(0x9B21F7, FixExplosionAmmoHook2<0x9B2201>);			// the same things Init does
 	WriteRelJump(0x9B0681, FixExplosionAmmoHook3<0x9B0688>);
 
-	// meltdown
-
-	WriteRelJump(0x89B455, MeltdownPassHitDataWeaponHook<0x89B4CC>);	// pass current weapon not player weapon
-	WriteRelJump(0x89B670, MeltdownSetWeaponAndAmmoHook<0x89B6D0>);		// set weapon and ammo for the meltdown explosion
-
 	// jipln
-	
+
 	WriteRelJump(0x9B5623, PreCalculateHitDamageHook<0x9B5628>);
 	WriteRelCall(0x9B562D, PostCalculateHitDamageHook1);
 	WriteRelJump(0x9B5702, PreCalculateHitDamageHook<0x9B5707>);
@@ -105,4 +103,65 @@ void patchCorrectAmmoEffects(const bool bEnable)
 	WriteRelCall(0x9B58BE, PostCalculateHitDamageHook2);
 	WriteRelJump(0x9B5A10, PreCalculateHitDamageHook<0x9B5A15>);
 	WriteRelCall(0x9B5A18, PostCalculateHitDamageHook2);
+}
+
+void patchCorrectMeltdownEffects(const bool bEnable)
+{
+	WriteRelJump(0x89B455, MeltdownPassHitDataWeaponHook<0x89B4CC>);	// pass current weapon not player weapon
+	WriteRelJump(0x89B670, MeltdownSetWeaponAndAmmoHook<0x89B6D0>);		// set weapon and ammo for the meltdown explosion
+}
+
+/*
+char __cdecl MergeScriptEvent(ActorHitData* a0, TESForm* a1, ExtraDataList* a2, UInt32 a3)
+{
+	ExtraScript* script;
+	if (BSExtraData* xData = a2->GetByType(kExtraData_Script))
+		if (ExtraScript* xScript = DYNAMIC_CAST(xData, BSExtraData, ExtraScript))
+		{
+			xScript->script = a0->GetWeapon()->scritpable.script;
+			xScript->eventList->m_script = a0->GetWeapon()->scritpable.script;;
+			for (auto i = xScript->eventList->m_eventList->Begin(); !i.End(); i.Next())
+			{
+				i.Get()->object = a0->GetWeapon();
+			}
+		}
+
+	auto ret = CdeclCall<char>(0x5AC750, a1, a2, a3);
+
+	return ret;
+}
+
+__declspec(naked) void Waaaa() {
+	static const auto retnAddr = 0x89ABDC;
+	static const auto SpreadFunc = MergeScriptEvent;
+	__asm {
+		mov eax, [ebx + 8]
+		push eax
+		call SpreadFunc
+		pop eax
+		jmp retnAddr
+	}
+}
+*/
+
+void patchCorrectWeaponEffects(const bool bEnable)
+{
+
+	//	WriteRelCall(0x8C248E, Test);
+	//	WriteRelCall(0x8C2593, Test);
+	//	WriteRelCall(0x8C250E, Test);
+	//	WriteRelJump(0x816266, Test3);
+
+
+	WriteRelJump(0x8C2243, WeaponEffectHook1<0x8C2310>);
+	WriteRelJump(0x8C2342, WeaponEffectHook2<0x8C2366>);
+
+//	WriteRelJump(0x89ABD4, MergeScriptEvent);
+}
+
+void patchMultiplicativeProjectileCount(const bool bEnable)
+{
+	WriteRelJump(0x525B20, TESObjectWEAPGetNumProjectilesHook);
+	SafeWrite8(0x708343, 0x38);
+	WriteRelCall(0x70835E, 0x525B20); // undo stewie's fix, replace with mine
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include "GameExtraData.h"
 Float64 __cdecl AdjustPushForceAlt(Actor* target, ActorHitData* hitdata, ActorValueOwner* owner, SInt32 force);
 
 template <UInt32 retn> __declspec(naked) void HitKnockbackHook()
@@ -161,3 +162,48 @@ template <UInt32 retn> __declspec(naked) void PreCalculateHitDamageHook()
 void __fastcall PostCalculateHitDamageHook1(ActorHitData* hitData, void* dummyedx, Projectile* projectile);
 void __fastcall PostCalculateHitDamageHook2(ActorHitData* hitData);
 void __fastcall PostCalculateHitDamageHook3(ActorHitData* hitData);
+UInt8 __fastcall TESObjectWEAPGetNumProjectilesHook(TESObjectWEAP* weapon, void* dummyEdx, char hasWeaponMod, char dontCheckAmmo, TESForm* form);
+
+TESObjectWEAP* __fastcall EffectGetWeapon(ContChangesEntry* entry, Projectile* projectile);
+EnchantmentItem* __fastcall EffectGetEnchantment(ContChangesEntry* entry, Projectile* projectile);
+ExtraDataList* __fastcall EffectGetPoison(ContChangesEntry* entry, Projectile* projectile);
+
+template <UInt32 retn> __declspec(naked) void WeaponEffectHook1()
+{
+	static const auto retnAddr = retn;
+	static const auto func1 = reinterpret_cast<UInt32>(EffectGetWeapon);
+	static const auto func2 = reinterpret_cast<UInt32>(EffectGetEnchantment);
+	static const auto func3 = reinterpret_cast<UInt32>(EffectGetPoison);
+	__asm {
+		mov ecx, [ebp + 0x8]
+		mov edx, [ebp + 0x10]
+		call func1
+		mov[ebp - 0x18], eax
+
+		mov ecx, [ebp + 0x8]
+		mov edx, [ebp + 0x10]
+		call func2
+		mov[ebp - 0x14], eax
+
+		mov ecx, [ebp + 0x8]
+		mov edx, [ebp + 0x10]
+		call func3
+		mov[ebp - 0x10], eax
+
+		jmp retnAddr
+	}
+}
+
+template <UInt32 retn> __declspec(naked) void WeaponEffectHook2()
+{
+	static const auto retnAddr = retn;
+	static const auto func1 = reinterpret_cast<UInt32>(EffectGetWeapon);
+	__asm {
+		mov ecx, [ebp + 0x8]
+		mov edx, [ebp + 0x10]
+		call func1
+		mov[ebp - 0x38], eax
+
+		jmp retnAddr
+	}
+}

@@ -403,6 +403,21 @@ __declspec(naked) NiNode* __fastcall TESObjectREFR::GetNode(const char* nodeName
 		retn
 	}
 }
+
+ExtraDataList* ExtraContainerChanges::EntryData::GetEquippedExtra()
+{
+	return GetCustomExtra(kExtraData_Worn);
+}
+
+ExtraDataList* ExtraContainerChanges::EntryData::GetCustomExtra(UInt32 whichVal)
+{
+	if (!extendData) return nullptr;
+	const ListNode<ExtraDataList>* xdlIter = extendData->Head();
+	do if (ExtraDataList* xData = xdlIter->data; xData && xData->HasType(whichVal)) return xData;
+	while ((xdlIter = xdlIter->next));
+	return nullptr;
+}
+
 __declspec(naked) ContChangesEntry* ContChangesList::FindForItem(TESForm* item)
 {
 	__asm

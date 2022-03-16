@@ -1269,7 +1269,7 @@ public:
 	BGSTouchSpellForm();
 	~BGSTouchSpellForm();
 
-	TESForm	*unarmedEffect;	// 04
+	MagicItemForm *unarmedEffect;	// 04
 	UInt16	unarmedAnim;	// 08
 	UInt16	pad0A;		// 0A
 };

@@ -8,7 +8,7 @@
 Float64 __cdecl AdjustPushForceAlt(Actor* target, ActorHitData* hitdata, ActorValueOwner* owner, SInt32 force)
 {
 	Float64 scale = 1.0;
-	if (hitdata->explosion && hitdata->explosion->baseForm)
+	if (hitdata && hitdata->explosion && hitdata->explosion->baseForm)
 	{
 		const auto explosion = DYNAMIC_CAST(hitdata->explosion->baseForm, TESForm, BGSExplosion);
 		scale = CdeclCall<Float64>(0x647920, hitdata->explosion->radius, hitdata->explosion->GetDistance(target));
@@ -126,4 +126,58 @@ void __fastcall PostCalculateHitDamageHook3(ActorHitData* hitData)
 {
 	ThisCall<void>(0x9B7060, hitData);
 	PostCalculateHitDamage(hitData);
+}
+
+UInt8 __fastcall TESObjectWEAPGetNumProjectilesHook(TESObjectWEAP* weapon, void* dummyEdx, char hasWeaponMod, char dontCheckAmmo, TESForm* form)
+{
+	auto count = weapon->numProjectiles;
+	if (hasWeaponMod) count += ThisCall<Float64>(0x4BCF60, weapon, TESObjectWEAP::kWeaponModEffect_SplitBeam, 0);
+	if (form && !dontCheckAmmo) {
+		const auto ammo = form->typeID == kFormType_TESAmmo
+			? DYNAMIC_CAST(form, TESForm, TESAmmo)
+			: weapon->GetEquippedAmmo(DYNAMIC_CAST(form, TESForm, Actor));
+		if (ammo && ammo->projPerShot > 1) count *= ammo->projPerShot;
+	}
+	return count;
+}
+
+
+/*
+char __fastcall Test1(MagicCaster* caster, void* dummyedx, TESObjectWEAP* a3)
+{
+	return ThisCall<char>(0x815870, caster, a3);
+}
+
+ActiveEffect* __fastcall Test2(MagicCaster* wah, void* dummyedx, MagicItem* magicitem, EffectItem* effectitem, TESForm* weapon)
+{
+	return wah->CreateActiveEffect(magicitem, effectitem, weapon);
+}
+*/
+
+
+TESObjectWEAP* __fastcall EffectGetWeapon(ContChangesEntry* entry, Projectile* projectile)
+{
+	if (projectile && projectile->weapon) return projectile->weapon;
+	return reinterpret_cast<TESObjectWEAP*>(entry->form);
+}
+
+EnchantmentItem* __fastcall EffectGetEnchantment(ContChangesEntry* entry, Projectile* projectile)
+{
+	TESObjectWEAP* weapon = nullptr;
+	if (projectile) weapon = projectile->weapon;
+	if (!weapon && entry) weapon = reinterpret_cast<TESObjectWEAP*>(entry->form);
+	const auto enchantable = DYNAMIC_CAST(weapon, TESObjectWEAP, TESEnchantableForm);
+	auto enchantItem = enchantable->enchantItem;
+	if (!enchantable && projectile && projectile->baseForm)
+	{
+		const auto explosion = reinterpret_cast<BGSProjectile*>(projectile->baseForm)->explosionForm;
+		if (const auto enchantable2 = DYNAMIC_CAST(explosion, BGSExplosion, TESEnchantableForm)) enchantItem = enchantable2->enchantItem;
+	}
+	return enchantItem;
+}
+
+ExtraDataList* __fastcall EffectGetPoison(ContChangesEntry* entry, Projectile* projectile)
+{
+	if (!entry) return nullptr;
+	return entry->GetCustomExtra(kExtraData_Poison);
 }

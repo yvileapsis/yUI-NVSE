@@ -71,6 +71,9 @@ void writePatch()
 	patchFixExplosionPushForce(g_FixExplosionPushForce);
 	patchRestoreSpreadGameSettings(g_RestoreSpreadGameSettings);
 	patchCorrectAmmoEffects();
+	patchCorrectMeltdownEffects();
+	patchCorrectWeaponEffects();
+//	patchMultiplicativeProjectileCount();
 }
 UInt32 g_exec;
 

@@ -284,12 +284,12 @@ public:
 	virtual MagicTarget*	PickMagicTarget();/*018*/
 	virtual void			Unk_07();/*01C*/
 	virtual void			Unk_08();/*020*/
-	virtual void			Unk_09(UInt32 arg1, UInt32 arg2);/*024*/
+	virtual void			NullSub(UInt32 arg1, UInt32 arg2);/*024*/
 	virtual bool			Unk_0A(UInt32 arg1, float* arg2, UInt32* arg3, UInt32 arg4);/*028*/
 	virtual Actor*			GetActor();/*02C*/
 	virtual NiNode*			GetMagicNode();/*030*/
 	virtual MagicItem*		GetMagicItem();/*034*/
-	virtual bool			Unk_0E(ActiveEffect* activeEffect);/*038*/
+	virtual bool			ApplyEffectToTarget(ActiveEffect* activeEffect);/*038*/
 	virtual float			Unk_0F(UInt8 arg1, float arg2);/*03C*/
 	virtual void			SetMagicItem(MagicItem* spell);/*040*/
 	virtual MagicTarget*	GetMagicTarget();/*044*/
