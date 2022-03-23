@@ -73,7 +73,7 @@ template<class T> class SettingCollectionMap
 template<class T> class SettingCollectionList
 {
 	SettingCollection<T>	coll000;
-	tList<UInt32>			lst010C;
+	TList<UInt32>			lst010C;
 };
 
 // 120
@@ -132,7 +132,7 @@ public:
 	char				iniPath[0x100];		// 004
 	UInt32				unk104;				// 104
 	UInt32				unk108;				// 108
-	tList<Setting>		settings;			// 10C;
+	TList<Setting>		settings;			// 10C;
 
 	static IniSettingCollection * GetIniSettings();
 	static IniSettingCollection * GetIniPrefs();

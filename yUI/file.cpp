@@ -270,8 +270,8 @@ namespace SIFiles
 		{
 			const auto bgslist = DYNAMIC_CAST(list, TESForm, BGSListForm);
 			if (!bgslist) return;
-			for (auto iter = bgslist->list.Begin(); !iter.End(); ++iter)
-				if (iter.Get()) { JSONEntryItemRecursiveEmplace(common, iter.Get()); }
+			for (const auto iter : bgslist->list)
+				if (iter) { JSONEntryItemRecursiveEmplace(common, iter); }
 		}
 		else {
 			Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive", common.tag.c_str(), list->refID, list->GetName()));

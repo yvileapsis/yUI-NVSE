@@ -23,7 +23,7 @@ STATIC_ASSERT(sizeof(ExtraSound) == 0x18);
 class ExtraDroppedItemList : public BSExtraData
 {
 public:
-	tList<TESObjectREFR>	itemRefs;	// 0x0C
+	TList<TESObjectREFR>	itemRefs;	// 0x0C
 };
 STATIC_ASSERT(sizeof(ExtraDroppedItemList) == 0x14);
 
@@ -62,7 +62,7 @@ public:
 	ExtraContainerChanges();
 	virtual ~ExtraContainerChanges();
 
-	class ExtendDataList: public tList<ExtraDataList>
+	class ExtendDataList: public TList<ExtraDataList>
 	{
 	public:
 		SInt32				AddAt(ExtraDataList* item, SInt32 index);
@@ -90,7 +90,7 @@ public:
 		float				GetValue();
 	};
 
-	struct EntryDataList : tList<EntryData>
+	struct EntryDataList : TList<EntryData>
 	{
 		EntryData* FindForItem(TESForm* item);
 	};
@@ -455,7 +455,7 @@ public:
 		UInt8			pad[3];
 	};
 
-	typedef tList<FactionListData> FactionListEntry;
+	typedef TList<FactionListData> FactionListEntry;
 	FactionListEntry*	data;
 
 	void						DebugDump();

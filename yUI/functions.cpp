@@ -76,12 +76,12 @@ __declspec(naked) void UIHeight3()
 
 void FillCraftingComponents()
 {
-	for (auto mIter = g_dataHandler->recipeList.Begin(); !mIter.End(); ++mIter)
+	for (const auto mIter : g_dataHandler->recipeList)
 	{
-		for (ListNode<RecipeComponent>* node = mIter.Get()->inputs.Head(); node; node = node->next)
-			if (node->data && node->data->item) g_CraftingComponents.emplace(node->data->item);
-		for (ListNode<RecipeComponent>* node = mIter.Get()->outputs.Head(); node; node = node->next)
-			if (node->data && node->data->item) g_CraftingProducts.emplace(node->data->item);
+		for (const auto node : mIter->inputs)
+			if (node && node->item) g_CraftingComponents.emplace(node->item);
+		for (const auto node : mIter->outputs)
+			if (node && node->item) g_CraftingProducts.emplace(node->item);
 	}
 }
 
@@ -158,16 +158,6 @@ UInt32 TESObjectARMO::GetArmorValue(UInt32 whichVal)
 	return false;
 }
 
-ExtraDataList* ExtraContainerChanges::EntryData::GetCustomExtra(UInt32 whichVal)
-{
-	if (extendData)
-	{
-		ListNode<ExtraDataList>* xdlIter = extendData->Head();
-		do if (const auto xData = xdlIter->data; xData && xData->HasType(whichVal)) return xData;
-		while ((xdlIter = xdlIter->next));
-	}
-	return nullptr;
-}
 
 UInt8 ContWeaponHasAnyMod(ContChangesEntry* weaponInfo)
 {
@@ -200,8 +190,8 @@ bool ContGetEquipped(ContChangesEntry* weaponInfo)
 
 UInt32 AlchemyItem::HasBaseEffectRestoresAV(const SInt32 avCode)
 {
-	for (auto iter = magicItem.list.list.Begin(); !iter.End(); ++iter)
-		if (auto effect = iter.Get(); effect->GetSkillCode() == avCode)
+	for (const auto effect : magicItem.list.list)
+		if (effect->GetSkillCode() == avCode)
 			if (const auto setting = effect->setting; setting && !(setting->effectFlags & EffectSetting::kDetrimental))
 				return effect->magnitude;
 		//				if (effect->conditions.Evaluate(g_player, nullptr, &eval, false)) return true;
@@ -210,8 +200,8 @@ UInt32 AlchemyItem::HasBaseEffectRestoresAV(const SInt32 avCode)
 
 UInt32 AlchemyItem::HasBaseEffectDamagesAV(const SInt32 avCode)
 {
-	for (auto iter = magicItem.list.list.Begin(); !iter.End(); ++iter)
-		if (const auto effect = iter.Get(); effect->GetSkillCode() == avCode)
+	for (const auto effect : magicItem.list.list)
+		if (effect->GetSkillCode() == avCode)
 			if (const auto setting = effect->setting; setting && setting->effectFlags & EffectSetting::kDetrimental)
 				return effect->magnitude;
 		//				if (effect->conditions.Evaluate(g_player, nullptr, &eval, false)) return true;
@@ -237,7 +227,7 @@ bool AlchemyItem::IsPoison()
 {
 	EffectItem* effItem;
 	EffectSetting* effSetting = nullptr;
-	const ListNode<EffectItem>* iter = magicItem.list.list.Head();
+	const TListNode<EffectItem>* iter = magicItem.list.list.Head();
 	do
 	{
 		if (!((effItem = iter->data))) continue;
@@ -263,8 +253,8 @@ bool HasBaseEffectChangesAV(TESForm* form, const int avCode)
 	if (!armor) return false;
 	const auto enchantment = armor->enchantable.enchantItem;
 	if (!enchantment) return false;
-	for (auto iter = enchantment->magicItem.list.list.Begin(); !iter.End(); ++iter)
-		if (const auto effect = iter.Get(); effect->GetSkillCode() == avCode)
+	for (const auto effect : enchantment->magicItem.list.list)
+		if (effect->GetSkillCode() == avCode)
 			if (const auto setting = effect->setting; setting && setting->effectFlags & EffectSetting::kRecover)
 				return true;
 	return false;
@@ -294,17 +284,17 @@ bool FindStringCI(const std::string& strHaystack, const std::string& strNeedle)
 
 bool IsPlayersOtherAnimData(AnimData* animData)
 {
-	if (g_thePlayer->IsThirdPerson() && animData == g_thePlayer->firstPersonAnimData)
+	if (PlayerCharacter::GetSingleton()->IsThirdPerson() && animData == PlayerCharacter::GetSingleton()->firstPersonAnimData)
 		return true;
-	if (!g_thePlayer->IsThirdPerson() && animData == g_thePlayer->baseProcess->GetAnimData())
+	if (!PlayerCharacter::GetSingleton()->IsThirdPerson() && animData == PlayerCharacter::GetSingleton()->baseProcess->GetAnimData())
 		return true;
 	return false;
 }
 
 AnimData* GetThirdPersonAnimData(AnimData* animData)
 {
-	if (animData == g_thePlayer->firstPersonAnimData)
-		return g_thePlayer->baseProcess->GetAnimData();
+	if (animData == PlayerCharacter::GetSingleton()->firstPersonAnimData)
+		return PlayerCharacter::GetSingleton()->baseProcess->GetAnimData();
 	return animData;
 }
 
@@ -379,7 +369,7 @@ __declspec(naked) void funpatch()
 	}
 }
 
-tList<TESObjectREFR>::_Node* iterDroppedItem;
+TList<TESObjectREFR>::Node* iterDroppedItem;
 
 void* __fastcall FixGetDroppedWeaponPre(ExtraDataList* extradatalist)
 {

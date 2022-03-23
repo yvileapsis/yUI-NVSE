@@ -515,7 +515,7 @@ struct VoiceEntry
 		char*		fileName;
 	};
 
-	tList<void>		list00;
+	TList<void>		list00;
 	Response*		response;
 	TESTopicInfo*	topicInfo;
 	TESTopic*		topic;
@@ -531,7 +531,7 @@ namespace Radio
 		{
 			struct Struct00
 			{
-				tList<VoiceEntry>	voiceEntries;
+				TList<VoiceEntry>	voiceEntries;
 				Struct00*			next;
 			};
 
@@ -543,7 +543,7 @@ namespace Radio
 			UInt8		byte11;
 			UInt8		gap12[2];
 			UInt32		flags;
-			tList<void> list18;
+			TList<void> list18;
 		};
 
 		TESObjectREFR*	radioRef;
@@ -558,8 +558,8 @@ namespace Radio
 	static void (*SetEnabled)(bool toggleON) = (void(__cdecl*)(bool))0x8324E0;
 	static void (*SetStation)(TESObjectREFR* station, bool toggleON) = (void(__cdecl*)(TESObjectREFR*, bool))0x832240;
 	bool GetEnabled();
-	tList<TESObjectREFR>* GetFoundStations();
-	void GetNearbyStations(tList<TESObjectREFR>* dst);
+	TList<TESObjectREFR>* GetFoundStations();
+	void GetNearbyStations(TList<TESObjectREFR>* dst);
 
 	void SetActiveStation(TESObjectREFR* station);
 }

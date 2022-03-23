@@ -177,9 +177,8 @@ Tile* Menu::AddTileFromTemplate(Tile* destTile, const char* templateName, UInt32
 
 bool Menu::GetTemplateExists(const char* templateName)
 {
-	for (ListNode<TemplateData>* node = menuTemplates.Head(); node; node = node->next) {
-		if (node->data && (!_strcmpi(node->data->templateName, templateName))) { return true; }
-	}
+	for (const auto node : menuTemplates)
+		if (node && !_strcmpi(node->templateName, templateName)) return true;
 	return false;
 }
 
@@ -477,7 +476,7 @@ __declspec(naked) UInt32 InterfaceManager::GetTopVisibleMenuID()
 /*
 
 static MapMenu* GetSingleton() { return *(MapMenu**)0x11DA368; };
-static tList<TESObjectREFR> GetAvailableRadioStations() { return *(tList<TESObjectREFR>*)0x11DD59C; };
+static TList<TESObjectREFR> GetAvailableRadioStations() { return *(TList<TESObjectREFR>*)0x11DD59C; };
 static TESObjectREFR* GetCurrentRadioStation() { return *(TESObjectREFR**)0x11DD42C; };
 
 void Zoom(bool direction, float amount) { ThisCall(0x79C5A0, this, direction, amount); };

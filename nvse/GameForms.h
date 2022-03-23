@@ -417,7 +417,7 @@ struct PermanentClonedForm {
 	UInt32 cloneRefID;
 };
 
-typedef tList<EffectItem> EffectList;
+typedef TList<EffectItem> EffectList;
 
 class TESLeveledList;
 
@@ -553,7 +553,7 @@ public:
 		};
 	};
 
-	tList<ModInfo>	mods;
+	TList<ModInfo>	mods;
 
 	TESForm*		TryGetREFRParent(void);
 	TESFullName*	GetFullName() const;
@@ -561,8 +561,8 @@ public:
 	bool			IsCloned() const;
 	std::string		GetStringRepresentation() const;
 
-	bool			IsWeapon()	{ return typeID == kFormType_TESObjectWEAP; }
-	bool			IsArmor()	{ return typeID == kFormType_TESObjectARMO; }
+	bool			IsWeapon() const { return typeID == kFormType_TESObjectWEAP; }
+	bool			IsArmor() const { return typeID == kFormType_TESObjectARMO; }
 
 
 	bool			IsInventoryObject() const;
@@ -585,13 +585,12 @@ public:
 	static void		DoAddForm(TESForm* newForm, bool bPersist = true, bool record = true);
 	TESForm*		CloneForm(bool bPersist = true) const;
 	bool			IsInventoryObjectAlt(); 
-	
+	bool			IsCreated() const { return modIndex == 0xFF; }
+
 	MEMBER_FN_PREFIX(TESForm);
 	DEFINE_MEMBER_FN(MarkAsTemporary, void, 0x00484490);	// probably a member of TESForm
 };
 STATIC_ASSERT(sizeof(TESForm) == 0x18);
-
-
 
 class TESObject : public TESForm
 {
@@ -604,7 +603,7 @@ public:
 	virtual UInt32	Unk_50(void);
 	virtual bool	Unk_51(void);
 	virtual void	Unk_52(void * arg);
-	virtual NiNode	* Unk_53(TESObjectREFR * refr, void * arg1);
+	virtual NiNode* _CreateNiNode(TESObjectREFR * refr, void * arg1);
 	virtual void	Unk_54(void * arg);
 	virtual bool	IsInternal(void);
 	virtual bool	IsInternalMarker(void);
@@ -614,7 +613,7 @@ public:
 	virtual void	Unk_5A(void * arg0, void * arg1);
 	virtual UInt32	Unk_5B(void);
 	virtual UInt32	Unk_5C(void);
-	virtual bool	Unk_5D(TESObjectREFR * refr);	// if false, no NiNode gets returned by Unk_53, true for NPC
+	virtual bool	__CreateNiNode(TESObjectREFR * refr);	// if false, no NiNode gets returned by Unk_53, true for NPC
 };
 
 // 30
@@ -624,12 +623,12 @@ public:
 	TESBoundObject();
 	~TESBoundObject();
 
-	virtual NiNode	* CreateNiNode(TESObjectREFR * refr);	// calls Fn53, for NPC calls ReadBones, for LevelledActor level them if necessary
+	virtual NiNode*	CreateNiNode(TESObjectREFR * refr);	// calls Fn53, for NPC calls ReadBones, for LevelledActor level them if necessary
 	virtual bool	Unk_5F(void);
 
-	BoundObjectListHead		* head;		// 018
-	TESBoundObject			* prev;		// 01C
-	TESBoundObject			* next;		// 020
+	BoundObjectListHead*	head;		// 018
+	TESBoundObject*			prev;		// 01C
+	TESBoundObject*			next;		// 020
 	SInt16					bounds[6];	// 024
 };
 
@@ -652,7 +651,7 @@ public:
 
 	virtual UInt32	Unk_04(void);
 	virtual void	GetNormalMap(String * str);
-	virtual char *	GetPathRoot(void);
+	virtual char*	GetPathRoot(void);
 
 	String ddsPath;
 };
@@ -675,7 +674,7 @@ public:
 	TESScriptableForm();
 	~TESScriptableForm();
 
-	Script	* script;	// 004
+	Script*	script;		// 004
 	bool	resolved;	// 008	called during LoadForm, so scripts do not wait for TESForm_InitItem to be resolved
 	UInt8	pad[3];		// 009
 };
@@ -820,7 +819,7 @@ public:
 	UInt32				actorValueOrOther;	// 10
 	EffectSetting*		setting;	// 14
 	float				cost;				// 18 on autocalc items this seems to be the cost
-	tList<Condition>	conditions;			// 1C
+	TList<Condition>	conditions;			// 1C
 
 	//bool HasActorValue() const;
 	//UInt32 GetActorValue() const;
@@ -983,7 +982,7 @@ public:
 	virtual void	SetPath(char * path);
 	virtual void *	Unk_07(void);
 
-	tList<Texture> textureList;	// 018
+	TList<Texture> textureList;	// 018
 };
 
 // 008
@@ -1256,7 +1255,7 @@ public:
 		ContainerExtraData	*contExtraData;	//	08
 	};
 
-	typedef tList<FormCount> FormCountList;
+	typedef TList<FormCount> FormCountList;
 	FormCountList formCountList;	// 004
 	
 	SInt32 GetCountForForm(TESForm *form);
@@ -1377,13 +1376,11 @@ public:
 	float			Karma;				// 14	Karma
 	UInt16			dispositionBase;	// 18	Disposition Base
 	UInt16			templateFlags;		// 1A	Template Flags
-	TESForm			* deathItem;		// 1C	Death Item: object or FormList
-	BGSVoiceType	* voiceType;		// 20
+	TESForm*		deathItem;			// 1C	Death Item: object or FormList
+	BGSVoiceType*	voiceType;			// 20
 	TESForm*		templateActor;		// 24	Points toward Template
-#ifdef RUNTIME
 	UInt32			changedFlags;		// 28/000	Absent in Editor
-#endif
-	tList<FactionListData>	factionList;	// 2C/28
+	TList<FactionListData>	factionList;	// 2C/28
 
 	SInt8 GetFactionRank(TESFaction* faction);
 
@@ -1409,8 +1406,8 @@ public:
 	virtual void	Save(UInt32 changedFlags);
 	virtual void	Load(UInt32 changedFlags);
 
-	tList<SpellItem>	spellList;			// 004
-	tList<SpellItem>	leveledSpellList;	// 00C
+	TList<SpellItem>	spellList;			// 004
+	TList<SpellItem>	leveledSpellList;	// 00C
 
 	UInt32	GetSpellCount() const {
 		return spellList.Count();
@@ -1433,7 +1430,7 @@ public:
 	TESAIForm();
 	~TESAIForm();
 
-	typedef tList<TESPackage> PackageList;
+	typedef TList<TESPackage> PackageList;
 
 	virtual UInt32	GetSaveSize(UInt32 changedFlags);
 	virtual void	Save(UInt32 changedFlags);
@@ -1520,9 +1517,9 @@ public:
 	TESAnimation();
 	~TESAnimation();
 
-	typedef tList<char> AnimNames;
+	typedef TList<char> AnimNames;
 
-	// constructor and Fn_01 sugest this is a tList of char string.
+	// constructor and Fn_01 sugest this is a TList of char string.
 	// In GECK it is an array
 	AnimNames	animNames;
 	// 00C
@@ -1618,7 +1615,7 @@ public:
 	TESModelList();
 	~TESModelList();
 
-	tList<char>	modelList;	// 04
+	TList<char>	modelList;	// 04
 	UInt32		count;		// 0C
 	UInt32		unk10;		// 10
 
@@ -1663,7 +1660,7 @@ public:
 		UInt32		reaction;
 	};
 
-	tList <Reaction>	reactions;	// 4
+	TList <Reaction>	reactions;	// 4
 	UInt8	unkC;		// C
 	UInt8	padD[3];	// D
 };
@@ -1732,7 +1729,7 @@ public:
 	{
 		UInt8							byt000;				// 000
 		UInt8							fill[3];			// 001
-		tList<Condition*>				conditions;			// 004
+		TList<Condition*>				conditions;			// 004
 		TESObjectREFR*					target;				// 00C
 		BSSimpleArray<ParentSpaceNode>	parentSpaceNodes;	// 010 - The four fields coud be a struct
 		BSSimpleArray<TeleportLink>		teleportLinks;		// 020
@@ -1743,7 +1740,7 @@ public:
 	UInt32			objectiveId;	// 004 Objective Index in the GECK
 	String			displayText;	// 008
 	TESQuest*		quest;			// 010
-	tList<Target*>	targets;		// 014
+	TList<Target*>	targets;		// 014
 	UInt32			unk01C;			// 01C
 	UInt32			status;			// 020	bit0 = displayed, bit 1 = completed. 1 and 3 significant. If setting it to 3, quest flags bit1 will be set also.
 
@@ -1805,7 +1802,7 @@ public:
 	};
 
 	TESModelAnim		anim;			// 018
-	tList<Condition*>	conditions;		// 030
+	TList<Condition*>	conditions;		// 030
 	Data				data;			// 038
 	UInt32				unk040;			// 040	NiFormArray, contains all idle anims in path if eIFgf_flagUnknown is set
 	TESIdleForm			* parent;		// 044
@@ -1843,12 +1840,12 @@ public:
 
 	struct RelatedTopics
 	{
-		tList<TESTopic*>	linkFrom;
-		tList<TESTopic*>	choices;
-		tList<TESTopic*>	unknown;
+		TList<TESTopic*>	linkFrom;
+		TList<TESTopic*>	choices;
+		TList<TESTopic*>	unknown;
 	};
 
-	tList<Condition*>	conditions;			// 18
+	TList<Condition*>	conditions;			// 18
 	UInt16				unk20;				// 20
 	UInt8				saidOnce;			// 22
 	UInt8				type;				// 23
@@ -1857,7 +1854,7 @@ public:
 	UInt8				flags2;				// 26
 	UInt8				pad27;				// 27
 	String				prompt;				// 28
-	tList<TESTopic*>	addTopics;			// 30
+	TList<TESTopic*>	addTopics;			// 30
 	RelatedTopics	*	relatedTopics;		// 38
 	UInt32				speaker;			// 3C
 	UInt32				actorValueOrPerk;	// 40
@@ -1892,7 +1889,7 @@ public:
 	UInt8			flags;			// 25	DATA also used as bool or flag, connected to INFOGENERAL
 	UInt8			pad26[2];		// 26
 	float			priority;		// 28	PNAM
-	tList<Info*>	infos;			// 2C
+	TList<Info*>	infos;			// 2C
 	String			unk34;			// 34	TDUM
 	UInt16			unk3C;			// 3C	XIDX
 	UInt16			unk3E;			// 3E
@@ -2084,7 +2081,7 @@ public:
 
 	UInt32			factionFlags;	// 34
 	TESReputation*	reputation;		// 38
-	tList <Rank>	ranks;			// 3C
+	TList <Rank>	ranks;			// 3C
 	UInt32			crimeCount44;	// 44
 	UInt32			crimeCount48;	// 48
 
@@ -2227,14 +2224,14 @@ public:
 	UInt32			raceFlags;				// 070
 
 	TESAttributes	baseAttributes[2];		// 074 male/female
-	tList<TESHair>	hairs;					// 08C
+	TList<TESHair>	hairs;					// 08C
 	TESHair *		defaultHair[2];			// 094 male/female
 	UInt8			defaultHairColor[2];	// 09C male/female
 	UInt8			fill09E[2];				// 09E
 
 	UInt32			unk0A0[(0xA8 - 0xA0) >> 2];	// 0A0
 
-	tList<TESEyes>	eyes;					// 0A8
+	TList<TESEyes>	eyes;					// 0A8
 
 	TESModel		faceModels[2][8];			// 0B0	male/female Head, Ears, Mouth, TeethLower, TeethUpper, Tongue, LeftEye, RightEye
 	TESTexture		faceTextures[2][8];			// 230	male/female Head, Ears, Mouth, TeethLower, TeethUpper, Tongue, LeftEye, RightEye
@@ -2433,7 +2430,7 @@ public:
 	float					unused094;				// 94 - fMagicDefaultCEBarterFactor
 	UInt32					archtype;				// 98
 	UInt32					actorVal;				// 9C - actor value - last field of DATA
-	tList<EffectSetting>	counterEffects;		// A0 - counter effects list
+	TList<EffectSetting>	counterEffects;		// A0 - counter effects list
 	UInt32					unkA8;					// A8
 	UInt32					unkAC;					// AC
 
@@ -2484,7 +2481,7 @@ public:
 	UInt8			friction;			// 1D
 	UInt8			restitution;		// 1E
 	UInt8			specularExponent;	// 1F
-	tList<TESGrass>	grasses;			// 20
+	TList<TESGrass>	grasses;			// 20
 
 	SInt32	GetGrassIndex(TESGrass *grass);
 };
@@ -2609,11 +2606,11 @@ public:
 		BGSNote*			displayNote;
 		BGSTerminal*		subMenu;
 		ScriptEventList*	scriptEventList;
-		tList<Condition*>	conditions;	
+		TList<Condition*>	conditions;	
 	};
 
 	String				desc;			// 090	DESC
-	tList<MenuEntry>	menuEntries;	// 098
+	TList<MenuEntry>	menuEntries;	// 098
 	BGSNote*			password;		// 0A0	PNAM
 	TermData			data;			// 0A4	DNAM
 };
@@ -2716,7 +2713,7 @@ public:
 //	TESMagicTargetForm			magicTarget;		// 
 	BGSDestructibleObjectForm	destructForm;		// 68
 	BGSOpenCloseForm			openCloseForm;		// 70
-	// There is a tList in 088
+	// There is a TList in 088
 };	
 
 // IngredientItem (A4)
@@ -3278,7 +3275,7 @@ public:
 	float						ammoPercentConsumed;	// 0C0
 	String						shortName;				// 0C4
 	String						abbreviation;			// 0CC
-	tList<TESAmmoEffect>		effectList;				// 0D4
+	TList<TESAmmoEffect>		effectList;				// 0D4
 
 	bool IsNonPlayable() { return (flags & kFlags_NonPlayable) == kFlags_NonPlayable; }
 	bool IsPlayable() { return !IsNonPlayable(); }
@@ -3386,7 +3383,7 @@ public:
 	UInt16		unk1D2;							// 1D2
 	TESCombatStyle	* unk1D4;					// 1D4
 	UInt32		hairColor;						// 1D8/20C
-	tList<BGSHeadPart>	headPart;				// 1DC/210
+	TList<BGSHeadPart>	headPart;				// 1DC/210
 	UInt32		impactMaterialType;				// 1E4/218
 	UInt32      unk01E8;						// 1E8
 	TESRace     * race1EC;						// 1EC
@@ -3452,7 +3449,7 @@ public:
 		ContainerExtraData	*coed;		// 008
 	};	// 00C
 
-	tList<BaseData>	datas;			// 004
+	TList<BaseData>	datas;			// 004
 	UInt8			chanceNone;		// 00C
 	UInt8			flags;			// 00D
 	UInt8			fill00E[2];		// 00E
@@ -3676,7 +3673,7 @@ struct WeatherEntry
 		global = pGlb;
 	}
 };
-typedef tList<WeatherEntry> WeatherTypes;
+typedef TList<WeatherEntry> WeatherTypes;
 
 // 58
 class TESClimate : public TESForm
@@ -3714,7 +3711,7 @@ public:
 	UInt8		priority;	// 06
 	UInt8		unk7;		// 07
 };
-typedef tList<TESRegionData> RegionDataEntryList;
+typedef TList<TESRegionData> RegionDataEntryList;
 
 class TESRegionDataGrass : public TESRegionData
 {
@@ -3730,7 +3727,7 @@ public:
 	TESRegionDataImposter();
 	~TESRegionDataImposter();
 
-	tList<TESObjectREFR>	imposters;	// 08
+	TList<TESObjectREFR>	imposters;	// 08
 };
 
 class TESRegionDataLandscape : public TESRegionData
@@ -3756,7 +3753,7 @@ struct SoundType
 	UInt32			flags;
 	UInt32			chance;
 };
-typedef tList<SoundType> SoundTypeList;
+typedef TList<SoundType> SoundTypeList;
 
 // 20
 class TESRegionDataSound : public TESRegionData
@@ -3768,7 +3765,7 @@ public:
 	UInt32			unk08;					// 08
 	SoundTypeList	soundTypes;				// 0C
 	UInt32			incidentalMediaSet;		// 14
-	tList<UInt32>	mediaSetEntries;		// 18
+	TList<UInt32>	mediaSetEntries;		// 18
 };
 
 // 10
@@ -3786,7 +3783,7 @@ struct AreaPointEntry
 	float	x;
 	float	y;
 };
-typedef tList<AreaPointEntry> AreaPointEntryList;
+typedef TList<AreaPointEntry> AreaPointEntryList;
 
 struct RegionAreaEntry
 {
@@ -3796,7 +3793,7 @@ struct RegionAreaEntry
 	UInt32				edgeFallOff;
 	UInt32				pointCount;
 };
-typedef tList<RegionAreaEntry> RegionAreaEntryList;
+typedef TList<RegionAreaEntry> RegionAreaEntryList;
 
 // 38
 class TESRegion : public TESForm
@@ -3831,7 +3828,7 @@ public:
 	TESObjectCELL();
 	~TESObjectCELL();
 
-	typedef tList<TESObjectREFR> RefList;
+	typedef TList<TESObjectREFR> RefList;
 	struct CellCoordinates
 	{
 		UInt32				x;
@@ -3950,8 +3947,8 @@ public:
 	UInt8				unk04D;				// 04D filler
 	UInt16				parentFlags;		// 04E init'd to FF if has a parent. 5 is use ImageSpace, 4 is use parent climate, 3 is use parent Water, 1 is use parent LOD data, 0 is use parent LAND data
 	RefListPointerMap	pointerMap;			// 050 confirmed
-	tList<void*>		lst060;				// 060
-	tList<void*>		lst068;				// 068 confirmed as tList
+	TList<void*>		lst060;				// 060
+	TList<void*>		lst068;				// 068 confirmed as TList
 	TESWorldSpace*		parent;				// 070 confirmed
 	TESWaterForm*		waterFormFirst;		// 074 confirmed NAM2
 	TESWaterForm*		waterFormLast;		// 078 confirmed NAM3 LOD Water type for xEdit
@@ -3970,7 +3967,7 @@ public:
 	BGSEncounterZone*	encounterZone;		// 0D0 confirmed	
 	TESTexture			canopyShadow;		// 0D4 confirmed NNAM
 	TESTexture			waterNoiseTexture;	// 0E0 confirmed XNAM
-};	// I am seeing a tList at 60, a map at 50 indexed by XY coord !!!, another map at B0, indexed by modInfo::Unklist elements
+};	// I am seeing a TList at 60, a map at 50 indexed by XY coord !!!, another map at B0, indexed by modInfo::Unklist elements
 STATIC_ASSERT(sizeof(TESWorldSpace) == 0xEC);
 
 // TESObjectLAND (2C)
@@ -4008,7 +4005,7 @@ public:
 		UInt8			stage;	// 00 stageID
 		UInt8			unk001;	// 01 status ?
 		UInt8			pad[2];	// 02
-		tList<void*>	unk004;	// 04 log entries
+		TList<void*>	unk004;	// 04 log entries
 	};	// 00C
 
 	union LocalVariableOrObjectivePtr
@@ -4021,10 +4018,10 @@ public:
 	UInt8						priority;					// 03D
 	UInt8						pad03E[2];					// 03E
 	float						questDelayTime;				// 040
-	tList<StageInfo>			stages;						// 044
-	tList<LocalVariableOrObjectivePtr>	lVarOrObjectives;	// 04C	So: this list would contain both Objectives and LocalVariables !
+	TList<StageInfo>			stages;						// 044
+	TList<LocalVariableOrObjectivePtr>	lVarOrObjectives;	// 04C	So: this list would contain both Objectives and LocalVariables !
 		// That seems very strange but still, looking at Get/SetObjective... and ShowQuestVars there's no doubt.
-	tList<Condition*>			conditions;					// 054
+	TList<Condition*>			conditions;					// 054
 	ScriptEventList*			scriptEventList;			// 05C
 	UInt8						currentStage;				// 060
 	UInt8						pad061[3];					// 061
@@ -4364,7 +4361,7 @@ public:
 	UInt32				unk034;					// 034	idles
 	PackageTime			time;					// 038
 	UInt32				unk040[(0x80 - 0x40) >> 2];
-		// 	040 is a tList of Condition, 7C is an Interlocked counter
+		// 	040 is a TList of Condition, 7C is an Interlocked counter
 		//	048 is a DWord CombatStyle, 
 		//	04C, 05C and 06C are the same 4 DWord struct onBegin onEnd onChange, { TESIdle* idle; EmbeddedScript* script; Topic* topic; UInt32 unk0C; }
 		//	07C is a DWord
@@ -4403,7 +4400,7 @@ struct DialogueResponse {
 };
 
 struct DialogueItem {
-	tList<DialogueResponse>	responses;				// 000
+	TList<DialogueResponse>	responses;				// 000
 	DialogueResponse*	currentResponse;	// 008
 	TESTopicInfo*		currentTopicInfo;	// 00C
 	TESTopic*			currentTopic;		// 010
@@ -4472,7 +4469,7 @@ public:
 	float			unk090;		// 090
 	UInt8			unk094;		// 094
 	UInt8			pad095[3];	// 095
-	tList<TESForm*>	list098;	// 098
+	TList<TESForm*>	list098;	// 098
 	TESForm*		unk0A0;		// 0A0
 	TESForm*		unk0A4;		// 0A4
 	UInt8			unk0A8;		// 0A8
@@ -4664,9 +4661,9 @@ public:
 	UInt32					reqSkillLevel;	// 28
 	UInt32					categoryID;		// 2C
 	UInt32					subCategoryID;	// 30
-	tList<Condition>		conditions;		// 34
-	tList<RecipeComponent>	inputs;			// 3C
-	tList<RecipeComponent>	outputs;		// 44
+	TList<Condition>		conditions;		// 34
+	TList<RecipeComponent>	inputs;			// 3C
+	TList<RecipeComponent>	outputs;		// 44
 	UInt32					unk4C;			// 4C
 	UInt32					unk50;			// 50
 	TESRecipeCategory*		category;		// 54
@@ -4807,23 +4804,18 @@ public:
 	BGSListForm();
 	~BGSListForm();
 
-	tList<TESForm> list;			// 018
+	TList<TESForm> list;			// 018
 
 	UInt32	numAddedObjects;	// number of objects added via script - assumed to be at the start of the list
 
-	UInt32 Count() const {
-		return list.Count();
-	}
+	UInt32 Count() const { return list.Count(); }
 
-	TESForm* GetNthForm(SInt32 n) const {
-		return list.GetNthItem(n);
-	}
+	TESForm* GetNthForm(const SInt32 n) const { return list.GetNthItem(n); }
 
-	UInt32 AddAt(TESForm* pForm, SInt32 n) {
-		SInt32	result = list.AddAt(pForm, n);
+	UInt32 AddAt(TESForm* pForm, const SInt32 n) {
+		const SInt32 result = list.AddAt(pForm, n);
 
-		if(result >= 0 && IsAddedObject(n))
-			numAddedObjects++;
+		if (result >= 0 && IsAddedObject(n)) numAddedObjects++;
 
 		return result;
 	}
@@ -4831,19 +4823,13 @@ public:
 	SInt32 GetIndexOf(TESForm* pForm);
 
 	TESForm* RemoveNthForm(SInt32 n) {
-		TESForm	* form = list.RemoveNth(n);
+		TESForm* form = list.RemoveNth(n);
 
-		if(form && IsAddedObject(n))
-		{
-			if(numAddedObjects == 0)
-			{
+		if (form && IsAddedObject(n))
+			if (numAddedObjects == 0)
 				PrintLog("BGSListForm::RemoveNthForm: numAddedObjects = 0");
-			}
 			else
-			{
 				numAddedObjects--;
-			}
-		}
 
 		return form;
 	}
@@ -4964,9 +4950,9 @@ public:
 
 	struct EntryPointConditions
 	{
-		tList<Condition>		tab1;
-		tList<Condition>		tab2;
-		tList<Condition>		tab3;
+		TList<Condition>		tab1;
+		TList<Condition>		tab2;
+		TList<Condition>		tab3;
 	};
 
 	UInt8						entryPoint;		// 08
@@ -5001,8 +4987,8 @@ public:
 	TESDescription			description;		// 24
 	TESIcon					icon;				// 2C
 	PerkData				data;				// 38
-	tList<Condition>		conditions;			// 40
-	tList<BGSPerkEntry>		entries;			// 48
+	TList<Condition>		conditions;			// 40
+	TList<BGSPerkEntry>		entries;			// 48
 };
 STATIC_ASSERT(sizeof(BGSPerk) == 0x50);
 
@@ -5277,14 +5263,14 @@ public:
 
 	struct Button {
 		String				buttonText;		// 000
-		tList<Condition>	condition;		// 008
+		TList<Condition>	condition;		// 008
 	};
 
 	TESFullName			fullName;			// 018
 	TESDescription		description;		// 024
 
 	BGSMenuIcon*		menuIcon;			// 2C
-	tList<Button>		buttons;			// 030
+	TList<Button>		buttons;			// 030
 	UInt32				messageFlags;		// 038 init'd to 1
 	Float32				displayTime;		// 03C init'd to 2
 };
@@ -5456,7 +5442,7 @@ enum EWhichListForm
 	eWhichListForm_Max,
 };
 
-struct ConditionList : tList<Condition>
+struct ConditionList : TList<Condition>
 {
 	bool Evaluate(TESObjectREFR* runOnRef, TESForm* arg2, bool* result, bool arg4);
 };

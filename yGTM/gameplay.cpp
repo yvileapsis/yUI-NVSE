@@ -38,7 +38,7 @@ void __fastcall StoreAmmoOnProjectile(Projectile* projectile)
 void __fastcall StoreAmmoOnExplosion(Projectile* projectile, Explosion* explosion)
 {
 	explosion->weapon = projectile->weapon;
-	if (!explosion->ammo && explosion->source && explosion->source->IsActor()) explosion->ammo = projectile->ammo;
+	if (!explosion->ammo && explosion->CanStoreAmmo()) explosion->ammo = projectile->ammo;
 }
 
 void __fastcall GetAmmoFromHitData(ActorHitData* hitData, Actor* target)
@@ -51,7 +51,7 @@ bool __fastcall GetCanNotStoreAmmo(Explosion* explosion)
 {
 	if (!explosion || !explosion->IsExplosion()) return false;
 	if (!explosion->ammo) return false;
-	if (explosion->source && explosion->source->IsActor()) return false;
+	if (!explosion->CanStoreAmmo()) return false;
 	return true;
 }
 

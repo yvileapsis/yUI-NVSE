@@ -322,7 +322,7 @@ struct ExtraDataList : public BaseExtraList
 STATIC_ASSERT(sizeof(ExtraDataList) == 0x020);
 
 
-class ExtendDataList : public tList<ExtraDataList>
+class ExtendDataList : public TList<ExtraDataList>
 {
 public:
 	SInt32 AddAt(ExtraDataList* item, SInt32 index);

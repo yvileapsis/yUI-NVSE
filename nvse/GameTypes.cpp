@@ -200,8 +200,8 @@ bool TESObjectWEAP::IsMeleeWeapon() const
 
 BSAnimGroupSequence* BSAnimGroupSequence::Get3rdPersonCounterpart() const
 {
-	auto* animData = g_thePlayer->baseProcess->GetAnimData();
-	if (auto* base = animData->mapAnimSequenceBase->Lookup(this->animGroup->groupID))
+	const auto animData = PlayerCharacter::GetSingleton()->baseProcess->GetAnimData();
+	if (const auto base = animData->mapAnimSequenceBase->Lookup(this->animGroup->groupID))
 		return base->GetSequenceByIndex(0);
 	return nullptr;
 }
@@ -560,7 +560,7 @@ TESAmmo* ActorHitData::GetAmmo() const
 {
 	if (!projectile) return nullptr;
 	if (projectile->IsProjectile()) return projectile->ammo;
-	if (explosion->IsExplosion() && explosion->source && explosion->source->IsActor()) return explosion->ammo;
+	if (explosion->IsExplosion() && explosion->CanStoreAmmo()) return explosion->ammo;
 	return nullptr;
 }
 

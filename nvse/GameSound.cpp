@@ -63,12 +63,12 @@ namespace Radio
 		return station;
 	}
 	
-	void GetNearbyStations(tList<TESObjectREFR>* dst)
+	void GetNearbyStations(TList<TESObjectREFR>* dst)
 	{
 		CdeclCall(0x4FF1A0, PlayerCharacter::GetSingleton(), dst, nullptr);
 	}
 
-	tList<TESObjectREFR>* GetFoundStations() { return reinterpret_cast<tList<TESObjectREFR>*>(0x11DD59C); };
+	TList<TESObjectREFR>* GetFoundStations() { return reinterpret_cast<TList<TESObjectREFR>*>(0x11DD59C); };
 	bool GetEnabled() { return *reinterpret_cast<UInt8*>(0x11DD434); }
 	void SetActiveStation(TESObjectREFR* station)
 	{

@@ -301,7 +301,7 @@ public:
 };
 STATIC_ASSERT(sizeof(MagicCaster) == 0xC);
 
-typedef tList<ActiveEffect> EffectNode;
+typedef TList<ActiveEffect> EffectNode;
 
 class MagicTarget
 {
@@ -317,7 +317,7 @@ public:
 	UInt8					byt005;		// 005 
 	UInt8					byt006;		// 006
 	UInt8					byt007;		// 007
-	tList<void*>			lst008;		// 008
+	TList<void*>			lst008;		// 008
 
 	void					RemoveEffect(EffectItem *effItem);
 	void					StopEffect(void* arg0, bool arg1) { ThisStdCall(0x8248E0, this, arg0, arg1); }
@@ -590,7 +590,7 @@ public:
 };
 STATIC_ASSERT(sizeof(Character) == 0x1C8);
 
-typedef tList<BGSQuestObjective::Target> QuestObjectiveTargets;
+typedef TList<BGSQuestObjective::Target> QuestObjectiveTargets;
 
 struct PerkRank
 {
@@ -631,7 +631,7 @@ public:
 
 	UInt32								unk1C8[17];				// 1C8	208 could be a DialogPackage
 	void*								unk20C;					// 20C
-	tList<ActiveEffect>*				activeEffects;			// 210
+	TList<ActiveEffect>*				activeEffects;			// 210
 	UInt32								unk214[2];				// 214
 	void*								unk21C;					// 21C
 	UInt32								unk220[8];				// 220	224 is a package of type 1C
@@ -649,14 +649,14 @@ public:
 	ImageSpaceModifierInstanceDOF*		unk5F0;					// 5F0
 	ImageSpaceModifierInstanceDRB*		unk5F4;					// 5F4
 	UInt32								unk5F8;					// 5F8
-	tList<Actor>						teammates;				// 5FC
+	TList<Actor>						teammates;				// 5FC
 	TESObjectREFR*						lastExteriorDoor;		// 604
 	UInt8								isPlayingAttackSound;	// 608
 	UInt8								pad609[3];				// 609
-	tList<void>*						actionList;				// 60C
-	tList<void>*						casinoDataList;			// 610
-	tList<void>*						caravanCards1;			// 614
-	tList<void>*						caravanCards2;			// 618
+	TList<void>*						actionList;				// 60C
+	TList<void>*						casinoDataList;			// 610
+	TList<void>*						caravanCards1;			// 614
+	TList<void>*						caravanCards2;			// 618
 	UInt32								unk61C[6];				// 61C
 	void*								ptr634;					// 634	bhkMouseSpringAction when there's a grabbed reference
 	TESObjectREFR*						grabbedRef;				// 638
@@ -702,7 +702,7 @@ public:
 	TESTopic*							topic;					// 6A8
 	UInt32								unk6AC[3];				// 6AC
 	TESQuest*							quest;					// 6B8
-	tList<BGSQuestObjective>			questObjectiveList;		// 6BC
+	TList<BGSQuestObjective>			questObjectiveList;		// 6BC
 	UInt32								unk6C4[39];				// 6C4
 	TESRegion*							currentRegion;			// 760
 	TESRegionList						regionsList;			// 764
@@ -712,14 +712,14 @@ public:
 	bool								isHardcore;				// 7BC
 	UInt8								pad7BD[3];				// 7BD
 	UInt32								unk7C0[49];				// 7C0
-	tList<BGSEntryPointPerkEntry>		perkEntries[74];		// 884
-	tList<void>							perkRanksTM;			// AD4
-	tList<BGSEntryPointPerkEntry>		perkEntriesTM[74];		// ADC
+	TList<BGSEntryPointPerkEntry>		perkEntries[74];		// 884
+	TList<void>							perkRanksTM;			// AD4
+	TList<BGSEntryPointPerkEntry>		perkEntriesTM[74];		// ADC
 	UInt32								unkD2C[4];				// D2C
 	NiObject*							unkD3C;					// D3C
 	UInt32								unkD40;					// D40
 	Actor*								reticleActor;			// D44
-	tList<void>*						compassTargets;			// D48
+	TList<void>*						compassTargets;			// D48
 	UInt32								unkD4C;					// D4C
 	float								lastAmmoSwapTime;		// D50
 	UInt32								unkD54[4];				// D4C
@@ -763,7 +763,7 @@ public:
 		// Used when entering FlyCam : 7E8/7EC/7F0 stores Pos, 7F0 adjusted by scaledHeight multiplied by 0698 , 7E0 stores RotZ, 7E4 RotX
 		// Perks forms a list at 87C and AD4. Caravan Cards at 614 and 618. Quest Stage LogEntry at 6B0. Quest Objectives at 6BC.
 		// Hardcore flag would be E38. Byte at DF0 seems to be PlayerIsInCombat
-		// tList at 6C4 is cleared when there is no current quest. There is another NiNode at 069C
+		// TList at 6C4 is cleared when there is no current quest. There is another NiNode at 069C
 		// list of perk and perkRank are at 0x087C and 0x0AD4 (alt perks). 086C is cleared after equipement change.
 		// D68 counts the Teammates.
 		// D74: 96 bytes that are cleared when the 3D is cleared.
@@ -780,8 +780,6 @@ public:
 	HighProcess*			GetHighProcess();
 };
 STATIC_ASSERT(sizeof(PlayerCharacter) == 0xE50);
-
-extern PlayerCharacter* g_thePlayer;
 
 class NonActorMagicCaster : public BSExtraData
 {
@@ -802,7 +800,7 @@ public:
 	Float32				ISRadius;
 	UInt32				unk09C;
 	TESObjectREFR*		object0A0;
-	tList<void>			list0A4;
+	TList<void>			list0A4;
 	Sound				sound0AC;
 	Sound				sound0B8;
 	void*				pointLight;
@@ -819,7 +817,7 @@ public:
 	UInt8				byte0DB;
 	union										// 0DC
 	{
-		TESAmmo*				 ammo;							// unused for actors ???
+		TESAmmo*				ammo;							// unused for actors ???
 		NonActorMagicCaster*	unkCaster;		
 	};
 	TESObjectWEAP*		weapon;			// 0E0
@@ -827,6 +825,8 @@ public:
 	NiPoint3			vec0E8;			// 0E8
 	NiPoint3			vec0F4;			// 0F4
 	Float32				unk100;			// init to -1
+
+	bool CanStoreAmmo();
 };
 STATIC_ASSERT(sizeof(Explosion) == 0x104);
 
@@ -837,7 +837,7 @@ public:
 	Projectile();
 	~Projectile();
 
-	tList<BGSImpactData>	impactDataList;		// 0x088
+	TList<BGSImpactData>	impactDataList;		// 0x088
 	UInt8					hasImpacted;		// 0x08C
 	UInt8					pad091[3];
 	NiMatrix33				nimatrix33;			// 0x094

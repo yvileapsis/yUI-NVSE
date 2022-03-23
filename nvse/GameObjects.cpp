@@ -53,7 +53,7 @@ bool TESObjectREFR::Update3D_v1c()
 	UInt8 kPlayerUpdate3DpatchFrom = 0x0B6;
 	UInt8 kPlayerUpdate3DpatchTo = 0x0EB;
 
-	if (this == g_thePlayer)
+	if (this == PlayerCharacter::GetSingleton())
 	{
 		static constexpr UInt32 kPlayerUpdate3Dpatch = 0x0094EB7A;
 		// Lets try to allow unloading the player3D never the less...
@@ -67,7 +67,7 @@ bool TESObjectREFR::Update3D_v1c()
 
 bool TESObjectREFR::Update3D()
 {
-	if (this == g_thePlayer) {
+	if (this == PlayerCharacter::GetSingleton()) {
 		// Lets try to allow unloading the player3D never the less...
 		SafeWrite8(kPlayerUpdate3Dpatch, kPlayerUpdate3DpatchTo);
 	}
@@ -154,7 +154,7 @@ bool TESObjectREFR::GetInventoryItems(InventoryItemsMap &invItems)
 	SInt32 countDelta;
 	ContChangesEntry *entry;
 
-	for (auto contIter = container->formCountList.Begin(); !contIter.End(); ++contIter)
+	for (const auto contIter : container->formCountList)
 	{
 		item = contIter->form;
 		if (item->typeID == kFormType_TESObjectCONT || invItems.contains(item)) continue;
@@ -170,14 +170,13 @@ bool TESObjectREFR::GetInventoryItems(InventoryItemsMap &invItems)
 			invItems.emplace(item, InventoryItemData(contCount, entry));
 	}
 
-	for (auto xtraIter = entryList->Begin(); !xtraIter.End(); ++xtraIter)
+	for (const auto entry_data : *entryList)
 	{
-		entry = xtraIter.Get();
-		item = entry->form;
+		item = entry_data->form;
 		if (invItems.contains(item)) continue;
-		countDelta = entry->countDelta;
+		countDelta = entry_data->countDelta;
 		if (countDelta > 0)
-			invItems.emplace(item, InventoryItemData(countDelta, entry));
+			invItems.emplace(item, InventoryItemData(countDelta, entry_data));
 	}
 
 	return !invItems.empty();
@@ -412,8 +411,8 @@ ExtraDataList* ExtraContainerChanges::EntryData::GetEquippedExtra()
 ExtraDataList* ExtraContainerChanges::EntryData::GetCustomExtra(UInt32 whichVal)
 {
 	if (!extendData) return nullptr;
-	const ListNode<ExtraDataList>* xdlIter = extendData->Head();
-	do if (ExtraDataList* xData = xdlIter->data; xData && xData->HasType(whichVal)) return xData;
+	const TListNode<ExtraDataList>* xdlIter = extendData->Head();
+	do if (const auto xData = xdlIter->data; xData && xData->HasType(whichVal)) return xData;
 	while ((xdlIter = xdlIter->next));
 	return nullptr;
 }
@@ -439,8 +438,14 @@ __declspec(naked) ContChangesEntry* ContChangesList::FindForItem(TESForm* item)
 	}
 }
 
-PlayerCharacter* g_thePlayer = nullptr;
-
 PlayerCharacter*		PlayerCharacter::GetSingleton() { return *reinterpret_cast<PlayerCharacter**>(0x011DEA3C); }
 QuestObjectiveTargets*	PlayerCharacter::GetCurrentQuestObjectiveTargets() { return ThisStdCall<QuestObjectiveTargets*>(s_PlayerCharacter_GetCurrentQuestTargets, this); }
 HighProcess*			PlayerCharacter::GetHighProcess() { return reinterpret_cast<HighProcess*>(baseProcess); }
+
+bool Explosion::CanStoreAmmo()
+{
+	if (!source) return false;
+	if (source->typeID != kFormType_Character && source->typeID != kFormType_Creature) return false;
+	if (!source->IsActor()) return false;
+	return true;
+}

@@ -96,7 +96,7 @@ struct ModInfo		// referred to by game as TESFile
 		UInt32	high;
 	};
 
-	tList<ModInfo>						unkList;			// 000 treated as ModInfo during InitializeForm, looks to be a linked list of modInfo. Also during Save in GECK.
+	TList<ModInfo>						unkList;			// 000 treated as ModInfo during InitializeForm, looks to be a linked list of modInfo. Also during Save in GECK.
 	UInt32 /*NiTPointerMap<TESFile*>*/	* pointerMap;		// 008
 	UInt32								unk00C;				// 00C
 	BSFile*								unkFile;			// 010
@@ -120,7 +120,7 @@ struct ModInfo		// referred to by game as TESFile
 	FormInfo							writeInfo;			// 270 "used" to add record to the plugin.
 	UInt32								writeOffset;		// 288
 	UInt32								subrecordBytesToWrite;	// 28C
-	tList<UInt32>						tList290;			// 290 looks to be a list of form or a list of formInfo. referenced from TESForm::WriteForm
+	TList<UInt32>						TList290;			// 290 looks to be a list of form or a list of formInfo. referenced from TESForm::WriteForm
 	UInt8								unk298;				// 298
 	UInt8								bIsBigEndian;		// 299
 	UInt8								unk29A;				// 29A
@@ -129,8 +129,8 @@ struct ModInfo		// referred to by game as TESFile
 	FileHeader							header;				// 3DC
 	UInt8								flags;				// 3E8	Bit 0 is ESM . Runtime: Bit 2 is Valid, Bit 3 is Unselected Editor: 2 is selected, 3 is active, 4 may be invalid, 6 is endian, 14 controls VCI.
 	UInt8								pad3E9[3];
-	tList<char*>						refModNames;		// 3EC
-	tList<MasterSize*>					refModData;			// 3F4 most likely full of 0
+	TList<char*>						refModNames;		// 3EC
+	TList<MasterSize*>					refModData;			// 3F4 most likely full of 0
 	UInt32								numRefMods;			// 3FC related to modindex; see 4472D0
 																// formIDs in mod are as saved in GECK, must fix up at runtime
 	ModInfo								** refModInfo;		// 400 used to look up modInfo based on fixed mod index, double-check
@@ -164,7 +164,7 @@ STATIC_ASSERT(sizeof(ModInfo) == 0x42C);
 
 struct ModList
 {
-	tList<ModInfo>		modInfoList;		// 00
+	TList<ModInfo>		modInfoList;		// 00
 	UInt32				loadedModCount;		// 08
 	ModInfo*			loadedMods[0xFF];	// 0C
 };
@@ -179,64 +179,64 @@ public:
 
 	UInt32							unk00;					// 000
 	BoundObjectListHead*			boundObjectList;		// 004
-	tList<TESPackage>				packageList;			// 008
-	tList<TESWorldSpace>			worldSpaceList;			// 010
-	tList<TESClimate>				climateList;			// 019
-	tList<TESImageSpace>			imageSpaceList;			// 020
-	tList<TESImageSpaceModifier>	imageSpaceModList;		// 028
-	tList<TESWeather>				weatherList;			// 030
-	tList<EnchantmentItem>			enchantmentItemList;	// 038
-	tList<SpellItem>				spellItemList;			// 040
-	tList<BGSHeadPart>				headPartList;			// 048
-	tList<TESHair>					hairList;				// 050
-	tList<TESEyes>					eyeList;				// 058
-	tList<TESRace>					raceList;				// 060
-	tList<BGSEncounterZone>			encounterZoneList;		// 068
-	tList<TESLandTexture>			landTextureList;		// 070
-	tList<BGSCameraShot>			cameraShotList;			// 078
-	tList<TESClass>					classList;				// 080
-	tList<TESFaction>				factionList;			// 088
-	tList<TESReputation>			reputationList;			// 090
-	tList<TESChallenge>				challengeList;			// 098
-	tList<TESRecipe>				recipeList;				// 0A0
-	tList<TESRecipeCategory>		recipeCategoryList;		// 0A8
-	tList<TESAmmoEffect>			ammoEffectList;			// 0B0
-	tList<TESCasino>				casinoList;				// 0B8
-	tList<TESCaravanDeck>			caravanDeckList;		// 0C0
-	tList<Script>					scriptList;				// 0C8
-	tList<TESSound>					soundList;				// 0D0
-	tList<BGSAcousticSpace>			acousticSpaceList;		// 0D8
-	tList<BGSRagdoll>				ragdollList;			// 0E0
-	tList<TESGlobal>				globalList;				// 0E8
-	tList<BGSVoiceType>				voiceTypeList;			// 0F0
-	tList<BGSImpactData>			impactDataList;			// 0F8
-	tList<BGSImpactDataSet>			impactDataSetList;		// 100
-	tList<TESTopic>					topicList;				// 108
-	tList<TESTopicInfo>				topicInfoList;			// 110
-	tList<TESQuest>					questList;				// 118
-	tList<TESCombatStyle>			combatStyleList;		// 120
-	tList<TESLoadScreen>			loadScreenList;			// 128
-	tList<TESWaterForm>				waterFormList;			// 130
-	tList<TESEffectShader>			effectShaderList;		// 138
-	tList<BGSProjectile>			projectileList;			// 140
-	tList<BGSExplosion>				explosionList;			// 148
-	tList<BGSRadiationStage>		radiationStageList;		// 150
-	tList<BGSDehydrationStage>		dehydrationStageList;	// 158
-	tList<BGSHungerStage>			hungerStageList;		// 160
-	tList<BGSSleepDeprivationStage>	sleepDepriveStageList;	// 168
-	tList<BGSDebris>				debrisList;				// 170
-	tList<BGSPerk>					perkList;				// 178
-	tList<BGSBodyPartData>			bodyPartDataList;		// 180
-	tList<BGSNote>					noteList;				// 188
-	tList<BGSListForm>				listFormList;			// 190
-	tList<BGSMenuIcon>				menuIconList;			// 198
-	tList<TESObjectANIO>			anioList;				// 1A0
-	tList<BGSMessage>				messageList;			// 1A8
-	tList<BGSLightingTemplate>		lightningTemplateList;	// 1B0
-	tList<BGSMusicType>				musicTypeList;			// 1B8
-	tList<TESLoadScreenType>		loadScreenTypeList;		// 1C0
-	tList<MediaSet>					mediaSetList;			// 1C8
-	tList<MediaLocationController>	mediaLocControllerList;	// 1D0
+	TList<TESPackage>				packageList;			// 008
+	TList<TESWorldSpace>			worldSpaceList;			// 010
+	TList<TESClimate>				climateList;			// 019
+	TList<TESImageSpace>			imageSpaceList;			// 020
+	TList<TESImageSpaceModifier>	imageSpaceModList;		// 028
+	TList<TESWeather>				weatherList;			// 030
+	TList<EnchantmentItem>			enchantmentItemList;	// 038
+	TList<SpellItem>				spellItemList;			// 040
+	TList<BGSHeadPart>				headPartList;			// 048
+	TList<TESHair>					hairList;				// 050
+	TList<TESEyes>					eyeList;				// 058
+	TList<TESRace>					raceList;				// 060
+	TList<BGSEncounterZone>			encounterZoneList;		// 068
+	TList<TESLandTexture>			landTextureList;		// 070
+	TList<BGSCameraShot>			cameraShotList;			// 078
+	TList<TESClass>					classList;				// 080
+	TList<TESFaction>				factionList;			// 088
+	TList<TESReputation>			reputationList;			// 090
+	TList<TESChallenge>				challengeList;			// 098
+	TList<TESRecipe>				recipeList;				// 0A0
+	TList<TESRecipeCategory>		recipeCategoryList;		// 0A8
+	TList<TESAmmoEffect>			ammoEffectList;			// 0B0
+	TList<TESCasino>				casinoList;				// 0B8
+	TList<TESCaravanDeck>			caravanDeckList;		// 0C0
+	TList<Script>					scriptList;				// 0C8
+	TList<TESSound>					soundList;				// 0D0
+	TList<BGSAcousticSpace>			acousticSpaceList;		// 0D8
+	TList<BGSRagdoll>				ragdollList;			// 0E0
+	TList<TESGlobal>				globalList;				// 0E8
+	TList<BGSVoiceType>				voiceTypeList;			// 0F0
+	TList<BGSImpactData>			impactDataList;			// 0F8
+	TList<BGSImpactDataSet>			impactDataSetList;		// 100
+	TList<TESTopic>					topicList;				// 108
+	TList<TESTopicInfo>				topicInfoList;			// 110
+	TList<TESQuest>					questList;				// 118
+	TList<TESCombatStyle>			combatStyleList;		// 120
+	TList<TESLoadScreen>			loadScreenList;			// 128
+	TList<TESWaterForm>				waterFormList;			// 130
+	TList<TESEffectShader>			effectShaderList;		// 138
+	TList<BGSProjectile>			projectileList;			// 140
+	TList<BGSExplosion>				explosionList;			// 148
+	TList<BGSRadiationStage>		radiationStageList;		// 150
+	TList<BGSDehydrationStage>		dehydrationStageList;	// 158
+	TList<BGSHungerStage>			hungerStageList;		// 160
+	TList<BGSSleepDeprivationStage>	sleepDepriveStageList;	// 168
+	TList<BGSDebris>				debrisList;				// 170
+	TList<BGSPerk>					perkList;				// 178
+	TList<BGSBodyPartData>			bodyPartDataList;		// 180
+	TList<BGSNote>					noteList;				// 188
+	TList<BGSListForm>				listFormList;			// 190
+	TList<BGSMenuIcon>				menuIconList;			// 198
+	TList<TESObjectANIO>			anioList;				// 1A0
+	TList<BGSMessage>				messageList;			// 1A8
+	TList<BGSLightingTemplate>		lightningTemplateList;	// 1B0
+	TList<BGSMusicType>				musicTypeList;			// 1B8
+	TList<TESLoadScreenType>		loadScreenTypeList;		// 1C0
+	TList<MediaSet>					mediaSetList;			// 1C8
+	TList<MediaLocationController>	mediaLocControllerList;	// 1D0
 	TESRegionList*					regionList;				// 1D8
 	NiTArray<TESObjectCELL*>		cellArray;				// 1DC
 	NiTArray<BGSAddonNode*>			addonArray;				// 1EC

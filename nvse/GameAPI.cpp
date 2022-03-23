@@ -169,9 +169,9 @@ void ScriptEventList::Destructor()
 	}
 }
 
-tList<ScriptEventList::Var>* ScriptEventList::GetVars() const
+TList<ScriptEventList::Var>* ScriptEventList::GetVars() const
 {
-	return reinterpret_cast<tList<Var>*>(m_vars);
+	return reinterpret_cast<TList<Var>*>(m_vars);
 }
 
 void ScriptEventList::Dump(void)

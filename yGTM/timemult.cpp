@@ -12,7 +12,7 @@ namespace TimeMult
 	{
 		std::vector<Script*> vec;
 		const auto command = GetByOpcode(0x1186);
-		for (auto iter = g_dataHandler->scriptList.Begin(); !iter.End(); ++iter) vec.push_back(iter.Get());
+		for (auto iter : g_dataHandler->scriptList) vec.push_back(iter);
 		for (const auto& iter : std::ranges::reverse_view(vec))
 		{
 			if (g_specialMods.contains(iter->modIndex)) continue;

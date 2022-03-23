@@ -45,7 +45,7 @@ public:
 	UInt32		unk34;				// 34
 	UInt32		unk38;				// 38
 	TESForm		* enchantObject;	// 3C enchanted obj responsible for effect
-	tList<TESForm>	data;			// 40 - in ScriptEffect this is a Script *
+	TList<TESForm>	data;			// 40 - in ScriptEffect this is a Script *
 
 	void Remove(bool bRemoveImmediately);
 };

@@ -424,7 +424,7 @@ class LockFreeMap: InterfacedClass
 	Data014	*dat014;		// 14 Init'd to a 16 bytes structure
 	UInt32	unk018;			// 18
 	UInt32	unk01C;			// 1C
-	UInt32	unk020[2];		// 20 Pair of DWord (tList ?)
+	UInt32	unk020[2];		// 20 Pair of DWord (TList ?)
 	// ?
 };
 

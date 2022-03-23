@@ -35,8 +35,8 @@ public:
 	~ActorProcessManager();
 
 	struct ActorList {
-		tList<Actor>			head;
-		tList<Actor>::_Node		* tail;
+		TList<Actor>			head;
+		TList<Actor>::Node*		tail;
 	};
 
 	ActorList				middleHighActors;		// 00
@@ -45,17 +45,17 @@ public:
 	ActorList				lowActors18;			// 18
 	float					unk24;					// 24
 	UInt32					unk28;					// 28
-	void					* unk2C;				// 2C
+	void*					unk2C;					// 2C
 	UInt32					unk30;					// 30
-	void					* unk34;				// 34
+	void*					unk34;					// 34
 	UInt32					unk38[0x0A];			// 38
 	// almost confirmed to be at index 60
-	tList<BSTempEffect>		tempEffects;			// 60
+	TList<BSTempEffect>		tempEffects;			// 60
 	// needs recalc of offsets
 	UInt32					unk4C[4];				// 4C
-	tList<Actor>			highActors;				// 5C
-	Actor					* actor64;				// 64
-	tList<Actor>::_Node		* unkNodes[3];			// 68 ##TODO: which lists do these belong to
+	TList<Actor>			highActors;				// 5C
+	Actor*					actor64;				// 64
+	TList<Actor>::Node*		unkNodes[3];			// 68 ##TODO: which lists do these belong to
 	UInt32					unk74;					// 74 Possibly not a member. Definitely no more members following this.
 };
 
@@ -660,7 +660,7 @@ public:
 
 	struct ActorValueModifiers
 	{
-		tList<ActorValueModifier>	avModifierList;	// 00
+		TList<ActorValueModifier>	avModifierList;	// 00
 		UInt8						unk008;			// 08
 		UInt8						pad009[3];		// 09
 		void**						modifiedAV;	// 0C	array of damaged actorValue
@@ -704,12 +704,12 @@ public:
 	UInt32					unk050;		// not initialized!
 	UInt32					unk054;
 	UInt32					unk058;
-	tList<UInt32>			unk05C;		// List
+	TList<UInt32>			unk05C;		// List
 	UInt32					unk064;
 	UInt32					unk068;
-	tList<TESForm>			unk06C;
-	tList<UInt32>			unk074;
-	tList<UInt32>			unk07C;
+	TList<TESForm>			unk06C;
+	TList<UInt32>			unk074;
+	TList<UInt32>			unk07C;
 	UInt32					unk084;
 	UInt32					unk088;
 	UInt32					unk08C;
@@ -767,8 +767,8 @@ public:
 	virtual void	Unk_21A();
 	virtual void	Unk_21B();
 
-	tList<TESForm*>						unk0C8;				// 0C8
-	tList<UInt32>						unk0D0;				// 0D0
+	TList<TESForm*>						unk0C8;				// 0C8
+	TList<UInt32>						unk0D0;				// 0D0
 	UInt32								unk0D8[3];			// 0D8
 	PackageInfo							interruptPackage;	// 0E4 InterruptPackage
 	UInt8								unk0FC[12];			// 0FC	Saved as one, might be Pos/Rot given size
@@ -828,7 +828,7 @@ public:
 	UInt8								byte229;			// 229
 	UInt16								byte22A;			// 22A
 	UInt32								unk22C;				// 22C
-	tList<ContChangesEntry>				queuedEquipItems;	// 230	ContChangesEntry*
+	TList<ContChangesEntry>				queuedEquipItems;	// 230	ContChangesEntry*
 	float								rads238;			// 238
 	float								waterRadsSec;		// 23C
 	ActorHitData*						hitData240;			// 240 ActorHitData*
@@ -846,16 +846,16 @@ STATIC_ASSERT(sizeof(MiddleHighProcess) == 0x25C);
 class HighProcess : public MiddleHighProcess
 {
 public:
-	tList<void>* detectedActors;	// 25C
-	tList<void>* detectingActors;	// 260
+	TList<void>* detectedActors;	// 25C
+	TList<void>* detectingActors;	// 260
 	void* ptr264;			// 264
 	void* ptr268;			// 268
 	void* ptr26C;			// 26C
 	UInt32								unk270;				// 270
-	tList<void>					list274;			// 274
-	tList<void>							list27C;			// 27C
-	tList<void>							list284;			// 284
-	tList<void>							list28C;			// 28C
+	TList<void>					list274;			// 274
+	TList<void>							list27C;			// 27C
+	TList<void>							list284;			// 284
+	TList<void>							list28C;			// 28C
 	float								flt294;				// 294
 	float								flt298;				// 298
 	UInt32								unk29C;				// 29C
@@ -913,8 +913,8 @@ public:
 	UInt32								unk380;				// 380
 	float								flt384;				// 384
 	float								flt388;				// 388
-	tList<void>							list38C;			// 38C
-	tList<void>							list394;			// 394
+	TList<void>							list38C;			// 38C
+	TList<void>							list394;			// 394
 	UInt32								unk39C;				// 39C
 	UInt32								unk3A0;				// 3A0
 	float								flt3A4;				// 3A4
@@ -1052,7 +1052,7 @@ struct AnimData
 	NiTPointerMap<AnimSequenceBase>* mapAnimSequenceBase;// 0DC
 	BSAnimGroupSequence* animSequence[8];	// 0E0
 	BSAnimGroupSequence* animSeq100;		// 100
-	tList<KFModel>	loadingAnims;
+	TList<KFModel>	loadingAnims;
 	float movementSpeedMult;
 	float rateOfFire;
 	float turboSpeedMult;
@@ -1065,7 +1065,7 @@ struct AnimData
 	AnimIdle* idleAnimQueued;
 	NiNode* node12C;
 	NiNode* node130;
-	tList<void> list134;
+	TList<void> list134;
 
 	AnimGroupID GetNextAttackGroupID() const;
 

@@ -152,7 +152,7 @@ struct ScriptEventList
 		UInt8 unk00[8];
 	};
 
-	typedef tList<Event> EventList;
+	typedef TList<Event> EventList;
 
 	Script			* m_script;		// 00
 	UInt32			  m_unk1;			// 04
@@ -165,7 +165,7 @@ struct ScriptEventList
 	UInt32	ResetAllVariables();
 
 	void	Destructor();
-	tList<Var>* GetVars() const;
+	TList<Var>* GetVars() const;
 };
 
 ScriptEventList* EventListFromForm(TESForm* form);
@@ -530,42 +530,42 @@ public:
 		CreatedObject	* next;
 	};
 
-	ChangesMap					* changesMap;		// 000
-	UInt32						unk004;				// 004
-	InteriorCellNewReferencesMap	* intRefMap;	// 008
-	ExteriorCellNewReferencesMap	* extRefMap00C;	// 00C
-	ExteriorCellNewReferencesMap	* extRefMap010;	// 010
-	void						* saveLoadBuffer;	// 014
-	UInt32						unk018;				// 018
-	UInt8						unk01C;				// 01C
-	UInt8						pad01D[3];
-	NiTArray<TESObjectREFR*>	* arr020;			// 020
-	UInt32						unk024;				// 024
-	UInt32						unk028;				// 028
-	CreatedObject				createdObjectList;	// 02C data is formID - verified
-	NiTPointerMap<void*>		* map034;			// 034
-	UInt32				unk034[(0x58-0x44) >> 2];	// 044
-	NumericIDBufferMap			* idMap058;			// 058
-	NumericIDBufferMap			* idMap05C;			// 05C
-	NumericIDBufferMap			* idMap060;			// 060
-	NumericIDBufferMap			* idMap064;			// 064
-	UInt32						unk068;				// 068
-	UInt32						unk06C;				// 06C
-	UInt32						unk070;				// 070
-	UInt8						unk074;				// 074
-	UInt8						unk075;				//     init to 0x7D
-	UInt8						pad076[2];
-	NiTArray<UInt32>			* array078;			// 078 NiTLargePrimitiveArray<?>
-	NiTArray<UInt32>			* array07C;			// 07C NiTLargePrimitiveArray<?>	
-	UInt8						unk080;				// 080 version of save?
-	UInt8						unk081;
-	UInt8						pad082[2];
-	UInt32				unk084[(0xAC-0x84) >> 2];	// 084
-	UInt8						unk0AC;				// 0AC
-	UInt8						unk0AD;				// 0AD
-	UInt8						unk0AE;				// 0AE
-	UInt8						unk0AF;				// 0AF
-	UInt32				unk0B0[(0x1C8-0x0B0) >> 2];	// 0B0
+	ChangesMap*						changesMap;			// 000
+	UInt32							unk004;				// 004
+	InteriorCellNewReferencesMap*	intRefMap;			// 008
+	ExteriorCellNewReferencesMap*	extRefMap00C;		// 00C
+	ExteriorCellNewReferencesMap*	extRefMap010;		// 010
+	void*							saveLoadBuffer;		// 014
+	UInt32							unk018;				// 018
+	UInt8							unk01C;				// 01C
+	UInt8							pad01D[3];
+	NiTArray<TESObjectREFR*>*		arr020;				// 020
+	UInt32							unk024;				// 024
+	UInt32							unk028;				// 028
+	CreatedObject					createdObjectList;	// 02C data is formID - verified
+	NiTPointerMap<void*>*			map034;				// 034
+	UInt32							unk034[(0x58-0x44) >> 2];	// 044
+	NumericIDBufferMap*				idMap058;			// 058
+	NumericIDBufferMap*				idMap05C;			// 05C
+	NumericIDBufferMap*				idMap060;			// 060
+	NumericIDBufferMap*				idMap064;			// 064
+	UInt32							unk068;				// 068
+	UInt32							unk06C;				// 06C
+	UInt32							unk070;				// 070
+	UInt8							unk074;				// 074
+	UInt8							unk075;				//     init to 0x7D
+	UInt8							pad076[2];
+	NiTArray<UInt32>*				array078;			// 078 NiTLargePrimitiveArray<?>
+	NiTArray<UInt32>*				array07C;			// 07C NiTLargePrimitiveArray<?>	
+	UInt8							unk080;				// 080 version of save?
+	UInt8							unk081;
+	UInt8							pad082[2];
+	UInt32							unk084[(0xAC-0x84) >> 2];	// 084
+	UInt8							unk0AC;				// 0AC
+	UInt8							unk0AD;				// 0AD
+	UInt8							unk0AE;				// 0AE
+	UInt8							unk0AF;				// 0AF
+	UInt32							unk0B0[(0x1C8-0x0B0) >> 2];	// 0B0
 
 	static TESSaveLoadGame* Get();
 
@@ -672,7 +672,7 @@ public:
 		const char	* time;		// 18
 	};
 
-	tList<SaveGameData>		* saveList;		// 00
+	TList<SaveGameData>		* saveList;		// 00
 	UInt32					numSaves;		// 04
 	UInt32					unk08;			// 08
 	UInt8					unk0C;			// 0C	flag for either opened or writable or useSeparator (|)
@@ -791,21 +791,20 @@ public:
 		/* ELSE and ENDIF modify the above flags*/
 	};
 
-	// members
-	/*00*/ TESObjectREFR* containingObj; // set when executing scripts on inventory objects
-	/*04*/ TESForm* callingRefBaseForm;
-	/*08*/ ScriptEventList* eventList;
-	/*0C*/ UInt32 unk0C;
-	/*10*/ UInt32 unk10; // pointer? set to NULL before executing an instruction
-	/*14*/ Script* script;
-	/*18*/ UInt32 unk18; // set to 6 after a failed expression evaluation
-	/*1C*/ UInt32 unk1C; // set to Expression::errorCode
-	/*20*/ UInt32 ifStackDepth;
-	/*24*/ UInt32 ifStack[kStackDepth];	// stores flags
-	/*4C*/ UInt32 unk4C[(0xA0 - 0x4C) >> 2];
-	/*A0*/ UInt8 invalidReferences;	// set when the dot operator fails to resolve a reference (inside the error message handler)
-	/*A1*/ UInt8 unkA1;	// set when the executing CommandInfo's 2nd flag bit (+0x25) is set
-	/*A2*/ UInt16 padA2;
+	TESObjectREFR*		containingObj;		/*00*/  // set when executing scripts on inventory objects
+	TESForm*			callingRefBaseForm;	/*04*/ 
+	ScriptEventList*	eventList;			/*08*/ 
+	UInt32				unk0C;				/*0C*/ 
+	UInt32				unk10;				/*10*/  // pointer? set to NULL before executing an instruction
+	Script*				script;				/*14*/ 
+	UInt32				unk18;				/*18*/ // set to 6 after a failed expression evaluation
+	UInt32				unk1C;				/*1C*/ // set to Expression::errorCode
+	UInt32				ifStackDepth;		/*20*/ 
+	UInt32				ifStack[kStackDepth];		/*24*/ // stores flags
+	UInt32				unk4C[(0xA0 - 0x4C) >> 2];	/*4C*/ 
+	UInt8				invalidReferences;	/*A0*/ // set when the dot operator fails to resolve a reference (inside the error message handler)
+	UInt8				unkA1;				/*A1*/// set when the executing CommandInfo's 2nd flag bit (+0x25) is set
+	UInt16				padA2;				/*A2*/ 
 };
 STATIC_ASSERT(sizeof(ScriptRunner) == 0xA4);
 
@@ -820,7 +819,10 @@ public:
 		UInt32			numArgs;	// 0C
 		FunctionArg		args[4];	// 10
 
-		QueuedCmdCall(void* _cmdAddr, UInt32 _thisObj, UInt8 _numArgs) : opcode(0x2B), cmdAddr(_cmdAddr), thisObj(_thisObj), numArgs(_numArgs) {}
+		QueuedCmdCall(void* _cmdAddr, UInt32 _thisObj, UInt8 _numArgs) : opcode(0x2B), cmdAddr(_cmdAddr),
+		                                                                 thisObj(_thisObj), numArgs(_numArgs), args{}
+		{
+		}
 	};
 
 	static ScrapHeapQueue* GetSingleton() { return *reinterpret_cast<ScrapHeapQueue**>(0x11DF1A8); }

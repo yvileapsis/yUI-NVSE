@@ -145,8 +145,8 @@ public:
 	UInt32 GetVarCount() const;
 	UInt32 GetRefCount() const;
 
-	tList<VariableInfo>* GetVars();
-	tList<RefVariable>* GetRefList();
+	TList<VariableInfo>* GetVars();
+	TList<RefVariable>* GetRefList();
 	static Script* CreateScript();
 	void DeleteScript() const;
 

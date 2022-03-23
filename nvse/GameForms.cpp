@@ -176,12 +176,9 @@ const char* TESBipedModelForm::GetPath(UInt32 whichPath, bool bFemalePath)
 
 SInt8 TESActorBaseData::GetFactionRank(TESFaction* faction)
 {
-	for(tList<FactionListData>::Iterator iter = factionList.Begin(); !iter.End(); ++iter)
-	{
-		FactionListData	* data = iter.Get();
-		if(data && (data->faction == faction))
-			return data->rank;
-	}
+	for (const auto iter : factionList)
+		if (iter && (iter->faction == faction))
+			return iter->rank;
 
 	return -1;
 }
@@ -363,7 +360,7 @@ SInt32 BGSListForm::ReplaceForm(TESForm* pForm, TESForm* pReplaceWith)
 bool BGSListForm::Contains(TESForm* form)
 {
 	if (!form) return false;
-	for (auto iter = this->list.Begin(); !iter.End(); ++iter) if (iter.Get()->refID == form->refID) return true;
+	for (const auto iter : this->list) if (iter->refID == form->refID) return true;
 	return false;
 }
 
@@ -372,8 +369,8 @@ bool BGSListForm::ContainsRecursive(TESForm* form, UInt32 reclvl)
 	if (!form) return false;
 	if (this->Contains(form)) return true;
 	if (reclvl > 100) return false; [[unlikely]]
-	for (auto iter = this->list.Begin(); !iter.End(); ++iter)
-		if (iter.Get()->typeID == kFormType_BGSListForm)
+	for (const auto iter : this->list)
+		if (iter->typeID == kFormType_BGSListForm)
 			if (const auto list = DYNAMIC_CAST(this, TESForm, BGSListForm);  list && list->ContainsRecursive(form, reclvl++)) return true;
 	return false;
 }
@@ -794,7 +791,7 @@ Script* EffectSetting::	RemoveScript()
 SInt32 TESContainer::GetCountForForm(TESForm *form)
 {
 	SInt32 result = 0;
-	for (auto iter = formCountList.Begin(); !iter.End(); ++iter)
+	for (const auto iter : formCountList)
 		if (iter->form == form) result += iter->count;
 	return result;
 }

@@ -364,7 +364,7 @@ public:
 	int						unk060;				// 060
 	int						unk064;				// 064
 	UInt32					unk068[2];			// 068
-	tList<TESObjectREFR>	selectableRefs;		// 070
+	TList<TESObjectREFR>	selectableRefs;		// 070
 	UInt32					selectedRefIndex;	// 078
 	bool					debugText;			// 07C
 	UInt8					byte07D;			// 07D
@@ -533,22 +533,21 @@ public:
 
 	Item* GetSelected()
 	{
-		ListNode<ListBoxItem<Item>>* iter = BSSimpleList<Item>::list.Head();
-		ListBoxItem<Item>* item;
+		TListNode<ListBoxItem<Item>>* iter = BSSimpleList<Item>::list.Head();
 		do
 		{
-			item = iter->data;
+			const auto item = iter->data;
 			if (item && (item->tile == selected))
 				return item->object;
-		} while (iter = iter->next);
-		return NULL;
+		} while ((iter = iter->next));
+		return nullptr;
 	}
 
 	Tile* GetNthTile(SInt32 index)
 	{
 		if (index >= 0)
 		{
-			ListNode<ListBoxItem<Item>>* iter = BSSimpleList<Item>::list.Head();
+			TListNode<ListBoxItem<Item>>* iter = BSSimpleList<Item>::list.Head();
 			do
 			{
 				if (!index)
@@ -556,25 +555,24 @@ public:
 					return iter->data ? iter->data->tile : NULL;
 				}
 				index--;
-			} while (iter = iter->next);
+			} while ((iter = iter->next));
 		}
-		return NULL;
+		return nullptr;
 	}
 
 	void Clear()
 	{
-		ListNode<ListBoxItem<Item>>* iter = BSSimpleList<Item>::list.Head();
-		ListBoxItem<Item>* item;
+		TListNode<ListBoxItem<Item>>* iter = BSSimpleList<Item>::list.Head();
 		do
 		{
-			item = iter->data;
+			const auto item = iter->data;
 			if (!item) continue;
 			if (item->tile)
 				item->tile->Destroy(true);
 			GameHeapFree(item);
-		} while (iter = iter->next);
+		} while ((iter = iter->next));
 		BSSimpleList<Item>::list.RemoveAll();
-		selected = NULL;
+		selected = nullptr;
 		itemCount = 0;
 	}
 
@@ -609,15 +607,14 @@ public:
 
 	Item* GetItemForTile(Tile* tile)
 	{
-		ListNode<ListBoxItem<Item>>* iter = BSSimpleList<Item>::list.Head();
-		ListBoxItem<Item>* item;
+		TListNode<ListBoxItem<Item>>* iter = BSSimpleList<Item>::list.Head();
 		do
 		{
-			item = iter->data;
+			const auto item = iter->data;
 			if (item && (item->tile == tile))
 				return item->object;
-		} while (iter = iter->next);
-		return NULL;
+		} while ((iter = iter->next));
+		return nullptr;
 	}
 
 	void SaveScrollPosition()
@@ -803,7 +800,7 @@ public:
 	};
 	
 	TileMenu*			tile{};				// 04
-	tList<TemplateData>	menuTemplates;		// 08
+	TList<TemplateData>	menuTemplates;		// 08
 	UInt32				unk10{};			// 10
 	UInt32				unk14{};			// 14	Same as id (20)
 	UInt32				unk18{};			// 18
@@ -917,7 +914,7 @@ public:
 	TileRect*			tile06C;		// 06C
 	TileRect*			tile070;		// 070
 	TESObjectREFR*		containerRef;	// 074
-	tList<void>			list078;		// 078
+	TList<void>			list078;		// 078
 	UInt32				mode;			// 080
 	UInt32				valueTransfered;// 084
 	UInt8				hasPickedPocket;// 088
@@ -1142,7 +1139,7 @@ public:
 
 	UInt32						unk184;					// 184
 	float						flt188;					// 188
-	tList<QueuedMessage>		queuedMessages;			// 18C
+	TList<QueuedMessage>		queuedMessages;			// 18C
 	UInt32						currMsgKey;				// 194
 	BSSimpleArray<SubtitleData>	subtitlesArr;			// 198
 	SubtitleData*				currentSubtitle;		// 1A8 
@@ -1170,12 +1167,12 @@ public:
 	Timer						timer224;				// 224
 	UInt32						unk244;					// 244
 	UInt32						unk248[4];				// 248
-	tList<QueuedQuestText>		queuedQuestTextList;	// 258
+	TList<QueuedQuestText>		queuedQuestTextList;	// 258
 	UInt8						byte260;				// 260
 	UInt8						byte261;				// 261
 	UInt8						pad262[2];				// 262
-	tList<UInt32>				xpMessages;				// 264
-	tList<UInt32>				list26C;				// 26C
+	TList<UInt32>				xpMessages;				// 264
+	TList<UInt32>				list26C;				// 26C
 	float						hudShake;				// 274
 
 	static HUDMainMenu* GetSingleton() { return *reinterpret_cast<HUDMainMenu**>(0x11D96C0); }
@@ -1260,7 +1257,7 @@ public:
 	UInt32 miscStatArray[43];
 	String str1B8;
 	NiPoint4 backgroundColor;
-	tList<TESLoadScreen> loadScrList;
+	TList<TESLoadScreen> loadScrList;
 	void* ptr1D8;
 	TESLoadScreen* loadScr1DC;
 	UInt32 nextUpdateTime;
@@ -1346,13 +1343,13 @@ public:
 			UInt32 avCode;
 		};
 
-		tList<StatusData> statusDataList;
+		TList<StatusData> statusDataList;
 	};
 
 	class NamedEffectsList
 	{
 	public:
-		tList<void> list04;
+		TList<void> list04;
 	};
 
 	struct StatusEffect
@@ -1506,9 +1503,9 @@ public:
 	BSFadeNode** currencyCoinNIFs[3];
 	BSFadeNode** currencyBillNIFs[3];
 	BSSimpleArray<NiAVObject> unk134;
-	tList<void> list144;
+	TList<void> list144;
 	BSSimpleArray<NiAVObject> unk14C;
-	tList<void> list15C;
+	TList<void> list15C;
 	BSSimpleArray<SInt32> unk164[2];
 	BSFadeNode** CaravanTableNIF;
 	UInt32 unk188;
@@ -1660,7 +1657,7 @@ public:
 	UInt32 numSelected;
 	UInt32 maxSelect;
 	ListBox<BGSPerk> perkListBox;
-	tList<BGSPerk> perkList;
+	TList<BGSPerk> perkList;
 
 	static TraitMenu* GetSingleton() { return *reinterpret_cast<TraitMenu**>(0x11DAF74); };
 };
@@ -1923,7 +1920,7 @@ public:
 	ScrollPos	tabScrollPositions[6];	// 088, the scroll index for Weapons, Apparel, Aid, Misc, Ammo and the Keyring
 	MenuItemEntryList	itemsList;		// 0B8
 	HotKeyWheel			hotkeyWheel;	// 0E8
-	tList<ContChangesEntry> changedItemsList; // 11C
+	TList<ContChangesEntry> changedItemsList; // 11C
 
 	static InventoryMenu* GetSingleton() { return *reinterpret_cast<InventoryMenu**>(0x11D9EA4); };
 	static ContChangesEntry* GetSelection() { return *reinterpret_cast<ContChangesEntry**>(0x11D9EA8); };
@@ -1933,7 +1930,7 @@ public:
 STATIC_ASSERT(sizeof(InventoryMenu) == 0x124);
 
 
-typedef tList<ContChangesEntry> BarterItemList;
+typedef TList<ContChangesEntry> BarterItemList;
 class BarterMenu : public Menu			// 1053
 {
 public:
@@ -2094,7 +2091,7 @@ public:
 	Sound UIHackingCharEnter;
 	UInt32 printedLines_TileChildList[3];
 	UInt32 tileChildList174[3];
-	tList<char> words;
+	TList<char> words;
 	UInt32 tileChildList188[3];
 	TESObjectREFR* targetBaseRef;
 	TESObjectREFR* targetRef;
@@ -2169,7 +2166,7 @@ public:
 	Tile* tile_computers_display_zone_text;
 	Tile* tile_computers_separator;
 	ListBox<MenuEntry> terminalMenuItemsListBox;
-	tList<void> subMenuBGSTerminals;
+	TList<void> subMenuBGSTerminals;
 	UInt32 time0A0;
 	Tile::Value* isComputersCursorVisible;
 	BGSTerminal* targetRefBaseForm;
@@ -2291,9 +2288,9 @@ public:
 	UInt8 gap81[3];
 	UInt32 unk84[3];
 	BlackJackCard cards[208];
-	tList<BlackJackCard>* dealerHandCards;
-	tList<BlackJackCard>* playerHandCards;
-	tList<BlackJackCard>* playerSplitHandCards;
+	TList<BlackJackCard>* dealerHandCards;
+	TList<BlackJackCard>* playerHandCards;
+	TList<BlackJackCard>* playerSplitHandCards;
 	UInt32 numDecks;
 	UInt32 numRemainingCards;
 	UInt8 unkDA4;
@@ -2772,7 +2769,7 @@ class DialogMenu : public Menu			// 1009
 	struct __declspec(align(4)) DialogMenu070
 	{
 		DialogMenu070_00* unk00;
-		tList<tList<void>> listOfLists04;
+		TList<TList<void>> listOfLists04;
 		Actor* actor;
 		UInt8 isChallengeSpeechFailure;
 		UInt8 pad11[3];
@@ -2806,9 +2803,9 @@ public:
 	UInt8 gap105[3];			// 104
 	int field_108;				// 108
 	int lastMenuClickTime;		// 10C
-	tList<TESTopicInfo> infos110;// 110
-	tList<TESTopicInfo> infos118;// 118
-	tList<TESTopicInfo> infos120;// 120
+	TList<TESTopicInfo> infos110;// 110
+	TList<TESTopicInfo> infos118;// 118
+	TList<TESTopicInfo> infos120;// 120
 	float unk128;				// 128
 	ImageSpaceModifierInstance* depthOfFieldIMOD; // 12C
 	char bWasPlayerThirdPerson;	// 130
@@ -2894,8 +2891,8 @@ public:
 	TESQuest* selectedQuest;
 	BGSQuestObjective* currentObjective;
 	TileImage* mapMarker;		// 0D4
-	tList<TESObjectREFR>			mapMarkerList;	// 0D8
-	tList<TESObjectREFR>			doorList;		// 0E0
+	TList<TESObjectREFR>			mapMarkerList;	// 0D8
+	TList<TESObjectREFR>			doorList;		// 0E0
 	float							flt0E8;			// 0E8
 	float							flt0EC;			// 0EC
 	float							flt0F0;			// 0F0
@@ -3398,7 +3395,7 @@ public:
 	UInt32 numPerksToAssign;
 	ListBox<ActorValueCode> skillListBox;
 	ListBox<BGSPerk> perkListBox;
-	tList<BGSPerk> availablePerks; // perks to show in the perk listBox
+	TList<BGSPerk> availablePerks; // perks to show in the perk listBox
 
 	void SetCurrentPage(Pages newPage) { ThisCall(0x785830, this, newPage); }
 
@@ -3417,7 +3414,7 @@ struct GradualSetTile
 	Tile* tile;
 	UInt32 type; // 0-4, see 0xA081B5
 };
-static tList<GradualSetTile>* g_queuedGradualTileFades = (tList<GradualSetTile>*)0x11F3348;
+static TList<GradualSetTile>* g_queuedGradualTileFades = (TList<GradualSetTile>*)0x11F3348;
 
 struct SystemColorManager
 {
@@ -3575,7 +3572,7 @@ struct __declspec(align(4)) FontTextReplaced
 	UInt32 length;
 	UInt8 newLineCharacter;
 	UInt8 gap1D[3];
-	tList<void> lineWidths;
+	TList<void> lineWidths;
 
 	FontTextReplaced(): gap1D{}
 	{
