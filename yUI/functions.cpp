@@ -191,20 +191,16 @@ bool ContGetEquipped(ContChangesEntry* weaponInfo)
 UInt32 AlchemyItem::HasBaseEffectRestoresAV(const SInt32 avCode)
 {
 	for (const auto effect : magicItem.list.list)
-		if (effect->GetSkillCode() == avCode)
-			if (const auto setting = effect->setting; setting && !(setting->effectFlags & EffectSetting::kDetrimental))
-				return effect->magnitude;
-		//				if (effect->conditions.Evaluate(g_player, nullptr, &eval, false)) return true;
+		if (effect->GetSkillCode() == avCode && (effect->setting && !(effect->setting->effectFlags & EffectSetting::kDetrimental)))
+			return effect->magnitude;
 	return 0;
 }
 
 UInt32 AlchemyItem::HasBaseEffectDamagesAV(const SInt32 avCode)
 {
 	for (const auto effect : magicItem.list.list)
-		if (effect->GetSkillCode() == avCode)
-			if (const auto setting = effect->setting; setting && setting->effectFlags & EffectSetting::kDetrimental)
-				return effect->magnitude;
-		//				if (effect->conditions.Evaluate(g_player, nullptr, &eval, false)) return true;
+		if (effect->GetSkillCode() == avCode && (effect->setting && effect->setting->effectFlags & EffectSetting::kDetrimental))
+			return effect->magnitude;
 	return 0;
 }
 
@@ -225,15 +221,13 @@ bool AlchemyItem::IsMedicine()
 
 bool AlchemyItem::IsPoison()
 {
-	EffectItem* effItem;
 	EffectSetting* effSetting = nullptr;
-	const TListNode<EffectItem>* iter = magicItem.list.list.Head();
-	do
+	for (const auto effItem : magicItem.list.list)
 	{
-		if (!((effItem = iter->data))) continue;
 		effSetting = effItem->setting;
 		if (effSetting && !(effSetting->effectFlags & 4)) return false;
-	} while ((iter = iter->next));
+	}
+
 	return effSetting != nullptr;
 }
 
@@ -254,9 +248,8 @@ bool HasBaseEffectChangesAV(TESForm* form, const int avCode)
 	const auto enchantment = armor->enchantable.enchantItem;
 	if (!enchantment) return false;
 	for (const auto effect : enchantment->magicItem.list.list)
-		if (effect->GetSkillCode() == avCode)
-			if (const auto setting = effect->setting; setting && setting->effectFlags & EffectSetting::kRecover)
-				return true;
+		if (effect->GetSkillCode() == avCode && (effect->setting && effect->setting->effectFlags & EffectSetting::kRecover))
+			return true;
 	return false;
 }
 
@@ -373,7 +366,7 @@ TList<TESObjectREFR>::Node* iterDroppedItem;
 
 void* __fastcall FixGetDroppedWeaponPre(ExtraDataList* extradatalist)
 {
-	const auto xDropped = static_cast<ExtraDroppedItemList*>(extradatalist->GetByType(kExtraData_DroppedItemList));
+	const auto xDropped = reinterpret_cast<ExtraDroppedItemList*>(extradatalist->GetByType(kExtraData_DroppedItemList));
 	if (!xDropped) return nullptr;
 	iterDroppedItem = xDropped->itemRefs.Head();
 	if (!iterDroppedItem) return nullptr;
@@ -396,10 +389,7 @@ void FixTablineSelected()
 			fixTablineSelected = false;
 			const auto tabline = InventoryMenu::GetSingleton()->tile->GetChild("GLOW_BRANCH")->GetChild("IM_Tabline");
 			if (!tabline) return;
-			for (auto iter = tabline->children.Head(); iter; iter = iter->next)
-				iter->data->SetFloat(kTileValue_mouseover, 0, false);
+			for (const auto iter : tabline->children) iter->SetFloat(kTileValue_mouseover, 0, false);
 		}
-	} else {
-		fixTablineSelected = true;
-	}
+	} else fixTablineSelected = true;
 }

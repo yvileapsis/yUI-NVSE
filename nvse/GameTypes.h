@@ -164,7 +164,7 @@ public:
 
 	Node* Head() const { return const_cast<Node*>(&first); }
 	Node* Tail() const { return const_cast<Node*>(GetLastNode()); }
-
+	
 	bool Empty() const { return !first.data; }
 
 	class Iterator
@@ -206,7 +206,7 @@ public:
 	};
 
 	Iterator begin() const { return Iterator(Head()); }
-	Iterator end() const { return Iterator(Tail()); }
+	Iterator end() const { return Iterator(); }
 
 	UInt32 Count() const
 	{
@@ -582,8 +582,8 @@ public:
 	Node* Tail() { return last; }
 	UInt32 Size() const { return count; }
 
-	Iterator begin() const { return Iterator(Head()); }
-	Iterator end() const { return Iterator(Tail()); }
+	Iterator begin() const { return Iterator(first); }
+	Iterator end() const { return Iterator(last); }
 
 	void ExchangeNodeData(Node*, Node*);
 
