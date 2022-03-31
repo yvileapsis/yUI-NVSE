@@ -447,5 +447,6 @@ bool Explosion::CanStoreAmmo()
 	if (!source) return false;
 	if (source->typeID != kFormType_Character && source->typeID != kFormType_Creature) return false;
 	if (!source->IsActor()) return false;
+	if (ammo && (ammo->typeID != kFormType_TESAmmo && ammo->typeID != kFormType_TESObjectWEAP)) return false; // temporary check until I resolve saving issue
 	return true;
 }

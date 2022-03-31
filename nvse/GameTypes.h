@@ -141,6 +141,13 @@ public:
 		return node;
 	}
 
+	Node* GetLastNodeQuick() const
+	{
+		Node* node = first;
+		while (node->next) node = node->next;
+		return node;
+	}
+
 	Node* GetNthNode(SInt32 index) const
 	{
 		if (index < 0) return nullptr;
@@ -163,7 +170,7 @@ public:
 	}
 
 	Node* Head() const { return const_cast<Node*>(&first); }
-	Node* Tail() const { return const_cast<Node*>(GetLastNode()); }
+	Node* Tail() const { return const_cast<Node*>(GetLastNodeQuick()); }
 	
 	bool Empty() const { return !first.data; }
 
@@ -206,7 +213,7 @@ public:
 	};
 
 	Iterator begin() const { return Iterator(Head()); }
-	Iterator end() const { return Iterator(); }
+	Iterator end() const { return Iterator(GetLastNode()); }
 
 	UInt32 Count() const
 	{
@@ -1108,6 +1115,7 @@ struct ActorHitData
 	{
 		Projectile*		projectile;
 		Explosion*		explosion;
+		Actor*			actor;
 	};
 	UInt32				weaponAV;		// 0C
 	SInt32				hitLocation;	// 10

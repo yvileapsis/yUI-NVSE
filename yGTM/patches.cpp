@@ -85,12 +85,12 @@ void patchCorrectAmmoEffects(const bool bEnable)
 
 	WriteRelJump(0x89ABDC, GetAmmoFromHitDataHook<0x89AC3C>);			// get ammo from projectile and explosion
 
+	
 	WriteRelJump(0x9AC77E, FixExplosionAmmoHook1<0x9AC785>);			// HACKY HACKY HACKY
 	WriteRelJump(0x9B2662, FixExplosionAmmoHook1<0x9B2669>);			// Fix Destruct and Save so that it checks for 
 	WriteRelJump(0x9B066E, FixExplosionAmmoHook1<0x9B0675>);
 	WriteRelJump(0x9B21F7, FixExplosionAmmoHook2<0x9B2201>);			// the same things Init does
 	WriteRelJump(0x9B0681, FixExplosionAmmoHook3<0x9B0688>);
-
 	// jipln
 
 	WriteRelJump(0x9B5623, PreCalculateHitDamageHook<0x9B5628>);

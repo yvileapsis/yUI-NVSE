@@ -9,17 +9,18 @@
 extern inline bool Cmd_SetGlobalTimeMultiplierAlt_Execute(COMMAND_ARGS)
 {
 	Float32 timeMult = 1.0;
-	UInt16 mod = 0;
+	UInt32 changeTime = 0;
+	UInt32 mod = 0;
 
 	*result = 0;
-	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &timeMult, &mod)) return true;
+	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &timeMult, &changeTime, &mod)) return true;
 
 	if (mod == 0) mod = scriptObj->modIndex;
 
 	TimeMult::ModifyMap(timeMult, mod);
 	TimeMult::Set();
 
-	BSAudioManager::GetSingleton()->ignoreTimescale = 0;
+	BSAudioManager::GetSingleton()->ignoreTimescale = changeTime;
 
 	if (IsConsoleOpen()) {
 		PrintConsole("Global Time Multiplier >> '%0.2f'", TimeMult::g_timeMult);

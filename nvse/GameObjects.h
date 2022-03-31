@@ -818,7 +818,7 @@ public:
 	union										// 0DC
 	{
 		TESAmmo*				ammo;							// unused for actors ???
-		NonActorMagicCaster*	unkCaster;		
+		NonActorMagicCaster*	extraCaster;		
 	};
 	TESObjectWEAP*		weapon;			// 0E0
 	UInt32				unk0E4;			// 0E4

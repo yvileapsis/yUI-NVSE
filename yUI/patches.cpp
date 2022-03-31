@@ -101,6 +101,9 @@ void patchFixDroppedItems(const bool bEnable)
 	{
 		WriteRelCall(0x75C793, FixGetDroppedWeaponPre);
 		WriteRelJump(0x75C9AB, FixGetDroppedWeaponPost<0x75C798>);
+
+//		WriteRelJump(0x75C9DB, 0x75C9F1);
+//		WriteRelJump(0x75CA30, 0x75CA46);
 	}
 	else
 	{

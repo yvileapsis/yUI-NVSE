@@ -7,12 +7,13 @@ static ParamInfo kParams_OneOptionalInt[1] =
 };
 DEFINE_COMMAND_PLUGIN(GetGlobalTimeMultiplierAlt, , 0, 2, kParams_OneOptionalInt);
 
-static ParamInfo kParams_OneOptionalFloat_OneOptionalInt[2] =
+static ParamInfo kParams_OneOptionalFloat_OneOptionalInt[3] =
 {
 	{	"float", kParamType_Float, 1 },
 	{	"int", kParamType_Integer, 1 },
+	{	"int", kParamType_Integer, 1 },
 };
-DEFINE_COMMAND_PLUGIN(SetGlobalTimeMultiplierAlt, , 0, 2, kParams_OneOptionalFloat_OneOptionalInt);
+DEFINE_COMMAND_PLUGIN(SetGlobalTimeMultiplierAlt, , 0, 3, kParams_OneOptionalFloat_OneOptionalInt);
 
 static ParamInfo kParams_OneForm_OneOptionalForm[5] =
 {

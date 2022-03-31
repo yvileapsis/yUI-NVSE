@@ -8,7 +8,7 @@
 Float64 __cdecl AdjustPushForceAlt(Actor* target, ActorHitData* hitdata, ActorValueOwner* owner, SInt32 force)
 {
 	Float64 scale = 1.0;
-	if (hitdata && hitdata->explosion && hitdata->explosion->baseForm)
+	if (hitdata && hitdata->explosion && hitdata->explosion->IsExplosion() && hitdata->explosion->baseForm)
 	{
 		const auto explosion = DYNAMIC_CAST(hitdata->explosion->baseForm, TESForm, BGSExplosion);
 		scale = CdeclCall<Float64>(0x647920, hitdata->explosion->radius, hitdata->explosion->GetDistance(target));
@@ -50,8 +50,8 @@ void __fastcall GetAmmoFromHitData(ActorHitData* hitData, Actor* target)
 bool __fastcall GetCanNotStoreAmmo(Explosion* explosion)
 {
 	if (!explosion || !explosion->IsExplosion()) return false;
+	if (explosion->CanStoreAmmo()) return false;
 	if (!explosion->ammo) return false;
-	if (!explosion->CanStoreAmmo()) return false;
 	return true;
 }
 
