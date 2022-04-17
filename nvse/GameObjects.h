@@ -37,25 +37,25 @@ public:
 	virtual void				Unk_58(void);
 	virtual void				Unk_59(void);
 	virtual void				Unk_5A(void);
-	virtual void				Unk_5B(void);
-	virtual void				Unk_5C(void);
+	virtual void				GetStartingAngle(void);
+	virtual void				GetStartingPos(void);
 	virtual void				Unk_5D(void);
 	virtual void				Unk_5E(void);
-	virtual TESObjectREFR*		RemoveItem(TESForm* toRemove, BaseExtraList* extraList, UInt32 count, UInt32 unk3, UInt32 unk4, TESObjectREFR* destRef, 
+	virtual TESObjectREFR*		RemoveItem(TESForm* toRemove, BaseExtraList* extraList, UInt32 count, UInt32 keepOwner, UInt32 drop, TESObjectREFR* destRef, 
 											UInt32 unk6, UInt32 unk7, UInt32 unk8, UInt8 unk9);	// 40 unk2 quantity? Returns the reference assigned to the removed item.
-	virtual void				Unk_60(void);
+	virtual void				GetBodyPartData(void);
 	virtual bool				EquipObject(TESForm* item, UInt32 count, ExtraDataList* xData, bool lockEquip);
 	virtual void				Unk_62(void);	// Linked to Unequip (and or equip maybe)
 	virtual void				Unk_63(void);
 	virtual void				AddItem(TESForm* item, ExtraDataList* xDataList, UInt32 Quantity);	// Needs confirmation
 	virtual void				Unk_65(void);
-	virtual void				Unk_66(void);
-	virtual void				Unk_67(void);							// Actor: GetMagicEffectList
+	virtual void				GetMagicCaster(void);
+	virtual void				GetMagicTarget(void);							// Actor: GetMagicEffectList
 	virtual bool				GetIsChildSize(bool checkHeight);		// 068 Actor: GetIsChildSize
 	virtual UInt32				GetActorUnk0148(void);					// result can be interchanged with baseForm, so TESForm* ?
 	virtual void				SetActorUnk0148(UInt32 arg0);
-	virtual void				Unk_6B(void);
-	virtual void				Unk_6C(void);				// REFR: GetBSFaceGenNiNodeSkinned
+	virtual void				GetBSFaceGenNiNodeBiped(void);
+	virtual void				GetBSFaceGenNiNodeSkinned(void);				// REFR: GetBSFaceGenNiNodeSkinned
 	virtual void				Unk_6D(void);				// REFR: calls 006C
 	virtual void				Unk_6E(void);				// MobileActor: calls 006D then NiNode::Func0040
 	virtual void				Unk_6F(void);
@@ -80,18 +80,18 @@ public:
 	virtual void				Unk_82(void);
 	virtual NiNode*				GetProjectileNode(void);
 	virtual void				Unk_84(UInt32 arg0);
-	virtual UInt32				Unk_85(void);				// 0 or GetActor::Unk01AC
+	virtual UInt32				GetSitSleepState(void);				// 0 or GetActor::Unk01AC
 	virtual bool				IsCharacter();				// return false for Actor and Creature, true for character and PlayerCharacter
 	virtual bool				IsCreature();
 	virtual bool				IsExplosion();
 	virtual bool				IsProjectile();
-	virtual void				Unk_8A(void);				// SetParentCell (Interior only ?)
+	virtual void				SetParentCell(void);				// SetParentCell (Interior only ?)
 	virtual bool				IsDying(bool arg0);			// IsDead = HasNoHealth (baseForm health <= 0 or Flags bit23 set)
 	virtual bool				GetHasKnockedState(void);
 	virtual bool				Unk_8D(void);
 	virtual void				Unk_8E(void);
 	virtual void				Unk_8F(void);
-	virtual void				Unk_90(void);
+	virtual void				StartHighProcess(void);
 
 	struct RenderState
 	{
@@ -187,14 +187,13 @@ public:
 	MobileObject();
 	~MobileObject();
 
-	virtual void		StartHighProcess(void);		// 090
 	virtual void		Unk_91(void);
 	virtual void		Unk_92(void);
 	virtual void		Unk_93(void);
-	virtual void		Unk_94(void);
-	virtual void		Unk_95(void);
-	virtual void		Unk_96(void);
-	virtual void		Unk_97(void);
+	virtual void		Move(void);
+	virtual void		Jump(void);
+	virtual void		nullsub_96(void);
+	virtual void		ProcessAI(void);
 	virtual void		Unk_98(void);
 	virtual void		Unk_99(void);
 	virtual void		Unk_9A(void);
@@ -203,8 +202,8 @@ public:
 	virtual void		Unk_9D(void);
 	virtual void		Unk_9E(void);
 	virtual void		Unk_9F(void);
-	virtual void		Unk_A0(void);	// StartConversation(targetActor, subjectLocationData, targetLocationData, headTrack, allowMovement, arg, topicID, arg, arg
-	virtual void		Unk_A1(void);
+	virtual void		StartConversation(void);	// StartConversation(targetActor, subjectLocationData, targetLocationData, headTrack, allowMovement, arg, topicID, arg, arg
+	virtual void		DoSpeechLoadLipFiles(void);
 	virtual void		Unk_A2(void);
 	virtual void		Unk_A3(void);
 	virtual void		Unk_A4(void);
@@ -213,27 +212,27 @@ public:
 	virtual void		Unk_A7(void);
 	virtual void		Unk_A8(void);
 	virtual void		Unk_A9(void);
-	virtual void		Unk_AA(void);
+	virtual void		SetPos(void);
 	virtual void		Unk_AB(void);
-	virtual void		Unk_AC(void);
+	virtual void		HandleRunDetection(void);
 	virtual void		Unk_AD(void);
 	virtual void		Unk_AE(void);
-	virtual void		Unk_AF(void);
+	virtual void		AdjustRot(void);
 	virtual void		Unk_B0(void);
-	virtual void		Unk_B1(void);
+	virtual void		SetRotation(void);
 	virtual void		Unk_B2(void);
 	virtual void		Unk_B3(void);
-	virtual void		Unk_B4(void);
-	virtual void		Unk_B5(void);
-	virtual void		Unk_B6(void);
-	virtual void		Unk_B7(void);
+	virtual void		GetSpeechExpression(void);
+	virtual void		SetExpression(void);
+	virtual void		GetSpeechVolume(void);
+	virtual void		SetEmotionValue(void);
 	virtual void		Unk_B8(void);
 	virtual void		Unk_B9(void);
-	virtual void		Unk_BA(void);
+	virtual void		IsLifeStateDying(void);
 	virtual void		Unk_BB(void);
 	virtual void		Unk_BC(void);
 	virtual void		Unk_BD(void);
-	virtual void		Unk_BE(void);
+	virtual void		Update(void);
 	virtual void		Unk_BF(void);
 	virtual void		Unk_C0(void);
 	
@@ -379,68 +378,68 @@ public:
 	Actor();
 	~Actor();
 
-	virtual void		Unk_C1(void);
+	virtual void		GetByte1C1(void);
 	virtual void		Unk_C2(void);
-	virtual void		Unk_C3(void);
-	virtual void		Unk_C4(void);
+	virtual void		UpdateFlt1C4(void);
+	virtual void		GetFlt1C4(void);
 	virtual void		Unk_C5(void);
 	virtual void		Unk_C6(void);
-	virtual void		Unk_C7(void);
-	virtual void		Unk_C8(void);
-	virtual void		Unk_C9(void);
+	virtual void		SetIgnoreCrime(void);
+	virtual void		GetIgnoreCrime(void);
+	virtual void		Resurrect(void);
 	virtual void		Unk_CA(void);
 	virtual void		Unk_CB(void);
 	virtual void		Unk_CC(void);
-	virtual void		Unk_CD(void);
-	virtual void		Unk_CE(void);
-	virtual void		Unk_CF(void);
-	virtual void		Unk_D0(void);
-	virtual void		Unk_D1(void);
-	virtual void		Unk_D2(void);
+	virtual void		GetMaxActorValues(void);
+	virtual void		DamageHealthAndFatigue(void);
+	virtual void		DamageActionPoints(void);
+	virtual void		DamageActionPointsForAction(void);
+	virtual void		GetDisposition(void);
+	virtual void		UpdateMovement(void);
 	virtual void		Unk_D3(void);
 	virtual void		Unk_D4(void);
 	virtual void		Unk_D5(void);
-	virtual void		Unk_D6(void);
+	virtual void		GetIsOverencumbered(void);
 	virtual void		Unk_D7(void);
-	virtual void		Unk_D8(void);	// IsPlayerRef
-	virtual void		Unk_D9(void);
+	virtual void		IsPlayerRef(void);	// IsPlayerRef
+	virtual void		GetIsInCanibalAction(void);
 	virtual void		Unk_DA(void);
-	virtual void		Unk_DB(void);
+	virtual void		GetIsInSandmanAction(void);
 	virtual void		Unk_DC(void);
-	virtual void		Unk_DD(void);
-	virtual void		Unk_DE(void);
-	virtual void		Unk_DF(void);
-	virtual void		Unk_E0(void);
+	virtual void		SandmanActor(void);
+	virtual void		CannibalizeActor(void);
+	virtual void		GetRace(void);
+	virtual void		GetHandReachTimesCombatDistance(void);
 	virtual void		Unk_E1(void);
 	virtual void		Unk_E2(void);
-	virtual void		Unk_E3(void);
-	virtual void		Unk_E4(void);	// Creature = 0, Character = 1, PlayerCharacter = 2
-	virtual void		Unk_E5(void);
-	virtual void		Unk_E6(void);
+	virtual void		HasRagdoll(void);
+	virtual void		GetActorType(void);	// Creature = 0, Character = 1, PlayerCharacter = 2
+	virtual void		SetActorValue(void);
+	virtual void		SetActorValueInt(void);
 	virtual void		Unk_E7(void);
 	virtual void		Unk_E8(void);
-	virtual void		Unk_E9(void);
-	virtual void		Unk_EA(void);
-	virtual void		Unk_EB(void);
+	virtual void		ForceActorValue(void);
+	virtual void		ModActorValue(void);
+	virtual void		DamageActorValue(void);
 	virtual void		Unk_EC(void);
 	virtual void		Unk_ED(void);
 	virtual void		Unk_EE(void);
-	virtual void		Unk_EF(void);
+	virtual void		GetPreferedWeapon(void);
 	virtual void		Unk_F0(void);
-	virtual void		Unk_F1(void);
-	virtual void		Unk_F2(void);
-	virtual void		Unk_F3(void);
-	virtual void		Unk_F4(void);
+	virtual void		ResetActorDTDR(void);
+	virtual void		DamageItem(void);
+	virtual void		DropItem(void);
+	virtual void		HandlePickupItem(void);
 	virtual void		Unk_F5(void);
-	virtual void		Unk_F6(void);
+	virtual void		CastWeaponEffect(void);
 	virtual void		Unk_F7(void);
-	virtual void		Unk_F8(void);	// 0F8 bool AddSpell(spell)
+	virtual void		AddSpellToList(void);	// 0F8 bool AddSpell(spell)
 	virtual void		Unk_F9(void);
-	virtual void		Unk_FA(void);
-	virtual void		Unk_FB(void);
-	virtual void		Unk_FC(void);
+	virtual void		Reload(TESObjectWEAP* weapon, UInt32 animtype, UInt8 hasExtendedClip);
+	virtual void		ReloadAlt(TESObjectWEAP* weapon, UInt32 animtype, UInt8 hasExtendedClip, char isInstantSwapHotkey);
+	virtual void		DecreaseClipAmmo(UInt32 count);
 	virtual void		Unk_FD(void);
-	virtual void		Unk_FE(void);
+	virtual void		GetCombatGroup(void);
 	virtual void		Unk_FF(void);
 	virtual void		Unk_100(void);
 	virtual void		Unk_101(void);
@@ -449,54 +448,54 @@ public:
 	virtual void		Unk_104(void);
 	virtual void		Unk_105(void);
 	virtual void		Unk_106(void);
-	virtual void		Unk_107(void);
-	virtual void		Unk_108(void);
-	virtual void		Unk_109(void);
+	virtual void		UpdateFlt02B0(void);
+	virtual void		GetAlpha(void);
+	virtual void		ForceAttackActor(void);
 	virtual bool		IsInCombat(void);
 	virtual Actor*		GetCombatTarget(void);
-	virtual void		Unk_10C(void);
+	virtual void		UpdateCombat(void);
 	virtual void		Unk_10D(void);
 	virtual void		Unk_10E(void);
-	virtual void		Unk_10F(void);
-	virtual void		Unk_110(void);
-	virtual void		Unk_111(void);
-	virtual void		Unk_112(void);
+	virtual void		GetTotalArmorDR(void);
+	virtual void		GetTotalArmorDT(void);
+	virtual void		GetCreatureDamage(void);
+	virtual void		IsTrespassing(void);
 	virtual void		Unk_113(void);
-	virtual void		Unk_114(void);
+	virtual void		SetWantsWeaponOut(void);
 	virtual void		Unk_115(void);
-	virtual void		Unk_116(void);
-	virtual void		Unk_117(void);
+	virtual void		CalculateSpeedMult(void);
+	virtual void		CalculateRunSpeed(void);
 	virtual void		Unk_118(void);
 	virtual void		Unk_119(void);
 	virtual void		Unk_11A(void);
 	virtual void		Unk_11B(void);
-	virtual void		Unk_11C(void);
+	virtual void		GetAttacked(void);
 	virtual void		Unk_11D(void);
 	virtual void		Unk_11E(void);
-	virtual void		Unk_11F(void);
+	virtual void		nullsub_11F(void);
 	virtual void		Unk_120(void);
 	virtual void		Unk_121(void);
-	virtual void		Unk_122(void);	//	0122	Check for LevelUp
+	virtual void		RewardXP(void);	//	0122	Check for LevelUp
 	virtual void		Unk_123(void);
-	virtual void		Unk_124(void);
+	virtual void		InternalSetActorValue(void);
 	virtual void		Unk_125(void);
 	virtual void		SetPerkRank(BGSPerk* perk, UInt8 rank, bool alt);
-	virtual void		Unk_127(void);
+	virtual void		RemovePerk(void);
 	virtual UInt8		GetPerkRank(BGSPerk* perk, bool alt);
 	virtual void		Unk_129(void);
-	virtual void		Unk_12A(void);
-	virtual void		Unk_12B(void);
+	virtual void		RemovePerkEntry(void);
+	virtual void		GetPerkModifier(void);
 	virtual void		Unk_12C(void);
-	virtual void		Unk_12D(void);
-	virtual void		Unk_12E(void);
+	virtual void		IsImmobile(void);
+	virtual void		DoHealthDamage(void);
 	virtual void		Unk_12F(void);
 	virtual void		Unk_130(void);
 	virtual void		Unk_131(void);
-	virtual void		Unk_132(void);
-	virtual void		Unk_133(void);
-	virtual void		Unk_134(void);
-	virtual void		Unk_135(void);
-	virtual void		Unk_136(void);
+	virtual void		HandleHeadTracking(void);
+	virtual void		UpdateHeadTrackingEmotions(void);
+	virtual void		CreateActorMover(void);
+	virtual void		DestroyActorMover(void);
+	virtual void		GetBaseActorValue(void);
 	
 	MagicCaster							magicCaster;					// 088
 	MagicTarget							magicTarget;					// 094
@@ -578,7 +577,7 @@ public:
 	~Character();
 
 	virtual void	Unk_137(void);
-	virtual void	Unk_138(void);
+	virtual void	nullsub_138(void);
 
 	ValidBip01Names*	validBip01Names;	// 1B4
 	float				totalArmorDR;		// 1B8
@@ -624,8 +623,8 @@ public:
 		kControlFlag_Sneak			= 1 << 6,
 	};
 
-	virtual void		Unk_139(void);
-	virtual void		Unk_13A(void);
+	virtual void		ReturnFalse(void);
+	virtual void		GetPerkRanks(void);
 
 	// lotsa data
 

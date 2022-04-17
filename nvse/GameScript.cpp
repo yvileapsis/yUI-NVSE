@@ -140,14 +140,14 @@ CRITICAL_SECTION	csGameScript;				// trying to avoid what looks like concurrency
 
 ScriptEventList* Script::CreateEventList(void)
 {
-	ScriptEventList* result = NULL;
-	::EnterCriticalSection(&csGameScript);
+	ScriptEventList* result = nullptr;
+//	EnterCriticalSection(&csGameScript);
 	try
 	{
-		result = (ScriptEventList*)ThisStdCall(0x005ABF60, this);	// 4th sub above Script::Execute (was 1st above in Oblivion) Execute is the second to last call in Run
+		result = ThisCall<ScriptEventList*>(0x5ABF60, this);	// 4th sub above Script::Execute (was 1st above in Oblivion) Execute is the second to last call in Run
 	} catch(...) {}
 
-	::LeaveCriticalSection(&csGameScript);
+//	LeaveCriticalSection(&csGameScript);
 	return result;
 }
 

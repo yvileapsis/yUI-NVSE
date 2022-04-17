@@ -482,8 +482,7 @@ public:
 	virtual UInt32		GetTypeID(void);
 	virtual void		GetDebugName(String * dst);
 	virtual bool		IsQuestItem(void);
-										// Unk_26 though Unk_36 get or set flag bits
-	virtual bool		Unk_26(void);		// 00000040
+	virtual bool		HasTalkedToPC(void);		// 00000040
 	virtual bool		Unk_27(void);		// 00010000
 	virtual bool		Unk_28(void);		// 00010000
 	virtual bool		Unk_29(void);		// 00020000
@@ -494,10 +493,10 @@ public:
 	virtual bool		Unk_2E(void);		// 00000200
 	virtual void		Unk_2F(bool set);	// 00000200
 	virtual bool		Unk_30(void);		// returns false
-	virtual void		Unk_31(bool set);	// 00000020 then calls Fn12 MarkAsModified
+	virtual void		MarkProjectileForDeletion(bool set);	// 00000020 then calls Fn12 MarkAsModified
 	virtual void		Unk_32(bool set);	// 00000002 with a lot of housekeeping
 	virtual void		SetQuestItem(bool set);	// 00000400 then calls Fn12 MarkAsModified
-	virtual void		Unk_34(bool set);	// 00000040 then calls Fn12 MarkAsModified
+	virtual void		SetTalkedToPC(bool set);	// 00000040 then calls Fn12 MarkAsModified
 	virtual void		Unk_35(bool set);	// 00010000 then calls Fn12 MarkAsModified
 	virtual void		Unk_36(bool set);	// 00020000
 	virtual void		Unk_37(void);		// write esp format
@@ -506,7 +505,7 @@ public:
 	virtual bool		Unk_3A(void);
 	virtual bool		Unk_3B(void);
 	virtual bool		GetIsReference() const;
-	virtual bool		Unk_3D(void);
+	virtual bool		IsArmorAddon(void);
 	virtual bool		Unk_3E(void);
 	virtual bool		Unk_3F(void);	// returnTrue for refr whose baseForm is a TESActorBase
 	virtual bool		IsActor(void);
@@ -518,7 +517,7 @@ public:
 	virtual bool		Unk_46(void);
 	virtual bool		Unk_47(void);
 	virtual bool		Unk_48(UInt32 formType);	// returns if the same FormType is passed in
-	virtual bool		Unk_49(void * arg0, void * arg1, void * arg2, void * arg3, void * arg4);	// looks to be func33 in Oblivion
+	virtual bool		Activate(void * arg0, void * arg1, void * arg2, void * arg3, void * arg4);	// looks to be func33 in Oblivion
 	virtual void		SetRefID(UInt32 refID, bool generateID);
 	virtual char*		GetName2(void);	// GetName as in OBSE ?
 	virtual char*		GetName(void) const;	// GetEditorID as in OBSE ?

@@ -1390,7 +1390,7 @@ public:
 		UInt32 unk14[4];
 	};
 
-	TESAnimGroup::AnimGroupInfo* GetGroupInfo() const;
+	AnimGroupInfo* GetGroupInfo() const;
 	UInt8 GetBaseGroupID() const;
 
 	struct __declspec(align(4)) AnimGroupSound

@@ -53,9 +53,6 @@ template <typename Item> struct TListNode
 	TListNode() : data(nullptr), next(nullptr) {}
 	TListNode(Item* _data) : data(_data), next(nullptr) {}
 
-	Item* Data() const { return data; }
-	TListNode* Next() const { return next; }
-
 	TListNode* RemoveMe()
 	{
 		if (next)
@@ -129,22 +126,19 @@ public:
 
 	Node* GetLastNode(SInt32* outIdx = nullptr) const
 	{
-		SInt32 index = 0;
 		Node* node = Head();
-		while (node->next)
+		if (!node) return nullptr;
+		if (outIdx)
 		{
-			node = node->next;
-			index++;
+			SInt32 index = 0;
+			while (node->next)
+			{
+				node = node->next;
+				index++;
+			}
+			*outIdx = index;
 		}
-		if (outIdx) *outIdx = index;
-
-		return node;
-	}
-
-	Node* GetLastNodeQuick() const
-	{
-		Node* node = first;
-		while (node->next) node = node->next;
+		else while (node->next) node = node->next;
 		return node;
 	}
 
@@ -170,7 +164,7 @@ public:
 	}
 
 	Node* Head() const { return const_cast<Node*>(&first); }
-	Node* Tail() const { return const_cast<Node*>(GetLastNodeQuick()); }
+	Node* Tail() const { return GetLastNode(); }
 	
 	bool Empty() const { return !first.data; }
 
@@ -179,31 +173,19 @@ public:
 		Node*	m_curr;
 
 	public:
-		Iterator operator++()
+		Iterator	operator++()
 		{
 			if (m_curr) m_curr = m_curr->next;
 			return *this;
 		}
-		Item* operator->() const { return m_curr->data; }
-		Item*& operator*() const { return m_curr->data; }
-		Iterator& operator=(const Iterator& rhs)
+		Item*		operator->() const { return m_curr->data; }
+		Item*&		operator*() const { return m_curr->data; }
+		Iterator&	operator=(const Iterator& rhs)
 		{
 			m_curr = rhs.m_curr;
 			return *this;
 		}
-		bool operator!=(const Iterator& rhs) { return m_curr != rhs.m_curr; };
-
-		Item* Get() const { return m_curr->data; }
-		void Next() { if (m_curr) m_curr = m_curr->next; }
-//		bool End() const { return !m_curr || (!m_curr->data && !m_curr->next); }
-		void Find(Item* _item)
-		{
-			while (m_curr)
-			{
-				if (m_curr->data == _item) break;
-				m_curr = m_curr->next;
-			}
-		}
+		bool		operator!=(const Iterator& rhs) { return m_curr != rhs.m_curr && m_curr->next; }
 
 		Iterator(Node* node = nullptr) : m_curr(node) {}
 		Iterator(TList& _list) : m_curr(&_list.first) {}
@@ -213,18 +195,18 @@ public:
 	};
 
 	Iterator begin() const { return Iterator(Head()); }
-	Iterator end() const { return Iterator(GetLastNode()); }
+	Iterator end() const { return Iterator(); }
 
 	UInt32 Count() const
 	{
 		if (!first.data) return 0;
-		Node* node = Head();
 		UInt32 count = 1;
+		Node* node = Head();
 		while ((node = node->next)) count++;
 		return count;
 	}
 
-	bool IsInList(Item* item) const
+	bool Contains(Item* item) const
 	{
 		Node* node = Head();
 		do if (node->data == item) return true;
@@ -455,8 +437,7 @@ public:
 		return replaced;
 	}
 
-	template <class Op>
-	UInt32 RemoveIf(Op&& op)
+	template <class Op>	UInt32 RemoveIf(Op&& op)
 	{
 		return FreeNodes(Head(), op);
 	}
@@ -471,8 +452,7 @@ public:
 		return -1;
 	}
 
-	template <class Op>
-	SInt32 GetIndexOf(Op&& op)
+	template <class Op>	SInt32 GetIndexOf(Op&& op)
 	{
 		SInt32 idx = 0;
 		Node* curr = Head();
@@ -482,13 +462,18 @@ public:
 		return -1;
 	}
 
-	template <typename F>
-	void ForEach(const F* function)
+	template <typename F> void ForEach(const F* function)
 	{
 		auto* node = Head();
 		if (!node) return;
 		do function(node->data);
 		while ((node = node->next));
+	}
+
+	template <typename F> void ForEach(const F& f)
+	{
+		for (const auto iter : this)
+			f(iter);
 	}
 };
 STATIC_ASSERT(sizeof(TList<void*>) == 0x8);
@@ -521,16 +506,6 @@ template <typename Item> struct DListNode
 		return result;
 	}
 
-	Item* GetAndAdvance()
-	{
-		Item* item = nullptr;
-		if (next)
-		{
-			item = next->data;
-			next = next->next;
-		}
-		return item;
-	}
 };
 
 template <class Item> class DList
@@ -550,31 +525,19 @@ public:
 		Node* m_curr;
 
 	public:
-		Iterator operator++()
+		Iterator	operator++()
 		{
 			if (m_curr) m_curr = m_curr->next;
 			return *this;
 		}
-		Item* operator->() const { return m_curr->data; }
-		Item*& operator*() const { return m_curr->data; }
-		Iterator& operator=(const Iterator& rhs)
+		Item*		operator->() const { return m_curr->data; }
+		Item*&		operator*() const { return m_curr->data; }
+		Iterator&	operator=(const Iterator& rhs)
 		{
 			m_curr = rhs.m_curr;
 			return *this;
 		}
-		bool operator!=(const Iterator& rhs) { return m_curr != rhs.m_curr; }
-
-		Item* Get() const { return m_curr->data; }
-		void Next() { if (m_curr) m_curr = m_curr->next; }
-
-		void Find(Item* _item)
-		{
-			while (m_curr)
-			{
-				if (m_curr->data == _item) break;
-				m_curr = m_curr->next;
-			}
-		}
+		bool		operator!=(const Iterator& rhs) { return m_curr != rhs.m_curr; }
 
 		Iterator(Node* node = nullptr) : m_curr(node) {}
 		Iterator(DList& _list) : m_curr(&_list.first) {}
@@ -583,28 +546,27 @@ public:
 		Iterator(DList* _list, Item* _item) : m_curr(&_list->first) { Find(_item); }
 	};
 
-
 	bool Empty() const { return !first; }
 	Node* Head() { return first; }
 	Node* Tail() { return last; }
-	UInt32 Size() const { return count; }
+	UInt32 Count() const { return count; }
 
 	Iterator begin() const { return Iterator(first); }
 	Iterator end() const { return Iterator(last); }
 
-	void ExchangeNodeData(Node*, Node*);
+	void ExchangeNodeData(Node* node1, Node* node2)
+	{
+		const auto tmpdata = node1->data;
+		node1->data = node2->data;
+		node2->data = tmpdata;
+	}
 
 	void Append(Item* item) { ThisCall(0x4ED8C0, this, &item); }
 	
-	template <typename F>
-	void ForEach(const F& f)
+	template <typename F> void ForEach(const F& f)
 	{
-		auto* node = Head();
-		for (int i = 0; i < Size(); ++i)
-		{
-			f(node->data);
-			node = node->next;
-		}
+		for (const auto iter : this)
+			f(iter);
 	}
 
 	Node* Remove(Item* item)
@@ -618,10 +580,8 @@ public:
 		if (node->data == item)
 		{
 			first = node->next;
-			if (first)
-				first->prev = nullptr;
-			else
-				last = nullptr;
+			if (first) first->prev = nullptr;
+			else last = nullptr;
 
 			--count;
 			StdCall(0x4A49E0, node);
@@ -637,19 +597,14 @@ public:
 			do if (node->data == item)
 				{
 					result = node->prev;
-
-					if (node->prev) 
-						node->prev->next = node->next;
-					if (node->next)
-						node->next->prev = node->prev;
-					else
-						last = node->prev;
+					if (node->prev) node->prev->next = node->next;
+					if (node->next)	node->next->prev = node->prev;
+					else last = node->prev;
 					--count;
 					StdCall(0x4A49E0, node);
 				}
 			while ((node = node->next));
 		}
-
 		return result ? result : first;
 	}
 
@@ -676,13 +631,6 @@ public:
 };
 STATIC_ASSERT(sizeof(DList<void*>) == 0xC);
 
-template <class Item> void DList<Item>::ExchangeNodeData(Node* node1, Node* node2)
-{
-	const auto tmpdata = node1->data;
-	node1->data = node2->data;
-	node2->data = tmpdata;
-}
-
 enum KeyboardMenuInputCode;
 
 // 010
@@ -703,7 +651,7 @@ public:
 	virtual void	FreeAllTiles(void) {};
 	virtual void	Sort(signed int(__cdecl*)(Item*, Item*)) {};
 	
-	TList<Item>	list;	// 004
+	TList<Item>		list;	// 004
 };	// 00C
 STATIC_ASSERT(sizeof(BSSimpleList<void*>) == 0xC);
 
@@ -711,15 +659,15 @@ template <typename Item>
 struct BSSimpleArray
 {
 	virtual void	Destroy(bool doFree);
-	virtual Item* Allocate(UInt32 size);
+	virtual Item*	Allocate(UInt32 size);
 
 	Item*			data;			// 04
-	UInt32		size;			// 08
-	UInt32		alloc;			// 0C
+	UInt32			size;			// 08
+	UInt32			alloc;			// 0C
 
 	Item operator[](UInt32 idx)
 	{
-		return (idx < size) ? data[idx] : NULL;
+		return idx < size ? data[idx] : NULL;
 	}
 
 	class Iterator
@@ -740,13 +688,10 @@ struct BSSimpleArray
 
 		Item& operator*() const { return *pData; }
 		Item& operator->() const { return *pData; }
-		Item& Get() const { return *pData; }
 
 		Iterator(): pData(nullptr), count(0) {}
-
 		Iterator(BSSimpleArray& source) : pData(source.data), count(source.size) {}
 	};
-
 
 	void Append(Item* item) { ThisCall(0x7CB2E0, this, item); }
 };
@@ -773,17 +718,14 @@ class Visitor
 
 		if (compareOp.Accept(node->Info()))
 		{
-			if (nodeCount)
-				node->Delete();
-			else
-				node->DeleteHead(lastNode);
+			if (nodeCount) node->Delete();
+			else node->DeleteHead(lastNode);
 			numFreed++;
 			bRemovedNext = true;
 		}
 		else
 		{
-			if (bRemovedNext)
-				node->SetNext(lastNode);
+			if (bRemovedNext) node->SetNext(lastNode);
 			bRemovedNext = false;
 			lastNode = node;
 		}
@@ -811,20 +753,14 @@ class Visitor
 		const Info* m_toMatch;
 	public:
 		AcceptEqual(const Info* info) : m_toMatch(info) { }
-		bool Accept(const Info* info) {
-			return info == m_toMatch;
-		}
+		bool Accept(const Info* info) { return info == m_toMatch; }
 	};
 
 	class AcceptStriCmp {
 		const char* m_toMatch;
 	public:
 		AcceptStriCmp(const char* info) : m_toMatch(info) { }
-		bool Accept(const char* info) {
-			if (m_toMatch && info)
-				return _stricmp(info, m_toMatch) ? false : true;
-			return false;
-		}
+		bool Accept(const char* info) { return m_toMatch && info ? !_stricmp(info, m_toMatch) ? true : false : false; }
 	};
 public:
 	Visitor(const Node* pHead) : m_pHead(pHead) { }
@@ -855,9 +791,7 @@ public:
 		bool bContinue = true;
 		while (pCur && pCur->Info() && bContinue) {
 			bContinue = op.Accept(pCur->Info());
-			if (bContinue) {
-				pCur = pCur->Next();
-			}
+			if (bContinue) pCur = pCur->Next();
 		}
 	}
 
@@ -865,29 +799,22 @@ public:
 	const Node* Find(Op&& op, const Node* prev = NULL) const
 	{
 		const Node* pCur;
-		if (!prev)
-			pCur = m_pHead;
-		else
-			pCur = prev->next;
+		if (!prev) pCur = m_pHead;
+		else pCur = prev->next;
 		bool bFound = false;
 		while (pCur && !bFound)
 		{
-			if (!pCur->Info())
-				pCur = pCur->Next();
-			else
+			if (pCur->Info())
 			{
 				bFound = op.Accept(pCur->Info());
-				if (!bFound)
-					pCur = pCur->Next();
+				if (!bFound) pCur = pCur->Next();
 			}
+			else pCur = pCur->Next();
 		}
-
 		return pCur;
 	}
 
-	Node* FindInfo(const Info* toMatch) {
-		return Find(AcceptEqual(toMatch));
-	}
+	Node* FindInfo(const Info* toMatch) { return Find(AcceptEqual(toMatch)); }
 
 	template <class Op>
 	UInt32 CountIf(Op&& op) const
@@ -896,8 +823,7 @@ public:
 		const Node* pCur = m_pHead;
 		while (pCur)
 		{
-			if (pCur->Info() && op.Accept(pCur->Info()))
-				count++;
+			if (pCur->Info() && op.Accept(pCur->Info())) count++;
 			pCur = pCur->Next();
 		}
 		return count;
@@ -922,10 +848,8 @@ public:
 	void Append(Node* newNode)
 	{
 		Node* lastNode = const_cast<Node*>(GetLastNode());
-		if (lastNode == m_pHead && !m_pHead->Info())
-			lastNode->DeleteHead(newNode);
-		else
-			lastNode->SetNext(newNode);
+		if (lastNode == m_pHead && !m_pHead->Info()) lastNode->DeleteHead(newNode);
+		else lastNode->SetNext(newNode);
 	}
 
 	template <class Op>
@@ -947,8 +871,8 @@ public:
 
 struct CoordXY
 {
-	float	x;
-	float	y;
+	Float32	x;
+	Float32	y;
 
 	CoordXY(): x(0), y(0)	{}
 
@@ -956,7 +880,7 @@ struct CoordXY
 
 	inline CoordXY& operator =(const CoordXY& rhs)
 	{
-		*(double*)this = *(double*)&rhs;
+		*(Float64*)this = *(Float64*)&rhs;
 		return *this;
 	}
 };

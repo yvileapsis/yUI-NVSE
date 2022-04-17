@@ -194,6 +194,18 @@ static constexpr UInt8 kHandGripTable[] =
 	TESObjectWEAP::eHandGrip_6,
 };
 
+bool TESObjectWEAP::IsMeleeWeapon() const
+{
+	return eWeaponType >= 0 && eWeaponType <= 2;
+}
+
+float TESObjectWEAP::GetModBonuses(UInt32 effectID)
+{
+	float result = 0;
+	for (UInt32 idx = 0; idx < 3; idx++) if (effectMods[idx] == effectID) result += value1Mod[idx];
+	return result;
+}
+
 UInt8 TESObjectWEAP::HandGrip() const
 {
 	for (UInt32 i = 0; i < std::size(kHandGripTable); i++) if (handGrip == kHandGripTable[i]) return i;
@@ -328,6 +340,10 @@ TESObjectIMOD* TESObjectWEAP::GetItemMod(UInt8 which)
 	return pMod;
 }
 
+bool TESObjectWEAP::IsMeleeWeapon()
+{
+	return eWeaponType == kWeapType_HandToHandMelee || eWeaponType == kWeapType_OneHandMelee || eWeaponType == kWeapType_TwoHandMelee;
+}
 
 class FindByForm {
 	TESForm* m_pForm;

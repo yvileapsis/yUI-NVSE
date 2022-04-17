@@ -8,6 +8,17 @@ extern DataHandler* g_dataHandler;
 
 namespace TimeMult
 {
+	SInt8 wah(Script* iter, CommandInfo* command)
+	{
+		__try
+		{
+			return HasScriptCommand(iter, command, nullptr);
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+			return -1;
+		}
+	}
+
 	void FillMaps()
 	{
 		std::vector<Script*> vec;
@@ -16,12 +27,17 @@ namespace TimeMult
 		for (const auto& iter : std::ranges::reverse_view(vec))
 		{
 			if (g_specialMods.contains(iter->modIndex)) continue;
-			if (HasScriptCommand(iter, command, nullptr))
-			{
-				g_specialMods.emplace(iter->modIndex);
-				Log(FormatString("Found SGTM use in mod: %02X (%50s), form: %08X (%50s)", iter->modIndex, GetModName(
-					iter), iter->refID, iter->GetName()));
-			}
+				if (wah(iter, command) == 1)
+				{
+					g_specialMods.emplace(iter->modIndex);
+					Log(FormatString("Found SGTM use in mod: %02X (%50s), form: %08X (%50s)", iter->modIndex, GetModName(
+						iter), iter->refID, iter->GetName()));
+				}
+				else if (wah(iter, command) == -1)
+				{
+					Log(FormatString("Found FATAL FAILURE AND DISAPPOINTMENT use in mod: %02X (%50s), form: %08X (%50s)", iter->modIndex, GetModName(
+						iter), iter->refID, iter->GetName()));
+				}
 		}
 		vec.clear();
 	}

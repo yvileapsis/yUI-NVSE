@@ -166,7 +166,7 @@ UInt8 __fastcall TESObjectWEAPGetNumProjectilesHook(TESObjectWEAP* weapon, void*
 
 TESObjectWEAP* __fastcall EffectGetWeapon(ContChangesEntry* entry, Projectile* projectile);
 EnchantmentItem* __fastcall EffectGetEnchantment(ContChangesEntry* entry, Projectile* projectile);
-ExtraDataList* __fastcall EffectGetPoison(ContChangesEntry* entry, Projectile* projectile);
+AlchemyItem* __fastcall EffectGetPoison(ContChangesEntry* entry, Projectile* projectile);
 
 template <UInt32 retn> __declspec(naked) void WeaponEffectHook1()
 {
@@ -205,5 +205,103 @@ template <UInt32 retn> __declspec(naked) void WeaponEffectHook2()
 		mov[ebp - 0x38], eax
 
 		jmp retnAddr
+	}
+}
+
+char __fastcall MergeScriptEvent(const ActorHitData*);
+
+template <UInt32 retn> __declspec(naked) void MergeScriptEventHook() {
+	static const auto retnAddr = retn;
+	static const auto SpreadFunc = MergeScriptEvent;
+	__asm {
+		mov ecx, [ebx + 0x8]
+		call SpreadFunc
+		jmp retnAddr
+	}
+}
+
+namespace ArmedUnarmed
+{
+	bool __fastcall ShouldNotShowAmmo(TESObjectWEAP* weapon);
+
+	bool __fastcall QueueAttackFireCheck(TESObjectWEAP* weapon, Actor* actor);
+
+	template <UInt32 retn> __declspec(naked) void QueueAttackFireHook() {
+		static const auto retnAddr = retn;
+		static const auto check = QueueAttackFireCheck;
+		__asm {
+			mov edx, [ebp - 0x10C]
+			call check
+			jmp retnAddr
+		}
+	}
+
+	void __fastcall QueuePowerAttackFireCheck(TESObjectWEAP* weapon, Actor* actor);
+
+	template <UInt32 retn> __declspec(naked) void QueuePowerAttackFireHook() {
+		static const auto retnAddr = retn;
+		static const auto check = QueuePowerAttackFireCheck;
+		__asm {
+			mov ecx, [ebp - 0x38]
+			mov edx, [ebp - 0x10C]
+			call check
+			mov ecx, [ebp - 0x10C]
+			jmp retnAddr
+		}
+	}
+
+	bool __fastcall ExecuteAttackHook(TESObjectWEAP* weapon);
+
+	bool __fastcall CheckIfNotMelee(TESObjectWEAP* weapon);
+
+	template <UInt32 retn1, UInt32 retn2> __declspec(naked) void ExecuteAttackHook2() {
+		static const auto retnAddr1 = retn1;
+		static const auto retnAddr2 = retn2;
+		static const auto check = CheckIfNotMelee;
+		__asm {
+			mov ecx, [ebp - 0xB0]
+			call check
+			test al, al
+			jz jumptwo
+			jmp retnAddr1
+		jumptwo :
+			jmp retnAddr2
+		}
+	}
+
+	bool __fastcall CheckIfMeleeWithProjectile(TESObjectWEAP* weapon, Actor* actor);
+
+	template <UInt32 retn1, UInt32 retn2> __declspec(naked) void ShouldFireHook() {
+		static const auto retnAddr1 = retn1;
+		static const auto retnAddr2 = retn2;
+		static const auto check = CheckIfMeleeWithProjectile;
+		__asm {
+			jz skip
+			mov ecx, [ebp - 0x24]
+			mov edx, [ebp - 0xB4]
+			call check
+			test al, al
+			jnz skip
+			jmp retnAddr1
+		skip :
+			jmp retnAddr2
+		}
+	}
+
+	bool __fastcall CheckIfMeleePlayerAttack(TESObjectWEAP* weapon);
+
+	template <UInt32 retn1, UInt32 retn2> __declspec(naked) void PlayerAttackRemoveAmmoCheckHook() {
+		static const auto retnAddr1 = retn1;
+		static const auto retnAddr2 = retn2;
+		static const auto check = CheckIfMeleePlayerAttack;
+		__asm {
+			mov ecx, [ebp - 0x24]
+			call check
+			test al, al
+			jz jumptwo
+			jmp retnAddr1
+		jumptwo :
+			jmp retnAddr2
+		}
 	}
 }

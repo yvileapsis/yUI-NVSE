@@ -753,17 +753,14 @@ const char * GetExtraDataName(UInt8 ExtraDataType) {
 class TESScript;
 class TESScriptableForm;
 
-ExtraScript* ExtraScript::Create(TESForm* baseForm, bool create, TESObjectREFR* container) {
-	const auto xScript = (ExtraScript*)BSExtraData::Create(kExtraData_Script, sizeof(ExtraScript), s_ExtraScriptVtbl);
-	if (xScript && baseForm) {
-		const auto pScript = DYNAMIC_CAST(baseForm, TESForm, TESScriptableForm);
-		if (pScript && pScript->script) {
-			xScript->script = pScript->script;
-			if (create) {
-				xScript->eventList = xScript->script->CreateEventList();
-				if (container)
-					xScript->EventCreate(ScriptEventList::kEvent_OnAdd, container);
-			}
+ExtraScript* ExtraScript::Create(TESScriptableForm* pScript, bool create, TESObjectREFR* container) {
+	const auto xScript = reinterpret_cast<ExtraScript*>(BSExtraData::Create(kExtraData_Script, sizeof(ExtraScript), s_ExtraScriptVtbl));
+	if (xScript && (pScript && pScript->script)) {
+		xScript->script = pScript->script;
+		if (create) {
+			xScript->eventList = xScript->script->CreateEventList();
+			if (container)
+				xScript->EventCreate(ScriptEventList::kEvent_OnAdd, container);
 		}
 	}
 	return xScript;

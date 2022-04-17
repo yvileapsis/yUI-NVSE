@@ -51,7 +51,7 @@ public:
 	Script*				script;		// 00C
 	ScriptEventList*	eventList;	// 010
 
-	static ExtraScript*		Create(TESForm* baseForm = NULL, bool create = true, TESObjectREFR* container = NULL);
+	static ExtraScript*		Create(TESScriptableForm* baseForm = NULL, bool create = true, TESObjectREFR* container = NULL);
 	void					EventCreate(UInt32 eventCode, TESObjectREFR* container);
 };
 STATIC_ASSERT(sizeof(ExtraScript) == 0x14);
@@ -86,6 +86,7 @@ public:
 		float				GetItemHealthPerc(bool arg1 = true);
 		ExtraDataList*		GetEquippedExtra();
 		ExtraDataList*		GetCustomExtra(UInt32 whichVal);
+		BSExtraData*		GetExtraData(UInt32 whichVal);
 		float				CalculateWeaponDamage(float condition, TESForm* ammo);
 		float				GetValue();
 	};
@@ -635,3 +636,12 @@ public:
 	Animation*	data;	// 0C
 };
 STATIC_ASSERT(sizeof(ExtraAnim) == 0x10);
+
+class ExtraPoison : public BSExtraData
+{
+public:
+	ExtraPoison();
+	virtual ~ExtraPoison();
+
+	AlchemyItem* poisonEffect;    // 0C
+};

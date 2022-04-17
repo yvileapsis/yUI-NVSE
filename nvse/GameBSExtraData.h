@@ -297,7 +297,7 @@ STATIC_ASSERT(sizeof(BSExtraData) == 0xC);
 struct BaseExtraList
 {
 	bool						HasType(UInt32 type) const;
-	__forceinline BSExtraData*	GetByType(UInt8 type) const { return ThisStdCall<BSExtraData*>(0x410220, this, type); }
+	__forceinline BSExtraData*	GetByType(UInt8 type) const { return ThisStdCall<BSExtraData*>(0x410220, this, type); };
 	void						MarkType(UInt32 type, bool bCleared);
 	__forceinline void			Remove(BSExtraData* toRemove, bool doFree) { ThisStdCall(0x410020, this, toRemove, doFree); }
 	__forceinline void			RemoveByType(UInt32 type) { ThisStdCall(0x410140, this, type); }
@@ -308,7 +308,8 @@ struct BaseExtraList
 	void						DebugDump() const;
 	bool						IsWorn();
 
-	void**			m_vtbl;						// 000
+	virtual	BaseExtraList*		Destroy(char chr);
+
 	BSExtraData*	m_data;						// 004
 	UInt8			m_presenceBitfield[0x15];	// 008 - if a bit is set, then the extralist should contain that extradata
 	UInt8			pad1D[3];					// 01D

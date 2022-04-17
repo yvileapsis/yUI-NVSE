@@ -26,6 +26,22 @@ enum AnimAction : SInt16
 	kAnimAction_ReloadLoop = 0x11,
 };
 
+enum QueuedIdleFlags
+{
+	kIdleFlag_FireWeapon						= 0x1,
+	kIdleFlag_Reload							= 0x2,
+	kIdleFlag_CrippledLimb						= 0x10,
+	kIdleFlag_Death								= 0x20,
+	kIdleFlag_ForcedIdle						= 0x80,
+	kIdleFlag_HandGrip							= 0x100,
+	kIdleFlag_Activate							= 0x400,
+	kIdleFlag_StandingLayingDownChange			= 0x800,
+	kIdleFlag_EquipOrUnequip					= 0x4000,
+	kIdleFlag_AimWeapon							= 0x10000,
+	kIdleFlag_AttackEjectEaseInFollowThrough	= 0x20000,
+	kIdleFlag_SomethingAnimatingReloadLoop		= 0x40000,
+};
+
 // Straight from OBSE. Needs to be debugged ! ! ! 
 // This is used all over the game code to manage actors and occassionally other objects.
 class ActorProcessManager
@@ -61,46 +77,46 @@ public:
 
 extern ActorProcessManager * g_actorProcessManager;
 
+class AmmoInfo
+{
+public:
+	ExtraDataList** xData;	// 00
+	UInt32			count;	// 04
+	TESAmmo*		ammo;	// 08
+	UInt32			unk0C;	// 0C
+	UInt32			unk10;	// 10
+	UInt32			unk14;	// 14
+	UInt32			unk18;	// 18
+	UInt32			unk1C;	// 1C
+	UInt32			unk20;	// 20
+	UInt32			unk24;	// 24
+	UInt32			unk28;	// 28
+	UInt32			unk2C;	// 2C
+	UInt32			unk30;	// 30
+	UInt32			unk34;	// 34
+	UInt32			unk38;	// 38
+	UInt32			unk3C;	// 3C
+	UInt32			unk40;	// 40
+	TESObjectWEAP*	weapon;	// 44
+};
+class WeaponInfo
+{
+public:
+	ExtraDataList** xData;
+	UInt32			count;
+	TESObjectWEAP*	weapon;
+
+	ExtraDataList* GetExtraData()
+	{
+		return xData ? *xData : NULL;
+	}
+};
+
 class BaseProcess
 {
 public:
 	BaseProcess();
 	~BaseProcess();
-
-	class AmmoInfo
-	{
-	public:
-		void*	unk00;	// 00
-		UInt32	count;	// 04
-		TESAmmo* ammo;	// 08
-		UInt32	unk0C;	// 0C
-		UInt32	unk10;	// 10
-		UInt32	unk14;	// 14
-		UInt32	unk18;	// 18
-		UInt32	unk1C;	// 1C
-		UInt32	unk20;	// 20
-		UInt32	unk24;	// 24
-		UInt32	unk28;	// 28
-		UInt32	unk2C;	// 2C
-		UInt32	unk30;	// 30
-		UInt32	unk34;	// 34
-		UInt32	unk38;	// 38
-		UInt32	unk3C;	// 3C
-		UInt32	unk40;	// 40
-		TESObjectWEAP* weapon;	// 44
-	};
-	class WeaponInfo
-	{
-	public:
-		ExtraDataList	**xData;
-		UInt32			unk04;
-		TESObjectWEAP	*weapon;
-
-		ExtraDataList *GetExtraData()
-		{
-			return xData ? *xData : NULL;
-		}
-	};
 
 	struct Data004 {
 		TESPackage		* package;		// 000
@@ -134,10 +150,10 @@ public:
 	};
 
 	virtual void	Destroy(bool noDealloc);
-	virtual void	Unk_01(void);
-	virtual void	Unk_02(void);
+	virtual void	Copy(void);
+	virtual void	CopyPackage(void);
 	virtual void	Unk_03(void);
-	virtual void	Unk_04(void);
+	virtual void	Update(void);
 	virtual void	Unk_05(void);
 	virtual void	Unk_06(void);
 	virtual void	Unk_07(void);
@@ -214,9 +230,11 @@ public:
 	virtual void	Unk_4E(void);
 	virtual void	Unk_4F(void);
 	virtual void	Unk_50(void);
-	virtual void	Unk_51(void);
-	virtual WeaponInfo	*GetWeaponInfo();	// unk0114
-	virtual AmmoInfo*	GetAmmoInfo();	// unk0118
+	//	I FEEL INSANE BUT I HAVE 1 TOO MANY VIRTUAL CALLS BEFORE 0x52
+	virtual WeaponInfo*	GetWeaponInfo();	// unk0114
+	virtual AmmoInfo*	GetAmmoInfo();		// unk0118
+	// BUT THIS FIXES IT SOMEHOW
+	virtual void	Unk_51(void); 
 	virtual void	Unk_54(void);
 	virtual void	Unk_55(void);
 	virtual void	Unk_56(void);
@@ -265,20 +283,20 @@ public:
 	virtual void	Unk_80(void);
 	virtual void	Unk_81(void);
 	virtual void	Unk_82(void);
-	virtual void	Unk_83(void);	// 083 - GetInterruptPackage
-	virtual void	Unk_84(void);	// 084 - SetInterruptPackage
-	virtual void	Unk_85(void);	// 085 - StopInterruptPackage
+	virtual void	GetInterruptPackage(void);	// 083 - GetInterruptPackage
+	virtual void	SetInterruptPackage(void);	// 084 - SetInterruptPackage
+	virtual void	StopInterruptPackage(void);	// 085 - StopInterruptPackage
 	virtual void	Unk_86(void);	// 086 - SetInterruptPackageTargetRef
 	virtual void	Unk_87(void);	// 087 - SetInterruptPackageTargetRef
 	virtual void	Unk_88(void);	// 088 - IncreaseInterruptPackageUnk00C
 	virtual void	Unk_89(void);
 	virtual void	Unk_8A(void);
-	virtual void	Unk_8B(void);	// 08B - GetStablePackage
-	virtual void	Unk_8C(void);	// 08C - SetStablePackage
-	virtual void	Unk_8D(void);	// 08D - StopStablePackage
-	virtual void	Unk_8E(void);
-	virtual void	Unk_8F(void);
-	virtual void	Unk_90(void);
+	virtual void	GetStablePackage(void);	// 08B - GetStablePackage
+	virtual void	SetStablePackage(void);	// 08C - SetStablePackage
+	virtual void	StopStablePackage(void);	// 08D - StopStablePackage
+	virtual void	SetStablePackageUnk00C(void);
+	virtual void	GetStablePackageUnk00C(void);
+	virtual void	IncreaseStablePackageUnk00C(void);
 	virtual void	Unk_91(void);
 	virtual void	Unk_92(void);	// Only HighProcess, get Unk0454
 	virtual void	Unk_93(void);
@@ -475,7 +493,7 @@ public:
 	virtual void	Unk_152();
 	virtual void	Unk_153();
 	virtual void	Unk_154();
-	virtual void	Unk_155();
+	virtual void	LoadGame();
 	virtual void	Unk_156();
 	virtual void	Unk_157();
 	virtual void	Unk_158();
@@ -846,13 +864,13 @@ STATIC_ASSERT(sizeof(MiddleHighProcess) == 0x25C);
 class HighProcess : public MiddleHighProcess
 {
 public:
-	TList<void>* detectedActors;	// 25C
-	TList<void>* detectingActors;	// 260
-	void* ptr264;			// 264
-	void* ptr268;			// 268
-	void* ptr26C;			// 26C
+	TList<void>*						detectedActors;		// 25C
+	TList<void>*						detectingActors;	// 260
+	void*								ptr264;				// 264
+	void*								ptr268;				// 268
+	void*								ptr26C;				// 26C
 	UInt32								unk270;				// 270
-	TList<void>					list274;			// 274
+	TList<void>							list274;			// 274
 	TList<void>							list27C;			// 27C
 	TList<void>							list284;			// 284
 	TList<void>							list28C;			// 28C
@@ -881,11 +899,11 @@ public:
 	float								flt2D8;				// 2D8
 	UInt32								unk2DC;				// 2DC
 	float								flt2E0;				// 2E0
-	void* ptr2E4;			// 2E4
+	void*								ptr2E4;			// 2E4
 	UInt32								unk2E8;				// 2E8
 	AnimAction							currentAction;		// 2EC
 	UInt8								pad2EE[2];			// 2EE
-	BSAnimGroupSequence* currentSequence;	// 2F0
+	BSAnimGroupSequence*				currentSequence;	// 2F0
 	UInt8								forceFireWeapon;	// 2F4
 	UInt8								pad2F5[3];			// 2F5
 	float								flt2F8;				// 2F8
@@ -904,9 +922,9 @@ public:
 	float								flt344;				// 344
 	UInt32								unk348;				// 348
 	float								flt34C;				// 34C
-	TESIdleForm* idleForm350;		// 350
+	TESIdleForm*						idleForm350;		// 350
 	UInt32								unk354[4];			// 354
-	void** ptr364;			// 364
+	void**								ptr364;				// 364
 	UInt32								unk368[4];			// 368
 	float								flt378;				// 378
 	float								flt37C;				// 37C
@@ -925,9 +943,9 @@ public:
 	float								flt3C8;				// 3C8
 	UInt32								unk3CC;				// 3CC
 	UInt32								unk3D0;				// 3D0
-	void* projData;			// 3D4
+	void*								projData;			// 3D4
 	UInt32								unk3D8;				// 3D8
-	void* detectionEvent;	// 3DC
+	void*								detectionEvent;		// 3DC
 	UInt32								unk3E0;				// 3E0
 	UInt32								unk3E4;				// 3E4
 	UInt32								fadeType;			// 3E8
@@ -935,16 +953,16 @@ public:
 	UInt32								unk3F0;				// 3F0
 	UInt32								unk3F4;				// 3F4
 	UInt32								unk3F8[3];			// 3F8
-	Actor* combatTarget;		// 404
+	Actor*								combatTarget;		// 404
 	UInt32								unk408[4];			// 408
 	float								flt418;				// 418
-	TESObjectREFR* packageTarget;		// 41C
+	TESObjectREFR*						packageTarget;		// 41C
 	UInt32								unk420;				// 420
 	UInt32								queuedIdleFlags;	// 424
 	UInt32								unk428;				// 428
 	float								flt42C;				// 42C
 	UInt32								unk430;				// 430
-	void* ptr434;			// 434
+	void*								ptr434;				// 434
 	UInt32								unk438;				// 438
 	float								unk43C;				// 43C
 	float								radsSec440;			// 440

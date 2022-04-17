@@ -54,6 +54,7 @@ bool Cmd_SwapTexatlas_Execute(COMMAND_ARGS)
 	SetUIStringFull(texatlas, texatlasnew, kTileValue_texatlas);
 	return true;
 }
+*/
 
 bool Cmd_SetWorldspaceDefaultWaterHeight_Execute(COMMAND_ARGS)
 {
@@ -61,7 +62,11 @@ bool Cmd_SetWorldspaceDefaultWaterHeight_Execute(COMMAND_ARGS)
 	TESWorldSpace* worldspace = nullptr;
 	float newwaterheight = 0;
 	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &worldspace, &newwaterheight)) return true;
+
+	for (auto iter : *worldspace->cellMap)
+	{
+		
+	}
 	worldspace->defaultWaterHeight = newwaterheight;
 	return true;
 }
-*/

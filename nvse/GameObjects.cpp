@@ -5,19 +5,22 @@
 #include <GameUI.h>
 #include <SafeWrite.h>
 #include <NiObjects.h>
+#include <unordered_set>
 
-static constexpr UInt32 s_TESObject_REFR_init	= 0x0055A2F0;	// TESObject_REFR initialization routine (first reference to s_TESObject_REFR_vtbl)
-static constexpr UInt32	s_Actor_EquipItem		= 0x0088C650;	// maybe, also, would be: 007198E0 for FOSE	4th call from the end of TESObjectREFR::RemoveItem (func5F)
-static constexpr UInt32	s_Actor_UnequipItem		= 0x0088C790;	// maybe, also, would be: 007133E0 for FOSE next sub after EquipItem
-static constexpr UInt32 s_TESObjectREFR__GetContainer	= 0x0055D310;	// First call in REFR::RemoveItem
-static constexpr UInt32 s_TESObjectREFR_Set3D	= 0x005702E0;	// void : (const char*)
+#include "GameProcess.h"
+
+static constexpr UInt32 s_TESObject_REFR_init						= 0x0055A2F0;	// TESObject_REFR initialization routine (first reference to s_TESObject_REFR_vtbl)
+static constexpr UInt32	s_Actor_EquipItem							= 0x0088C650;	// maybe, also, would be: 007198E0 for FOSE	4th call from the end of TESObjectREFR::RemoveItem (func5F)
+static constexpr UInt32	s_Actor_UnequipItem							= 0x0088C790;	// maybe, also, would be: 007133E0 for FOSE next sub after EquipItem
+static constexpr UInt32 s_TESObjectREFR__GetContainer				= 0x0055D310;	// First call in REFR::RemoveItem
+static constexpr UInt32 s_TESObjectREFR_Set3D						= 0x005702E0;	// void : (const char*)
 static constexpr UInt32 s_PlayerCharacter_GetCurrentQuestTargets	= 0x00952BA0;	// BuildedQuestObjectiveTargets* : (void)
-static constexpr UInt32 s_PlayerCharacter_GenerateNiNode	= 0x0094E1D0; // Func0072
-static constexpr UInt32 kPlayerUpdate3Dpatch = 0x0094EB7A;
-static constexpr UInt32 TESObjectREFR_Set3D = 0x0094EB40;
-static constexpr UInt32 ValidBip01Names_Destroy = 0x00418E00;
-static constexpr UInt32 ExtraAnimAnimation_Destroy = 0x00418D20;
-static constexpr UInt32 RefNiRefObject_ReplaceNiRefObject = 0x0066B0D0;
+static constexpr UInt32 s_PlayerCharacter_GenerateNiNode			= 0x0094E1D0; // Func0072
+static constexpr UInt32 kPlayerUpdate3Dpatch						= 0x0094EB7A;
+static constexpr UInt32 TESObjectREFR_Set3D							= 0x0094EB40;
+static constexpr UInt32 ValidBip01Names_Destroy						= 0x00418E00;
+static constexpr UInt32 ExtraAnimAnimation_Destroy					= 0x00418D20;
+static constexpr UInt32 RefNiRefObject_ReplaceNiRefObject			= 0x0066B0D0;
 
 static constexpr UInt32 kg_Camera1st	= 0x011E07D0;
 static constexpr UInt32 kg_Camera3rd	= 0x011E07D4;
@@ -39,8 +42,7 @@ ScriptEventList* TESObjectREFR::GetEventList() const
 
 TESContainer* TESObjectREFR::GetContainer()
 {
-	if (IsActor())
-		return &static_cast<TESActorBase*>(baseForm)->container;
+	if (IsActor()) return &static_cast<TESActorBase*>(baseForm)->container;
 	if (baseForm->typeID == kFormType_TESObjectCONT)
 		return &static_cast<TESObjectCONT*>(baseForm)->container;
 	return nullptr;
@@ -417,6 +419,12 @@ ExtraDataList* ExtraContainerChanges::EntryData::GetCustomExtra(UInt32 whichVal)
 	return nullptr;
 }
 
+BSExtraData* ExtraContainerChanges::EntryData::GetExtraData(UInt32 whichVal)
+{
+	const auto extra = GetCustomExtra(whichVal);
+	return extra ? extra->GetByType(whichVal) : nullptr;
+}
+
 __declspec(naked) ContChangesEntry* ContChangesList::FindForItem(TESForm* item)
 {
 	__asm
@@ -449,4 +457,34 @@ bool Explosion::CanStoreAmmo()
 	if (!source->IsActor()) return false;
 	if (ammo && (ammo->typeID != kFormType_TESAmmo && ammo->typeID != kFormType_TESObjectWEAP)) return false; // temporary check until I resolve saving issue
 	return true;
+}
+/*
+void Actor::FireWeapon()
+{
+	animGroupId110 = static_cast<UInt32>(GetAnimData()->GetNextAttackGroupID());
+	this->baseProcess->SetQueuedIdleFlag(kIdleFlag_FireWeapon);
+	Actor::HandleQueuedAnimFlags(this); //Actor::HandleQueuedIdleFlags
+}
+
+void Actor::EjectFromWeapon(TESObjectWEAP* weapon)
+{
+	if (weapon && Actor::IsDoingAttackAnimation(this) && !weapon->IsMeleeWeapon() && !weapon->IsAutomatic())
+	{
+		baseProcess->SetQueuedIdleFlag(kIdleFlag_AttackEjectEaseInFollowThrough);
+		Actor::HandleQueuedAnimFlags(this);
+	}
+}
+*/
+TESObjectWEAP* Actor::GetWeaponForm() const
+{
+	const auto weaponInfo = this->baseProcess->GetWeaponInfo();
+	if (!weaponInfo) return nullptr;
+	return weaponInfo->weapon;
+}
+
+bool Actor::IsAnimActionReload() const
+{
+	const auto currentAnimAction = static_cast<AnimAction>(baseProcess->GetCurrentAnimAction());
+	const static std::unordered_set s_reloads = { kAnimAction_Reload, kAnimAction_ReloadLoop, kAnimAction_ReloadLoopStart, kAnimAction_ReloadLoopEnd };
+	return s_reloads.contains(currentAnimAction);
 }

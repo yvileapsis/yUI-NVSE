@@ -4,6 +4,10 @@
 #include <vector>
 #include <span>
 
+#define CALL_EAX(addr) __asm mov eax, addr __asm call eax
+#define JMP_EAX(addr)  __asm mov eax, addr __asm jmp eax
+#define JMP_EDX(addr)  __asm mov edx, addr __asm jmp edx
+
 inline std::unordered_map <UInt32, std::vector<std::byte>> g_SafeWriteData;
 
 void SafeWrite8(UInt32 addr, UInt32 data);

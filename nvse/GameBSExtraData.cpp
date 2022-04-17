@@ -8,7 +8,7 @@ static const UInt32 s_ExtraDataListVtbl							= 0x010143E8;	//	0x0100e3a8;
 
 bool BaseExtraList::HasType(UInt32 type) const
 {
-	return (m_presenceBitfield[type >> 3] & (1 << (type & 7))) != 0;
+	return (m_presenceBitfield[type >> 3] & 1 << (type & 7)) != 0;
 }
 
 void BaseExtraList::MarkType(UInt32 type, bool bCleared)
@@ -24,8 +24,7 @@ ExtraDataList* ExtraDataList::Create(BSExtraData* xBSData)
 	ExtraDataList* xData = (ExtraDataList*)FormHeap_Allocate(sizeof(ExtraDataList));
 	memset(xData, 0, sizeof(ExtraDataList));
 	((UInt32*)xData)[0] = s_ExtraDataListVtbl;
-	if (xBSData)
-		xData->Add(xBSData);
+	if (xBSData) xData->Add(xBSData);
 	return xData;
 }
 

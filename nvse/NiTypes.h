@@ -416,9 +416,22 @@ public:
 				FindNonEmpty();
 			}
 		}
+
+		T_Data* operator->() const { return m_entry->data; }
+		T_Data*& operator*() const { return m_entry->data; }
+		Iterator& operator=(const Iterator& rhs)
+		{
+			m_entry = rhs.m_entry;
+			return *this;
+		}
+		bool operator!=(const Iterator& rhs) { return m_entry != rhs.m_entry; };
 	};
 
 	Iterator Begin() { return Iterator(*this); }
+
+	Iterator begin() { return Iterator(*this); }
+	Iterator end() { return Iterator(nullptr); }
+
 };
 
 template <typename T_Data>

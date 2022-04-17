@@ -118,8 +118,8 @@ public:
 		return (field >> shift) & (0xFFFFFFFF >> (32 - length));
 	}
 
-	bool	IsSet(UInt32 data) const { return ((field & data) == data) ? true : false; }	//!< Are all these bits set?
-	bool	IsUnSet(UInt32 data) const { return (field & data) ? false : true; }			//!< Are all these bits clear?
+	bool	IsSet(UInt32 data) const { return field & data ? true : false; }	//!< Are all these bits set?
+	bool	IsUnSet(UInt32 data) const { return field & data ? false : true; }			//!< Are all these bits clear?
 	bool	IsClear(UInt32 data) const { return IsUnSet(data); }							//!< Are all these bits clear?
 
 private:
