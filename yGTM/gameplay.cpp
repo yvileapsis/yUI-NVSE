@@ -233,26 +233,21 @@ namespace ArmedUnarmed
 
 	bool __fastcall QueueAttackFireCheck(TESObjectWEAP* weapon, Actor* actor)
 	{
-		if (!weapon->IsMeleeWeapon()) return true;
+		if (!weapon || !weapon->IsMeleeWeapon()) return true;
 
 		if (!weapon->HasScope()) return false;
 
-		if (weapon->projectile)
+		if (!weapon->ammo.ammo)
 		{
-			if (weapon->ammo.ammo)
+			if (weapon->projectile) actor->baseProcess->SetQueuedIdleFlag(kIdleFlag_FireWeapon);
+		}
+		else if (const auto ammoinfo = actor->baseProcess->GetAmmoInfo(); ammoinfo && ammoinfo->ammo)
+		{
+			if (weapon->projectile)
 			{
-				const auto ammoinfo = actor->baseProcess->GetAmmoInfo();
-				if (ammoinfo && ammoinfo->ammo && ammoinfo->count >= weapon->ammoUse) actor->baseProcess->SetQueuedIdleFlag(kIdleFlag_FireWeapon);
+				if (ammoinfo->count >= weapon->ammoUse) actor->baseProcess->SetQueuedIdleFlag(kIdleFlag_FireWeapon);
 			}
 			else
-			{
-				actor->baseProcess->SetQueuedIdleFlag(kIdleFlag_FireWeapon);
-			}
-		}
-		if (!weapon->projectile && weapon->ammo.ammo)
-		{
-			const auto ammoinfo = actor->baseProcess->GetAmmoInfo();
-			if (ammoinfo && ammoinfo->ammo)
 			{
 				if (ammoinfo->count >= weapon->ammoUse)
 				{
@@ -266,34 +261,26 @@ namespace ArmedUnarmed
 			}
 		}
 
+
 		return false;
 	}
 
 
 	void __fastcall QueuePowerAttackFireCheck(TESObjectWEAP* weapon, Actor* actor)
 	{
-		if (weapon->eWeaponType != TESObjectWEAP::kWeapType_HandToHandMelee && weapon->eWeaponType !=
-			TESObjectWEAP::kWeapType_OneHandMelee && weapon->eWeaponType != TESObjectWEAP::kWeapType_TwoHandMelee)
-		{
-			return;
-		}
+		if (!weapon || !weapon->IsMeleeWeapon()) return;
 
-		if (weapon->projectile)
+		if (!weapon->ammo.ammo)
 		{
-			if (weapon->ammo.ammo)
+			if (weapon->projectile) actor->baseProcess->SetQueuedIdleFlag(kIdleFlag_FireWeapon);
+		}
+		else if (const auto ammoinfo = actor->baseProcess->GetAmmoInfo(); ammoinfo && ammoinfo->ammo)
+		{
+			if (weapon->projectile)
 			{
-				const auto ammoinfo = actor->baseProcess->GetAmmoInfo();
-				if (ammoinfo && ammoinfo->ammo && ammoinfo->count >= weapon->ammoUse) actor->baseProcess->SetQueuedIdleFlag(kIdleFlag_FireWeapon);
+				if (ammoinfo->count >= weapon->ammoUse) actor->baseProcess->SetQueuedIdleFlag(kIdleFlag_FireWeapon);
 			}
 			else
-			{
-				actor->baseProcess->SetQueuedIdleFlag(kIdleFlag_FireWeapon);
-			}
-		}
-		if (!weapon->projectile && weapon->ammo.ammo)
-		{
-			const auto ammoinfo = actor->baseProcess->GetAmmoInfo();
-			if (ammoinfo && ammoinfo->ammo)
 			{
 				if (ammoinfo->count >= weapon->ammoUse)
 				{
@@ -305,7 +292,6 @@ namespace ArmedUnarmed
 				}
 			}
 		}
-
 	}
 
 	bool __fastcall ExecuteAttackHook(TESObjectWEAP* weapon)
