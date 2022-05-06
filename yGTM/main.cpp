@@ -5,8 +5,8 @@
 #include <settings.h>
 #include <timeMult.h>
 
-#define yGTM_VERSION 2.0
-#define yGTM_VERSION_STR "2.0a"
+#define yGTM_VERSION 2.1
+#define yGTM_VERSION_STR "2.1"
 #define yGTM_STR "yGTM"
 
 PluginHandle	g_pluginHandle = kPluginHandle_Invalid;

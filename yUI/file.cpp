@@ -50,18 +50,22 @@ namespace SIFiles
 					if (elem.contains("mod") && elem.contains("form"))
 					{
 						auto modName = elem.contains("mod") ? elem["mod"].get<std::string>() : "";
-						const auto* mod = !modName.empty() ? DataHandler::GetSingleton()->LookupModByName(modName.c_str()) : nullptr;
-						if (!mod && !modName.empty())
+						const auto mod = !modName.empty() ? DataHandler::GetSingleton()->LookupModByName(modName.c_str()) : nullptr;
+
+						UInt8 modIndex;
+						if (modName == "FF") modIndex = 0xFF;
+						else if (!mod && !modName.empty())
 						{
 							Log("Mod name " + modName + " was not found");
 							continue;
 						}
+						modIndex = mod->modIndex;
 
 						UInt32 formlist = 0;
 						if (elem.contains("formlist")) formlist = elem["formlist"].get<UInt32>();
 
 						std::vector<int> formIds;
-						if (auto* formElem = elem.contains("form") ? &elem["form"] : nullptr; formElem)
+						if (const auto formElem = elem.contains("form") ? &elem["form"] : nullptr; formElem)
 						{
 							if (formElem->is_array())
 								std::ranges::transform(*formElem, std::back_inserter(formIds), [&](auto& i) {return strToFormID(i.template get<std::string>()); });
@@ -75,7 +79,7 @@ namespace SIFiles
 						{
 							for (auto formId : formIds)
 							{
-								formId = (mod->modIndex << 24) + (formId & 0x00FFFFFF);
+								formId = (modIndex << 24) + (formId & 0x00FFFFFF);
 								common.form = LookupFormByID(formId);
 								if (!common.form) { Log(FormatString("Form %X was not found", formId)); continue; }
 								if (!formlist) {
@@ -86,15 +90,21 @@ namespace SIFiles
 									JSONEntryItemRecursiveEmplace(common, common.form);
 								}
 								else if (formlist == 2) {
-									for (auto mIter = GetAllForms()->Begin(); mIter; ++mIter) {
-										auto item = mIter.Get();
-										if (item->typeID != kFormType_TESObjectWEAP) continue;
-										const auto weapon = DYNAMIC_CAST(item, TESForm, TESObjectWEAP);
-										if (!weapon) continue;
-										if (!weapon->repairItemList.listForm) continue;
-										if (weapon->refID == common.form->refID || weapon->repairItemList.listForm->refID == common.form->refID || weapon->repairItemList.listForm->ContainsRecursive(common.form)) {
-											Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", common.tag.c_str(), item->refID, item->GetName(), formId));
-											g_Items_JSON.emplace_back(common, item);
+									for (const auto item : *GetAllForms()) {
+										if (item->typeID == kFormType_TESObjectWEAP) {
+											const auto weapon = DYNAMIC_CAST(item, TESForm, TESObjectWEAP);
+											if (!weapon || !weapon->repairItemList.listForm) continue;
+											if (weapon->refID == common.form->refID || weapon->repairItemList.listForm->refID == common.form->refID || weapon->repairItemList.listForm->ContainsRecursive(common.form)) {
+												Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", common.tag.c_str(), item->refID, item->GetName(), formId));
+												g_Items_JSON.emplace_back(common, item);
+											}
+										} else if (item->typeID == kFormType_TESObjectARMO) {
+											const auto armor = DYNAMIC_CAST(item, TESForm, TESObjectARMO);
+											if (!armor || !armor->repairItemList.listForm) continue;
+											if (armor->refID == common.form->refID || armor->repairItemList.listForm->refID == common.form->refID || armor->repairItemList.listForm->ContainsRecursive(common.form)) {
+												Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", common.tag.c_str(), item->refID, item->GetName(), formId));
+												g_Items_JSON.emplace_back(common, item);
+											}
 										}
 									}
 								}
@@ -124,8 +134,8 @@ namespace SIFiles
 						if (elem.contains("ammoMod") && elem.contains("ammoForm"))
 						{
 							auto ammoModName = elem["ammoMod"].get<std::string>();
-							const auto* ammoMod = !ammoModName.empty() ? DataHandler::GetSingleton()->LookupModByName(ammoModName.c_str()) : nullptr;
-							auto* ammoForm = LookupFormByID((ammoMod->modIndex << 24) + (strToFormID(elem["ammoForm"].get<std::string>()) & 0x00FFFFFF));
+							const auto ammoMod = !ammoModName.empty() ? DataHandler::GetSingleton()->LookupModByName(ammoModName.c_str()) : nullptr;
+							auto ammoForm = LookupFormByID((ammoMod->modIndex << 24) + (strToFormID(elem["ammoForm"].get<std::string>()) & 0x00FFFFFF));
 							weapon.ammo = ammoForm;
 						}
 
@@ -264,18 +274,17 @@ namespace SIFiles
 
 	}
 
-	void JSONEntryItemRecursiveEmplace(const JSONEntryItemCommon& common, TESForm* list)
+	void JSONEntryItemRecursiveEmplace(const JSONEntryItemCommon& common, TESForm* item)
 	{
-		if (list->typeID == kFormType_BGSListForm)
+		if (item->typeID == kFormType_BGSListForm)
 		{
-			const auto bgslist = DYNAMIC_CAST(list, TESForm, BGSListForm);
+			const auto bgslist = DYNAMIC_CAST(item, TESForm, BGSListForm);
 			if (!bgslist) return;
 			for (const auto iter : bgslist->list)
-				if (iter) { JSONEntryItemRecursiveEmplace(common, iter); }
-		}
-		else {
-			Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive", common.tag.c_str(), list->refID, list->GetName()));
-			g_Items_JSON.emplace_back(common, list);
+				if (iter) JSONEntryItemRecursiveEmplace(common, iter);
+		} else if (!common.formType || item->typeID == common.formType) {
+			Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive", common.tag.c_str(), item->refID, item->GetName()));
+			g_Items_JSON.emplace_back(common, item);
 		}
 	}
 }

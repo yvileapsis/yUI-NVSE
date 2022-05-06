@@ -15,7 +15,7 @@ namespace SIFiles
 {
 	bool AssignTagToItem(TESForm* form)
 	{
-		for (const auto& entry : g_Items_JSON) {
+		for (const auto &entry : g_Items_JSON) {
 			if (entry.formCommon.form && entry.formCommon.form->refID != form->refID) continue;
 			if (entry.formCommon.formType && entry.formCommon.formType != form->typeID) continue;
 
@@ -80,8 +80,7 @@ namespace SIFiles
 
 		if (!g_ySI_JustInTime)
 		{
-			for (auto mIter = GetAllForms()->Begin(); mIter; ++mIter) {
-				TESForm* form = mIter.Get();
+			for (const auto form : *GetAllForms()) {
 				if (!form || !form->IsInventoryObjectAlt()) continue;
 				AssignTagToItem(form);
 			}

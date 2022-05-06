@@ -19,8 +19,27 @@ void patchSortingHooks(const bool bEnable)
 	}
 }
 
+void wah123(TileRect* tabline, int traitID, char* strWeapon, char* strApparel, char* strAid, char* strMisc, char* strAmmo, char* zero)
+{
+//	String str;
+//	str.Set("waaaah");
+
+//	va_list args;
+//	va_start(args, strApparel);
+
+	__asm {
+//		sub esp, 4
+	}
+//	CdeclCall(0x707BE0, tabline, traitID, strWeapon, strApparel, strAid, strMisc, strAmmo, zero);
+	CdeclCall(0x707BE0, tabline, traitID, "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", zero);
+	__asm {
+//		add esp, 4
+	}
+}
+
 void patchAddIcons(const bool bEnable)
 {
+//	WriteRelCall(0x77FDF3, wah123);
 	if (bEnable)
 	{
 		WriteRelJump(0x71A3D5, SIHooks::IconInjectTileSetStringValueHook<0x71A3DA>);

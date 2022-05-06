@@ -292,9 +292,6 @@ struct NiTArray
 	Iterator Begin() { return Iterator(*this); }
 };
 
-
-#if RUNTIME
-
 template <typename T> void NiTArray<T>::AddAtIndex(UInt32 index, T* item)
 {
 	ThisStdCall(0x00869640, this, index, item);
@@ -305,13 +302,10 @@ template <typename T> void NiTArray<T>::SetCapacity(UInt16 newCapacity)
 	ThisStdCall(0x008696E0, this, newCapacity);
 }
 
-#endif
-
 // 18
 // an NiTArray that can go above 0xFFFF, probably with all the same weirdness
 // this implies that they make fragmentable arrays with 0x10000 elements, wtf
-template <typename T>
-class NiTLargeArray
+template <typename T> class NiTLargeArray
 {
 public:
 	NiTLargeArray();
@@ -336,19 +330,15 @@ public:
 };
 
 // 8
-template <typename T>
-struct NiTSet
+template <typename T> struct NiTSet
 {
-	T		* data;		// 00
+	T*		data;		// 00
 	UInt16	capacity;	// 04
 	UInt16	length;		// 06
 };
 
 // 10
-// this is a NiTPointerMap <UInt32, T_Data>
-// todo: generalize key
-template <typename T_Data>
-class NiTPointerMap
+template <typename T_Data> class NiTPointerMap
 {
 public:
 	NiTPointerMap();
@@ -356,9 +346,9 @@ public:
 
 	struct Entry
 	{
-		Entry	* next;
+		Entry*	next;
 		UInt32	key;
-		T_Data	* data;
+		T_Data*	data;
 	};
 
 	virtual void	Destroy(bool doFree);
@@ -372,7 +362,7 @@ public:
 	T_Data *		Lookup(UInt32 key);
 	bool			Insert(Entry* nuEntry);
 
-//	void	** _vtbl;				// 0
+//	void**			_vtbl;			// 0
 	UInt32			m_numBuckets;	// 4
 	Entry**			m_buckets;		// 8
 	UInt32			m_numItems;		// C
@@ -386,15 +376,13 @@ public:
 		Entry* m_entry;
 		Entry** m_bucket;
 		
-		void FindValid();
-		void FindNonEmpty()
-		{
-			for (Entry** end = &m_table->m_buckets[m_table->m_numBuckets]; m_bucket != end; m_bucket++)
-				if (m_entry = *m_bucket) return;
-		}
-	
+		void FindNonEmpty();
+
 	public:
-		Iterator(NiTPointerMap& _table) : m_table(&_table), m_bucket(m_table->m_buckets), m_entry(NULL) { FindNonEmpty(); }
+
+		Iterator() : m_table(nullptr), m_entry(nullptr), m_bucket(nullptr) {}
+		Iterator(NiTPointerMap* table, Entry* entry = nullptr)
+			: m_table(table), m_entry(entry), m_bucket(table->m_buckets) { FindNonEmpty(); }
 
 		~Iterator() { }
 
@@ -403,10 +391,9 @@ public:
 		bool		Next(void);
 		bool		Done(void);
 
-		T_Data Get() const { return m_entry->data; }
 		//		T_Key Key() const { return m_entry->key; }
 
-		explicit operator bool() const { return m_entry != NULL; }
+		explicit operator bool() const { return m_entry != nullptr; }
 		void operator++()
 		{
 			m_entry = m_entry->next;
@@ -424,95 +411,78 @@ public:
 			m_entry = rhs.m_entry;
 			return *this;
 		}
-		bool operator!=(const Iterator& rhs) { return m_entry != rhs.m_entry; };
+		bool operator!=(const Iterator& rhs) { return m_entry != rhs.m_entry; }
 	};
 
-	Iterator Begin() { return Iterator(*this); }
-
-	Iterator begin() { return Iterator(*this); }
-	Iterator end() { return Iterator(nullptr); }
+	Iterator begin() { return Iterator(this); }
+	Iterator end() { return Iterator(); }
 
 };
 
-template <typename T_Data>
-T_Data * NiTPointerMap <T_Data>::Lookup(UInt32 key)
+template <typename T_Data> T_Data* NiTPointerMap <T_Data>::Lookup(UInt32 key)
 {
-	for(Entry * traverse = m_buckets[key % m_numBuckets]; traverse; traverse = traverse->next)
-		if(traverse->key == key)
+	for (Entry * traverse = m_buckets[key % m_numBuckets]; traverse; traverse = traverse->next)
+		if (traverse->key == key)
 			return traverse->data;
-	
-	return NULL;
+	return nullptr;
 }
 
-template <typename T_Data>
-bool NiTPointerMap<T_Data>::Insert(Entry* nuEntry)
+template <typename T_Data> bool NiTPointerMap<T_Data>::Insert(Entry* nuEntry)
 {
 	// game code does not appear to care about ordering of entries in buckets
 	UInt32 bucket = nuEntry->key % m_numBuckets;
-	Entry* prev = NULL;
+	Entry* prev = nullptr;
 	for (Entry* cur = m_buckets[bucket]; cur; cur = cur->next) {
-		if (cur->key == nuEntry->key) {
-			return false;
-		}
-		else if (!cur->next) {
+		if (cur->key == nuEntry->key) return false;
+		if (!cur->next) {
 			prev = cur;
 			break;
 		}
 	}
 
-	if (prev) {
-		prev->next = nuEntry;
-	}
-	else {
-		m_buckets[bucket] = nuEntry;
-	}
+	if (prev) prev->next = nuEntry;
+	else m_buckets[bucket] = nuEntry;
 
 	m_numBuckets++;
 	return true;
 }
 
-template <typename T_Data>
-T_Data * NiTPointerMap <T_Data>::Iterator::Get(void)
+template <typename T_Data> void NiTPointerMap<T_Data>::Iterator::FindNonEmpty()
 {
-	if(m_entry)
-		return m_entry->data;
-
-	return NULL;
+	for (Entry** end = &m_table->m_buckets[m_table->m_numBuckets]; m_bucket != end; ++m_bucket)
+		if ((m_entry = *m_bucket)) return;
 }
 
-template <typename T_Data>
-UInt32 NiTPointerMap <T_Data>::Iterator::GetKey(void)
+template <typename T_Data> T_Data * NiTPointerMap <T_Data>::Iterator::Get(void)
 {
-	if(m_entry)
-		return m_entry->key;
-
-	return 0;
+	return m_entry ? m_entry->data : nullptr;
 }
 
-template <typename T_Data>
-bool NiTPointerMap <T_Data>::Iterator::Next(void)
+template <typename T_Data> UInt32 NiTPointerMap <T_Data>::Iterator::GetKey(void)
 {
-	if(m_entry)
-		m_entry = m_entry->next;
+	return m_entry ? m_entry->key : 0;
+}
 
-	while(!m_entry && (m_bucket < (m_table->m_numBuckets - 1)))
+template <typename T_Data> bool NiTPointerMap <T_Data>::Iterator::Next(void)
+{
+	if (m_entry) m_entry = m_entry->next;
+
+	while (!m_entry && (m_bucket < (m_table->m_numBuckets - 1)))
 	{
-		m_bucket++;
-
+		++m_bucket;
 		m_entry = m_table->m_buckets[m_bucket];
 	}
 
-	return m_entry != NULL;
+	return m_entry != nullptr;
 }
 
-template <typename T_Data>
-bool NiTPointerMap <T_Data>::Iterator::Done(void)
+template <typename T_Data> bool NiTPointerMap <T_Data>::Iterator::Done(void)
 {
-	return m_entry == NULL;
+	return m_entry == nullptr;
 }
 
-template <typename T_Data>
-void NiTPointerMap <T_Data>::Iterator::FindValid(void)
+/*
+template <typename T_Data> void NiTPointerMap <T_Data>::Iterator::FindValid(void)
 {
 	// validate bucket
 	if(m_bucket >= m_table->m_numBuckets) return;
@@ -528,6 +498,7 @@ void NiTPointerMap <T_Data>::Iterator::FindValid(void)
 		m_entry = m_table->m_buckets[m_bucket];
 	}
 }
+*/
 
 // 10
 // todo: NiTPointerMap should derive from this
@@ -541,7 +512,7 @@ public:
 
 	struct Entry
 	{
-		Entry	* next;	// 000
+		Entry*	next;	// 000
 		T_Key	key;	// 004
 		T_Data	data;	// 008
 	};
@@ -554,17 +525,16 @@ public:
 	virtual	void						Unk_005(void);									// 005
 	virtual	void						Unk_006();										// 006
 
-	//void	** _vtbl;	// 0
-	UInt32	numBuckets;	// 4
-	Entry	** buckets;	// 8
-	UInt32	numItems;	// C
+	//void**	_vtbl;	// 0
+	UInt32		numBuckets;	// 4
+	Entry**		buckets;	// 8
+	UInt32		numItems;	// C
 
 	DEFINE_MEMBER_FN_LONG(NiTMapBase, Lookup, bool, _NiTMap_Lookup, T_Key key, T_Data * dataOut);
 };
 
 // 14
-template <typename T_Data>
-class NiTStringPointerMap : public NiTPointerMap <T_Data>
+template <typename T_Data> class NiTStringPointerMap : public NiTPointerMap <T_Data>
 {
 public:
 	NiTStringPointerMap();
@@ -575,8 +545,7 @@ public:
 
 // not sure how much of this is in NiTListBase and how much is in NiTPointerListBase
 // 10
-template <typename T>
-class NiTListBase
+template <typename T> class NiTListBase
 {
 public:
 	NiTListBase();
@@ -584,24 +553,23 @@ public:
 
 	struct Node
 	{
-		Node	* next;
-		Node	* prev;
-		T		* data;
+		Node*	next;
+		Node*	prev;
+		T*		data;
 	};
 
 	virtual void	Destructor(void);
-	virtual Node *	AllocateNode(void);
+	virtual Node*	AllocateNode(void);
 	virtual void	FreeNode(Node * node);
 
-//	void	** _vtbl;	// 000
-	Node	* start;	// 004
-	Node	* end;		// 008
-	UInt32	numItems;	// 00C
+//	void**		_vtbl;		// 000
+	Node*		start;		// 004
+	Node*		end;		// 008
+	UInt32		numItems;	// 00C
 };
 
 // 10
-template <typename T>
-class NiTPointerListBase : public NiTListBase <T>
+template <typename T> class NiTPointerListBase : public NiTListBase <T>
 {
 public:
 	NiTPointerListBase();
@@ -609,8 +577,7 @@ public:
 };
 
 // 10
-template <typename T>
-class NiTPointerList : public NiTPointerListBase <T>
+template <typename T> class NiTPointerList : public NiTPointerListBase <T>
 {
 public:
 	NiTPointerList();
@@ -618,13 +585,12 @@ public:
 };
 
 // 4
-template <typename T>
-class NiPointer
+template <typename T> class NiPointer
 {
 public:
 	NiPointer(T *init) : data(init)		{	}
 
-	T	* data;
+	T*		data;
 
 	const T&	operator *() const { return *data; }
 	T&			operator *() { return *data; }
@@ -634,8 +600,7 @@ public:
 };
 
 // 14
-template <typename T>
-class BSTPersistentList
+template <typename T> class BSTPersistentList
 {
 public:
 	BSTPersistentList();
