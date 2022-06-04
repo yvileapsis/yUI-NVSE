@@ -11,6 +11,7 @@ inline NVSEMessagingInterface*		g_messagingInterface	= nullptr;
 inline NVSEScriptInterface*			g_scriptInterface		= nullptr;
 inline NVSECommandTableInterface*	g_commandInterface		= nullptr;
 inline NVSEDataInterface*			g_dataInterface			= nullptr;
+inline NVSEEventManagerInterface*	g_eventInterface		= nullptr;
 
 inline DIHookControl*				g_DIHook				= nullptr;
 inline PlayerCharacter*				g_player				= nullptr;

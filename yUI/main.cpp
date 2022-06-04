@@ -34,6 +34,9 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 		if (iDoOnce == 0 && !CdeclCall<bool>(0x702360)) {
 			iDoOnce++;
 
+			SetNativeEventHandler("OnAdd", reinterpret_cast<EventHandler>(TestFunc));
+			SetNativeEventHandler("OnDrop", reinterpret_cast<EventHandler>(TestFunc));
+
 			if (g_ySI_Icons) SI::InjectTemplates();
 		}
 		
@@ -48,6 +51,7 @@ void writePatches()
 	patchReplaceHotkeyIcons	(g_ySI && g_ySI_Hotkeys);
 	patchSortingCategories	(g_ySI && g_ySI_Categories);
 	patchMatchedCursor		(g_yMC);
+	patchSortingTabs		(true);
 }
 
 bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
@@ -113,6 +117,12 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	g_commandInterface = static_cast<NVSECommandTableInterface*>(nvse->QueryInterface(kInterface_CommandTable));
 
 	ExtractArgsEx = g_scriptInterface->ExtractArgsEx;
+
+	g_eventInterface = static_cast<NVSEEventManagerInterface*>(nvse->QueryInterface(kInterface_EventManager));
+
+	SetNativeEventHandler = g_eventInterface->SetNativeEventHandler;
+	RemoveNativeEventHandler = g_eventInterface->RemoveNativeEventHandler;
+
 /*
 	RegisterTraitID("&runsnig;", 2032);
 	RegisterTraitID("runsnig", 2032);

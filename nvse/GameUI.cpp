@@ -235,9 +235,9 @@ _declspec(naked) bool IsControlHeld()
 	}
 }
 
-bool InventoryMenu::IsKeyringOpen() const
+bool InventoryMenu::IsKeyringOpen()
 {
-	return this->tile->GetValueFloat(*(UInt32*)0x11D9EB8); // Trait_KeyringOpen
+	return GetSingleton()->tile->GetValueFloat(*(UInt32*)0x11D9EB8); // Trait_KeyringOpen
 }
 
 

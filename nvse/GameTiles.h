@@ -323,6 +323,7 @@ public:
 	void				SetStringRecursive(UInt32, const char*, const char*);
 
 	Menu*				GetParentMenu();
+	TileMenu*			GetTileMenu();
 	void				DestroyAllChildren();
 	void __fastcall		PokeValue(UInt32 valueID);
 	void				FakeClick();
@@ -330,6 +331,7 @@ public:
 	void				Dump(void);
 	void				HandleChange(UInt32 tilevalue) { ThisCall<void>(0xA074D0, this, tilevalue); }
 	Tile*				GetChildByID(UInt32 id) { return ThisCall<Tile*>(0xA03EB0, this, id); }; // THANKS STEWIE
+	Tile*				LookUpRectByName(const char* name);
 
 };
 

@@ -44,32 +44,33 @@ enum
 
 	// Added v0005 - version bumped to 3
 	kInterface_Data,
+	// Added v0006
+	kInterface_EventManager,
 
 	kInterface_Max
 };
 
 struct NVSEInterface
 {
-	UInt32	nvseVersion;
-	UInt32	runtimeVersion;
-	UInt32	editorVersion;
-	UInt32	isEditor;
-	bool	(* RegisterCommand)(CommandInfo * info);	// returns true for success, false for failure
-	void	(* SetOpcodeBase)(UInt32 opcode);
-	void *	(* QueryInterface)(UInt32 id);
+	UInt32			nvseVersion;
+	UInt32			runtimeVersion;
+	UInt32			editorVersion;
+	UInt32			isEditor;
+	bool			(*RegisterCommand)(CommandInfo * info);	// returns true for success, false for failure
+	void			(*SetOpcodeBase)(UInt32 opcode);
+	void*			(*QueryInterface)(UInt32 id);
 
 	// call during your Query or Load functions to get a PluginHandle uniquely identifying your plugin
 	// invalid if called at any other time, so call it once and save the result
-	PluginHandle	(* GetPluginHandle)(void);
+	PluginHandle	(*GetPluginHandle)(void);
 
 	// CommandReturnType enum defined in CommandTable.h
 	// does the same as RegisterCommand but includes return type; *required* for commands returning arrays
-	bool	(* RegisterTypedCommand)(CommandInfo * info, CommandReturnType retnType);
-	// returns a full path the the game directory
-	const char* (* GetRuntimeDirectory)();
+	bool			(*RegisterTypedCommand)(CommandInfo * info, CommandReturnType retnType);
+	
+	const char*		(*GetRuntimeDirectory)(); // returns a full path the the game directory
 
-	// Allows checking for nogore edition
-	UInt32	isNogore;
+	UInt32			isNogore;
 };
 
 struct NVSEConsoleInterface
@@ -699,6 +700,132 @@ struct NVSESerializationInterface
 	UInt32	(*ReadRecord32)();
 	void	(*ReadRecord64)(void *outData);
 };
+
+#ifdef RUNTIME
+/**** Event API docs  *******************************************************************************************
+ *  This interface allows you to
+ *	- Register a new event type which can be dispatched with parameters
+ *	- Dispatch an event from code to scripts (and plugins with this interface) with parameters and calling ref.
+ *	   - SetEventHandlerAlt supports up to 15 filters in script calls in the syntax of 1::myFilter
+ *	   (1st argument will receive this filter for example)
+ *	- Set an event handler for any NVSE events registered with SetEventHandler(Alt) which will be called back.
+ *
+ *	For RegisterEvent, paramTypes needs to be statically defined
+ *	(i.e. the pointer to it may never become invalid).
+ *  For example, a good way to define it is to make a global variable like this:
+ *
+ *	    static ParamType s_MyEventParams[] = { ParamType::eParamType_AnyForm, ParamType::eParamType_String };
+ *
+ *	Then you can pass it into PluginEventInfo like this:
+ *
+ *  Which can be registered like this:
+ *
+ *	    s_EventInterface->RegisterEvent("MyEvent", 2, s_MyEventParams);
+ *
+ *  Then, from your code, you can dispatch the event like this:
+ *
+ *	    s_EventInterface->DispatchEvent("MyEvent", callingRef, someForm, someString);
+ *
+ *	When passing float types to DispatchEvent you MUST pack them in a float, which then needs to be
+ *  cast as a void* pointer. This is due to the nature of variadic arguments in C/C++. Example:
+ *      float number = 10;
+ *	    void* floatArg = *(void**) &number;
+ *	    s_EventInterface->DispatchEvent("MyEvent", callingRef, floatArg);
+ */
+struct NVSEEventManagerInterface
+{
+	typedef void (*EventHandler)(TESObjectREFR* thisObj, void* parameters);
+
+	// Mostly just used for filtering information.
+	enum ParamType : int8_t
+	{
+		eParamType_Float = 0,
+		eParamType_Int,
+		eParamType_String,
+		eParamType_Array,
+
+		// All the form-type ParamTypes support formlist filters, which will check if the dispatched form matches with any of the forms in the list.
+		// In case a reference is dispatched, it can be filtered by a baseForm.
+		eParamType_RefVar,
+		eParamType_AnyForm = eParamType_RefVar,
+
+		// Behaves normally if a reference filter is set up for a param of Reference Type.
+		// Otherwise, if a regular baseform is the filter, will match the dispatched reference arg's baseform to the filter.
+		// Else, if the filter is a formlist, will do the above but for each element in the list.
+		eParamType_Reference,
+
+		// When attempting to set an event handler, if the filter-to-set is a reference the paramType is BaseForm, will reject that filter.
+		// Otherwise, behaves the same as eParamType_RefVar.
+		eParamType_BaseForm,
+
+		eParamType_Invalid,
+		eParamType_Anything
+	};
+	static bool IsFormParam(ParamType pType)
+	{
+		return pType == eParamType_RefVar || pType == eParamType_Reference || pType == eParamType_BaseForm
+		 || pType == eParamType_Anything;
+	}
+
+	enum EventFlags : UInt32
+	{
+		kFlags_None = 0,
+
+		//If on, will remove all set handlers for the event every game load.
+		kFlag_FlushOnLoad = 1 << 0,
+
+		//Identifies script-created events, for the DispatchEvent(Alt) script functions.
+		kFlag_IsUserDefined = 1 << 1,
+	};
+
+	// Registers a new event which can be dispatched to scripts and plugins. Returns false if event with name already exists.
+	bool			(*RegisterEvent)(const char* name, UInt8 numParams, ParamType* paramTypes, EventFlags flags);
+
+	// Dispatch an event that has been registered with RegisterEvent.
+	// Variadic arguments are passed as parameters to script / function.
+	// Returns false if an error occurred.
+	bool			(*DispatchEvent)(const char* eventName, TESObjectREFR* thisObj, ...);
+
+	enum DispatchReturn : int8_t
+	{
+		kRetn_UnknownEvent = -2,  // for plugins, events are supposed to be pre-defined.
+		kRetn_GenericError = -1,  // anything > -1 is a good result.
+		kRetn_Normal = 0,
+		kRetn_EarlyBreak,
+		kRetn_Deferred,	//for the "ThreadSafe" DispatchEvent functions.
+	};
+	typedef bool	(*DispatchCallback)(NVSEArrayVarInterface::Element& result, void* anyData);
+
+	// If resultCallback is not null, then it is called for each SCRIPT event handler that is dispatched, which allows checking the result of each dispatch.
+	// If the callback returns false, then dispatching for the event will end prematurely, and this returns kRetn_EarlyBreak.
+	// anyData arg is passed to the callbacks.
+	DispatchReturn	(*DispatchEventAlt)(const char* eventName, DispatchCallback resultCallback, void* anyData, TESObjectREFR* thisObj, ...);
+
+	// Similar to script function SetEventHandler, allows you to set a native function that gets called back on events
+	bool			(*SetNativeEventHandler)(const char* eventName, EventHandler func);
+
+	// Same as script function RemoveEventHandler but for native functions
+	bool			(*RemoveNativeEventHandler)(const char* eventName, EventHandler func);
+
+	bool			(*RegisterEventWithAlias)(const char* name, const char* alias, UInt8 numParams, ParamType* paramTypes, EventFlags flags);
+
+	// If passed as non-null, will be called after all handlers have been dispatched.
+	// The "ThreadSafe" dispatch functions can delay the dispatch by a frame, hence why this callback is needed.
+	// Useful to potentially clear heap-allocated memory for the dispatch.
+	typedef void	(*PostDispatchCallback)(void* anyData, DispatchReturn retn);
+
+	// Same as DispatchEvent, but if attempting to dispatch outside of the game's main thread, the dispatch will be deferred.
+	// WARNING: must ensure data will not be invalid if the dispatch is deferred.
+	// Recommended to avoid potential multithreaded crashes, usually related to Console_Print.
+	bool			(*DispatchEventThreadSafe)(const char* eventName, PostDispatchCallback postCallback, TESObjectREFR* thisObj, ...);
+
+	// Same as DispatchEventAlt, but if attempting to dispatch outside of the game's main thread, the dispatch will be deferred.
+	// WARNING: must ensure data will not be invalid if the dispatch is deferred.
+	// Recommended to avoid potential multithreaded crashes, usually related to Console_Print.
+	DispatchReturn (*DispatchEventAltThreadSafe)(const char* eventName, DispatchCallback resultCallback, void* anyData, 
+		PostDispatchCallback postCallback, TESObjectREFR* thisObj, ...);
+};
+#endif
 
 struct PluginInfo
 {

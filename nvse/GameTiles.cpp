@@ -3,6 +3,8 @@
 #include "nvse/GameAPI.h"
 #include <string>
 
+#include "GameRTTI.h"
+
 typedef NiTMapBase <const char *, int>	TraitNameMap;
 TraitNameMap	* g_traitNameMap = (TraitNameMap *)0x011F32F4;
 
@@ -182,6 +184,11 @@ void Tile::Dump(void)
 	gLog.Outdent();
 }
 
+Tile* Tile::LookUpRectByName(const char* name)
+{
+	return ThisCall<Tile*>(0xA03DA0, this, name);
+}
+
 void Debug_DumpTraits(void)
 {
 	for(UInt32 i = 0; i < g_traitNameMap->numBuckets; i++)
@@ -216,6 +223,19 @@ __declspec(naked) float Tile::GetValueFloat(UInt32 id)
 {
 	static const UInt32 procAddr = kAddr_TileGetFloat;
 	__asm	jmp		procAddr
+}
+
+Menu* Tile::GetParentMenu()
+{
+	return ThisCall<Menu*>(0xA03C90, this);
+}
+
+TileMenu* Tile::GetTileMenu()
+{
+	auto tilemenu = this;
+	do if IS_TYPE(tilemenu, TileMenu) break;
+	while ((tilemenu = tilemenu->parent));
+	return reinterpret_cast<TileMenu*>(tilemenu);
 }
 
 __declspec(naked) void __fastcall Tile::PokeValue(UInt32 valueID)

@@ -12,12 +12,12 @@ extern bool Cmd_ySIGetTrait_Execute(COMMAND_ARGS)
 	if (!form && thisObj) form = thisObj->baseForm;
 	if (!form) return true;
 	const auto tochange = std::string(src);
-	if (tochange == "tag" || tochange == "string") {
-		const std::string tag = SI::GetTagForItem(form);
+	if (tochange == "category" || tochange == "tag" || tochange == "string") {
+		const std::string tag = SI::GetCategoryForItem(form);
 		AssignString(PASS_COMMAND_ARGS, tag.c_str());
 	} else if (tochange == "icon" || tochange == "filename") {
-		const std::string tag = SI::GetTagForItem(form);
-		const std::string icon = SI::g_Tags[tag].filename;
+		const std::string tag = SI::GetCategoryForItem(form);
+		const std::string icon = SI::g_Categories[tag].filename;
 		AssignString(PASS_COMMAND_ARGS, icon.c_str());
 	}
 	return true;
@@ -34,11 +34,11 @@ extern bool Cmd_ySISetTrait_Execute(COMMAND_ARGS)
 	if (!form) return true;
 	const auto tochange = std::string(src);
 	if (tochange == "tag" || tochange == "string") {
-		SI::g_Items[form] = std::string(newstring);
+		SI::g_ItemToCategory[form] = std::string(newstring);
 		*result = 1;
 	} else if (tochange == "icon" || tochange == "filename") {
-		const std::string tag = SI::GetTagForItem(form);
-		SI::g_Tags[tag].filename = std::string(newstring);
+		const std::string tag = SI::GetCategoryForItem(form);
+		SI::g_Categories[tag].filename = std::string(newstring);
 		*result = 1;
 	}
 	return true;

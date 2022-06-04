@@ -919,16 +919,22 @@ public:
 	static bool				HasConsoleOutputFilename(void);
 };
 
+typedef void (*EventHandler)(TESObjectREFR* thisObj, void* parameters);
+
 typedef bool				(*_ExtractArgsEx)(COMMAND_ARGS_EX, ...);
 typedef bool				(*_HasScriptCommand)(Script* script, CommandInfo* info, CommandInfo* eventBlock);
 typedef CommandInfo*		(*_GetByOpcode)(UInt32 opcode);
 typedef const char*			(*_GetStringVar)(UInt32 var);
 typedef void				(*_SetStringVar)(UInt32, const char*);
 typedef bool				(*_AssignString)(ParamInfo*, void*, TESObjectREFR*, TESObjectREFR*, Script*, ScriptEventList*, double*, UInt32*, const char*);
+typedef	bool				(*_SetNativeEventHandler)(const char* eventName, EventHandler func);
+typedef bool				(*_RemoveNativeEventHandler)(const char* eventName, EventHandler func);
 
-inline _ExtractArgsEx		ExtractArgsEx;
-inline _HasScriptCommand	HasScriptCommand;
-inline _GetByOpcode			GetByOpcode;
-inline _GetStringVar		GetStringVar;
-inline _SetStringVar		SetStringVar;
-inline _AssignString		AssignString;
+inline _ExtractArgsEx				ExtractArgsEx;
+inline _HasScriptCommand			HasScriptCommand;
+inline _GetByOpcode					GetByOpcode;
+inline _GetStringVar				GetStringVar;
+inline _SetStringVar				SetStringVar;
+inline _AssignString				AssignString;
+inline _SetNativeEventHandler		SetNativeEventHandler;
+inline _RemoveNativeEventHandler	RemoveNativeEventHandler;

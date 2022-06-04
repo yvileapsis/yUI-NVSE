@@ -185,8 +185,8 @@ public:
 	static Tile*				GetMenuComponentTile(const char* componentPath);
 	static Tile::Value*			GetMenuComponentValueAlt(const char* componentPath);
 	
-	UInt32 GetTopVisibleMenuID();
-	Tile *GetActiveTile();
+	UInt32						GetTopVisibleMenuID();
+	Tile*						GetActiveTile();
 
 	struct Struct0178
 	{
@@ -835,7 +835,11 @@ public:
 	void HideTitle(bool noFadeIn) { ThisCall(0xA1DC20, this, noFadeIn); };
 };
 
-typedef ListBox<ContChangesEntry> MenuItemEntryList;
+class MenuItemEntryList : public ListBox<ContChangesEntry>
+{
+public:
+	void RestoreScrollPositionProxy(Float32 listIndex, Float32 scrollbarPos) { ThisCall(0x7832E0, this, listIndex, scrollbarPos); }
+};
 
 struct ContainerBarterItems
 {
@@ -1889,43 +1893,46 @@ public:
 
 	struct ScrollPos
 	{
-		SInt32 listIndex;
-		SInt32 currentValue;
+		SInt32				listIndex;
+		SInt32				currentValue;
 	};
 
-	TileRect* tileCapsInfo;
-	TileRect* tilePlayerHPInfo;
-	TileRect* tilePlayerDRInfo;
-	TileRect* tilePlayerWGInfo;
-	TileImage* tileInventoryList;
-	TileRect* tileHotKeyWheel;
-	TileImage* tileEquipButton;
-	TileImage* tileDropButton;
-	TileImage* tileRepairButton;
-	TileImage* tileHotkeyButton;
-	TileImage* tileCancelButton;
-	TileImage* tileItemIcon;
-	TileRect* tileItemInfoRect;
-	TileRect* tileTabline;
-	TileRect* tileDAMInfo;
-	TileRect* tileDPSInfo;
-	TileRect* tileStrengthReqInfo;
-	TileRect* tileDamResistInfo;
-	TileRect* tileDamThresholdInfo;
-	TileImage* tileModButton;
-	TileImage* tileItemIconBadge;
-	TileRect* tilePlayerDTInfo;
-	TileText* tileStrReq;
-	UInt32				filter;			// 084
-	ScrollPos	tabScrollPositions[6];	// 088, the scroll index for Weapons, Apparel, Aid, Misc, Ammo and the Keyring
-	MenuItemEntryList	itemsList;		// 0B8
-	HotKeyWheel			hotkeyWheel;	// 0E8
-	TList<ContChangesEntry> changedItemsList; // 11C
+	TileRect*				tileCapsInfo;
+	TileRect*				tilePlayerHPInfo;
+	TileRect*				tilePlayerDRInfo;
+	TileRect*				tilePlayerWGInfo;
+	TileImage*				tileInventoryList;
+	TileRect*				tileHotKeyWheel;
+	TileImage*				tileEquipButton;
+	TileImage*				tileDropButton;
+	TileImage*				tileRepairButton;
+	TileImage*				tileHotkeyButton;
+	TileImage*				tileCancelButton;
+	TileImage*				tileItemIcon;
+	TileRect*				tileItemInfoRect;
+	TileRect*				tileTabline;
+	TileRect*				tileDAMInfo;
+	TileRect*				tileDPSInfo;
+	TileRect*				tileStrengthReqInfo;
+	TileRect*				tileDamResistInfo;
+	TileRect*				tileDamThresholdInfo;
+	TileImage*				tileModButton;
+	TileImage*				tileItemIconBadge;
+	TileRect*				tilePlayerDTInfo;
+	TileText*				tileStrReq;
+	UInt32					filter;					// 084
+	ScrollPos				tabScrollPositions[6];	// 088, the scroll index for Weapons, Apparel, Aid, Misc, Ammo and the Keyring
+	MenuItemEntryList		itemsList;				// 0B8
+	HotKeyWheel				hotkeyWheel;			// 0E8
+	TList<ContChangesEntry> changedItemsList;		// 11C
 
-	static InventoryMenu* GetSingleton() { return *reinterpret_cast<InventoryMenu**>(0x11D9EA4); };
-	static ContChangesEntry* GetSelection() { return *reinterpret_cast<ContChangesEntry**>(0x11D9EA8); };
-	bool IsKeyringOpen() const;
-	void ResetInventorySelectionAndHideDataTile() { ThisCall(0x781B10, this); }
+	static InventoryMenu*		GetSingleton() { return *reinterpret_cast<InventoryMenu**>(0x11D9EA4); }
+	static UInt32				GetMenuID() { return 1002; }
+	static ContChangesEntry*	GetSelection() { return *reinterpret_cast<ContChangesEntry**>(0x11D9EA8); }
+	static bool					IsKeyringOpen();
+	static void					RestoreScrollPosition() { CdeclCall(0x7800C0); }
+
+	void						ResetInventorySelectionAndHideDataTile() { ThisCall(0x781B10, this); }
 };
 STATIC_ASSERT(sizeof(InventoryMenu) == 0x124);
 

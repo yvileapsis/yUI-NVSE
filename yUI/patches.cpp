@@ -19,27 +19,8 @@ void patchSortingHooks(const bool bEnable)
 	}
 }
 
-void wah123(TileRect* tabline, int traitID, char* strWeapon, char* strApparel, char* strAid, char* strMisc, char* strAmmo, char* zero)
-{
-//	String str;
-//	str.Set("waaaah");
-
-//	va_list args;
-//	va_start(args, strApparel);
-
-	__asm {
-//		sub esp, 4
-	}
-//	CdeclCall(0x707BE0, tabline, traitID, strWeapon, strApparel, strAid, strMisc, strAmmo, zero);
-	CdeclCall(0x707BE0, tabline, traitID, "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", zero);
-	__asm {
-//		add esp, 4
-	}
-}
-
 void patchAddIcons(const bool bEnable)
 {
-//	WriteRelCall(0x77FDF3, wah123);
 	if (bEnable)
 	{
 		WriteRelJump(0x71A3D5, SIHooks::IconInjectTileSetStringValueHook<0x71A3DA>);
@@ -113,6 +94,134 @@ void patchSortingCategories(const bool bEnable)
 		UndoSafeWrite(0x7815A6);
 	}
 }
+
+template <UInt32 retn> __declspec(naked) void InventoryMenuHandleClickHook1()
+{
+	static const UInt32 retnAddr = retn;
+	static const auto GetFilter = reinterpret_cast<UInt32>(SI::InventoryMenuHandleClickGetFilter);
+	__asm
+	{
+		mov ecx, [ebp + 0xC]
+		push ecx
+		mov ecx, [ebp - 0x64]
+		mov edx, [ebp + 0x8]
+		call GetFilter
+		mov ecx, eax
+		jmp retnAddr
+	}
+}
+
+template <UInt32 retn> __declspec(naked) void InventoryMenuHandleClickHook2()
+{
+	static const UInt32 retnAddr = retn;
+	static const auto GetFilter = reinterpret_cast<UInt32>(SI::InventoryMenuHandleClickGetFilter);
+	__asm
+	{
+		mov ecx, [ebp + 0xC]
+		push ecx
+		mov ecx, [ebp - 0x64]
+		mov edx, [ebp + 0x8]
+		call GetFilter
+		mov edx, eax
+		jmp retnAddr
+	}
+}
+
+template <UInt32 retn> __declspec(naked) void InventoryMenuHandleClickHook3()
+{
+	static const UInt32 retnAddr = retn;
+	static const auto GetFilter = reinterpret_cast<UInt32>(SI::InventoryMenuHandleClickGetFilter);
+	__asm
+	{
+		mov ecx, [ebp + 0xC]
+		push ecx
+		mov ecx, [ebp - 0x64]
+		mov edx, [ebp + 0x8]
+		call GetFilter
+		push eax
+		jmp retnAddr
+	}
+}
+
+template <UInt32 retn> __declspec(naked) void InventoryMenuHandleClickHook4()
+{
+	static const UInt32 retnAddr = retn;
+	static const auto SetUpData = reinterpret_cast<UInt32>(SI::InventoryMenuSetupData);
+	__asm
+	{
+		mov ecx, [ebp + 0xC]
+		push ecx
+		mov ecx, [ebp - 0x64]
+		mov edx, [ebp + 0x8]
+		call SetUpData
+		jmp retnAddr
+	}
+}
+
+template <UInt32 retn> __declspec(naked) void InventoryMenuHandleSpecialInputHook()
+{
+	static const UInt32 retnAddr = retn;
+	static const auto AdvanceTab = reinterpret_cast<UInt32>(SI::InventoryMenuChooseTab);
+	__asm
+	{
+		mov ecx, [ebp + 0x8]
+		mov edx, [ebp - 0x8]
+		call AdvanceTab
+		push eax
+		push 0x18
+		jmp retnAddr
+	}
+}
+
+template <UInt32 retn> __declspec(naked) void InventoryMenuSaveScrollPositionHook()
+{
+	static const UInt32 retnAddr = retn;
+	static const auto SaveScroll = reinterpret_cast<UInt32>(SI::InventoryMenuSaveScrollPosition);
+	__asm
+	{
+		call SaveScroll
+		jmp retnAddr
+	}
+}
+
+template <UInt32 retn> __declspec(naked) void InventoryMenuRestoreScrollPositionHook()
+{
+	static const UInt32 retnAddr = retn;
+	static const auto RestoreScroll = reinterpret_cast<UInt32>(SI::InventoryMenuRestoreScrollPosition);
+	__asm
+	{
+		call RestoreScroll
+		jmp retnAddr
+	}
+}
+
+template <UInt32 retn> __declspec(naked) void InventoryMenuShouldHideItemHook()
+{
+	static const UInt32 retnAddr = retn;
+	static const auto ShouldHide = reinterpret_cast<UInt32>(SI::InventoryMenuShouldHideItem);
+	__asm
+	{
+		mov ecx, [ebp + 0x8]
+		call ShouldHide
+		jmp retnAddr
+	}
+}
+
+void patchSortingTabs(const bool bEnable)
+{
+	WriteRelJump(0x7801B2, InventoryMenuHandleClickHook1<0x7801B8>);
+	WriteRelJump(0x780215, InventoryMenuHandleClickHook2<0x78021B>);
+	WriteRelJump(0x78027C, InventoryMenuHandleClickHook3<0x780281>);
+	WriteRelJump(0x7802C9, InventoryMenuHandleClickHook4<0x780386>);
+	WriteRelJump(0x78232C, InventoryMenuHandleSpecialInputHook<0x782371>);
+	WriteRelJump(0x77FFD6, InventoryMenuSaveScrollPositionHook<0x7800BB>);
+	WriteRelJump(0x7800C6, InventoryMenuRestoreScrollPositionHook<0x78013B>);
+	WriteRelJump(0x782704, InventoryMenuShouldHideItemHook<0x7827F1>);
+
+	WriteRelCall(0x77FDF3, SI::SetUpTabline);
+	//	WriteRelJump(0x78232C, 0x782362);
+}
+
 
 void patchFixDroppedItems(const bool bEnable)
 {
