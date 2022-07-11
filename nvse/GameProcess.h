@@ -409,7 +409,7 @@ public:
 	virtual bool	IsReadyForAnim();
 	virtual void	Unk_FF();
 	virtual void	SetIsAiming();
-	virtual void	IsAiming();
+	virtual bool	IsAiming();
 	virtual void	Unk_102();
 	virtual void	GetKnockedState();
 	virtual void	SetKnockedState();
@@ -832,8 +832,8 @@ public:
 	MagicTarget*						magicTarget1BC;		// 1BC MagicTarget*
 	AnimData*							animData;			// 1C0
 	BSAnimGroupSequence*				animSequence[3];	// 1C4 	Cleared at the same time as the animation
-	float								angle1D0;			// 1D0
-	float								unk1D4;				// 1D4
+	Float32								angle1D0;			// 1D0
+	Float32								unk1D4;				// 1D4
 	UInt8								byte1D8;			// 1D8
 	UInt8								byte1D9;			// 1D9
 	UInt8								gap1DA[2];			// 1DA

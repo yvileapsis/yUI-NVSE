@@ -8,6 +8,7 @@
 #include <unordered_set>
 
 #include "GameProcess.h"
+#include "GameSettings.h"
 
 static constexpr UInt32 s_TESObject_REFR_init						= 0x0055A2F0;	// TESObject_REFR initialization routine (first reference to s_TESObject_REFR_vtbl)
 static constexpr UInt32	s_Actor_EquipItem							= 0x0088C650;	// maybe, also, would be: 007198E0 for FOSE	4th call from the end of TESObjectREFR::RemoveItem (func5F)
@@ -142,6 +143,90 @@ ContChangesExtendArray	Actor::GetEquippedExtendDataList()
 	if(const auto xChanges = static_cast<ExtraContainerChanges *>(extraDataList.GetByType(kExtraData_ContainerChanges)))
 		xChanges->GetAllEquipped(itemArray, outExtendData);
 	return outExtendData;
+}
+
+Float64 Actor::GetCalculatedSpread(UInt32 mode, ContChangesEntry* entry)
+{
+	if (!entry) entry = reinterpret_cast<ContChangesEntry*>(this->baseProcess->GetWeaponInfo());
+
+	if (!entry || !entry->form) return 0;
+
+	Float64 totalSpread = 0;
+
+	if (mode == 0)
+	{
+		bool hasDecreaseSpreadEffect = ThisStdCall<bool>(0x4BDA70, entry, 3);
+		double minSpread = ThisStdCall<double>(0x524B80, entry->form, hasDecreaseSpreadEffect);
+		double weapSpread = ThisStdCall<float>(0x524BE0, entry->form, hasDecreaseSpreadEffect);
+
+		totalSpread = (weapSpread * ThisStdCall<double>(0x8B0DD0, this, 1) + minSpread) * 0.01745329238474369;
+
+		const auto eqAmmo = ThisStdCall<TESAmmo*>(0x525980, entry->form, static_cast<MobileObject*>(this));
+		totalSpread = CdeclCall<Float64>(0x59A030, 3, (eqAmmo ? &eqAmmo->effectList : nullptr), static_cast<Float32>(totalSpread));
+
+		if (this != PlayerCharacter::GetSingleton())
+		{
+			double spreadPenalty = ThisStdCall<double>(0x8B0DD0, this, 2);
+
+			Setting* fNPCMaxGunWobbleAngle;
+			GameSettingCollection::GetSingleton()->GetGameSetting("fNPCMaxGunWobbleAngle", &fNPCMaxGunWobbleAngle);
+
+			totalSpread += spreadPenalty * fNPCMaxGunWobbleAngle->data.f * 0.01745329238474369;
+		}
+
+		const auto noIdea = ThisStdCall<HighProcess*>(0x8D8520, this)->angle1D0;
+		totalSpread = totalSpread + noIdea;
+
+		if (entry->HasWeaponMod(0xC)) totalSpread *= ThisStdCall<float>(0x4BCF60, entry->form, 0xC, 1);
+	}
+	else if (mode == 1)
+	{
+		if (!entry->form || static_cast<TESObjectWEAP*>(entry->form)->IsMeleeWeapon())
+			totalSpread = 1.0;
+		else
+			totalSpread = ThisStdCall<double>(0x8B0DD0, this, 2);
+
+		if (!this->IsDoingAttackAnim())
+		{
+			Setting* fNonAttackGunWobbleMult;
+			GameSettingCollection::GetSingleton()->GetGameSetting("fNonAttackGunWobbleMult", &fNonAttackGunWobbleMult);
+
+			totalSpread = totalSpread * fNonAttackGunWobbleMult->data.f;
+		}
+
+		totalSpread *= 0.01745329238474369;
+	}
+	else if (mode == 2)
+	{
+		totalSpread = ThisStdCall<double>(0x8B0DD0, this, 0); 
+		Setting* fGunWobbleMultScope;
+		GameSettingCollection::GetSingleton()->GetGameSetting("fGunWobbleMultScope", &fGunWobbleMultScope);
+		totalSpread = totalSpread * fGunWobbleMultScope->data.f;
+
+	}
+	return totalSpread;
+
+}
+
+bool Actor::IsCombatTarget(const Actor* source)
+{
+	if (source->isInCombat)
+		for (const auto iter : *source->combatTargets)
+			if (iter == this) return true;
+	return false;
+}
+
+bool Actor::IsHostileCompassTarget() {
+	for (const auto iter : *PlayerCharacter::GetSingleton()->compassTargets)
+		if (iter->isHostile && iter->target == this) return true;
+	return false;
+}
+
+bool TESObjectREFR::IsCrimeOrEnemy()
+{
+	const auto actor = static_cast<Actor*>(this);
+	return ThisCall(0x579690, this) && (!this->IsActor() || !actor->isTeammate) || this->IsActor() && (actor->
+		IsCombatTarget(PlayerCharacter::GetSingleton()) || actor->IsHostileCompassTarget());
 }
 
 bool TESObjectREFR::GetInventoryItems(InventoryItemsMap &invItems)
@@ -423,6 +508,11 @@ BSExtraData* ExtraContainerChanges::EntryData::GetExtraData(UInt32 whichVal)
 {
 	const auto extra = GetCustomExtra(whichVal);
 	return extra ? extra->GetByType(whichVal) : nullptr;
+}
+
+UInt32 ExtraContainerChanges::EntryData::GetWeaponNumProjectiles(Actor* owner)
+{
+	return ThisCall<UInt8>(0x525B20, this->form, this->HasWeaponMod(0xC), 0, owner);
 }
 
 __declspec(naked) ContChangesEntry* ContChangesList::FindForItem(TESForm* item)

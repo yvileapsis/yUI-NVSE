@@ -134,14 +134,14 @@ public:
 	UInt32				unk108;				// 108
 	TList<Setting>		settings;			// 10C;
 
-	static IniSettingCollection * GetIniSettings();
+	static IniSettingCollection * GetSingleton();
 	static IniSettingCollection * GetIniPrefs();
 };
 
 STATIC_ASSERT(sizeof(IniSettingCollection) == 0x114);
 
 bool GetNumericGameSetting(char * settingName, double * result);
-bool GetNumericIniSetting(char * settingName, double * result);
+bool GetNumericIniSetting(const char * settingName, double * result);
 bool GetIniSetting(const char* settingName, Setting** out);
 
 Setting* GameSettingFromString(const std::string& settingName);

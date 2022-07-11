@@ -4,6 +4,8 @@
 #include "GameRTTI.h"
 #include "GameObjects.h"
 #include "GameData.h"
+#include "GameProcess.h"
+#include "GameSettings.h"
 
 static const ActorValueInfo** ActorValueInfoPointerArray = (const ActorValueInfo**)0x0011D61C8;		// See GetActorValueInfo
 static const _GetActorValueInfo GetActorValueInfo = (_GetActorValueInfo)0x00066E920;	// See GetActorValueName
@@ -343,6 +345,11 @@ TESObjectIMOD* TESObjectWEAP::GetItemMod(UInt8 which)
 bool TESObjectWEAP::IsMeleeWeapon()
 {
 	return eWeaponType == kWeapType_HandToHandMelee || eWeaponType == kWeapType_OneHandMelee || eWeaponType == kWeapType_TwoHandMelee;
+}
+
+bool TESObjectWEAP::IsRangedWeapon()
+{
+	return (this->projectile);
 }
 
 class FindByForm {

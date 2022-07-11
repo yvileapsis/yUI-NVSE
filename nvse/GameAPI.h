@@ -922,6 +922,7 @@ public:
 typedef void (*EventHandler)(TESObjectREFR* thisObj, void* parameters);
 
 typedef bool				(*_ExtractArgsEx)(COMMAND_ARGS_EX, ...);
+typedef bool				(*_ExtractFormatStringArgs)(UInt32 fmtStringPos, char* buffer, COMMAND_ARGS_EX, UInt32 maxParams, ...);
 typedef bool				(*_HasScriptCommand)(Script* script, CommandInfo* info, CommandInfo* eventBlock);
 typedef CommandInfo*		(*_GetByOpcode)(UInt32 opcode);
 typedef const char*			(*_GetStringVar)(UInt32 var);
@@ -931,6 +932,7 @@ typedef	bool				(*_SetNativeEventHandler)(const char* eventName, EventHandler fu
 typedef bool				(*_RemoveNativeEventHandler)(const char* eventName, EventHandler func);
 
 inline _ExtractArgsEx				ExtractArgsEx;
+inline _ExtractFormatStringArgs		ExtractFormatStringArgs;
 inline _HasScriptCommand			HasScriptCommand;
 inline _GetByOpcode					GetByOpcode;
 inline _GetStringVar				GetStringVar;

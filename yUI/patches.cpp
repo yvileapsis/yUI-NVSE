@@ -207,8 +207,29 @@ template <UInt32 retn> __declspec(naked) void InventoryMenuShouldHideItemHook()
 	}
 }
 
+float __cdecl WeaponSpread(float a1, float a2)
+{
+	return a2;
+};
+
+float __fastcall MyFunc2(Actor* actor, void* edx, int i)
+{
+	return 0;
+}
+
 void patchSortingTabs(const bool bEnable)
 {
+//	WriteRelCall(0x523A11, MyFunc2);
+//	WriteRelCall(0x524019, MyFunc2);
+
+	WriteRelCall(0x524468, WeaponSpread); // weapon spread
+//	WriteRelCall(0x963056, MyFunc2); // player spread
+//	WriteRelCall(0x96344F, MyFunc2); // scope
+
+	Log("wa");
+	//	WriteRelJump(0x77FCE7, 0x77FCEC);
+//	WriteRelJump(0x7FB064, 0x7FB069);
+//	WriteRelJump(0x7DA376, 0x7DA37B);
 	WriteRelJump(0x7801B2, InventoryMenuHandleClickHook1<0x7801B8>);
 	WriteRelJump(0x780215, InventoryMenuHandleClickHook2<0x78021B>);
 	WriteRelJump(0x78027C, InventoryMenuHandleClickHook3<0x780281>);

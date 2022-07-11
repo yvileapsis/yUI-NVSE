@@ -1,6 +1,7 @@
 #include <SortingIcons.h>
 
 #include "functions.h"
+#include "PluginAPI.h"
 
 extern bool Cmd_ySIGetTrait_Execute(COMMAND_ARGS)
 {
@@ -41,32 +42,5 @@ extern bool Cmd_ySISetTrait_Execute(COMMAND_ARGS)
 		SI::g_Categories[tag].filename = std::string(newstring);
 		*result = 1;
 	}
-	return true;
-}
-
-/*
-bool Cmd_SwapTexatlas_Execute(COMMAND_ARGS)
-{
-	*result = 0;
-	char texatlas[0x100];
-	char texatlasnew[0x100];
-	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &texatlas, &texatlasnew)) return true;
-	SetUIStringFull(texatlas, texatlasnew, kTileValue_texatlas);
-	return true;
-}
-*/
-
-bool Cmd_SetWorldspaceDefaultWaterHeight_Execute(COMMAND_ARGS)
-{
-	*result = 0;
-	TESWorldSpace* worldspace = nullptr;
-	float newwaterheight = 0;
-	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &worldspace, &newwaterheight)) return true;
-
-	for (auto iter : *worldspace->cellMap)
-	{
-		
-	}
-	worldspace->defaultWaterHeight = newwaterheight;
 	return true;
 }

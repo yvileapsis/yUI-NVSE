@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{AE7CFEE7-4058-4E3C-ADC2-AE7480EE2028}</ProjectGuid>
+    <RootNamespace>yJAM</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>16.0.28916.169</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>yJAM</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
+    <IntDir>$(Configuration)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>yJAM</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\..\nvse;$(SolutionDir)\..\libraries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;yJAM_EXPORTS;RUNTIME_VERSION=0x040020D0;RUNTIME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <ForcedIncludeFiles>nvse/prefix.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <OptimizeReferences>false</OptimizeReferences>
+    </Link>
+    <PostBuildEvent>
+      <Message>Installing DLL...</Message>
+      <Command>copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yJAM\NVSE\Plugins\$(ProjectName).dll"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\..\nvse;$(SolutionDir)\..\libraries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;yJAM_EXPORTS;RUNTIME_VERSION=0x040020D0;RUNTIME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ForcedIncludeFiles>nvse/prefix.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Message>Installing DLL...</Message>
+      <Command>copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yJAM\NVSE\Plugins\$(ProjectName).dll"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\nvse\GameAPI.cpp" />
+    <ClCompile Include="..\nvse\GameBSExtraData.cpp" />
+    <ClCompile Include="..\nvse\GameData.cpp" />
+    <ClCompile Include="..\nvse\GameExtraData.cpp" />
+    <ClCompile Include="..\nvse\GameForms.cpp" />
+    <ClCompile Include="..\nvse\GameObjects.cpp" />
+    <ClCompile Include="..\nvse\GameOSDepend.cpp" />
+    <ClCompile Include="..\nvse\GameRTTI.cpp" />
+    <ClCompile Include="..\nvse\GameScript.cpp" />
+    <ClCompile Include="..\nvse\GameSettings.cpp" />
+    <ClCompile Include="..\nvse\GameTasks.cpp" />
+    <ClCompile Include="..\nvse\GameTiles.cpp" />
+    <ClCompile Include="..\nvse\GameTypes.cpp" />
+    <ClCompile Include="..\nvse\GameUI.cpp" />
+    <ClCompile Include="..\nvse\GameSound.cpp" />
+    <ClCompile Include="..\nvse\printf.cpp" />
+    <ClCompile Include="..\nvse\SafeWrite.cpp" />
+    <ClCompile Include="..\nvse\Utilities.cpp" />
+    <ClCompile Include="dllmain.c">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="file.cpp" />
+    <ClCompile Include="JDC.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="functions.cpp" />
+    <ClCompile Include="patches.cpp" />
+    <ClCompile Include="settings.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\libraries\json.h" />
+    <ClInclude Include="..\nvse\CommandTable.h" />
+    <ClInclude Include="..\nvse\GameAPI.h" />
+    <ClInclude Include="..\nvse\GameBSExtraData.h" />
+    <ClInclude Include="..\nvse\GameData.h" />
+    <ClInclude Include="..\nvse\GameEffects.h" />
+    <ClInclude Include="..\nvse\GameExtraData.h" />
+    <ClInclude Include="..\nvse\GameForms.h" />
+    <ClInclude Include="..\nvse\GameObjects.h" />
+    <ClInclude Include="..\nvse\GameOSDepend.h" />
+    <ClInclude Include="..\nvse\GameProcess.h" />
+    <ClInclude Include="..\nvse\GameRTTI.h" />
+    <ClInclude Include="..\nvse\GameScript.h" />
+    <ClInclude Include="..\nvse\GameSettings.h" />
+    <ClInclude Include="..\nvse\GameSound.h" />
+    <ClInclude Include="..\nvse\GameTasks.h" />
+    <ClInclude Include="..\nvse\GameTiles.h" />
+    <ClInclude Include="..\nvse\GameTypes.h" />
+    <ClInclude Include="..\nvse\GameUI.h" />
+    <ClInclude Include="..\nvse\NiNodes.h" />
+    <ClInclude Include="..\nvse\NiObjects.h" />
+    <ClInclude Include="..\nvse\NiTypes.h" />
+    <ClInclude Include="..\nvse\PluginAPI.h" />
+    <ClInclude Include="..\nvse\PluginManager.h" />
+    <ClInclude Include="..\nvse\prefix.h" />
+    <ClInclude Include="..\nvse\SafeWrite.h" />
+    <ClInclude Include="..\nvse\Utilities.h" />
+    <ClInclude Include="file.h" />
+    <ClInclude Include="functions.h" />
+    <ClInclude Include="JDC.h" />
+    <ClInclude Include="patches.h" />
+    <ClInclude Include="settings.h" />
+    <ClInclude Include="main.h" />
+    <ClInclude Include="..\libraries\SimpleINILibrary.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\nvse\GameRTTI.inc" />
+    <None Include="exports.def" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

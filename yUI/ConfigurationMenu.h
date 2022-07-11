@@ -59,4 +59,5 @@ public:
 	std::unordered_map<UInt32, yCM_Option*>			mods;
 };
 
-void writeMCMHooks();
+void WriteMCMHooks();
+void FixReorderMCM();

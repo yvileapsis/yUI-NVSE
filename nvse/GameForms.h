@@ -3197,6 +3197,7 @@ public:
 	void			SetPlayable(bool doset) { weaponFlags1.Write(Eflag_NonPlayable, !doset); }
 	bool			HasNightVision() const { return weaponFlags2.IsSet(eFlag_NightVision); }
 	bool			IsMeleeWeapon();
+	bool			IsRangedWeapon();
 	void			SetAttackAnimation(UInt32 attackAnim);
 	TESAmmo*		GetAmmo();
 	int				GetClipRounds(bool hasExtendedClipMod) { return ThisCall<int>(0x4FE160, this, hasExtendedClipMod); };

@@ -1,19 +1,16 @@
 #include <main.h>
 #include <functions.h>
 #include <patches.h>
-#include <commands.h>
 #include <settings.h>
-#include <SortingIcons.h>
-#include <ConfigurationMenu.h>
 #include <file.h>
 
-#define yUI_VERSION 1.4
-#define yUI_VERSION_STR "1.4d"
-#define yUI_STR "yUI"
+#include <JDC.h>
+
+#define yJAM_VERSION 0.1
+#define yJAM_VERSION_STR "0.1"
+#define yJAM_STR "yJAM"
 
 PluginHandle	g_pluginHandle = kPluginHandle_Invalid;
-
-extern float g_flt178, g_flt17C, g_flt180, g_flt184;
 
 void MessageHandler(NVSEMessagingInterface::Message* msg)
 {
@@ -21,72 +18,57 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	{
 		g_player = PlayerCharacter::GetSingleton();
 		g_dataHandler = DataHandler::GetSingleton();
-		Log(FormatString("%s", yUI_VERSION_STR), 2);
+		Log(FormatString("%s", yJAM_VERSION_STR), 2);
 
 		PrintAndClearQueuedConsoleMessages();
-		FillCraftingComponents();
 
-		if (g_ySI_Sort || g_ySI_Icons || g_ySI_Hotkeys || g_ySI_Categories) LoadSIMapsFromFiles();
 	}
 	else if (msg->type == NVSEMessagingInterface::kMessage_MainGameLoop)
 	{
-		if (g_FixTablineSelected) FixTablineSelected();
-		if (g_FixReorderMCM) FixReorderMCM();
-		if (g_ySI_Categories) SI::KeyringRefreshPostStewie();
-
+		if (g_JDC) JDC::MainLoop();
 		if (iDoOnce == 0 && !CdeclCall<bool>(0x702360)) {
 			iDoOnce++;
+
+			if (g_JDC) JDC::Initialize();
+
 //			SetNativeEventHandler("OnAdd", reinterpret_cast<EventHandler>(SI::TestFunc));
 //			SetNativeEventHandler("OnDrop", reinterpret_cast<EventHandler>(SI::TestFunc));
-
-			if (g_ySI_Icons) SI::InjectTemplates();
 		}
 		
 	}
 }
 
-void writePatches()
-{
-	patchSortingHooks		(g_FixIndefiniteSorting || (g_ySI && g_ySI_Sort));
-	patchFixDroppedItems	(g_FixDroppedItems);
-	patchAddIcons			(g_ySI && g_ySI_Icons);
-	patchReplaceHotkeyIcons	(g_ySI && g_ySI_Hotkeys);
-	patchSortingCategories	(g_ySI && g_ySI_Categories);
-	patchMatchedCursor		(g_yMC);
-	patchSortingTabs		(true);
-}
-
 bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 {
-	gLog.Create("yUI.log");
-	gLog.SetModString(yUI_STR);
+	gLog.Create("yJAM.log");
+	gLog.SetModString(yJAM_STR);
 	Log("Query", 1);
 
 	// fill out the info structure
 	info->infoVersion = PluginInfo::kInfoVersion;
-	info->name = "yUI";
-	info->version = yUI_VERSION * 100;
+	info->name = "yJAM";
+	info->version = yJAM_VERSION * 100;
 
 	// version checks
 	if (nvse->isEditor) {
 		if (nvse->editorVersion < CS_VERSION_1_4_0_518)
 		{
-			Log(FormatString("yUI: incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518), 1);
+			Log(FormatString("yJAM: incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518), 1);
 			return false;
 		}
 	} else {
 		if (nvse->nvseVersion < PACKED_NVSE_VERSION) {
-			Log(FormatString("yUI: NVSE version too old (got %X expected at least %X). Plugin will NOT load! Install the latest version here: https://github.com/xNVSE/NVSE/releases/", nvse->nvseVersion, PACKED_NVSE_VERSION), 1);
+			Log(FormatString("yJAM: NVSE version too old (got %X expected at least %X). Plugin will NOT load! Install the latest version here: https://github.com/xNVSE/NVSE/releases/", nvse->nvseVersion, PACKED_NVSE_VERSION), 1);
 			return false;
 		}
 
 		if (nvse->runtimeVersion < RUNTIME_VERSION_1_4_0_525) {
-			Log(FormatString("yUI: incorrect runtime version (got %08X need at least %08X)", nvse->runtimeVersion, RUNTIME_VERSION_1_4_0_525), 1);
+			Log(FormatString("yJAM: incorrect runtime version (got %08X need at least %08X)", nvse->runtimeVersion, RUNTIME_VERSION_1_4_0_525), 1);
 			return false;
 		}
 
 		if (nvse->isNogore) {
-			Log(FormatString("yUI: NoGore is not supported"), 1);
+			Log(FormatString("yJAM: NoGore is not supported"), 1);
 			return false;
 		}
 	}
@@ -99,10 +81,6 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	g_nvseInterface = const_cast<NVSEInterface*>(nvse);
 	g_messagingInterface = static_cast<NVSEMessagingInterface*>(nvse->QueryInterface(kInterface_Messaging));
 	g_messagingInterface->RegisterListener(g_pluginHandle, "NVSE", MessageHandler);
-
-	nvse->SetOpcodeBase(0x21D0);
-	REG_CMD_STR(ySIGetTrait);
-	REG_CMD(ySISetTrait);
 
 	if (nvse->isEditor)	return true;
 
@@ -118,24 +96,13 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	g_commandInterface = static_cast<NVSECommandTableInterface*>(nvse->QueryInterface(kInterface_CommandTable));
 
 	ExtractArgsEx = g_scriptInterface->ExtractArgsEx;
-	ExtractFormatStringArgs = g_scriptInterface->ExtractFormatStringArgs;
 
 	g_eventInterface = static_cast<NVSEEventManagerInterface*>(nvse->QueryInterface(kInterface_EventManager));
 
 	SetNativeEventHandler = g_eventInterface->SetNativeEventHandler;
 	RemoveNativeEventHandler = g_eventInterface->RemoveNativeEventHandler;
 
-/*
-	RegisterTraitID("&runsnig;", 2032);
-	RegisterTraitID("runsnig", 2032);
-	WriteRelJump(0xA095D1, reinterpret_cast<UInt32>(funpatch));
-*/
-	if (g_FixReorderMCM) WriteMCMHooks();
-
-//	CaptureLambdaVars = static_cast<_CaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaSaveVariableList));
-//	UncaptureLambdaVars = static_cast<_UncaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaUnsaveVariableList));
 	handleINIOptions();
-	writePatches();
 
 	return true;
 }

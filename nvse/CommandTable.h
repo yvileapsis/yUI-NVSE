@@ -208,13 +208,13 @@ bool Cmd_Default_Eval(COMMAND_ARGS_EVAL);
 
 struct CommandInfo
 {
-	const char	* longName;		// 00
-	const char	* shortName;	// 04
+	const char*	longName;		// 00
+	const char*	shortName;		// 04
 	UInt32		opcode;			// 08
-	const char	* helpText;		// 0C
+	const char*	helpText;		// 0C
 	UInt16		needsParent;	// 10
 	UInt16		numParams;		// 12
-	ParamInfo	* params;		// 14
+	ParamInfo*	params;			// 14
 
 	// handlers
 	Cmd_Execute	execute;		// 18

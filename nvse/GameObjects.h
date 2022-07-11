@@ -173,6 +173,8 @@ public:
 	bool					IsInInterior();
 	NiNode*					GetNiNode();
 
+	bool					IsCrimeOrEnemy();
+
 	MEMBER_FN_PREFIX(TESObjectREFR);
 	DEFINE_MEMBER_FN_LONG(_MEMBER_FN_BASE_TYPE, Activate, bool, 0x00573170, TESObjectREFR*, UInt32, UInt32, UInt32);	// Usage Activate(actionRef, 0, 0, 1); found inside Cmd_Activate_Execute as the last call (190 bytes)
 	DEFINE_MEMBER_FN(Set3D, void, 0x0094EB40, NiNode*, bool);	// Usage Set3D(niNode, true); virtual func 0073
@@ -504,20 +506,69 @@ public:
 
 	bhkRagdollController*				ragDollController;				// 0AC
 	bhkRagdollPenetrationUtil*			ragDollPentrationUtil;			// 0B0
-	UInt32								unk0B4[(0x104-0x0b4) >> 2];		// 0B4
-	UInt8								unk104;							// 104 Is in combat
-	UInt8								pad105[3];						// 105
+	UInt32								unk0B4;							// 0B4-
+	float								flt0B8;							// 0B8
+	UInt8								byte0BC;						// 0BC-
+	UInt8								byte0BD;						// 0BD
+	UInt8								byte0BE;						// 0BE
+	UInt8								byte0BF;						// 0BF
+	Actor*								killer;							// 0C0
+	UInt8								byte0C4;						// 0C4-
+	UInt8								byte0C5;						// 0C5
+	UInt8								byte0C6;						// 0C6
+	UInt8								byte0C7;						// 0C7
+	float								flt0C8;							// 0C8
+	float								flt0CC;							// 0CC
+	TList<void>							list0D0;						// 0D0
+	UInt8								byte0D8;						// 0D8
+	UInt8								byte0D9;						// 0D9
+	UInt8								byte0DA;						// 0DA
+	UInt8								byte0DB;						// 0DB
+	UInt32								unk0DC;							// 0DC
+	TList<void>							list0E0;						// 0E0
+	UInt8								byte0E8;						// 0E8	const 1
+	UInt8								byte0E9;						// 0E9
+	UInt8								byte0EA;						// 0EA
+	UInt8								byte0EB;						// 0EB
+	UInt32								unk0EC;							// 0EC
+	UInt8								byte0F0;						// 0F0-
+	UInt8								byte0F1;						// 0F1-
+	UInt8								byte0F2;						// 0F2
+	UInt8								byte0F3;						// 0F3
+	TList<void>							list0F4;						// 0F4
+	TList<void>							list0FC;						// 0FC
+	UInt8								isInCombat;						// 104 Is in combat
+	UInt8								jipActorFlags1;					// 105
+	UInt8								jipActorFlags2;					// 106
+	UInt8								jipActorFlags3;					// 107
 	UInt32								lifeState;						// 108 saved as byte HasHealth = 1 or 2, optionally 6
-	UInt32								unk10C;							// 10C
+	UInt32								criticalStage;					// 10C
 	UInt32								animGroupId110;					// 110
-	UInt32								unk114[(0x140-0x114) >> 2];		// 10B 12C is an array (of combat targets ?)
-	UInt32								unk140;							// 140 looks like a flag. Bit31 used while checking if non essential can take damage
-	UInt8                               unk144;							// 144
-	UInt8                               unk145;							// 145 Has to do with package evaluation
-	UInt8                               unk146;							// 146 Has to do with package evaluation
-	UInt8                               unk147;							// 147
-	UInt32								unk148;							// 148
-	UInt8								unk14C;							// 14C
+	float								flt114;							// 114
+	UInt8								byte118;						// 118-
+	UInt8								byte119;						// 119+
+	UInt16								jip11A;							// 11A+
+	UInt32								unk11C;							// 11C-
+	UInt32								unk120;							// 120-
+	bool								forceRun;						// 124
+	bool								forceSneak;						// 125
+	UInt8								byte126;						// 126-
+	UInt8								byte127;						// 127-
+	Actor*								combatTarget;					// 128
+	BSSimpleArray<Actor*>*				combatTargets;					// 12C
+	BSSimpleArray<Actor*>*				combatAllies;					// 130
+	UInt8								byte134;						// 134-
+	UInt8								byte135;						// 135+
+	UInt16								jip136;							// 136+
+	UInt32								unk138;							// 138-
+	UInt32								unk13C;							// 13C-
+	UInt32								actorFlags;						// 140	0x80000000 - IsEssential
+	bool								ignoreCrime;					// 144
+	UInt8								byte145;						// 145	Has to do with package evaluation
+	UInt8								byte146;						// 146	Has to do with package evaluation
+	UInt8								byte147;						// 147
+	UInt32								unk148;							// 148-
+	UInt8								inWater;						// 14C
 	UInt8								isSwimming;						// 14D
 	UInt8								unk14E;							// 14E
 	UInt8								unk14F;							// 14F
@@ -532,10 +583,23 @@ public:
 	UInt32								unk170;							// 170 receive ParentCell if Interior, Worldspace otherwize
 	UInt32								unk174;
 	Float32								flt178;
-	UInt32								unk17C[(0x190 - 0x17C) >> 2];	// 17C	 
+	Float32								flt17C;							// 17C	 
+	Float32								flt180;
+	Float32								flt184;
+	Float32								flt188;							// 188
+	UInt8								byte18C;						// 18C-
+	bool								isTeammate;						// 18D
+	UInt8								byte18E;						// 18E-
+	UInt8								byte18F;						// 18F
 	ActorMover*							actorMover;						// 190
 
-	UInt32								unk194[(0x1B0-0x194) >> 2];		// 184 Byt018D = PlayerTeammate, 1AC is a list (or not! I have it loaded from a byte)
+	UInt32								unk194;							// 194-
+	UInt32								unk198;							// 198-
+	Float32								flt19C;							// 19C
+	UInt32								unk1A0;							// 1A0-
+	UInt32								unk1A4;							// 1A4-
+	UInt32								unk1A8;							// 1A8-
+	UInt32								unk1AC;							// 1AC-
 
 	UInt8								unk1B0;							// 1B0
 	UInt8								unk1B1;							// 1B1
@@ -554,6 +618,12 @@ public:
 	EquippedItemsList					GetEquippedItems();
 	ContChangesArray					GetEquippedEntryDataList();
 	ContChangesExtendArray				GetEquippedExtendDataList();
+
+	Float64								GetCalculatedSpread(UInt32 mode = 0, ContChangesEntry* entry = nullptr);
+
+	bool								IsDoingAttackAnim() { return ThisCall<bool>(0x894900, this); }
+	bool								IsCombatTarget(const Actor* source);
+	bool								IsHostileCompassTarget();
 };
 STATIC_ASSERT(sizeof(Actor) == 0x1B4);
 
@@ -625,6 +695,20 @@ public:
 
 	virtual void		ReturnFalse(void);
 	virtual void		GetPerkRanks(void);
+
+	struct MapMarkerInfo
+	{
+		ExtraMapMarker::MarkerData*	markerData;
+		TESObjectREFR*				markerRef;
+	};
+
+	struct CompassTarget
+	{
+		Actor*		target;
+		UInt8		isHostile;
+		UInt8		isDetected;
+		UInt8		pad06[2];
+	};
 
 	// lotsa data
 
@@ -718,7 +802,7 @@ public:
 	NiObject*							unkD3C;					// D3C
 	UInt32								unkD40;					// D40
 	Actor*								reticleActor;			// D44
-	TList<void>*						compassTargets;			// D48
+	TList<CompassTarget>*				compassTargets;			// D48
 	UInt32								unkD4C;					// D4C
 	float								lastAmmoSwapTime;		// D50
 	UInt32								unkD54[4];				// D4C
@@ -731,7 +815,7 @@ public:
 	UInt32								unkDB8[7];				// DB8
 	NiPoint3							vectorDD4;				// DD4
 	NiPoint3							cameraPos;				// DE0
-	void*								rigidBody;				// DEC
+	bhkRigidBody*						rigidBody;				// DEC
 	bool								pcInCombat;				// DF0
 	bool								pcUnseen;				// DF1
 	UInt8								byteDF2;				// DF2

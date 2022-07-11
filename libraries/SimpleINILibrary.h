@@ -1159,7 +1159,7 @@ public:
     /* get an option and creates it if it doesn't exist */
     int GetOrCreate(const char* sectionName, const char* keyName, int defaultValue, const char* comment, bool* isNew = nullptr);
     long GetOrCreateHex(char* sectionName, char* keyName, long defaultValue, char* comment);
-    float GetOrCreate(char* sectionName, char* keyName, double defaultValue, char* comment);
+    float GetOrCreate(const char* sectionName, const char* keyName, double defaultValue, const char* comment);
     const char* GetOrCreate(const char* sectionName, const char* keyName, const char* defaultValue, const char* comment);
 
 private:
@@ -1580,7 +1580,7 @@ _declspec(noinline) long CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::Get
 }
 
 template<class SI_CHAR, class SI_STRLESS, class SI_CONVERTER>
-_declspec(noinline) float CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::GetOrCreate(char* sectionName, char* keyName, double defaultValue, char* comment)
+_declspec(noinline) float CSimpleIniTempl<SI_CHAR, SI_STRLESS, SI_CONVERTER>::GetOrCreate(const char* sectionName, const char* keyName, double defaultValue, const char* comment)
 {
     double settingValue = this->GetDoubleValue(sectionName, keyName, -1);
     if (settingValue == -1) {

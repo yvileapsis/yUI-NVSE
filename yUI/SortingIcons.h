@@ -191,11 +191,11 @@ namespace SI
 		TESForm* form2;
 	};
 
-	void TestFunc(TESObjectREFR* thisObj, AddRemoveEventParams* parameters)
-	{
-		Log(FormatString(parameters->form1->GetTheName()), 2);
-		Log(FormatString(parameters->form2->GetTheName()), 2);
-	}
+///	void TestFunc(TESObjectREFR* thisObj, AddRemoveEventParams* parameters)
+//	{
+//		Log(FormatString(parameters->form1->GetTheName()), 2);
+	//	Log(FormatString(parameters->form2->GetTheName()), 2);
+	//}
 
 }
 

@@ -108,7 +108,7 @@ GameSettingCollection * GameSettingCollection::GetSingleton()
 	return *g_GameSettingCollection;
 }
 
-IniSettingCollection* IniSettingCollection::GetIniSettings()
+IniSettingCollection* IniSettingCollection::GetSingleton()
 {
 	return *g_IniSettingCollection;
 }
@@ -145,7 +145,7 @@ bool GetIniSetting(const char* settingName, Setting** out)
 
 	if (!setting)
 	{
-		coll = IniSettingCollection::GetIniSettings();
+		coll = IniSettingCollection::GetSingleton();
 		setting = coll->settings.Find(finder);
 	}
 
@@ -181,7 +181,7 @@ bool GetNumericGameSetting(char * settingName, double * result)
 	return bResult;
 }
 
-bool GetNumericIniSetting(char * settingName, double * result)
+bool GetNumericIniSetting(const char * settingName, double * result)
 {
 	bool bResult = false;
 	*result = -1;

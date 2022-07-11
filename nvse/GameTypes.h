@@ -655,8 +655,7 @@ public:
 };	// 00C
 STATIC_ASSERT(sizeof(BSSimpleList<void*>) == 0xC);
 
-template <typename Item>
-struct BSSimpleArray
+template <typename Item> struct BSSimpleArray
 {
 	virtual void	Destroy(bool doFree);
 	virtual Item*	Allocate(UInt32 size);
@@ -688,10 +687,16 @@ struct BSSimpleArray
 
 		Item& operator*() const { return *pData; }
 		Item& operator->() const { return *pData; }
+		bool operator!=(const Iterator& rhs) { return pData != rhs.pData; }
 
 		Iterator(): pData(nullptr), count(0) {}
-		Iterator(BSSimpleArray& source) : pData(source.data), count(source.size) {}
+		Iterator(const BSSimpleArray& source) : pData(source.data), count(source.size) {}
+		Iterator(const BSSimpleArray* source) : pData(source->data), count(source->size) {}
+
 	};
+
+	Iterator begin() const { return Iterator(); }
+	Iterator end() const { return Iterator(this); }
 
 	void Append(Item* item) { ThisCall(0x7CB2E0, this, item); }
 };
