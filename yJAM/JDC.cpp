@@ -16,24 +16,29 @@ namespace JDC
 
 	HUDMainMenu*		menuHUDMain		= nullptr;
 	Tile*				tileJDC			= nullptr;
+	Tile*				tileReticleCenter = nullptr;
 	PlayerCharacter*	player			= nullptr;
 
 	void Initialize()
 	{
 		menuHUDMain = HUDMainMenu::GetSingleton();
 		tileJDC = menuHUDMain->tile->GetChild("JDC");
+		tileReticleCenter = menuHUDMain->tileReticleCenter;
 		player = PlayerCharacter::GetSingleton();
 
-		tileJDC->SetFloat(tileJDC->GetComponentValue("_JDCDynamicOffset")->id, g_JDC_Dynamic & 1);
-		tileJDC->SetFloat(tileJDC->GetComponentValue("_JDCDynamicLength")->id, g_JDC_Dynamic & 2);
+		tileJDC->SetFloat(Tile::TraitNameToID("_JDCDynamicOffset"), g_JDC_Dynamic & 1);
+		tileJDC->SetFloat(Tile::TraitNameToID("_JDCDynamicLength"), g_JDC_Dynamic & 2);
 
-		tileJDC->SetFloat(tileJDC->GetComponentValue("_JDCLengthMin")->id, g_JDC_LengthMin);
-		tileJDC->SetFloat(tileJDC->GetComponentValue("_JDCLengthMax")->id, g_JDC_LengthMax);
+		tileJDC->SetFloat(Tile::TraitNameToID("_JDCLengthMin"), g_JDC_LengthMin);
+		tileJDC->SetFloat(Tile::TraitNameToID("_JDCLengthMax"), g_JDC_LengthMax);
 
-		tileJDC->SetFloat(tileJDC->GetComponentValue("_JDCOffsetMin")->id, g_JDC_OffsetMin);
-		tileJDC->SetFloat(tileJDC->GetComponentValue("_JDCOffsetMax")->id, g_JDC_OffsetMax);
+		tileJDC->SetFloat(Tile::TraitNameToID("_JDCOffsetMin"), g_JDC_OffsetMin);
+		tileJDC->SetFloat(Tile::TraitNameToID("_JDCOffsetMax"), g_JDC_OffsetMax);
 
-		tileJDC->SetFloat(tileJDC->GetComponentValue("_JDCWidth")->id, g_JDC_Width);
+		tileJDC->SetFloat(Tile::TraitNameToID("_JDCWidth"), g_JDC_Width);
+
+		tileJDC->SetFloat(Tile::TraitNameToID("_JDCVisible"), 0);
+		tileReticleCenter->GetChild("reticle_center")->SetFloat(kTileValue_visible, 1);
 
 		/*
 	fWorldFOV = GetNumericINISetting "fDefaultWorldFOV:Display"
@@ -50,6 +55,12 @@ namespace JDC
 	endif
 		 */
 
+	}
+
+	void Wraaa()
+	{
+		handleINIOptions();
+		Initialize();
 	}
 
 	bool IsPlayerWeaponGood()
@@ -101,8 +112,6 @@ namespace JDC
 	void MainLoop()
 	{
 		if (!player) return;
-
-		const auto tileReticleCenter = menuHUDMain->tileReticleCenter;
 
 		tileJDC->SetFloat(tileJDC->GetComponentValue("_JDCAlphaRC")->id, menuHUDMain->tileReticleCenter->GetChild("reticle_center")->GetValueFloat(kTileValue_alpha));
 
@@ -163,9 +172,9 @@ namespace JDC
 			visibleDot = 2;
 		}
 
-		tileJDC->SetFloat(tileJDC->GetComponentValue("_JDCVisible")->id, visibleDot || visibleCrosshair);
-		tileJDC->SetFloat(tileJDC->GetComponentValue("_JDCVisibleDot")->id, visibleDot);
-		tileJDC->SetFloat(tileJDC->GetComponentValue("_JDCVisibleReticle")->id, visibleCrosshair);
+		tileJDC->SetFloat(Tile::TraitNameToID("_JDCVisible"), visibleDot || visibleCrosshair);
+		tileJDC->SetFloat(Tile::TraitNameToID("_JDCVisibleDot"), visibleDot);
+		tileJDC->SetFloat(Tile::TraitNameToID("_JDCVisibleReticle"), visibleCrosshair);
 		tileReticleCenter->GetChild("reticle_center")->SetFloat(kTileValue_visible, visibleReticle);
 
 		Float64 totalSpread = 0.1;
@@ -191,7 +200,7 @@ namespace JDC
 				spreadTarget *= tan(0.5 * player->baseProcess->GetWeaponInfo()->weapon->sightFOV) / tan(0.5 * fDefaultWorldFOV);
 		}
 
-		tileJDC->SetFloat(tileJDC->GetComponentValue("_JDCSpread")->id, UpdateCurrentSpread(spreadTarget));
+		tileJDC->SetFloat(Tile::TraitNameToID("_JDCSpread"), UpdateCurrentSpread(spreadTarget));
 
 	}
 

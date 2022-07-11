@@ -31,7 +31,7 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 
 			if (g_JDC) JDC::Initialize();
 
-//			SetNativeEventHandler("OnAdd", reinterpret_cast<EventHandler>(SI::TestFunc));
+			SetNativeEventHandler("JDCReset", reinterpret_cast<EventHandler>(JDC::Wraaa));
 //			SetNativeEventHandler("OnDrop", reinterpret_cast<EventHandler>(SI::TestFunc));
 		}
 		

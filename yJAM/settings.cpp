@@ -31,16 +31,16 @@ void HandleINIForPathJDC(const std::string& iniPath, const bool isDefault = fals
 	
 	if (isDefault)
 	{
-		g_JDC					= ini.GetOrCreate("JustMods", "JDCEnabled", 1, nullptr);
-		g_JDC_Dynamic			= ini.GetOrCreate("JDC", "JDCDynamic", 1, nullptr);
-		g_JDC_ShotgunAlt		= ini.GetOrCreate("JDC", "JDCShotgunAlt", 1, nullptr);
-		g_JDC_NoNodeSighting	= ini.GetOrCreate("JDC", "JDCNoNodeSighting", 1, nullptr);
-		g_JDC_ModeHolstered		= ini.GetOrCreate("JDC", "JDCModeHolstered", 1, nullptr);
-		g_JDC_ModeOut1st		= ini.GetOrCreate("JDC", "JDCModeOut1st", 5, nullptr);
-		g_JDC_ModeOut3rd		= ini.GetOrCreate("JDC", "JDCModeOut3rd", 5, nullptr);
-		g_JDC_ModeSighting1st	= ini.GetOrCreate("JDC", "JDCModeSighting1st", 3, nullptr);
-		g_JDC_ModeSighting3rd	= ini.GetOrCreate("JDC", "JDCModeSighting3rd", 3, nullptr);
-		g_JDC_ModeScope			= ini.GetOrCreate("JDC", "JDCModeScope", 0, nullptr);
+		g_JDC					= ini.GetOrCreate("JustMods", "JDCEnabled", 1.0, nullptr);
+		g_JDC_Dynamic			= ini.GetOrCreate("JDC", "JDCDynamic", 1.0, nullptr);
+		g_JDC_ShotgunAlt		= ini.GetOrCreate("JDC", "JDCShotgunAlt", 1.0, nullptr);
+		g_JDC_NoNodeSighting	= ini.GetOrCreate("JDC", "JDCNoNodeSighting", 1.0, nullptr);
+		g_JDC_ModeHolstered		= ini.GetOrCreate("JDC", "JDCModeHolstered", 1.0, nullptr);
+		g_JDC_ModeOut1st		= ini.GetOrCreate("JDC", "JDCModeOut1st", 5.0, nullptr);
+		g_JDC_ModeOut3rd		= ini.GetOrCreate("JDC", "JDCModeOut3rd", 5.0, nullptr);
+		g_JDC_ModeSighting1st	= ini.GetOrCreate("JDC", "JDCModeSighting1st", 3.0, nullptr);
+		g_JDC_ModeSighting3rd	= ini.GetOrCreate("JDC", "JDCModeSighting3rd", 3.0, nullptr);
+		g_JDC_ModeScope			= ini.GetOrCreate("JDC", "JDCModeScope", 0.0, nullptr);
 		g_JDC_Distance			= ini.GetOrCreate("JDC", "JDCDistance", 2.25, nullptr);
 		g_JDC_Speed				= ini.GetOrCreate("JDC", "JDCSpeed", 0.3, nullptr);
 		g_JDC_LengthMax			= ini.GetOrCreate("JDC", "JDCLengthMax", 72.0, nullptr);
