@@ -62,6 +62,8 @@
       <Filter>nvse</Filter>
     </ClCompile>
     <ClCompile Include="JDC.cpp" />
+    <ClCompile Include="events.cpp" />
+    <ClCompile Include="JHM.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="file.h" />
@@ -154,6 +156,8 @@
       <Filter>nvse</Filter>
     </ClInclude>
     <ClInclude Include="JDC.h" />
+    <ClInclude Include="events.h" />
+    <ClInclude Include="JHM.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />

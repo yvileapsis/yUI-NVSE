@@ -151,7 +151,7 @@ SaveGameManager* SaveGameManager::GetSingleton()
 
 std::string GetSavegamePath()
 {
-	char path[0x104];
+	char path[0x104] = "\0";
 	CALL_MEMBER_FN(SaveGameManager::GetSingleton(), ConstructSavegamePath)(path);
 	return path;
 }

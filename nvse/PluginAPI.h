@@ -511,6 +511,7 @@ struct NVSECommandTableInterface
 
 #if RUNTIME
 
+
 struct NVSEScriptInterface
 {
 	enum {
@@ -525,6 +526,26 @@ struct NVSEScriptInterface
 		ScriptEventList * eventList, ...);
 	bool	(* ExtractFormatStringArgs)(UInt32 fmtStringPos, char* buffer, ParamInfo * paramInfo, void * scriptDataIn, 
 		UInt32 * scriptDataOffset, Script * scriptObj, ScriptEventList * eventList, UInt32 maxParams, ...);
+
+	bool	(*CallFunctionAlt)(Script *funcScript, TESObjectREFR *callingObj, UInt8 numArgs, ...);
+
+	// Compile a partial script without a script name
+	// Example:
+	//   Script* script = g_scriptInterface->CompileScript(R"(Begin Function{ }
+	//		PlaceAtMe Explosion
+	//	 end)");
+	//   g_scriptInterface->CallFunctionAlt(script, *g_thePlayer, 0);
+	Script* (*CompileScript)(const char* scriptText);
+
+	// Compile one line* script that returns a result utilizing the NVSE expression evaluator
+	// Example:
+	//   Script* condition = g_scriptInterface->CompileExpression("GetAV Health > 10");
+	//   g_scriptInterface->CallFunction(condition, *g_thePlayer, nullptr, &result, 0);
+	//   if (!result.GetNumber()) return;
+	// Script can then be passed to CallFunction which will set the passed Element* result with the result of the script function call
+	//
+	// *if expression contains SetFunctionValue and %R for line breaks it can be multiline as well
+	Script* (*CompileExpression)(const char* expression);
 };
 
 #endif
@@ -535,7 +556,7 @@ struct NVSEScriptInterface
 struct NVSEDataInterface
 {
 	enum {
-		kVersion = 2
+		kVersion = 3
 	};
 
 	UInt32		version;
@@ -547,8 +568,8 @@ struct NVSEDataInterface
 
 		kNVSEData_SingletonMax,
 	};
-	void* (*GetSingleton)(UInt32 singletonID);
-	enum {
+	void* (* GetSingleton)(UInt32 singletonID);
+	enum  {
 		kNVSEData_InventoryReferenceCreate = 1,
 		kNVSEData_InventoryReferenceGetForRefID,
 		kNVSEData_InventoryReferenceGetRefBySelf,
@@ -564,22 +585,25 @@ struct NVSEDataInterface
 		// keeping the lambda.
 		kNVSEData_LambdaSaveVariableList,
 		kNVSEData_LambdaUnsaveVariableList,
-
+		
 		kNVSEData_IsScriptLambda,
 		kNVSEData_HasScriptCommand,
 		kNVSEData_DecompileScript,
-
+		
 		kNVSEData_FuncMax,
 	};
-	void* (*GetFunc)(UInt32 funcID);
-	enum {
+	void* (* GetFunc)(UInt32 funcID);
+	enum  {
 		kNVSEData_NumPreloadMods = 1,
 
 		kNVSEData_DataMax,
 	};
-	void* (*GetData)(UInt32 dataID);
+	void* (* GetData)(UInt32 dataID);
 	// v2: xNVSE caches script data for additional performance and short circuit evaluation, if you are manipulating script data then you can clear the cache 
 	void (*ClearScriptDataCache)();
+	// v3
+	
+	
 };
 #endif
 
@@ -588,7 +612,7 @@ struct NVSEDataInterface
  *	The serialization API adds a separate save data file plugins can use to save
  *	data along with a game save. It is be stored separately from the main save
  *	(.ess) file to prevent any potential compatibility issues. The actual
- *	implementation is opaqe, so it can be changed if needed, but the APIs
+	 *	implementation is opaqe, so it can be changed if needed, but the APIs
  *	provided will always remain the same and will operate the same way.
  *	
  *	Each plugin that has registered the proper callbacks will be able to write
@@ -665,30 +689,30 @@ struct NVSESerializationInterface
 	typedef void (* EventCallback)(void * reserved);
 
 	UInt32	version;
-	void	(* SetSaveCallback)(PluginHandle plugin, EventCallback callback);
-	void	(* SetLoadCallback)(PluginHandle plugin, EventCallback callback);
-	void	(* SetNewGameCallback)(PluginHandle plugin, EventCallback callback);
+	void	(*SetSaveCallback)(PluginHandle plugin, EventCallback callback);
+	void	(*SetLoadCallback)(PluginHandle plugin, EventCallback callback);
+	void	(*SetNewGameCallback)(PluginHandle plugin, EventCallback callback);
 
-	bool	(* WriteRecord)(UInt32 type, UInt32 version, const void * buf, UInt32 length);
-	bool	(* OpenRecord)(UInt32 type, UInt32 version);
-	bool	(* WriteRecordData)(const void * buf, UInt32 length);
+	bool	(*WriteRecord)(UInt32 type, UInt32 version, const void * buf, UInt32 length);
+	bool	(*OpenRecord)(UInt32 type, UInt32 version);
+	bool	(*WriteRecordData)(const void * buf, UInt32 length);
 
-	bool	(* GetNextRecordInfo)(UInt32 * type, UInt32 * version, UInt32 * length);
-	UInt32	(* ReadRecordData)(void * buf, UInt32 length);
+	bool	(*GetNextRecordInfo)(UInt32 * type, UInt32 * version, UInt32 * length);
+	UInt32	(*ReadRecordData)(void * buf, UInt32 length);
 
 	// take a refid as stored in the loaded save file and resolve it using the currently
 	// loaded list of mods. All refids stored in a save file must be run through this
 	// function to account for changing mod lists. This returns true on success, and false
 	// if the mod owning the RefID was unloaded.
-	bool	(* ResolveRefID)(UInt32 refID, UInt32 * outRefID);
+	bool	(*ResolveRefID)(UInt32 refID, UInt32 * outRefID);
 
-	void	(* SetPreLoadCallback)(PluginHandle plugin, EventCallback callback);
+	void	(*SetPreLoadCallback)(PluginHandle plugin, EventCallback callback);
 
 	// returns a full path to the last loaded save game
-	const char* (* GetSavePath)();
+	const char* (*GetSavePath)();
 
 	// Peeks at the data without interfiring with the current position
-	UInt32	(* PeekRecordData)(void * buf, UInt32 length);
+	UInt32	(*PeekRecordData)(void * buf, UInt32 length);
 
 	void	(*WriteRecord8)(UInt8 inData);
 	void	(*WriteRecord16)(UInt16 inData);
@@ -699,6 +723,8 @@ struct NVSESerializationInterface
 	UInt16	(*ReadRecord16)();
 	UInt32	(*ReadRecord32)();
 	void	(*ReadRecord64)(void *outData);
+
+	void	(*SkipNBytes)(UInt32 byteNum);
 };
 
 #ifdef RUNTIME
@@ -779,7 +805,7 @@ struct NVSEEventManagerInterface
 	};
 
 	// Registers a new event which can be dispatched to scripts and plugins. Returns false if event with name already exists.
-	bool			(*RegisterEvent)(const char* name, UInt8 numParams, ParamType* paramTypes, EventFlags flags);
+	bool			(*RegisterEvent)(const char* name, UInt8 numParams, SInt8* paramTypes, UInt32 flags);
 
 	// Dispatch an event that has been registered with RegisterEvent.
 	// Variadic arguments are passed as parameters to script / function.

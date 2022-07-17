@@ -7,6 +7,7 @@
 constexpr auto playerID = 0x7;
 constexpr auto playerRefID = 0x14;
 
+__forceinline bool MenuMode() { return CdeclCall<bool>(0x702360); }
 
 extern bool extraTraces;
 extern bool alternateUpdate3D;
@@ -825,8 +826,8 @@ public:
 		}
 	};
 
-	static ScrapHeapQueue* GetSingleton() { return *reinterpret_cast<ScrapHeapQueue**>(0x11DF1A8); }
-	void AddQueuedCmdCall(QueuedCmdCall qCall) { ThisCall(0x87D160, this, &qCall); }
+	static ScrapHeapQueue*		GetSingleton() { return *reinterpret_cast<ScrapHeapQueue**>(0x11DF1A8); }
+	__forceinline void			AddQueuedCmdCall(QueuedCmdCall qCall) { ThisCall(0x87D160, this, &qCall); }
 };
 
 // Gets the real script data ptr, as it can be a pointer to a buffer on the stack in case of vanilla expressions in set and if statements
@@ -855,7 +856,7 @@ struct TimeGlobal : Timer
 	float unk28;  // 028
 
 	static TimeGlobal*	GetSingleton();
-	void				Set(Float32, char);
+	__forceinline void	Set(Float32, char);
 	static Float32		Get();
 	static Float32		GetTarget();
 };
@@ -930,6 +931,11 @@ typedef void				(*_SetStringVar)(UInt32, const char*);
 typedef bool				(*_AssignString)(ParamInfo*, void*, TESObjectREFR*, TESObjectREFR*, Script*, ScriptEventList*, double*, UInt32*, const char*);
 typedef	bool				(*_SetNativeEventHandler)(const char* eventName, EventHandler func);
 typedef bool				(*_RemoveNativeEventHandler)(const char* eventName, EventHandler func);
+typedef bool				(*_RegisterEvent)(const char* name, UInt8 numParams, SInt8* paramTypes, UInt32 flags);
+typedef bool				(*_DispatchEvent)(const char* eventName, TESObjectREFR* thisObj, ...);
+typedef bool				(*_CallFunctionAlt)(Script* funcScript, TESObjectREFR* callingObj, UInt8 numArgs, ...);
+typedef Script*				(*_CompileScript)(const char* scriptText);
+typedef Script*				(*_CompileExpression)(const char* expression);
 
 inline _ExtractArgsEx				ExtractArgsEx;
 inline _ExtractFormatStringArgs		ExtractFormatStringArgs;
@@ -940,3 +946,8 @@ inline _SetStringVar				SetStringVar;
 inline _AssignString				AssignString;
 inline _SetNativeEventHandler		SetNativeEventHandler;
 inline _RemoveNativeEventHandler	RemoveNativeEventHandler;
+inline _RegisterEvent				RegisterEvent;
+inline _DispatchEvent				DispatchEvent;
+inline _CallFunctionAlt				CallFunctionAlt;
+inline _CompileScript				CompileScript;
+inline _CompileExpression			CompileExpression;

@@ -4,7 +4,10 @@
 #include <settings.h>
 #include <file.h>
 
+#include <events.h>
 #include <JDC.h>
+#include <JHM.h>
+
 
 #define yJAM_VERSION 0.1
 #define yJAM_VERSION_STR "0.1"
@@ -26,13 +29,14 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	else if (msg->type == NVSEMessagingInterface::kMessage_MainGameLoop)
 	{
 		if (g_JDC) JDC::MainLoop();
-		if (iDoOnce == 0 && !CdeclCall<bool>(0x702360)) {
+		if (g_JHM) JHM::MainLoop();
+
+		if (iDoOnce == 0 && !MenuMode()) {
 			iDoOnce++;
 
+			EventLayer();
 			if (g_JDC) JDC::Initialize();
-
-			SetNativeEventHandler("JDCReset", reinterpret_cast<EventHandler>(JDC::Wraaa));
-//			SetNativeEventHandler("OnDrop", reinterpret_cast<EventHandler>(SI::TestFunc));
+			if (g_JHM) JHM::Initialize();
 		}
 		
 	}
@@ -96,12 +100,15 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	g_commandInterface = static_cast<NVSECommandTableInterface*>(nvse->QueryInterface(kInterface_CommandTable));
 
 	ExtractArgsEx = g_scriptInterface->ExtractArgsEx;
+	CallFunctionAlt = g_scriptInterface->CallFunctionAlt;
+	CompileExpression = g_scriptInterface->CompileExpression;
 
 	g_eventInterface = static_cast<NVSEEventManagerInterface*>(nvse->QueryInterface(kInterface_EventManager));
 
 	SetNativeEventHandler = g_eventInterface->SetNativeEventHandler;
 	RemoveNativeEventHandler = g_eventInterface->RemoveNativeEventHandler;
-
+	RegisterEvent = g_eventInterface->RegisterEvent;
+	DispatchEvent = g_eventInterface->DispatchEvent;
 	handleINIOptions();
 
 	return true;

@@ -7,20 +7,7 @@
 void QuickRefreshItemsList();
 void RefreshItemsList();
 bool RefreshItemsListForm(TESForm*);
-/*
-class Menu;
-class SceneGraph;
-class FOPipboyManager;
-class NiObject;
-class TESObjectREFR;
-class NiNode;
-class BSShaderAccumulator;
-class ShadowSceneNode;
-class NiSourceTexture;
-class FORenderedMenu;
-class TileExtra;
-class NiRefObject;
-*/
+
 typedef Menu * (* _TempMenuByType)(UInt32 menuType);
 extern const _TempMenuByType TempMenuByType;
 
@@ -815,24 +802,21 @@ public:
 	// check 4 at 0xA1D9EC (when closing menu) :: set at 0x7036A4, 0x71204D
 	// check 8 at 0x712194 :: set 8 at 0xA1DB8F (when opening menu), 0x720B39
 
-	Menu* HandleMenuInput(UInt32 tileID, Tile* clickedTile);
-	Tile* AddTileFromTemplate(Tile* destTile, const char* templateName, UInt32 arg3);
+	Menu*					HandleMenuInput(UInt32 tileID, Tile* clickedTile);
+	__forceinline Tile*		AddTileFromTemplate(Tile* destTile, const char* templateName, UInt32 arg3 = 0)
+							{ return ThisCall<Tile*>(0xA1DDB0, this, destTile, templateName, arg3); }
+	bool					GetTemplateExists(const char* templateName);
 
-	bool GetTemplateExists(const char* templateName);
-
-	void Close()
+	void					Close()
 	{
 		this->tile->SetFloat(6002, 1);
 		ThisCall(0xA1D910, this);
 	}
 
-	void Free()
-	{
-		ThisCall(0xA1C520, this);
-	}
+	__forceinline void			Free() { ThisCall(0xA1C520, this); }
 
-	void RegisterTile(Tile* tile, bool noAppendToMenuStack) { ThisCall(0xA1DC70, this, tile, noAppendToMenuStack); };
-	void HideTitle(bool noFadeIn) { ThisCall(0xA1DC20, this, noFadeIn); };
+	__forceinline void			RegisterTile(Tile* tile, bool noAppendToMenuStack) { ThisCall(0xA1DC70, this, tile, noAppendToMenuStack); };
+	__forceinline void			HideTitle(bool noFadeIn) { ThisCall(0xA1DC20, this, noFadeIn); };
 };
 
 class MenuItemEntryList : public ListBox<ContChangesEntry>

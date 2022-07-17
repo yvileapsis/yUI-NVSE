@@ -44,7 +44,9 @@ struct SerializationTask
 struct PluginCallbacks
 {
 	PluginCallbacks()
-		:save(NULL), load(NULL), newGame(NULL), preLoad(NULL) { }
+		:save(NULL), load(NULL), newGame(NULL), preLoad(NULL) {
+		hadData = 0;
+	}
 
 	NVSESerializationInterface::EventCallback	save;
 	NVSESerializationInterface::EventCallback	load;

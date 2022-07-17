@@ -86,7 +86,7 @@ public:
 	virtual bool				IsExplosion();
 	virtual bool				IsProjectile();
 	virtual void				SetParentCell(void);				// SetParentCell (Interior only ?)
-	virtual bool				IsDying(bool arg0);			// IsDead = HasNoHealth (baseForm health <= 0 or Flags bit23 set)
+	virtual bool				IsDying(bool essentialUnconcious = false);			// IsDead = HasNoHealth (baseForm health <= 0 or Flags bit23 set)
 	virtual bool				GetHasKnockedState(void);
 	virtual bool				Unk_8D(void);
 	virtual void				Unk_8E(void);
@@ -374,6 +374,17 @@ public:
 
 typedef std::vector<TESForm*> EquippedItemsList;
 
+enum LifeStates
+{
+	kLifeState_Alive				= 0,
+	kLifeState_Dying				= 1,
+	kLifeState_Dead					= 2,
+	kLifeState_Unconscious			= 3,
+	kLifeState_Reanimate			= 4,
+	kLifeState_Restrained			= 5,
+	kLifeState_EssentialUnconscious	= 6,
+};
+
 class Actor : public MobileObject
 {
 public:
@@ -624,6 +635,9 @@ public:
 	bool								IsDoingAttackAnim() { return ThisCall<bool>(0x894900, this); }
 	bool								IsCombatTarget(const Actor* source);
 	bool								IsHostileCompassTarget();
+
+	Float32								GetHitDataValue(UInt32 valueType) const;
+	Float32								GetActorValue(ActorValueCode avcode);
 };
 STATIC_ASSERT(sizeof(Actor) == 0x1B4);
 

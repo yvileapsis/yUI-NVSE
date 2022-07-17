@@ -133,8 +133,10 @@
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ForcedIncludeFiles>
     </ClCompile>
+    <ClCompile Include="events.cpp" />
     <ClCompile Include="file.cpp" />
     <ClCompile Include="JDC.cpp" />
+    <ClCompile Include="JHM.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="patches.cpp" />
@@ -168,9 +170,11 @@
     <ClInclude Include="..\nvse\prefix.h" />
     <ClInclude Include="..\nvse\SafeWrite.h" />
     <ClInclude Include="..\nvse\Utilities.h" />
+    <ClInclude Include="events.h" />
     <ClInclude Include="file.h" />
     <ClInclude Include="functions.h" />
     <ClInclude Include="JDC.h" />
+    <ClInclude Include="JHM.h" />
     <ClInclude Include="patches.h" />
     <ClInclude Include="settings.h" />
     <ClInclude Include="main.h" />

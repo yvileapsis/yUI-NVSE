@@ -23,7 +23,6 @@ class Menu;
 class NiObject;
 class RefNiObject;
 
-
 // 38+
 enum eTileValue {
 	kTileValue_Rect = 0x385,
@@ -284,7 +283,7 @@ public:
 		char*		str;		// 0C
 		Action*		action;		// 10
 		
-		void __thiscall Refresh(bool string) { ThisCall<void>(0xA09410, this, string); };
+		__forceinline void __thiscall Refresh(bool string) { ThisCall<void>(0xA09410, this, string); };
 	};
 
 	struct ChildNode
@@ -304,35 +303,39 @@ public:
 	UInt8						unk35;		// 35
 	UInt8						pad35[2];	// 36
 
-	static UInt32		TraitNameToID(const char * traitName);
-	static UInt32		TraitNameToIDAdd(const char* traitName);
-	Value* __fastcall	GetValue(UInt32 typeID);
-	Value*				GetValueName(const char * valueName);
-	float				GetValueFloat(UInt32 id);
-	DListNode<Tile>*	GetNthChild(UInt32 index);
-	Tile*				GetChild(const char * childName);
-	Tile*				GetComponent(const char * componentTile, const char **trait);
-	Tile*				GetComponentTile(const char * componentTile);
-	Value*				GetComponentValue(const char * componentPath);
-	char*				GetComponentFullName(char *resStr);
-	__forceinline Tile* ReadXML(const char* xmlPath) { return ThisCall<Tile*>(0xA01B00, this, xmlPath); }
-	Tile*				InjectUIXML(const char*);
+	static UInt32				TraitNameToID(const char * traitName);
+	static UInt32				TraitNameToIDAdd(const char* traitName);
+	Value* __fastcall			GetValue(UInt32 typeID);
+	Value*						GetValueName(const char * valueName);
+	float						GetValueFloat(UInt32 id);
+	DListNode<Tile>*			GetNthChild(UInt32 index);
+	Tile*						GetChild(const char * childName);
+	Tile*						GetComponent(const char * componentTile, const char **trait);
+	Tile*						GetComponentTile(const char * componentTile);
+	Value*						GetComponentValue(const char * componentPath);
+	char*						GetComponentFullName(char *resStr);
+	__forceinline Tile*			ReadXML(const char* xmlPath) { return ThisCall<Tile*>(0xA01B00, this, xmlPath); }
+	Tile*						InjectUIXML(const char*);
 
-	void				SetFloat(UInt32 id, float fltVal, bool bPropagate = true);
-	void				SetString(UInt32 id, const char* strVal, bool bPropagate = true);
-	void				SetStringRecursive(UInt32, const char*, const char*);
+	void						SetFloat(UInt32 id, float fltVal, bool bPropagate = true);
+	void						SetString(UInt32 id, const char* strVal, bool bPropagate = true);
+	void						SetStringRecursive(UInt32, const char*, const char*);
+	__forceinline void			GradualSetFloat(UInt32 id, Float32 startVal, Float32 endVal, Float32 seconds, UInt32 changeMode = 0)
+								{ ThisCall(0xA07C60, this, id, startVal, endVal, seconds, changeMode); };
 
-	Menu*				GetParentMenu();
-	TileMenu*			GetTileMenu();
-	void				DestroyAllChildren();
-	void __fastcall		PokeValue(UInt32 valueID);
-	void				FakeClick();
 
-	void				Dump(void);
-	void				HandleChange(UInt32 tilevalue) { ThisCall<void>(0xA074D0, this, tilevalue); }
-	Tile*				GetChildByID(UInt32 id) { return ThisCall<Tile*>(0xA03EB0, this, id); }; // THANKS STEWIE
-	Tile*				LookUpRectByName(const char* name);
+	__forceinline Menu*			GetParentMenu();
+	TileMenu*					GetTileMenu();
+	void						DestroyAllChildren();
+	void __fastcall				PokeValue(UInt32 valueID);
+	void						FakeClick();
 
+	void						Dump(void);
+	__forceinline void			HandleChange(UInt32 tilevalue) { ThisCall<void>(0xA074D0, this, tilevalue); }
+	__forceinline Tile*			GetChildByID(UInt32 id) { return ThisCall<Tile*>(0xA03EB0, this, id); }; // THANKS STEWIE
+	__forceinline Tile*			LookUpRectByName(const char* name);
+
+	Tile*						AddTileFromTemplate(const char* templateName, const char* altName = nullptr);
 };
 
 // 3C
@@ -379,4 +382,33 @@ public:
 
 	Tile* parentTile;	// 0C
 	NiNode* parentNode;	// 10
+};
+
+// 1C
+struct GradualSetFloat
+{	//	0		From start to end in duration
+	//	1		From start to end to start, in duration, perpetually
+	//	2		From start to end to start, in duration, 4 times
+	//	3		From start to end to start, 7 times, in duration
+	//	4		From start to end in duration/6, end for duration*2/3, from end to start in duration/6
+	//	5**		From start to end, in duration, perpetually (suitable for image rotation)
+	enum
+	{
+		kGradualSetFloat_StartToEnd				= 0,
+		kGradualSetFloat_StartToEndPerpetual	= 1,
+		kGradualSetFloat_StartToEndFourTimes	= 2,
+		kGradualSetFloat_StartToEndSevenTimes	= 3,
+		kGradualSetFloat_StartToEndToStart		= 4,
+		kGradualSetFloat_StartToEndRotation		= 5
+	};
+
+	Float32		startValue;		// 00
+	Float32		endValue;		// 04
+	UInt32		startTimeMS;	// 08
+	Float32		durationMS;		// 0C
+	UInt32		valueID;		// 10
+	Tile*		tile;			// 14
+	UInt32		changeMode;		// 18	0-4, see 0xA081B5
+
+	__forceinline static TList<GradualSetFloat>* QueuedGradualSetFloat() { return (TList<GradualSetFloat>*)0x11F3348; }
 };

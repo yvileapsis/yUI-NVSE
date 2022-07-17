@@ -222,6 +222,47 @@ bool Actor::IsHostileCompassTarget() {
 	return false;
 }
 
+__declspec(naked) double __fastcall AdjustDmgByDifficulty(ActorHitData *hitData, PlayerCharacter* g_thePlayer = PlayerCharacter::GetSingleton())
+{
+	__asm
+	{
+		mov		edx, g_thePlayer
+		mov		eax, 0x119B310
+		cmp		dword ptr [ecx+4], edx
+		jz		isPlayer
+		add		eax, 0x14
+	isPlayer:
+		mov		edx, [edx+0x7B8]
+		mov		eax, [eax+edx*4]
+		fld		dword ptr [ecx+0x14]
+		fmul	dword ptr [eax+4]
+		retn
+	}
+}
+
+Float32 Actor::GetHitDataValue(UInt32 valueType) const
+{
+	if (!baseProcess || (baseProcess->processLevel > 1)) return 0;
+	ActorHitData* hitData = baseProcess->GetLastHitData();
+	if (!hitData) return 0;
+	switch (valueType)
+	{
+	case 0:		return AdjustDmgByDifficulty(hitData);
+	case 1:		return hitData->limbDmg;
+	case 2:		return hitData->flags & 0x80000000 ? 1 : 0;
+	case 3:		return hitData->wpnBaseDmg;
+	case 4:		return hitData->fatigueDmg;
+	case 5:		return hitData->armorDmg;
+	}
+	return 0;
+}
+
+Float32 Actor::GetActorValue(ActorValueCode avcode)
+{
+	return this->avOwner.GetActorValue(avcode);
+}
+
+
 bool TESObjectREFR::IsCrimeOrEnemy()
 {
 	const auto actor = static_cast<Actor*>(this);

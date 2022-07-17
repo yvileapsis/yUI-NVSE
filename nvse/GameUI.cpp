@@ -169,12 +169,6 @@ void InterfaceManager::VATSHighlightData::AddRefAndSetFlashing(TESObjectREFR* re
 	}
 };
 
-Tile* Menu::AddTileFromTemplate(Tile* destTile, const char* templateName, UInt32 arg3 = 0)
-{
-	return ThisCall<Tile*>(0xA1DDB0, this, destTile, templateName, 0);
-}
-
-
 bool Menu::GetTemplateExists(const char* templateName)
 {
 	for (const auto node : menuTemplates)

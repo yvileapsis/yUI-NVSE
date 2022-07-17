@@ -4,6 +4,7 @@
 #include <string>
 
 #include "GameRTTI.h"
+#include "GameUI.h"
 
 typedef NiTMapBase <const char *, int>	TraitNameMap;
 TraitNameMap	* g_traitNameMap = (TraitNameMap *)0x011F32F4;
@@ -189,6 +190,14 @@ Tile* Tile::LookUpRectByName(const char* name)
 	return ThisCall<Tile*>(0xA03DA0, this, name);
 }
 
+Tile* Tile::AddTileFromTemplate(const char* templateName, const char* altName)
+{
+	const auto tile = this->GetParentMenu()->AddTileFromTemplate(this, templateName, 0);
+	if (altName) tile->name.Set(altName);
+	return tile;
+}
+
+
 void Debug_DumpTraits(void)
 {
 	for(UInt32 i = 0; i < g_traitNameMap->numBuckets; i++)
@@ -213,11 +222,6 @@ const char * TraitIDToName(int id)
 }
 
 void Debug_DumpTileImages(void) {};
-
-enum
-{
-	kAddr_TileGetFloat = 0xA011B0,
-};
 
 __declspec(naked) float Tile::GetValueFloat(UInt32 id)
 {
