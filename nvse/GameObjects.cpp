@@ -579,6 +579,7 @@ __declspec(naked) ContChangesEntry* ContChangesList::FindForItem(TESForm* item)
 
 PlayerCharacter*		PlayerCharacter::GetSingleton() { return *reinterpret_cast<PlayerCharacter**>(0x011DEA3C); }
 QuestObjectiveTargets*	PlayerCharacter::GetCurrentQuestObjectiveTargets() { return ThisStdCall<QuestObjectiveTargets*>(s_PlayerCharacter_GetCurrentQuestTargets, this); }
+TESObjectREFR*			PlayerCharacter::GetPlacedMarkerOrTeleportLink() { return ThisStdCall<TESObjectREFR*>(0x77A400, this); }
 HighProcess*			PlayerCharacter::GetHighProcess() { return reinterpret_cast<HighProcess*>(baseProcess); }
 
 bool Explosion::CanStoreAmmo()

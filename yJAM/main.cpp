@@ -34,6 +34,7 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 		if (iDoOnce == 0 && !MenuMode()) {
 			iDoOnce++;
 
+			InitFunctions();
 			EventLayer();
 			if (g_JDC) JDC::Initialize();
 			if (g_JHM) JHM::Initialize();
@@ -109,6 +110,7 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	RemoveNativeEventHandler = g_eventInterface->RemoveNativeEventHandler;
 	RegisterEvent = g_eventInterface->RegisterEvent;
 	DispatchEvent = g_eventInterface->DispatchEvent;
+
 	handleINIOptions();
 
 	return true;

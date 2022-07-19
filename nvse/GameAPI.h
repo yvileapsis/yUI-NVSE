@@ -920,6 +920,24 @@ public:
 	static bool				HasConsoleOutputFilename(void);
 };
 
+enum ExtendedEventFlags : UInt32
+{
+	kFlags_None = 0,
+
+	//If on, will remove all set handlers for the event every game load.
+	kFlag_FlushOnLoad = 1 << 0,
+
+
+	// == Flags below reserved for internal use; their values can be changed as the exposed EventFlags grows.
+
+	//Identifies script-created events, for the DispatchEvent(Alt) script functions.
+	//Arg types are only known when dispatching the event.
+	kFlag_IsUserDefined = 1 << 1,
+
+	//Identifies xNVSE's unit-testing event, which can be dispatched via DispatchEventAlt, but arg types are known in advance.
+	kFlag_IsTestEvent = 1 << 2,
+};
+
 typedef void (*EventHandler)(TESObjectREFR* thisObj, void* parameters);
 
 typedef bool				(*_ExtractArgsEx)(COMMAND_ARGS_EX, ...);

@@ -874,6 +874,7 @@ public:
 	bool					SetSkeletonPath_v1c(const char* newPath);	// Less worse version as used by some modders
 	static void				UpdateHead();
 	QuestObjectiveTargets*	GetCurrentQuestObjectiveTargets();
+	TESObjectREFR*			GetPlacedMarkerOrTeleportLink();
 	HighProcess*			GetHighProcess();
 };
 STATIC_ASSERT(sizeof(PlayerCharacter) == 0xE50);

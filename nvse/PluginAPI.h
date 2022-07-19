@@ -758,6 +758,7 @@ struct NVSESerializationInterface
  *	    void* floatArg = *(void**) &number;
  *	    s_EventInterface->DispatchEvent("MyEvent", callingRef, floatArg);
  */
+
 struct NVSEEventManagerInterface
 {
 	typedef void (*EventHandler)(TESObjectREFR* thisObj, void* parameters);
@@ -797,11 +798,22 @@ struct NVSEEventManagerInterface
 	{
 		kFlags_None = 0,
 
-		//If on, will remove all set handlers for the event every game load.
+		// If on, will remove all set handlers for the event every game load.
 		kFlag_FlushOnLoad = 1 << 0,
 
-		//Identifies script-created events, for the DispatchEvent(Alt) script functions.
-		kFlag_IsUserDefined = 1 << 1,
+		// Events with this flag do not need to provide ParamTypes when defined.
+		// However, arg types must still be known when dispatching the event.
+		// For scripts, DispatchEventAlt will provide the args + their types.
+		// For plugins, no method is exposed to dispatch such an event,
+		// since it is recommended to define the event with ParamTypes instead.
+		kFlag_HasUnknownArgTypes = 1 << 1,
+
+		// Allows scripts to dispatch the event.
+		// This comes at the risk of not knowing if some other scripted mod is dispatching your event.
+		kFlag_AllowScriptDispatch = 1 << 2,
+
+		// When implicitly creating a new event via the script function SetEventHandler(Alt), these flags are set.
+		kFlag_IsUserDefined = kFlag_HasUnknownArgTypes | kFlag_AllowScriptDispatch,
 	};
 
 	// Registers a new event which can be dispatched to scripts and plugins. Returns false if event with name already exists.

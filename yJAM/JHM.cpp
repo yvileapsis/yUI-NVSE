@@ -6,33 +6,22 @@
 #include <GameSettings.h>
 #include <GameProcess.h>
 #include <ranges>
+#include <functions.h>
+#include <unordered_set>
 
 #include <SimpleINILibrary.h>
 
 namespace JHM
 {
-	HUDMainMenu*		menuHUDMain			= nullptr;
+	bool				initialized			= false;
 	Tile*				tileMain			= nullptr;
-	Tile*				tileReticleCenter	= nullptr;
-	PlayerCharacter*	player				= nullptr;
 
 	SInt64				visible				= 0;
 	UInt32				depth				= 0;
 
 	std::map<TESObjectREFR*, UInt32> g_HitMarkers;
-	std::map<Tile*, bool (*)(Tile* tile)> g_TileCallbacks;
-
-	enum kHitMarkerFlags
-	{
-		kHitMarkerNothing			= 1 << 0,
-		kHitMarkerNormal			= 1 << 1,
-		kHitMarkerDouble			= 1 << 2,
-		kHitMarkerOffset			= 1 << 3,
-		kHitMarkerShake				= 1 << 4,
-		kHitMarkerRotate			= 1 << 5,
-		kHitMarkerAltColor			= 1 << 6,
-		kHitMarkerHalfAlpha			= 1 << 7
-	};
+	std::unordered_set<Tile*> g_UsefulTiles;
+	std::unordered_set<Tile*> g_UselessTiles;
 
 	void HandleINI(const std::string& iniPath)
 	{
@@ -47,13 +36,13 @@ namespace JHM
 		g_JHM_Length			= ini.GetOrCreate("JHM", "Length", 24.0, nullptr);
 		g_JHM_Width				= ini.GetOrCreate("JHM", "Width", 8.0, nullptr);
 		g_JHM_Offset			= ini.GetOrCreate("JHM", "Offset", 24.0, nullptr);
-		g_JHM_ModeHit			= ini.GetOrCreate("JHM", "ModeHit", kHitMarkerNormal, nullptr);
-		g_JHM_ModeDead			= ini.GetOrCreate("JHM", "ModeDead", kHitMarkerNothing, nullptr);
-		g_JHM_ModeKill			= ini.GetOrCreate("JHM", "ModeKill", kHitMarkerOffset, nullptr);
-		g_JHM_ModeEnemy			= ini.GetOrCreate("JHM", "ModeEnemy", kHitMarkerAltColor, nullptr);
-		g_JHM_ModeCrit			= ini.GetOrCreate("JHM", "ModeCrit", kHitMarkerDouble, nullptr);
-		g_JHM_ModeHeadshot		= ini.GetOrCreate("JHM", "ModeHead", kHitMarkerShake, nullptr);
-		g_JHM_ModeCompanion		= ini.GetOrCreate("JHM", "ModeByCompanion", kHitMarkerHalfAlpha, nullptr);
+		g_JHM_ModeHit			= ini.GetOrCreate("JHM", "ModeHit", static_cast<double>(kHitMarkerNormal), nullptr);
+		g_JHM_ModeDead			= ini.GetOrCreate("JHM", "ModeDead", static_cast<double>(kHitMarkerNormal), nullptr);
+		g_JHM_ModeKill			= ini.GetOrCreate("JHM", "ModeKill", static_cast<double>(kHitMarkerOffset), nullptr);
+		g_JHM_ModeEnemy			= ini.GetOrCreate("JHM", "ModeEnemy", static_cast<double>(kHitMarkerAltColor), nullptr);
+		g_JHM_ModeCrit			= ini.GetOrCreate("JHM", "ModeCrit", static_cast<double>(kHitMarkerDouble), nullptr);
+		g_JHM_ModeHeadshot		= ini.GetOrCreate("JHM", "ModeHead", static_cast<double>(kHitMarkerShake), nullptr);
+		g_JHM_ModeCompanion		= ini.GetOrCreate("JHM", "ModeByCompanion", static_cast<double>(kHitMarkerHalfAlpha), nullptr);
 		g_JHM_EnableOut			= ini.GetOrCreate("JHM", "EnableOut", 1.0, nullptr);
 		g_JHM_EnableSighting	= ini.GetOrCreate("JHM", "EnableSighting", 1.0, nullptr);
 		g_JHM_EnableScope		= ini.GetOrCreate("JHM", "EnableScope", 1.0, nullptr);
@@ -62,17 +51,6 @@ namespace JHM
 
 		if (const auto errVal = ini.SaveFile(iniPath.c_str(), false); errVal == SI_FILE) { return; }
 
-	}
-
-	bool DeleteIfAlphaNegative(Tile* tile)
-	{
-		if (!tile || !tile->GetComponentValue("alpha")) return false;
-		if (tile->GetValueFloat(kTileValue_alpha) < 0)
-		{
-			tile->Destroy(true);
-			return false;
-		}
-		return true;
 	}
 
 	void Reset()
@@ -97,25 +75,41 @@ namespace JHM
 
 	void Initialize()
 	{
-		menuHUDMain = HUDMainMenu::GetSingleton();
-		tileMain = menuHUDMain->tile->GetChild("JHM");
+		initialized = true;
+		tileMain = g_MenuHUDMain->tile->GetChild("JHM");
 		if (!tileMain)
 		{
-			menuHUDMain->tile->InjectUIXML(R"(Data\menus\prefabs\JHM\JHM.xml)");
-			tileMain = menuHUDMain->tile->GetChild("JHM");
+			g_MenuHUDMain->tile->InjectUIXML(R"(Data\menus\prefabs\JHM\JHM.xml)");
+			tileMain = g_MenuHUDMain->tile->GetChild("JHM");
 		}
 		if (!tileMain) return;
-		tileReticleCenter = menuHUDMain->tileReticleCenter;
-		player = PlayerCharacter::GetSingleton();
-
-		SetNativeEventHandler("yJAM:JIP:OnHit", reinterpret_cast<EventHandler>(OnHitHandler));
+		RegisterEvent("JHM:Reset", 0, nullptr, 4);
 		SetNativeEventHandler("JHM:Reset", reinterpret_cast<EventHandler>(Reset));
 		DispatchEvent("JHM:Reset", nullptr);
+
+		SetNativeEventHandler("yJAM:JIP:OnHit", reinterpret_cast<EventHandler>(OnHitHandler));
+	}
+
+	bool ProcessUselessTiles(Tile* tile)
+	{
+		if (!tile) return false;
+		const auto val = tile->GetValue(kTileValue_alpha);
+		if (!val) return false;
+		if (val->num > 0) return true;
+		g_UsefulTiles.emplace(tile);
+		return false;
 	}
 
 	void CreateHitMarker(UInt32 flags)
 	{
-		const auto tile = tileMain->GetChild("JHM")->AddTileFromTemplate("JHMInjected");
+		Tile* tile;
+		if (g_UsefulTiles.empty()) {
+			tile = tileMain->GetChild("JHM")->AddTileFromTemplate("JHMInjected");
+		} else {
+			const auto iter = g_UsefulTiles.begin();
+			tile = *iter;
+			g_UsefulTiles.erase(iter);
+		}
 
 		tile->SetFloat(Tile::TraitNameToID("_JHMDepth"), depth++);
 
@@ -129,56 +123,53 @@ namespace JHM
 
 		tile->GradualSetFloat(Tile::TraitNameToID("_JHMCounter"), 0, 1, (flags & kHitMarkerDouble) ? 2 * g_JHM_Seconds : g_JHM_Seconds, GradualSetFloat::kGradualSetFloat_StartToEnd);
 
-		g_TileCallbacks[tile] = DeleteIfAlphaNegative;
+		g_UselessTiles.emplace(tile);
 	}
 
 	__forceinline bool GetPCUsingIronSights()
 	{
-		return player->ironSightNode && player->baseProcess->IsWeaponOut() || player->baseProcess->IsAiming();
+		return g_Player->ironSightNode && g_Player->baseProcess->IsWeaponOut() || g_Player->baseProcess->IsAiming();
 	}
 
 	__forceinline bool GetPCUsingScope()
 	{
-		return menuHUDMain->isUsingScope;
+		return g_MenuHUDMain->isUsingScope;
 	}
 
 	void MainLoop()
 	{
-		if (!player) return;
+		if (!initialized) return;
 
 		if (GetPCUsingScope()) visible = -1 * static_cast<SInt64>(g_JHM_EnableScope);
 		else if (GetPCUsingIronSights()) visible = g_JHM_EnableSighting;
 		else visible = g_JHM_EnableOut;
 		tileMain->SetFloat(Tile::TraitNameToID("_JHMVisible"), visible);
 
-		if (!visible)
-		{
-			g_HitMarkers.clear();
-			g_TileCallbacks.clear();
-			return;
-		}
+		if (!visible) { g_HitMarkers.clear(); return; }
+
 		depth = 0;
 		for (const auto& snd : g_HitMarkers | std::views::values) CreateHitMarker(snd);
 		g_HitMarkers.clear();
-		for (auto i = g_TileCallbacks.begin(); i != g_TileCallbacks.end(); ) if (!i->second(i->first)) g_TileCallbacks.erase(i++); else ++i;
 
-		tileMain->SetFloat(Tile::TraitNameToID("_JDCOffset"), menuHUDMain->tile->GetChild("JDC")->GetValueFloat(Tile::TraitNameToID("_JDCOffset")));
-		tileMain->SetFloat(Tile::TraitNameToID("_JDCLength"), menuHUDMain->tile->GetChild("JDC")->GetValueFloat(Tile::TraitNameToID("_JDCLength")));
+		for (auto i = g_UselessTiles.begin(); i != g_UselessTiles.end(); ) if (!ProcessUselessTiles(*i)) g_UselessTiles.erase(i++); else ++i;
+
+		tileMain->SetFloat(Tile::TraitNameToID("_JDCOffset"), g_MenuHUDMain->tile->GetChild("JDC")->GetValueFloat(Tile::TraitNameToID("_JDCOffset")));
+		tileMain->SetFloat(Tile::TraitNameToID("_JDCLength"), g_MenuHUDMain->tile->GetChild("JDC")->GetValueFloat(Tile::TraitNameToID("_JDCLength")));
 	}
 
 	void OnHitHandler(Actor* target, void* args)
 	{
-		if (!player || !visible) return;
+		if (!initialized || !visible) return;
 
-		if (!target || target == player) return;
+		if (!target || target == g_Player) return;
 
 		UInt32 flags = 0;
 
 		if (target->IsActor())
 		{
 			const auto hitData = target->baseProcess->GetLastHitData();
-			if (!hitData) return;
-			if (hitData->source != player && !hitData->source->isTeammate) return;
+			if (!hitData || !hitData->source) return;
+			if (hitData->source != g_Player && !hitData->source->isTeammate) return;
 
 			flags |= g_JHM_ModeHit;
 			if (target->lifeState == kLifeState_Dead || target->lifeState == kLifeState_Dying) flags |= g_JHM_ModeDead;
