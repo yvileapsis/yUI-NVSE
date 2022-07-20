@@ -65,6 +65,9 @@
       <Filter>nvse</Filter>
     </ClCompile>
     <ClCompile Include="commands.cpp" />
+    <ClCompile Include="..\nvse\dinput8.cpp">
+      <Filter>nvse</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="file.h" />
@@ -158,6 +161,9 @@
       <Filter>nvse</Filter>
     </ClInclude>
     <ClInclude Include="..\nvse\PluginAPI.h">
+      <Filter>nvse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nvse\dinput8.h">
       <Filter>nvse</Filter>
     </ClInclude>
   </ItemGroup>

@@ -535,11 +535,10 @@ public:
 	DEFINE_MEMBER_FN(GetExtraData, NiExtraData*, kNiObjectNET_GetExtraData, const char* name);
 #endif
 
-	const char			* m_pcName;						// 008 - name known
-	NiTimeController	* m_controller;					// 00C - size ok
+	const char*			m_pcName;						// 008 - name known
+	NiTimeController*	m_controller;					// 00C - size ok
 
-	// doesn't appear to be part of a class?
-	NiExtraData			** m_extraDataList;				// 010 - size ok
+	NiExtraData**		m_extraDataList;				// 010 - size ok
 	UInt16				m_extraDataListLen;				// 014 - size ok
 	UInt16				m_extraDataListCapacity;		// 016 - size ok
 	// 018

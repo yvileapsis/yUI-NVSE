@@ -509,9 +509,6 @@ struct NVSECommandTableInterface
  *
  ******************************************************************************/
 
-#if RUNTIME
-
-
 struct NVSEScriptInterface
 {
 	enum {
@@ -547,10 +544,6 @@ struct NVSEScriptInterface
 	// *if expression contains SetFunctionValue and %R for line breaks it can be multiline as well
 	Script* (*CompileExpression)(const char* expression);
 };
-
-#endif
-
-#if RUNTIME
 
 // Gives access to internal data without reverse engineering NVSE
 struct NVSEDataInterface
@@ -605,7 +598,6 @@ struct NVSEDataInterface
 	
 	
 };
-#endif
 
 /**** serialization API docs ***************************************************
  *	

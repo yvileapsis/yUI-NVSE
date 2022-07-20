@@ -165,29 +165,15 @@ AnimGroupID AnimData::GetNextAttackGroupID() const
 
 OSInputGlobals** g_inputGlobals = reinterpret_cast<OSInputGlobals**>(0x11F35CC);
 
-__declspec(naked) NiExtraData* __fastcall NiObjectNET::GetExtraData(UInt32 vtbl) const
+NiExtraData* __fastcall NiObjectNET::GetExtraData(UInt32 vtbl) const
 {
-	__asm
+	for (UInt16 index = 0; index < m_extraDataListLen; index++)
 	{
-		push	esi
-		mov		esi, [ecx+0x10]
-		movzx	ecx, word ptr [ecx+0x14]
-		ALIGN 16
-	iterHead:
-		dec		ecx
-		js		retnNULL
-		mov		eax, [esi+ecx*4]
-		test	eax, eax
-		jz		iterHead
-		cmp		[eax], edx
-		jnz		iterHead
-		pop		esi
-		retn
-	retnNULL:
-		xor		eax, eax
-		pop		esi
-		retn
+		const auto iter = this->m_extraDataList[index];
+		if (*(UInt32*)iter == vtbl)
+			return iter;
 	}
+	return nullptr;
 }
 
 BSAnimGroupSequence* BSAnimGroupSequence::Get3rdPersonCounterpart() const

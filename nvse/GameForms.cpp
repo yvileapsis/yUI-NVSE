@@ -830,8 +830,3 @@ SInt32 TESContainer::GetCountForForm(TESForm *form)
 		if (iter->form == form) result += iter->count;
 	return result;
 }
-
-signed int EffectItem::GetSkillCode()
-{
-	return ThisCall<signed int>(0x403EA0, this);
-}

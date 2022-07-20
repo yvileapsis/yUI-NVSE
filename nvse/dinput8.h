@@ -4,8 +4,6 @@
 #include <dinput.h>
 #include <queue>
 
-void Hook_DirectInput8Create_Init();
-
 enum
 {
 	kDeviceType_Keyboard = 1,
@@ -58,8 +56,6 @@ public:
 };
 
 template <typename T> T* ISingleton <T>::ms_Singleton = 0;
-
-#pragma warning(pop)
 
 
 class DIHookControl : public ISingleton <DIHookControl>

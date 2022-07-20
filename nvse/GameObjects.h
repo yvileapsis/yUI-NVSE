@@ -115,8 +115,8 @@ public:
 
 	TESForm*			baseForm;				// 020
 	
-	Float32				rotX, rotY, rotZ;		// 024 - either public or accessed via simple inline accessor common to all child classes
-	Float32				posX, posY, posZ;		// 030 - seems to be private
+	NiPoint3			rot;		// 024 - either public or accessed via simple inline accessor common to all child classes
+	NiPoint3			pos;		// 030 - seems to be private
 	Float32				scale;					// 03C 
 
 	TESObjectCELL*		parentCell;				// 040
@@ -131,8 +131,8 @@ public:
 	bool					IsDeleted() const { return flags & kFormFlags_Deleted; }
 	bool					IsDestroyed() { return flags & kFormFlags_Destroyed; }
 
-	NiPoint3*				PosVector() { return (NiPoint3*)&posX; }
-	CoordXY*				PosXY() { return (CoordXY*)&posX; }
+	NiPoint3*				PosVector() { return (NiPoint3*)&pos; }
+	CoordXY*				PosXY() { return (CoordXY*)&pos; }
 	
 	bool					Update3D();
 	bool					Update3D_v1c();	// Less worse version as used by some modders
@@ -175,7 +175,8 @@ public:
 	NiNode*					GetNiNode();
 	NiAVObject*				GetNifBlock(UInt32 pcNode, const char* blockName);
 	bool					IsCrimeOrEnemy();
-	BSBound*				GetBoundingBox() const;
+	NiPoint3				GetCenter() const;
+	NiPoint3				GetDimensions() const;
 	__forceinline Float32	GetScale() { return ThisCall<float>(0x567400, this); }
 
 

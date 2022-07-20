@@ -3,27 +3,38 @@
 #include <GameData.h>
 #include <PluginAPI.h>
 
+#include <dinput8.h>
+
 extern DataHandler* g_dataHandler;
 extern NVSEScriptInterface* g_scriptInterface;
 extern NVSEArrayVarInterface* g_arrayInterface;
+extern DIHookControl* g_DIHook;
 
 void InitFunctions()
 {
 	HMODULE jg = GetModuleHandle("johnnyguitar");
-	if (jg)
-	{
-		JG_WorldToScreen = (_JG_WorldToScreen) GetProcAddress(jg, "JG_WorldToScreen");
-	}
+	if (jg) JG_WorldToScreen = (_JG_WorldToScreen) GetProcAddress(jg, "JG_WorldToScreen");
+
 	g_MenuHUDMain = HUDMainMenu::GetSingleton();
 	g_TileReticleCenter = g_MenuHUDMain->tileReticleCenter;
 }
 
-Script* JIPObjectDimensions;
-
-Float32 GetObjectDimensions(TESObjectREFR* object)
+bool IsKeyPressed(UInt32 key, UInt32 flags)
 {
-	if (!JIPObjectDimensions) JIPObjectDimensions = CompileExpression(R"((this).GetObjectDimensions Z)");
+	return g_DIHook->IsKeyPressed(key, flags);
+}
+
+Script* JIPGetAuxVarOrDefault;
+Float32 GetJIPAuxVarOrDefault(const char* auxvar, SInt32 index, Float32 def)
+{
+	if (!JIPGetAuxVarOrDefault) JIPGetAuxVarOrDefault = CompileScript(R"(Begin Function { string_var auxvar, int index, float def }
+		if PlayerRef.AuxiliaryVariableGetType (auxvar) index
+			SetFunctionValue (PlayerRef.AuxiliaryVariableGetFloat (auxvar) index)
+		else
+			SetFunctionValue def
+		endif
+	End)");
 	NVSEArrayElement element;
-	g_scriptInterface->CallFunction(JIPObjectDimensions, object, nullptr, &element, 0);
+	g_scriptInterface->CallFunction(JIPGetAuxVarOrDefault, nullptr, nullptr, &element, 3, auxvar, index, def);
 	return element.num;
 }

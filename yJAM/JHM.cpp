@@ -19,8 +19,8 @@ namespace JHM
 	UInt32				depth				= 0;
 
 	std::map<TESObjectREFR*, UInt32>	g_HitMarkers;
-	std::unordered_set<Tile*>			g_UsefulTiles;
-	std::unordered_set<Tile*>			g_UselessTiles;
+	std::unordered_set<Tile*>			g_TilesFree;
+	std::unordered_set<Tile*>			g_TilesInUse;
 
 	void HandleINI(const std::string& iniPath)
 	{
@@ -95,22 +95,22 @@ namespace JHM
 		const auto val = tile->GetValue(kTileValue_alpha);
 		if (!val) return false;
 		if (val->num > 0) return true;
-		g_UsefulTiles.emplace(tile);
+		g_TilesFree.emplace(tile);
 		return false;
 	}
 
 	Tile* CreateTileForHitMarker()
 	{
 		Tile* tile;
-		if (g_UsefulTiles.empty()) {
+		if (g_TilesFree.empty()) {
 			tile = tileMain->GetChild("JHMContainer")->AddTileFromTemplate("JHMMarker");
 		}
 		else {
-			const auto iter = g_UsefulTiles.begin();
+			const auto iter = g_TilesFree.begin();
 			tile = *iter;
-			g_UsefulTiles.erase(iter);
+			g_TilesFree.erase(iter);
 		}
-		g_UselessTiles.emplace(tile);
+		g_TilesInUse.emplace(tile);
 		return tile;
 	}
 
@@ -146,7 +146,7 @@ namespace JHM
 		for (const auto& snd : g_HitMarkers | std::views::values) CreateHitMarker(snd);
 		g_HitMarkers.clear();
 
-		for (auto i = g_UselessTiles.begin(); i != g_UselessTiles.end(); ) if (!ProcessUselessTiles(*i)) g_UselessTiles.erase(i++); else ++i;
+		for (auto i = g_TilesInUse.begin(); i != g_TilesInUse.end(); ) if (!ProcessUselessTiles(*i)) g_TilesInUse.erase(i++); else ++i;
 
 		tileMain->SetFloat(TraitNameToID("_JDCOffset"), g_MenuHUDMain->tile->GetChild("JDC")->GetValueFloat(TraitNameToID("_JDCOffset")));
 		tileMain->SetFloat(TraitNameToID("_JDCLength"), g_MenuHUDMain->tile->GetChild("JDC")->GetValueFloat(TraitNameToID("_JDCLength")));

@@ -22,4 +22,6 @@ __forceinline bool GetPCUsingScope()
 typedef bool (*_JG_WorldToScreen)(NiPoint3* posXYZ, NiPoint3& posOut, float offscreenHandling);
 inline _JG_WorldToScreen JG_WorldToScreen;
 
-Float32 GetObjectDimensions(TESObjectREFR* object);
+Float32 GetJIPAuxVarOrDefault(const char* auxvar, SInt32 index, Float32 def);
+
+bool IsKeyPressed(UInt32 key, UInt32 flags = 0);

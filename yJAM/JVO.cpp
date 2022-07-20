@@ -15,9 +15,15 @@ namespace JVO
 	
 	SInt64				visible				= 0;
 	UInt32				depth				= 0;
+	bool				show				= true;
+	bool				doonce				= false;
 
-	std::unordered_set<Tile*>					g_UsefulTiles;
-	std::unordered_map<Tile*, NiPoint3>			g_UselessTiles;
+	Float32				offsetHUDMarker		= 0;
+	Float32				offsetHUDText		= 0;
+	Float32				offsetWorld			= 20;
+
+	std::unordered_set<Tile*>					g_TilesFree;
+	std::unordered_map<Tile*, NiPoint3>			g_TilesInUse;
 
 	void HandleINI(const std::string& iniPath)
 	{
@@ -26,8 +32,29 @@ namespace JVO
 
 		if (const auto errVal = ini.LoadFile(iniPath.c_str()); errVal == SI_FILE) { return; }
 
-//		g_JDC = ini.GetOrCreate("JustMods", "JDC", 1.0, nullptr);
-//		g_JDC_Dynamic = ini.GetOrCreate("JDC", "Dynamic", 1.0, nullptr);
+		g_JVO						= ini.GetOrCreate("JustMods", "JVO", 1.0, nullptr);
+		g_JVO_Key					= ini.GetOrCreate("JVO", "Key", 49.0, nullptr);
+		g_JVO_Toggle				= ini.GetOrCreate("JVO", "Toggle", 1.0, nullptr);
+		g_JVO_OffscreenHandling		= ini.GetOrCreate("JVO", "OffscreenHandling", 0.0, nullptr);
+		g_JVO_DistanceHandling		= ini.GetOrCreate("JVO", "DistanceHandling", 2.0, nullptr);
+		g_JVO_DistanceSystem		= ini.GetOrCreate("JVO", "DistanceSystem", 1.0, nullptr);
+		g_JVO_TextHandling			= ini.GetOrCreate("JVO", "TextHandling", 1.0, nullptr);
+		g_JVO_TextSystem			= ini.GetOrCreate("JVO", "TextSystem", 1.0, nullptr);
+		g_JVO_Alpha					= ini.GetOrCreate("JVO", "Alpha", 0.0, nullptr);
+		g_JVO_AlphaMult				= ini.GetOrCreate("JVO", "AlphaMult", 0.6, nullptr);
+		g_JVO_Height				= ini.GetOrCreate("JVO", "Height", 36.0, nullptr);
+		g_JVO_Width					= ini.GetOrCreate("JVO", "Width", 24.0, nullptr);
+		g_JVO_OffsetHeight			= ini.GetOrCreate("JVO", "OffsetHeight", 0.02, nullptr);
+		g_JVO_OffsetWidth			= ini.GetOrCreate("JVO", "OffsetWidth", 0.01, nullptr);
+		g_JVO_AltColor				= ini.GetOrCreate("JVO", "AltColor", 1, nullptr);
+		g_JVO_Radius				= ini.GetOrCreate("JVO", "Radius", 0.06, nullptr);
+		g_JVO_DistanceMin			= ini.GetOrCreate("JVO", "DistanceMin", -1.0, nullptr);
+		g_JVO_DistanceMax			= ini.GetOrCreate("JVO", "DistanceMax", -1.0, nullptr);
+		g_JVO_EnableOut				= ini.GetOrCreate("JVO", "EnableOut", 1.0, nullptr);
+		g_JVO_EnableSighting		= ini.GetOrCreate("JVO", "EnableSighting", 1.0, nullptr);
+		g_JVO_EnableScope			= ini.GetOrCreate("JVO", "EnableScope", 0.0, nullptr);
+		g_JVO_Font					= ini.GetOrCreate("JVO", "Font", 0.0, nullptr);
+		g_JVO_FontY					= ini.GetOrCreate("JVO", "FontY", 0.0, nullptr);
 
 		if (const auto errVal = ini.SaveFile(iniPath.c_str(), false); errVal == SI_FILE) { return; }
 
@@ -58,11 +85,11 @@ namespace JVO
 
 	void OnRender()
 	{
-		for (auto& [fst, snd] : g_UselessTiles)
+		for (auto& [fst, snd] : g_TilesInUse)
 		{
 			NiPoint3 out;
 			const bool onScreen = JG_WorldToScreen(&snd, out, g_JVO_OffscreenHandling);
-			fst->SetFloat(kTileValue_visible, onScreen && (g_JVO_OffscreenHandling != 2));
+			fst->SetFloat(kTileValue_visible, onScreen || (g_JVO_OffscreenHandling != 2));
 			fst->SetFloat(TraitNameToID("_X"), out.x);
 			fst->SetFloat(TraitNameToID("_Y"), out.y);
 		}
@@ -87,15 +114,9 @@ namespace JVO
 	Tile* CreateTileForVisualObjective(NiPoint3 target)
 	{
 		Tile* tile;
-		if (g_UsefulTiles.empty()) {
-			tile = tileMain->GetChild("JVOContainer")->AddTileFromTemplate("JVOMarker");
-		}
-		else {
-			const auto iter = g_UsefulTiles.begin();
-			tile = *iter;
-			g_UsefulTiles.erase(iter);
-		}
-		g_UselessTiles[tile] = target;
+		if (!g_TilesFree.empty()) { const auto iter = g_TilesFree.begin(); tile = *iter; g_TilesFree.erase(iter); }
+		else tile = tileMain->GetChild("JVOContainer")->AddTileFromTemplate("JVOMarker");
+		g_TilesInUse[tile] = target;
 		return tile;
 	}
 
@@ -117,16 +138,20 @@ namespace JVO
 			if (const auto niblock = target->GetNifBlock(0, "Bip01 Head"))
 			{
 				in = niblock->m_worldTransform.pos;
-				in.z += 20;
+				in.z += offsetWorld;
 			}
 			else
-			// TODO: real GetObjectDimensions
-			// if (const auto bounds = target->GetBoundingBox())
-			//(bounds->centre.z + target->GetScale() * bounds->dimensions.z)
-				in.z += 0.5 * GetObjectDimensions(target) + 20;
+			{
+				const auto center = target->GetCenter();
+				in.x += center.x;
+				in.y += center.y;
+				in.z += center.z + offsetWorld;
+			}
 		}
 
 		const auto tile = CreateTileForVisualObjective(in);
+
+		tile->SetFloat(TraitNameToID("_JVOHostile"), depth++);
 
 		// TODO: fix this so it doesn't rely on altMarker but rather somehow checks for target to be player marker
 		const auto distance = !altMarker ? g_player->GetDistance(target) : g_player->GetDistance2D(target);
@@ -136,7 +161,6 @@ namespace JVO
 		if (g_JVO_DistanceMin >= 0 && distance < g_JVO_DistanceMin) inDistance = false;
 
 		const bool inFocus = tile->GetValueFloat(TraitNameToID("_JVOInFocus"));
-
 
 		if (g_JVO_AltColor) tile->SetFloat(TraitNameToID("_JVOHostile"), target->IsCrimeOrEnemy());
 
@@ -188,6 +212,15 @@ namespace JVO
 		if (GetPCUsingScope()) visible = -1 * static_cast<SInt64>(g_JVO_EnableScope);
 		else if (GetPCUsingIronSights()) visible = g_JVO_EnableSighting;
 		else visible = g_JVO_EnableOut;
+
+		if (g_JVO_Toggle)
+		{
+			if (!IsKeyPressed(g_JVO_Key)) doonce = true;
+			else if (doonce) { doonce = false; show = true - show; }
+			if (!show) visible = 0;
+		}
+		else if (!IsKeyPressed(g_JVO_Key)) visible = 0;
+
 		tileMain->SetFloat(TraitNameToID("_JVOVisible"), visible);
 
 		if (!visible) return;
@@ -195,13 +228,20 @@ namespace JVO
 		tileMain->SetFloat(TraitNameToID("_JVOInCombat"), g_player->pcInCombat);
 		tileMain->SetFloat(TraitNameToID("_JVOAlphaCW"), g_MenuHUDMain->tileHitPointsCompass->GetValueFloat(kTileValue_alpha));
 
-		const auto targets = g_player->GetCurrentQuestObjectiveTargets();
-		const auto target = g_player->GetPlacedMarkerOrTeleportLink();
+		offsetHUDMarker = GetJIPAuxVarOrDefault("*_JVOOffset", 0, 0);
+		offsetHUDText = GetJIPAuxVarOrDefault("*_JVOOffset", 1, 0);
+		offsetWorld = GetJIPAuxVarOrDefault("*_JVOOffset", 2, 20);
 
-		for (const auto fst : g_UselessTiles | std::views::keys) { g_UsefulTiles.emplace(fst); fst->SetFloat(kTileValue_visible, 0); }
-		g_UselessTiles.clear();
+		tileMain->SetFloat(TraitNameToID("_JVOOffsetMarker"), offsetHUDMarker);
+		tileMain->SetFloat(TraitNameToID("_JVOOffsetText"), offsetHUDText);
 
-		if (target)						AddVisualObjective(1, target);
-		for (const auto i : *targets)	AddVisualObjective(0, i->target, i->teleportLinks.size ? i->teleportLinks.data->door : nullptr);
+		for (const auto fst : g_TilesInUse | std::views::keys) { g_TilesFree.emplace(fst); fst->SetFloat(kTileValue_visible, 0); }
+		g_TilesInUse.clear();
+
+		depth = 0;
+		if (const auto target = g_player->GetPlacedMarkerOrTeleportLink())
+			AddVisualObjective(1, target);
+		for (const auto i : *g_player->GetCurrentQuestObjectiveTargets())
+			AddVisualObjective(0, i->target, i->teleportLinks.size ? i->teleportLinks.data->door : nullptr);
 	}
 }

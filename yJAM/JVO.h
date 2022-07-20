@@ -20,7 +20,6 @@ inline Float64	g_JVO_OffsetHeight		= 0.02;
 inline Float64	g_JVO_OffsetWidth		= 0.01;
 
 inline UInt32	g_JVO_AltColor			= 1;
-inline UInt32	g_JVO_Down				= 0;
 
 inline Float64	g_JVO_Radius			= 0.06;
 inline Float64	g_JVO_DistanceMin		= -1.0;

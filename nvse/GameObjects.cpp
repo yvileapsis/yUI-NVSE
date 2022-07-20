@@ -666,32 +666,80 @@ bool Actor::IsAnimActionReload() const
 	return s_reloads.contains(currentAnimAction);
 }
 
-
-__declspec(naked) BSBound *TESObjectREFR::GetBoundingBox() const
+NiPoint3 TESObjectREFR::GetCenter() const
 {
-	__asm
-	{
-		mov		eax, [ecx]
-		cmp		dword ptr [eax+0xFC], 0x8D0360
-		jnz		getFromNode
-		mov		eax, [ecx+0x68]
-		test	eax, eax
-		jz		getFromNode
-		cmp		[eax+0x28], 1
-		ja		getFromNode
-		mov		eax, [eax+0x224]
-		retn
-	getFromNode:
-		mov		eax, [ecx+0x64]
-		test	eax, eax
-		jz		done
-		mov		eax, [eax+0x14]
-		test	eax, eax
-		jz		done
-		mov		edx, 0x10C2B64
-		mov		ecx, eax
-		jmp		NiObjectNET::GetExtraData
-	done:
-		retn
-	}
+	if (this->IsActor())
+		if (const auto baseProcess = ((Actor*)this)->baseProcess; baseProcess && baseProcess->processLevel != 1)
+			return baseProcess->GetBoundingBox()->centre;
+	if (this->renderState && this->renderState->niNode14)
+		if (const auto bounds = reinterpret_cast<BSBound*>(this->renderState->niNode14->GetExtraData(kVtbl_BSBound)))
+			return bounds->centre;
+	if (this->baseForm && this->baseForm->IsBoundObject())
+		if (const auto bounds = (reinterpret_cast<TESBoundObject*>(this->baseForm)))
+		{
+			NiPoint3 ni3 {};
+			ni3.x = abs(bounds->right.x - bounds->left.x) / 2;
+			ni3.y = abs(bounds->right.y - bounds->left.y) / 2;
+			ni3.z = abs(bounds->right.z - bounds->left.z) / 2;
+
+			const auto rot = this->rot;
+
+			const auto sX = sin(rot.x);
+			const auto sY = sin(rot.y);
+			const auto sZ = sin(rot.z);
+			const auto cX = cos(rot.x);
+			const auto cY = cos(rot.y);
+			const auto cZ = cos(rot.z);
+
+			const Float32 newX = (ni3.x * cZ + ni3.y * sZ) * cY + ni3.z * -sY;
+			const Float32 newY = (ni3.x * -sZ + ni3.y * cZ) * cX + ((ni3.x * cZ + ni3.y * sZ) * sY + ni3.z * cY) * sX;
+			const Float32 newZ = (ni3.x * -sZ + ni3.y * cZ) * -sX + ((ni3.x * cZ + ni3.y * sZ) * sY + ni3.z * cY) * cX;
+
+			ni3.x = newX;
+			ni3.y = newY;
+			ni3.z = newZ;
+
+			return ni3;
+		}
+	const NiPoint3 ni3{};
+	return ni3;
+}
+
+NiPoint3 TESObjectREFR::GetDimensions() const
+{
+	if (this->IsActor())
+		if (const auto baseProcess = ((Actor*)this)->baseProcess; baseProcess && baseProcess->processLevel != 1)
+			return baseProcess->GetBoundingBox()->dimensions;
+	if (this->renderState && this->renderState->niNode14)
+		if (const auto bounds = reinterpret_cast<BSBound*>(this->renderState->niNode14->GetExtraData(kVtbl_BSBound)))
+			return bounds->dimensions;
+	if (this->baseForm && this->baseForm->IsBoundObject())
+		if (const auto bounds = (reinterpret_cast<TESBoundObject*>(this->baseForm)))
+		{
+			NiPoint3 ni3 {};
+			ni3.x = abs(bounds->right.x - bounds->left.x) / 2;
+			ni3.y = abs(bounds->right.y - bounds->left.y) / 2;
+			ni3.z = abs(bounds->right.z - bounds->left.z) / 2;
+
+			const auto rot = this->rot;
+
+			const auto sX = sin(rot.x);
+			const auto sY = sin(rot.y);
+			const auto sZ = sin(rot.z);
+			const auto cX = cos(rot.x);
+			const auto cY = cos(rot.y);
+			const auto cZ = cos(rot.z);
+
+			const Float32 newX = (ni3.x * cZ + ni3.y * sZ) * cY + ni3.z * -sY;
+			const Float32 newY = (ni3.x * -sZ + ni3.y * cZ) * cX + ((ni3.x * cZ + ni3.y * sZ) * sY + ni3.z * cY) * sX;
+			const Float32 newZ = (ni3.x * -sZ + ni3.y * cZ) * -sX + ((ni3.x * cZ + ni3.y * sZ) * sY + ni3.z * cY) * cX;
+
+			ni3.x = newX;
+			ni3.y = newY;
+			ni3.z = newZ;
+
+			return ni3;
+		}
+	const NiPoint3 ni3{};
+	return ni3;
 }

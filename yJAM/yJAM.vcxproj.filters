@@ -69,7 +69,7 @@
     <ClCompile Include="JLM.cpp" />
     <ClCompile Include="JBT.cpp" />
     <ClCompile Include="JWH.cpp" />
-    <ClCompile Include="..\nvse\DirectInput8Create.cpp">
+    <ClCompile Include="..\nvse\dinput8.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
   </ItemGroup>
@@ -171,7 +171,7 @@
     <ClInclude Include="JLM.h" />
     <ClInclude Include="JWH.h" />
     <ClInclude Include="JBT.h" />
-    <ClInclude Include="..\nvse\DirectInput8Create.h">
+    <ClInclude Include="..\nvse\dinput8.h">
       <Filter>nvse</Filter>
     </ClInclude>
   </ItemGroup>

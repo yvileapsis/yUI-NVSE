@@ -176,59 +176,6 @@ bool Menu::GetTemplateExists(const char* templateName)
 	return false;
 }
 
-DIHookControl* g_DIHook = nullptr;
-
-__declspec(naked) bool IsShiftHeld()
-{
-	_asm
-	{
-		mov ecx, g_DIHook
-		cmp byte ptr[ecx + 0x12A], 0    // check left shift (DirectX scancode * 7 + 4)
-		jne done
-		cmp byte ptr[ecx + 0x17E], 0    // check right shift (DirectX scancode * 7 + 4)
-
-		done:
-		setne al
-			ret
-	}
-}
-
-_declspec(naked) bool IsAltHeld()
-{
-	_asm
-	{
-		mov edx, g_DIHook
-		cmp byte ptr[edx + 0x18C], 0    // check left alt (DirectX scancode * 7 + 4)
-		setne al
-		ret
-	}
-}
-
-_declspec(naked) bool IsTabHeld()
-{
-	_asm
-	{
-		mov edx, g_DIHook
-		cmp byte ptr[edx + 0x6D], 0    // check tab (DirectX scancode * 7 + 4)
-		setne al
-		ret
-	}
-}
-
-_declspec(naked) bool IsControlHeld()
-{
-	_asm
-	{
-		mov edx, g_DIHook
-		cmp	byte ptr[edx + 0xCF], 0
-		jne	done
-		cmp	byte ptr[edx + 0x44F], 0
-		done:
-		setne al
-			ret
-	}
-}
-
 bool InventoryMenu::IsKeyringOpen()
 {
 	return GetSingleton()->tile->GetValueFloat(*(UInt32*)0x11D9EB8); // Trait_KeyringOpen
@@ -240,85 +187,12 @@ bool DialogMenu::IsNPCTalking()
 	return tile->GetValueFloat(*(UInt32*)0x11D9500); // g_dialogMenu_TraitShowingText
 }
 
-bool MapMenuScrollNotes(MenuSpecialKeyboardInputCode direction)
-{
-	MapMenu* mapMenu = MapMenu::GetSingleton();
-	Tile* tile = NULL;
-
-	if (mapMenu->currentTab == MapMenu::MapMenuTabs::kQuests)
-	{
-		tile = mapMenu->objectiveList.scrollBar;
-	}
-	else if (mapMenu->currentTab == MapMenu::MapMenuTabs::kMisc)
-	{
-		tile = ThisCall<Tile*>(0xA03DA0, mapMenu->tile05C, "MM_TextScrollbar");
-	}
-
-	if (!tile) return false;
-
-	int deltaScroll = direction == kMenu_UpArrow ? -1 : 1;
-	if (IsShiftHeld()) deltaScroll *= 4;
-
-	if (tile->GetValueFloat(kTileValue_visible))
-	{
-		int currentValueTrait = tile->TraitNameToID("_current_value");
-		float currentScroll = tile->GetValueFloat(currentValueTrait);
-
-		currentScroll += deltaScroll;
-		tile->SetFloat(currentValueTrait, currentScroll, 0);
-
-		if (currentScroll != tile->GetValueFloat(currentValueTrait))
-		{
-			int setInCodeTrait = tile->TraitNameToID("_SetInCode");
-			tile->SetFloat(setInCodeTrait, 1.0, 1);
-			tile->SetFloat(setInCodeTrait, 0.0, 1);
-		}
-	}
-	return true;
-}
-
-bool StatsMenuNotesScroll(StatsMenu* statsMenu, MenuSpecialKeyboardInputCode direction)
-{
-	Tile* tile = NULL;
-
-	tile = statsMenu->statusEffListBox.scrollBar;
-	if (!tile) return false;
-
-	Tile* lastChild = statsMenu->tile0F8->children.Tail()->data;
-
-	if (ThisCall<bool>(0xA040A0, tile) || lastChild->GetValueFloat(kTileValue_visible))
-	{
-		int deltaScroll = direction == kMenu_UpArrow ? -1 : 1;
-		if (IsShiftHeld()) deltaScroll *= 4;
-
-		if (statsMenu->tile->GetValue(kTileValue_user0))
-		{
-			tile = lastChild;
-		}
-
-		int currentValueTrait = tile->TraitNameToID("_current_value");
-		float currentScroll = tile->GetValueFloat(currentValueTrait);
-
-		currentScroll += deltaScroll;
-		tile->SetFloat(currentValueTrait, currentScroll, 0);
-
-		if (currentScroll != tile->GetValueFloat(currentValueTrait))
-		{
-			int setInCodeTrait = tile->TraitNameToID("_SetInCode");
-			tile->SetFloat(setInCodeTrait, 1.0, 1);
-			tile->SetFloat(setInCodeTrait, 0.0, 1);
-		}
-	}
-	return true;
-}
-
 
 bool IsInStartMenu()
 {
 	auto menu = StartMenu::GetSingleton();
 	return menu && menu->flags & StartMenu::kInStartMenu;
 }
-
 
 /*
  * Lifted from Stewie's Tweaks

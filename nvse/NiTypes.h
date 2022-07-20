@@ -172,7 +172,22 @@ struct NiQuaternion
 // 24
 class NiMatrix33 {
 public:
-	float data[3][3];
+	union
+	{
+		Float32 dataAlt[9];
+		Float32 data[3][3];
+		struct
+		{
+			NiPoint3 x;
+			NiPoint3 y;
+			NiPoint3 z;
+		};
+	};
+	NiMatrix33()
+	{
+		for (float& i : dataAlt)
+			i = 0;
+	}
 };
 STATIC_ASSERT(sizeof(NiMatrix33) == 0x024);
 

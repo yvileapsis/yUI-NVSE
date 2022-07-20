@@ -1,4 +1,4 @@
-#include "DirectInput8Create.h"
+#include "dinput8.h"
 #include "SafeWrite.h"
 #include <queue>
 
@@ -9,7 +9,6 @@ static const GUID GUID_SysKeyboard	= { 0x6F1D2B61, 0xD5A0, 0x11CF, { 0xBF,0xC7,0
 
 typedef HRESULT (_stdcall * CreateDInputProc)(HINSTANCE, DWORD, REFIID, LPVOID, LPUNKNOWN);
 
-DIHookControl			g_diHookData;
 FramerateTracker		g_framerateTracker;
 static CreateDInputProc	DICreate_RealFunc;
 
@@ -221,14 +220,6 @@ static HRESULT _stdcall Hook_DirectInput8Create_Execute(HINSTANCE instance, DWOR
 	return DI_OK;
 }
 
-void Hook_DirectInput8Create_Init()
-{
-	UInt32 thunkAddress = 0x00FDF02C;
-
-	DICreate_RealFunc = (CreateDInputProc)*(DWORD *)thunkAddress;
-	SafeWrite32(thunkAddress, (DWORD)Hook_DirectInput8Create_Execute);
-}
-
 DIHookControl::DIHookControl()
 {
 	memset(&m_keys, 0, sizeof(m_keys));
@@ -260,7 +251,7 @@ bool DIHookControl::IsKeyPressed(UInt32 keycode, UInt32 flags)
 	if((flags & kFlag_IgnoreDisabled_Script) && info->scriptDisable)
 		disable = true;
 
-	if(disable)	result = false;
+	if (disable)	result = false;
 
 	return result;
 }
@@ -318,7 +309,7 @@ void DIHookControl::BufferedKeyTap(UInt32 key)
 	DIDEVICEOBJECTDATA data;
 
 	data.uAppData = -1;
-	data.dwTimeStamp = GetTickCount();
+	data.dwTimeStamp = GetTickCount64();
 	data.dwSequence = 0;	// engine doesn't appear to use this and we can't fake it easily
 	data.dwOfs = key;
 	data.dwData = 0x80;
@@ -336,7 +327,7 @@ void DIHookControl::BufferedKeyPress(UInt32 key)
 	DIDEVICEOBJECTDATA data;
 
 	data.uAppData = -1;
-	data.dwTimeStamp = GetTickCount();
+	data.dwTimeStamp = GetTickCount64();
 	data.dwSequence = 0;
 	data.dwOfs = key;
 	data.dwData = 0x80;
@@ -349,7 +340,7 @@ void DIHookControl::BufferedKeyRelease(UInt32 key)
 	DIDEVICEOBJECTDATA data;
 
 	data.uAppData = -1;
-	data.dwTimeStamp = GetTickCount();
+	data.dwTimeStamp = GetTickCount64();
 	data.dwSequence = 0;
 	data.dwOfs = key;
 	data.dwData = 0x00;
@@ -510,7 +501,7 @@ m_averageFrameTime(0)
 
 void FramerateTracker::Update(void)
 {
-	DWORD time = GetTickCount();
+	DWORD time = GetTickCount64();
 
 	// calculate current frame time
 	m_lastFrameLength = (float)(time - m_lastTime) / 1000.0f;

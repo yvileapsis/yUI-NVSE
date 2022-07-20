@@ -109,7 +109,7 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\nvse\DirectInput8Create.cpp" />
+    <ClCompile Include="..\nvse\dinput8.cpp" />
     <ClCompile Include="..\nvse\GameAPI.cpp" />
     <ClCompile Include="..\nvse\GameBSExtraData.cpp" />
     <ClCompile Include="..\nvse\GameData.cpp" />
@@ -151,7 +151,7 @@
   <ItemGroup>
     <ClInclude Include="..\libraries\json.h" />
     <ClInclude Include="..\nvse\CommandTable.h" />
-    <ClInclude Include="..\nvse\DirectInput8Create.h" />
+    <ClInclude Include="..\nvse\dinput8.h" />
     <ClInclude Include="..\nvse\GameAPI.h" />
     <ClInclude Include="..\nvse\GameBSExtraData.h" />
     <ClInclude Include="..\nvse\GameData.h" />

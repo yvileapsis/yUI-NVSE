@@ -532,10 +532,10 @@ public:
 	virtual void			Unk_179();
 	virtual void			Unk_17A();
 	virtual void			Unk_17B();
-	virtual void			Unk_17C();
+	virtual BSBound*		GetBoundingBox();
 	virtual void			Unk_17D();
 	virtual void			Unk_17E();
-	virtual void			Unk_17F();
+	virtual bool			IsTeammate();
 	virtual void			Unk_180();
 	virtual void			Unk_181();
 	virtual void			Unk_182();
