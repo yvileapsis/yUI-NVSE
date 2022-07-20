@@ -185,7 +185,7 @@ public:
 			m_curr = rhs.m_curr;
 			return *this;
 		}
-		bool		operator!=(const Iterator& rhs) { return m_curr != rhs.m_curr && m_curr->next; }
+		bool		operator!=(const Iterator& rhs) { return m_curr != rhs.m_curr && m_curr->data; }
 
 		Iterator(Node* node = nullptr) : m_curr(node) {}
 		Iterator(TList& _list) : m_curr(&_list.first) {}
@@ -1009,8 +1009,6 @@ extern OSInputGlobals** g_inputGlobals;
 
 //TESAnimGroup::AnimGroupInfo* GetGroupInfo(UInt8 groupId);
 UInt32 GetSequenceType(UInt8 groupId);
-
-NiAVObject* __fastcall GetNifBlock(TESObjectREFR* thisObj, UInt32 pcNode, const char* blockName);
 
 #define GetExtraType(xDataList, Type) (Extra ## Type*)xDataList.GetByType(kExtraData_ ## Type)
 

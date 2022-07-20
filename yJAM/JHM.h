@@ -35,5 +35,5 @@ namespace JHM
 {
 	void Initialize();
 	void MainLoop();
-	void OnHitHandler(Actor*, void*);
+	void OnHit(Actor*, void*);
 }

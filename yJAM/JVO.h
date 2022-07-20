@@ -30,8 +30,8 @@ inline UInt32	g_JVO_EnableOut			= 1;
 inline UInt32	g_JVO_EnableSighting	= 1;
 inline UInt32	g_JVO_EnableScope		= 0;
 
-inline UInt32	g_JVO_Font				= 1;
-inline Float64	g_JVO_FontY				= 1;
+inline UInt32	g_JVO_Font				= 0;
+inline Float64	g_JVO_FontY				= 0.0;
 
 namespace JVO
 {

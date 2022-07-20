@@ -8,6 +8,7 @@
 #include <JDC.h>
 #include <JHM.h>
 
+#include "JVO.h"
 
 #define yJAM_VERSION 0.1
 #define yJAM_VERSION_STR "0.1"
@@ -21,6 +22,10 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	{
 		g_player = PlayerCharacter::GetSingleton();
 		g_dataHandler = DataHandler::GetSingleton();
+
+		InitFunctions();
+		EventLayer();
+
 		Log(FormatString("%s", yJAM_VERSION_STR), 2);
 
 		PrintAndClearQueuedConsoleMessages();
@@ -30,14 +35,15 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	{
 		if (g_JDC) JDC::MainLoop();
 		if (g_JHM) JHM::MainLoop();
+		if (g_JVO) JVO::MainLoop();
 
 		if (iDoOnce == 0 && !MenuMode()) {
 			iDoOnce++;
 
-			InitFunctions();
-			EventLayer();
+
 			if (g_JDC) JDC::Initialize();
 			if (g_JHM) JHM::Initialize();
+			if (g_JVO) JVO::Initialize();
 		}
 		
 	}
@@ -86,7 +92,7 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	g_nvseInterface = const_cast<NVSEInterface*>(nvse);
 	g_messagingInterface = static_cast<NVSEMessagingInterface*>(nvse->QueryInterface(kInterface_Messaging));
 	g_messagingInterface->RegisterListener(g_pluginHandle, "NVSE", MessageHandler);
-
+	
 	if (nvse->isEditor)	return true;
 
 	g_stringInterface = static_cast<NVSEStringVarInterface*>(nvse->QueryInterface(kInterface_StringVar));
@@ -103,6 +109,7 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	ExtractArgsEx = g_scriptInterface->ExtractArgsEx;
 	CallFunctionAlt = g_scriptInterface->CallFunctionAlt;
 	CompileExpression = g_scriptInterface->CompileExpression;
+	CompileScript = g_scriptInterface->CompileScript;
 
 	g_eventInterface = static_cast<NVSEEventManagerInterface*>(nvse->QueryInterface(kInterface_EventManager));
 

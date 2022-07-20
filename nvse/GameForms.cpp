@@ -669,6 +669,18 @@ const char* TESPackage::PackageTime::DayForCode(UInt8 dayCode)
 	return dayCode < sizeof TESPackage_DayStrings ? TESPackage_DayStrings[dayCode] : "";
 }
 
+BGSQuestObjective* TESQuest::GetObjective(UInt32 objectiveID) const
+{
+	auto iter = lVarOrObjectives.Head();
+	do
+	{
+		const auto objective = (BGSQuestObjective*)iter->data;
+		if (objective && IS_TYPE(objective, BGSQuestObjective) && (objective->objectiveId == objectiveID))
+			return objective;
+	} while (iter = iter->next);
+	return NULL;
+}
+
 const char* TESPackage::PackageTime::MonthForCode(UInt8 monthCode)
 {
 	monthCode += 1;

@@ -1,15 +1,14 @@
 #include <JHM.h>
 
-#include <GameTiles.h>
-#include <GameUI.h>
-#include <GameObjects.h>
-#include <GameSettings.h>
 #include <GameProcess.h>
-#include <ranges>
+#include <GameUI.h>
 #include <functions.h>
+
+#include <ranges>
 #include <unordered_set>
 
 #include <SimpleINILibrary.h>
+
 
 namespace JHM
 {
@@ -19,9 +18,9 @@ namespace JHM
 	SInt64				visible				= 0;
 	UInt32				depth				= 0;
 
-	std::map<TESObjectREFR*, UInt32> g_HitMarkers;
-	std::unordered_set<Tile*> g_UsefulTiles;
-	std::unordered_set<Tile*> g_UselessTiles;
+	std::map<TESObjectREFR*, UInt32>	g_HitMarkers;
+	std::unordered_set<Tile*>			g_UsefulTiles;
+	std::unordered_set<Tile*>			g_UselessTiles;
 
 	void HandleINI(const std::string& iniPath)
 	{
@@ -57,20 +56,20 @@ namespace JHM
 	{
 		HandleINI(GetCurPath() + R"(\Data\Config\JustMods.ini)");
 
-		if (tileMain->GetChild("JHM")) tileMain->GetChild("JHM")->Destroy(true);
-		tileMain->AddTileFromTemplate("JHMTemp");
+		if (tileMain->GetChild("JHM")) tileMain->GetChild("JHMContainer")->Destroy(true);
+		tileMain->AddTileFromTemplate("JHMContainer");
 
-		tileMain->SetFloat(Tile::TraitNameToID("_JHMAlphaBase"), g_JHM_Alpha);
-		tileMain->SetFloat(Tile::TraitNameToID("_JHMLengthBase"), g_JHM_Length);
-		tileMain->SetFloat(Tile::TraitNameToID("_JHMWidthBase"), g_JHM_Width);
-		tileMain->SetFloat(Tile::TraitNameToID("_JHMOffsetBase"), g_JHM_Offset);
+		tileMain->SetFloat(TraitNameToID("_JHMAlphaBase"), g_JHM_Alpha);
+		tileMain->SetFloat(TraitNameToID("_JHMLengthBase"), g_JHM_Length);
+		tileMain->SetFloat(TraitNameToID("_JHMWidthBase"), g_JHM_Width);
+		tileMain->SetFloat(TraitNameToID("_JHMOffsetBase"), g_JHM_Offset);
 
-		tileMain->SetFloat(Tile::TraitNameToID("_JHMJDCLength"), g_JHM_Dynamic & 1);
-		tileMain->SetFloat(Tile::TraitNameToID("_JHMJDCOffset"), g_JHM_Dynamic & 2);
+		tileMain->SetFloat(TraitNameToID("_JHMJDCLength"), g_JHM_Dynamic & 1);
+		tileMain->SetFloat(TraitNameToID("_JHMJDCOffset"), g_JHM_Dynamic & 2);
 
-		tileMain->GradualSetFloat(Tile::TraitNameToID("_JHMGlobalShaker"), -0.05, 0.05, 0.15, GradualSetFloat::kGradualSetFloat_StartToEndPerpetual);
+		tileMain->GradualSetFloat(TraitNameToID("_JHMGlobalShaker"), -0.05, 0.05, 0.15, GradualSetFloat::kGradualSetFloat_StartToEndPerpetual);
 
-		tileMain->SetFloat(Tile::TraitNameToID("_JHMVisible"), visible = 0);
+		tileMain->SetFloat(TraitNameToID("_JHMVisible"), visible = 0);
 	}
 
 	void Initialize()
@@ -87,7 +86,7 @@ namespace JHM
 		SetNativeEventHandler("JHM:Reset", reinterpret_cast<EventHandler>(Reset));
 		DispatchEvent("JHM:Reset", nullptr);
 
-		SetNativeEventHandler("yJAM:JIP:OnHit", reinterpret_cast<EventHandler>(OnHitHandler));
+		SetNativeEventHandler("yJAM:JIP:OnHit", reinterpret_cast<EventHandler>(OnHit));
 	}
 
 	bool ProcessUselessTiles(Tile* tile)
@@ -100,40 +99,36 @@ namespace JHM
 		return false;
 	}
 
-	void CreateHitMarker(UInt32 flags)
+	Tile* CreateTileForHitMarker()
 	{
 		Tile* tile;
 		if (g_UsefulTiles.empty()) {
-			tile = tileMain->GetChild("JHM")->AddTileFromTemplate("JHMInjected");
-		} else {
+			tile = tileMain->GetChild("JHMContainer")->AddTileFromTemplate("JHMMarker");
+		}
+		else {
 			const auto iter = g_UsefulTiles.begin();
 			tile = *iter;
 			g_UsefulTiles.erase(iter);
 		}
+		g_UselessTiles.emplace(tile);
+		return tile;
+	}
 
-		tile->SetFloat(Tile::TraitNameToID("_JHMDepth"), depth++);
+	void CreateHitMarker(UInt32 flags)
+	{
+		const auto tile = CreateTileForHitMarker();
+
+		tile->SetFloat(TraitNameToID("_JHMDepth"), depth++);
 
 		tile->SetFloat(kTileValue_systemcolor, 1 + static_cast<bool>(flags & kHitMarkerAltColor));
 
-		tile->SetFloat(Tile::TraitNameToID("_JHMModeOffset"), static_cast<bool>(flags & kHitMarkerOffset));
-		tile->SetFloat(Tile::TraitNameToID("_JHMModeShake"), static_cast<bool>(flags & kHitMarkerShake));
-		tile->SetFloat(Tile::TraitNameToID("_JHMModeRotate"), static_cast<bool>(flags & kHitMarkerRotate));
+		tile->SetFloat(TraitNameToID("_JHMModeOffset"), static_cast<bool>(flags & kHitMarkerOffset));
+		tile->SetFloat(TraitNameToID("_JHMModeShake"), static_cast<bool>(flags & kHitMarkerShake));
+		tile->SetFloat(TraitNameToID("_JHMModeRotate"), static_cast<bool>(flags & kHitMarkerRotate));
 
-		if (flags & kHitMarkerHalfAlpha) tile->SetFloat(Tile::TraitNameToID("_JHMAlphaMult"), 0.5);
+		if (flags & kHitMarkerHalfAlpha) tile->SetFloat(TraitNameToID("_JHMAlphaMult"), 0.5);
 
-		tile->GradualSetFloat(Tile::TraitNameToID("_JHMCounter"), 0, 1, (flags & kHitMarkerDouble) ? 2 * g_JHM_Seconds : g_JHM_Seconds, GradualSetFloat::kGradualSetFloat_StartToEnd);
-
-		g_UselessTiles.emplace(tile);
-	}
-
-	__forceinline bool GetPCUsingIronSights()
-	{
-		return g_Player->ironSightNode && g_Player->baseProcess->IsWeaponOut() || g_Player->baseProcess->IsAiming();
-	}
-
-	__forceinline bool GetPCUsingScope()
-	{
-		return g_MenuHUDMain->isUsingScope;
+		tile->GradualSetFloat(TraitNameToID("_JHMCounter"), 0, 1, (flags & kHitMarkerDouble) ? 2 * g_JHM_Seconds : g_JHM_Seconds, GradualSetFloat::kGradualSetFloat_StartToEnd);
 	}
 
 	void MainLoop()
@@ -143,7 +138,7 @@ namespace JHM
 		if (GetPCUsingScope()) visible = -1 * static_cast<SInt64>(g_JHM_EnableScope);
 		else if (GetPCUsingIronSights()) visible = g_JHM_EnableSighting;
 		else visible = g_JHM_EnableOut;
-		tileMain->SetFloat(Tile::TraitNameToID("_JHMVisible"), visible);
+		tileMain->SetFloat(TraitNameToID("_JHMVisible"), visible);
 
 		if (!visible) { g_HitMarkers.clear(); return; }
 
@@ -153,15 +148,15 @@ namespace JHM
 
 		for (auto i = g_UselessTiles.begin(); i != g_UselessTiles.end(); ) if (!ProcessUselessTiles(*i)) g_UselessTiles.erase(i++); else ++i;
 
-		tileMain->SetFloat(Tile::TraitNameToID("_JDCOffset"), g_MenuHUDMain->tile->GetChild("JDC")->GetValueFloat(Tile::TraitNameToID("_JDCOffset")));
-		tileMain->SetFloat(Tile::TraitNameToID("_JDCLength"), g_MenuHUDMain->tile->GetChild("JDC")->GetValueFloat(Tile::TraitNameToID("_JDCLength")));
+		tileMain->SetFloat(TraitNameToID("_JDCOffset"), g_MenuHUDMain->tile->GetChild("JDC")->GetValueFloat(TraitNameToID("_JDCOffset")));
+		tileMain->SetFloat(TraitNameToID("_JDCLength"), g_MenuHUDMain->tile->GetChild("JDC")->GetValueFloat(TraitNameToID("_JDCLength")));
 	}
 
-	void OnHitHandler(Actor* target, void* args)
+	void OnHit(Actor* target, void* args)
 	{
 		if (!initialized || !visible) return;
 
-		if (!target || target == g_Player) return;
+		if (!target || target == g_player) return;
 
 		UInt32 flags = 0;
 
@@ -169,7 +164,7 @@ namespace JHM
 		{
 			const auto hitData = target->baseProcess->GetLastHitData();
 			if (!hitData || !hitData->source) return;
-			if (hitData->source != g_Player && !hitData->source->isTeammate) return;
+			if (hitData->source != g_player && !hitData->source->isTeammate) return;
 
 			flags |= g_JHM_ModeHit;
 			if (target->lifeState == kLifeState_Dead || target->lifeState == kLifeState_Dying) flags |= g_JHM_ModeDead;

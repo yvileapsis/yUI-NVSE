@@ -165,6 +165,31 @@ AnimGroupID AnimData::GetNextAttackGroupID() const
 
 OSInputGlobals** g_inputGlobals = reinterpret_cast<OSInputGlobals**>(0x11F35CC);
 
+__declspec(naked) NiExtraData* __fastcall NiObjectNET::GetExtraData(UInt32 vtbl) const
+{
+	__asm
+	{
+		push	esi
+		mov		esi, [ecx+0x10]
+		movzx	ecx, word ptr [ecx+0x14]
+		ALIGN 16
+	iterHead:
+		dec		ecx
+		js		retnNULL
+		mov		eax, [esi+ecx*4]
+		test	eax, eax
+		jz		iterHead
+		cmp		[eax], edx
+		jnz		iterHead
+		pop		esi
+		retn
+	retnNULL:
+		xor		eax, eax
+		pop		esi
+		retn
+	}
+}
+
 BSAnimGroupSequence* BSAnimGroupSequence::Get3rdPersonCounterpart() const
 {
 	const auto animData = PlayerCharacter::GetSingleton()->baseProcess->GetAnimData();
@@ -269,7 +294,6 @@ UInt8 TESAnimGroup::GetBaseGroupID() const
 {
 	return groupID;
 }
-
 
 __declspec(naked) TESForm* __stdcall LookupFormByRefID(UInt32 refID)
 {

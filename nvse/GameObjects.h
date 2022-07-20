@@ -148,10 +148,11 @@ public:
 	SInt32					GetItemCount(TESForm* form);
 	void					AddItemAlt(TESForm* item, UInt32 count, float condition, bool doEquip);
 	bool					GetInventoryItems(UInt8 typeID);
-	TESObjectCELL*			GetParentCell();
-	TESWorldSpace*			GetParentWorld();
-	bool					GetInSameCellOrWorld(TESObjectREFR* target);
+	TESObjectCELL*			GetParentCell() { return this->parentCell; };
+	TESWorldSpace*			GetParentWorld() { return ThisCall<TESWorldSpace*>(0x575D70, this); };
+	bool __fastcall			GetInSameCellOrWorld(TESObjectREFR* target) const;
 	Float32 __vectorcall	GetDistance(TESObjectREFR* target);
+	Float32 __vectorcall	GetDistance2D(TESObjectREFR* target);
 	void					SetPos(NiPoint3& posVector);
 	void					SetAngle(NiPoint3& rotVector);
 	bool					MoveToCell(TESForm* worldOrCell, NiPoint3& posVector);
@@ -170,10 +171,13 @@ public:
 	void					SetScale(float scale);
 	bool					IsOwnedByActor(Actor* actor, bool includeFactionOwnership) { return ThisCall<bool>(0x5785E0, this, actor, includeFactionOwnership); };
 	TESObjectREFR*			ResolveOwnership() { return ThisCall<TESObjectREFR*>(0x567790, this); };
-	bool					IsInInterior();
+	bool					IsInInterior() { return ThisCall<bool>(0x575D10, this); };
 	NiNode*					GetNiNode();
-
+	NiAVObject*				GetNifBlock(UInt32 pcNode, const char* blockName);
 	bool					IsCrimeOrEnemy();
+	BSBound*				GetBoundingBox() const;
+	__forceinline Float32	GetScale() { return ThisCall<float>(0x567400, this); }
+
 
 	MEMBER_FN_PREFIX(TESObjectREFR);
 	DEFINE_MEMBER_FN_LONG(_MEMBER_FN_BASE_TYPE, Activate, bool, 0x00573170, TESObjectREFR*, UInt32, UInt32, UInt32);	// Usage Activate(actionRef, 0, 0, 1); found inside Cmd_Activate_Execute as the last call (190 bytes)
@@ -638,6 +642,7 @@ public:
 
 	Float32								GetHitDataValue(UInt32 valueType) const;
 	Float32								GetActorValue(ActorValueCode avcode);
+	bool								GetLineOfSight(TESObjectREFR* actor) { return ThisCall<bool>(0x88B880, this, 0, actor, 1, 0, 0); }
 };
 STATIC_ASSERT(sizeof(Actor) == 0x1B4);
 
@@ -796,9 +801,9 @@ public:
 	UInt32								unk69C;					// 69C
 	AnimData*							unkNotTpsAniMData;		// 6A0
 	UInt32								unk6A4;					// 6A4
-	TESTopic*							topic;					// 6A8
-	UInt32								unk6AC[3];				// 6AC
-	TESQuest*							quest;					// 6B8
+	TList<TESTopic>						topicList;				// 6A8
+	UInt32								unk6AC[2];				// 6AC
+	TESQuest*							activeQuest;			// 6B8
 	TList<BGSQuestObjective>			questObjectiveList;		// 6BC
 	UInt32								unk6C4[39];				// 6C4
 	TESRegion*							currentRegion;			// 760

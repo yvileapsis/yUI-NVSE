@@ -544,7 +544,15 @@ public:
 	UInt16				m_extraDataListCapacity;		// 016 - size ok
 	// 018
 
+	const char* GetName() const { return m_pcName ? m_pcName : "NULL"; }
 	void SetName(const char* newName);
+	NiExtraData* __fastcall GetExtraData(UInt32 vtbl) const;
+	__forceinline bool AddExtraData(NiExtraData* xData)
+	{
+		return ThisCall<bool>(0xA5BA40, this, xData);
+	}
+	void DumpExtraData();
+
 };
 STATIC_ASSERT(sizeof(NiObjectNET) == 0x18);
 
@@ -1662,6 +1670,14 @@ class NiExtraData : public NiObject
 {
 public:
 	NiFixedString m_kName;
+};
+
+// 24
+class BSBound : public NiExtraData
+{
+public:
+	NiPoint3		centre;			// 0C
+	NiPoint3		dimensions;		// 18
 };
 
 class NiTextKeyExtraData : public NiExtraData

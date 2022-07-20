@@ -1,13 +1,12 @@
 #include <JDC.h>
 
-#include <GameTiles.h>
 #include <GameUI.h>
-#include <GameObjects.h>
-#include <GameSettings.h>
 #include <GameProcess.h>
-#include <cmath>
+#include <GameSettings.h>
 
 #include <functions.h>
+
+#include <cmath>
 
 #include <SimpleINILibrary.h>
 
@@ -51,18 +50,18 @@ namespace JDC
 	{
 		HandleINI(GetCurPath() + R"(\Data\Config\JustMods.ini)");
 
-		tileMain->SetFloat(Tile::TraitNameToID("_JDCDynamicOffset"), g_JDC_Dynamic & 1);
-		tileMain->SetFloat(Tile::TraitNameToID("_JDCDynamicLength"), g_JDC_Dynamic & 2);
+		tileMain->SetFloat(TraitNameToID("_JDCDynamicOffset"), g_JDC_Dynamic & 1);
+		tileMain->SetFloat(TraitNameToID("_JDCDynamicLength"), g_JDC_Dynamic & 2);
 
-		tileMain->SetFloat(Tile::TraitNameToID("_JDCLengthMin"), g_JDC_LengthMin);
-		tileMain->SetFloat(Tile::TraitNameToID("_JDCLengthMax"), g_JDC_LengthMax);
+		tileMain->SetFloat(TraitNameToID("_JDCLengthMin"), g_JDC_LengthMin);
+		tileMain->SetFloat(TraitNameToID("_JDCLengthMax"), g_JDC_LengthMax);
 
-		tileMain->SetFloat(Tile::TraitNameToID("_JDCOffsetMin"), g_JDC_OffsetMin);
-		tileMain->SetFloat(Tile::TraitNameToID("_JDCOffsetMax"), g_JDC_OffsetMax);
+		tileMain->SetFloat(TraitNameToID("_JDCOffsetMin"), g_JDC_OffsetMin);
+		tileMain->SetFloat(TraitNameToID("_JDCOffsetMax"), g_JDC_OffsetMax);
 
-		tileMain->SetFloat(Tile::TraitNameToID("_JDCWidth"), g_JDC_Width);
+		tileMain->SetFloat(TraitNameToID("_JDCWidth"), g_JDC_Width);
 
-		tileMain->SetFloat(Tile::TraitNameToID("_JDCVisible"), 0);
+		tileMain->SetFloat(TraitNameToID("_JDCVisible"), 0);
 		g_TileReticleCenter->GetChild("reticle_center")->SetFloat(kTileValue_visible, 1);
 
 		/*
@@ -98,10 +97,10 @@ namespace JDC
 
 	bool IsPlayerWeaponGood()
 	{
-		const auto weaponInfo = g_Player->baseProcess->GetWeaponInfo();
+		const auto weaponInfo = g_player->baseProcess->GetWeaponInfo();
 
 		if (!weaponInfo) return false;
-		if (!g_Player->baseProcess->IsWeaponOut()) return false;
+		if (!g_player->baseProcess->IsWeaponOut()) return false;
 		if (!weaponInfo->weapon->IsRangedWeapon()) return false;
 		// TODO: exclusion list
 		return true;
@@ -111,9 +110,9 @@ namespace JDC
 	{
 		if (!g_JDC_ShotgunAlt) return false;
 
-		const auto weaponInfo = g_Player->baseProcess->GetWeaponInfo();
+		const auto weaponInfo = g_player->baseProcess->GetWeaponInfo();
 
-		if (reinterpret_cast<ContChangesEntry*>(weaponInfo)->GetWeaponNumProjectiles(g_Player) < 2) return false;
+		if (reinterpret_cast<ContChangesEntry*>(weaponInfo)->GetWeaponNumProjectiles(g_player) < 2) return false;
 		return true;
 	}
 
@@ -132,14 +131,9 @@ namespace JDC
 		return spreadCurrent;
 	}
 
-	bool GetPCUsingIronSights()
+	bool GetPCUsingIronSights2()
 	{
-		return g_Player->ironSightNode && g_Player->baseProcess->IsWeaponOut() || g_JDC_NoNodeSighting && g_Player->baseProcess->IsAiming();
-	}
-
-	bool GetPCUsingScope()
-	{
-		return g_MenuHUDMain->isUsingScope;
+		return g_player->ironSightNode && g_player->baseProcess->IsWeaponOut() || g_JDC_NoNodeSighting && g_player->baseProcess->IsAiming();
 	}
 
 	void MainLoop()
@@ -161,7 +155,7 @@ namespace JDC
 			mode = g_JDC_ModeHolstered;
 		else if (GetPCUsingScope())
 			mode = g_JDC_ModeScope;
-		else if (GetPCUsingIronSights())
+		else if (GetPCUsingIronSights2())
 			mode = PlayerCharacter::GetSingleton()->isInThirdPerson ? g_JDC_ModeSighting3rd : g_JDC_ModeSighting1st;
 		else
 			mode = PlayerCharacter::GetSingleton()->isInThirdPerson ? g_JDC_ModeOut3rd : g_JDC_ModeOut1st;
@@ -199,9 +193,9 @@ namespace JDC
 			visibleDot = 2;
 		}
 
-		tileMain->SetFloat(Tile::TraitNameToID("_JDCVisible"), visibleDot || visibleCrosshair);
-		tileMain->SetFloat(Tile::TraitNameToID("_JDCVisibleDot"), visibleDot);
-		tileMain->SetFloat(Tile::TraitNameToID("_JDCVisibleReticle"), visibleCrosshair);
+		tileMain->SetFloat(TraitNameToID("_JDCVisible"), visibleDot || visibleCrosshair);
+		tileMain->SetFloat(TraitNameToID("_JDCVisibleDot"), visibleDot);
+		tileMain->SetFloat(TraitNameToID("_JDCVisibleReticle"), visibleCrosshair);
 		g_TileReticleCenter->GetChild("reticle_center")->SetFloat(kTileValue_visible, visibleReticle);
 
 		Float64 totalSpread = 0.1;
@@ -223,11 +217,11 @@ namespace JDC
 		{
 			Float64 fDefaultWorldFOV;
 			GetNumericIniSetting("fDefaultWorldFOV:Display", &fDefaultWorldFOV);
-			if (g_Player->baseProcess && g_Player->baseProcess->GetWeaponInfo() && g_Player->baseProcess->GetWeaponInfo()->weapon)
-				spreadTarget *= tan(0.5 * g_Player->baseProcess->GetWeaponInfo()->weapon->sightFOV) / tan(0.5 * fDefaultWorldFOV);
+			if (g_player->baseProcess && g_player->baseProcess->GetWeaponInfo() && g_player->baseProcess->GetWeaponInfo()->weapon)
+				spreadTarget *= tan(0.5 * g_player->baseProcess->GetWeaponInfo()->weapon->sightFOV) / tan(0.5 * fDefaultWorldFOV);
 		}
 
-		tileMain->SetFloat(Tile::TraitNameToID("_JDCSpread"), UpdateCurrentSpread(spreadTarget));
+		tileMain->SetFloat(TraitNameToID("_JDCSpread"), UpdateCurrentSpread(spreadTarget));
 
 	}
 

@@ -1,5 +1,6 @@
 #pragma once
 #include "GameForms.h"
+#include "NiObjects.h"
 #include "Utilities.h"
 
 struct ChunkAndFormType {
@@ -278,3 +279,124 @@ public:
 	TESQuest* GetQuestByName(const char* questName);
 };
 STATIC_ASSERT(sizeof(DataHandler) == 0x63C);
+
+// A0
+struct WaterSurfaceManager
+{
+	// B0 c'tor @ 0x4ED5F0
+	struct WaterGroup
+	{
+		TESWaterForm* waterForm;		// 00
+		NiPoint4				vector04;		// 04
+		NiPoint4				vector14;		// 14
+		DList<TESObjectREFR>	waterPlanes;	// 24
+		DList<void>				list30;			// 30
+		DList<void>				list3C;			// 3C
+		DList<void>				list48;			// 48
+		NiAVObject* object54;		// 54
+		NiAVObject* object58;		// 58
+		UInt8					byte5C;			// 5C
+		UInt8					byte5D;			// 5D
+		UInt8					byte5E;			// 5E
+		UInt8					byte5F;			// 5F
+		UInt8					byte60;			// 60
+		UInt8					pad61[3];		// 61
+		DList<void>				list64;			// 64
+		DList<void>				list70;			// 70
+		DList<void>				list7C;			// 7C
+		DList<void>				list88;			// 88
+		NiObject* object94;		// 94
+		NiObject* object98;		// 98
+		UInt32					unk9C;			// 9C
+		UInt32					unkA0;			// A0
+		NiObject* objectA4;		// A4
+		NiObject* objectA8;		// A8
+		UInt32					unkAC;			// AC
+	};
+
+	struct Struct8C
+	{
+		UInt32		unk00;
+		UInt32		unk04;
+		UInt32		unk08;
+	};
+
+	UInt32								unk00;			// 00
+	UInt32								unk04;			// 04
+	NiObject* object08;		// 08
+	NiObject* object0C;		// 0C
+	NiObject* object10;		// 10
+	NiObject* object14;		// 14
+	NiObject* object18;		// 18
+	NiObject* object1C;		// 1C	Seen NiSourceTexture
+	NiObject* object20;		// 20
+	UInt32								unk24;			// 24
+	UInt32								unk28;			// 28
+	UInt32								unk2C;			// 2C
+	UInt32								unk30;			// 30
+	UInt32								unk34;			// 34
+	UInt32								unk38;			// 38
+	DList<WaterGroup>					waterGroups;	// 3C
+	WaterGroup* waterLOD;		// 48	(Assumed)
+	NiTPointerMap<TESObjectREFR>		map4C;			// 4C
+	NiTPointerMap<TESObjectREFR>		map5C;			// 5C
+	NiTPointerMap<TESWaterForm>			map6C;			// 6C
+	NiTMapBase<TESObjectREFR*, void*>	map7C;			// 7C
+	Struct8C							unk8C;			// 8C
+	float								flt98;			// 98
+	UInt32								unk9C;			// 9C
+};
+static_assert(sizeof(WaterSurfaceManager) == 0xA0);
+
+class TES
+{
+public:
+	virtual void Fn_00(UInt32 arg1, UInt32 arg2, UInt32 arg3, UInt32 arg4, UInt32 arg5);
+
+	UInt32								unk04;				// 04
+	GridCellArray						*gridCellArray;		// 08
+	NiNode								*niNode0C;			// 0C
+	NiNode								*niNode10;			// 10
+	NiNode								*niNode14;			// 14
+	BSTempNodeManager					*tempNodeMgr;		// 18
+	NiDirectionalLight					*directionalLight;	// 1C
+	void								*ptr20;				// 20
+	SInt32								extGridX;			// 24
+	SInt32								extGridY;			// 28
+	SInt32								extCoordX;			// 2C
+	SInt32								extCoordY;			// 30
+	TESObjectCELL						*currentInterior;	// 34
+	TESObjectCELL						**interiorsBuffer;	// 38
+	TESObjectCELL						**exteriorsBuffer;	// 3C
+	UInt32								unk40[9];			// 40
+	WaterSurfaceManager					*waterManager;		// 64
+	Sky									*sky;				// 68
+	TList<ImageSpaceModifierInstance>	activeIMODs;		// 6C
+	UInt32								unk74[3];			// 74
+	float								flt80;				// 80	Abs X distance from centre of grid.
+	float								flt84;				// 84	Abs Y distance from centre of grid.
+	TESWorldSpace						*currentWrldspc;	// 88
+	TList<UInt32>						list8C;				// 8C
+	TList<UInt32>						list94;				// 94
+	TList<UInt32>						list9C;				// 9C
+	QueuedFile							*unkA4;				// A4
+	NiSourceTexture						*unkA8;				// A8
+	QueuedFile							*unkAC;				// AC
+	void								*ptrB0;				// B0
+	UInt32								unkB4[2];			// B4
+	NavMeshInfoMap						*navMeshInfoMap;	// BC
+	LoadedAreaBound						*areaBound;			// C0
+
+	__forceinline static TES *GetSingleton() {return *(TES**)0x11DEA10;}
+
+	__forceinline bool GetTerrainHeight(NiPoint2 *posXY, float *result)
+	{
+		return ThisCall<bool>(0x4572E0, this, posXY, result);
+	}
+
+	__forceinline void AddTempNode(NiAVObject *object, float lifetime)
+	{
+		ThisCall(0x458E20, this, object, lifetime);
+	}
+};
+static_assert(sizeof(TES) == 0xC4);

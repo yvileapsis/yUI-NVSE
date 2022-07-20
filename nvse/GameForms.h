@@ -2940,7 +2940,7 @@ public:
 	};
 
 	enum EWeaponFlags2 {
-		eFlag_PlayerOnly				= 0x1,
+		eFlag_playerOnly				= 0x1,
 		eFlag_NPCsUseAmmo				= 0x2,
 		eFlag_NoJamAfterReload			= 0x4,
 		eFlag_ActionPointOverride		= 0x8,
@@ -4026,6 +4026,8 @@ public:
 	UInt8						currentStage;				// 060
 	UInt8						pad061[3];					// 061
 	String						editorName;					// 064
+
+	BGSQuestObjective* GetObjective(UInt32 objectiveID) const;
 };
 STATIC_ASSERT(sizeof(TESQuest) == 0x6C);
 

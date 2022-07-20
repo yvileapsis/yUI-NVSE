@@ -328,29 +328,12 @@ __declspec(naked) ContChangesList* TESObjectREFR::GetContainerChangesList()
 	}
 }
 
-__declspec(naked) float __vectorcall GetDistance3D(TESObjectREFR* ref1, TESObjectREFR* ref2)
+__declspec(naked) float __vectorcall Point2Distance(const NiPoint3& pt1, const NiPoint3& pt2)
 {
 	__asm
 	{
-		movups	xmm0, [ecx + 0x2C]
-		psrldq	xmm0, 4
-		movups	xmm1, [edx + 0x2C]
-		psrldq	xmm1, 4
-		subps	xmm0, xmm1
-		mulps	xmm0, xmm0
-		haddps	xmm0, xmm0
-		haddps	xmm0, xmm0
-		sqrtss	xmm0, xmm0
-		retn
-	}
-}
-
-__declspec(naked) float __vectorcall GetDistance2D(TESObjectREFR* ref1, TESObjectREFR* ref2)
-{
-	__asm
-	{
-		movq	xmm0, qword ptr[ecx + 0x30]
-		movq	xmm1, qword ptr[edx + 0x30]
+		movq	xmm0, qword ptr[ecx]
+		movq	xmm1, qword ptr[edx]
 		subps	xmm0, xmm1
 		mulps	xmm0, xmm0
 		haddps	xmm0, xmm0
@@ -359,7 +342,23 @@ __declspec(naked) float __vectorcall GetDistance2D(TESObjectREFR* ref1, TESObjec
 	}
 }
 
-__declspec(naked) bool TESObjectREFR::GetInSameCellOrWorld(TESObjectREFR *target)
+__declspec(naked) float __vectorcall Point3Distance(const NiPoint3& pt1, const NiPoint3& pt2)
+{
+	__asm
+	{
+		movups	xmm0, [ecx]
+		movups	xmm1, [edx]
+		subps	xmm0, xmm1
+		mulps	xmm0, xmm0
+		xorps	xmm1, xmm1
+		haddps	xmm0, xmm1
+		haddps	xmm0, xmm1
+		sqrtss	xmm0, xmm0
+		retn
+	}
+}
+
+__declspec(naked) bool __fastcall TESObjectREFR::GetInSameCellOrWorld(TESObjectREFR *target) const
 {
 	__asm
 	{
@@ -401,23 +400,14 @@ __declspec(naked) bool TESObjectREFR::GetInSameCellOrWorld(TESObjectREFR *target
 	}
 }
 
-__declspec(naked) float __vectorcall TESObjectREFR::GetDistance(TESObjectREFR* target)
+float __vectorcall TESObjectREFR::GetDistance(TESObjectREFR* target)
 {
-	__asm
-	{
-		push	ecx
-		push	edx
-		call	TESObjectREFR::GetInSameCellOrWorld
-		pop		edx
-		pop		ecx
-		test	al, al
-		jz		fltMax
-		jmp		GetDistance3D
-	fltMax:
-		mov		eax, 0x7F7FFFFF
-		movd	xmm0, eax
-		retn
-	}
+	return this->GetInSameCellOrWorld(target) ? Point3Distance(*this->GetPos(), *target->GetPos()) : FLT_MAX;
+}
+
+float __vectorcall TESObjectREFR::GetDistance2D(TESObjectREFR* target)
+{
+	return this->GetInSameCellOrWorld(target) ? Point2Distance(*this->GetPos(), *target->GetPos()) : FLT_MAX;
 }
 
 __declspec(naked) NiAVObject* __fastcall NiNode::GetBlockByName(const char *nameStr)	//	str of NiFixedString
@@ -491,6 +481,22 @@ __declspec(naked) NiAVObject* __fastcall NiNode::GetBlock(const char* blockName)
 	}
 }
 
+__declspec(naked) NiNode* __fastcall NiNode::GetNode(const char *nodeName) const
+{
+	__asm
+	{
+		call	NiNode::GetBlock
+		test	eax, eax
+		jz		done
+		xor		edx, edx
+		mov		ecx, [eax]
+		cmp		dword ptr [ecx+0xC], 0x6815C0
+		cmovnz	eax, edx
+	done:
+		retn
+	}
+}
+
 __declspec(naked) NiNode* TESObjectREFR::GetNiNode()
 {
 	__asm
@@ -529,6 +535,45 @@ __declspec(naked) NiNode* __fastcall TESObjectREFR::GetNode(const char* nodeName
 	done :
 		retn
 	}
+}
+
+// jazz code
+__declspec(naked) NiAVObject* __fastcall GetNifBlock2(TESObjectREFR *thisObj, UInt32 pcNode, const char *blockName)
+{
+	__asm
+	{
+		test	dl, dl
+		jz		notPlayer
+		cmp		dword ptr [ecx+0xC], 0x14
+		jnz		notPlayer
+		test	dl, 1
+		jz		get1stP
+		mov		eax, [ecx+0x64]
+		test	eax, eax
+		jz		done
+		mov		eax, [eax+0x14]
+		jmp		gotRoot
+	get1stP:
+		mov		eax, [ecx+0x694]
+		jmp		gotRoot
+	notPlayer:
+		call	TESObjectREFR::GetNiNode
+	gotRoot:
+		test	eax, eax
+		jz		done
+		mov		edx, [esp+4]
+		cmp		[edx], 0
+		jz		done
+		mov		ecx, eax
+		call	NiNode::GetBlock
+	done:
+		retn	4
+	}
+}
+
+NiAVObject* TESObjectREFR::GetNifBlock(UInt32 pcNode, const char* blockName)
+{
+	return GetNifBlock2(this, pcNode, blockName);
 }
 
 ExtraDataList* ExtraContainerChanges::EntryData::GetEquippedExtra()
@@ -619,4 +664,34 @@ bool Actor::IsAnimActionReload() const
 	const auto currentAnimAction = static_cast<AnimAction>(baseProcess->GetCurrentAnimAction());
 	const static std::unordered_set s_reloads = { kAnimAction_Reload, kAnimAction_ReloadLoop, kAnimAction_ReloadLoopStart, kAnimAction_ReloadLoopEnd };
 	return s_reloads.contains(currentAnimAction);
+}
+
+
+__declspec(naked) BSBound *TESObjectREFR::GetBoundingBox() const
+{
+	__asm
+	{
+		mov		eax, [ecx]
+		cmp		dword ptr [eax+0xFC], 0x8D0360
+		jnz		getFromNode
+		mov		eax, [ecx+0x68]
+		test	eax, eax
+		jz		getFromNode
+		cmp		[eax+0x28], 1
+		ja		getFromNode
+		mov		eax, [eax+0x224]
+		retn
+	getFromNode:
+		mov		eax, [ecx+0x64]
+		test	eax, eax
+		jz		done
+		mov		eax, [eax+0x14]
+		test	eax, eax
+		jz		done
+		mov		edx, 0x10C2B64
+		mov		ecx, eax
+		jmp		NiObjectNET::GetExtraData
+	done:
+		retn
+	}
 }

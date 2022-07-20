@@ -291,7 +291,7 @@ public:
 	NiNode* CreateCopy();
 	NiAVObject* __fastcall GetBlockByName(const char* nameStr);	//	str of NiString
 	NiAVObject* __fastcall GetBlock(const char* blockName);
-	NiNode* __fastcall GetNode(const char* nodeName);
+	NiNode* __fastcall GetNode(const char* nodeName) const;
 	bool IsMovable();
 	void RemoveCollision();
 	void BulkSetMaterialPropertyTraitValue(UInt32 traitID, float value);
@@ -301,7 +301,6 @@ public:
 	void Dump();
 };
 STATIC_ASSERT(sizeof(NiNode) == 0xAC);
-
 
 // F0
 class SceneGraph : public NiNode
