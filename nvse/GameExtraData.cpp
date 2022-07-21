@@ -216,7 +216,7 @@ ContChangesEntry* ContChangesEntry::Create(UInt32 refID, UInt32 count, ExtendDat
 	if (xData) {
 		memset(xData, 0, sizeof(ContChangesEntry));
 		if (refID) {
-			if (const auto pForm = LookupFormByID(refID)) {
+			if (const auto pForm = GetFormByID(refID)) {
 				xData->form = pForm;
 				xData->countDelta = count;
 				xData->extendData = pExtendDataList;

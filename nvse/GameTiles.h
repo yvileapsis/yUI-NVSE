@@ -2,11 +2,6 @@
 #include <NiNodes.h>
 #include <GameTypes.h>
 
-class TileMenu;
-typedef UInt32 (* _TraitNameToID)(const char* traitName);
-extern const _TraitNameToID TraitNameToID;
-const char* TraitIDToName(int id);	// slow
-
 //	Tile			
 //		TileRect		3C	ID=385
 //			TileMenu	40	ID=389
@@ -17,11 +12,6 @@ const char* TraitIDToName(int id);	// slow
 //	Close by:
 //		HotRect	ID=38A
 //		Window	ID=38B
-
-class NiNode;
-class Menu;
-class NiObject;
-class RefNiObject;
 
 // 38+
 enum eTileValue {
@@ -191,12 +181,6 @@ public:
 		kTileID_max
 	};
 
-	MEMBER_FN_PREFIX(Tile);
-#if RUNTIME
-	DEFINE_MEMBER_FN(SetStringValue, void, 0x00A01350, UInt32 valueID, const char* str, bool bPropagate);
-	DEFINE_MEMBER_FN(SetFloatValue, void, 0x00A012D0, UInt32 valueID, float num, bool bPropagate);
-#endif
-
 	virtual Tile*			Destroy(bool noDealloc);
 	virtual void			Init(Tile * parent, const char * name, Tile* replacedChild);
 	virtual NiNode*			CalcNode(void);
@@ -303,28 +287,34 @@ public:
 	UInt8						unk35;		// 35
 	UInt8						pad35[2];	// 36
 
-	static UInt32				TraitNameToID(const char * traitName);
-	static UInt32				TraitNameToIDAdd(const char* traitName);
+	static UInt32				TraitNameToID(const char* traitName) { return CdeclCall<UInt32>(0x00A01860, traitName); }
+	static const char*			TraitIDToName(int id);	// slow
 	Value* __fastcall			GetValue(UInt32 typeID);
 	Value*						GetValueName(const char * valueName);
-	float						GetValueFloat(UInt32 id);
 	DListNode<Tile>*			GetNthChild(UInt32 index);
 	Tile*						GetChild(const char * childName);
 	Tile*						GetComponent(const char * componentTile, const char **trait);
 	Tile*						GetComponentTile(const char * componentTile);
 	Value*						GetComponentValue(const char * componentPath);
 	char*						GetComponentFullName(char *resStr);
-	__forceinline Tile*			ReadXML(const char* xmlPath) { return ThisCall<Tile*>(0xA01B00, this, xmlPath); }
-	Tile*						InjectUIXML(const char*);
 
-	void						SetFloat(UInt32 id, float fltVal, bool bPropagate = true);
-	void						SetString(UInt32 id, const char* strVal, bool bPropagate = true);
+	__forceinline Tile*			ReadXML(const char* xmlPath) { return ThisCall<Tile*>(0xA01B00, this, xmlPath); }
+	__forceinline Tile*			InjectUIXML(const char* str) { return FileExists(str) ? this->ReadXML(str) : nullptr; };
+
+	__forceinline Float32		GetFloat(const UInt32 id) { return ThisCall<Float32>(0xA011B0, this, id); };
+	__forceinline Float32		GetFloat(const char* id) { return this->GetFloat(TraitNameToID(id)); };
+
+	__forceinline void			SetFloat(UInt32 id, float fltVal, bool bPropagate = true) { ThisCall(0xA012D0, this, id, fltVal, bPropagate); }
+	__forceinline void			SetFloat(const char* id, float fltVal, bool bPropagate = true) { this->SetFloat(TraitNameToID(id), fltVal, bPropagate); }
+	__forceinline void			SetString(UInt32 id, const char* strVal, bool bPropagate = true) { ThisCall(0xA01350, this, id, strVal, bPropagate); }
+	__forceinline void			SetString(const char* id, const char* strVal, bool bPropagate = true) { this->SetString(TraitNameToID(id), strVal, bPropagate); }
 	void						SetStringRecursive(UInt32, const char*, const char*);
 	__forceinline void			GradualSetFloat(UInt32 id, Float32 startVal, Float32 endVal, Float32 seconds, UInt32 changeMode = 0)
 								{ ThisCall(0xA07C60, this, id, startVal, endVal, seconds, changeMode); };
+	__forceinline void			GradualSetFloat(const char* id, Float32 startVal, Float32 endVal, Float32 seconds, UInt32 changeMode = 0)
+								{ this->GradualSetFloat(TraitNameToID(id), startVal, endVal, seconds, changeMode); }
 
-
-	__forceinline Menu*			GetParentMenu();
+	__forceinline Menu*			GetParentMenu() { return ThisCall<Menu*>(0xA03C90, this); };
 	TileMenu*					GetTileMenu();
 	void						DestroyAllChildren();
 	void __fastcall				PokeValue(UInt32 valueID);
@@ -372,7 +362,6 @@ public:
 };
 
 void Debug_DumpTraits(void);
-void Debug_DumpTileImages(void);
 
 class TileExtra : public NiExtraData
 {

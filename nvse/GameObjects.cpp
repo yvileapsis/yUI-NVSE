@@ -155,9 +155,9 @@ Float64 Actor::GetCalculatedSpread(UInt32 mode, ContChangesEntry* entry)
 
 	if (mode == 0)
 	{
-		bool hasDecreaseSpreadEffect = ThisStdCall<bool>(0x4BDA70, entry, 3);
-		double minSpread = ThisStdCall<double>(0x524B80, entry->form, hasDecreaseSpreadEffect);
-		double weapSpread = ThisStdCall<float>(0x524BE0, entry->form, hasDecreaseSpreadEffect);
+		const bool hasDecreaseSpreadEffect = ThisStdCall<bool>(0x4BDA70, entry, 3);
+		const auto minSpread = ThisStdCall<double>(0x524B80, entry->form, hasDecreaseSpreadEffect);
+		const double weapSpread = ThisStdCall<float>(0x524BE0, entry->form, hasDecreaseSpreadEffect);
 
 		totalSpread = (weapSpread * ThisStdCall<double>(0x8B0DD0, this, 1) + minSpread) * 0.01745329238474369;
 
@@ -166,7 +166,7 @@ Float64 Actor::GetCalculatedSpread(UInt32 mode, ContChangesEntry* entry)
 
 		if (this != PlayerCharacter::GetSingleton())
 		{
-			double spreadPenalty = ThisStdCall<double>(0x8B0DD0, this, 2);
+			const auto spreadPenalty = ThisStdCall<double>(0x8B0DD0, this, 2);
 
 			Setting* fNPCMaxGunWobbleAngle;
 			GameSettingCollection::GetSingleton()->GetGameSetting("fNPCMaxGunWobbleAngle", &fNPCMaxGunWobbleAngle);
@@ -181,7 +181,7 @@ Float64 Actor::GetCalculatedSpread(UInt32 mode, ContChangesEntry* entry)
 	}
 	else if (mode == 1)
 	{
-		if (!entry->form || static_cast<TESObjectWEAP*>(entry->form)->IsMeleeWeapon())
+		if (!entry->form || reinterpret_cast<TESObjectWEAP*>(entry->form)->IsMeleeWeapon())
 			totalSpread = 1.0;
 		else
 			totalSpread = ThisStdCall<double>(0x8B0DD0, this, 2);
@@ -247,12 +247,12 @@ Float32 Actor::GetHitDataValue(UInt32 valueType) const
 	if (!hitData) return 0;
 	switch (valueType)
 	{
-	case 0:		return AdjustDmgByDifficulty(hitData);
-	case 1:		return hitData->limbDmg;
-	case 2:		return hitData->flags & 0x80000000 ? 1 : 0;
-	case 3:		return hitData->wpnBaseDmg;
-	case 4:		return hitData->fatigueDmg;
-	case 5:		return hitData->armorDmg;
+	case 0:	return AdjustDmgByDifficulty(hitData);
+	case 1:	return hitData->limbDmg;
+	case 2:	return hitData->flags & 0x80000000 ? 1 : 0;
+	case 3:	return hitData->wpnBaseDmg;
+	case 4:	return hitData->fatigueDmg;
+	case 5:	return hitData->armorDmg;
 	}
 	return 0;
 }
@@ -742,4 +742,12 @@ NiPoint3 TESObjectREFR::GetDimensions() const
 		}
 	const NiPoint3 ni3{};
 	return ni3;
+}
+
+TESObjectREFR* TESObjectREFR::ResolveAshpile()
+{
+	if (*(UInt32*)baseForm == kVtbl_TESObjectACTI)
+		if (const auto xAshPileRef = reinterpret_cast<ExtraAshPileRef*>(extraDataList.GetByType(kExtraData_AshPileRef)))
+			return xAshPileRef->sourceRef;
+	return this;
 }

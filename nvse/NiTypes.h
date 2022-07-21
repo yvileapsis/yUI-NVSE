@@ -174,7 +174,7 @@ class NiMatrix33 {
 public:
 	union
 	{
-		Float32 dataAlt[9];
+		Float32 dataAlt[9]{};
 		Float32 data[3][3];
 		struct
 		{
@@ -184,10 +184,7 @@ public:
 		};
 	};
 	NiMatrix33()
-	{
-		for (float& i : dataAlt)
-			i = 0;
-	}
+	= default;
 };
 STATIC_ASSERT(sizeof(NiMatrix33) == 0x024);
 

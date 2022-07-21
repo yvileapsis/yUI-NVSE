@@ -16,14 +16,14 @@ extern UInt32 s_CheckInsideOnActorEquipHook;
 
 void PrintConsole(const char * fmt, ...);
 
-//typedef void * (* _FormHeap_Allocate)(UInt32 size);
-//extern const _FormHeap_Allocate FormHeap_Allocate;
-//
-//typedef void (* _FormHeap_Free)(void * ptr);
-//extern const _FormHeap_Free FormHeap_Free;
-
-typedef bool (* _ExtractArgs)(ParamInfo * paramInfo, void * scriptData, UInt32 * arg2, TESObjectREFR * arg3, TESObjectREFR * arg4, Script * script, ScriptEventList * eventList, ...);
-extern const _ExtractArgs ExtractArgs;
+__forceinline bool ExtractArgs(ParamInfo * paramInfo, void * scriptData, UInt32 * arg2, TESObjectREFR * arg3, TESObjectREFR * arg4, Script * script, ScriptEventList * eventList, ...)
+{
+	va_list args;
+	va_start(args, eventList);
+	const auto result = CdeclCall<bool>(0x005ACCB0, paramInfo, scriptData, arg2, arg3, arg4, script, eventList, args);
+	va_end(args);
+	return result;
+}
 
 typedef TESForm * (* _CreateFormInstance)(UInt8 type);
 extern const _CreateFormInstance CreateFormInstance;
@@ -31,7 +31,7 @@ extern const _CreateFormInstance CreateFormInstance;
 bool IsConsoleMode();
 bool GetConsoleEcho();
 void SetConsoleEcho(bool doEcho);
-const char * GetFullName(TESForm * baseForm);
+const char * GetFullName(const TESForm * baseForm);
 const char* GetActorValueString(UInt32 actorValue); // should work now
 UInt32 GetActorValueForString(const char* strActorVal, bool bForScript = false);
 
@@ -75,9 +75,6 @@ extern const _QueueUIMessage QueueUIMessage;
 const UInt32 kMaxMessageLength = 0x4000;
 
 void ShowCompilerError(ScriptLineBuffer* lineBuf, const char* fmt, ...);
-
-typedef TESForm* (__cdecl* _GetFormByID)(const char* editorID);
-extern const _GetFormByID GetFormByID;
 
 struct NVSEStringVarInterface;
 	// Problem: plugins may want to use %z specifier in format strings, but don't have access to StringVarMap
@@ -568,18 +565,13 @@ public:
 	UInt8							unk0AF;				// 0AF
 	UInt32							unk0B0[(0x1C8-0x0B0) >> 2];	// 0B0
 
-	static TESSaveLoadGame* Get();
+	static TESSaveLoadGame* Get() { return reinterpret_cast<TESSaveLoadGame*>(0x011DE45C); }
 
 	MEMBER_FN_PREFIX(TESSaveLoadGame);
 #if RUNTIME
 	DEFINE_MEMBER_FN(AddCreatedForm, UInt32, 0x00861780, TESForm * pForm);
 #endif
 };
-
-#if RUNTIME
-const UInt32 _SaveGameManager_ConstructSavegameFilename = 0x0084FF90;
-const UInt32 _SaveGameManager_ConstructSavegamePath		= 0x0084FF30;
-#endif
 
 template <typename T_Key, typename T_Data>
 class NiTMap : public NiTMapBase<T_Key, T_Data>
@@ -656,12 +648,6 @@ public:
 	SaveGameManager();
 	~SaveGameManager();
 
-	static SaveGameManager* GetSingleton();
-	MEMBER_FN_PREFIX(SaveGameManager);
-	DEFINE_MEMBER_FN(ConstructSavegameFilename, void, _SaveGameManager_ConstructSavegameFilename, 
-					 const char* filename, char* outputBuf, bool bTempFile);
-	DEFINE_MEMBER_FN(ConstructSavegamePath, void, _SaveGameManager_ConstructSavegamePath, char* outputBuf);
-
 	struct SaveGameData
 	{
 		const char	* name;		// 00
@@ -691,6 +677,9 @@ public:
 	UInt32					unk24;			// 24
 	UInt32					unk28;			// 28
 */
+	static SaveGameManager*		GetSingleton() { return *reinterpret_cast<SaveGameManager**>(0x011DE134); }
+	__forceinline UInt32		ConstructSavegameFilename(const char* filename, char* outputBuf, bool bTempFile) { return StdCall<UInt32>(0x0084FF90, filename, outputBuf, bTempFile); }
+	__forceinline bool			ConstructSavegamePath(char* outputBuf) { return StdCall<bool>(0x0084FF30, outputBuf); }
 };
 
 std::string GetSavegamePath();
@@ -855,22 +844,15 @@ struct TimeGlobal : Timer
 	float unk24;  // 024
 	float unk28;  // 028
 
-	static TimeGlobal*	GetSingleton();
-	__forceinline void	Set(Float32, char);
-	static Float32		Get();
-	static Float32		GetTarget();
+	static TimeGlobal*				GetSingleton() { return reinterpret_cast<TimeGlobal*>(0x11F6394); };
+	__forceinline void				Set(const Float32 value, const char isImmediateChange) { ThisCall<void>(0xAA4DB0, this, value, isImmediateChange); }
+	static __forceinline Float32	Get() { return *reinterpret_cast<Float32*>(0x11AC3A0); }
+	static __forceinline Float32	GetTarget() { return *reinterpret_cast<Float32*>(0x11AC3A4); }
 };
-
-NiTPointerMap<TESForm>* GetAllForms();
 
 class ConsoleManager
 {
 public:
-#if RUNTIME
-	MEMBER_FN_PREFIX(ConsoleManager);
-	DEFINE_MEMBER_FN(Print, void, 0x0071D0A0, const char* fmt, va_list args);
-#endif
-
 	ConsoleManager();
 	~ConsoleManager();
 
@@ -913,30 +895,17 @@ public:
 	RecordedCommand			recordedCommands[20];
 	char					scofPath[260];
 	
-	static ConsoleManager*	GetSingleton(void);
-	void					AppendToSentHistory(const char*);
-
-	static char*			GetConsoleOutputFilename(void);
-	static bool				HasConsoleOutputFilename(void);
+	__forceinline static ConsoleManager*	GetSingleton(bool canCreateNew = true) { return CdeclCall<ConsoleManager*>(0x0071B160, canCreateNew); }
+	void									AppendToSentHistory(const char*);
+	__forceinline void						Print(const char* fmt, va_list args) { ThisCall(0x0071D0A0, this, fmt, args); }
+	static char*							GetConsoleOutputFilename(void);
+	static bool								HasConsoleOutputFilename(void);
 };
 
-enum ExtendedEventFlags : UInt32
-{
-	kFlags_None = 0,
-
-	//If on, will remove all set handlers for the event every game load.
-	kFlag_FlushOnLoad = 1 << 0,
-
-
-	// == Flags below reserved for internal use; their values can be changed as the exposed EventFlags grows.
-
-	//Identifies script-created events, for the DispatchEvent(Alt) script functions.
-	//Arg types are only known when dispatching the event.
-	kFlag_IsUserDefined = 1 << 1,
-
-	//Identifies xNVSE's unit-testing event, which can be dispatched via DispatchEventAlt, but arg types are known in advance.
-	kFlag_IsTestEvent = 1 << 2,
-};
+__forceinline NiTPointerMap<TESForm>* GetAllForms() { return *reinterpret_cast<NiTPointerMap<TESForm>**>(0x11C54C0); }
+__forceinline TESForm* GetFormByID(const char* editorID) { return CdeclCall<TESForm*>(0x483A00, editorID); };
+__forceinline TESForm* GetFormByID(UInt32 refID) { return GetAllForms()->Lookup(refID); };
+TESForm* GetFormByID(const char* mod, UInt32 refID);
 
 typedef void (*EventHandler)(TESObjectREFR* thisObj, void* parameters);
 
@@ -963,7 +932,11 @@ inline _GetStringVar				GetStringVar;
 inline _SetStringVar				SetStringVar;
 inline _AssignString				AssignString;
 inline _SetNativeEventHandler		SetNativeEventHandler;
+template <typename T> void __forceinline SetEventHandler(const char* eventName, T func)
+{ SetNativeEventHandler(eventName, reinterpret_cast<EventHandler>(func)); }
 inline _RemoveNativeEventHandler	RemoveNativeEventHandler;
+template <typename T> void __forceinline RemoveEventHandler(const char* eventName, T func)
+{ RemoveNativeEventHandler(eventName, reinterpret_cast<EventHandler>(func)); }
 inline _RegisterEvent				RegisterEvent;
 inline _DispatchEvent				DispatchEvent;
 inline _CallFunctionAlt				CallFunctionAlt;

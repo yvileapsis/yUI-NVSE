@@ -35,5 +35,7 @@ inline Float64	g_JVO_FontY				= 0.0;
 namespace JVO
 {
 	void Initialize();
+	void Reset();
 	void MainLoop();
+	void OnRender();
 }

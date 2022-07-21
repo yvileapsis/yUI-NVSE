@@ -1,20 +1,10 @@
-#include "nvse/GameTiles.h"
-#include "nvse/Utilities.h"
-#include "nvse/GameAPI.h"
-#include <string>
-
-#include "GameRTTI.h"
-#include "GameUI.h"
+#include <GameTiles.h>
+#include <Utilities.h>
+#include <GameAPI.h>
+#include <GameUI.h>
 
 typedef NiTMapBase <const char *, int>	TraitNameMap;
 TraitNameMap	* g_traitNameMap = (TraitNameMap *)0x011F32F4;
-
-const _TraitNameToID TraitNameToID = (_TraitNameToID)0x00A01860;
-
-UInt32 Tile::TraitNameToID(const char * traitName)
-{
-	return ::TraitNameToID(traitName);
-}
 
 __declspec(naked) Tile::Value* __fastcall Tile::GetValue(UInt32 typeID)
 {
@@ -139,11 +129,6 @@ char *Tile::GetComponentFullName(char *resStr)
 	return fullName;
 }
 
-Tile* Tile::InjectUIXML(const char* str)
-{
-	return FileExists(str) ? this->ReadXML(str) : nullptr;
-}
-
 void Tile::Dump(void)
 {
 	PrintLog("%s", name.m_data);
@@ -155,32 +140,25 @@ void Tile::Dump(void)
 	
 	for(UInt32 i = 0; i < values.size; i++)
 	{
-		Value		* val = values[i];
-		const char	* traitName = TraitIDToName(val->id);
-		char		traitNameIDBuf[16];
+		const Value* val = values[i];
+		const char* traitName = TraitIDToName(val->id);
+		char traitNameIDBuf[16];
 
-		if(!traitName)
+		if (!traitName)
 		{
 			sprintf_s(traitNameIDBuf, "%08X", val->id);
 			traitName = traitNameIDBuf;
 		}
 
-		if(val->str)
-			PrintLog("%s: %s", traitName, val->str);
-		else if(val->action)
-			PrintLog("%s: action %08X", traitName, val->action);
-		else
-			PrintLog("%s: %f", traitName, val->num);
+		if (val->str)			PrintLog("%s: %s", traitName, val->str);
+		else if(val->action)	PrintLog("%s: action %08X", traitName, val->action);
+		else					PrintLog("%s: %f", traitName, val->num);
 	}
 
 	gLog.Outdent();
 
 	for(DListNode<Tile>* node = children.Head(); node; node = node->next)
-	{
-		if (node && node->data) {
-			node->data->Dump();
-		}
-	}
+		if (node && node->data)	node->data->Dump();
 
 	gLog.Outdent();
 }
@@ -211,28 +189,17 @@ void Debug_DumpTraits(void)
 
 // not a one-way mapping, so we just return the first
 // also this is slow and sucks
-const char * TraitIDToName(int id)
+const char * Tile::TraitIDToName(int id)
 {
 	for(UInt32 i = 0; i < g_traitNameMap->numBuckets; i++)
 		for(TraitNameMap::Entry * bucket = g_traitNameMap->buckets[i]; bucket; bucket = bucket->next)
 			if(bucket->data == id)
 				return bucket->key;
 
-	return NULL;
+	return nullptr;
 }
 
 void Debug_DumpTileImages(void) {};
-
-__declspec(naked) float Tile::GetValueFloat(UInt32 id)
-{
-	static const UInt32 procAddr = kAddr_TileGetFloat;
-	__asm	jmp		procAddr
-}
-
-Menu* Tile::GetParentMenu()
-{
-	return ThisCall<Menu*>(0xA03C90, this);
-}
 
 TileMenu* Tile::GetTileMenu()
 {

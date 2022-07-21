@@ -37,13 +37,8 @@ enum {
 	eListInvalid	= -1,
 };
 
-typedef void* (*_FormHeap_Allocate)(UInt32 size);
-extern const _FormHeap_Allocate FormHeap_Allocate;
-
-typedef void (*_FormHeap_Free)(void* ptr);
-extern const _FormHeap_Free FormHeap_Free;
-
-TESForm* __stdcall LookupFormByID(UInt32 refID);
+__forceinline void*	FormHeap_Allocate(UInt32 size) { return CdeclCall<void*>(0x00401000, size); }
+__forceinline void	FormHeap_Free(void* ptr) { CdeclCall(0x00401030, ptr); }
 
 template <typename Item> struct TListNode
 {
@@ -175,7 +170,7 @@ public:
 	public:
 		Iterator	operator++()
 		{
-			if (m_curr) m_curr = m_curr->next;
+			m_curr = m_curr->next;
 			return *this;
 		}
 		Item*		operator->() const { return m_curr->data; }
@@ -185,7 +180,7 @@ public:
 			m_curr = rhs.m_curr;
 			return *this;
 		}
-		bool		operator!=(const Iterator& rhs) { return m_curr != rhs.m_curr && m_curr->data; }
+		bool		operator!=(const Iterator& rhs) { return m_curr; }
 
 		Iterator(Node* node = nullptr) : m_curr(node) {}
 		Iterator(TList& _list) : m_curr(&_list.first) {}
@@ -527,7 +522,7 @@ public:
 	public:
 		Iterator	operator++()
 		{
-			if (m_curr) m_curr = m_curr->next;
+			m_curr = m_curr->next;
 			return *this;
 		}
 		Item*		operator->() const { return m_curr->data; }
@@ -537,7 +532,7 @@ public:
 			m_curr = rhs.m_curr;
 			return *this;
 		}
-		bool		operator!=(const Iterator& rhs) { return m_curr != rhs.m_curr; }
+		bool		operator!=(const Iterator& rhs) { return m_curr; }
 
 		Iterator(Node* node = nullptr) : m_curr(node) {}
 		Iterator(DList& _list) : m_curr(&_list.first) {}
@@ -552,7 +547,7 @@ public:
 	UInt32 Count() const { return count; }
 
 	Iterator begin() const { return Iterator(first); }
-	Iterator end() const { return Iterator(last); }
+	Iterator end() const { return Iterator(); }
 
 	void ExchangeNodeData(Node* node1, Node* node2)
 	{

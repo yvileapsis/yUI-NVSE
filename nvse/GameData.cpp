@@ -1,10 +1,5 @@
 #include "GameData.h"
 
-DataHandler* DataHandler::GetSingleton()
-{
-	const auto g_dataHandler = reinterpret_cast<DataHandler**>(0x011C3F2C);
-	return *g_dataHandler;
-}
 
 class LoadedModFinder
 {

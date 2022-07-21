@@ -170,7 +170,7 @@ namespace SI
 	void __fastcall AddSortingCategories();
 	bool __fastcall KeyringHideKeys(ContChangesEntry* entry);
 	void __fastcall HideNonKeysGetTile(InventoryMenu* invmenu, Tile* tile);
-	SInt32 __fastcall CompareItemsWithTags(ContChangesEntry* a2, ContChangesEntry* a1, Tile* tile1, Tile* tile2);
+	SInt32 __fastcall CompareItemsWithTags(const TileContChangesEntryUnk* unk1, const TileContChangesEntryUnk* unk2);
 	void __fastcall SetStringValueTagImage(Tile* tile, ContChangesEntry* entry, eTileValue tilevalue, char* src, char propagate);
 	void __fastcall SetStringValueTagRose(Tile* tile, ContChangesEntry* entry, eTileValue tilevalue, char* src, char propagate);
 
@@ -224,15 +224,8 @@ namespace SIHooks
 		static const UInt32 retnAddr = retn;
 		_asm
 		{
-			mov		eax, [ebp + 0xC]	// a2
-			mov		ecx, [eax]
-			push	ecx					// tile2
-			mov		ecx, [eax + 0x4]	// entry2
-
-			mov		eax, [ebp + 0x8]	// a1
-			mov		edx, [eax]
-			push	edx					// tile1
-			mov		edx, [eax + 0x4]	// entry1
+			mov		ecx, [ebp + 0x8]	// a1
+			mov		edx, [ebp + 0xC]	// a2
 
 			call	CompareItems
 			test	eax, eax

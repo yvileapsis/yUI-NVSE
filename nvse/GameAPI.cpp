@@ -3,28 +3,17 @@
 #include <GameForms.h>
 #include <GameObjects.h>
 #include <GameTypes.h>
-#include <CommandTable.h>
+#include <GameData.h>
 #include <GameScript.h>
 #include <StringVar.h>
-#include <printf.h>
 
 bool alternateUpdate3D = false;
 
 // arg1 = 1, ignored if canCreateNew is false, passed to 'init' function if a new object is created
-typedef void * (* _GetSingleton)(bool canCreateNew);
-
 char s_tempStrArgBuffer[0x4000];
-
-TESForm* __stdcall LookupFormByID(const UInt32 refID) { return GetAllForms()->Lookup(refID); }
-
-const _ExtractArgs ExtractArgs = reinterpret_cast<_ExtractArgs>(0x005ACCB0);
-
-const _FormHeap_Allocate FormHeap_Allocate = reinterpret_cast<_FormHeap_Allocate>(0x00401000);
-const _FormHeap_Free FormHeap_Free = reinterpret_cast<_FormHeap_Free>(0x00401030);
 
 const _CreateFormInstance CreateFormInstance = reinterpret_cast<_CreateFormInstance>(0x00465110);
 
-const _GetSingleton ConsoleManager_GetSingleton = reinterpret_cast<_GetSingleton>(0x0071B160);
 bool* bEchoConsole = reinterpret_cast<bool*>(0x011F158C);
 
 const _QueueUIMessage QueueUIMessage = reinterpret_cast<_QueueUIMessage>(0x007052F0);	// Called from Cmd_AddSpell_Execute
@@ -40,7 +29,6 @@ const _MarkBaseExtraListScriptEvent MarkBaseExtraListScriptEvent = reinterpret_c
 const _DoCheckScriptRunnerAndRun DoCheckScriptRunnerAndRun = reinterpret_cast<_DoCheckScriptRunnerAndRun>(0x005AC190);
 
 // Johnny Guitar supports this
-const _GetFormByID GetFormByID = reinterpret_cast<_GetFormByID>(0x483A00);
 
 struct TLSData
 {
@@ -100,7 +88,7 @@ void SetConsoleEcho(const bool doEcho)
 	*bEchoConsole = doEcho ? true : false;
 }
 
-const char* GetFullName(TESForm * baseForm)
+const char* GetFullName(const TESForm * baseForm)
 {
 	if (baseForm)
 		if (const auto fullName = baseForm->GetFullName(); fullName && fullName->name.m_data && fullName->name.m_dataLen)
@@ -108,9 +96,15 @@ const char* GetFullName(TESForm * baseForm)
 	return "<no name>";
 }
 
-ConsoleManager* ConsoleManager::GetSingleton(void)
+ConsoleManager::TextList* ConsoleManager::TextList::Append(TextNode* append)
 {
-	return static_cast<ConsoleManager*>(ConsoleManager_GetSingleton(true));
+	append->prev = 0;
+	append->next = this->first;
+	if (this->first) this->first->prev = append;
+	else this->last = append;
+	this->first = append;
+	++this->count;
+	return this;
 }
 
 char * ConsoleManager::GetConsoleOutputFilename(void)
@@ -122,37 +116,31 @@ bool ConsoleManager::HasConsoleOutputFilename(void) {
 	return 0 != GetSingleton()->scofPath[0];
 }
 
+extern DataHandler* g_dataHandler;
+
+TESForm* GetFormByID(const char* mod, UInt32 refID)
+{
+	return GetFormByID(g_dataHandler->GetModIndex(mod) << 8 | refID);
+}
+
 bool s_InsideOnActorEquipHook = false;
 UInt32 s_CheckInsideOnActorEquipHook = 1;
 
 void PrintConsole(const char * fmt, ...)
 {
-	if (ConsoleManager * mgr = ConsoleManager::GetSingleton())
+	if (const auto mgr = ConsoleManager::GetSingleton())
 	{
 		va_list	args;
-
 		va_start(args, fmt);
-
-		CALL_MEMBER_FN(mgr, Print)(fmt, args);
-
+		mgr->Print(fmt, args);
 		va_end(args);
 	}
-}
-
-TESSaveLoadGame* TESSaveLoadGame::Get()
-{
-	return reinterpret_cast<TESSaveLoadGame*>(0x011DE45C);
-}
-
-SaveGameManager* SaveGameManager::GetSingleton()
-{
-	return *reinterpret_cast<SaveGameManager**>(0x011DE134);
 }
 
 std::string GetSavegamePath()
 {
 	char path[0x104] = "\0";
-	CALL_MEMBER_FN(SaveGameManager::GetSingleton(), ConstructSavegamePath)(path);
+	SaveGameManager::GetSingleton()->ConstructSavegamePath(path);
 	return path;
 }
 
@@ -261,50 +249,6 @@ UInt32 GetActorValueForString(const char* strActorVal, bool bForScript)
 			return n;
 	}
 	return eActorVal_NoActorValue;
-}
-
-//Log error if expression evaluates to false
-bool SCRIPT_ASSERT(bool expr, Script* script, const char * errorMsg, ...)
-{
-	//	static bool bAlerted = false;			//only alert user on first error
-	//	static std::set<UInt32> naughtyScripts;	//one error per script to avoid thrashing
-	//
-	//	if (!expr && naughtyScripts.find(script->refID) == naughtyScripts.end())
-	//	{
-	//		const ModEntry ** activeMods = (*g_dataHandler)->GetActiveModList();
-	//		UInt8 modIndex = script->GetModIndex();
-	//		const ModEntry * modEntry = activeMods[modIndex];
-	//
-	//		const char * modName;
-	//		if (modIndex != 0xFF && modEntry && modEntry->data && modEntry->data->name)
-	//			modName = modEntry->data->name;
-	//		else
-	//			modName = "Unknown";
-	//
-	////		sprintf_s(errorHeader, sizeof(errorHeader) - 1, "** Error: Script %08X in file \"%s\" **", script->refID, modName);
-	////		_MESSAGE("%s", errorHeader);
-	//		_MESSAGE("** Script Error: Script %08x in file \"%s\" **", script->refID, modName);
-	//
-	//		va_list args;
-	//		va_start(args, errorMsg);
-	//
-	//		char errorBuf[512];
-	//		vsprintf_s(errorBuf, sizeof(errorBuf) - 1, errorMsg, args);
-	//		va_end(args);
-	//
-	//		gLog.Indent();
-	//		_MESSAGE("%s", errorBuf);
-	//		gLog.Outdent();
-	//
-	//		if (!bAlerted)
-	//		{
-	//			MessageBoxAlert("NVSE has detected a script error. \n\nPlease check nvse.log for details.");
-	//			bAlerted = true;
-	//		}
-	//
-	//		naughtyScripts.insert(script->refID);
-	//	}
-	return expr;
 }
 
 void ShowCompilerError(ScriptLineBuffer* lineBuf, const char * fmt, ...)
@@ -429,18 +373,6 @@ UInt8* GetScriptDataPosition(Script* script, void* scriptDataIn, const UInt32* o
 	return static_cast<UInt8*>(scriptDataIn) + *opcodeOffsetPtrIn;
 }
 
-TimeGlobal* TimeGlobal::GetSingleton() { return reinterpret_cast<TimeGlobal*>(0x11F6394); }
-
-void TimeGlobal::Set(const Float32 value, const char isImmediateChange)
-{
-	ThisCall<void>(0xAA4DB0, this, value, isImmediateChange);
-}
-
-Float32 TimeGlobal::Get() { return *reinterpret_cast<Float32*>(0x11AC3A0); }
-Float32 TimeGlobal::GetTarget() { return *reinterpret_cast<Float32*>(0x11AC3A4); }
-
-NiTPointerMap<TESForm>* GetAllForms() { return *reinterpret_cast<NiTPointerMap<TESForm>**>(0x11C54C0); }
-/*
 void ConsoleManager::AppendToSentHistory(const char* str)
 {
 	// create text node
@@ -454,4 +386,4 @@ void ConsoleManager::AppendToSentHistory(const char* str)
 
 	// append it to the input history
 	this->inputHistory.Append(textNode);
-}*/
+}

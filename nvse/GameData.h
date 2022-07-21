@@ -265,7 +265,7 @@ public:
 	UInt32							unk634;					// 634
 	UInt32							unk638;					// 638
 
-	static DataHandler* GetSingleton();
+	static DataHandler* GetSingleton() { return *reinterpret_cast<DataHandler**>(0x011C3F2C); }
 	const ModInfo ** GetActiveModList();		// returns array of modEntry* corresponding to loaded mods sorted by mod index
 	const ModInfo* LookupModByName(const char* modName);
 	UInt8 GetModIndex(const char* modName);

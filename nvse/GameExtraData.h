@@ -143,6 +143,14 @@ typedef ExtraContainerChanges::ExtendDataArray ContChangesExtendArray;
 typedef ExtraContainerChanges::EntryData ContChangesEntry;
 STATIC_ASSERT(sizeof(ContChangesEntry) == 0xC);
 
+class TileContChangesEntryUnk
+{
+public:
+	Tile*				tile = nullptr;
+	ContChangesEntry*	entry = nullptr;
+	UInt32				count = 0;
+};
+
 typedef ExtraContainerChanges::DataArray ContChangesArray;
 
 typedef ExtraContainerChanges::EntryDataList ContChangesList;
@@ -327,12 +335,19 @@ public:
 
 	struct Data
 	{
+		enum
+		{
+			kLocked = 1
+		};
+
 		UInt32	lockLevel;	// 00
-		TESKey	* key;		// 04
+		TESKey* key;		// 04
 		UInt8	flags;		// 08
 		UInt8	pad[3];
 		UInt32  unk0C;		// 0C introduced since form version 0x10
 		UInt32	unk10;		// 10
+
+		bool IsLocked() { return flags & kLocked; };
 	};
 
 	Data*	data;		// 00C
@@ -647,3 +662,14 @@ public:
 
 	AlchemyItem* poisonEffect;    // 0C
 };
+STATIC_ASSERT(sizeof(ExtraPoison) == 0x10);
+
+class ExtraAshPileRef : public BSExtraData
+{
+public:
+	ExtraAshPileRef();
+	~ExtraAshPileRef();
+
+	TESObjectREFR* sourceRef;		// 0C
+};
+STATIC_ASSERT(sizeof(ExtraAshPileRef) == 0x10);

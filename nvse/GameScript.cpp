@@ -130,8 +130,8 @@ void Script::RefVariable::Resolve(ScriptEventList * eventList)
 		ScriptEventList::Var	* var = eventList->GetVariable(varIdx);
 		if(var)
 		{
-			UInt32	refID = *((UInt32 *)&var->data);
-			form = LookupFormByID(refID);
+			UInt32 refID = *((UInt32 *)&var->data);
+			form = GetFormByID(refID);
 		}
 	}
 }
@@ -205,7 +205,7 @@ Script::RefVariable* ScriptBuffer::ResolveRef(const char* refName)
 #if RUNTIME
 		if (_stricmp(refName, "player") == 0)
 		{
-			form = LookupFormByID(0x14);
+			form = GetFormByID(0x14);
 		}
 #endif
 		if (form)

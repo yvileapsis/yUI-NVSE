@@ -3,45 +3,30 @@
 #include <SafeWrite.h>
 #include <GameObjects.h>
 
-UInt8* g_menuVisibility = reinterpret_cast<UInt8*>(0x011F308F);
-NiTArray <TileMenu*>* g_tileMenuArray = reinterpret_cast<NiTArray<TileMenu*>*>(0x011F3508);
+UInt8*					g_menuVisibility = reinterpret_cast<UInt8*>(0x011F308F);
+NiTArray<TileMenu*>*	g_tileMenuArray = reinterpret_cast<NiTArray<TileMenu*>*>(0x011F3508);
 
-static const UInt32 s_RaceSexMenu__UpdatePlayerHead	= 0x007B25A0;	// End of RaceSexMenu::Func003.case0, call containing QueuedHead::Init (3rd before jmp)
 static UInt8*	g_bUpdatePlayerModel		= (UInt8*)0x011C5CB4;	// this is set to true when player confirms change of race in RaceSexMenu -
 																	// IF requires change of skeleton - and back to false when model updated
-const _TempMenuByType TempMenuByType = (_TempMenuByType)0x00707990;	// Called from called from call RaceSexMenu::Init
-
-bool InterfaceManager::IsMenuVisible(UInt32 menuType)
+bool InterfaceManager::IsMenuVisible(const UInt32 menuType)
 {
-	if((menuType >= kMenuType_Min) && (menuType <= kMenuType_Max))
-		return g_menuVisibility[menuType] != 0;
-
-	return false;
+	return menuType >= kMenuType_Min && menuType <= kMenuType_Max ? g_menuVisibility[menuType] != 0 : false;
 }
 
-Menu * InterfaceManager::GetMenuByType(UInt32 menuType)
+TileMenu* TileMenu::GetTileMenu(const UInt32 menuType)
 {
-	if((menuType >= kMenuType_Min) && (menuType <= kMenuType_Max))
-	{
-		TileMenu * tileMenu = g_tileMenuArray->Get(menuType - kMenuType_Min);
-		if (tileMenu) return tileMenu->menu;
-	}
+	return menuType >= kMenuType_Min && menuType <= kMenuType_Max ? g_tileMenuArray->Get(menuType - kMenuType_Min) : nullptr;
+}
 
+Menu* InterfaceManager::GetMenuByType(const UInt32 menuType)
+{
+	if (const auto tileMenu = TileMenu::GetTileMenu(menuType)) return tileMenu->menu;
 	return nullptr;
-}
-
-TileMenu* TileMenu::GetTileMenu(const UInt32 menuID)
-{
-	return menuID ? g_tileMenuArray->Get(menuID - kMenuType_Min) : nullptr;
 }
 
 Menu * InterfaceManager::TempMenuByType(UInt32 menuType)
 {
-	if((menuType >= kMenuType_Min) && (menuType <= kMenuType_Max))
-	{
-		return ::TempMenuByType(menuType);
-	}
-	return NULL;
+	return menuType >= kMenuType_Min && menuType <= kMenuType_Max ? CdeclCall<Menu*>(0x00707990, menuType) : nullptr;
 }
 
 const char kMenuNames[] =
@@ -124,28 +109,12 @@ void Debug_DumpMenus(void)
 	}
 }
 
-void RaceSexMenu::UpdatePlayerHead(void)
-{
-	ThisStdCall(s_RaceSexMenu__UpdatePlayerHead, this);
-}
-
 void (*ToggleMenus)(bool toggleON) = reinterpret_cast<void(*)(bool)>(0x703810);
-void (*RefreshItemsListBox)(void) = reinterpret_cast<void(*)()>(0x704AF0);
 bool(__cdecl* GetIsMenuMode)() = reinterpret_cast<bool(*)()>(0x702360);
 int* (__thiscall* Tile_A01000)(Tile*, enum TileValues) = (int* (__thiscall*)(Tile*, enum TileValues))0xA01000;
 void(__thiscall* TileValueSetString)(int*, char*, char) = (void(__thiscall*)(int*, char*, char))0xA0A300;
-//void(__thiscall* Tile__SetStringValue)(Tile*, enum TileValues, const char*, char) = (void(__thiscall*)(Tile*, enum TileValues, const char*, char))0xA01350;
-//void(__thiscall* Tile__SetFloatValue)(Tile*, enum TileValues, float, char) = (void(__thiscall*)(Tile*, enum TileValues, float, char))0xA012D0;
-//TileMenu* (__cdecl* Tile__GetMenuTile)(UInt32 id) = reinterpret_cast<TileMenu * (*)(UInt32)>(0xA09030);
-Menu* (__thiscall* TileList__GetMenu)(Tile*) = reinterpret_cast<Menu * (__thiscall*)(Tile*)>(0xA03C90);
-void(__thiscall* Menu__RegisterTile)(Menu*, Tile*, bool) = reinterpret_cast<void(__thiscall*)(Menu*, Tile*, bool)>(0xA1DC70);
-void(__thiscall* Menu__HideTitle)(Menu*, bool) = reinterpret_cast<void(__thiscall*)(Menu*, bool)>(0xA1DC20);
 void(__cdecl* HUDMainMenu_UpdateVisibilityState)(signed int) = reinterpret_cast<void(*)(int)>(0x771700);
 void(__cdecl* MenuButton_Downloads)() = reinterpret_cast<void(*)()>(0x7D0550);
-bool(*MenuVisible)(UINT32) = reinterpret_cast<bool(*)(UINT32)>(0x11F308F);
-void(__thiscall* RefreshContainerMenu)(ContainerMenu*, TESForm*) = reinterpret_cast<void(__thiscall*)(ContainerMenu*, TESForm*)>(0x75C280);
-void(__thiscall* RefreshBarterMenu)(BarterMenu*, TESForm*) = reinterpret_cast<void(__thiscall*)(BarterMenu*, TESForm*)>(0x72DC30);
-void(__thiscall* InitEntriesRepairServices)(RepairServicesMenu*) = reinterpret_cast<void(__thiscall*)(RepairServicesMenu*)>(0x7B8B30);
 
 void MenuButton_DownloadsClick() { MenuButton_Downloads(); }
 
@@ -178,13 +147,13 @@ bool Menu::GetTemplateExists(const char* templateName)
 
 bool InventoryMenu::IsKeyringOpen()
 {
-	return GetSingleton()->tile->GetValueFloat(*(UInt32*)0x11D9EB8); // Trait_KeyringOpen
+	return GetSingleton()->tile->GetFloat(*(UInt32*)0x11D9EB8); // Trait_KeyringOpen
 }
 
 
 bool DialogMenu::IsNPCTalking()
 {
-	return tile->GetValueFloat(*(UInt32*)0x11D9500); // g_dialogMenu_TraitShowingText
+	return tile->GetFloat(*(UInt32*)0x11D9500); // g_dialogMenu_TraitShowingText
 }
 
 
@@ -199,76 +168,54 @@ bool IsInStartMenu()
  * RefreshItemsList calls itemsList->FreeAllTiles() and then allocates the memory for all the tiles again
  * instead skip the calls that free/allocate
  */
+/*
 void RefreshItemsList()
 {
-//	SafeWrite16(0x75C3F5, 0); // ContainerMenu, nop JE by changing dest
-//	SafeWrite16(0x75C443, 0x60EB); // ContainerMenu
-
 	SafeWriteBuf(0x75C588, "\xA1\x3C\xEA\x1D\x01", 5);
 	SafeWriteBuf(0x75C5AC, "\x8B\x8D\x44\xFF\xFF\xFF\x8B\x51\x74", 9);
-	RefreshItemsListBox();
-	
-//	SafeWrite16(0x75C3F5, 0x0182); // ContainerMenu
-//	SafeWrite16(0x75C443, 0x4D8B); // ContainerMenu
+	InterfaceManager::RefreshItemsList();
 }
-
-bool RefreshItemsListForm(TESForm* form)
+*/
+bool InterfaceManager::RefreshItemsListForm(TESForm* form)
 {
-	if (g_menuVisibility[kMenuType_Barter])
+	bool refresh = false;
+	if (IsMenuVisible(kMenuType_Barter))
 	{
-		RefreshBarterMenu(BarterMenu::GetSingleton(), form);
-		return true;
+		BarterMenu::GetSingleton()->Refresh(form);
+		refresh = true;
 	}
-	else if (g_menuVisibility[kMenuType_Container])
+	if (IsMenuVisible(kMenuType_Container))
 	{
-		RefreshContainerMenu(ContainerMenu::GetSingleton(), form);
-		return true;
+		ContainerMenu::GetSingleton()->Refresh(form);
+		refresh = true;
 	}
-	else if (g_menuVisibility[kMenuType_RepairServices])
+	if (IsMenuVisible(kMenuType_RepairServices))
 	{
-		InitEntriesRepairServices(RepairServicesMenu::GetSingleton());
-		return true;
+		RepairServicesMenu::GetSingleton()->Refresh();
+		refresh = true;
 	}
-	else
-	{
-		return false;
-	}
+	return refresh;
 }
 
-void QuickRefreshItemsList()
+void InterfaceManager::RefreshItemsListQuick()
 {
 	SafeWriteBuf(0x78319C, "\xE8\x2F\xCE\xFF\xFF\xEB\x70", 7); // InventoryMenu, call SaveCurrentTabScrollPosition and skip reallocating tiles
+
 	SafeWrite16(0x75C3F5, 0); // ContainerMenu, nop JE by changing dest
 	SafeWrite16(0x75C443, 0x60EB); // ContainerMenu
 
 	SafeWrite16(0x72DC9C, 0); // BarterMenu
 	SafeWrite32(0x72DCD3, 0x0004B2E9); // BarterMenu, jump over code recalculating the selected items for trading
 
-	RefreshItemsListBox();
+	RefreshItemsList();
 
 	SafeWriteBuf(0x78319C, "\x6A\x00\x6A\x00\x68\x50\x28", 7); // InventoryMenu
+
 	SafeWrite16(0x75C3F5, 0x0182); // ContainerMenu
 	SafeWrite16(0x75C443, 0x4D8B); // ContainerMenu
 
 	SafeWrite16(0x72DC9C, 0x01F6);
 	SafeWrite32(0x72DCD3, 0x00D1840F); // jump over code recalculating the selected items for trading
-}
-
-void InterfaceManager::VATSHighlightData::ResetRefs()
-{
-	ThisCall(0x800ED0, this);
-}
-
-__declspec(naked) void Tile::SetFloat(UInt32 id, float fltVal, bool bPropagate)
-{
-	static constexpr UInt32 procAddr = 0xA012D0;
-	__asm	jmp		procAddr
-}
-
-__declspec(naked) void Tile::SetString(UInt32 id, const char* strVal, bool bPropagate)
-{
-	static const UInt32 procAddr = 0xA01350;
-	__asm	jmp		procAddr
 }
 
 StartMenuOption* StartMenuOption::Create(const char* str, void (*callback)(void), UInt32 flags)
@@ -364,8 +311,8 @@ void Move(float deltaX, float deltaY)
 
 	if (this->tile038)
 	{
-		this->clickStartPos.x = this->tile038->GetValueFloat(kTileValue_x);
-		this->clickStartPos.y = this->tile038->GetValueFloat(kTileValue_y);
+		this->clickStartPos.x = this->tile038->GetFloat(kTileValue_x);
+		this->clickStartPos.y = this->tile038->GetFloat(kTileValue_y);
 	}
 }
 

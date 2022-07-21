@@ -261,8 +261,13 @@ namespace SI
 		if (entry && entry->form && TryGetTypeOfForm(entry->form)) InjectIconTile(g_Categories[GetCategoryForItem(entry)], list, tile, entry);
 	}
 
-	SInt32 __fastcall CompareItemsWithTags(ContChangesEntry* a2, ContChangesEntry* a1, Tile* tile1, Tile* tile2)
+	SInt32 __fastcall CompareItemsWithTags(const TileContChangesEntryUnk* unk1, const TileContChangesEntryUnk* unk2)
 	{
+		const auto a1 = unk1->entry;
+		const auto a2 = unk2->entry;
+		const auto tile1 = unk1->tile;
+		const auto tile2 = unk2->tile;
+
 		TESForm* form1 = nullptr, * form2 = nullptr;
 
 		if (a1 && a1->form) form1 = a1->form;
@@ -631,15 +636,8 @@ namespace SIHooks
 		_asm
 		{
 			pop		eax
-			mov		eax, [ebp + 0xC]	// a2
-			mov		ecx, [eax]
-			push	ecx					// tile2
-			mov		ecx, [eax + 0x4]	// entry2
-
-			mov		eax, [ebp + 0x8]	// a1
-			mov		edx, [eax]
-			push	edx					// tile1
-			mov		edx, [eax + 0x4]	// entry1
+			mov		ecx, [ebp + 0x8]	// a1
+			mov		edx, [ebp + 0xC]	// a2
 
 			call	CompareItems
 			mov		esp, ebp

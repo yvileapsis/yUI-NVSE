@@ -5,10 +5,11 @@
 #include <file.h>
 
 #include <events.h>
+
 #include <JDC.h>
 #include <JHM.h>
-
-#include "JVO.h"
+#include <JVO.h>
+#include <JLM.h>
 
 #define yJAM_VERSION 0.1
 #define yJAM_VERSION_STR "0.1"
@@ -33,17 +34,15 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	}
 	else if (msg->type == NVSEMessagingInterface::kMessage_MainGameLoop)
 	{
-		if (g_JDC) JDC::MainLoop();
-		if (g_JHM) JHM::MainLoop();
-		if (g_JVO) JVO::MainLoop();
+		DispatchEvent("yJAM:MainLoop", nullptr);
 
 		if (iDoOnce == 0 && !MenuMode()) {
 			iDoOnce++;
 
-
-			if (g_JDC) JDC::Initialize();
-			if (g_JHM) JHM::Initialize();
-			if (g_JVO) JVO::Initialize();
+			JDC::Initialize();
+			JHM::Initialize();
+			JVO::Initialize();
+			JLM::Initialize();
 		}
 		
 	}

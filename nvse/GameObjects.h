@@ -167,7 +167,7 @@ public:
 	NiNode* __fastcall		GetNode(const char* nodeName);
 	hkpRigidBody*			GetRigidBody(const char* nodeName);
 	bool					RunScriptSource(const char* sourceStr);
-	ExtraLock::Data*		GetLockData();
+	ExtraLock::Data*		GetLockData() { return ThisCall<ExtraLock::Data*>(0x569160, this); }
 	void					SetScale(float scale);
 	bool					IsOwnedByActor(Actor* actor, bool includeFactionOwnership) { return ThisCall<bool>(0x5785E0, this, actor, includeFactionOwnership); };
 	TESObjectREFR*			ResolveOwnership() { return ThisCall<TESObjectREFR*>(0x567790, this); };
@@ -178,7 +178,9 @@ public:
 	NiPoint3				GetCenter() const;
 	NiPoint3				GetDimensions() const;
 	__forceinline Float32	GetScale() { return ThisCall<float>(0x567400, this); }
-
+	TESObjectREFR*			ResolveAshpile();
+	__forceinline bool		IsLocked() { return this->GetLockData() ? this->GetLockData()->IsLocked() : false; }
+	__forceinline bool		CanContainItems() { return typeID == kFormType_TESObjectACTI || typeID == kFormType_TESObjectCONT || typeID == kFormType_TESNPC || typeID == kFormType_Creature; }
 
 	MEMBER_FN_PREFIX(TESObjectREFR);
 	DEFINE_MEMBER_FN_LONG(_MEMBER_FN_BASE_TYPE, Activate, bool, 0x00573170, TESObjectREFR*, UInt32, UInt32, UInt32);	// Usage Activate(actionRef, 0, 0, 1); found inside Cmd_Activate_Execute as the last call (190 bytes)

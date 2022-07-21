@@ -4,13 +4,6 @@
 #include <GameAPI.h>
 #include <GameExtraData.h>
 
-void QuickRefreshItemsList();
-void RefreshItemsList();
-bool RefreshItemsListForm(TESForm*);
-
-typedef Menu * (* _TempMenuByType)(UInt32 menuType);
-extern const _TempMenuByType TempMenuByType;
-
 enum MenuSpecialKeyboardInputCode
 {
 	kMenu_Enter = -2,
@@ -67,20 +60,12 @@ enum
 	kAddr_EquipItem = 0x88C650,
 	kAddr_UnequipItem = 0x88C790,
 	kAddr_ReturnTrue = 0x8D0360,
-	kAddr_TileGetFloat = 0xA011B0,
-	kAddr_TileSetFloat = 0xA012D0,
-	kAddr_TileSetString = 0xA01350,
 	kAddr_InitFontInfo = 0xA12020,
 	kAddr_GetItemHealthPerc = 0x4BCDB0,
 	kAddr_GetItemValue = 0x4BD400,
-	kAddr_ReadXML = 0xA01B00,
-	kAddr_TileFromTemplate = 0xA1DDB0,
 	kAddr_EvaluateConditions = 0x680C60,
 	kAddr_EvaluateCondition = 0x681600,
 };
-
-class Tile3D;
-
 
 enum MouseButtonNames
 {
@@ -160,21 +145,6 @@ struct InterfaceManagerStruct0178;
 class InterfaceManager
 {
 public:
-	InterfaceManager();
-	~InterfaceManager();
-
-	static InterfaceManager*	GetSingleton(void) { return *reinterpret_cast<InterfaceManager**>(0x11D8A80); };
-	static bool					IsMenuVisible(UInt32 menuType);
-	static Menu *				GetMenuByType(UInt32 menuType);
-	static Menu *				TempMenuByType(UInt32 menuType);
-	static TileMenu*			GetMenuByPath(const char* componentPath, const char** slashPos);
-	static Tile::Value*			GetMenuComponentValue(const char* componentPath);
-	static Tile*				GetMenuComponentTile(const char* componentPath);
-	static Tile::Value*			GetMenuComponentValueAlt(const char* componentPath);
-	
-	UInt32						GetTopVisibleMenuID();
-	Tile*						GetActiveTile();
-
 	struct Struct0178
 	{
 		UInt32 unk00;
@@ -253,7 +223,7 @@ public:
 
 		void AddRef(TESObjectREFR* ref);
 		void AddRefAndSetFlashing(TESObjectREFR* ref);
-		void ResetRefs();
+		void __forceinline ResetRefs() { ThisCall(0x800ED0, this); };
 	};
 
 	struct Tutorials
@@ -435,6 +405,24 @@ public:
 	UInt8					pad4CF;				// 4CF
 	UInt32					unk4D0;				// 4D0
 	Tutorials				help;				// 4D4
+
+	InterfaceManager();
+	~InterfaceManager();
+
+	static InterfaceManager*	GetSingleton(void) { return *reinterpret_cast<InterfaceManager**>(0x11D8A80); };
+	static bool					IsMenuVisible(const UInt32 menuType);
+	static Menu *				GetMenuByType(const UInt32 menuType);
+	static Menu *				TempMenuByType(const UInt32 menuType);
+	static TileMenu*			GetMenuByPath(const char* componentPath, const char** slashPos);
+	static Tile::Value*			GetMenuComponentValue(const char* componentPath);
+	static Tile*				GetMenuComponentTile(const char* componentPath);
+	static Tile::Value*			GetMenuComponentValueAlt(const char* componentPath);
+	
+	UInt32						GetTopVisibleMenuID();
+	Tile*						GetActiveTile();
+	static void	__forceinline	RefreshItemsList() { StdCall(0x704AF0); }
+	static void					RefreshItemsListQuick();
+	static bool					RefreshItemsListForm(TESForm* form = nullptr);
 };
 STATIC_ASSERT(sizeof(InterfaceManager) == 0x580);
 STATIC_ASSERT(sizeof(InterfaceManager::Struct0178) == 0x64);
@@ -625,8 +613,8 @@ public:
 		auto _template = _templateName ? _templateName : this->templateName;
 		if (!_template) return nullptr;
 
-		auto menu = ThisCall<Menu*>(0xA03C90, this->parentTile);
-		Tile* newTile = ThisCall<Tile*>(0xA1DDB0, menu, this->parentTile, _template, nullptr);
+		auto menu = this->parentTile->GetParentMenu();
+		Tile* newTile = menu->AddTileFromTemplate(this->parentTile, _template, nullptr);
 		if (!newTile->GetValue(kTileValue_id))
 		{
 			newTile->SetFloat(kTileValue_id, -1);
@@ -661,14 +649,14 @@ public:
 
 		if (this->itemCount == 1)
 		{
-			auto numVisibleItemsTrait = TraitNameToID("_number_of_visible_items");
-			if (this->parentTile->GetValueFloat(numVisibleItemsTrait) > 0)
+			auto numVisibleItemsTrait = Tile::TraitNameToID("_number_of_visible_items");
+			if (this->parentTile->GetFloat(numVisibleItemsTrait) > 0)
 			{
 				auto valPtr = ThisCall<Tile::Value*>(0xA00E90, this->parentTile, kTileValue_height);
 				ThisCall(0xA09200, valPtr);
 				ThisCall(0xA09130, valPtr, 2000, newTile, kTileValue_height);
 
-				auto numVisible = this->parentTile->GetValueFloat(numVisibleItemsTrait);
+				auto numVisible = this->parentTile->GetFloat(numVisibleItemsTrait);
 				ThisCall(0xA09080, valPtr, kTileValue_Mul, numVisible);
 				ThisCall(0xA09410, valPtr, 0);
 			}
@@ -700,14 +688,14 @@ public:
 
 	void SetParentEnabled(bool isEnabled)
 	{
-		static UInt32 enabledTrait = TraitNameToID("_enabled");
+		static UInt32 enabledTrait = Tile::TraitNameToID("_enabled");
 		parentTile->SetFloat(enabledTrait, isEnabled);
 	}
 
 	bool IsEnabled()
 	{
-		static UInt32 enabledTrait = TraitNameToID("_enabled");
-		return parentTile && parentTile->GetValueFloat(enabledTrait);
+		static UInt32 enabledTrait = Tile::TraitNameToID("_enabled");
+		return parentTile && parentTile->GetFloat(enabledTrait);
 	}
 
 	void Init()
@@ -803,8 +791,7 @@ public:
 	// check 8 at 0x712194 :: set 8 at 0xA1DB8F (when opening menu), 0x720B39
 
 	Menu*					HandleMenuInput(UInt32 tileID, Tile* clickedTile);
-	__forceinline Tile*		AddTileFromTemplate(Tile* destTile, const char* templateName, UInt32 arg3 = 0)
-							{ return ThisCall<Tile*>(0xA1DDB0, this, destTile, templateName, arg3); }
+	__forceinline Tile*		AddTileFromTemplate(Tile* destTile, const char* templateName, UInt32 arg3 = 0)	{ return ThisCall<Tile*>(0xA1DDB0, this, destTile, templateName, arg3); }
 	bool					GetTemplateExists(const char* templateName);
 
 	void					Close()
@@ -918,9 +905,11 @@ public:
 	UInt32				unk0FC;			// 0FC
 	Sound				menuSound;		// 100
 
-	static ContainerMenu* GetSingleton() { return *reinterpret_cast<ContainerMenu**>(0x11D93F8); }
-	static ContChangesEntry* GetSelection() { return *reinterpret_cast<ContChangesEntry**>(0x11D93FC); }
-	static void SetSelection(ContChangesEntry* entry) { *reinterpret_cast<ContChangesEntry**>(0x11D93FC) = entry; }
+	static ContainerMenu*		GetSingleton() { return *reinterpret_cast<ContainerMenu**>(0x11D93F8); }
+	static ContChangesEntry*	GetSelection() { return *reinterpret_cast<ContChangesEntry**>(0x11D93FC); }
+	static void					SetSelection(ContChangesEntry* entry) { *reinterpret_cast<ContChangesEntry**>(0x11D93FC) = entry; }
+	void __forceinline			Refresh(TESForm* form = nullptr) { ThisCall(0x75C280, form); }
+
 };
 
 class BookMenu : public Menu
@@ -1679,8 +1668,9 @@ public:
 	UInt8				skill;			// 9C
 	UInt8				pad9D[3];		// 9D
 
-	static RepairServicesMenu* GetSingleton() { return *reinterpret_cast<RepairServicesMenu**>(0x11DA7F0); };
-	static Actor* GetActor() { return *reinterpret_cast<Actor**>(0x11DA7F4); };
+	static RepairServicesMenu*	GetSingleton() { return *reinterpret_cast<RepairServicesMenu**>(0x11DA7F0); };
+	static Actor*				GetActor() { return *reinterpret_cast<Actor**>(0x11DA7F4); };
+	void __forceinline			Refresh() { ThisCall(0x7B8B30, this); }
 };
 
 // 8C
@@ -1982,6 +1972,8 @@ public:
 	UInt32				unk11C;			// 11C
 
 	static BarterMenu* GetSingleton() { return *reinterpret_cast<BarterMenu**>(0x11D8FA4); }
+	void __forceinline Refresh(TESForm* form = nullptr) { ThisCall(0x72DC30, form); }
+
 };
 
 // 44
@@ -2605,7 +2597,7 @@ public:
 			auto rsm = RaceSexMenu::GetSingleton();
 			auto tile = rsm->AddTileFromTemplate(rsm->rsmBackground, "RSM_list_item_template", 0);
 			tile->SetString(kTileValue_string, str);
-			tile->SetFloat(kTileValue_user0, this->listItemTemplate->GetValueFloat(kTileValue_user0));
+			tile->SetFloat(kTileValue_user0, this->listItemTemplate->GetFloat(kTileValue_user0));
 			tile->SetFloat(kTileValue_target, true);
 			tile->SetString(kTileValue_clicksound, nullptr);
 			entry->tile = tile;
@@ -2639,9 +2631,9 @@ public:
 			auto iter = items.Head();
 			if (!iter) return;
 
-			auto topTrait = TraitNameToID("_top_bound");
+			auto topTrait = Tile::TraitNameToID("_top_bound");
 			auto tile = iter->data->tile;
-			float yPos = tile->parent->GetValueFloat(topTrait);
+			float yPos = tile->parent->GetFloat(topTrait);
 
 			tile->SetFloat(kTileValue_y, yPos);
 			ThisCall(0xA04640, tile, false);
@@ -2649,15 +2641,15 @@ public:
 			while (iter = iter->next)
 			{
 				auto tileAbove = iter->prev->data->tile;
-				yPos = tileAbove->GetValueFloat(kTileValue_y);
-				yPos += tileAbove->GetValueFloat(kTileValue_height);
+				yPos = tileAbove->GetFloat(kTileValue_y);
+				yPos += tileAbove->GetFloat(kTileValue_height);
 
 				tile = iter->data->tile;
 				tile->SetFloat(kTileValue_y, yPos);
 				ThisCall(0xA04640, tile, false);
 			}
 
-			this->height = max(this->height, items.Tail()->data->tile->GetValueFloat(kTileValue_height));
+			this->height = max(this->height, items.Tail()->data->tile->GetFloat(kTileValue_height));
 		}
 
 		void UpdateSelectedSquares()
@@ -2741,9 +2733,9 @@ public:
 
 	void RefreshSliders();
 	void UpdateScrollButtonVisibilities() { ThisCall(0x7AF6B0, this); };
-	UInt32 GetCurrentMenuID() { return this->tile->GetValueFloat(kTileValue_user0); };
+	UInt32 GetCurrentMenuID() { return this->tile->GetFloat(kTileValue_user0); };
 	void SetMenuActive(UInt32 _id) { ThisCall(0x7AF180, this, _id); };
-	void UpdatePlayerHead(void);
+	void UpdatePlayerHead() { ThisStdCall(0x007B25A0, this); }
 };
 STATIC_ASSERT(sizeof(RaceSexMenu) == 0x1A4);
 
@@ -3541,12 +3533,18 @@ public:
 	// 3C
 
 
-	FontInfo* fontInfos[8];		// 00
+	FontInfo*			fontInfos[8];		// 00
 	UInt8				byte20;				// 20
 	UInt8				pad21[3];			// 21
-	FontInfo* extraFonts[80];	// 24
+	FontInfo*			extraFonts[80];	// 24
 
-	NiPoint3* GetStringDimensions(NiPoint3* outDims, const char* srcString, UInt32 fontID, UInt32 maxFlt = 0x7F7FFFFF, UInt32 startIdx = 0);
+	NiPoint3* GetStringDimensions(NiPoint3* outDims, const char* srcString, UInt32 fontID, Float32 wrapwidth = 0x7F7FFFFF, UInt32 startIdx = 0) { return ThisCall<NiPoint3*>(0xA1B020, this, outDims, srcString, fontID, wrapwidth, startIdx); };
+	NiPoint3* GetStringDimensions(const char* srcString, UInt32 fontID, Float32 wrapwidth = 0x7F7FFFFF, UInt32 startIdx = 0)
+	{
+		NiPoint3 out;
+		return GetStringDimensions(&out, srcString, fontID, wrapwidth, startIdx);
+	}
+
 	static FontManager* GetSingleton() { return *reinterpret_cast<FontManager**>(0x11F33F8); };
 };
 
@@ -3819,16 +3817,12 @@ enum Scancodes
 	MouseWheelDown = 0x109,
 };
 
-class ImageSpaceModifierInstance;
-
 struct FontHeightData
 {
 	float		heightBase;
 	float		heightwGap;
 };
 //s_fontHeightDatas[90];
-
-
 
 void MenuButton_DownloadsClick();
 void Debug_DumpFontNames(void);
