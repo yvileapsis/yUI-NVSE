@@ -107,7 +107,7 @@ public:
 	static GameSettingCollection * GetSingleton();
 };
 
-STATIC_ASSERT(sizeof(GameSettingCollection) == 0x120);
+static_assert(sizeof(GameSettingCollection) == 0x120);
 
 // 114
 // actually 2 classes used: IniSettingCollection and IniPrefSettingCollection. Layouts are the same
@@ -138,7 +138,7 @@ public:
 	static IniSettingCollection * GetIniPrefs();
 };
 
-STATIC_ASSERT(sizeof(IniSettingCollection) == 0x114);
+static_assert(sizeof(IniSettingCollection) == 0x114);
 
 bool GetNumericGameSetting(char * settingName, double * result);
 bool GetNumericIniSetting(const char * settingName, double * result);

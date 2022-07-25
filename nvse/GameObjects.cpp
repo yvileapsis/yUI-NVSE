@@ -11,8 +11,6 @@
 #include "GameSettings.h"
 
 static constexpr UInt32 s_TESObject_REFR_init						= 0x0055A2F0;	// TESObject_REFR initialization routine (first reference to s_TESObject_REFR_vtbl)
-static constexpr UInt32	s_Actor_EquipItem							= 0x0088C650;	// maybe, also, would be: 007198E0 for FOSE	4th call from the end of TESObjectREFR::RemoveItem (func5F)
-static constexpr UInt32	s_Actor_UnequipItem							= 0x0088C790;	// maybe, also, would be: 007133E0 for FOSE next sub after EquipItem
 static constexpr UInt32 s_TESObjectREFR__GetContainer				= 0x0055D310;	// First call in REFR::RemoveItem
 static constexpr UInt32 s_TESObjectREFR_Set3D						= 0x005702E0;	// void : (const char*)
 static constexpr UInt32 s_PlayerCharacter_GetCurrentQuestTargets	= 0x00952BA0;	// BuildedQuestObjectiveTargets* : (void)
@@ -91,14 +89,49 @@ TESObjectREFR* TESObjectREFR::Create(bool bTemp)
 {
 	const auto refr = static_cast<TESObjectREFR*>(FormHeap_Allocate(sizeof(TESObjectREFR)));
 	ThisStdCall(s_TESObject_REFR_init, refr);
-	if (bTemp) CALL_MEMBER_FN(refr, MarkAsTemporary)();
+//	if (bTemp) MarkAsTemporary();
 	return refr;
+}
+
+std::vector<ContChangesEntry*> TESObjectREFR::GetAllItems()
+{
+	std::vector<ContChangesEntry*> vector;
+	
+	ContChangesEntry* entry = nullptr;
+	void* iterator = nullptr;
+	ThisCall(0x575510, this, 0, &iterator, &entry);
+	if (iterator && entry) for (auto iter = ThisCall<ContChangesEntry*>(0x4CA330, entry, iterator); iter; iter = ThisCall<ContChangesEntry*>(0x4CA330, entry, iterator))
+		if (iter->ShouldDisplay()) vector.push_back(iter);
+
+	// Vanilla method is more than twice as slow but it does a lot of stuff, like removing LvlItem garbage, combining throwables, etc
+
+	/*
+	if (const auto entryList = GetContainerChangesList()) for (auto iter : *entryList) 
+		if (iter->countDelta > 0) vector.push_back(iter);
+
+	if (const auto container = GetContainer()) for (const auto iter : container->formCountList)
+		if (iter->form->typeID != kFormType_TESLevItem && iter->count > 0) vector.push_back(ContChangesEntry::Create(iter->form, iter->count));
+	*/
+
+	// Process linked ref for vendor containers, recursive, but hopefully no one links container on itself
+	if (const auto xLinkedRef = reinterpret_cast<ExtraLinkedRef*>(this->extraDataList.GetByType(kExtraData_LinkedRef)))
+		if (const auto linked = xLinkedRef->linkedRef)
+		{
+			const auto newvector = linked->GetAllItems();
+			vector.insert(vector.end(), newvector.begin(), newvector.end());
+		}
+
+	if (this->IsActor())
+		if (const auto xDropped = reinterpret_cast<ExtraDroppedItemList*>(this->extraDataList.GetByType(kExtraData_DroppedItemList)))
+			for (const auto iter : xDropped->itemRefs) vector.push_back(ContChangesEntry::Create(iter, 1));
+
+	return vector;
 }
 
 TESForm* GetPermanentBaseForm(TESObjectREFR* thisObj)	// For LevelledForm, find real baseForm, not temporary one.
 {
 	if (thisObj)
-		if (const auto pXCreatureData = GetByTypeCast(thisObj->extraDataList, LeveledCreature); pXCreatureData && pXCreatureData->baseForm)
+		if (const auto pXCreatureData = DYNAMIC_CAST(thisObj->extraDataList.GetByType(kExtraData_LeveledCreature), BSExtraData, ExtraLeveledCreature); pXCreatureData && pXCreatureData->baseForm)
 			return pXCreatureData->baseForm;
 	if (thisObj && thisObj->baseForm)
 		return thisObj->baseForm;
@@ -107,12 +140,12 @@ TESForm* GetPermanentBaseForm(TESObjectREFR* thisObj)	// For LevelledForm, find 
 
 void Actor::EquipItem(TESForm * objType, UInt32 equipCount, ExtraDataList* itemExtraList, UInt32 unk3, bool lockEquip, UInt32 unk5)
 {
-	ThisStdCall(s_Actor_EquipItem, this, objType, equipCount, itemExtraList, unk3, lockEquip, unk5);
+	ThisStdCall(0x0088C650, this, objType, equipCount, itemExtraList, unk3, lockEquip, unk5);
 }
 
 void Actor::UnequipItem(TESForm* objType, UInt32 unk1, ExtraDataList* itemExtraList, UInt32 unk3, bool lockUnequip, UInt32 unk5)
 {
-	ThisStdCall(s_Actor_UnequipItem, this, objType, unk1, itemExtraList, unk3, lockUnequip, unk5);
+	ThisStdCall(0x0088C790, this, objType, unk1, itemExtraList, unk3, lockUnequip, unk5);
 }
 
 EquippedItemsList Actor::GetEquippedItems()
@@ -576,12 +609,12 @@ NiAVObject* TESObjectREFR::GetNifBlock(UInt32 pcNode, const char* blockName)
 	return GetNifBlock2(this, pcNode, blockName);
 }
 
-ExtraDataList* ExtraContainerChanges::EntryData::GetEquippedExtra()
+ExtraDataList* ContChangesEntry::GetEquippedExtra()
 {
 	return GetCustomExtra(kExtraData_Worn);
 }
 
-ExtraDataList* ExtraContainerChanges::EntryData::GetCustomExtra(UInt32 whichVal)
+ExtraDataList* ContChangesEntry::GetCustomExtra(UInt32 whichVal)
 {
 	if (!extendData) return nullptr;
 	const TListNode<ExtraDataList>* xdlIter = extendData->Head();
@@ -590,15 +623,59 @@ ExtraDataList* ExtraContainerChanges::EntryData::GetCustomExtra(UInt32 whichVal)
 	return nullptr;
 }
 
-BSExtraData* ExtraContainerChanges::EntryData::GetExtraData(UInt32 whichVal)
+BSExtraData* ContChangesEntry::GetExtraData(UInt32 whichVal)
 {
 	const auto extra = GetCustomExtra(whichVal);
 	return extra ? extra->GetByType(whichVal) : nullptr;
 }
 
-UInt32 ExtraContainerChanges::EntryData::GetWeaponNumProjectiles(Actor* owner)
+UInt32 ContChangesEntry::GetWeaponNumProjectiles(Actor* owner)
 {
 	return ThisCall<UInt8>(0x525B20, this->form, this->HasWeaponMod(0xC), 0, owner);
+}
+
+inline bool ContChangesEntry::ShouldDisplay()
+{
+	return this->form->IsItemPlayable() && *this->form->GetTheName();
+}
+
+UInt8 ContChangesEntry::GetWeaponMod()
+{
+	const auto xModFlags = reinterpret_cast<ExtraWeaponModFlags*>(this->GetExtraData(kExtraData_WeaponModFlags));
+	return xModFlags ? xModFlags->flags : 0;
+}
+
+Float64 ExtraContainerChanges::EntryData::GetHealthPercentAlt(bool axonisFix)
+{
+	Float64 healthPer = -1;
+
+	if (const auto healthForm = DYNAMIC_CAST(form->TryGetREFRParent(), TESForm, TESHealthForm))
+	{
+		const auto xHealth = form->GetIsReference() ? reinterpret_cast<ExtraHealth*>(reinterpret_cast<TESObjectREFR*>(form)->extraDataList.GetByType(kExtraData_Health)) : reinterpret_cast<ExtraHealth*>(this->GetExtraData(kExtraData_Health));
+
+		healthPer = xHealth ? xHealth->health / ((int)healthForm->health + (
+				            HasWeaponMod(TESObjectWEAP::kWeaponModEffect_IncreaseMaxCondition)
+					            ? reinterpret_cast<TESObjectWEAP*>(form)->GetEffectModValue(TESObjectWEAP::kWeaponModEffect_IncreaseMaxCondition)
+					            : 0))
+							: 1;
+	}
+	else
+	{
+		const auto destructible = DYNAMIC_CAST(form->TryGetREFRParent(), TESForm, BGSDestructibleObjectForm);
+		if (destructible && destructible->data)
+		{
+			const auto xObjHealth = form->GetIsReference() ? reinterpret_cast<ExtraObjectHealth*>(reinterpret_cast<TESObjectREFR*>(form)->extraDataList.GetByType(kExtraData_ObjectHealth)) : reinterpret_cast<ExtraObjectHealth*>(this->GetExtraData(kExtraData_ObjectHealth));
+			healthPer = xObjHealth ? xObjHealth->health / (int) destructible->data->health : 1;
+		}
+	}
+	return axonisFix ? healthPer >= 0.995 ? 1 : healthPer >= 95 ? 0.95 : healthPer : healthPer;
+}
+
+bool ContChangesEntry::GetEquipped()
+{
+	if (reinterpret_cast<ExtraWorn*>(this->GetExtraData(kExtraData_Worn))) return true;
+	if (reinterpret_cast<ExtraWornLeft*>(this->GetExtraData(kExtraData_WornLeft))) return true;
+	return false;
 }
 
 __declspec(naked) ContChangesEntry* ContChangesList::FindForItem(TESForm* item)

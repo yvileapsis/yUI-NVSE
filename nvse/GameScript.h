@@ -6,15 +6,9 @@
 struct ScriptEventList;
 struct ScriptBuffer;
 
-#if RUNTIME
 #define SCRIPT_SIZE 0x54
 static const UInt32 kScript_ExecuteFnAddr = 0x005AC1E0;
-#elif EDITOR
-#define SCRIPT_SIZE 0x48
-static const UInt32 kScript_SetTextFnAddr = 0x005C27B0;
-#else
-#error
-#endif
+
 
 extern CRITICAL_SECTION	csGameScript;				// trying to avoid what looks like concurrency issues
 
@@ -91,25 +85,15 @@ public:
 		eType_Magic = 0x100,
 		eType_Unk = 0x10000,
 	};
-#if !RUNTIME
-	UInt32			unk028;					//     /     / 028
-#endif
 	ScriptInfo		info;					// 018 / 018 / 02C
 	char			* text;					// 02C / 02C / 040
 	void			* data;					// 030 / 030 / 044
-#if RUNTIME
 	float			unk34;					// 034
 	float			questDelayTimeCounter;	// 038      - init'd to fQuestDelayTime, decremented by frametime each frame
 	float			secondsPassed;			// 03C      - only if you've modified fQuestDelayTime
 	TESQuest*		quest;					// 040
-#endif
 	RefListEntry	refList;				// 044 / 034 / 048 - ref variables and immediates
 	VarInfoEntry	varList;				// 04C / 03C / 050 - local variable list
-#if !RUNTIME
-	void			* unk050;				//     /     / 050
-	UInt8			unk054;					//	   /     / 054
-	UInt8			pad055[3];
-#endif
 
 	RefVariable *	GetRefFromRefList(UInt32 refIdx);
 	VariableInfo*	GetVariableInfo(UInt32 idx);
@@ -128,19 +112,15 @@ public:
 
 	bool			IsUserDefinedFunction() const;
 
-	static bool	RunScriptLine(const char * text, TESObjectREFR * object = NULL);
-	static bool	RunScriptLine2(const char * text, TESObjectREFR * object = NULL, bool bSuppressOutput = true);
-
 	// no changed flags (TESForm flags)
 	MEMBER_FN_PREFIX(Script);
-#if RUNTIME
 	// arg3 appears to be true for result scripts (runs script even if dataLength <= 4)
 	DEFINE_MEMBER_FN(Execute, bool, kScript_ExecuteFnAddr, TESObjectREFR* thisObj, ScriptEventList* eventList, TESObjectREFR* containingObj, bool arg3);
 	DEFINE_MEMBER_FN(Constructor, Script *, 0x005AA0F0);
 	DEFINE_MEMBER_FN(SetText, void, 0x005ABE50, const char * text);
 	DEFINE_MEMBER_FN(Run, bool, 0x005AC400, void * scriptContext, bool unkAlwaysOne, TESObjectREFR * object);
 	DEFINE_MEMBER_FN(Destructor, void, 0x005AA1A0);
-#endif
+
 	ScriptEventList	* CreateEventList();
 	UInt32 GetVarCount() const;
 	UInt32 GetRefCount() const;
@@ -152,8 +132,7 @@ public:
 
 	static Script* CompileFromText(const std::string& text, const std::string& name);
 };
-
-STATIC_ASSERT(sizeof(Script) == SCRIPT_SIZE);
+static_assert(sizeof(Script) == SCRIPT_SIZE);
 
 struct ConditionEntry
 {
@@ -194,7 +173,7 @@ struct QuestStageItem
 };
 
 #if RUNTIME
-STATIC_ASSERT(sizeof(QuestStageItem) == (SCRIPT_SIZE + 0x1C));
+static_assert(sizeof(QuestStageItem) == (SCRIPT_SIZE + 0x1C));
 #endif
 
 // 41C

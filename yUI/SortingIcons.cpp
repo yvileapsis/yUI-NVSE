@@ -3,6 +3,44 @@
 #include <settings.h>
 #include <functions.h>
 #include <filesystem>
+#include <json.h>
+
+#include <GameData.h>
+#include <GameAPI.h>
+#include <GameRTTI.h>
+#include <Utilities.h>
+#include <fstream>
+
+void LoadSIMapsFromFiles()
+{
+	Log("Loading files");
+	const auto dir = GetCurPath() + R"(\Data\menus\ySI)";
+	const auto then = std::chrono::system_clock::now();
+	if (std::filesystem::exists(dir))
+	{
+		for (std::filesystem::directory_iterator iter(dir.c_str()), end; iter != end; ++iter)
+		{
+			const auto& path = iter->path();
+			const auto& fileName = path.filename();
+			if (iter->is_directory())
+				Log(iter->path().string() + " found");
+			else if (_stricmp(path.extension().string().c_str(), ".json") == 0)
+				SIFiles::HandleSIJson(iter->path());
+			else if (_stricmp(path.extension().string().c_str(), ".xml") == 0)
+			{
+				auto pathstring = iter->path().generic_string();
+				auto relativepath = pathstring.substr(pathstring.find_last_of("\\Data\\") - 3);
+				SI::g_XMLPaths.emplace_back(std::filesystem::path(relativepath));
+			}
+		}
+	}
+	else
+		Log(dir + " does not exist.");
+	SIFiles::FillSIMapsFromJSON();
+	const auto now = std::chrono::system_clock::now();
+	const auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - then);
+	Log(FormatString("Loaded items, categories and tabs in %d ms", diff.count()));
+}
 
 namespace SI
 {
@@ -13,61 +51,380 @@ namespace SI
 
 namespace SIFiles
 {
+	void JSONEntryItemRecursiveEmplace(const JSONEntryItemCommon&, TESForm*);
+
+	void HandleSIItem(nlohmann::basic_json<> elem)
+	{
+		constexpr auto strToFormID = [](const std::string& formIdStr)
+		{
+			const auto formId = HexStringToInt(formIdStr);
+			if (formId == -1) Log("Form field was incorrectly formatted, got " + formIdStr);
+			return formId;
+		};
+
+		if (!elem.is_object())
+		{
+			Log("JSON error: expected object");
+			return;
+		}
+		JSONEntryItemCommon common{};
+
+		common.tag =												elem["tag"].get<std::string>();
+		if (elem.contains("priority"))		common.priority =		elem["priority"].get<SInt32>();
+		if (elem.contains("formType"))		common.formType =		elem["formType"].get<UInt32>();
+		if (elem.contains("questItem"))		common.questItem =		elem["questItem"].get<UInt8>();
+		if (elem.contains("miscComponent"))	common.miscComponent =	elem["miscComponent"].get<UInt8>();
+		if (elem.contains("miscProduct"))	common.miscProduct =	elem["miscProduct"].get<UInt8>();
+
+		if (elem.contains("mod") && elem.contains("form"))
+		{
+			auto modName = elem.contains("mod") ? elem["mod"].get<std::string>() : "";
+			const auto mod = !modName.empty() ? DataHandler::GetSingleton()->LookupModByName(modName.c_str()) : nullptr;
+
+			UInt8 modIndex;
+			if (modName == "FF") modIndex = 0xFF;
+			else if (!mod && !modName.empty())
+			{
+				Log("Mod name " + modName + " was not found");
+				return;
+			}
+			modIndex = mod->modIndex;
+
+			UInt32 formlist = 0;
+			if (elem.contains("formlist")) formlist = elem["formlist"].get<UInt32>();
+
+			std::vector<int> formIds;
+			if (const auto formElem = elem.contains("form") ? &elem["form"] : nullptr; formElem)
+			{
+				if (formElem->is_array())
+					std::ranges::transform(*formElem, std::back_inserter(formIds), [&](auto& i) {return strToFormID(i.template get<std::string>()); });
+				else
+					formIds.push_back(strToFormID(formElem->get<std::string>()));
+				if (std::ranges::find(formIds, -1) != formIds.end())
+					return;
+			}
+
+			if (mod && !formIds.empty())
+			{
+				for (auto formId : formIds)
+				{
+					formId = (modIndex << 24) + (formId & 0x00FFFFFF);
+					common.form = GetFormByID(formId);
+					if (!common.form) { Log(FormatString("Form %X was not found", formId)); continue; }
+					if (!formlist) {
+						Log(FormatString("Tag: '%10s', form: %08X (%50s), individual", common.tag.c_str(), formId, common.form->GetName()));
+						g_Items_JSON.emplace_back(common);
+					}
+					else if (formlist == 1) {
+						JSONEntryItemRecursiveEmplace(common, common.form);
+					}
+					else if (formlist == 2) {
+						for (const auto item : *GetAllForms()) {
+							if (item->typeID == kFormType_TESObjectWEAP) {
+								const auto weapon = DYNAMIC_CAST(item, TESForm, TESObjectWEAP);
+								if (!weapon || !weapon->repairItemList.listForm) continue;
+								if (weapon->refID == common.form->refID || weapon->repairItemList.listForm->refID == common.form->refID || weapon->repairItemList.listForm->ContainsRecursive(common.form)) {
+									Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", common.tag.c_str(), item->refID, item->GetName(), formId));
+									g_Items_JSON.emplace_back(common, item);
+								}
+							} else if (item->typeID == kFormType_TESObjectARMO) {
+								const auto armor = DYNAMIC_CAST(item, TESForm, TESObjectARMO);
+								if (!armor || !armor->repairItemList.listForm) continue;
+								if (armor->refID == common.form->refID || armor->repairItemList.listForm->refID == common.form->refID || armor->repairItemList.listForm->ContainsRecursive(common.form)) {
+									Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", common.tag.c_str(), item->refID, item->GetName(), formId));
+									g_Items_JSON.emplace_back(common, item);
+								}
+							}
+						}
+					}
+				}
+			}
+			else {
+				Log(FormatString("Tag: '%10s', mod: '%s'", common.tag.c_str(), modName.c_str()));
+				g_Items_JSON.emplace_back(common);
+			}
+		}
+		else if (common.formType == 40 || elem.contains("weaponSkill") || elem.contains("weaponType"))
+		{
+			common.formType = 40;
+			JSONEntryItemWeapon weapon{};
+
+			if (elem.contains("weaponSkill"))			weapon.skill =			elem["weaponSkill"].get<UInt32>();
+			if (elem.contains("weaponHandgrip"))		weapon.handgrip =		elem["weaponHandgrip"].get<UInt32>();
+			if (elem.contains("weaponAttackAnim"))		weapon.attackAnim =		elem["weaponAttackAnim"].get<UInt32>();
+			if (elem.contains("weaponReloadAnim"))		weapon.reloadAnim =		elem["weaponReloadAnim"].get<UInt32>();
+			if (elem.contains("weaponIsAutomatic"))		weapon.isAutomatic =	elem["weaponIsAutomatic"].get<UInt32>();
+			if (elem.contains("weaponHasScope"))		weapon.hasScope =		elem["weaponHasScope"].get<UInt32>();
+			if (elem.contains("weaponIgnoresDTDR"))		weapon.ignoresDTDR =	elem["weaponIgnoresDTDR"].get<UInt32>();
+			if (elem.contains("weaponClipRounds"))		weapon.clipRounds =		elem["weaponClipRounds"].get<UInt32>();
+			if (elem.contains("weaponNumProjectiles"))	weapon.numProjectiles =	elem["weaponNumProjectiles"].get<UInt32>();
+			if (elem.contains("weaponSoundLevel"))		weapon.soundLevel =		elem["weaponSoundLevel"].get<UInt32>();
+
+			if (elem.contains("ammoMod") && elem.contains("ammoForm"))
+			{
+				auto ammoModName = elem["ammoMod"].get<std::string>();
+				const auto ammoMod = !ammoModName.empty() ? DataHandler::GetSingleton()->LookupModByName(ammoModName.c_str()) : nullptr;
+				auto ammoForm = GetFormByID((ammoMod->modIndex << 24) + (strToFormID(elem["ammoForm"].get<std::string>()) & 0x00FFFFFF));
+				weapon.ammo = ammoForm;
+			}
+
+			std::vector<int> weaponTypes;
+			if (auto* weaponTypeElem = elem.contains("weaponType") ? &elem["weaponType"] : nullptr; weaponTypeElem)
+			{
+				if (weaponTypeElem->is_array())
+					std::ranges::transform(*weaponTypeElem, std::back_inserter(weaponTypes), [&](auto& i) {return i.template get<UInt32>(); });
+				else
+					weaponTypes.push_back(weaponTypeElem->get<UInt32>());
+				if (std::ranges::find(weaponTypes, -1) != weaponTypes.end())
+					return;
+			}
+
+			if (!weaponTypes.empty())
+			{
+				for (auto weaponType : weaponTypes)
+				{
+					weapon.type = weaponType;
+					Log(FormatString("Tag: '%10s', weapon condition, type: %d", common.tag.c_str(), weaponType));
+					g_Items_JSON.emplace_back(common, weapon);
+				}
+			}
+			else {
+				Log(FormatString("Tag: '%10s', weapon condition", common.tag.c_str()));
+				g_Items_JSON.emplace_back(common, weapon);
+			}
+		}
+		else if (common.formType == 24)
+		{
+			common.formType = 24;
+			JSONEntryItemArmor armor{};
+
+			if (elem.contains("armorHead")) 		(elem["armorHead"].get<SInt8>() == 1 ?			armor.slotsMaskWL : armor.slotsMaskBL) += 1;
+			if (elem.contains("armorHair")) 		(elem["armorHair"].get<SInt8>() == 1 ?			armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 1;
+			if (elem.contains("armorUpperBody")) 	(elem["armorUpperBody"].get<SInt8>() == 1 ?		armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 2;
+			if (elem.contains("armorLeftHand")) 	(elem["armorLeftHand"].get<SInt8>() == 1 ?		armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 3;
+			if (elem.contains("armorRightHand")) 	(elem["armorRightHand"].get<SInt8>() == 1 ?		armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 4;
+			if (elem.contains("armorWeapon")) 		(elem["armorWeapon"].get<SInt8>() == 1 ?		armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 5;
+			if (elem.contains("armorPipBoy")) 		(elem["armorPipBoy"].get<SInt8>() == 1 ?		armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 6;
+			if (elem.contains("armorBackpack")) 	(elem["armorBackpack"].get<SInt8>() == 1 ?		armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 7;
+			if (elem.contains("armorNecklace")) 	(elem["armorNecklace"].get<SInt8>() == 1 ?		armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 8;
+			if (elem.contains("armorHeadband")) 	(elem["armorHeadband"].get<SInt8>() == 1 ?		armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 9;
+			if (elem.contains("armorHat")) 			(elem["armorHat"].get<SInt8>() == 1 ?			armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 10;
+			if (elem.contains("armorEyeglasses")) 	(elem["armorEyeglasses"].get<SInt8>() == 1 ?	armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 11;
+			if (elem.contains("armorNosering")) 	(elem["armorNosering"].get<SInt8>() == 1 ?		armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 12;
+			if (elem.contains("armorEarrings")) 	(elem["armorEarrings"].get<SInt8>() == 1 ?		armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 13;
+			if (elem.contains("armorMask")) 		(elem["armorMask"].get<SInt8>() == 1 ?			armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 14;
+			if (elem.contains("armorChoker")) 		(elem["armorChoker"].get<SInt8>() == 1 ?		armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 15;
+			if (elem.contains("armorMouthObject"))	(elem["armorMouthObject"].get<SInt8>() == 1 ?	armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 16;
+			if (elem.contains("armorBodyAddon1"))	(elem["armorBodyAddon1"].get<SInt8>() == 1 ?	armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 17;
+			if (elem.contains("armorBodyAddon2"))	(elem["armorBodyAddon2"].get<SInt8>() == 1 ?	armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 18;
+			if (elem.contains("armorBodyAddon3"))	(elem["armorBodyAddon3"].get<SInt8>() == 1 ?	armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 19;
+
+			if (elem.contains("armorClass"))		armor.armorClass =	elem["armorClass"].get<UInt16>();
+			if (elem.contains("armorPower"))		armor.powerArmor =	elem["armorPower"].get<SInt8>();
+			if (elem.contains("armorHasBackpack"))	armor.hasBackpack =	elem["armorHasBackpack"].get<SInt8>();
+
+			if (elem.contains("armorDT"))			armor.dt =			elem["armorDT"].get<float>();
+			if (elem.contains("armorDR"))			armor.dr =			elem["armorDR"].get<UInt16>();
+			if (elem.contains("armorChangesAV"))	armor.changesAV =	elem["armorChangesAV"].get<UInt16>();
+
+			g_Items_JSON.emplace_back(common, armor);
+		}
+		else if (common.formType == 31 || elem.contains("miscComponent"))
+		{
+			common.formType = 31;
+			JSONEntryItemMisc misc{};
+			g_Items_JSON.emplace_back(common, misc);
+		}
+		else if (common.formType == 47 || elem.contains("IsFood") || elem.contains("IsMedicine"))
+		{
+			common.formType = 47;
+			JSONEntryItemAid aid{};
+
+			if (elem.contains("aidRestoresAV"))			aid.restoresAV =	elem["aidRestoresAV"].get<UInt8>();
+			if (elem.contains("aidDamagesAV"))			aid.damagesAV =		elem["aidDamagesAV"].get<UInt8>();
+			if (elem.contains("aidIsAddictive"))		aid.isAddictive =	elem["aidIsAddictive"].get<UInt8>();
+			if (elem.contains("aidIsFood"))				aid.isFood =		elem["aidIsFood"].get<UInt8>();
+			if (elem.contains("aidIsWater"))			aid.isWater =		elem["aidIsWater"].get<UInt8>();
+			if (elem.contains("aidIsMedicine"))			aid.isMedicine =	elem["aidIsMedicine"].get<UInt8>();
+			if (elem.contains("aidIsPoisonous"))		aid.isPoisonous =	elem["aidIsPoisonous"].get<UInt8>();
+			g_Items_JSON.emplace_back(common, aid);
+		}
+		else g_Items_JSON.emplace_back(common);
+	}
+
+	void HandleSICategory(nlohmann::basic_json<> elem)
+	{
+		if (!elem.is_object())
+		{
+			Log("JSON error: expected object");
+			return;
+		}
+
+		JSONEntryCategory category{};
+
+		category.tag =													elem["tag"].get<std::string>();
+		if (elem.contains("priority"))			category.priority =		elem["priority"].get<SInt16>();
+		if (elem.contains("template"))			category.xmltemplate =	elem["template"].get<std::string>();
+		if (elem.contains("filename"))			category.filename =		elem["filename"].get<std::string>();
+		if (elem.contains("texatlas"))			category.texatlas =		elem["texatlas"].get<std::string>();
+		if (elem.contains("systemcolor"))		category.systemcolor =	elem["systemcolor"].get<SInt32>();
+		if (elem.contains("category"))			category.category =		elem["category"].get<std::string>();
+		if (elem.contains("routeToKeyring"))	category.category =		elem["routeToKeyring"].get<std::string>();
+		if (elem.contains("name"))				category.name =			UTF8toANSI(elem["name"].get<std::string>());
+		if (elem.contains("icon"))				category.icon =			elem["icon"].get<std::string>();
+		if (elem.contains("tab"))				category.tab =			elem["tab"].get<UInt32>();
+		if (elem.contains("count"))				category.count =		elem["count"].get<UInt32>();
+
+		Log(FormatString("Tag: '%10s', icon: '%s'", category.tag.c_str(), category.filename.c_str()));
+		g_Categories_JSON.emplace_back(category);
+	}
+
+	void HandleSITab(nlohmann::basic_json<> elem)
+	{
+		if (!elem.is_object())
+		{
+			Log("JSON error: expected object with mod, form and folder fields");
+			return;
+		}
+
+		JSONEntryTab tab{};
+		tab.tab =												elem["tab"].get<std::string>();
+		if (elem.contains("name"))			tab.name =			UTF8toANSI(elem["name"].get<std::string>());
+		if (elem.contains("priority"))		tab.priority =		elem["priority"].get<SInt32>();
+		if (elem.contains("tabNew"))		tab.tabNew =		elem["tabNew"].get<UInt32>();
+		if (elem.contains("inventory"))		tab.inventory =		elem["inventory"].get<UInt32>();
+		if (elem.contains("container"))		tab.container =		elem["container"].get<UInt32>();
+//		if (elem.contains("tabMisc"))		tab.tabMisc =		elem["tabMisc"].get<UInt32>();
+
+		if (const auto types = elem.contains("types") ? &elem["types"] : nullptr; types)
+		{
+			if (!types->is_array()) tab.types.emplace(types->get<UInt32>());
+			else for (const auto& type : elem["types"]) tab.types.emplace(type.get<UInt32>());
+		}
+
+		if (const auto categories = elem.contains("categories") ? &elem["categories"] : nullptr; categories)
+		{
+			if (!categories->is_array()) tab.categories.emplace(categories->get<std::string>());
+			else for (const auto& type : elem["categories"]) tab.categories.emplace(type.get<std::string>());
+		}
+
+		if (const auto tabMisc = elem.contains("tabMisc") ? &elem["tabMisc"] : nullptr; tabMisc)
+		{
+			if (!tabMisc->is_array()) tab.tabMisc.emplace(tabMisc->get<std::string>());
+			else for (const auto& type : elem["tabMisc"]) tab.tabMisc.emplace(type.get<std::string>());
+		}
+
+		g_Tabs_JSON.push_back(tab);
+	}
+
+	void HandleSIJson(const std::filesystem::path& path)
+	{
+		Log("\nReading JSON file " + path.string());
+
+		try
+		{
+			std::ifstream i(path);
+			auto j = nlohmann::json::parse(i, nullptr, true, true);
+
+			if (j.contains("items") && j["items"].is_array())
+				for (const auto& elem : j["items"]) HandleSIItem(elem);
+			else if (j.contains("tags") && j["tags"].is_array())				// legacy support
+				for (const auto& elem : j["tags"]) HandleSIItem(elem);
+			else 
+				Log(path.string() + " JSON ySI item array not detected");
+
+			if (j.contains("categories") && j["categories"].is_array())
+				for (const auto& elem : j["categories"]) HandleSICategory(elem);
+			else if (j.contains("icons") && j["icons"].is_array())				// legacy support
+				for (const auto& elem : j["icons"]) HandleSICategory(elem);
+			else
+				Log(path.string() + " JSON ySI category array not detected");
+
+			if (j.contains("tabs") && j["tabs"].is_array())
+				for (const auto& elem : j["tabs"]) HandleSITab(elem);
+			else
+				Log(path.string() + " JSON ySI tab array not detected");
+		}
+		catch (nlohmann::json::exception& e)
+		{
+			Log("The JSON is incorrectly formatted! It will not be applied.");
+			Log(FormatString("JSON error: %s\n", e.what()));
+		}
+
+	}
+
+	void JSONEntryItemRecursiveEmplace(const JSONEntryItemCommon& common, TESForm* item)
+	{
+		if (item->typeID == kFormType_BGSListForm)
+		{
+			const auto bgslist = DYNAMIC_CAST(item, TESForm, BGSListForm);
+			if (!bgslist) return;
+			for (const auto iter : bgslist->list)
+				if (iter) JSONEntryItemRecursiveEmplace(common, iter);
+		} else if (!common.formType || item->typeID == common.formType) {
+			Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive", common.tag.c_str(), item->refID, item->GetName()));
+			g_Items_JSON.emplace_back(common, item);
+		}
+	}
+}
+
+namespace SIFiles
+{
 	bool AssignCategoryToItem(TESForm* form)
 	{
 		for (const auto &entry : g_Items_JSON) {
-			if (entry.formCommon.form			&& entry.formCommon.form->refID != form->refID) continue;
-			if (entry.formCommon.formType		&& entry.formCommon.formType != form->typeID) continue;
+			if (entry.common.form			&& entry.common.form->refID != form->refID) continue;
+			if (entry.common.formType		&& entry.common.formType != form->typeID) continue;
 
-			if (entry.formCommon.questItem		&& entry.formCommon.questItem != static_cast<UInt8>(form->IsQuestItem2())) continue;
-			if (entry.formCommon.miscComponent	&& !IsCraftingComponent(form)) continue;
-			if (entry.formCommon.miscProduct	&& !IsCraftingProduct(form)) continue;
+			if (entry.common.questItem		&& entry.common.questItem != static_cast<UInt8>(form->IsQuestItem2())) continue;
+			if (entry.common.miscComponent	&& !IsCraftingComponent(form)) continue;
+			if (entry.common.miscProduct	&& !IsCraftingProduct(form)) continue;
 
-			if (entry.formCommon.formType == 40) {
+			if (entry.common.formType == 40) {
 				const auto weapon = DYNAMIC_CAST(form, TESForm, TESObjectWEAP);
 				if (!weapon) continue;
-				if (entry.formWeapon.weaponSkill			&& entry.formWeapon.weaponSkill != weapon->weaponSkill) continue;
-				if (entry.formWeapon.weaponType				&& entry.formWeapon.weaponType != weapon->eWeaponType) continue;
-				if (entry.formWeapon.weaponHandgrip			&& entry.formWeapon.weaponHandgrip != weapon->HandGrip()) continue;
-				if (entry.formWeapon.weaponAttackAnim		&& entry.formWeapon.weaponAttackAnim != weapon->AttackAnimation()) continue;
-				if (entry.formWeapon.weaponReloadAnim		&& entry.formWeapon.weaponReloadAnim != weapon->reloadAnim) continue;
-				if (entry.formWeapon.weaponType				&& entry.formWeapon.weaponType != weapon->eWeaponType) continue;
-				if (entry.formWeapon.weaponIsAutomatic		&& entry.formWeapon.weaponIsAutomatic != static_cast<UInt32>(weapon->IsAutomatic())) continue;
-				if (entry.formWeapon.weaponHasScope			&& entry.formWeapon.weaponHasScope != static_cast<UInt32>(weapon->HasScopeAlt())) continue;
-				if (entry.formWeapon.weaponIgnoresDTDR		&& entry.formWeapon.weaponIgnoresDTDR != static_cast<UInt32>(weapon->IgnoresDTDR())) continue;
-				if (entry.formWeapon.weaponClipRounds		&& entry.formWeapon.weaponClipRounds > static_cast<UInt32>(weapon->GetClipRounds(false))) continue;
-				if (entry.formWeapon.weaponNumProjectiles	&& entry.formWeapon.weaponNumProjectiles > weapon->numProjectiles) continue;
-				if (entry.formWeapon.weaponSoundLevel		&& entry.formWeapon.weaponSoundLevel != weapon->soundLevel) continue;
-				if (entry.formWeapon.ammo					&& !FormContainsRecusive(entry.formWeapon.ammo, weapon->ammo.ammo)) continue;
+				if (entry.weapon.skill				&& entry.weapon.skill != weapon->weaponSkill) continue;
+				if (entry.weapon.type				&& entry.weapon.type != weapon->eWeaponType) continue;
+				if (entry.weapon.handgrip			&& entry.weapon.handgrip != weapon->HandGrip()) continue;
+				if (entry.weapon.attackAnim			&& entry.weapon.attackAnim != weapon->AttackAnimation()) continue;
+				if (entry.weapon.reloadAnim			&& entry.weapon.reloadAnim != weapon->reloadAnim) continue;
+				if (entry.weapon.type				&& entry.weapon.type != weapon->eWeaponType) continue;
+				if (entry.weapon.isAutomatic		&& entry.weapon.isAutomatic != static_cast<UInt32>(weapon->IsAutomatic())) continue;
+				if (entry.weapon.hasScope			&& entry.weapon.hasScope != static_cast<UInt32>(weapon->HasScopeAlt())) continue;
+				if (entry.weapon.ignoresDTDR		&& entry.weapon.ignoresDTDR != static_cast<UInt32>(weapon->IgnoresDTDR())) continue;
+				if (entry.weapon.clipRounds			&& entry.weapon.clipRounds > static_cast<UInt32>(weapon->GetClipRounds(false))) continue;
+				if (entry.weapon.numProjectiles		&& entry.weapon.numProjectiles > weapon->numProjectiles) continue;
+				if (entry.weapon.soundLevel			&& entry.weapon.soundLevel != weapon->soundLevel) continue;
+				if (entry.weapon.ammo				&& !FormContainsRecusive(entry.weapon.ammo, weapon->ammo.ammo)) continue;
 			}
-			else if (entry.formCommon.formType == 24) {
+			else if (entry.common.formType == 24) {
 				const auto armor = DYNAMIC_CAST(form, TESForm, TESObjectARMO);
 				if (!armor) continue;
-				if (entry.formArmor.armorSlotsMaskWL		&& (entry.formArmor.armorSlotsMaskWL & armor->GetArmorValue(6)) != entry.formArmor.armorSlotsMaskWL) continue;
-				if (entry.formArmor.armorSlotsMaskWL		&& (entry.formArmor.armorSlotsMaskBL & armor->GetArmorValue(6)) != 0) continue;
-				if (entry.formArmor.armorClass				&& entry.formArmor.armorClass != armor->GetArmorValue(1)) continue;
-				if (entry.formArmor.armorPower				&& entry.formArmor.armorPower != armor->GetArmorValue(2)) continue;
-				if (entry.formArmor.armorHasBackpack		&& entry.formArmor.armorHasBackpack != armor->GetArmorValue(3)) continue;
+				if (entry.armor.slotsMaskWL			&& (entry.armor.slotsMaskWL & armor->GetArmorValue(6)) != entry.armor.slotsMaskWL) continue;
+				if (entry.armor.slotsMaskBL			&& (entry.armor.slotsMaskBL & armor->GetArmorValue(6)) != 0) continue;
+				if (entry.armor.armorClass			&& entry.armor.armorClass != armor->GetArmorValue(1)) continue;
+				if (entry.armor.powerArmor			&& entry.armor.powerArmor != armor->GetArmorValue(2)) continue;
+				if (entry.armor.hasBackpack			&& entry.armor.hasBackpack != armor->GetArmorValue(3)) continue;
 
-				if (entry.formArmor.armorDT					&& entry.formArmor.armorDT > armor->damageThreshold) continue;
-				if (entry.formArmor.armorDR					&& entry.formArmor.armorDR > armor->armorRating) continue;
-//				if (entry.formArmor.armorChangesAV && entry.formArmor.armorChangesAV > armor->armorRating) continue;
+				if (entry.armor.dt					&& entry.armor.dt > armor->damageThreshold) continue;
+				if (entry.armor.dr					&& entry.armor.dr > armor->armorRating) continue;
+//				if (entry.armor.armorChangesAV && entry.armor.armorChangesAV > armor->armorRating) continue;
 			}
-			else if (entry.formCommon.formType == 31) {
+			else if (entry.common.formType == 31) {
 			}
-			else if (entry.formCommon.formType == 47) {
+			else if (entry.common.formType == 47) {
 				const auto aid = DYNAMIC_CAST(form, TESForm, AlchemyItem);
 				if (!aid) continue;
-				if (entry.formAid.aidRestoresAV				&& !aid->HasBaseEffectRestoresAV(entry.formAid.aidRestoresAV)) continue;
-				if (entry.formAid.aidDamagesAV				&& !aid->HasBaseEffectDamagesAV(entry.formAid.aidDamagesAV)) continue;
-				if (entry.formAid.aidIsAddictive			&& !aid->IsAddictive()) continue;
-				if (entry.formAid.aidIsFood					&& !aid->IsFood()) continue;
-				if (entry.formAid.aidIsWater				&& !aid->IsWaterAlt()) continue;
-				if (entry.formAid.aidIsPoisonous			&& !aid->IsPoison()) continue;
-				if (entry.formAid.aidIsMedicine				&& !aid->IsMedicine()) continue;
+				if (entry.aid.restoresAV				&& !aid->HasBaseEffectRestoresAV(entry.aid.restoresAV)) continue;
+				if (entry.aid.damagesAV				&& !aid->HasBaseEffectDamagesAV(entry.aid.damagesAV)) continue;
+				if (entry.aid.isAddictive			&& !aid->IsAddictive()) continue;
+				if (entry.aid.isFood					&& !aid->IsFood()) continue;
+				if (entry.aid.isWater				&& !aid->IsWaterAlt()) continue;
+				if (entry.aid.isPoisonous			&& !aid->IsPoison()) continue;
+				if (entry.aid.isMedicine				&& !aid->IsMedicine()) continue;
 			}
 
-			SI::g_ItemToCategory.emplace(form, entry.formCommon.tag);
+			SI::g_ItemToCategory.emplace(form, entry.common.tag);
 			return true;
 		}
 		return false;
@@ -97,7 +454,7 @@ namespace SIFiles
 	void FillSIMapsFromJSON()
 	{
 		ra::sort(g_Items_JSON, [&](const JSONEntryItem& entry1, const JSONEntryItem& entry2)
-		         { return entry1.formCommon.priority > entry2.formCommon.priority; });
+		         { return entry1.common.priority > entry2.common.priority; });
 
 		if (!g_ySI_JustInTime)
 		{
@@ -195,17 +552,23 @@ namespace SI
 		return false;
 	}
 
+	bool InjectTemplates(TileMenu* tilemenu, std::string templateName) {
+		const auto menu = tilemenu->menu;
+		if (!menu->GetTemplateExists(templateName.c_str()))
+		{
+			if (menu->id != kMenuType_Barter && menu->id != kMenuType_Container && menu->id != kMenuType_RepairServices) return false;
+			for (auto& iter : g_XMLPaths) tilemenu->InjectUIXML(iter.generic_string().c_str());
+			if (!menu->GetTemplateExists(templateName.c_str())) return false;
+		}
+		return true;
+	}
+
 	void InjectIconTile(const SIFiles::JSONEntryCategory& category, MenuItemEntryList* list, Tile* tile, ContChangesEntry* entry)
 	{
 		//	if (g_Items.find(entry->type) == g_Items.end()) return;
 		if (category.filename.empty()) return;
 
-		Tile* tilemenu = tile;
-
-		do if IS_TYPE(tilemenu, TileMenu) break;
-		while ((tilemenu = tilemenu->parent));
-
-		const auto menu = DYNAMIC_CAST(tilemenu, Tile, TileMenu);
+		TileMenu* menu = tile->GetTileMenu();
 
 		if (!menu || !menu->menu) return;
 
@@ -213,46 +576,37 @@ namespace SI
 
 		if (!text || !std::string("ListItemText")._Equal(text->name.CStr())) return;
 
-		if (!menu->menu->GetTemplateExists(category.xmltemplate.c_str()))
-		{
-			if (menu != TileMenu::GetTileMenu(kMenuType_Barter) && menu != TileMenu::GetTileMenu(kMenuType_Container) && menu != TileMenu::GetTileMenu(kMenuType_RepairServices)) return;
-			for (auto& iter : g_XMLPaths) menu->InjectUIXML(iter.generic_string().c_str());
-			if (!menu->menu->GetTemplateExists(category.xmltemplate.c_str())) return;
+		Tile* icon = tile->GetChild(category.xmltemplate.c_str());
+
+		if (!icon) {
+			if (!InjectTemplates(menu, category.xmltemplate)) return;
+			const auto last = tile->children.Head();
+			icon = tile->AddTileFromTemplate(category.xmltemplate.c_str());
+			tile->children.ExchangeNodeData(tile->children.Head(), last);
+			if (!icon) return;
 		}
-
-		const auto last = tile->children.Head();
-
-		const auto icon = menu->menu->AddTileFromTemplate(tile, category.xmltemplate.c_str(), 0);
-
-		const auto icondata = tile->children.Head();
-
-		tile->children.ExchangeNodeData(icondata, last);
-		
-		if (!icon) return;
 
 		if (!category.filename.empty()) icon->SetString(kTileValue_filename, category.filename.c_str(), false);
 		if (!category.texatlas.empty()) icon->SetString(kTileValue_texatlas, category.texatlas.c_str(), false);
 		if (!category.systemcolor) {
-			icon->SetFloat(kTileValue_systemcolor, menu->GetValueFloat(kTileValue_systemcolor));
+			icon->SetFloat(kTileValue_systemcolor, menu->GetFloat(kTileValue_systemcolor));
 		} else {
 			icon->SetFloat(kTileValue_systemcolor, category.systemcolor, false);
 		}
 		//	icon->SetFloat(kTileValue_alpha, 255, propagate);
 
-		float x = text->GetValueFloat(kTileValue_x);
+		Float32 x = text->GetFloat(kTileValue_x);
 
-		if (icon->GetValue(kTileValue_user0)) x += icon->GetValueFloat(kTileValue_user0);
+		if (icon->GetValue(kTileValue_user0)) x += icon->GetFloat(kTileValue_user0);
 
 		icon->SetFloat(kTileValue_x, x, true);
 
-		x += icon->GetValueFloat(kTileValue_width);
+		x += icon->GetFloat(kTileValue_width);
 
-		if (icon->GetValue(kTileValue_user1)) x += icon->GetValueFloat(kTileValue_user1);
-
-		const float wrapwidth = text->GetValueFloat(kTileValue_wrapwidth) - x;
+		if (icon->GetValue(kTileValue_user1)) x += icon->GetFloat(kTileValue_user1);
 
 		text->SetFloat(kTileValue_x, x, true);
-		text->SetFloat(kTileValue_wrapwidth, wrapwidth, true);
+		text->SetFloat(kTileValue_wrapwidth, text->GetFloat(kTileValue_wrapwidth) - x, true);
 	}
 
 	void __fastcall SetTileStringInjectTile(Tile* tile, ContChangesEntry* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate)
@@ -292,8 +646,7 @@ namespace SI
 			{
 				if (!tag2.empty()) return 1;
 			}
-			else if (tag2.empty())
-				return -1;
+			else if (tag2.empty()) return -1;
 			else
 			{
 				cmp = tag1.compare(tag2);
@@ -316,16 +669,16 @@ namespace SI
 		if (!form1) return form2 ? -1 : 0;
 		if (!form2) return 1;
 
-		const SInt16 mods1 = ContWeaponHasAnyMod(a1);
-		const SInt16 mods2 = ContWeaponHasAnyMod(a2);
+		const SInt16 mods1 = a1->GetWeaponMod();
+		const SInt16 mods2 = a2->GetWeaponMod();
 		if (mods1 != mods2) return mods1 > mods2 ? -1 : 1;
 
-		const float condition1 = ContGetHealthPercent(a1);
-		const float condition2 = ContGetHealthPercent(a2);
+		const float condition1 = a1->GetHealthPercent();
+		const float condition2 = a2->GetHealthPercent();
 		if (condition1 != condition2) return condition1 > condition2 ? -1 : 1;
 
-		const bool equipped1 = ContGetEquipped(a1);
-		const bool equipped2 = ContGetEquipped(a2);
+		const bool equipped1 = a1->GetEquipped();
+		const bool equipped2 = a2->GetEquipped();
 		if (equipped1 != equipped2) return equipped1 > equipped2 ? -1 : 1;
 
 		const UInt32 refID1 = form1->refID;
@@ -340,8 +693,8 @@ namespace SI
 		if (!tile) return;
 
 		if (Tile* icon = tile->GetChild("HK_Icon"); icon) {
-			icon->SetFloat(kTileValue_width, tile->GetValueFloat(kTileValue_width) - 16, propagate);
-			icon->SetFloat(kTileValue_height, tile->GetValueFloat(kTileValue_height) - 16, propagate);
+			icon->SetFloat(kTileValue_width, tile->GetFloat(kTileValue_width) - 16, propagate);
+			icon->SetFloat(kTileValue_height, tile->GetFloat(kTileValue_height) - 16, propagate);
 			icon->SetFloat(kTileValue_x, 8, propagate);
 			icon->SetFloat(kTileValue_y, 8, propagate);
 		}
@@ -360,8 +713,8 @@ namespace SI
 	{
 		if (!tile) return;
 
-		if (compassRoseX == 0) compassRoseX = tile->GetValueFloat(kTileValue_x);
-		if (compassRoseY == 0) compassRoseY = tile->GetValueFloat(kTileValue_y);
+		if (compassRoseX == 0) compassRoseX = tile->GetFloat(kTileValue_x);
+		if (compassRoseY == 0) compassRoseY = tile->GetFloat(kTileValue_y);
 
 		tile->SetFloat(kTileValue_width, 44, propagate);
 		tile->SetFloat(kTileValue_height, 44, propagate);
@@ -502,13 +855,13 @@ namespace SI
 			tile->SetFloat(kTileValue_id, traitID); // + listIndex
 			tile->SetFloat(kTileValue_clips, true);
 			CdeclCall<void>(0xA04200, 0);
-			if (i < 5) width += trunc(tile->GetValueFloat(kTileValue_width));
+			if (i < 5) width += trunc(tile->GetFloat(kTileValue_width));
 			listIndex++;
 			tablineTiles.push_back(tile);
 			i++;
 		}
 
-		const auto tablineWidth = tabline->GetValueFloat(kTileValue_width);
+		const auto tablineWidth = tabline->GetFloat(kTileValue_width);
 		const auto leftLineLength = trunc((tablineWidth - width) / (listIndex + 1));
 		tabline->SetFloat(Tile::TraitNameToID("_LeftLineLength"), leftLineLength);
 		tabline->SetFloat(Tile::TraitNameToID("_ButtonCount"), tablineWidth);
@@ -517,7 +870,7 @@ namespace SI
 		for (const auto tile : tablineTiles)
 		{
 			tile->SetFloat(Tile::TraitNameToID("_x"), _x);
-			_x += leftLineLength + trunc(tile->GetValueFloat(kTileValue_width));
+			_x += leftLineLength + trunc(tile->GetFloat(kTileValue_width));
 			i++;
 		}
 
@@ -526,12 +879,12 @@ namespace SI
 
 	UInt32 __fastcall InventoryMenuHandleClickGetFilter(InventoryMenu* menu, SInt32 tileID, Tile* clickedTile)
 	{
-		return clickedTile->GetValueFloat(kTileValue_listindex);
+		return clickedTile->GetFloat(kTileValue_listindex);
 	}
 
 	void __fastcall InventoryMenuSetupData(InventoryMenu* menu, SInt32 tileID, Tile* clickedTile)
 	{
-		const auto listIndex = clickedTile->GetValueFloat(kTileValue_listindex);
+		const auto listIndex = clickedTile->GetFloat(kTileValue_listindex);
 
 		if (listIndex == 0) {
 			menu->tileModButton->SetFloat(kTileValue_visible, true);
@@ -571,10 +924,10 @@ namespace SI
 		const auto menu = InventoryMenu::GetSingleton();
 		SInt32 listIndex;
 		if (const auto item = menu->itemsList.GetSelectedTile())
-			listIndex = trunc(item->GetValueFloat(kTileValue_listindex));
+			listIndex = trunc(item->GetFloat(kTileValue_listindex));
 		else
 			listIndex = -1;
-		const SInt32 currentValue = menu->itemsList.scrollBar->GetValueFloat(Tile::TraitNameToID("_current_value"));
+		const SInt32 currentValue = menu->itemsList.scrollBar->GetFloat("_current_value");
 
 		if (InventoryMenu::IsKeyringOpen())
 		{

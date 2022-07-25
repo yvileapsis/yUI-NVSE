@@ -424,8 +424,8 @@ public:
 	static void					RefreshItemsListQuick();
 	static bool					RefreshItemsListForm(TESForm* form = nullptr);
 };
-STATIC_ASSERT(sizeof(InterfaceManager) == 0x580);
-STATIC_ASSERT(sizeof(InterfaceManager::Struct0178) == 0x64);
+static_assert(sizeof(InterfaceManager) == 0x580);
+static_assert(sizeof(InterfaceManager::Struct0178) == 0x64);
 
 
 void Debug_DumpMenus(void);
@@ -613,8 +613,7 @@ public:
 		auto _template = _templateName ? _templateName : this->templateName;
 		if (!_template) return nullptr;
 
-		auto menu = this->parentTile->GetParentMenu();
-		Tile* newTile = menu->AddTileFromTemplate(this->parentTile, _template, nullptr);
+		Tile* newTile = this->parentTile->AddTileFromTemplate(_template);
 		if (!newTile->GetValue(kTileValue_id))
 		{
 			newTile->SetFloat(kTileValue_id, -1);
@@ -761,7 +760,7 @@ public:
 	struct TemplateInstance
 	{
 		UInt32		unk00;		// 00
-		float		flt04;		// 04
+		Float32		flt04;		// 04
 		String		tileName;	// 08
 		Tile*		tile;		// 10
 	};
@@ -1158,7 +1157,7 @@ public:
 	void RemoveQueuedQuestAndLocationUpdates();
 	void RemoveCrippledLimbIndicator();
 };
-STATIC_ASSERT(sizeof(HUDMainMenu) == 0x278);
+static_assert(sizeof(HUDMainMenu) == 0x278);
 
 
 class LoadingMenu : public Menu
@@ -1255,7 +1254,7 @@ public:
 
 	static LoadingMenu* GetSingleton() { return *reinterpret_cast<LoadingMenu**>(0x11DA0C0); };
 };
-STATIC_ASSERT(sizeof(LoadingMenu) == 0x5C0);
+static_assert(sizeof(LoadingMenu) == 0x5C0);
 
 
 
@@ -1282,7 +1281,7 @@ public:
 
 	static CharGenMenu* GetSingleton() { return *reinterpret_cast<CharGenMenu**>(0x11D920C); };
 };
-STATIC_ASSERT(sizeof(CharGenMenu) == 0x88);
+static_assert(sizeof(CharGenMenu) == 0x88);
 
 // 2A4
 class StatsMenu : public Menu			// 1003
@@ -1458,7 +1457,7 @@ public:
 	Sound sound7C;
 	static CompanionWheelMenu* GetSingleton() { return *reinterpret_cast<CompanionWheelMenu**>(0x11D92B8); };
 };
-STATIC_ASSERT(sizeof(CompanionWheelMenu) == 0x88);
+static_assert(sizeof(CompanionWheelMenu) == 0x88);
 
 
 class CaravanMenu : Menu
@@ -1588,7 +1587,7 @@ public:
 	UInt8 padE87;
 	static CaravanMenu* GetSingleton() { return *reinterpret_cast<CaravanMenu**>(0x11D917C); };
 };
-STATIC_ASSERT(sizeof(CaravanMenu) == 0xE88);
+static_assert(sizeof(CaravanMenu) == 0xE88);
 
 class ItemModMenu : Menu
 {
@@ -1742,7 +1741,7 @@ struct VATSTargetInfo
 	UInt8 isMissFortuneVisit;
 	UInt8 gap25[3];
 };
-STATIC_ASSERT(sizeof(VATSTargetInfo) == 0x28);
+static_assert(sizeof(VATSTargetInfo) == 0x28);
 
 class VATSMenu : public Menu
 {
@@ -1836,7 +1835,7 @@ public:
 	static VATSMenu* GetSingleton() { return *reinterpret_cast<VATSMenu**>(0x11DB0D4); };
 	static TESObjectREFR* GetTarget() { return *reinterpret_cast<TESObjectREFR**>(0x11F21CC); };
 };
-STATIC_ASSERT(sizeof(VATSMenu) == 0x144);
+static_assert(sizeof(VATSMenu) == 0x144);
 
 class InventoryMenu : public Menu		// 1002
 {
@@ -1908,7 +1907,7 @@ public:
 
 	void						ResetInventorySelectionAndHideDataTile() { ThisCall(0x781B10, this); }
 };
-STATIC_ASSERT(sizeof(InventoryMenu) == 0x124);
+static_assert(sizeof(InventoryMenu) == 0x124);
 
 
 typedef TList<ContChangesEntry> BarterItemList;
@@ -2014,7 +2013,7 @@ struct HackingText
 	UInt8 isTextRemaining;
 	UInt8 gap2A[2];
 };
-STATIC_ASSERT(sizeof(HackingText) == 0x2C);
+static_assert(sizeof(HackingText) == 0x2C);
 
 struct MenuEntry
 {
@@ -2027,7 +2026,7 @@ struct MenuEntry
 	UInt8 entryFlags;
 	UInt8 pad75[3];
 };
-STATIC_ASSERT(sizeof(MenuEntry) == 0x78);
+static_assert(sizeof(MenuEntry) == 0x78);
 
 class HackingMenu : public Menu
 {
@@ -2102,7 +2101,7 @@ public:
 
 	void RemoveDud(const char* word);
 };
-STATIC_ASSERT(sizeof(HackingMenu) == 0x1DC);
+static_assert(sizeof(HackingMenu) == 0x1DC);
 
 // 0FC
 class ComputersMenu : public Menu
@@ -2174,7 +2173,7 @@ public:
 
 	static ComputersMenu* GetSingleton() { return *reinterpret_cast<ComputersMenu**>(0x11D9334); };
 };
-STATIC_ASSERT(sizeof(ComputersMenu) == 0xFC);
+static_assert(sizeof(ComputersMenu) == 0xFC);
 
 class SlotMachineMenu : public Menu
 {
@@ -2330,7 +2329,7 @@ public:
 	NiControllerSequence* Dealer_07;
 	NiControllerSequence* Dealer_Reveal;
 };
-STATIC_ASSERT(sizeof(BlackJackMenu) == 0xE70);
+static_assert(sizeof(BlackJackMenu) == 0xE70);
 
 
 class LoveTesterMenu : public Menu
@@ -2407,7 +2406,7 @@ public:
 
 	static LoveTesterMenu* GetSingleton() { return *reinterpret_cast<LoveTesterMenu**>(0x11DA2C8); };
 };
-STATIC_ASSERT(sizeof(LoveTesterMenu) == 0x230);
+static_assert(sizeof(LoveTesterMenu) == 0x230);
 
 
 class SPECIALBookMenu : public Menu
@@ -2671,7 +2670,7 @@ public:
 
 		void Destroy(bool doFree = true) { ThisCall(0x7AC700, this, doFree); };
 	};
-	STATIC_ASSERT(sizeof(List) == 0x24);
+	static_assert(sizeof(List) == 0x24);
 
 	union
 	{
@@ -2737,7 +2736,7 @@ public:
 	void SetMenuActive(UInt32 _id) { ThisCall(0x7AF180, this, _id); };
 	void UpdatePlayerHead() { ThisStdCall(0x007B25A0, this); }
 };
-STATIC_ASSERT(sizeof(RaceSexMenu) == 0x1A4);
+static_assert(sizeof(RaceSexMenu) == 0x1A4);
 
 
 class DialogMenu : public Menu			// 1009
@@ -2804,7 +2803,7 @@ public:
 	bool IsNPCTalking();
 	static DialogMenu* GetSingleton() { return *reinterpret_cast<DialogMenu**>(0x11D9510); };
 };
-STATIC_ASSERT(sizeof(DialogMenu) == 0x13C);
+static_assert(sizeof(DialogMenu) == 0x13C);
 
 // 230
 class MapMenu : public Menu				// 1023
@@ -2918,7 +2917,7 @@ public:
 
 	bool ScrollNotes(MenuSpecialKeyboardInputCode direction, bool isShiftHeld);
 };
-STATIC_ASSERT(sizeof(MapMenu) == 0x230);
+static_assert(sizeof(MapMenu) == 0x230);
 
 // 104
 class RecipeMenu : public Menu			// 1077
@@ -3064,7 +3063,7 @@ public:
 
 	static StartMenu* GetSingleton() { return *reinterpret_cast<StartMenu**>(0x11DAAC0); };
 };
-STATIC_ASSERT(sizeof(StartMenu) == 0x1D4);
+static_assert(sizeof(StartMenu) == 0x1D4);
 
 // 10
 struct StartMenuOption
@@ -3169,7 +3168,7 @@ public:
 
 	static LockPickMenu* GetSingleton() { return *reinterpret_cast<LockPickMenu**>(0x11DA204); };
 };
-STATIC_ASSERT(sizeof(LockPickMenu) == 0xE4);
+static_assert(sizeof(LockPickMenu) == 0xE4);
 
 // D8
 class FORenderedMenu
@@ -3258,7 +3257,7 @@ public:
 	UInt32 unk0D0;
 	NiNode* node0D4;
 };
-STATIC_ASSERT(sizeof(FORenderedMenu) == 0xD8);
+static_assert(sizeof(FORenderedMenu) == 0xD8);
 
 class FORenderedMenuRaceSex : public FORenderedMenu
 {
@@ -3296,7 +3295,7 @@ public:
 	UInt32 unk168;
 	RaceMenuType menuType;
 };
-STATIC_ASSERT(sizeof(FORenderedMenuRaceSex) == 0x170);
+static_assert(sizeof(FORenderedMenuRaceSex) == 0x170);
 
 class FOPipboyManager : public FORenderedMenu
 {
@@ -3335,7 +3334,7 @@ public:
 	UInt8 isResetPipboyManager;
 	UInt8 gap16D[3];
 };
-STATIC_ASSERT(sizeof(FOPipboyManager) == 0x170);
+static_assert(sizeof(FOPipboyManager) == 0x170);
 
 class LevelUpMenu : public Menu
 {
@@ -3384,7 +3383,7 @@ public:
 
 	static LevelUpMenu* GetSingleton() { return *reinterpret_cast<LevelUpMenu**>(0x11D9FDC); }
 };
-STATIC_ASSERT(sizeof(LevelUpMenu) == 0xCC);
+static_assert(sizeof(LevelUpMenu) == 0xCC);
 
 
 struct GradualSetTile
@@ -3522,7 +3521,7 @@ struct FontInfo {
 	static FontInfo* Load(const char* path, UInt32 ID);
 	bool GetName(char* out);	// filename stripped of path and extension
 };	// 054
-STATIC_ASSERT(sizeof(FontInfo) == 0x54);
+static_assert(sizeof(FontInfo) == 0x54);
 
 class FontManager
 {
@@ -3549,7 +3548,7 @@ public:
 };
 
 
-STATIC_ASSERT(sizeof(FontInfo) == 0x54);
+static_assert(sizeof(FontInfo) == 0x54);
 
 struct __declspec(align(4)) FontTextReplaced
 {
@@ -3587,7 +3586,7 @@ struct __declspec(align(4)) FontTextReplaced
 	void GetVariableEscapedText(const char* input);
 };
 
-STATIC_ASSERT(sizeof(FontTextReplaced) == 0x28);
+static_assert(sizeof(FontTextReplaced) == 0x28);
 static void(__thiscall* Font__CheckForVariablesInText)(FontInfo*, const char* input, FontTextReplaced* a3) = (void(__thiscall*)(FontInfo*, const char*, FontTextReplaced*))0xA12FB0;
 
 
@@ -3682,7 +3681,7 @@ public:
 		return &(GetDebugInputLine()->text);
 	}
 };
-STATIC_ASSERT(sizeof(DebugText) == 0x229C);
+static_assert(sizeof(DebugText) == 0x229C);
 
 
 struct VATSTargetBodyPartData

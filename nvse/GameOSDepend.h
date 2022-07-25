@@ -83,8 +83,8 @@ struct OSInputGlobals
 	UInt8 joystickBinds[28];
 	UInt8 controllerBinds[28];
 };
-STATIC_ASSERT(sizeof(OSInputGlobals) == 0x1C04);
-STATIC_ASSERT(offsetof(OSInputGlobals, mouseBinds) == 0x1BB0);
+static_assert(sizeof(OSInputGlobals) == 0x1C04);
+static_assert(offsetof(OSInputGlobals, mouseBinds) == 0x1BB0);
 
 
 extern OSInputGlobals** g_OSInputGlobals;
@@ -171,7 +171,7 @@ public:
 	UInt32					unk324;						// 324
 };
 
-STATIC_ASSERT(sizeof(OSSoundGlobals) == 0x328);
+static_assert(sizeof(OSSoundGlobals) == 0x328);
 #endif
 
 class OSSoundGlobals {
@@ -207,6 +207,6 @@ public:
 	UInt32			unk60;				// 60 relates to unk50
 };
 
-//STATIC_ASSERT(sizeof(OSGlobals) == 0x0A4);	// found in oldWinMain 0x0086AF4B
+//static_assert(sizeof(OSGlobals) == 0x0A4);	// found in oldWinMain 0x0086AF4B
 
 extern OSGlobals ** g_osGlobals;

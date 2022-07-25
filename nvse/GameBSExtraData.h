@@ -292,7 +292,7 @@ public:
 	UInt8			pad[3];		// 005
 	BSExtraData*	next;		// 008
 };
-STATIC_ASSERT(sizeof(BSExtraData) == 0xC);
+static_assert(sizeof(BSExtraData) == 0xC);
 
 struct BaseExtraList
 {
@@ -314,13 +314,13 @@ struct BaseExtraList
 	UInt8			m_presenceBitfield[0x15];	// 008 - if a bit is set, then the extralist should contain that extradata
 	UInt8			pad1D[3];					// 01D
 };
-STATIC_ASSERT(sizeof(BaseExtraList) == 0x020);
+static_assert(sizeof(BaseExtraList) == 0x020);
 
 struct ExtraDataList : public BaseExtraList
 {
 	static ExtraDataList * Create(BSExtraData* xBSData = NULL);
 };
-STATIC_ASSERT(sizeof(ExtraDataList) == 0x020);
+static_assert(sizeof(ExtraDataList) == 0x020);
 
 
 class ExtendDataList : public TList<ExtraDataList>

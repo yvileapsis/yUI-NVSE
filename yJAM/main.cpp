@@ -17,6 +17,7 @@
 
 PluginHandle	g_pluginHandle = kPluginHandle_Invalid;
 
+
 void MessageHandler(NVSEMessagingInterface::Message* msg)
 {
 	if (msg->type == NVSEMessagingInterface::kMessage_DeferredInit)

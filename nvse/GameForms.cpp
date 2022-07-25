@@ -1,11 +1,8 @@
 #include "GameForms.h"
-
 #include "GameAPI.h"
 #include "GameRTTI.h"
 #include "GameObjects.h"
 #include "GameData.h"
-#include "GameProcess.h"
-#include "GameSettings.h"
 
 static const ActorValueInfo** ActorValueInfoPointerArray = (const ActorValueInfo**)0x0011D61C8;		// See GetActorValueInfo
 static const _GetActorValueInfo GetActorValueInfo = (_GetActorValueInfo)0x00066E920;	// See GetActorValueName
@@ -19,15 +16,15 @@ TESForm* TESForm::TryGetREFRParent()
 	return result;
 }
 
-TESFullName* TESForm::GetFullName() const
+TESFullName* TESForm::GetFullName()
 {
 	if (typeID == kFormType_TESObjectCELL)		// some exterior cells inherit name of parent worldspace
 	{
-		const auto cell = DYNAMIC_CAST(this, TESForm, TESObjectCELL);
+		const auto cell = reinterpret_cast<TESObjectCELL*>(this);
 		TESFullName *fullName = &cell->fullName;
 		return fullName->name.m_data && fullName->name.m_dataLen || !cell->worldSpace ? fullName : &cell->worldSpace->fullName;
 	}
-	const TESForm *baseForm = GetIsReference() ? (DYNAMIC_CAST(this, TESForm, TESObjectREFR))->baseForm : this;
+	const TESForm *baseForm = GetIsReference() ? reinterpret_cast<TESObjectREFR*>(this)->baseForm : this;
 	return DYNAMIC_CAST(baseForm, TESForm, TESFullName);
 }
 
@@ -76,16 +73,6 @@ TESForm* TESForm::CloneForm(bool persist) const
 	}
 
 	return result;
-}
-
-bool TESForm::IsCloned() const
-{
-	return this->modIndex == 0xFF;
-}
-
-std::string TESForm::GetStringRepresentation() const
-{
-	return FormatString(R"([id: %X, edid: "%s", name: "%s"])", refID, GetName(), GetFullName()->name.CStr());
 }
 
 // static
@@ -342,6 +329,13 @@ TESObjectIMOD* TESObjectWEAP::GetItemMod(UInt8 which)
 	return pMod;
 }
 
+Float32 TESObjectWEAP::GetEffectModValue(kWeaponModEffects value, UInt8 second)
+{
+	if (value == GetItemModEffect(0)) return second ? GetItemModValue2(0) : GetItemModValue1(0);
+	if (value == GetItemModEffect(1)) return second ? GetItemModValue2(1) : GetItemModEffect(1);
+	if (value == GetItemModEffect(2)) return second ? GetItemModValue2(2) : GetItemModValue1(2);
+}
+
 bool TESObjectWEAP::IsMeleeWeapon()
 {
 	return eWeaponType == kWeapType_HandToHandMelee || eWeaponType == kWeapType_OneHandMelee || eWeaponType == kWeapType_TwoHandMelee;
@@ -410,20 +404,36 @@ bool FormContainsRecusive(TESForm* parent, TESForm* child)
 	return false;
 }
 
-bool TESForm::IsInventoryObject() const
+__declspec(naked) bool TESForm::IsItemPlayable()
 {
-	typedef bool (* _IsInventoryObjectType)(UInt32 formType);
-#if RUNTIME
-	static _IsInventoryObjectType IsInventoryObjectType = (_IsInventoryObjectType)0x00481F30;	// first call from first case of main switch in _ExtractArg
-#elif EDITOR
-	static _IsInventoryObjectType IsInventoryObjectType = (_IsInventoryObjectType)0x004F4100;	// first call from first case of main switch in Cmd_DefaultParse
-#endif
-	return IsInventoryObjectType(typeID);
+	__asm
+	{
+		mov		al, [ecx + 4]
+		cmp		al, kFormType_TESObjectARMO
+		jz		armor
+		cmp		al, kFormType_TESObjectWEAP
+		jz		weapon
+		cmp		al, kFormType_TESAmmo
+		jz		ammo
+		mov		al, 1
+		retn
+	armor :
+		test[ecx + 0x78], 0x40
+		setz	al
+		retn
+	weapon :
+		test[ecx + 0x100], 0x80
+		setz	al
+		retn
+	ammo :
+		test[ecx + 0xA0], 2
+		setz	al
+		retn
+	}
 }
 
 bool TESForm::IsInventoryObjectAlt()
 {
-	if (!this) return false;
 	switch (this->typeID)
 	{
 	case kFormType_TESObjectARMO:
@@ -666,7 +676,7 @@ const char* TESPackage::StringForProcedureCode(eProcedure proc, bool bRemovePref
 const char* TESPackage::PackageTime::DayForCode(UInt8 dayCode)
 {
 	dayCode += 1;
-	return dayCode < sizeof TESPackage_DayStrings ? TESPackage_DayStrings[dayCode] : "";
+	return (dayCode < sizeof TESPackage_DayStrings) ? TESPackage_DayStrings[dayCode] : "";
 }
 
 BGSQuestObjective* TESQuest::GetObjective(UInt32 objectiveID) const
@@ -684,7 +694,7 @@ BGSQuestObjective* TESQuest::GetObjective(UInt32 objectiveID) const
 const char* TESPackage::PackageTime::MonthForCode(UInt8 monthCode)
 {
 	monthCode += 1;
-	return monthCode < sizeof TESPackage_MonthString ? TESPackage_MonthString[monthCode] : "";
+	return (monthCode < sizeof TESPackage_MonthString) ? TESPackage_MonthString[monthCode] : "";
 }
 
 UInt8 TESPackage::PackageTime::CodeForDay(const char* dayStr)
@@ -799,7 +809,7 @@ EffectItem* EffectItemList::ItemAt(const UInt32 whichItem)
 const char* EffectItemList::GetNthEIName(const UInt32 whichEffect) const
 {
 	const EffectItem* effItem = list.GetNthItem(whichEffect);
-	return effItem->setting ? GetFullName(effItem->setting) : "<no name>";
+	return effItem->setting ? effItem->setting->GetFullName()->name.CStr() : "<no name>";
 }
 
 BGSDefaultObjectManager* BGSDefaultObjectManager::GetSingleton()

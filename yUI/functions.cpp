@@ -158,36 +158,6 @@ UInt32 TESObjectARMO::GetArmorValue(UInt32 whichVal)
 	return false;
 }
 
-
-UInt8 ContWeaponHasAnyMod(ContChangesEntry* weaponInfo)
-{
-	const auto xData = weaponInfo->GetCustomExtra(kExtraData_WeaponModFlags);
-	if (!xData) return 0;
-	const auto xModFlags = GetExtraType((*xData), WeaponModFlags);
-	if (!xModFlags) return 0;
-	return xModFlags->flags;
-}
-
-float ContGetHealthPercent(ContChangesEntry* itemInfo)
-{
-	const auto xData = itemInfo->GetCustomExtra(kExtraData_Health);
-	if (!xData) return 0;
-	const auto healthForm = DYNAMIC_CAST(itemInfo->form, TESForm, TESHealthForm);
-	if (!healthForm) return 0;
-	const auto xHealth = GetExtraType((*xData), Health);
-	const float health = xHealth ? xHealth->health : static_cast<int>(healthForm->health);
-	return (health / healthForm->health);
-}
-
-bool ContGetEquipped(ContChangesEntry* weaponInfo)
-{
-	const auto xData = weaponInfo->GetCustomExtra(kExtraData_Worn);
-	const auto xDataLeft = weaponInfo->GetCustomExtra(kExtraData_WornLeft);
-	if (xData && GetExtraType((*xData), Worn)) return true;
-	if (xDataLeft && GetExtraType((*xDataLeft), WornLeft)) return true;
-	return false;
-}
-
 UInt32 AlchemyItem::HasBaseEffectRestoresAV(const SInt32 avCode)
 {
 	for (const auto effect : magicItem.list.list)

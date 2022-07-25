@@ -553,7 +553,7 @@ public:
 	void DumpExtraData();
 
 };
-STATIC_ASSERT(sizeof(NiObjectNET) == 0x18);
+static_assert(sizeof(NiObjectNET) == 0x18);
 
 // 030
 class NiTexture : public NiObjectNET
@@ -1097,7 +1097,7 @@ public:
 
 	BSAnimGroupSequence* Get3rdPersonCounterpart() const;
 };
-STATIC_ASSERT(sizeof(BSAnimGroupSequence) == 0x78);
+static_assert(sizeof(BSAnimGroupSequence) == 0x78);
 
 const auto s = sizeof(BSAnimGroupSequence);
 
@@ -1429,7 +1429,7 @@ public:
 	static const char* StringForAnimGroupCode(UInt32 groupCode);
 	static UInt32 AnimGroupForString(const char* groupName);
 };
-STATIC_ASSERT(sizeof(TESAnimGroup) == 0x3C);
+static_assert(sizeof(TESAnimGroup) == 0x3C);
 
 void DumpAnimGroups(void);
 

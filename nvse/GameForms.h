@@ -2003,7 +2003,7 @@ struct Condition {
 	UInt32			runOn;		// 014	Subject, Target, Reference, CombatTarget, LinkedReference
 	TESObjectREFR*	reference;	// 018
 };
-STATIC_ASSERT(sizeof(Condition) == 0x1C);
+static_assert(sizeof(Condition) == 0x1C);
 
 class BaseFormComponent
 {
@@ -2161,42 +2161,32 @@ public:
 
 	TList<ModInfo>	mods;
 
-	TESForm*		TryGetREFRParent(void);
-	TESFullName*	GetFullName() const;
-	const char*		GetTheName();
-	bool			IsCloned() const;
-	std::string		GetStringRepresentation() const;
-
-	bool			IsWeapon() const { return typeID == kFormType_TESObjectWEAP; }
-	bool			IsArmor() const { return typeID == kFormType_TESObjectARMO; }
-
-
-	bool			IsInventoryObject() const;
-	bool			IsReference();
-
-	bool			HasScript();
-	bool			GetScriptAndEventList(Script*& script, ScriptEventList*& eventList);
-	bool			IsItemPlayable();
-	UInt32			GetItemValue();
-	float			GetWeight();
-	float			GetModifiedWeight();
-	UInt8			GetOverridingModIdx();
-	const char*		GetDescriptionText();
-	const char*		RefToString();
-	TESLeveledList*	GetLvlList();
-	void			SetJIPFlag(UInt8 jipFlag, bool bSet);
-	bool			IsQuestItem2()	{ return flags & kFormFlags_QuestItem; };
-	bool			IsDisabled()	{ return flags & kFormFlags_IsPermanent; };
-	bool			IsDeleted()		{ return flags & kFormFlags_Deleted; };
-	static void		DoAddForm(TESForm* newForm, bool bPersist = true, bool record = true);
-	TESForm*		CloneForm(bool bPersist = true) const;
-	bool			IsInventoryObjectAlt(); 
-	bool			IsCreated() const { return modIndex == 0xFF; }
-
-	MEMBER_FN_PREFIX(TESForm);
-	DEFINE_MEMBER_FN(MarkAsTemporary, void, 0x00484490);	// probably a member of TESForm
+	TESForm*					TryGetREFRParent();
+	TESFullName*				GetFullName();
+	const char*					GetTheName();
+	bool						IsCloned() const { return this->modIndex == 0xFF; }
+	bool						HasScript();
+	bool						GetScriptAndEventList(Script*& script, ScriptEventList*& eventList);
+	bool						IsItemPlayable();
+	UInt32						GetItemValue();
+	float						GetWeight();
+	float						GetModifiedWeight();
+	UInt8						GetOverridingModIdx();
+	const char*					GetDescriptionText();
+	const char*					RefToString();
+	TESLeveledList*				GetLvlList();
+	void						SetJIPFlag(UInt8 jipFlag, bool bSet);
+	bool						IsQuestItem2()	{ return flags & kFormFlags_QuestItem; };
+	bool						IsDisabled()	{ return flags & kFormFlags_IsPermanent; };
+	bool						IsDeleted()		{ return flags & kFormFlags_Deleted; };
+	static void					DoAddForm(TESForm* newForm, bool bPersist = true, bool record = true);
+	TESForm*					CloneForm(bool bPersist = true) const;
+	bool						IsInventoryObject() { return CdeclCall<char>(0x00481F30, typeID); }
+	bool						IsInventoryObjectAlt(); 
+	bool						IsCreated() const { return modIndex == 0xFF; }
+	bool						CanContainItems() const { return typeID == kFormType_TESObjectACTI || typeID == kFormType_TESObjectCONT || typeID == kFormType_TESNPC || typeID == kFormType_TESCreature; }
 };
-STATIC_ASSERT(sizeof(TESForm) == 0x18);
+static_assert(sizeof(TESForm) == 0x18);
 
 class TESObject : public TESForm
 {
@@ -2492,7 +2482,7 @@ public:
 	//	UInt32 CopyItemFrom(EffectItemList& fromList, UInt32 whichItem);
 	//	bool RemoveItem(UInt32 whichItem);
 };
-STATIC_ASSERT(sizeof(EffectItemList) == 0x10);
+static_assert(sizeof(EffectItemList) == 0x10);
 
 // 1C
 class MagicItem : public TESFullName
@@ -2528,7 +2518,7 @@ public:
 	EType Type() const;
 };
 
-STATIC_ASSERT(sizeof(MagicItem) == 0x1C);
+static_assert(sizeof(MagicItem) == 0x1C);
 
 // 034
 class MagicItemForm : public TESForm
@@ -2543,7 +2533,7 @@ public:
 	MagicItem	magicItem;	// 018
 };
 
-STATIC_ASSERT(sizeof(MagicItemForm) == 0x34);
+static_assert(sizeof(MagicItemForm) == 0x34);
 
 // 18
 class TESModel : public BaseFormComponent
@@ -2572,7 +2562,7 @@ public:
 
 	void SetPath(const char* newPath)	{ nifPath.Set(newPath); }
 };
-STATIC_ASSERT(sizeof(TESModel) == 0x18);
+static_assert(sizeof(TESModel) == 0x18);
 
 // 18
 class BGSTextureModel : public TESModel
@@ -2656,7 +2646,7 @@ public:
 	DestructibleData	*data;			// 04
 };
 
-STATIC_ASSERT(sizeof(BGSDestructibleObjectForm) == 0x8);
+static_assert(sizeof(BGSDestructibleObjectForm) == 0x8);
 
 // 00C
 class BGSPickupPutdownSounds : public BaseFormComponent
@@ -2843,7 +2833,7 @@ public:
 	void SetBipedMask(UInt32 mask);
 };
 
-STATIC_ASSERT(sizeof(TESBipedModelForm) == 0x0DC);
+static_assert(sizeof(TESBipedModelForm) == 0x0DC);
 
 // 30
 class TESBoundAnimObject : public TESBoundObject
@@ -2870,8 +2860,8 @@ public:
 	struct FormCount
 	{
 		SInt32				count;			//	00
-		TESForm				*form;			//	04
-		ContainerExtraData	*contExtraData;	//	08
+		TESForm*			form;			//	04
+		ContainerExtraData*	contExtraData;	//	08
 	};
 
 	typedef TList<FormCount> FormCountList;
@@ -3165,7 +3155,7 @@ public:
 	// SkillsCurrentValue[14] at index 20
 };
 
-STATIC_ASSERT(sizeof(ActorValueOwner) == 0x004);
+static_assert(sizeof(ActorValueOwner) == 0x004);
 
 class CachedValuesOwner
 {
@@ -3191,7 +3181,7 @@ public:
 	virtual bool	Fn_0F(void);
 };
 
-STATIC_ASSERT(sizeof(CachedValuesOwner) == 0x004);
+static_assert(sizeof(CachedValuesOwner) == 0x004);
 
 // 10C
 class TESActorBase : public TESBoundAnimObject
@@ -3225,7 +3215,7 @@ public:
 	BGSDestructibleObjectForm	destructible;	// 104
 	// 10C
 };
-STATIC_ASSERT(sizeof(TESActorBase) == 0x10C);
+static_assert(sizeof(TESActorBase) == 0x10C);
 
 // 14
 class TESModelList : public BaseFormComponent
@@ -3513,7 +3503,7 @@ public:
 	UInt16			unk3C;			// 3C	XIDX
 	UInt16			unk3E;			// 3E
 };
-STATIC_ASSERT(sizeof(TESTopic) == 0x40);
+static_assert(sizeof(TESTopic) == 0x40);
 
 // A0
 class BGSTextureSet : public TESBoundObject
@@ -3574,7 +3564,7 @@ public:
 	UInt32			unk9C;			// 9C
 };
 
-STATIC_ASSERT(sizeof(BGSTextureSet) == 0xA0);
+static_assert(sizeof(BGSTextureSet) == 0xA0);
 
 // 24
 class BGSMenuIcon : public TESForm
@@ -3586,7 +3576,7 @@ public:
 	TESIcon	icon;	// 18
 };
 
-STATIC_ASSERT(sizeof(BGSMenuIcon) == 0x24);
+static_assert(sizeof(BGSMenuIcon) == 0x24);
 
 // 28
 class TESGlobal : public TESForm
@@ -3608,7 +3598,7 @@ public:
 	float	data;		// 24
 };
 
-STATIC_ASSERT(sizeof(TESGlobal) == 0x28);
+static_assert(sizeof(TESGlobal) == 0x28);
 
 // 60
 class TESClass : public TESForm
@@ -3654,7 +3644,7 @@ public:
 	UInt8			pad5E[2];		// 5E
 };
 
-STATIC_ASSERT(sizeof(TESClass) == 0x60);
+static_assert(sizeof(TESClass) == 0x60);
 
 class TESReputation : public TESForm
 {
@@ -3727,7 +3717,7 @@ public:
 	void SetNthRankName(const char* newName, UInt32 whichRank, bool bFemale);
 };
 
-STATIC_ASSERT(sizeof(TESFaction) == 0x4C);
+static_assert(sizeof(TESFaction) == 0x4C);
 
 // 50
 class BGSHeadPart : public TESForm
@@ -3750,7 +3740,7 @@ public:
 	UInt32				unk4C;		// 4C
 };
 
-STATIC_ASSERT(sizeof(BGSHeadPart) == 0x50);
+static_assert(sizeof(BGSHeadPart) == 0x50);
 
 // 4C
 class TESHair : public TESForm
@@ -3775,7 +3765,7 @@ public:
 	UInt8			pad49[3];	// 49
 };
 
-STATIC_ASSERT(sizeof(TESHair) == 0x4C);
+static_assert(sizeof(TESHair) == 0x4C);
 
 // 34
 class TESEyes : public TESForm
@@ -3798,7 +3788,7 @@ public:
 	UInt8			pad31[3];	// 31
 };
 
-STATIC_ASSERT(sizeof(TESEyes) == 0x34);
+static_assert(sizeof(TESEyes) == 0x34);
 
 // 4E4 - incomplete
 class TESRace : public TESForm
@@ -3915,7 +3905,7 @@ public:
 		soundFlags = bMod ? (soundFlags | pFlag) : (soundFlags & ~pFlag);
 	}
 };
-STATIC_ASSERT(sizeof(TESSound) == 0x68);
+static_assert(sizeof(TESSound) == 0x68);
 
 // 3C
 class BGSAcousticSpace : public TESBoundObject
@@ -3929,7 +3919,7 @@ public:
 	UInt32	unk38;	// 38
 };
 
-STATIC_ASSERT(sizeof(BGSAcousticSpace) == 0x3C);
+static_assert(sizeof(BGSAcousticSpace) == 0x3C);
 
 // 60
 class TESSkill : public TESForm
@@ -3950,7 +3940,7 @@ public:
 	UInt32			unk58[(0x60 - 0x58) >> 2];	// 58
 };
 
-STATIC_ASSERT(sizeof(TESSkill) == 0x60);
+static_assert(sizeof(TESSkill) == 0x60);
 
 // B0
 class EffectSetting : public TESForm	// MGEF
@@ -4059,7 +4049,7 @@ public:
 	Script*			SetScript(Script* newScript);
 };
 
-STATIC_ASSERT(sizeof(EffectSetting) == 0xB0);
+static_assert(sizeof(EffectSetting) == 0xB0);
 
 // 68
 class TESGrass : public TESBoundObject
@@ -4086,7 +4076,7 @@ public:
 	UInt8			pad65[3];				// 65
 };
 
-STATIC_ASSERT(sizeof(TESGrass) == 0x68);
+static_assert(sizeof(TESGrass) == 0x68);
 
 // 28
 class TESLandTexture : public TESForm
@@ -4104,7 +4094,7 @@ public:
 
 	SInt32	GetGrassIndex(TESGrass *grass);
 };
-STATIC_ASSERT(sizeof(TESLandTexture) == 0x28);
+static_assert(sizeof(TESLandTexture) == 0x28);
 
 // 44
 class EnchantmentItem : public MagicItemForm
@@ -4127,7 +4117,7 @@ public:
 	UInt8		enchFlags;	// 40
 	UInt8		pad41[3];	// 41
 };
-STATIC_ASSERT(sizeof(EnchantmentItem) == 0x44);
+static_assert(sizeof(EnchantmentItem) == 0x44);
 
 // 44
 class SpellItem : public MagicItemForm
@@ -4156,7 +4146,7 @@ public:
 	UInt8	pad41[3];	// 41
 };
 
-STATIC_ASSERT(sizeof(SpellItem) == 0x44);
+static_assert(sizeof(SpellItem) == 0x44);
 
 class BGSTalkingActivator;
 
@@ -4182,7 +4172,7 @@ public:
 	String						activationPrompt;	// 88	XATO
 };
 
-STATIC_ASSERT(sizeof(TESObjectACTI) == 0x90);
+static_assert(sizeof(TESObjectACTI) == 0x90);
 
 // BGSTalkingActivator (8C)
 class BGSTalkingActivator;
@@ -4270,7 +4260,7 @@ public:
 
 	UInt32						GetArmorValue(UInt32);
 };
-STATIC_ASSERT(sizeof(TESObjectARMO) == 0x188);
+static_assert(sizeof(TESObjectARMO) == 0x188);
 
 // TESObjectBOOK (C4)
 class TESObjectBOOK;
@@ -4306,8 +4296,6 @@ public:
 	TESModelTextureSwap			model;				// 48
 	TESScriptableForm			scriptForm;			// 68
 	TESWeightForm				weightForm;			// 74
-//	TESMagicCasterForm			magicCaster;		// 
-//	TESMagicTargetForm			magicTarget;		// 
 	BGSDestructibleObjectForm	destructForm;		// 7C
 	BGSOpenCloseForm			openCloseForm;		// 84 / B8
 
@@ -4387,7 +4375,7 @@ public:
 		lightFlags = bMod ? (lightFlags | pFlag) : (lightFlags & ~pFlag);
 	}
 };
-STATIC_ASSERT(sizeof(TESObjectLIGH) == 0x0C8);
+static_assert(sizeof(TESObjectLIGH) == 0x0C8);
 
 // TESObjectMISC (A8)
 class TESObjectMISC : public TESBoundObject
@@ -4546,7 +4534,7 @@ public:
 		eReload_Z,
 		eReload_Count,
 	};
-	STATIC_ASSERT(eReload_Count == 23);
+	static_assert(eReload_Count == 23);
 
 	enum EWeaponFlags1 {
 		eFlag_IgnoresNormalWeapResist	= 0x1,
@@ -4604,7 +4592,7 @@ public:
 		eCritDamage_OnDeath				= 0x1
 	};
 
-	enum
+	enum kWeaponModEffects
 	{
 		kWeaponModEffect_None = 0,
 		kWeaponModEffect_IncreaseDamage,
@@ -4810,9 +4798,10 @@ public:
 	UInt8					AttackAnimation() const;
 	void					SetAttackAnimation(UInt8 attackAnim);
 	TESObjectIMOD*			GetItemMod(UInt8 which);
-	UInt32					GetItemModEffect(UInt8 which)	{ which -= 1; ASSERT(which < 3); return effectMods[which]; }
-	float					GetItemModValue1(UInt8 which)	{ which -= 1; ASSERT(which < 3); return value1Mod[which]; }
-	float					GetItemModValue2(UInt8 which)	{ which -= 1; ASSERT(which < 3); return value2Mod[which]; }
+	__forceinline UInt32	GetItemModEffect(UInt8 which)	{ which -= 1; ASSERT(which < 3); return effectMods[which]; }
+	__forceinline Float32	GetItemModValue1(UInt8 which)	{ which -= 1; ASSERT(which < 3); return value1Mod[which]; }
+	__forceinline Float32	GetItemModValue2(UInt8 which)	{ which -= 1; ASSERT(which < 3); return value2Mod[which]; }
+	Float32					GetEffectModValue(kWeaponModEffects value, UInt8 second = 0);
 
 	void					SetPlayable(bool doset) { weaponFlags1.Write(Eflag_NonPlayable, !doset); }
 	bool					HasNightVision() const { return weaponFlags2.IsSet(eFlag_NightVision); }
@@ -4830,7 +4819,7 @@ public:
 	__forceinline bool		HasScopeAlt() const { return weaponFlags1.IsSet(eFlag_HasScope) && !weaponFlags2.IsSet(eFlag_ScopeFromMod); }
 	__forceinline TESAmmo*	GetEquippedAmmo(Actor* actor) { return ThisCall<TESAmmo*>(0x525980, this, actor); }
 };
-STATIC_ASSERT(sizeof(TESObjectWEAP) == 0x388);
+static_assert(sizeof(TESObjectWEAP) == 0x388);
 
 class TESAmmoEffect : public TESForm
 {
@@ -4860,7 +4849,7 @@ public:
 	UInt32			operation;	// 028
 	float			value;		// 02C
 }; 
-STATIC_ASSERT(sizeof(TESAmmoEffect) == 0x30);
+static_assert(sizeof(TESAmmoEffect) == 0x30);
 
 // DC
 class TESAmmo : public TESBoundObject
@@ -4902,7 +4891,7 @@ public:
 	SInt32 GetEffectIndex(TESAmmoEffect *effect);
 };
 
-STATIC_ASSERT(sizeof(TESAmmo) == 0xDC);
+static_assert(sizeof(TESAmmo) == 0xDC);
 
 class BSFaceGenNiNode;
 
@@ -5013,7 +5002,7 @@ public:
 	NiTArray <FaceGenUndo *>	faceGenUndo;	// 1FC
 };
 
-STATIC_ASSERT(sizeof(TESNPC) == 0x20C);
+static_assert(sizeof(TESNPC) == 0x20C);
 
 // 160
 class TESCreature : public TESActorBase
@@ -5046,7 +5035,7 @@ public:
 	UInt8						byt015C;			// 15C
 	UInt8						pad015D[3];			// 15D
 };
-STATIC_ASSERT(sizeof(TESCreature) == 0x160);
+static_assert(sizeof(TESCreature) == 0x160);
 
 
 class TESLeveledList : public BaseFormComponent
@@ -5142,7 +5131,7 @@ public:
 	bool IsWaterAlt();
 };
 
-STATIC_ASSERT(sizeof(AlchemyItem) == 0xD8);
+static_assert(sizeof(AlchemyItem) == 0xD8);
 
 
 // BGSIdleMarker (40)
@@ -5167,7 +5156,7 @@ public:
 	UInt8                       unk07E;					// 07E
 	UInt8                       unk07F;					// 07F
 };
-STATIC_ASSERT(sizeof(BGSNote) == 0x80);
+static_assert(sizeof(BGSNote) == 0x80);
 
 // BGSConstructibleObject (B0)
 class BGSConstructibleObject;
@@ -5242,7 +5231,7 @@ public:
 	UInt8	b;
 	UInt8	a;
 };
-STATIC_ASSERT(sizeof(RGBA) == 0x004);
+static_assert(sizeof(RGBA) == 0x004);
 
 // 2F4
 class TESWeather : public TESForm
@@ -5278,7 +5267,7 @@ public:
 	ColorData				colors[10];				// 108
 	UInt32					unk1F8[63];					// 1F8
 };
-STATIC_ASSERT(sizeof(TESWeather) == 0x2F4);
+static_assert(sizeof(TESWeather) == 0x2F4);
 
 struct WeatherEntry
 {
@@ -5317,7 +5306,7 @@ public:
 	WeatherEntry *GetWeatherEntry(TESWeather *weather, bool rmv);
 };
 
-STATIC_ASSERT(sizeof(TESClimate) == 0x58);
+static_assert(sizeof(TESClimate) == 0x58);
 
 // 08
 class TESRegionData : public BaseFormComponent
@@ -5429,7 +5418,7 @@ public:
 	UInt32					unk28[4];		// 28
 };
 
-STATIC_ASSERT(sizeof(TESRegion) == 0x38);
+static_assert(sizeof(TESRegion) == 0x38);
 
 class TESRegionList : public BSSimpleList<TESRegion>
 {
@@ -5484,7 +5473,7 @@ public:
 
 	bool IsInterior() { return worldSpace == nullptr; }
 };
-STATIC_ASSERT(sizeof(TESObjectCELL) == 0xE0);
+static_assert(sizeof(TESObjectCELL) == 0xE0);
 
 struct LODdata;	// 03C
 
@@ -5588,7 +5577,7 @@ public:
 	TESTexture			canopyShadow;		// 0D4 confirmed NNAM
 	TESTexture			waterNoiseTexture;	// 0E0 confirmed XNAM
 };	// I am seeing a TList at 60, a map at 50 indexed by XY coord !!!, another map at B0, indexed by modInfo::Unklist elements
-STATIC_ASSERT(sizeof(TESWorldSpace) == 0xEC);
+static_assert(sizeof(TESWorldSpace) == 0xEC);
 
 // TESObjectLAND (2C)
 class TESObjectLAND;
@@ -5649,7 +5638,7 @@ public:
 
 	BGSQuestObjective* GetObjective(UInt32 objectiveID) const;
 };
-STATIC_ASSERT(sizeof(TESQuest) == 0x6C);
+static_assert(sizeof(TESQuest) == 0x6C);
 
 // TESIdleForm (54)
 class TESIdleForm;
@@ -6007,7 +5996,7 @@ public:
 	static const char*	StringForProcedureCode(eProcedure proc, bool bRemovePrefix);
 };
 
-STATIC_ASSERT(sizeof(TESPackage) == 0x80);
+static_assert(sizeof(TESPackage) == 0x80);
 
 struct DialogueResponse {
 	String			responseText;	// 000
@@ -6250,7 +6239,7 @@ public:
 
 	void SetFlag(UInt32 pFlag, bool bMod) { csFlags = bMod ? (csFlags | pFlag) : (csFlags & ~pFlag); }
 };
-STATIC_ASSERT(sizeof(TESCombatStyle) == 0x108);
+static_assert(sizeof(TESCombatStyle) == 0x108);
 
 // 2C
 class TESRecipeCategory : public TESForm
@@ -6262,7 +6251,7 @@ public:
 	TESFullName			fullName;	// 18
 	UInt32				flags;		// 24
 };
-STATIC_ASSERT(sizeof(TESRecipeCategory) == 0x28);
+static_assert(sizeof(TESRecipeCategory) == 0x28);
 
 struct RecipeComponent
 {
@@ -6291,7 +6280,7 @@ public:
 	TESRecipeCategory*		category;		// 54
 	TESRecipeCategory*		subCategory;	// 58
 };
-STATIC_ASSERT(sizeof(TESRecipe) == 0x5C);
+static_assert(sizeof(TESRecipe) == 0x5C);
 
 // TESLoadScreen (3C)
 class TESLoadScreen : public TESForm
@@ -6384,7 +6373,7 @@ public:
 
 	void SetFlag(UInt32 flag, bool val) { explFlags = val ? (explFlags | flag) : (explFlags & ~flag); }
 };
-STATIC_ASSERT(sizeof(BGSExplosion) == 0xA4);
+static_assert(sizeof(BGSExplosion) == 0xA4);
 
 // BGSDebris (24)
 class BGSDebris : public TESForm
@@ -6406,7 +6395,7 @@ public:
 
 	UInt32 unk018[(0xB0-0x18) >> 2];		// 018
 };
-STATIC_ASSERT(sizeof(TESImageSpace) == 0xB0);
+static_assert(sizeof(TESImageSpace) == 0xB0);
 
 // TESImageSpaceModifier (728)
 class TESImageSpaceModifier : public TESForm
@@ -6417,7 +6406,7 @@ public:
 
 	UInt32 unk018[(0x728-0x18) >> 2];		// 018
 };
-STATIC_ASSERT(sizeof(TESImageSpaceModifier) == 0x728);
+static_assert(sizeof(TESImageSpaceModifier) == 0x728);
 
 // 24
 class BGSListForm : public TESForm
@@ -6471,7 +6460,7 @@ public:
 	bool Contains(TESForm* form);
 	bool ContainsRecursive(TESForm* form, UInt32 reclvl = 0);
 };
-STATIC_ASSERT(sizeof(BGSListForm) == 0x024);
+static_assert(sizeof(BGSListForm) == 0x024);
 
 bool FormContainsRecusive(TESForm* parent, TESForm* child);
 
@@ -6486,7 +6475,7 @@ public:
 	UInt8				priority;			// 05
 	UInt16				type;				// 06 (Quest: 0xC24, Ability: 0xB27, Entry Point: 0xD16)
 };
-STATIC_ASSERT(sizeof(BGSPerkEntry) == 0x8);
+static_assert(sizeof(BGSPerkEntry) == 0x8);
 
 class BGSQuestPerkEntry : public BGSPerkEntry
 {
@@ -6498,7 +6487,7 @@ public:
 	UInt8				stage;				// 0C
 	UInt8				pad[3];				// 0D
 };
-STATIC_ASSERT(sizeof(BGSQuestPerkEntry) == 0x10);
+static_assert(sizeof(BGSQuestPerkEntry) == 0x10);
 
 class BGSAbilityPerkEntry : public BGSPerkEntry
 {
@@ -6508,7 +6497,7 @@ public:
 
 	SpellItem*			ability;			// 08
 };
-STATIC_ASSERT(sizeof(BGSAbilityPerkEntry) == 0xC);
+static_assert(sizeof(BGSAbilityPerkEntry) == 0xC);
 
 class BGSEntryPointFunctionData
 {
@@ -6518,7 +6507,7 @@ public:
 
 	UInt32				vtbl;				// 00
 };
-STATIC_ASSERT(sizeof(BGSEntryPointFunctionData) == 0x4);
+static_assert(sizeof(BGSEntryPointFunctionData) == 0x4);
 
 // 08
 class BGSEntryPointFunctionDataOneValue : public BGSEntryPointFunctionData
@@ -6529,7 +6518,7 @@ public:
 
 	Float32				value;				// 04
 };
-STATIC_ASSERT(sizeof(BGSEntryPointFunctionDataOneValue) == 0x8);
+static_assert(sizeof(BGSEntryPointFunctionDataOneValue) == 0x8);
 
 // 0C
 class BGSEntryPointFunctionDataTwoValue : public BGSEntryPointFunctionData
@@ -6540,7 +6529,7 @@ public:
 
 	Float32				value[2];			// 04
 };
-STATIC_ASSERT(sizeof(BGSEntryPointFunctionDataTwoValue) == 0xC);
+static_assert(sizeof(BGSEntryPointFunctionDataTwoValue) == 0xC);
 
 class BGSEntryPointFunctionDataLeveledList : public BGSEntryPointFunctionData
 {
@@ -6550,7 +6539,7 @@ public:
 
 	TESLevItem			*leveledList;		// 04
 };
-STATIC_ASSERT(sizeof(BGSEntryPointFunctionDataLeveledList) == 0x8);
+static_assert(sizeof(BGSEntryPointFunctionDataLeveledList) == 0x8);
 
 class BGSEntryPointFunctionDataActivateChoice : public BGSEntryPointFunctionData
 {
@@ -6562,7 +6551,7 @@ public:
 	Script*					script;			// 0C
 	UInt32					flags;			// 10
 };
-STATIC_ASSERT(sizeof(BGSEntryPointFunctionDataActivateChoice) == 0x14);
+static_assert(sizeof(BGSEntryPointFunctionDataActivateChoice) == 0x14);
 
 class BGSEntryPointPerkEntry : public BGSPerkEntry
 {
@@ -6584,7 +6573,7 @@ public:
 	BGSEntryPointFunctionData*	data;			// 0C
 	EntryPointConditions*		conditions;		// 10
 };
-STATIC_ASSERT(sizeof(BGSEntryPointPerkEntry) == 0x14);
+static_assert(sizeof(BGSEntryPointPerkEntry) == 0x14);
 
 // 50
 class BGSPerk : public TESForm
@@ -6612,7 +6601,7 @@ public:
 	TList<Condition>		conditions;			// 40
 	TList<BGSPerkEntry>		entries;			// 48
 };
-STATIC_ASSERT(sizeof(BGSPerk) == 0x50);
+static_assert(sizeof(BGSPerk) == 0x50);
 
 class BGSBodyPart : public BaseFormComponent
 {
@@ -6667,7 +6656,7 @@ public:
 	
 	void SetFlag(UInt32 pFlag, bool bMod) { flags = bMod ? (flags | pFlag) : (flags & ~pFlag); }
 };
-STATIC_ASSERT(sizeof(BGSBodyPart) == 0xB0);
+static_assert(sizeof(BGSBodyPart) == 0xB0);
 
 // 74
 class BGSBodyPartData : public TESForm
@@ -6700,7 +6689,7 @@ public:
 	BGSBodyPart*	bodyParts[15];		// 034
 	BGSRagdoll*		ragDoll;			// 070
 };
-STATIC_ASSERT(sizeof(BGSBodyPartData) == 0x74);
+static_assert(sizeof(BGSBodyPartData) == 0x74);
 
 class BGSAddonNode : public TESBoundObject
 {
@@ -6711,7 +6700,7 @@ public:
 	TESModel	model;				// 030
 	UInt32		unk48[(0x60-0x48) >> 2]; // 048
 };
-STATIC_ASSERT(sizeof(BGSAddonNode) == 0x60);
+static_assert(sizeof(BGSAddonNode) == 0x60);
 
 // ActorValueInfo (C4)
 class ActorValueInfo : public TESForm {
@@ -6736,7 +6725,7 @@ public:
 	UInt32		unk_098;								// 098
 	UInt32		fill_09C[(0x0C4-0x09C) >> 2];			// 09C 0C3
 };
-STATIC_ASSERT(sizeof(ActorValueInfo) == 0x0C4);
+static_assert(sizeof(ActorValueInfo) == 0x0C4);
 
 extern const ActorValueInfo** ActorValueInfoPointerArray;
 
@@ -6752,7 +6741,7 @@ public:
 	UInt32	unk018;			// 018
 	UInt32	unk01C;			// 01C
 };
-STATIC_ASSERT(sizeof(BGSRadiationStage) == 0x20);
+static_assert(sizeof(BGSRadiationStage) == 0x20);
 
 // BGSCameraShot (78)
 class BGSCameraShot : public TESForm
@@ -6765,7 +6754,7 @@ class BGSCameraShot : public TESForm
 
 	UInt32 unk024[(0x78-0x18) >> 2];	// 024
 };
-STATIC_ASSERT(sizeof(BGSCameraShot) == 0x78);
+static_assert(sizeof(BGSCameraShot) == 0x78);
 
 // BGSCameraPath (38)
 class BGSCameraPath;
@@ -6780,7 +6769,7 @@ public:
 	UInt32		unk01C;		// 01C
 	UInt32		unk020;		// 020
 };
-STATIC_ASSERT(sizeof(BGSVoiceType) == 0x24);
+static_assert(sizeof(BGSVoiceType) == 0x24);
 
 struct ColorRGB
 {
@@ -6804,7 +6793,7 @@ struct DecalData
 	UInt8		unk01E[2];		// 01E
 	ColorRGB	color;			// 020
 };
-STATIC_ASSERT(sizeof(DecalData) == 0x024);
+static_assert(sizeof(DecalData) == 0x024);
 
 class BGSImpactData : public TESForm
 {
@@ -6829,7 +6818,7 @@ public:
 	TESSound*		sound2;				// 050
 	DecalData		decalData;			// 054 DODT [begining of DATA before form version 0x0A]
 };
-STATIC_ASSERT(sizeof(BGSImpactData) == 0x078);
+static_assert(sizeof(BGSImpactData) == 0x078);
 
 // 4C
 class BGSImpactDataSet : public TESForm
@@ -6841,7 +6830,7 @@ public:
 	BGSPreloadable	preloadable;				// 018
 	UInt32			impactDatas[12];			// 01C
 };
-STATIC_ASSERT(sizeof(BGSImpactDataSet) == 0x4C);
+static_assert(sizeof(BGSImpactDataSet) == 0x4C);
 
 // TESObjectARMA (180)
 class TESObjectARMA : public TESBoundObject
@@ -6866,7 +6855,7 @@ public:
 	UInt32						unk17C;					// 17C
 };
 
-STATIC_ASSERT(sizeof(TESObjectARMA) == 0x180);
+static_assert(sizeof(TESObjectARMA) == 0x180);
 
 class BGSEncounterZone : public TESForm
 {
@@ -6875,7 +6864,7 @@ class BGSEncounterZone : public TESForm
 
 	UInt32 unk018[(0x30-0x18) >> 2];	// 018
 };
-STATIC_ASSERT(sizeof(BGSEncounterZone) == 0x30);
+static_assert(sizeof(BGSEncounterZone) == 0x30);
 
 class BGSMessage : public TESForm
 {
@@ -6896,7 +6885,7 @@ public:
 	UInt32				messageFlags;		// 038 init'd to 1
 	Float32				displayTime;		// 03C init'd to 2
 };
-STATIC_ASSERT(sizeof(BGSMessage) == 0x40);
+static_assert(sizeof(BGSMessage) == 0x40);
 
 // BGSRagdoll (148)
 class BGSRagdoll : public TESForm
@@ -6908,7 +6897,7 @@ public:
 	TESModel	model;						// 018
 	UInt32		unk030[(0x148-0x30) >> 2];	// 030
 };
-STATIC_ASSERT(sizeof(BGSRagdoll) == 0x148);
+static_assert(sizeof(BGSRagdoll) == 0x148);
 
 class BGSLightingTemplate : public TESForm
 {
@@ -6918,7 +6907,7 @@ public:
 
 	UInt32	unk018[(0x44 - 0x18) >> 2];
 };
-STATIC_ASSERT(sizeof(BGSLightingTemplate) == 0x44);
+static_assert(sizeof(BGSLightingTemplate) == 0x44);
 
 // BGSMusicType (30)
 class BGSMusicType : public TESForm
@@ -6932,7 +6921,7 @@ public:
 	UInt32			unk028;
 	UInt32			unk02C;
 };
-STATIC_ASSERT(sizeof(BGSMusicType) == 0x30);
+static_assert(sizeof(BGSMusicType) == 0x30);
 
 // BGSDefaultObjectManager, with help from "Luthien Anarion"
 constexpr char kDefaultObjectNames[34][28] = {	// 0x0118C360 is an array of struct: { char * Name, UInt8 kFormType , UInt8 pad[3] }
@@ -7033,7 +7022,7 @@ public:
 	DefaultObjects	defaultObjects;	// 018
 };
 
-STATIC_ASSERT(sizeof(BGSDefaultObjectManager) == 0xA0);
+static_assert(sizeof(BGSDefaultObjectManager) == 0xA0);
 
 enum EActionListForm
 {

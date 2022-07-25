@@ -655,7 +655,7 @@ public:
 	Data02C*		unk02C;			// 2C
 	bool IsHighProcess() { return processLevel == 0; };
 };
-STATIC_ASSERT(sizeof(BaseProcess) == 0x30);
+static_assert(sizeof(BaseProcess) == 0x30);
 
 
 class LowProcess : public BaseProcess
@@ -738,7 +738,7 @@ public:
 	float					fltAC;				// AC
 	UInt32					unkB0;
 };
-STATIC_ASSERT(sizeof(LowProcess) == 0xB4);
+static_assert(sizeof(LowProcess) == 0xB4);
 
 // LowProcess has 207 virtual func
 
@@ -753,7 +753,7 @@ public:
 	UInt32				unk0B4;			// 0B4
 	ActorValueModifiers	tempModifiers;	// 0B8
 };	// 0C8
-STATIC_ASSERT(sizeof(MiddleLowProcess) == 0x0C8);
+static_assert(sizeof(MiddleLowProcess) == 0x0C8);
 
 // MiddleLowProcess has 208 virtual func, 208 would be SetAnimation
 
@@ -867,7 +867,7 @@ public:
 	ActorHitData*						lastTargetHitData;			// 254 ActorHitData*
 	UInt32								unk258;				// 258
 };
-STATIC_ASSERT(sizeof(MiddleHighProcess) == 0x25C);
+static_assert(sizeof(MiddleHighProcess) == 0x25C);
 
 
 // 46C
@@ -983,7 +983,7 @@ public:
 	float								flt450;				// 450
 	UInt32								unk454[6];			// 454
 };
-STATIC_ASSERT(sizeof(HighProcess) == 0x46C);
+static_assert(sizeof(HighProcess) == 0x46C);
 
 
 class AnimIdle : public NiRefObject
@@ -1000,7 +1000,7 @@ public:
 	UInt32 unk030;
 	Actor* actor;
 };
-STATIC_ASSERT(sizeof(AnimIdle) == 0x38);
+static_assert(sizeof(AnimIdle) == 0x38);
 
 
 class AnimSequenceBase
@@ -1098,4 +1098,4 @@ struct AnimData
 	AnimGroupID GetNextAttackGroupID() const;
 
 };
-STATIC_ASSERT(sizeof(AnimData) == 0x13C);
+static_assert(sizeof(AnimData) == 0x13C);

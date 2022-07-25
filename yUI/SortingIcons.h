@@ -5,6 +5,8 @@
 #include <unordered_set>
 #include <unordered_map>
 
+void LoadSIMapsFromFiles();
+
 namespace SIFiles
 {
 	class JSONEntryItemCommon
@@ -24,17 +26,17 @@ namespace SIFiles
 	class JSONEntryItemWeapon
 	{
 	public:
-		UInt32			weaponSkill;
-		UInt32			weaponType;
-		UInt32			weaponHandgrip;
-		UInt32 			weaponAttackAnim;
-		UInt32 			weaponReloadAnim;
-		UInt32 			weaponIsAutomatic;
-		UInt32 			weaponHasScope;
-		UInt32 			weaponIgnoresDTDR;
-		UInt32 			weaponClipRounds;
-		UInt32 			weaponNumProjectiles;
-		UInt32 			weaponSoundLevel;
+		UInt32			skill;
+		UInt32			type;
+		UInt32			handgrip;
+		UInt32 			attackAnim;
+		UInt32 			reloadAnim;
+		UInt32 			isAutomatic;
+		UInt32 			hasScope;
+		UInt32 			ignoresDTDR;
+		UInt32 			clipRounds;
+		UInt32 			numProjectiles;
+		UInt32 			soundLevel;
 
 		TESForm*		ammo;
 
@@ -44,16 +46,16 @@ namespace SIFiles
 	class JSONEntryItemArmor
 	{
 	public:
-		UInt32			armorSlotsMaskWL;
-		UInt32 			armorSlotsMaskBL;
+		UInt32			slotsMaskWL;
+		UInt32 			slotsMaskBL;
 
 		UInt16 			armorClass;
-		SInt8 			armorPower;
-		SInt8 			armorHasBackpack;
+		SInt8 			powerArmor;
+		SInt8 			hasBackpack;
 
-		Float32 		armorDT;
-		UInt16 			armorDR;
-		UInt16 			armorChangesAV;
+		Float32 		dt;
+		UInt16 			dr;
+		UInt16 			changesAV;
 
 		JSONEntryItemArmor() = default;
 	};
@@ -61,13 +63,13 @@ namespace SIFiles
 	class JSONEntryItemAid
 	{
 	public:
-		UInt8  			aidRestoresAV;
-		UInt8  			aidDamagesAV;
-		UInt8  			aidIsAddictive;
-		UInt8  			aidIsWater;
-		UInt8  			aidIsFood;
-		UInt8  			aidIsMedicine;
-		UInt8  			aidIsPoisonous;
+		UInt8  			restoresAV;
+		UInt8  			damagesAV;
+		UInt8  			isAddictive;
+		UInt8  			isWater;
+		UInt8  			isFood;
+		UInt8  			isMedicine;
+		UInt8  			isPoisonous;
 
 		JSONEntryItemAid() = default;
 	};
@@ -82,18 +84,20 @@ namespace SIFiles
 	{
 	public:
 
-		JSONEntryItemCommon		formCommon{};
-		JSONEntryItemWeapon		formWeapon{};
-		JSONEntryItemArmor		formArmor{};
-		JSONEntryItemAid		formAid{};
-		JSONEntryItemMisc		formMisc{};
+		JSONEntryItemCommon			common{};
+		union {
+			JSONEntryItemWeapon		weapon{};
+			JSONEntryItemArmor		armor;
+			JSONEntryItemAid		aid;
+			JSONEntryItemMisc		misc;
+		};
 
-		JSONEntryItem(JSONEntryItemCommon common) : formCommon(std::move(common)) {}
-		JSONEntryItem(JSONEntryItemCommon common, JSONEntryItemWeapon weapon) : formCommon(std::move(common)), formWeapon(weapon) {}
-		JSONEntryItem(JSONEntryItemCommon common, JSONEntryItemArmor armor) : formCommon(std::move(common)), formArmor(armor) {}
-		JSONEntryItem(JSONEntryItemCommon common, JSONEntryItemAid aid) : formCommon(std::move(common)), formAid(aid) {}
-		JSONEntryItem(JSONEntryItemCommon common, JSONEntryItemMisc misc) : formCommon(std::move(common)), formMisc(misc) {}
-		JSONEntryItem(JSONEntryItemCommon common, TESForm* form) : formCommon(std::move(common)) { formCommon.form = form; }
+		JSONEntryItem(JSONEntryItemCommon common) : common(std::move(common)) {}
+		JSONEntryItem(JSONEntryItemCommon common, JSONEntryItemWeapon weapon) : common(std::move(common)), weapon(weapon) {}
+		JSONEntryItem(JSONEntryItemCommon common, JSONEntryItemArmor armor) : common(std::move(common)), armor(armor) {}
+		JSONEntryItem(JSONEntryItemCommon common, JSONEntryItemAid aid) : common(std::move(common)), aid(aid) {}
+		JSONEntryItem(JSONEntryItemCommon common, JSONEntryItemMisc misc) : common(std::move(common)), misc(misc) {}
+		JSONEntryItem(JSONEntryItemCommon common, TESForm* form) : common(std::move(common)) { common.form = form; }
 	};
 
 	class JSONEntryCategory
@@ -141,7 +145,7 @@ namespace SIFiles
 	inline std::vector<JSONEntryTab>				g_Tabs_JSON;
 
 	bool AssignCategoryToItem(TESForm* form);
-
+	void HandleSIJson(const std::filesystem::path& path);
 	void FillSIMapsFromJSON();
 }
 

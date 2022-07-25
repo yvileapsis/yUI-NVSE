@@ -29,7 +29,7 @@ public:
 	void		EraseNextWord(UInt32 index);
 	void		RemoveLastChar();
 };
-STATIC_ASSERT(sizeof(String) == 0x8);
+static_assert(sizeof(String) == 0x8);
 
 enum {
 	eListCount		= -3,
@@ -180,7 +180,7 @@ public:
 			m_curr = rhs.m_curr;
 			return *this;
 		}
-		bool		operator!=(const Iterator& rhs) { return m_curr; }
+		bool		operator!=(const Iterator& rhs) { return m_curr && m_curr->data; }
 
 		Iterator(Node* node = nullptr) : m_curr(node) {}
 		Iterator(TList& _list) : m_curr(&_list.first) {}
@@ -471,7 +471,7 @@ public:
 			f(iter);
 	}
 };
-STATIC_ASSERT(sizeof(TList<void*>) == 0x8);
+static_assert(sizeof(TList<void*>) == 0x8);
 
 template <typename Item> struct DListNode
 {
@@ -532,7 +532,7 @@ public:
 			m_curr = rhs.m_curr;
 			return *this;
 		}
-		bool		operator!=(const Iterator& rhs) { return m_curr; }
+		bool		operator!=(const Iterator& rhs) { return m_curr && m_curr->data; }
 
 		Iterator(Node* node = nullptr) : m_curr(node) {}
 		Iterator(DList& _list) : m_curr(&_list.first) {}
@@ -624,7 +624,7 @@ public:
 		}
 	}
 };
-STATIC_ASSERT(sizeof(DList<void*>) == 0xC);
+static_assert(sizeof(DList<void*>) == 0xC);
 
 enum KeyboardMenuInputCode;
 
@@ -648,7 +648,7 @@ public:
 	
 	TList<Item>		list;	// 004
 };	// 00C
-STATIC_ASSERT(sizeof(BSSimpleList<void*>) == 0xC);
+static_assert(sizeof(BSSimpleList<void*>) == 0xC);
 
 template <typename Item> struct BSSimpleArray
 {

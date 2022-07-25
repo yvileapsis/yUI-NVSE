@@ -83,8 +83,6 @@ template <bool x> struct StaticAssertFailure;
 template <> struct StaticAssertFailure <true> { enum { a = 1 }; };
 template <int x> struct static_assert_test { };
 
-#define STATIC_ASSERT(a) static_assert(a)
-
 #define VERSION_CODE(primary, secondary, sub)	(((primary & 0xFFF) << 20) | ((secondary & 0xFFF) << 8) | ((sub & 0xFF) << 0))
 #define VERSION_CODE_PRIMARY(in)				((in >> 20) & 0xFFF)
 #define VERSION_CODE_SECONDARY(in)				((in >> 8) & 0xFFF)
@@ -129,9 +127,9 @@ private:
 typedef Bitfield <UInt8>	Bitfield8;		//!< An 8-bit bitfield
 typedef Bitfield <UInt16>	Bitfield16;		//!< A 16-bit bitfield
 typedef Bitfield <UInt32>	Bitfield32;		//!< A 32-bit bitfield
-STATIC_ASSERT(sizeof(Bitfield8) == 1);
-STATIC_ASSERT(sizeof(Bitfield16) == 2);
-STATIC_ASSERT(sizeof(Bitfield32) == 4);
+static_assert(sizeof(Bitfield8) == 1);
+static_assert(sizeof(Bitfield16) == 2);
+static_assert(sizeof(Bitfield32) == 4);
 
 const float kFloatEpsilon = 0.0001f;
 inline bool FloatEqual(float a, float b) { float magnitude = a - b; if (magnitude < 0) magnitude = -magnitude; return magnitude < kFloatEpsilon; }
@@ -513,3 +511,4 @@ struct ValidBip01Names;
 struct VATSCameraData;
 struct VATSTargetBodyPartData;
 struct VATSTargetInfo;
+//struct EntryData;

@@ -16,22 +16,12 @@ extern UInt32 s_CheckInsideOnActorEquipHook;
 
 void PrintConsole(const char * fmt, ...);
 
-__forceinline bool ExtractArgs(ParamInfo * paramInfo, void * scriptData, UInt32 * arg2, TESObjectREFR * arg3, TESObjectREFR * arg4, Script * script, ScriptEventList * eventList, ...)
-{
-	va_list args;
-	va_start(args, eventList);
-	const auto result = CdeclCall<bool>(0x005ACCB0, paramInfo, scriptData, arg2, arg3, arg4, script, eventList, args);
-	va_end(args);
-	return result;
-}
-
 typedef TESForm * (* _CreateFormInstance)(UInt8 type);
 extern const _CreateFormInstance CreateFormInstance;
 
 bool IsConsoleMode();
 bool GetConsoleEcho();
 void SetConsoleEcho(bool doEcho);
-const char * GetFullName(const TESForm * baseForm);
 const char* GetActorValueString(UInt32 actorValue); // should work now
 UInt32 GetActorValueForString(const char* strActorVal, bool bForScript = false);
 
@@ -796,7 +786,7 @@ public:
 	UInt8				unkA1;				/*A1*/// set when the executing CommandInfo's 2nd flag bit (+0x25) is set
 	UInt16				padA2;				/*A2*/ 
 };
-STATIC_ASSERT(sizeof(ScriptRunner) == 0xA4);
+static_assert(sizeof(ScriptRunner) == 0xA4);
 
 class ScrapHeapQueue
 {

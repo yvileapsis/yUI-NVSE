@@ -306,11 +306,15 @@ public:
 
 	__forceinline void			SetFloat(UInt32 id, float fltVal, bool bPropagate = true) { ThisCall(0xA012D0, this, id, fltVal, bPropagate); }
 	__forceinline void			SetFloat(const char* id, float fltVal, bool bPropagate = true) { this->SetFloat(TraitNameToID(id), fltVal, bPropagate); }
+
 	__forceinline void			SetString(UInt32 id, const char* strVal, bool bPropagate = true) { ThisCall(0xA01350, this, id, strVal, bPropagate); }
 	__forceinline void			SetString(const char* id, const char* strVal, bool bPropagate = true) { this->SetString(TraitNameToID(id), strVal, bPropagate); }
+
 	void						SetStringRecursive(UInt32, const char*, const char*);
+
 	__forceinline void			GradualSetFloat(UInt32 id, Float32 startVal, Float32 endVal, Float32 seconds, UInt32 changeMode = 0)
 								{ ThisCall(0xA07C60, this, id, startVal, endVal, seconds, changeMode); };
+
 	__forceinline void			GradualSetFloat(const char* id, Float32 startVal, Float32 endVal, Float32 seconds, UInt32 changeMode = 0)
 								{ this->GradualSetFloat(TraitNameToID(id), startVal, endVal, seconds, changeMode); }
 

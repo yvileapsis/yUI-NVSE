@@ -32,7 +32,7 @@ struct NiRTTI {
 	const char* name;
 	NiRTTI* parent;
 };
-STATIC_ASSERT(sizeof(NiRTTI) == 0x008);
+static_assert(sizeof(NiRTTI) == 0x008);
 
 class NiPoint2
 {
@@ -151,7 +151,7 @@ public:
 		return (abs(z - compare->z) <= FLT_EPSILON);
 	}
 };
-STATIC_ASSERT(sizeof(NiPoint3) == 0x00C);
+static_assert(sizeof(NiPoint3) == 0x00C);
 
 // 10 - always aligned?
 class NiPoint4 {
@@ -161,7 +161,7 @@ public:
 	float z;
 	float w;
 };
-STATIC_ASSERT(sizeof(NiPoint4) == 0x010);
+static_assert(sizeof(NiPoint4) == 0x010);
 
 // 10 - always aligned?
 struct NiQuaternion
@@ -186,7 +186,7 @@ public:
 	NiMatrix33()
 	= default;
 };
-STATIC_ASSERT(sizeof(NiMatrix33) == 0x024);
+static_assert(sizeof(NiMatrix33) == 0x024);
 
 // 34
 class NiTransform {
@@ -195,7 +195,7 @@ public:
 	NiPoint3	pos;		// 24
 	float		scale;		// 30
 };
-STATIC_ASSERT(sizeof(NiTransform) == 0x034);
+static_assert(sizeof(NiTransform) == 0x034);
 
 // 10
 struct NiSphere

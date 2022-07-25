@@ -2,7 +2,6 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="dllmain.c" />
-    <ClCompile Include="file.cpp" />
     <ClCompile Include="LambdaVariableContext.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="functions.cpp" />
@@ -70,7 +69,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="file.h" />
     <ClInclude Include="functions.h" />
     <ClInclude Include="ConfigurationMenu.h" />
     <ClInclude Include="patches.h" />

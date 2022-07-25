@@ -14,12 +14,11 @@ public:
 
 //	void	** vtbl;	// 00
 };
-STATIC_ASSERT(sizeof(TESChildCell) == 0x4);
+static_assert(sizeof(TESChildCell) == 0x4);
 
 class TESObjectREFR : public TESForm
 {
 public:
-	MEMBER_FN_PREFIX(TESObjectREFR);
 
 	TESObjectREFR();
 	~TESObjectREFR();
@@ -161,7 +160,6 @@ public:
 	float					GetWaterImmersionPerc();
 	bool					IsMobile();
 	bool					IsGrabbable();
-	bool					SetLinkedRef(TESObjectREFR* linkObj, UInt8 modIdx);
 	bool					ValidForHooks();
 	NiAVObject*				GetNiBlock(const char* blockName);
 	NiNode* __fastcall		GetNode(const char* nodeName);
@@ -180,13 +178,12 @@ public:
 	__forceinline Float32	GetScale() { return ThisCall<float>(0x567400, this); }
 	TESObjectREFR*			ResolveAshpile();
 	__forceinline bool		IsLocked() { return this->GetLockData() ? this->GetLockData()->IsLocked() : false; }
-	__forceinline bool		CanContainItems() { return typeID == kFormType_TESObjectACTI || typeID == kFormType_TESObjectCONT || typeID == kFormType_TESNPC || typeID == kFormType_Creature; }
 
-	MEMBER_FN_PREFIX(TESObjectREFR);
-	DEFINE_MEMBER_FN_LONG(_MEMBER_FN_BASE_TYPE, Activate, bool, 0x00573170, TESObjectREFR*, UInt32, UInt32, UInt32);	// Usage Activate(actionRef, 0, 0, 1); found inside Cmd_Activate_Execute as the last call (190 bytes)
-	DEFINE_MEMBER_FN(Set3D, void, 0x0094EB40, NiNode*, bool);	// Usage Set3D(niNode, true); virtual func 0073
+	__forceinline bool		Activate(Actor* activator, UInt32 unk1, UInt32 unk2, UInt32 unk3) { return ThisCall<bool>(0x573170, this, activator, unk1, unk2, unk3); }
+
+	std::vector<ContChangesEntry*> GetAllItems();
 };
-STATIC_ASSERT(sizeof(TESObjectREFR) == 0x68);
+static_assert(sizeof(TESObjectREFR) == 0x68);
 
 TESForm* GetPermanentBaseForm(TESObjectREFR* thisObj);	// For LevelledForm, find real baseForm, not temporary one.
 
@@ -263,7 +260,7 @@ public:
 	UInt8			extraInfoGeneralTopicDataFlags;		// 086 - loaded
 	UInt8			unk087;								// 087	Init'd to the inverse of NoLowLevelProcessing
 };
-STATIC_ASSERT(sizeof(MobileObject) == 0x088);
+static_assert(sizeof(MobileObject) == 0x088);
 
 class MagicCaster
 {
@@ -307,7 +304,7 @@ public:
 	void*	unk004;	// 004
 	State	state;	// 008
 };
-STATIC_ASSERT(sizeof(MagicCaster) == 0xC);
+static_assert(sizeof(MagicCaster) == 0xC);
 
 typedef TList<ActiveEffect> EffectNode;
 
@@ -330,7 +327,7 @@ public:
 	void					RemoveEffect(EffectItem *effItem);
 	void					StopEffect(void* arg0, bool arg1) { ThisStdCall(0x8248E0, this, arg0, arg1); }
 };
-STATIC_ASSERT(sizeof(MagicTarget) == 0x10);
+static_assert(sizeof(MagicTarget) == 0x10);
 
 class hkaRaycastInterface
 {
@@ -344,7 +341,7 @@ public:
 	// Assumed to be 0x010 bytes due to context where the vftable is used
 	UInt32							unk000[(0x010 - 0x004) >> 2];	// 0000
 };
-STATIC_ASSERT(sizeof(hkaRaycastInterface) == 0x010);
+static_assert(sizeof(hkaRaycastInterface) == 0x010);
 
 class bhkRagdollController : public hkaRaycastInterface
 {
@@ -358,7 +355,7 @@ public:
 	bool	fikStatus;						// 0220
 	UInt8	fill0221[3];					// 0221
 };
-STATIC_ASSERT(sizeof(bhkRagdollController) == 0x0224);
+static_assert(sizeof(bhkRagdollController) == 0x0224);
 
 class ActorMover	// I need to call Func008
 {
@@ -636,7 +633,6 @@ public:
 	EquippedItemsList					GetEquippedItems();
 	ContChangesArray					GetEquippedEntryDataList();
 	ContChangesExtendArray				GetEquippedExtendDataList();
-
 	Float64								GetCalculatedSpread(UInt32 mode = 0, ContChangesEntry* entry = nullptr);
 
 	bool								IsDoingAttackAnim() { return ThisCall<bool>(0x894900, this); }
@@ -647,7 +643,7 @@ public:
 	Float32								GetActorValue(ActorValueCode avcode);
 	bool								GetLineOfSight(TESObjectREFR* actor) { return ThisCall<bool>(0x88B880, this, 0, actor, 1, 0, 0); }
 };
-STATIC_ASSERT(sizeof(Actor) == 0x1B4);
+static_assert(sizeof(Actor) == 0x1B4);
 
 class Creature : public Actor
 {
@@ -659,7 +655,7 @@ public:
 
 	UInt32			unk1B4[3];			// 1B4
 };
-STATIC_ASSERT(sizeof(Creature) == 0x1C0);
+static_assert(sizeof(Creature) == 0x1C0);
 
 
 class Character : public Actor
@@ -679,7 +675,7 @@ public:
 	UInt16				unk1C2;				// 1C2
 	float				unk1C4;				// 1C4
 };
-STATIC_ASSERT(sizeof(Character) == 0x1C8);
+static_assert(sizeof(Character) == 0x1C8);
 
 typedef TList<BGSQuestObjective::Target> QuestObjectiveTargets;
 
@@ -885,7 +881,7 @@ public:
 	TESObjectREFR*			GetPlacedMarkerOrTeleportLink();
 	HighProcess*			GetHighProcess();
 };
-STATIC_ASSERT(sizeof(PlayerCharacter) == 0xE50);
+static_assert(sizeof(PlayerCharacter) == 0xE50);
 
 class NonActorMagicCaster : public BSExtraData
 {
@@ -934,7 +930,7 @@ public:
 
 	bool CanStoreAmmo();
 };
-STATIC_ASSERT(sizeof(Explosion) == 0x104);
+static_assert(sizeof(Explosion) == 0x104);
 
 
 class Projectile : public MobileObject
@@ -984,7 +980,7 @@ public:
 	UInt8					pad149[3];			// 0x149
 	Float32					maxrange;
 };
-STATIC_ASSERT(sizeof(Projectile) == 0x150);
+static_assert(sizeof(Projectile) == 0x150);
 
 struct ParentSpaceNode;
 struct TeleportLink
@@ -1000,4 +996,4 @@ struct QuestTarget
 	NiPoint3							startPos;
 	NiPoint3							endPos;
 };
-STATIC_ASSERT(sizeof(QuestTarget) == 0x38);
+static_assert(sizeof(QuestTarget) == 0x38);

@@ -160,8 +160,8 @@ struct ModInfo		// referred to by game as TESFile
 #endif
 };
 
-STATIC_ASSERT(sizeof(WIN32_FIND_DATA) == 0x140);
-STATIC_ASSERT(sizeof(ModInfo) == 0x42C);
+static_assert(sizeof(WIN32_FIND_DATA) == 0x140);
+static_assert(sizeof(ModInfo) == 0x42C);
 
 struct ModList
 {
@@ -169,7 +169,7 @@ struct ModList
 	UInt32				loadedModCount;		// 08
 	ModInfo*			loadedMods[0xFF];	// 0C
 };
-STATIC_ASSERT(sizeof(ModList) == 0x408);
+static_assert(sizeof(ModList) == 0x408);
 
 // 5B8
 class DataHandler
@@ -278,7 +278,7 @@ public:
 
 	TESQuest* GetQuestByName(const char* questName);
 };
-STATIC_ASSERT(sizeof(DataHandler) == 0x63C);
+static_assert(sizeof(DataHandler) == 0x63C);
 
 // A0
 struct WaterSurfaceManager

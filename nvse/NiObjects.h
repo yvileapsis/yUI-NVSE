@@ -136,7 +136,7 @@ public:
 	void DumpProperties();
 	void DumpParents();
 };
-STATIC_ASSERT(sizeof(NiAVObject) == 0x9C);
+static_assert(sizeof(NiAVObject) == 0x9C);
 
 
 
@@ -300,7 +300,7 @@ public:
 	void ApplyForce(NiPoint4* forceVector);
 	void Dump();
 };
-STATIC_ASSERT(sizeof(NiNode) == 0xAC);
+static_assert(sizeof(NiNode) == 0xAC);
 
 // F0
 class SceneGraph : public NiNode
@@ -315,7 +315,7 @@ public:
 	UInt32				unk0E8;				// 0E8
 	float				cameraFOV;			// 0EC
 };
-//STATIC_ASSERT(sizeof(SceneGraph) == 0x0F0);
+//static_assert(sizeof(SceneGraph) == 0x0F0);
 
 // E0
 class BSTempNodeManager : public NiNode

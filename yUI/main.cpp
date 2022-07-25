@@ -5,7 +5,6 @@
 #include <settings.h>
 #include <SortingIcons.h>
 #include <ConfigurationMenu.h>
-#include <file.h>
 
 #define yUI_VERSION 1.4
 #define yUI_VERSION_STR "1.4d"

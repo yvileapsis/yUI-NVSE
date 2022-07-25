@@ -18,9 +18,6 @@ void FillCraftingComponents();
 
 TESForm* GetRefFromString(char*, char*);
 
-UInt8 ContWeaponHasAnyMod(ContChangesEntry*);
-float ContGetHealthPercent(ContChangesEntry*);
-bool ContGetEquipped(ContChangesEntry*);
 bool IsAddictive(TESForm*);
 bool IsFood(TESForm*);
 bool IsMedicine(TESForm*);

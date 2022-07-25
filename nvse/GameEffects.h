@@ -49,7 +49,7 @@ public:
 
 	void Remove(bool bRemoveImmediately);
 };
-STATIC_ASSERT(sizeof(ActiveEffect) == 0x048);
+static_assert(sizeof(ActiveEffect) == 0x048);
 
 class ValueModifierEffect : public ActiveEffect
 {
@@ -59,8 +59,8 @@ public:
 
 	UInt32 actorVal;	// 48
 };
-STATIC_ASSERT(offsetof(ValueModifierEffect, actorVal) == 0x48);
-STATIC_ASSERT(sizeof(ValueModifierEffect) == 0x04C);
+static_assert(offsetof(ValueModifierEffect, actorVal) == 0x48);
+static_assert(sizeof(ValueModifierEffect) == 0x04C);
 
 class AssociatedItemEffect : public ActiveEffect
 {
@@ -128,7 +128,7 @@ public:
 
 	float	unk48;		//  48
 };
-STATIC_ASSERT(sizeof(ConcussionEffect) == 0x4C);
+static_assert(sizeof(ConcussionEffect) == 0x4C);
 
 class CureEffect : public ActiveEffect
 {

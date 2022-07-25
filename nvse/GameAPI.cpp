@@ -88,7 +88,7 @@ void SetConsoleEcho(const bool doEcho)
 	*bEchoConsole = doEcho ? true : false;
 }
 
-const char* GetFullName(const TESForm * baseForm)
+const char* GetFullName(TESForm * baseForm)
 {
 	if (baseForm)
 		if (const auto fullName = baseForm->GetFullName(); fullName && fullName->name.m_data && fullName->name.m_dataLen)
@@ -120,7 +120,7 @@ extern DataHandler* g_dataHandler;
 
 TESForm* GetFormByID(const char* mod, UInt32 refID)
 {
-	return GetFormByID(g_dataHandler->GetModIndex(mod) << 8 | refID);
+	return GetFormByID((g_dataHandler->GetModIndex(mod) << 24) + (refID & 0x00FFFFFF));
 }
 
 bool s_InsideOnActorEquipHook = false;

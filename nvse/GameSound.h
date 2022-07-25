@@ -133,7 +133,7 @@ public:
 	UInt32			priority;				// 188
 	UInt32			unk18C[3];				// 18C
 };
-STATIC_ASSERT(sizeof(BSGameSound) == 0x198);
+static_assert(sizeof(BSGameSound) == 0x198);
 
 // 230
 class BSWin32GameSound : public BSGameSound
@@ -157,7 +157,7 @@ public:
 	NiPoint3		originWorldPos;			// 218
 	UInt32			unk224[3];				// 224
 };
-STATIC_ASSERT(sizeof(BSWin32GameSound) == 0x230);
+static_assert(sizeof(BSWin32GameSound) == 0x230);
 
 enum AudioRequestTypes
 {
@@ -316,7 +316,7 @@ public:
 
 	static BSAudioManager* GetSingleton() { return reinterpret_cast<BSAudioManager*>(0x11F6EF0); };
 };
-STATIC_ASSERT(sizeof(BSAudioManager) == 0x188);
+static_assert(sizeof(BSAudioManager) == 0x188);
 
 class BSAudioListener
 {
@@ -354,7 +354,7 @@ public:
 	NiPoint3				topOrientation;		// 4C
 	NiPoint3				frontOrientation;	// 58
 };
-STATIC_ASSERT(sizeof(BSWin32AudioListener) == 0x64);
+static_assert(sizeof(BSWin32AudioListener) == 0x64);
 
 class IDirectSound8;
 class IDirectSoundBuffer;
@@ -394,7 +394,7 @@ public:
 
 	static BSWin32Audio* GetSingleton() { return *(BSWin32Audio**)0x11F6D98; }
 };
-STATIC_ASSERT(sizeof(BSWin32Audio) == 0xA4);
+static_assert(sizeof(BSWin32Audio) == 0xA4);
 
 // 30
 class BSThread
@@ -458,7 +458,7 @@ struct PlayingMusic
 
 	static PlayingMusic* GetSingleton() { return (PlayingMusic*)0x11DD0F0; }
 };
-STATIC_ASSERT(sizeof(PlayingMusic) == 0x288);
+static_assert(sizeof(PlayingMusic) == 0x288);
 
 // 0C
 struct Sound

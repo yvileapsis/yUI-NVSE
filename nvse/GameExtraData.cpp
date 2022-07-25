@@ -210,26 +210,6 @@ void ContChangesEntry::Cleanup()
 	extendData->RemoveIf(ExtraDataListInExtendDataListMatcher(nullptr));
 }
 
-ContChangesEntry* ContChangesEntry::Create(UInt32 refID, UInt32 count, ExtendDataList* pExtendDataList)
-{
-	auto xData = static_cast<ContChangesEntry*>(FormHeap_Allocate(sizeof(ContChangesEntry)));
-	if (xData) {
-		memset(xData, 0, sizeof(ContChangesEntry));
-		if (refID) {
-			if (const auto pForm = GetFormByID(refID)) {
-				xData->form = pForm;
-				xData->countDelta = count;
-				xData->extendData = pExtendDataList;
-			}
-			else {
-				FormHeap_Free(xData);
-				xData = nullptr;
-			}
-		}
-	}
-	return xData;
-}
-
 ContChangesEntry* ContChangesEntry::Create(TESForm* pForm, UInt32 count, ExtendDataList* pExtendDataList)
 {
 	const auto xData = static_cast<ContChangesEntry*>(FormHeap_Allocate(sizeof(ContChangesEntry)));
@@ -238,6 +218,11 @@ ContChangesEntry* ContChangesEntry::Create(TESForm* pForm, UInt32 count, ExtendD
 		if (pForm) {
 			xData->form = pForm;
 			xData->countDelta = count;
+			if (pExtendDataList == nullptr)
+			{
+				pExtendDataList = static_cast<ExtendDataList*>(FormHeap_Allocate(sizeof(ExtendDataList)));
+				if (pExtendDataList) memset(pExtendDataList, 0, sizeof(ExtendDataList));
+			}
 			xData->extendData = pExtendDataList;
 		}
 	}
@@ -298,7 +283,7 @@ ContChangesList* ExtraContainerChangesEntryDataListCreate(UInt32 refID, UInt32 c
 	const auto xData = (ContChangesList*)FormHeap_Allocate(sizeof(ContChangesList));
 	if (xData) {
 		memset(xData, 0, sizeof(ContChangesList));
-		xData->AddAt(ContChangesEntry::Create(refID, count, pExtendDataList), eListEnd);
+		xData->AddAt(ContChangesEntry::Create(GetFormByID(refID), count, pExtendDataList), eListEnd);
 	}
 	return xData;
 #else
@@ -459,7 +444,7 @@ void ExtraContainerChanges::DebugDump()
 	{
 		for (const auto entry : *data->objList)
 		{
-			PrintLog("Type: %s CountDelta: %d [%08X]", GetFullName(entry->form), entry->countDelta, entry);
+			PrintLog("Type: %s CountDelta: %d [%08X]", entry->form->GetFullName()->name.CStr(), entry->countDelta, entry);
 			gLog.Indent();
 			if (!entry || !entry->extendData)
 				PrintLog("* No extend data *");

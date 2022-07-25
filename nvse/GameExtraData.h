@@ -18,14 +18,14 @@ public:
 
 	Sound	sound; // 0x0C
 };
-STATIC_ASSERT(sizeof(ExtraSound) == 0x18);
+static_assert(sizeof(ExtraSound) == 0x18);
 
 class ExtraDroppedItemList : public BSExtraData
 {
 public:
 	TList<TESObjectREFR>	itemRefs;	// 0x0C
 };
-STATIC_ASSERT(sizeof(ExtraDroppedItemList) == 0x14);
+static_assert(sizeof(ExtraDroppedItemList) == 0x14);
 
 class ExtraAction : public BSExtraData
 {
@@ -40,7 +40,7 @@ public:
 
 	static ExtraAction* Create();
 };
-STATIC_ASSERT(sizeof(ExtraAction) == 0x14);
+static_assert(sizeof(ExtraAction) == 0x14);
 
 class ExtraScript : public BSExtraData
 {
@@ -54,7 +54,7 @@ public:
 	static ExtraScript*		Create(TESScriptableForm* baseForm = NULL, bool create = true, TESObjectREFR* container = NULL);
 	void					EventCreate(UInt32 eventCode, TESObjectREFR* container);
 };
-STATIC_ASSERT(sizeof(ExtraScript) == 0x14);
+static_assert(sizeof(ExtraScript) == 0x14);
 
 class ExtraContainerChanges : public BSExtraData
 {
@@ -76,21 +76,26 @@ public:
 		SInt32				countDelta;		// 04
 		TESForm*			form;			// 08
 
-		void				Cleanup();
-		static EntryData*	Create(UInt32 refID = 0, UInt32 count = 1, ExtendDataList* pExtendDataList = NULL);
-		static EntryData*	Create(TESForm* pForm, UInt32 count = 1, ExtendDataList* pExtendDataList = NULL);
-		ExtendDataList*		Add(ExtraDataList* newList);
-		bool				Remove(ExtraDataList* toRemove, bool bFree = false);
-		bool				HasExtraLeveledItem();
-		void				RemoveCannotWear();
-		float				GetItemHealthPerc(bool arg1 = true);
-		ExtraDataList*		GetEquippedExtra();
-		ExtraDataList*		GetCustomExtra(UInt32 whichVal);
-		BSExtraData*		GetExtraData(UInt32 whichVal);
-		float				CalculateWeaponDamage(float condition, TESForm* ammo);
-		float				GetValue();
-		bool				HasWeaponMod(UInt32 modEffect) { return ThisStdCall<bool>(0x4BDA70, this, modEffect); }
-		UInt32				GetWeaponNumProjectiles(Actor* owner);
+		void					Cleanup();
+		static EntryData*		Create(TESForm* pForm, UInt32 count = 1, ExtendDataList* pExtendDataList = nullptr);
+		ExtendDataList*			Add(ExtraDataList* newList);
+		bool					Remove(ExtraDataList* toRemove, bool bFree = false);
+		bool					HasExtraLeveledItem();
+		void					RemoveCannotWear();
+		float					GetItemHealthPerc(bool arg1 = true);
+		ExtraDataList*			GetEquippedExtra();
+		ExtraDataList*			GetCustomExtra(UInt32 whichVal);
+		BSExtraData*			GetExtraData(UInt32 whichVal);
+		float					CalculateWeaponDamage(float condition, TESForm* ammo);
+		float					GetValue();
+		bool					HasWeaponMod(UInt32 modEffect) { return ThisStdCall<bool>(0x4BDA70, this, modEffect); }
+		UInt32					GetWeaponNumProjectiles(Actor* owner);
+		bool					ShouldDisplay();
+
+		UInt8					GetWeaponMod();
+		__forceinline Float64	GetHealthPercent(char a1 = 0) { return ThisCall<Float64>(0x4BCDB0, this, a1); };
+		Float64					GetHealthPercentAlt(bool axonisFix = false);
+		bool					GetEquipped();
 	};
 
 	struct EntryDataList : TList<EntryData>
@@ -136,12 +141,14 @@ public:
 	FoundEquipData					FindEquipped(FormMatcher& matcher) const;
 	EntryDataList*					GetEntryDataList() const { return data ? data->objList : nullptr; }
 };
-STATIC_ASSERT(sizeof(ExtraContainerChanges) == 0x10);
+
+
+static_assert(sizeof(ExtraContainerChanges) == 0x10);
 
 typedef ExtraContainerChanges::ExtendDataArray ContChangesExtendArray;
 
 typedef ExtraContainerChanges::EntryData ContChangesEntry;
-STATIC_ASSERT(sizeof(ContChangesEntry) == 0xC);
+static_assert(sizeof(ContChangesEntry) == 0xC);
 
 class TileContChangesEntryUnk
 {
@@ -149,12 +156,15 @@ public:
 	Tile*				tile = nullptr;
 	ContChangesEntry*	entry = nullptr;
 	UInt32				count = 0;
+
+	TileContChangesEntryUnk() = default;
+	TileContChangesEntryUnk(ContChangesEntry* entry, Tile* tile = nullptr) : tile(tile), entry(entry), count(entry->countDelta) {}
 };
 
 typedef ExtraContainerChanges::DataArray ContChangesArray;
 
 typedef ExtraContainerChanges::EntryDataList ContChangesList;
-STATIC_ASSERT(sizeof(ContChangesList) == 0x8);
+static_assert(sizeof(ContChangesList) == 0x8);
 
 struct InventoryItemData
 {
@@ -163,7 +173,7 @@ struct InventoryItemData
 
 	InventoryItemData(SInt32 count, ContChangesEntry* entry) : count(count), entry(entry) {}
 };
-STATIC_ASSERT(sizeof(InventoryItemData) == 0x08);
+static_assert(sizeof(InventoryItemData) == 0x08);
 
 typedef std::unordered_map<TESForm*, InventoryItemData> InventoryItemsMap;
 
@@ -270,7 +280,7 @@ public:
 
 	static ExtraHealth* Create();
 };
-STATIC_ASSERT(sizeof(ExtraHealth) == 0x10);
+static_assert(sizeof(ExtraHealth) == 0x10);
 
 class ExtraWorn : public BSExtraData	// Item is equipped
 {
@@ -280,7 +290,7 @@ public:
 
 	static ExtraWorn* Create();
 };
-STATIC_ASSERT(sizeof(ExtraWorn) == 0x0C);
+static_assert(sizeof(ExtraWorn) == 0x0C);
 
 class ExtraWornLeft : public BSExtraData	// haven't seen used yet
 {
@@ -290,7 +300,7 @@ public:
 
 	static ExtraWornLeft* Create();
 };
-STATIC_ASSERT(sizeof(ExtraWornLeft) == 0x0C);
+static_assert(sizeof(ExtraWornLeft) == 0x0C);
 
 class ExtraCannotWear : public BSExtraData	//	Seen used as ForceEquip ! Unused as forceUnequip (bug?)
 {
@@ -300,7 +310,7 @@ public:
 
 	static ExtraCannotWear* Create();
 };
-STATIC_ASSERT(sizeof(ExtraCannotWear) == 0x0C);
+static_assert(sizeof(ExtraCannotWear) == 0x0C);
 
 class ExtraHotkey : public BSExtraData
 {
@@ -312,7 +322,7 @@ public:
 
 	static ExtraHotkey* Create();
 };
-STATIC_ASSERT(sizeof(ExtraHotkey) == 0x10);
+static_assert(sizeof(ExtraHotkey) == 0x10);
 
 class ExtraCount : public BSExtraData
 {
@@ -325,7 +335,7 @@ public:
 
 	static ExtraCount* Create(UInt32 count = 0);	
 };
-STATIC_ASSERT(sizeof(ExtraCount) == 0x10);
+static_assert(sizeof(ExtraCount) == 0x10);
 
 class ExtraLock : public BSExtraData
 {
@@ -354,7 +364,7 @@ public:
 
 	static ExtraLock* Create();
 };
-STATIC_ASSERT(sizeof(ExtraLock) == 0x10);
+static_assert(sizeof(ExtraLock) == 0x10);
 
 class ExtraUses : public BSExtraData
 {
@@ -366,7 +376,7 @@ public:
 
 	static ExtraUses* Create();
 };
-STATIC_ASSERT(sizeof(ExtraUses) == 0x10);
+static_assert(sizeof(ExtraUses) == 0x10);
 
 class ExtraTeleport : public BSExtraData
 {
@@ -391,7 +401,7 @@ public:
 
 	static ExtraTeleport* Create();
 };
-STATIC_ASSERT(sizeof(ExtraTeleport) == 0x10);
+static_assert(sizeof(ExtraTeleport) == 0x10);
 
 class ExtraRandomTeleportMarker : public BSExtraData
 {
@@ -401,7 +411,7 @@ public:
 
 	TESObjectREFR *	teleportRef;
 };
-STATIC_ASSERT(sizeof(ExtraRandomTeleportMarker) == 0x10);
+static_assert(sizeof(ExtraRandomTeleportMarker) == 0x10);
 
 class ExtraAmmo : public BSExtraData
 {
@@ -412,7 +422,7 @@ public:
 	TESAmmo*	ammo;	// 0xC
 	UInt32		count;	// 0x10
 };
-STATIC_ASSERT(sizeof(ExtraAmmo) == 0x14);
+static_assert(sizeof(ExtraAmmo) == 0x14);
 
 class ExtraOwnership : public BSExtraData
 {
@@ -424,7 +434,7 @@ public:
 
 	static ExtraOwnership* Create();
 };
-STATIC_ASSERT(sizeof(ExtraOwnership) == 0x10);
+static_assert(sizeof(ExtraOwnership) == 0x10);
 
 class ExtraRank : public BSExtraData
 {
@@ -436,7 +446,7 @@ public:
 
 	static ExtraRank* Create();
 };
-STATIC_ASSERT(sizeof(ExtraRank) == 0x10);
+static_assert(sizeof(ExtraRank) == 0x10);
 
 class ExtraGlobal : public BSExtraData
 {								//ownership data, stored separately from ExtraOwnership
@@ -446,7 +456,7 @@ public:
 
 	TESGlobal*	globalVar;	// 00C
 };
-STATIC_ASSERT(sizeof(ExtraGlobal) == 0x10);
+static_assert(sizeof(ExtraGlobal) == 0x10);
 
 class ExtraWeaponModFlags : public BSExtraData
 {
@@ -458,7 +468,7 @@ public:
 
 	static ExtraWeaponModFlags* Create();
 };
-STATIC_ASSERT(sizeof(ExtraWeaponModFlags) == 0x10);
+static_assert(sizeof(ExtraWeaponModFlags) == 0x10);
 
 class ExtraFactionChanges : public BSExtraData
 {
@@ -479,7 +489,7 @@ public:
 	void						DebugDump();
 	static ExtraFactionChanges* Create();
 };
-STATIC_ASSERT(sizeof(ExtraFactionChanges) == 0x10);
+static_assert(sizeof(ExtraFactionChanges) == 0x10);
 
 class ExtraFactionChangesMatcher
 {
@@ -503,7 +513,7 @@ public:
 	TESActorBase*		baseForm;		// 00C
 	TESActorBase*		actorBase;		// 010
 };
-STATIC_ASSERT(sizeof(ExtraLeveledCreature) == 0x14);
+static_assert(sizeof(ExtraLeveledCreature) == 0x14);
 
 // PackageStartLocation = Worldspace or Cell / PosX / PosY / PosZ / and 4 bytes
 
@@ -515,7 +525,7 @@ public:
 
 	TESCombatStyle*		combatStyle;	// 00C
 };
-STATIC_ASSERT(sizeof(ExtraCombatStyle) == 0x10);
+static_assert(sizeof(ExtraCombatStyle) == 0x10);
 
 class ExtraReferencePointer : public BSExtraData
 {
@@ -525,7 +535,7 @@ public:
 
 	TESObjectREFR*		refr;			// 00C
 };
-STATIC_ASSERT(sizeof(ExtraReferencePointer) == 0x10);
+static_assert(sizeof(ExtraReferencePointer) == 0x10);
 
 // Provided by "Luthien Anarion"
 class ExtraMapMarker : BSExtraData
@@ -576,7 +586,7 @@ public:
 	void SetCanTravel(bool travel)	{ data->flags = travel ? data->flags | kFlag_CanTravel : data->flags & ~kFlag_CanTravel; }
 	void SetHidden(bool hidden)		{ data->flags = hidden ? data->flags | kFlag_Hidden : data->flags & ~kFlag_Hidden; }
 };
-STATIC_ASSERT(sizeof(ExtraMapMarker) == 0x10);
+static_assert(sizeof(ExtraMapMarker) == 0x10);
 
 class ExtraNorthRotation : public BSExtraData
 {
@@ -586,7 +596,7 @@ public:
 
 	UInt32				angle;		// 00C
 };
-STATIC_ASSERT(sizeof(ExtraNorthRotation) == 0x10);
+static_assert(sizeof(ExtraNorthRotation) == 0x10);
 
 class ExtraSeenData : public BSExtraData
 {
@@ -596,7 +606,7 @@ public:
 
 	UInt8 unk[0x24 - 0x0C];		// 00C
 };
-STATIC_ASSERT(sizeof(ExtraSeenData) == 0x24);
+static_assert(sizeof(ExtraSeenData) == 0x24);
 
 class ExtraIntSeenData : public ExtraSeenData
 {
@@ -609,7 +619,7 @@ public:
 	UInt8				filler[2];	// 026
 	ExtraIntSeenData*	next;		// 028
 };
-STATIC_ASSERT(sizeof(ExtraIntSeenData) == 0x2C);
+static_assert(sizeof(ExtraIntSeenData) == 0x2C);
 
 // ExtraUsedMarkers is a bitmask of 30 bits.
 
@@ -621,7 +631,7 @@ public:
 
 	TESObjectCELL*		persistentCell;	// 0C
 };
-STATIC_ASSERT(sizeof(ExtraPersistentCell) == 0x10);
+static_assert(sizeof(ExtraPersistentCell) == 0x10);
 
 class ExtraTerminalState : public BSExtraData
 {
@@ -638,7 +648,54 @@ public:
 	UInt8	lockLevel;
 	UInt8	filler[2];
 };
-STATIC_ASSERT(sizeof(ExtraTerminalState) == 0x10);
+static_assert(sizeof(ExtraTerminalState) == 0x10);
+
+// 10
+class ExtraLinkedRef : public BSExtraData
+{
+public:
+	TESObjectREFR* linkedRef;		// 0C
+
+	static ExtraLinkedRef* __stdcall Create(TESObjectREFR* _linkedRef = NULL);
+};
+
+// 14
+class ExtraLinkedRefChildren : public BSExtraData
+{
+public:
+	TList<TESObjectREFR>	children;	// 0C
+};
+
+// 20
+class ExtraActivateRef : public BSExtraData
+{
+public:
+	struct parentRef
+	{
+		TESObjectREFR* ref;
+		float			delay;
+	};
+	TList<parentRef>	parentRefs;
+	UInt32				flags;
+	String              activationPromptOverride;
+};
+
+// 10
+class ExtraTalkingActor : public BSExtraData
+{
+public:
+	Actor* actor;		// 0C
+};
+
+// 10
+class ExtraObjectHealth : public BSExtraData
+{
+public:
+	float			health;		// 0C
+
+	static ExtraObjectHealth* __stdcall Create(float _health);
+};
+
 
 class ExtraAnim : public BSExtraData
 {
@@ -652,7 +709,7 @@ public:
 
 	Animation*	data;	// 0C
 };
-STATIC_ASSERT(sizeof(ExtraAnim) == 0x10);
+static_assert(sizeof(ExtraAnim) == 0x10);
 
 class ExtraPoison : public BSExtraData
 {
@@ -662,7 +719,7 @@ public:
 
 	AlchemyItem* poisonEffect;    // 0C
 };
-STATIC_ASSERT(sizeof(ExtraPoison) == 0x10);
+static_assert(sizeof(ExtraPoison) == 0x10);
 
 class ExtraAshPileRef : public BSExtraData
 {
@@ -672,4 +729,4 @@ public:
 
 	TESObjectREFR* sourceRef;		// 0C
 };
-STATIC_ASSERT(sizeof(ExtraAshPileRef) == 0x10);
+static_assert(sizeof(ExtraAshPileRef) == 0x10);
