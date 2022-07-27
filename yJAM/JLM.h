@@ -61,4 +61,6 @@ namespace JLM
 	void Reset();
 	void OnRender();
 	void MainLoop();
+	void OnAddDropUpdate(TESObjectREFR* thisObj, void* parameters);
+	void OnPreActivate(TESObjectREFR* thisObj, void* parameters);
 }

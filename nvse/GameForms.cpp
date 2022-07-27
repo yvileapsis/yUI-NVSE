@@ -334,6 +334,7 @@ Float32 TESObjectWEAP::GetEffectModValue(kWeaponModEffects value, UInt8 second)
 	if (value == GetItemModEffect(0)) return second ? GetItemModValue2(0) : GetItemModValue1(0);
 	if (value == GetItemModEffect(1)) return second ? GetItemModValue2(1) : GetItemModEffect(1);
 	if (value == GetItemModEffect(2)) return second ? GetItemModValue2(2) : GetItemModValue1(2);
+	return -1;
 }
 
 bool TESObjectWEAP::IsMeleeWeapon()

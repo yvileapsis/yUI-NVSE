@@ -32,16 +32,16 @@ namespace JDC
 
 		if (const auto errVal = ini.LoadFile(iniPath.c_str()); errVal == SI_FILE) { return; }
 
-		g_JDC				= ini.GetOrCreate("JustMods", "JDC", 1.0, nullptr);
-		g_Dynamic			= ini.GetOrCreate("JDC", "Dynamic", 1.0, nullptr);
-		g_ShotgunAlt		= ini.GetOrCreate("JDC", "ShotgunAlt", 1.0, nullptr);
-		g_NoNodeSighting	= ini.GetOrCreate("JDC", "NoNodeSighting", 1.0, nullptr);
-		g_ModeHolstered		= ini.GetOrCreate("JDC", "ModeHolstered", 1.0, nullptr);
-		g_ModeOut1st		= ini.GetOrCreate("JDC", "ModeOut1st", 5.0, nullptr);
-		g_ModeOut3rd		= ini.GetOrCreate("JDC", "ModeOut3rd", 5.0, nullptr);
-		g_ModeSighting1st	= ini.GetOrCreate("JDC", "ModeSighting1st", 3.0, nullptr);
-		g_ModeSighting3rd	= ini.GetOrCreate("JDC", "ModeSighting3rd", 3.0, nullptr);
-		g_ModeScope			= ini.GetOrCreate("JDC", "ModeScope", 0.0, nullptr);
+		g_JDC				= ini.GetOrCreate("JustMods", "JDC", 1, nullptr);
+		g_Dynamic			= ini.GetOrCreate("JDC", "Dynamic", 1, nullptr);
+		g_ShotgunAlt		= ini.GetOrCreate("JDC", "ShotgunAlt", 1, nullptr);
+		g_NoNodeSighting	= ini.GetOrCreate("JDC", "NoNodeSighting", 1, nullptr);
+		g_ModeHolstered		= ini.GetOrCreate("JDC", "ModeHolstered", 1, nullptr);
+		g_ModeOut1st		= ini.GetOrCreate("JDC", "ModeOut1st", 5, nullptr);
+		g_ModeOut3rd		= ini.GetOrCreate("JDC", "ModeOut3rd", 5, nullptr);
+		g_ModeSighting1st	= ini.GetOrCreate("JDC", "ModeSighting1st", 3, nullptr);
+		g_ModeSighting3rd	= ini.GetOrCreate("JDC", "ModeSighting3rd", 3, nullptr);
+		g_ModeScope			= ini.GetOrCreate("JDC", "ModeScope", 0, nullptr);
 		g_Distance			= ini.GetOrCreate("JDC", "Distance", 0.0, nullptr);
 		g_Speed				= ini.GetOrCreate("JDC", "Speed", 0.3, nullptr);
 		g_LengthMax			= ini.GetOrCreate("JDC", "LengthMax", 72.0, nullptr);

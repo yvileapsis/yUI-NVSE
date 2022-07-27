@@ -47,6 +47,9 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 		}
 		
 	}
+	else if (msg->type == NVSEMessagingInterface::kMessage_PostQueryPlugins)
+	{
+	}
 }
 
 bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)

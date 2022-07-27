@@ -27,7 +27,7 @@ bool IsKeyPressed(UInt32 key, UInt32 flags)
 Script* JIPGetAuxVarOrDefault;
 Float32 GetJIPAuxVarOrDefault(const char* auxvar, SInt32 index, Float32 def)
 {
-	if (!JIPGetAuxVarOrDefault) JIPGetAuxVarOrDefault = CompileScript(R"(Begin Function { string_var auxvar, int index, float def }
+	if (!JIPGetAuxVarOrDefault) JIPGetAuxVarOrDefault = CompileScript(R"(Begin Function { string_var auxvar, int index, int def }
 		if PlayerRef.AuxiliaryVariableGetType (auxvar) index
 			SetFunctionValue (PlayerRef.AuxiliaryVariableGetFloat (auxvar) index)
 		else
@@ -35,6 +35,17 @@ Float32 GetJIPAuxVarOrDefault(const char* auxvar, SInt32 index, Float32 def)
 		endif
 	End)");
 	NVSEArrayElement element;
-	g_scriptInterface->CallFunction(JIPGetAuxVarOrDefault, nullptr, nullptr, &element, 3, auxvar, index, def);
+	g_scriptInterface->CallFunction(JIPGetAuxVarOrDefault, nullptr, nullptr, &element, 3, auxvar, index, *(UInt32*)&def);
+	return element.num;
+}
+
+Script* JIPSetAuxVarOrDefault;
+Float32 SetJIPAuxVarOrDefault(const char* auxvar, SInt32 index, Float32 value)
+{
+	if (!JIPSetAuxVarOrDefault) JIPSetAuxVarOrDefault = CompileScript(R"(Begin Function { string_var auxvar, int index, float value }
+		PlayerRef.AuxiliaryVariableSetFloat (auxvar) value index
+	End)");
+	NVSEArrayElement element;
+	g_scriptInterface->CallFunction(JIPSetAuxVarOrDefault, nullptr, nullptr, &element, 3, auxvar, index, *(UInt32*)&value);
 	return element.num;
 }

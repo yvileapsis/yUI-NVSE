@@ -93,6 +93,13 @@ TESObjectREFR* TESObjectREFR::Create(bool bTemp)
 	return refr;
 }
 
+Float64 TESObjectREFR::GetInventoryWeight()
+{
+	if (const auto xChanges = reinterpret_cast<ExtraContainerChanges*>(this->extraDataList.GetByType(kExtraData_ContainerChanges)))
+		return xChanges->data->GetInventoryWeight();
+	return 0;
+}
+
 std::vector<ContChangesEntry*> TESObjectREFR::GetAllItems()
 {
 	std::vector<ContChangesEntry*> vector;

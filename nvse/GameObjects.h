@@ -181,6 +181,8 @@ public:
 
 	__forceinline bool		Activate(Actor* activator, UInt32 unk1, UInt32 unk2, UInt32 unk3) { return ThisCall<bool>(0x573170, this, activator, unk1, unk2, unk3); }
 
+	Float64					GetInventoryWeight();
+
 	std::vector<ContChangesEntry*> GetAllItems();
 };
 static_assert(sizeof(TESObjectREFR) == 0x68);
@@ -446,7 +448,7 @@ public:
 	virtual void		ResetActorDTDR(void);
 	virtual void		DamageItem(void);
 	virtual void		DropItem(void);
-	virtual void		HandlePickupItem(void);
+	virtual void		HandlePickupItem(TESObjectREFR* activatedRef, UInt32 count, bool arg3);
 	virtual void		Unk_F5(void);
 	virtual void		CastWeaponEffect(void);
 	virtual void		Unk_F7(void);
@@ -642,6 +644,8 @@ public:
 	Float32								GetHitDataValue(UInt32 valueType) const;
 	Float32								GetActorValue(ActorValueCode avcode);
 	bool								GetLineOfSight(TESObjectREFR* actor) { return ThisCall<bool>(0x88B880, this, 0, actor, 1, 0, 0); }
+	Float64								GetMaxCarryWeight() { return ThisCall<Float64>(0x8A0C20, this); }
+	__forceinline void					PlayPickupPutdownSounds(TESForm* item, char isPickup, char isEquip) { ThisCall(0x8ADED0, this, item, isPickup, isEquip); }
 };
 static_assert(sizeof(Actor) == 0x1B4);
 

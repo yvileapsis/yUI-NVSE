@@ -31,5 +31,6 @@ typedef bool (*_JG_WorldToScreen)(NiPoint3* posXYZ, NiPoint3& posOut, float offs
 inline _JG_WorldToScreen JG_WorldToScreen;
 
 Float32 GetJIPAuxVarOrDefault(const char* auxvar, SInt32 index, Float32 def);
+Float32 SetJIPAuxVarOrDefault(const char* auxvar, SInt32 index, Float32 value);
 
 bool IsKeyPressed(UInt32 key, UInt32 flags = 0);

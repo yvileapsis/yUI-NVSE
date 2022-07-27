@@ -346,6 +346,11 @@ ExtraContainerChanges::Data* ExtraContainerChanges::Data::Create(TESObjectREFR* 
 	return data;
 }
 
+Float64 ExtraContainerChanges::Data::GetInventoryWeight()
+{
+	return ThisCall<Float64>(0x4D0900, this, PlayerCharacter::GetSingleton()->isHardcore);
+}
+
 ExtraContainerChanges* ExtraContainerChanges::Create(TESObjectREFR* thisObj, UInt32 refID, UInt32 count, ExtendDataList* pExtendDataList)
 {
 	const auto xData = (ExtraContainerChanges*)BSExtraData::Create(kExtraData_ContainerChanges, sizeof(ExtraContainerChanges), s_ExtraContainerChangesVtbl);
