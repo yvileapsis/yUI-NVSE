@@ -154,6 +154,7 @@ public:
 	Float32 __vectorcall	GetDistance2D(TESObjectREFR* target);
 	void					SetPos(NiPoint3& posVector);
 	void					SetAngle(NiPoint3& rotVector);
+	Float32					GetHeadingAngle(TESObjectREFR* target);
 	bool					MoveToCell(TESForm* worldOrCell, NiPoint3& posVector);
 	void					DeleteReference();
 	TESObjectREFR*			GetMerchantContainer();

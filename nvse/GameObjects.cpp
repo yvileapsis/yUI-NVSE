@@ -9,6 +9,7 @@
 
 #include "GameProcess.h"
 #include "GameSettings.h"
+#include <numbers>
 
 static constexpr UInt32 s_TESObject_REFR_init						= 0x0055A2F0;	// TESObject_REFR initialization routine (first reference to s_TESObject_REFR_vtbl)
 static constexpr UInt32 s_TESObjectREFR__GetContainer				= 0x0055D310;	// First call in REFR::RemoveItem
@@ -448,6 +449,12 @@ float __vectorcall TESObjectREFR::GetDistance(TESObjectREFR* target)
 float __vectorcall TESObjectREFR::GetDistance2D(TESObjectREFR* target)
 {
 	return this->GetInSameCellOrWorld(target) ? Point2Distance(*this->GetPos(), *target->GetPos()) : FLT_MAX;
+}
+
+Float32 TESObjectREFR::GetHeadingAngle(TESObjectREFR* target)
+{
+	if (!target) return 0;
+	return this->rot.z - atan2(target->pos.x - this->pos.x, target->pos.y - this->pos.y) - 2 * std::numbers::pi;
 }
 
 __declspec(naked) NiAVObject* __fastcall NiNode::GetBlockByName(const char *nameStr)	//	str of NiFixedString

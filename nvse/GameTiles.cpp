@@ -42,11 +42,6 @@ __declspec(naked) Tile::Value* __fastcall Tile::GetValue(UInt32 typeID)
 	}
 }
 
-Tile::Value * Tile::GetValueName(const char * valueName)
-{
-	return GetValue(TraitNameToID(valueName));
-}
-
 Tile * Tile::GetChild(const char * childName)
 {
 	int childIndex = 0;
@@ -98,7 +93,7 @@ Tile::Value * Tile::GetComponentValue(const char * componentPath)
 {
 	const char *trait = NULL;
 	Tile *tile = GetComponent(componentPath, &trait);
-	return (tile && trait) ? tile->GetValueName(trait) : NULL;
+	return (tile && trait) ? tile->GetValue(trait) : NULL;
 }
 
 Tile * Tile::GetComponentTile(const char * componentPath)
@@ -209,11 +204,16 @@ TileMenu* Tile::GetTileMenu()
 	return reinterpret_cast<TileMenu*>(tilemenu);
 }
 
+__forceinline Tile::Value* TileGetValue(Tile* tile, UInt32 typeID)
+{
+	return tile->GetValue(typeID);
+}
+
 __declspec(naked) void __fastcall Tile::PokeValue(UInt32 valueID)
 {
 	__asm
 	{
-		call	Tile::GetValue
+		call	TileGetValue
 		test	eax, eax
 		jz		done
 		push	eax

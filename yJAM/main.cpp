@@ -8,6 +8,7 @@
 
 #include <JDC.h>
 #include <JHM.h>
+#include <JHI.h>
 #include <JVO.h>
 #include <JLM.h>
 
@@ -42,6 +43,7 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 
 			JDC::Initialize();
 			JHM::Initialize();
+			JHI::Initialize();
 			JVO::Initialize();
 			JLM::Initialize();
 		}

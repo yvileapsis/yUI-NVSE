@@ -28,6 +28,7 @@ namespace JHM
 	inline UInt32	g_ModeCrit			= kHitMarkerDouble;
 	inline UInt32	g_ModeHeadshot		= kHitMarkerShake;
 	inline UInt32	g_ModeCompanion		= kHitMarkerHalfAlpha;
+	inline UInt32	g_ModeExplosion		= kHitMarkerDouble;
 	inline UInt32	g_EnableOut			= 1;
 	inline UInt32	g_EnableSighting	= 1;
 	inline UInt32	g_EnableScope		= 1;

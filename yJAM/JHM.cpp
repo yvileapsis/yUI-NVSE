@@ -48,6 +48,7 @@ namespace JHM
 		g_ModeEnemy			= ini.GetOrCreate("JHM", "ModeEnemy", static_cast<double>(kHitMarkerAltColor), nullptr);
 		g_ModeCrit			= ini.GetOrCreate("JHM", "ModeCrit", static_cast<double>(kHitMarkerDouble), nullptr);
 		g_ModeHeadshot		= ini.GetOrCreate("JHM", "ModeHead", static_cast<double>(kHitMarkerShake), nullptr);
+		g_ModeExplosion		= ini.GetOrCreate("JHM", "ModeExplosion", static_cast<double>(kHitMarkerDouble), nullptr);
 		g_ModeCompanion		= ini.GetOrCreate("JHM", "ModeByCompanion", static_cast<double>(kHitMarkerHalfAlpha), nullptr);
 		g_EnableOut			= ini.GetOrCreate("JHM", "EnableOut", 1.0, nullptr);
 		g_EnableSighting	= ini.GetOrCreate("JHM", "EnableSighting", 1.0, nullptr);
@@ -84,7 +85,7 @@ namespace JHM
 		tileMain->SetFloat("_JHMJDCLength", g_Dynamic & 1);
 		tileMain->SetFloat("_JHMJDCOffset", g_Dynamic & 2);
 
-		tileMain->GradualSetFloat("_JHMGlobalShaker", -0.05, 0.05, 0.15, GradualSetFloat::kGradualSetFloat_StartToEndPerpetual);
+		tileMain->GradualSetFloat("_JHMGlobalShaker", -0.05, 0.05, 0.15, GradualSetFloat::StartToEndPerpetual);
 
 		tileMain->SetFloat("_JHMVisible", visible = 0);
 	}
@@ -92,9 +93,9 @@ namespace JHM
 	bool ProcessTilesInUse(Tile* tile)
 	{
 		if (!tile) return false;
-		const auto val = tile->GetValue(kTileValue_alpha);
+		const auto val = tile->GetValue("_counter");
 		if (!val) return false;
-		if (val->num > 0) return true;
+		if (val->num < 1) return true;
 		g_TilesFree.emplace(tile);
 		return false;
 	}
@@ -126,27 +127,28 @@ namespace JHM
 		tile->SetFloat("_JHMModeShake", static_cast<bool>(flags & kHitMarkerShake));
 		tile->SetFloat("_JHMModeRotate", static_cast<bool>(flags & kHitMarkerRotate));
 
-		if (flags & kHitMarkerHalfAlpha) tile->SetFloat("_JHMAlphaMult", 0.5);
+		tile->SetFloat("_JHMAlphaMult", flags & kHitMarkerHalfAlpha ? 0.5 : 1);
 
-		tile->GradualSetFloat("_JHMCounter", 0, 1, flags & kHitMarkerDouble ? 2 * g_Seconds : g_Seconds, GradualSetFloat::kGradualSetFloat_StartToEnd);
+		tile->GradualSetFloat("_counter", 0, 1, flags & kHitMarkerDouble ? 2 * g_Seconds : g_Seconds, GradualSetFloat::StartToEnd);
 	}
 
 	void MainLoop()
 	{
 		if (!initialized) return;
 
-		if (GetPCUsingScope()) visible = -1 * static_cast<SInt64>(g_EnableScope);
+		if (GetPCUsingScope()) visible = static_cast<SInt64>(g_EnableScope);
 		else if (GetPCUsingIronSights()) visible = g_EnableSighting;
 		else visible = g_EnableOut;
 		tileMain->SetFloat("_JHMVisible", visible);
+		tileMain->SetFloat("_scope", GetPCUsingScope());
 
 		if (!visible) { g_HitMarkers.clear(); return; }
+
+		for (auto i = g_TilesInUse.begin(); i != g_TilesInUse.end(); ) if (!ProcessTilesInUse(*i)) g_TilesInUse.erase(i++); else ++i;
 
 		depth = 0;
 		for (const auto& snd : g_HitMarkers | std::views::values) CreateHitMarker(snd);
 		g_HitMarkers.clear();
-
-		for (auto i = g_TilesInUse.begin(); i != g_TilesInUse.end(); ) if (!ProcessTilesInUse(*i)) g_TilesInUse.erase(i++); else ++i;
 
 		if (const auto tileJDC = g_MenuHUDMain->tile->GetChild("JDC"))
 		{
@@ -177,6 +179,7 @@ namespace JHM
 				BGSBodyPartData::eBodyPart_Head1 || hitData->hitLocation == BGSBodyPartData::eBodyPart_Head2) flags |= g_ModeHeadshot;
 			if (target->IsCrimeOrEnemy()) flags |= g_ModeEnemy;
 			if (hitData->source->isTeammate) flags |= g_ModeCompanion;
+			if (hitData->explosion && hitData->explosion->IsExplosion()) flags |= g_ModeExplosion;
 		}
 
 		if (flags & kHitMarkerNothing) return;

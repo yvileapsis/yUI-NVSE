@@ -66,18 +66,18 @@ namespace JDC
 
 		SetEventHandler("yJAM:MainLoop", MainLoop);
 
-		tileMain->SetFloat("_JDCDynamicOffset", g_Dynamic & 1);
-		tileMain->SetFloat("_JDCDynamicLength", g_Dynamic & 2);
+		tileMain->SetFloat("_DynamicOffset", g_Dynamic & 1);
+		tileMain->SetFloat("_DynamicLength", g_Dynamic & 2);
 
-		tileMain->SetFloat("_JDCLengthMin", g_LengthMin);
-		tileMain->SetFloat("_JDCLengthMax", g_LengthMax);
+		tileMain->SetFloat("_LengthMin", g_LengthMin);
+		tileMain->SetFloat("_LengthMax", g_LengthMax);
 
-		tileMain->SetFloat("_JDCOffsetMin", g_OffsetMin);
-		tileMain->SetFloat("_JDCOffsetMax", g_OffsetMax);
+		tileMain->SetFloat("_OffsetMin", g_OffsetMin);
+		tileMain->SetFloat("_OffsetMax", g_OffsetMax);
 
-		tileMain->SetFloat("_JDCWidth", g_Width);
+		tileMain->SetFloat("_Width", g_Width);
 
-		tileMain->SetFloat("_JDCVisible", 0);
+		tileMain->SetFloat("_Visible", 0);
 		g_TileReticleCenter->GetChild("reticle_center")->SetFloat(kTileValue_visible, 1);
 
 		if (g_Distance == 0)
@@ -132,7 +132,7 @@ namespace JDC
 	{
 		if (!initialized) return;
 
-		tileMain->SetFloat(tileMain->GetComponentValue("_JDCAlphaRC")->id, g_TileReticleCenter->GetChild("reticle_center")->GetFloat(kTileValue_alpha));
+		tileMain->SetFloat(tileMain->GetComponentValue("_AlphaRC")->id, g_TileReticleCenter->GetChild("reticle_center")->GetFloat(kTileValue_alpha));
 
 		if (true && g_TileReticleCenter->GetChild("reticle_center")->children.Head()) { // iHUDEditor
 			tileMain->SetFloat(kTileValue_red, g_TileReticleCenter->GetChild("reticle_center")->children.Head()->data->GetFloat(kTileValue_red));
@@ -148,8 +148,7 @@ namespace JDC
 		else if (GetPCAiming())		mode = g_player->isInThirdPerson ? g_ModeSighting3rd : g_ModeSighting1st;
 		else						mode = g_player->isInThirdPerson ? g_ModeOut3rd : g_ModeOut1st;
 
-
-		tileMain->SetFloat(tileMain->GetComponentValue("_JDCScope")->id, GetPCUsingScope());
+		tileMain->SetFloat("_scope", GetPCUsingScope());
 
 		UInt32 visibleReticle = 0;
 		UInt32 visibleDot = 0;
@@ -164,9 +163,9 @@ namespace JDC
 		else if (mode == 6) { visibleCrosshair = !IsPlayerWeaponShotgun() ? 1 : 2; visibleDot = 1; }
 		else if (mode == 7) { visibleCrosshair = !IsPlayerWeaponShotgun() ? 1 : 2;	visibleDot = 2; }
 
-		tileMain->SetFloat("_JDCVisible", visibleDot || visibleCrosshair);
-		tileMain->SetFloat("_JDCVisibleDot", visibleDot);
-		tileMain->SetFloat("_JDCVisibleReticle", visibleCrosshair);
+		tileMain->SetFloat("_visible", visibleDot || visibleCrosshair);
+		tileMain->SetFloat("_VisibleDot", visibleDot);
+		tileMain->SetFloat("_VisibleReticle", visibleCrosshair);
 		g_TileReticleCenter->GetChild("reticle_center")->SetFloat(kTileValue_visible, visibleReticle);
 
 		Float64 totalSpread = 0.1;
@@ -192,6 +191,6 @@ namespace JDC
 				spreadTarget *= tan(0.5 * g_player->baseProcess->GetWeaponInfo()->weapon->sightFOV) / tan(0.5 * fDefaultWorldFOV);
 		}
 
-		tileMain->SetFloat("_JDCSpread", UpdateCurrentSpread(spreadTarget));
+		tileMain->SetFloat("_Spread", UpdateCurrentSpread(spreadTarget));
 	}
 }

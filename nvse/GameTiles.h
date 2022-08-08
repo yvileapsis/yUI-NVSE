@@ -165,11 +165,11 @@ public:
 	~Tile();
 
 	enum eTileID {
-		kTileID_rect		= 0x0385,
+		kTileID_rect = 0x0385,
 		kTileID_image,
 		kTileID_text,
 		kTileID_3D,
-		kTileID_nif			= kTileID_3D,
+		kTileID_nif = kTileID_3D,
 		kTileID_menu,
 
 		// Not a Tile descendend
@@ -181,11 +181,11 @@ public:
 		kTileID_max
 	};
 
-	virtual Tile*			Destroy(bool noDealloc);
-	virtual void			Init(Tile * parent, const char * name, Tile* replacedChild);
-	virtual NiNode*			CalcNode(void);
+	virtual Tile* Destroy(bool noDealloc);
+	virtual void			Init(Tile* parent, const char* name, Tile* replacedChild);
+	virtual NiNode* CalcNode(void);
 	virtual UInt32			GetType(void);		// returns one of kTileValue_XXX
-	virtual const char*		GetTypeStr(void);	// 4-byte id
+	virtual const char* GetTypeStr(void);	// 4-byte id
 	virtual bool			Unk_05(UInt32 arg0, UInt32 arg1);
 	virtual UInt32			UpdateField(UInt32 valueID, float floatValue, const char* strValue);
 	virtual void			Unk_07(void);
@@ -232,10 +232,10 @@ public:
 		~Action();
 
 		virtual float	GetFloat();
-		virtual Value	*GetValue();
+		virtual Value* GetValue();
 
 		UInt32		type;		// 04
-		Action*		next;		// 08
+		Action* next;		// 08
 	};
 
 	// 10
@@ -245,7 +245,7 @@ public:
 		RefValueAction();
 		~RefValueAction();
 
-		Value*		tileVal;	// 0C
+		Value* tileVal;	// 0C
 	};
 
 	// 10
@@ -257,40 +257,40 @@ public:
 
 		float		value;		// 0C
 	};
-	
+
 	// 14
 	struct Value
 	{
 		UInt32		id;			// 00
-		Tile*		parent;		// 04
+		Tile* parent;		// 04
 		float		num;		// 08
-		char*		str;		// 0C
-		Action*		action;		// 10
-		
+		char* str;		// 0C
+		Action* action;		// 10
+
 		__forceinline void __thiscall Refresh(bool string) { ThisCall<void>(0xA09410, this, string); };
 	};
 
 	struct ChildNode
 	{
-		ChildNode*	next;		// 000
-		ChildNode*	prev;		// 004
-		Tile*		child;		// 008
+		ChildNode* next;		// 000
+		ChildNode* prev;		// 004
+		Tile* child;		// 008
 	};
 
 	DList<Tile>					children;	// 04
 	BSSimpleArray<Value*>		values;		// 10
 	String						name;		// 20
-	Tile*						parent;		// 28
-	NiNode*						node;		// 2C
+	Tile* parent;		// 28
+	NiNode* node;		// 2C
 	UInt32						flags;		// 30
 	UInt8						unk34;		// 34
 	UInt8						unk35;		// 35
 	UInt8						pad35[2];	// 36
 
 	static UInt32				TraitNameToID(const char* traitName) { return CdeclCall<UInt32>(0x00A01860, traitName); }
-	static const char*			TraitIDToName(int id);	// slow
-	Value* __fastcall			GetValue(UInt32 typeID);
-	Value*						GetValueName(const char * valueName);
+	static const char* TraitIDToName(int id);	// slow
+	__forceinline Value* __fastcall	GetValue(UInt32 typeID);
+	Value*						GetValue(const char* valueName) { return GetValue(TraitNameToID(valueName)); }
 	DListNode<Tile>*			GetNthChild(UInt32 index);
 	Tile*						GetChild(const char * childName);
 	Tile*						GetComponent(const char * componentTile, const char **trait);
@@ -385,14 +385,14 @@ struct GradualSetFloat
 	//	3		From start to end to start, 7 times, in duration
 	//	4		From start to end in duration/6, end for duration*2/3, from end to start in duration/6
 	//	5**		From start to end, in duration, perpetually (suitable for image rotation)
-	enum
+	enum kGradualSetFloat
 	{
-		kGradualSetFloat_StartToEnd				= 0,
-		kGradualSetFloat_StartToEndPerpetual	= 1,
-		kGradualSetFloat_StartToEndFourTimes	= 2,
-		kGradualSetFloat_StartToEndSevenTimes	= 3,
-		kGradualSetFloat_StartToEndToStart		= 4,
-		kGradualSetFloat_StartToEndRotation		= 5
+		StartToEnd				= 0,
+		StartToEndPerpetual		= 1,
+		StartToEndFourTimes		= 2,
+		StartToEndSevenTimes	= 3,
+		StartToEndToStart		= 4,
+		StartToEndRotation		= 5
 	};
 
 	Float32		startValue;		// 00
