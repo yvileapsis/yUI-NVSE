@@ -110,14 +110,15 @@ namespace JHI
 	{
 		const auto tile = CreateTileForHitMarker(target);
 
-		tile->SetFloat("_Depth", depth++);
+		tile->SetFloat("_depth", depth++);
 
 		tile->SetFloat(kTileValue_systemcolor, 1 + static_cast<bool>(flags & kHitIndicatorAltColor));
 
 		tile->SetFloat("_ModeOffset", static_cast<bool>(flags & kHitIndicatorOffset));
-		tile->SetFloat("_ModeShake", static_cast<bool>(flags & kHitIndicatorShakeVert));
-		tile->SetFloat("_RotateAngle", g_player->GetHeadingAngle(target));
-		tile->SetFloat("_AlphaMult", flags & kHitIndicatorHalfAlpha ? 0.5 : 1);
+		tile->SetFloat("_ModeShakeVert", static_cast<bool>(flags & kHitIndicatorShakeVert));
+		tile->SetFloat("_ModeShakeHoriz", static_cast<bool>(flags & kHitIndicatorShakeHoriz));
+		tile->SetFloat("_angle", g_player->GetHeadingAngle(target));
+		tile->SetFloat("_alphaMult", flags & kHitIndicatorHalfAlpha ? 0.5 : 1);
 
 		tile->GradualSetFloat("_counter", 0, 1, flags & kHitIndicatorDouble ? 2 * g_Seconds : g_Seconds, GradualSetFloat::StartToEnd);
 	}
@@ -137,7 +138,7 @@ namespace JHI
 		if (g_Rotate == 1)
 		{
 			const auto newAngle = g_player->pos.z;
-			tileMain->SetFloat("_AddAngle", angle - newAngle);
+			tileMain->SetFloat("_angleWorld", angle - newAngle);
 			angle = newAngle;
 		}
 
@@ -148,7 +149,7 @@ namespace JHI
 		hitQueue.clear();
 	}
 
-	void OnHit(Actor* target, void* args)
+	void OnHit(const Actor* target, void* args)
 	{
 		if (!initialized || !visible) return;
 
@@ -170,11 +171,11 @@ namespace JHI
 			if (hitData->flags & ActorHitData::kFlag_IsCritical) flags |= g_ModeCrit;
 			if (hitData->hitLocation == BGSBodyPartData::eBodyPart_Brain || hitData->hitLocation ==
 				BGSBodyPartData::eBodyPart_Head1 || hitData->hitLocation == BGSBodyPartData::eBodyPart_Head2) flags |= g_ModeHeadshot;
+			if (hitData->explosion && IS_TYPE(hitData->explosion, Explosion) && hitData->explosion->IsExplosion()) flags |= g_ModeExplosion;
 			if (hitData->dmgMult <= 0) flags |= g_ModeNoDamage;
 			if (!source) flags |= g_ModeNoAttacker;
 			if (source && source->IsCrimeOrEnemy()) flags |= g_ModeEnemy;
-			if (source == g_player) flags |= g_ModeSelfDamage;
-			if (hitData->explosion && IS_TYPE(hitData->explosion, Explosion) && hitData->explosion->IsExplosion()) flags |= g_ModeExplosion;
+			if (source == g_player) flags |= g_ModeSelf;
 		}
 
 		if (flags & kHitIndicatorNothing) return;

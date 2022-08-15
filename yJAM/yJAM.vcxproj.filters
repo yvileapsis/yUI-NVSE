@@ -34,9 +34,6 @@
     <ClCompile Include="..\nvse\GameObjects.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="..\nvse\GameOSDepend.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
     <ClCompile Include="..\nvse\GameRTTI.cpp">
       <Filter>nvse</Filter>
     </ClCompile>

@@ -8,7 +8,7 @@ inline int g_yTM_Mode					= 1;
 inline int g_yTM_MinMax					= 1;
 
 inline int g_FixExplosionPushForce		= 1;
-inline int g_RestoreSpreadGameSettings	= 1;
+inline int g_AlterSpread				= 0;
 
 inline int g_CorrectAmmoEffects			= 0;
 inline int g_CorrectMeltdownEffects		= 0;

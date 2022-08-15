@@ -26,9 +26,9 @@ namespace JHI
 	inline UInt32	g_ModeKill			= kHitIndicatorOffset;
 	inline UInt32	g_ModeEnemy			= kHitIndicatorAltColor;
 	inline UInt32	g_ModeCrit			= kHitIndicatorDouble;
-	inline UInt32	g_ModeHeadshot		= kHitIndicatorShakeHoriz;
-	inline UInt32	g_ModeSelfDamage	= kHitIndicatorHalfAlpha;
-	inline UInt32	g_ModeExplosion		= kHitIndicatorShakeVert;
+	inline UInt32	g_ModeHeadshot		= kHitIndicatorShakeVert;
+	inline UInt32	g_ModeSelf			= kHitIndicatorHalfAlpha;
+	inline UInt32	g_ModeExplosion		= kHitIndicatorShakeHoriz;
 	inline UInt32	g_ModeNoAttacker	= kHitIndicatorHalfAlpha;
 	inline UInt32	g_ModeNoDamage		= kHitIndicatorNothing;
 	inline UInt32	g_EnableOut			= 1;
@@ -39,5 +39,5 @@ namespace JHI
 	void Initialize();
 	void Reset();
 	void MainLoop();
-	void OnHit(Actor*, void*);
+	void OnHit(const Actor*, void*);
 }

@@ -19,11 +19,5 @@ void EventLayer()
 	if (!expression) Log("MISSING REQUIREMENTS - JIP LN WAAAAAAAAAAAAA");
 	CallFunctionAlt(expression, nullptr, 0);
 
-	RegisterEvent("yJAM:OnPreActivate", 0, nullptr, NVSEEventManagerInterface::kFlag_IsUserDefined);
-	expression = CompileExpression(R"(SetEventHandler "ShowOff:OnPreActivate" (begin function {}
-		DispatchEventAlt "yJAM:OnPreActivate"
-		SetFunctionValue 0
-	end))");
-	if (!expression) Log("MISSING REQUIREMENTS - JIP LN WAAAAAAAAAAAAA");
 //	CallFunctionAlt(expression, nullptr, 0);
 }

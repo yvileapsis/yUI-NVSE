@@ -10,10 +10,10 @@ struct OSInputGlobals
 {
 	enum
 	{
-		kFlag_HasJoysticks = 1 << 0,
-		kFlag_HasMouse = 1 << 1,
-		kFlag_HasKeyboard = 1 << 2,
-		kFlag_BackgroundMouse = 1 << 3,
+		kFlag_HasJoysticks		= 1 << 0,
+		kFlag_HasMouse			= 1 << 1,
+		kFlag_HasKeyboard		= 1 << 2,
+		kFlag_BackgroundMouse	= 1 << 3,
 	};
 
 	enum
@@ -82,12 +82,11 @@ struct OSInputGlobals
 	UInt8 mouseBinds[28];
 	UInt8 joystickBinds[28];
 	UInt8 controllerBinds[28];
+
+	static OSInputGlobals* GetSingleton() { return *reinterpret_cast<OSInputGlobals**>(0x011F35CC); }
 };
 static_assert(sizeof(OSInputGlobals) == 0x1C04);
 static_assert(offsetof(OSInputGlobals, mouseBinds) == 0x1BB0);
-
-
-extern OSInputGlobals** g_OSInputGlobals;
 
 #if 0
 #include "GameTypes.h"
@@ -205,6 +204,8 @@ public:
 	UInt32*			unk50;				// 50, same object as unk18
 	//..
 	UInt32			unk60;				// 60 relates to unk50
+
+	OSGlobals* GetSingleton() { return *reinterpret_cast<OSGlobals**>(0x011DEA0C); }
 };
 
 //static_assert(sizeof(OSGlobals) == 0x0A4);	// found in oldWinMain 0x0086AF4B

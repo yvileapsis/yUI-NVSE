@@ -116,7 +116,6 @@
     <ClCompile Include="..\nvse\GameExtraData.cpp" />
     <ClCompile Include="..\nvse\GameForms.cpp" />
     <ClCompile Include="..\nvse\GameObjects.cpp" />
-    <ClCompile Include="..\nvse\GameOSDepend.cpp" />
     <ClCompile Include="..\nvse\GameRTTI.cpp" />
     <ClCompile Include="..\nvse\GameScript.cpp" />
     <ClCompile Include="..\nvse\GameSettings.cpp" />

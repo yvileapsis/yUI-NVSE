@@ -666,17 +666,9 @@ const char GetSeparatorChar(Script * script)
 		return '|';
 }
 
-const char * GetSeparatorChars(Script * script)
+std::string GetSeparatorChars(Script * script)
 {
-	if(IsConsoleMode())
-	{
-		if(script && script->modIndex != 0xFF)
-			return "|";
-		else
-			return "@";
-	}
-	else
-		return "|";
+	return IsConsoleMode() ? script && script->modIndex != 0xFF ? "|" : "@" : "|";
 }
 
 void Console_Print_Long(const std::string& str)
@@ -693,15 +685,15 @@ void Console_Print_Long(const std::string& str)
 struct ControlName
 {
 	UInt32		unk0;
-	const char	* name;
+	const char* name;
 	UInt32		unkC;
 };
 
-ControlName ** g_keyNames = (ControlName **)0x011D52F0;
-ControlName ** g_mouseButtonNames = (ControlName **)0x011D5240;
-ControlName ** g_joystickNames = (ControlName **)0x011D51B0;
+ControlName ** g_keyNames			= (ControlName **)0x011D52F0;
+ControlName ** g_mouseButtonNames	= (ControlName **)0x011D5240;
+ControlName ** g_joystickNames		= (ControlName **)0x011D51B0;
 
-const char * GetDXDescription(UInt32 keycode)
+std::string GetDXDescription(UInt32 keycode)
 {
 	const char * keyName = "<no key>";
 

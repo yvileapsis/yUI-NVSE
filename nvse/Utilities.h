@@ -254,8 +254,8 @@ private:
 };
 
 const char GetSeparatorChar(Script * script);
-const char * GetSeparatorChars(Script * script);
-const char * GetDXDescription(UInt32 keycode);
+std::string GetSeparatorChars(Script * script);
+std::string GetDXDescription(UInt32 keycode);
 
 bool ci_equal(char ch1, char ch2);
 bool ci_less(const char* lh, const char* rh);

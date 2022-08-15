@@ -600,11 +600,11 @@ public:
 	UInt32								unk16C;
 	UInt32								unk170;							// 170 receive ParentCell if Interior, Worldspace otherwize
 	UInt32								unk174;
-	Float32								flt178;
-	Float32								flt17C;							// 17C	 
-	Float32								flt180;
-	Float32								flt184;
-	Float32								flt188;							// 188
+	Float32								spreadWeapon;
+	Float32								spreadScope;					// 17C	 
+	Float32								spreadActor;
+	Float32								spreadVATS;
+	Float32								spreadHealthPercent;			// 188
 	UInt8								byte18C;						// 18C-
 	bool								isTeammate;						// 18D
 	UInt8								byte18E;						// 18E-
@@ -647,6 +647,8 @@ public:
 	bool								GetLineOfSight(TESObjectREFR* actor) { return ThisCall<bool>(0x88B880, this, 0, actor, 1, 0, 0); }
 	Float64								GetMaxCarryWeight() { return ThisCall<Float64>(0x8A0C20, this); }
 	__forceinline void					PlayPickupPutdownSounds(TESForm* item, char isPickup, char isEquip) { ThisCall(0x8ADED0, this, item, isPickup, isEquip); }
+
+	void								SendStealingAlarm(TESObjectREFR* container, bool checkItems);
 };
 static_assert(sizeof(Actor) == 0x1B4);
 
@@ -1002,3 +1004,9 @@ struct QuestTarget
 	NiPoint3							endPos;
 };
 static_assert(sizeof(QuestTarget) == 0x38);
+
+template <typename ...Args>
+void ApplyPerkModifiers(UInt32 id, Actor* actor, Args ...args)
+{
+	CdeclCall<void>(0x05E58F0, id, actor, std::forward<Args>(args)...);
+}

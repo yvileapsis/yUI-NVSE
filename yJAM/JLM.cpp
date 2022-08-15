@@ -9,28 +9,41 @@ namespace JLM
 	bool				initialized			= false;
 	Tile*				tileMain			= nullptr;
 
-	UInt32 typeCodes[] {116, 46, 49, 25, 115, 108, 41, 40, 103, 24, 26, 47, 31};
-
 	std::vector<ContChangesEntry*> items;
 
-	TESObjectREFR*	container		= nullptr;
+	TESObjectREFR*		container			= nullptr;
 
 	/* those are needed to know if ref should be updated */
-	TESObjectREFR*	ref				= nullptr;
-	bool			notcannibal		= false;
-	bool			dead			= false;
-	bool			open			= false;
+	TESObjectREFR*		ref					= nullptr;
+	bool				notcannibal			= false;
+	bool				dead				= false;
+	bool				open				= false;
+	bool				owned				= false;
 
-	TESForm*		formEVE				= nullptr;
-	TESForm*		formShovel			= nullptr;
-	TESForm*		formShovelUnique	= nullptr;
+	TESForm*			formEVE				= nullptr;
+	TESForm*			formShovel			= nullptr;
+	TESForm*			formShovelUnique	= nullptr;
 
-	SInt32			offset			= 0;
-	SInt32			index			= 0;
-	SInt32			total			= 0;
-	SInt32			tiles			= 0;
+	UInt32				offset				= 0;
+	UInt32				index				= 0;
+	UInt32				total				= 0;
+	SInt32				tiles				= 0;
 
-	bool			info			= false;
+	bool				info				= false;
+
+	UInt32				key1				= 0;
+	UInt32				key2				= 0;
+	UInt32				key3				= 0;
+	UInt32				keyAlt				= 0;
+	UInt32				button1				= 0;
+	UInt32				button2				= 0;
+	UInt32				button3				= 0;
+	UInt32				buttonAlt			= 0;
+
+	bool				lockTake			= true;
+
+	TESObjectREFR*		tookItem			= nullptr;
+	bool				openedContainer		= false;
 
 	void Initialize()
 	{
@@ -54,11 +67,27 @@ namespace JLM
 
 		if (const auto errVal = ini.LoadFile(iniPath.c_str()); errVal == SI_FILE) { return; }
 
-//		g_JDC				= ini.GetOrCreate("JustMods", "JDC", 1.0, nullptr);
-//		g_Dynamic			= ini.GetOrCreate("JDC", "Dynamic", 1.0, nullptr);
-		
+		//		g_JDC				= ini.GetOrCreate("JustMods", "JDC", 1.0, nullptr);
+		//		g_Dynamic			= ini.GetOrCreate("JDC", "Dynamic", 1.0, nullptr);
+
 		if (const auto errVal = ini.SaveFile(iniPath.c_str(), false); errVal == SI_FILE) { return; }
 
+	}
+
+	std::string GetStringForButton(UInt32 button)
+	{
+		switch (button)
+		{
+		case 1 << 0: return "Up)";
+		case 1 << 1: return "Down)";
+		case 1 << 2: return "Left)";
+		case 1 << 3: return "Right)";
+		case 1 << 4: return "Start)";
+		case 1 << 5: case 1 << 6: case 1 << 7: case 1 << 8: case 1 << 9:
+		case 1 << 11: case 1 << 12: case 1 << 13: case 1 << 14:	return "";
+		case 1 << 10: return "Guide)";
+		default: return std::to_string(button);
+		}
 	}
 
 
@@ -77,8 +106,7 @@ namespace JLM
 		SetEventHandler("yJAM:JG:OnRender", OnRender);
 		SetEventHandler("OnAdd", OnAddDropUpdate);
 		SetEventHandler("OnDrop", OnAddDropUpdate);
-		SetEventHandler("yJAM:OnPreActivate", OnPreActivate);
-
+		SetEventHandler("ShowOff:OnPreActivate", OnPreActivate);
 
 		tileMain->SetFloat("_JLMFontBase", g_Font);
 		tileMain->SetFloat("_JLMFontYBase", g_FontY);
@@ -118,8 +146,31 @@ namespace JLM
 		if (!formEVE) formEVE = GetFormByID("EVE FNV - NO GRA.esp", 0x02E612);
 		if (!formEVE) formEVE = GetFormByID("RA-Gear.esm", 0x02E612);
 
-		if (!formShovel)		formShovel			= GetFormByID("PointLookout.esm", 0x0082B5);
-		if (!formShovelUnique)	formShovelUnique	= GetFormByID("PointLookout.esm", 0x00D5A8);
+		if (!formShovel)		formShovel = GetFormByID("PointLookout.esm", 0x0082B5);
+		if (!formShovelUnique)	formShovelUnique = GetFormByID("PointLookout.esm", 0x00D5A8);
+
+		key1 = g_Key1 ? g_Key1 : GetControl(5, kControlType_Keyboard);
+		key2 = g_Key2 ? g_Key2 : GetControl(7, kControlType_Keyboard);
+		key3 = g_Key3 ? g_Key3 : GetControl(16, kControlType_Keyboard);
+		keyAlt = g_KeyAlt ? g_KeyAlt : GetControl(9, kControlType_Keyboard);
+
+		button1 = g_Button1 ? g_Button1 : GetControl(5, kControlType_Joystick);
+		button2 = g_Button2 ? g_Button2 : GetControl(7, kControlType_Joystick);
+		button3 = g_Button3 ? g_Button3 : GetControl(16, kControlType_Joystick);
+		buttonAlt = g_ButtonAlt ? g_Button3 : GetControl(9, kControlType_Joystick);
+
+		if (CdeclCall<bool>(0x4B71D0))
+		{
+			GetStringForButton(button1).empty() ? tileMain->SetFloat("_JLMButton1", button1) : tileMain->SetString("_JLMKeyString1", button1 ? (GetStringForButton(button1) + ")").c_str() : "");
+			GetStringForButton(button2).empty() ? tileMain->SetFloat("_JLMButton2", button2) : tileMain->SetString("_JLMKeyString2", button2 ? (GetStringForButton(button2) + ")").c_str() : "");
+			GetStringForButton(button3).empty() ? tileMain->SetFloat("_JLMButton3", button3) : tileMain->SetString("_JLMKeyString3", button3 ? (GetStringForButton(button3) + ")").c_str() : "");
+		}
+		else
+		{
+			tileMain->SetString("_JLMKeyString1", key1 ? (GetDXDescription(key1) + ")").c_str() : "");
+			tileMain->SetString("_JLMKeyString2", key2 ? (GetDXDescription(key2) + ")").c_str() : "");
+			tileMain->SetString("_JLMKeyString3", key3 ? (GetDXDescription(key3) + ")").c_str() : "");
+		}
 	}
 
 	void Display()
@@ -133,18 +184,29 @@ namespace JLM
 		if (!container)
 		{
 			tileMain->SetFloat("_JLMVisible", 0);
+			ToggleVanityWheel(true);
+			if (key1) DisableKey(key1, false);
+			if (key2) DisableKey(key2, false);
+			if (key3) DisableKey(key3, false);
+			if (keyAlt) DisableKey(keyAlt, false);
 			return;
 		}
+		ToggleVanityWheel(false);
+		if (key1) DisableKey(key1, true);
+		if (key2) DisableKey(key2, true);
+		if (key3) DisableKey(key3, true);
+		if (keyAlt) DisableKey(keyAlt, true);
 
+		owned = container->IsCrimeOrEnemy();
 		tileMain->SetString("_JLMTitle", container->GetTheName());
-		tileMain->SetFloat("_JLMSystemColor", 1 + container->IsCrimeOrEnemy());
+		tileMain->SetFloat("_JLMSystemColor", 1 + owned);
 		tileMain->SetFloat("_JLMAlphaAC", g_MenuHUDMain->tileActionPointsMeterText1->GetFloat(kTileValue_alpha));
 
 		auto item = items.begin() + offset;
 
 		for (const auto fst : tileMain->GetChild("JLMContainer")->children)
 		{
-			if (items.empty() || item == items.end())
+			if (items.empty() || item >= items.end())
 			{
 				fst->SetFloat(kTileValue_visible, 0);
 				continue;
@@ -194,6 +256,9 @@ namespace JLM
 		tileMain->SetFloat("_JLMItemHeightCur", y);
 		tileMain->SetFloat("_JLMItemWidthCur", x);
 
+		if (offset > items.size() - tiles) { offset = items.size() - tiles > 0 ? items.size() - tiles : 0; }
+		if (index > tiles) { index = tiles; }
+
 		tileMain->SetFloat("_JLMArrowUp", offset > 0);
 		tileMain->SetFloat("_JLMArrowDown", offset < items.size() - tiles);
 
@@ -208,56 +273,25 @@ namespace JLM
 
 	bool IsDead(TESObjectREFR* ref)
 	{
-		return ref->IsActor()  ? (reinterpret_cast<Actor*>(ref)->lifeState == kLifeState_Dead || reinterpret_cast<Actor*>(ref)->lifeState == kLifeState_Dying) : true;
+		return ref->IsActor() ? (reinterpret_cast<Actor*>(ref)->lifeState == kLifeState_Dead || reinterpret_cast<Actor*>(ref)->lifeState == kLifeState_Dying) : true;
 	}
 
-	// TODO:: sorting
-	SInt16 CompareItems(ContChangesEntry* first, ContChangesEntry* second)
+	UInt32 typeCodes[]{ 116, 46, 49, 25, 115, 108, 41, 40, 103, 24, 26, 47, 31 };
+
+	UInt16 CompareItems(ContChangesEntry* first, ContChangesEntry* second)
 	{
-		const auto a1 = first;
-		const auto a2 = second;
-
-		TESForm* form1 = nullptr, * form2 = nullptr;
-
-		if (a1 && a1->form) form1 = a1->form;
-		if (a2 && a2->form) form2 = a2->form;
-
-		signed int cmp;
-
-		std::string name1, name2;
-
-		if (form1) name1 = form1->GetTheName();
-		if (form2) name2 = form2->GetTheName();
-
-		cmp = name1.compare(name2);
-		if (cmp > 0) return 1;
-		if (cmp < 0) return -1;
-
-		if (!form1) return form2 ? -1 : 0;
-		if (!form2) return 1;
-
-		const SInt16 mods1 = a1->GetWeaponMod();
-		const SInt16 mods2 = a2->GetWeaponMod();
-		if (mods1 != mods2) return mods1 > mods2 ? -1 : 1;
-
-		const float condition1 = a1->GetHealthPercent();
-		const float condition2 = a2->GetHealthPercent();
-		if (condition1 != condition2) return condition1 > condition2 ? -1 : 1;
-
-		const bool equipped1 = a1->GetEquipped();
-		const bool equipped2 = a2->GetEquipped();
-		if (equipped1 != equipped2) return equipped1 > equipped2 ? -1 : 1;
-
-		const UInt32 refID1 = form1->refID;
-		const UInt32 refID2 = form2->refID;
-		if (refID1 != refID2) return refID1 > refID2 ? -1 : 1;
-
-		return 0;
+		TileContChangesEntryUnk first_(first);
+		TileContChangesEntryUnk second_(second);
+		return CdeclCall<SInt16>(0x7824E0, &first_, &second_) != 1 ? 1 : 0;
 	}
-
 
 	void MinorUpdate()
 	{
+		if (g_HidePrompt && (!info && container || (info && !container)))
+		{
+			info = !info;
+			SetJIPAuxVarOrDefault("*_JAMInfoDisable", 0, (!info ? -1 : 1) + GetJIPAuxVarOrDefault("*_JAMInfoDisable", 0, 0));
+		}
 		Display();
 	}
 
@@ -265,18 +299,26 @@ namespace JLM
 	void MajorUpdate()
 	{
 		items.clear();
-		if (g_HidePrompt && ((!info && container) || (info && !container)))
-		{
-			info = true - info;
-			SetJIPAuxVarOrDefault("*_JAMInfoDisable", 0, (!info ? -1 : 1) + GetJIPAuxVarOrDefault("*_JAMInfoDisable", 0, 0));
-		}
 		if (container)
 		{
+			if (formEVE) container->RemoveItem(formEVE, nullptr, 1, 0, 0, nullptr, 0, 0, 0, 0);
 			items = container->GetAllItems();
 			ra::sort(items, CompareItems);
 		}
 		MinorUpdate();
 	}
+
+	void HandleContainerChange(TESObjectREFR* container, TESObjectREFR* newcontainer)
+	{
+		if (tookItem) g_player->SendStealingAlarm(tookItem, true);
+		tookItem = nullptr;
+
+		offset = 0;
+		index = 0;
+	}
+
+	bool notcannibal2 = true;
+	bool owned2 = false;
 
 	void UpdateContainer(TESObjectREFR* newref)
 	{
@@ -284,42 +326,48 @@ namespace JLM
 		if (ref != newref) update = true;
 		ref = newref;
 
-		if (!ref || !ref->baseForm->CanContainItems()) { container = nullptr; MajorUpdate(); return; }
+		if (!ref || !ref->baseForm->CanContainItems())
+		{
+			HandleContainerChange(container, nullptr);
+			container = nullptr;
+			MajorUpdate();
+			return;
+		}
 
-		if (dead != IsDead(ref)) { update = true; dead = 1 - dead; }
-		if (open != !ref->IsLocked()) { update = true; open = 1 - open; }
-		if (notcannibal != true) { update = true; notcannibal = 1 - notcannibal; } // TODO:: cannibal
+		if (owned != owned2) { update = true; owned = !owned; }
+		if (dead != IsDead(ref)) { update = true; dead = !dead; }
+		if (open != !ref->IsLocked()) { update = true; open = !open; }
+		if (notcannibal != notcannibal2) { update = true; notcannibal = !notcannibal; }
 
 		if (!update) return;
-
-		if (!dead || !open || !notcannibal || !NameNotEmpty(ref)) { container = nullptr; MajorUpdate(); return; }
-		container = ref->ResolveAshpile();
-		offset = 0;
-		index = 0;
+		const auto newcontainer = !dead || !open || !notcannibal || !NameNotEmpty(ref) ? nullptr : ref->ResolveAshpile();
+		HandleContainerChange(container, newcontainer);
+		container = newcontainer;
 		MajorUpdate();
 	}
 
 	void MainLoop()
 	{
 		if (!initialized) return;
-		if (container)
-		{
-
-		}
+		notcannibal2 = ref ? GetCannibalPrompt(ref) : true;
+		owned2 = ref ? ref->IsCrimeOrEnemy() : false;
 	}
 
 	void HandleScroll()
 	{
+		if (!container) return;
+
 		bool update = false;
-		if (IsKeyPressed(265)) {
-			if (index < tiles - 1) { update = true; index++; }
-			else if (offset < items.size() - tiles) { update = true; offset++; }
-		}
-		if (IsKeyPressed(264)) {
-			if (index > 0) { update = true; index--; }
-			else if (offset > 0) { update = true; offset--; }
-		}
-		if (index > tiles - 1) { update = true; index = tiles - 1; }
+
+		if (!IsKeyPressed(265)) {}
+		else if (index < tiles - 1)				{ update = true; index++; }
+		else if (offset < items.size() - tiles)	{ update = true; offset++; }
+		else if (g_OverScroll)					{ update = true; offset = 0; index = 0; }
+
+		if (!IsKeyPressed(264)) {}
+		else if (index > 0)						{ update = true; index--; }
+		else if (offset > 0)					{ update = true; offset--; }
+		else if (g_OverScroll)					{ update = true; offset = items.size() - tiles; index = tiles - 1; }
 
 		if (update)
 		{
@@ -349,72 +397,95 @@ namespace JLM
 		if (g_WeightAltColor == 2 && !items.empty())
 		{
 			const auto item = (items.begin() + index + offset);
-			if (item != items.end()) weight += CdeclCall<Float64>(0x48EBC0,(*item)->form, g_player->isHardcore);
+			if (item < items.end()) weight += CdeclCall<Float64>(0x48EBC0, (*item)->form, g_player->isHardcore);
 		}
 
 		tileMain->SetFloat("_JLMWeightColor", weight > weightmax);
 
 	}
 
-	bool a = true;
-
 	void HandleTakeItem(ContChangesEntry* entry, bool all, bool keepowner, bool equip)
 	{
 		const auto form = entry->form->TryGetREFRParent();
-		if (entry->form->GetIsReference())
+		if (entry->form->GetIsReference()) {
 			g_player->HandlePickupItem(reinterpret_cast<TESObjectREFR*>(entry->form), all ? entry->countDelta : 1, keepowner);
-		else
-		{
-			container->RemoveItem(entry->form, entry->extendData ? entry->extendData->GetFirstItem() : nullptr, all ? entry->countDelta : 1, keepowner, 0, g_player, 0, 0, 1, 0);
-			g_player->PlayPickupPutdownSounds(entry->form, !equip, equip);
+			g_player->SendStealingAlarm((TESObjectREFR*)entry->form, false);
+		} else {
+			container->RemoveItem(entry->form, entry->extendData ? entry->extendData->GetFirstItem() : nullptr, all ? entry->countDelta : 1, !container->IsActor(), 0, g_player, 0, 0, 1, 0);
+			tookItem = container;
 		}
-		if (!keepowner && equip)
-		{
-			g_player->EquipItem(form);
-		}
+		if (!keepowner && equip) g_player->EquipItem(form);
 	}
 
-	void TakeItem()
+	void Action(UInt32 action)
 	{
-		if (items.empty()) return;
+		const auto keepowner = owned;
+
+		if (action == kActionTakeAll)
+		{
+			PlayGameSound("UIItemTakeAll");
+			if (items.empty()) return;
+			for (const auto item : items) HandleTakeItem(item, true, keepowner, false);
+			MajorUpdate();
+			return;
+		}
+
+		if (items.empty())
+		{
+			PlayGameSound("UIActivateNothing");
+			return;
+		}
 
 		const auto item = items.begin() + index + offset;
-		if (item == items.end()) return;
+		if (item >= items.end()) return;
 		const auto entry = *item;
 
-		bool keepowner = false;
 		bool takeall = false;
-		bool equip = false;
+		if (CdeclCall<Float64>(0x48EBC0, entry->form, g_player->isHardcore) < 0.02) takeall = true;
+		if (entry->countDelta > g_TakeSmartMin) takeall = true;
 
-		keepowner = container->IsCrimeOrEnemy();
+		g_player->PlayPickupPutdownSounds(entry->form, action != kActionEquip, action == kActionEquip);
+		HandleTakeItem(entry, takeall, keepowner, action == kActionEquip);
 
-		if (IsKeyPressed(42))
-		{
-			equip = true;
-			Log("AAA", 2);
-		}
-		{
-			if (CdeclCall<Float64>(0x48EBC0, entry->form, g_player->isHardcore) < 0.02) takeall = true;
-			if (entry->countDelta > g_TakeSmartMin) takeall = true;
-		}
-		HandleTakeItem(entry, takeall, keepowner, equip);
-
-		HandleScroll();
 		MajorUpdate();
+	}
+
+	void UpdateKeys()
+	{
+		const auto alt = keyAlt && IsKeyPressed(keyAlt, DIHookControl::kFlag_RawState) || buttonAlt && IsButtonPressed(buttonAlt);
+		owned = container->IsCrimeOrEnemy();
+
+		auto action = (alt ? g_Mode1Alt : g_Mode1) << 1;
+		if (action > 0) action -= !owned;
+		tileMain->SetFloat("_JLMAction1", action);
+
+		action = (alt ? g_Mode2Alt : g_Mode2) << 1;
+		if (action > 0) action -= !owned;
+		tileMain->SetFloat("_JLMAction2", action);
+
+		action = (alt ? g_Mode3Alt : g_Mode3) << 1;
+		if (action > 0) action -= !owned;
+		tileMain->SetFloat("_JLMAction3", action);
 	}
 
 	void OnRender()
 	{
 		if (!initialized) return;
 
-		UpdateContainer(InterfaceManager::GetSingleton()->crosshairRef);
+		UpdateContainer(!MenuMode() ? InterfaceManager::GetSingleton()->crosshairRef : nullptr);
 
 		if (container)
 		{
-			if (IsKeyPressed(0x28)) { if (a) { a = false; TakeItem(); } }
-			else a = true;
+			if (key1 && IsKeyPressed(key1, DIHookControl::kFlag_RawState) || button1 && IsButtonPressed(button1) ||
+				key2 && IsKeyPressed(key2, DIHookControl::kFlag_RawState) || button2 && IsButtonPressed(button2) ||
+				key3 && IsKeyPressed(key3, DIHookControl::kFlag_RawState) || button3 && IsButtonPressed(button3))
+			{
+				if (lockTake) { lockTake = false; container->Activate(g_player, 0, 0, 1); }
+			}
+			else lockTake = true;
 			Weight();
 			HandleScroll();
+			UpdateKeys();
 			if (g_HidePrompt) g_MenuHUDMain->tileInfo->SetFloat(kTileValue_visible, GetJIPAuxVarOrDefault("*_JAMInfoDisable", 0, 0) == 0);
 		}
 	}
@@ -436,9 +507,26 @@ namespace JLM
 		bool isActivationNotPrevented;
 	};
 
+	UInt32 ActionToTake()
+	{
+		const auto alt = keyAlt && IsKeyPressed(keyAlt, DIHookControl::kFlag_RawState) || buttonAlt && IsButtonPressed(buttonAlt);
+		if (key1 && IsKeyPressed(key1, DIHookControl::kFlag_RawState) || button1 && IsButtonPressed(button1)) return alt ? g_Mode1Alt : g_Mode1;
+		if (key2 && IsKeyPressed(key2, DIHookControl::kFlag_RawState) || button2 && IsButtonPressed(button2)) return alt ? g_Mode2Alt : g_Mode2;
+		if (key3 && IsKeyPressed(key3, DIHookControl::kFlag_RawState) || button3 && IsButtonPressed(button3)) return alt ? g_Mode3Alt : g_Mode3;
+		return kActionNone;
+	}
+
 	void OnPreActivate(TESObjectREFR* thisObj, void *parameters)
 	{
-		TakeItem();
 		const auto ptr = static_cast<ReferenceBool*>(parameters);
+		const auto action = ActionToTake();
+		if (!container || thisObj != container || ptr->ref != g_player || !ptr->isActivationNotPrevented || action == kActionOpen)
+		{
+			SetNativeHandlerFunctionBool(true);
+			return;
+		}
+		SetNativeHandlerFunctionBool(false);
+		if (action == kActionNone) return;
+		Action(action);
 	}
 }

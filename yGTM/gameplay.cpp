@@ -1,9 +1,9 @@
 #include <gameplay.h>
-#include <GameObjects.h>
-#include <GameRTTI.h>
-#include <GameProcess.h>
-#include <GameSettings.h>
-#include <GameExtraData.h>
+
+#include "GameProcess.h"
+#include "GameRTTI.h"
+#include "GameSettings.h"
+#include "settings.h"
 
 Float64 __cdecl AdjustPushForceAlt(Actor* target, ActorHitData* hitdata, ActorValueOwner* owner, SInt32 force)
 {
@@ -17,22 +17,53 @@ Float64 __cdecl AdjustPushForceAlt(Actor* target, ActorHitData* hitdata, ActorVa
 	return scale * CdeclCall<Float64>(0x646580, owner, force);
 }
 
-Float32 __fastcall SetSpreadForActor(Actor* actor) {
+Float32 __fastcall GetMinSpread(Actor* actor) {
 	const auto conditionTier = ThisStdCall<SInt32>(0x92B9E0, actor->baseProcess, actor);
     if (conditionTier > 9) return 0.5;
     const auto spreadArray = reinterpret_cast<Setting**>(0x119B2BC);
     const Setting* spreadSetting = spreadArray[conditionTier + 10];
     const float result = spreadSetting->data.f;
-	actor->flt178 = result;
+	actor->spreadWeapon = result;
     return result;
 }
 
+bool AlterSpread()
+{
+	return g_AlterSpread;
+}
+
+Float64 __fastcall AlterSpreadCalculation(Actor* actor, TESObjectWEAP* weapon, Float32 condition, char isAiming,
+	char isSneaking, char isWalking, char isRunning)
+{
+	const auto IronSightsBonus = GameSettingFromString("fGunSpreadIronSightsBase")->data.f + isAiming * GameSettingFromString("fGunSpreadIronSightsMult")->data.f;
+	const auto CrouchBonus = GameSettingFromString("fGunSpreadCrouchBase")->data.f + isSneaking * GameSettingFromString("fGunSpreadCrouchMult")->data.f;
+	const auto ConditionPenalty = GameSettingFromString("fGunSpreadCondBase")->data.f + condition * GameSettingFromString("fGunSpreadCondMult")->data.f;
+	const auto SkillBonus = 0; // GameSettingFromString("fGunSpreadSkillBase")->data.f + wah * GameSettingFromString("fGunSpreadSkillMult")->data.f;
+	const auto WalkPenalty = GameSettingFromString("fGunSpreadWalkBase")->data.f + isWalking * GameSettingFromString("fGunSpreadWalkMult")->data.f;
+	const auto RunPenalty = GameSettingFromString("fGunSpreadRunBase")->data.f + isRunning * GameSettingFromString("fGunSpreadRunMult")->data.f;
+	const auto ArmPenalty = 0; // GameSettingFromString("fGunSpreadArmBase")->data.f + wah * GameSettingFromString("fGunSpreadArmMult")->data.f;
+//	const auto NPCArmPenalty = GameSettingFromString("fGunSpreadNPCArmBase")->data.f + wah * GameSettingFromString("fGunSpreadNPCArmMult")->data.f;
+//	const auto HeadPenalty = GameSettingFromString("fGunSpreadHeadBase")->data.f + wah * GameSettingFromString("fGunSpreadHeadMult")->data.f;
+
+	return  (IronSightsBonus * CrouchBonus * (ConditionPenalty + SkillBonus) * (WalkPenalty + RunPenalty) + ArmPenalty);
+}
+
+Float64 __fastcall GetSpreadCondition(Actor* actor)
+{
+	if (actor->spreadHealthPercent < 0.0)
+	{
+		const auto entry = (ContChangesEntry*)actor->baseProcess->GetWeaponInfo();
+		actor->spreadHealthPercent = entry->GetHealthPercent(1) / 100.0;
+	}
+	return actor->spreadHealthPercent;
+}
+
+
 void __fastcall StoreAmmoOnProjectile(Projectile* projectile)
 {
-//	projectile->ammo = projectile->weapon->GetEquippedAmmo(static_cast<Actor*>(projectile->source));
-	const auto highProcess = reinterpret_cast<HighProcess*>(reinterpret_cast<Actor*>(projectile->source)->baseProcess);
-	if (!highProcess || !highProcess->ammoInfo) return;
-	projectile->ammo = highProcess->ammoInfo->ammo;
+	const auto process = reinterpret_cast<Actor*>(projectile->source)->baseProcess;
+	if (!process || !process->GetAmmoInfo()) return;
+	projectile->ammo = process->GetAmmoInfo()->ammo;
 }
 
 void __fastcall StoreAmmoOnExplosion(Projectile* projectile, Explosion* explosion)

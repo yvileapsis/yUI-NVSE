@@ -405,32 +405,12 @@ bool FormContainsRecusive(TESForm* parent, TESForm* child)
 	return false;
 }
 
-__declspec(naked) bool TESForm::IsItemPlayable()
+bool TESForm::IsItemPlayable()
 {
-	__asm
-	{
-		mov		al, [ecx + 4]
-		cmp		al, kFormType_TESObjectARMO
-		jz		armor
-		cmp		al, kFormType_TESObjectWEAP
-		jz		weapon
-		cmp		al, kFormType_TESAmmo
-		jz		ammo
-		mov		al, 1
-		retn
-	armor :
-		test[ecx + 0x78], 0x40
-		setz	al
-		retn
-	weapon :
-		test[ecx + 0x100], 0x80
-		setz	al
-		retn
-	ammo :
-		test[ecx + 0xA0], 2
-		setz	al
-		retn
-	}
+	if (this->typeID == kFormType_TESObjectWEAP && reinterpret_cast<TESObjectWEAP*>(this)->weaponFlags1 & 0x80) return false;
+	if (this->typeID == kFormType_TESObjectARMO && reinterpret_cast<TESObjectARMO*>(this)->bipedModel.bipedFlags & 0x40) return false;
+	if (this->typeID == kFormType_TESAmmo && reinterpret_cast<TESAmmo*>(this)->flags & 0x2) return false;
+	return true;
 }
 
 bool TESForm::IsInventoryObjectAlt()
@@ -555,15 +535,12 @@ TESPackage::LocationData* TESPackage::GetLocationData()
 
 bool TESPackage::IsFlagSet(UInt32 flag)
 {
-	return (packageFlags & flag) == flag;
+	return packageFlags & flag;
 }
 
 void TESPackage::SetFlag(UInt32 flag, bool bSet)
 {
-	if (bSet)
-		packageFlags |= flag;
-	else
-		packageFlags &= ~flag;
+	bSet ? packageFlags |= flag : packageFlags &= ~flag;
 
 	// handle either-or flags
 	switch (flag)

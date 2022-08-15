@@ -303,6 +303,33 @@ Float32 Actor::GetActorValue(ActorValueCode avcode)
 	return this->avOwner.GetActorValue(avcode);
 }
 
+void Actor::SendStealingAlarm(TESObjectREFR* container, bool checkItems)
+{
+	if (!checkItems) {
+		const auto owner = ThisStdCall<TESForm*>(0x567790, container); // TESObjectREFR::ResolveOwnership
+		if (!owner) return;
+		ThisStdCall(0x8BFA40, this, container, NULL, NULL, 1, owner); // Actor::HandleStealing,
+		return;
+	}
+	const auto owner = ThisStdCall<TESForm*>(0x567790, container); // TESObjectREFR::ResolveOwnership
+	if (!owner) return;
+	const auto xChanges = reinterpret_cast<ExtraContainerChanges*>(this->extraDataList.GetByType(kExtraData_ContainerChanges));
+	if (!xChanges || !xChanges->data || !xChanges->data->objList) return;
+
+	for (const auto entry : *xChanges->data->objList) {
+		if (!entry->extendData || !entry->form) continue;
+		for (const auto xData : *entry->extendData) {
+			if (xData && xData->HasType(kExtraData_Ownership)) {
+				const auto xOwn = reinterpret_cast<ExtraOwnership*>(xData->GetByType(kExtraData_Ownership));
+				if (xOwn->owner && xOwn->owner->refID == owner->refID) {
+					ThisStdCall(0x8BFA40, this, container, NULL, NULL, 1, owner); // Actor::HandleStealing
+					return;
+				}
+			}
+		}
+	}
+}
+
 
 bool TESObjectREFR::IsCrimeOrEnemy()
 {

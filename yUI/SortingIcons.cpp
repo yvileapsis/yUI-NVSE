@@ -624,17 +624,17 @@ namespace SI
 
 		TESForm* form1 = nullptr, * form2 = nullptr;
 
-		if (a1 && a1->form) form1 = a1->form;
-		if (a2 && a2->form) form2 = a2->form;
+		if (a1 && a1->form) form1 = a1->form->TryGetREFRParent();
+		if (a2 && a2->form) form2 = a2->form->TryGetREFRParent();
 
 		signed int cmp;
 
-		if (g_ySI_Sort && !g_ItemToCategory.empty())
+		if (g_ySI_Sort)
 		{
 			std::string tag1, tag2;
 
-			if (form1) tag1 = GetCategoryForItem(a1);
-			if (form2) tag2 = GetCategoryForItem(a2);
+			if (form1) tag1 = GetCategoryForItem(form1);
+			if (form2) tag2 = GetCategoryForItem(form2);
 
 			if (g_ySI_Categories && !g_Keyrings.empty())
 			{

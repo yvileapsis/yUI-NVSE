@@ -33,4 +33,11 @@ inline _JG_WorldToScreen JG_WorldToScreen;
 Float32 GetJIPAuxVarOrDefault(const char* auxvar, SInt32 index, Float32 def);
 Float32 SetJIPAuxVarOrDefault(const char* auxvar, SInt32 index, Float32 value);
 
+bool GetCannibalPrompt(TESObjectREFR* ref);
+
 bool IsKeyPressed(UInt32 key, UInt32 flags = 0);
+void DisableKey(UInt32 key, bool disable, UInt32 mask = 0);
+bool IsButtonPressed(UInt32 button);
+UInt32 GetControl(UInt32 whichControl, UInt32 type = kControlType_Keyboard);
+void SetNativeHandlerFunctionBool(bool trueorfalse);
+bool ToggleVanityWheel(bool toggle);

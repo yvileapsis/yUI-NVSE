@@ -69,7 +69,7 @@ void writePatch()
 {
 	patchTimeMult(g_yTM);
 	patchFixExplosionPushForce(g_FixExplosionPushForce);
-	patchRestoreSpreadGameSettings(g_RestoreSpreadGameSettings);
+	patchRestoreSpreadGameSettings(g_AlterSpread);
 	patchCorrectAmmoEffects(g_CorrectAmmoEffects);
 	patchCorrectMeltdownEffects(g_CorrectMeltdownEffects);
 	patchCorrectWeaponEffects(g_CorrectWeaponEffects);

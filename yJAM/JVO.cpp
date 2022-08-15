@@ -117,13 +117,6 @@ namespace JVO
 		if (linkDoor) target = linkDoor;
 
 		NiPoint3 in = *target->GetPos();
-		if (in.z == 0)
-		{
-			NiPoint2 ni2{ in.x, in.y };
-			Float32 ni1;
-			TES::GetSingleton()->GetTerrainHeight(&ni2, &ni1);
-			in.z = ni1 > 0 ? ni1 : g_player->GetPos()->z;
-		}
 		if (target->GetNiNode())
 		{
 			if (const auto niblock = target->GetNifBlock(0, "Bip01 Head"))
@@ -139,7 +132,13 @@ namespace JVO
 				in.z += center.z + offsetWorld;
 			}
 		}
-
+		if (in.z == 0)
+		{
+			NiPoint2 ni2{ in.x, in.y };
+			Float32 ni1;
+			TES::GetSingleton()->GetTerrainHeight(&ni2, &ni1);
+			in.z = ni1 > 0 ? ni1 : g_player->GetPos()->z;
+		}
 		const auto tile = CreateTileForVisualObjective(in);
 
 		tile->SetFloat("_JVOHostile", depth++);

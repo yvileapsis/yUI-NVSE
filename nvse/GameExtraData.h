@@ -1,6 +1,6 @@
 #pragma once
-#include <GameBSExtraData.h>
 #include <GameTypes.h>
+#include <GameBSExtraData.h>
 #include <GameForms.h>
 #include <GameSound.h>
 #include <vector>

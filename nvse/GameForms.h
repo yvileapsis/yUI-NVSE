@@ -4684,7 +4684,7 @@ public:
 	UInt8				pad[3];
 	float				animMult;				// 0F8
 	float				reach;					// 0FC
-	Bitfield8			weaponFlags1;			// 100
+	UInt8				weaponFlags1;			// 100
 	UInt8				handGrip;				// 101
 	UInt8				ammoUse;				// 102
 	UInt8				reloadAnim;				// 103
@@ -4701,7 +4701,7 @@ public:
 	float				minRange;				// 120
 	float				maxRange;				// 124
 	UInt32				onHit;					// 128
-	Bitfield32			weaponFlags2;			// 12C
+	UInt32				weaponFlags2;			// 12C
 	float				animAttackMult;			// 130
 	float				fireRate;				// 134
 	float				AP;						// 138
@@ -4788,11 +4788,11 @@ public:
 	UInt8				unk385[3];				// 385
 
 
-	bool					IsAutomatic() const { return weaponFlags1.IsSet(eFlag_IsAutomatic); }
-	void					SetIsAutomatic(bool bAuto) { weaponFlags1.Write(eFlag_IsAutomatic, bAuto); }
-	bool					HasScope() const { return weaponFlags1.IsSet(eFlag_HasScope); }
-	bool					IsNonPlayable() { return weaponFlags1.IsSet( 0x80 ); }
-	bool					IsPlayable() { return !IsNonPlayable(); }
+	bool					IsAutomatic() const { return weaponFlags1 & (eFlag_IsAutomatic); }
+	void					SetIsAutomatic(bool bAuto) { bAuto ? weaponFlags1 |= eFlag_IsAutomatic : weaponFlags1 &= ~eFlag_IsAutomatic; }
+
+	bool					HasScope() const { return weaponFlags1 & (eFlag_HasScope); }
+	bool					IsNonPlayable() { return weaponFlags1 & ( 0x80 ); }
 	UInt8					HandGrip() const;
 	void					SetHandGrip(UInt8 handGrip);
 	UInt8					AttackAnimation() const;
@@ -4803,8 +4803,8 @@ public:
 	__forceinline Float32	GetItemModValue2(UInt8 which)	{ which -= 1; ASSERT(which < 3); return value2Mod[which]; }
 	Float32					GetEffectModValue(kWeaponModEffects value, UInt8 second = 0);
 
-	void					SetPlayable(bool doset) { weaponFlags1.Write(Eflag_NonPlayable, !doset); }
-	bool					HasNightVision() const { return weaponFlags2.IsSet(eFlag_NightVision); }
+	void					SetPlayable(bool bAuto) { bAuto ? weaponFlags1 |= Eflag_NonPlayable : weaponFlags1 &= ~Eflag_NonPlayable; }
+	bool					HasNightVision() const { return weaponFlags2 & eFlag_NightVision; }
 	bool					IsMeleeWeapon();
 	bool					IsRangedWeapon();
 	void					SetAttackAnimation(UInt32 attackAnim);
@@ -4813,10 +4813,10 @@ public:
 	bool					CanEquipAmmo(TESAmmo* ammo);
 	bool					IsThrownWeapon() { return eWeaponType >= kWeapType_OneHandGrenade; };
 	BGSListForm*			GetAmmoList();
-	__forceinline bool		IgnoresDTDR() const { return weaponFlags1.IsSet(eFlag_IgnoresNormalWeapResist); }
+	__forceinline bool		IgnoresDTDR() const { return weaponFlags1 & eFlag_IgnoresNormalWeapResist; }
 
 	float					GetWeaponValue(UInt32 whichVal);
-	__forceinline bool		HasScopeAlt() const { return weaponFlags1.IsSet(eFlag_HasScope) && !weaponFlags2.IsSet(eFlag_ScopeFromMod); }
+	__forceinline bool		HasScopeAlt() const { return weaponFlags1 & (eFlag_HasScope) && !(weaponFlags2 & eFlag_ScopeFromMod); }
 	__forceinline TESAmmo*	GetEquippedAmmo(Actor* actor) { return ThisCall<TESAmmo*>(0x525980, this, actor); }
 };
 static_assert(sizeof(TESObjectWEAP) == 0x388);

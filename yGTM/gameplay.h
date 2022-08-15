@@ -1,5 +1,7 @@
 #pragma once
+#include "GameObjects.h"
 #include "GameExtraData.h"
+
 Float64 __cdecl AdjustPushForceAlt(Actor* target, ActorHitData* hitdata, ActorValueOwner* owner, SInt32 force);
 
 template <UInt32 retn> __declspec(naked) void HitKnockbackHook()
@@ -18,15 +20,58 @@ template <UInt32 retn> __declspec(naked) void HitKnockbackHook()
 	}
 }
 
-Float32 __fastcall SetSpreadForActor(Actor* actor);
-
-template <UInt32 retn> __declspec(naked) void RestoreSpreadHook() {
+Float32 __fastcall GetMinSpread(Actor* actor);
+template <UInt32 retn> __declspec(naked) void RestoreMinSpreadHook() {
 	static const auto retnAddr = retn;
-	static const auto SpreadFunc = SetSpreadForActor;
 	__asm {
-		call SpreadFunc
+		call GetMinSpread
 		fstp[ebp - 0x10]
 		jmp retnAddr
+	}
+}
+
+Float64 __fastcall GetSpreadCondition(Actor* actor);
+template <UInt32 retn> __declspec(naked) void RestoreSpreadConditionHook() {
+	static const auto retnAddr = retn;
+	__asm {
+		mov ecx, [ebp - 0x20]
+		call GetSpreadCondition
+		jmp retnAddr
+	}
+}
+
+bool AlterSpread();
+Float64 __fastcall AlterSpreadCalculation(Actor* actor, TESObjectWEAP* weapon, Float32 condition, char isAiming, char isSneaking, char isWalking, char isRunning);
+template <UInt32 retn1, UInt32 retn2> __declspec(naked) void AlterSpreadHook() {
+	static const auto retnAddr1 = retn1;
+	static const auto retnAddr2 = retn2;
+	__asm {
+		call AlterSpread
+		test al, al
+		jz no
+
+		movzx eax, [ebp + 0x20] // running
+		push eax
+		movzx eax, [ebp + 0x1C] // walking
+		push eax
+		movzx ecx, [ebp + 0x18] // sneaking
+		push ecx
+		movzx edx, [ebp + 0x14] // aiming
+		push edx
+		mov eax, [ebp + 0x10] // condition
+		push eax
+		mov edx, [ebp + 0x0C] // weapon
+		mov ecx, [ebp + 0x08] // actor
+
+		call AlterSpreadCalculation
+		fstp [ebp - 0x24]
+
+		jmp retnAddr2
+
+	no:
+		movzx ecx, [ebp + 0x18]
+		test ecx, ecx
+		jmp retnAddr1
 	}
 }
 

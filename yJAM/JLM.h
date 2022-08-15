@@ -4,31 +4,39 @@ inline UInt32	g_JLM					= 1;
 
 namespace JLM
 {
-	
-	inline UInt32	g_Key1				= 18;
-	inline UInt32	g_Key2				= 19;
-	inline UInt32	g_Key3				= 20;
+	enum
+	{
+		kActionNone			= 0,
+		kActionTake			= 1,
+		kActionEquip		= 2,
+		kActionTakeAll		= 3,
+		kActionOpen			= 4,
+	};
+
+	inline UInt32	g_Key1				= 0;
+	inline UInt32	g_Key2				= 0;
+	inline UInt32	g_Key3				= 0;
 	inline UInt32	g_KeyAlt			= 42;
 	inline UInt32	g_KeyScrollUp		= 264;
 	inline UInt32	g_KeyScrollDown		= 265;
 
-	inline UInt32	g_Button1			= 0x1000;
-	inline UInt32	g_Button2			= 0x4000;
+	inline UInt32	g_Button1			= 0;
+	inline UInt32	g_Button2			= 0;
 	inline UInt32	g_Button3			= 0;
 	inline UInt32	g_ButtonAlt			= 0x2;
 
-	inline UInt32	g_TakeModeSimple	= 0x0;
-	inline UInt32	g_TakeModeStack		= 0x0;
-	inline UInt32	g_TakeModeSmart		= 0x1;
-	inline UInt32	g_TakeModeEquip		= 0x2;
-	inline UInt32	g_TakeModeOpen		= 0x3;
-	inline UInt32	g_TakeModeAll		= 0x4;
+	inline UInt32	g_Mode1				= 0x1;
+	inline UInt32	g_Mode1Alt			= 0x2;
+	inline UInt32	g_Mode2				= 0x4;
+	inline UInt32	g_Mode2Alt			= 0x3;
+	inline UInt32	g_Mode3				= 0x0;
+	inline UInt32	g_Mode3Alt			= 0x0;
 
 	inline UInt32	g_TakeSmartMin		= 5;
 	inline UInt32	g_TakeWeightless	= 1;
 
 	inline UInt32	g_Block				= 0;
-	inline UInt32	g_LegacyMode		= 0;
+	inline UInt32	g_OverScroll		= 0;
 	inline UInt32	g_HidePrompt		= 1;
 	inline UInt32	g_HideName			= 0;
 	inline UInt32	g_ItemsMax			= 5;

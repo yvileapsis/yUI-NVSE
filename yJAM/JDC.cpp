@@ -175,7 +175,7 @@ namespace JDC
 			const auto weaponSpread = g_player->GetCalculatedSpread(0);
 			const auto playerSpread = g_player->GetCalculatedSpread(1);
 
-			totalSpread = weaponSpread + 10 * playerSpread;
+			totalSpread = weaponSpread + 6.75 * playerSpread;
 
 			if (totalSpread < 0) totalSpread = 0;
 			if (totalSpread > 1.5) totalSpread = 1.5;

@@ -63,8 +63,9 @@ void patchRestoreSpreadGameSettings(const bool bEnable)
 {
 	if (bEnable) {
 
-		WriteRelJump(0x8B0E54, RestoreSpreadHook<0x8B0E65>);
-
+		WriteRelJump(0x8B0E54, RestoreMinSpreadHook<0x8B0E65>);
+		WriteRelJump(0x8B0EEE, RestoreSpreadConditionHook<0x8B0F01>);
+		WriteRelJump(0x64695B, AlterSpreadHook<0x646961, 0x646CA3>);
 	}
 	else {
 
