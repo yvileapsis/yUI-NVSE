@@ -41,7 +41,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\..\nvse;$(SolutionDir)\..\nvse"
+				AdditionalIncludeDirectories="$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\..\nvse;$(SolutionDir)\..\game"
 				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;yUI_EXPORTS;RUNTIME_VERSION=0x040020D0;RUNTIME"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
@@ -120,7 +120,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\..\nvse;$(SolutionDir)\..\nvse"
+				AdditionalIncludeDirectories="$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\..\nvse;$(SolutionDir)\..\game"
 				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;yUI_EXPORTS;RUNTIME_VERSION=0x040020D0;RUNTIME"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
@@ -182,111 +182,111 @@
 			Name="nvse"
 			>
 			<File
-				RelativePath="..\nvse\GameAPI.cpp"
+				RelativePath="..\game\GameAPI.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameAPI.h"
+				RelativePath="..\game\GameAPI.h"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameBSExtraData.cpp"
+				RelativePath="..\game\GameBSExtraData.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameBSExtraData.h"
+				RelativePath="..\game\GameBSExtraData.h"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameData.cpp"
+				RelativePath="..\game\GameData.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameData.h"
+				RelativePath="..\game\GameData.h"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameEffects.h"
+				RelativePath="..\game\GameEffects.h"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameExtraData.cpp"
+				RelativePath="..\game\GameExtraData.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameExtraData.h"
+				RelativePath="..\game\GameExtraData.h"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameForms.cpp"
+				RelativePath="..\game\GameForms.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameForms.h"
+				RelativePath="..\game\GameForms.h"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameMenus.h"
+				RelativePath="..\game\GameMenus.h"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameObjects.cpp"
+				RelativePath="..\game\GameObjects.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameObjects.h"
+				RelativePath="..\game\GameObjects.h"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameOSDepend.cpp"
+				RelativePath="..\game\GameOSDepend.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameOSDepend.h"
+				RelativePath="..\game\GameOSDepend.h"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameRTTI.cpp"
+				RelativePath="..\game\GameRTTI.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameRTTI.h"
+				RelativePath="..\game\GameRTTI.h"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameScript.cpp"
+				RelativePath="..\game\GameScript.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameSettings.cpp"
+				RelativePath="..\game\GameSettings.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameSettings.h"
+				RelativePath="..\game\GameSettings.h"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameTasks.cpp"
+				RelativePath="..\game\GameTasks.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameTasks.h"
+				RelativePath="..\game\GameTasks.h"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameTiles.cpp"
+				RelativePath="..\game\GameTiles.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameTiles.h"
+				RelativePath="..\game\GameTiles.h"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameTypes.cpp"
+				RelativePath="..\game\GameTypes.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\GameTypes.h"
+				RelativePath="..\game\GameTypes.h"
 				>
 			</File>
 			<File

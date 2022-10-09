@@ -3,6 +3,7 @@
 #include <SimpleINILibrary.h>
 
 #include "dinput8.h"
+#include "NiObjects.h"
 
 namespace JLM
 {
@@ -43,7 +44,7 @@ namespace JLM
 	bool				lockTake			= true;
 
 	TESObjectREFR*		tookItem			= nullptr;
-	bool				openedContainer		= false;
+	TESObjectREFR*		openedContainer		= nullptr;
 
 	void Initialize()
 	{
@@ -175,34 +176,14 @@ namespace JLM
 
 	void Display()
 	{
-		Float64 y = 0;
-		Float64 x = 0;
-		tiles = 0;
-
-		if (g_HidePrompt) g_MenuHUDMain->tileInfo->SetFloat(kTileValue_visible, GetJIPAuxVarOrDefault("*_JAMInfoDisable", 0, 0) == 0);
-
-		if (!container)
-		{
-			tileMain->SetFloat("_JLMVisible", 0);
-			ToggleVanityWheel(true);
-			if (key1) DisableKey(key1, false);
-			if (key2) DisableKey(key2, false);
-			if (key3) DisableKey(key3, false);
-			if (keyAlt) DisableKey(keyAlt, false);
-			return;
-		}
-		ToggleVanityWheel(false);
-		if (key1) DisableKey(key1, true);
-		if (key2) DisableKey(key2, true);
-		if (key3) DisableKey(key3, true);
-		if (keyAlt) DisableKey(keyAlt, true);
-
-		owned = container->IsCrimeOrEnemy();
-		tileMain->SetString("_JLMTitle", container->GetTheName());
-		tileMain->SetFloat("_JLMSystemColor", 1 + owned);
-		tileMain->SetFloat("_JLMAlphaAC", g_MenuHUDMain->tileActionPointsMeterText1->GetFloat(kTileValue_alpha));
+		if (offset + tiles > items.size()) { offset = items.size() > tiles ? items.size() - tiles : 0; }
 
 		auto item = items.begin() + offset;
+
+		Float64 y = 0;
+		Float64 x = 0;
+
+		tiles = 0;
 
 		for (const auto fst : tileMain->GetChild("JLMContainer")->children)
 		{
@@ -217,12 +198,6 @@ namespace JLM
 			++item;
 
 			fst->SetFloat(kTileValue_y, y);
-
-			fst->SetFloat("_JLMActive", tiles == index);
-			if (tiles == index)
-			{
-				// TODO: send out event
-			}
 
 			std::string string = snd->form->GetTheName();
 
@@ -256,13 +231,17 @@ namespace JLM
 		tileMain->SetFloat("_JLMItemHeightCur", y);
 		tileMain->SetFloat("_JLMItemWidthCur", x);
 
-		if (offset > items.size() - tiles) { offset = items.size() - tiles > 0 ? items.size() - tiles : 0; }
-		if (index > tiles) { index = tiles; }
+		if (index > tiles - 1) { index = tiles - 1; }
 
-		tileMain->SetFloat("_JLMArrowUp", offset > 0);
-		tileMain->SetFloat("_JLMArrowDown", offset < items.size() - tiles);
-
-		tileMain->SetFloat("_JLMVisible", 1);
+		UInt32 i = 0;
+		for (const auto fst : tileMain->GetChild("JLMContainer")->children) {
+			fst->SetFloat("_JLMActive", i == index);
+			if (i == index)
+			{
+				// TODO: send out event
+			}
+			i++;
+		}
 	}
 
 
@@ -292,7 +271,36 @@ namespace JLM
 			info = !info;
 			SetJIPAuxVarOrDefault("*_JAMInfoDisable", 0, (!info ? -1 : 1) + GetJIPAuxVarOrDefault("*_JAMInfoDisable", 0, 0));
 		}
+
+		if (g_HidePrompt) g_MenuHUDMain->tileInfo->SetFloat(kTileValue_visible, GetJIPAuxVarOrDefault("*_JAMInfoDisable", 0, 0) == 0);
+
+		if (!container)
+		{
+			tileMain->SetFloat("_JLMVisible", 0);
+			ToggleVanityWheel(true);
+			if (key1) DisableKey(key1, false);
+			if (key2) DisableKey(key2, false);
+			if (key3) DisableKey(key3, false);
+			if (keyAlt) DisableKey(keyAlt, false);
+			return;
+		}
+		ToggleVanityWheel(false);
+		if (key1) DisableKey(key1, true);
+		if (key2) DisableKey(key2, true);
+		if (key3) DisableKey(key3, true);
+		if (keyAlt) DisableKey(keyAlt, true);
+
+		owned = container->IsCrimeOrEnemy();
+		tileMain->SetString("_JLMTitle", container->GetTheName());
+		tileMain->SetFloat("_JLMSystemColor", 1 + owned);
+		tileMain->SetFloat("_JLMAlphaAC", g_MenuHUDMain->tileActionPointsMeterText1->GetFloat(kTileValue_alpha));
+
 		Display();
+
+		tileMain->SetFloat("_JLMArrowUp", offset > 0);
+		tileMain->SetFloat("_JLMArrowDown", offset < items.size() - tiles);
+
+		tileMain->SetFloat("_JLMVisible", 1);
 	}
 
 
@@ -310,8 +318,8 @@ namespace JLM
 
 	void HandleContainerChange(TESObjectREFR* container, TESObjectREFR* newcontainer)
 	{
-		if (tookItem) g_player->SendStealingAlarm(tookItem, true);
-		tookItem = nullptr;
+		if (tookItem) { g_player->SendStealingAlarm(tookItem, true); tookItem = nullptr; }
+		if (openedContainer) { container->OpenCloseContainer(false, g_Sounds & 0x1); openedContainer = nullptr; }
 
 		offset = 0;
 		index = 0;
@@ -349,6 +357,9 @@ namespace JLM
 	void MainLoop()
 	{
 		if (!initialized) return;
+
+		if (MenuMode()) UpdateContainer(nullptr);
+
 		notcannibal2 = ref ? GetCannibalPrompt(ref) : true;
 		owned2 = ref ? ref->IsCrimeOrEnemy() : false;
 	}
@@ -411,14 +422,17 @@ namespace JLM
 			g_player->HandlePickupItem(reinterpret_cast<TESObjectREFR*>(entry->form), all ? entry->countDelta : 1, keepowner);
 			g_player->SendStealingAlarm((TESObjectREFR*)entry->form, false);
 		} else {
-			container->RemoveItem(entry->form, entry->extendData ? entry->extendData->GetFirstItem() : nullptr, all ? entry->countDelta : 1, !container->IsActor(), 0, g_player, 0, 0, 1, 0);
+			container->RemoveItem(entry->form, entry->extendData ? entry->extendData->GetFirstItem() : nullptr, (all ||  form->typeID == kFormType_TESAmmo) ? entry->countDelta : 1, !container->IsActor(), 0, g_player, 0, 0, 1, 0);
 			tookItem = container;
 		}
 		if (!keepowner && equip) g_player->EquipItem(form);
 	}
 
+
 	void Action(UInt32 action)
 	{
+		if (!openedContainer) { container->OpenCloseContainer(true, g_Sounds & 0x1); openedContainer = container; }
+
 		const auto keepowner = owned;
 
 		if (action == kActionTakeAll)
@@ -529,4 +543,5 @@ namespace JLM
 		if (action == kActionNone) return;
 		Action(action);
 	}
+
 }

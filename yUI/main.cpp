@@ -1,18 +1,4 @@
 #include <main.h>
-#include <functions.h>
-#include <patches.h>
-#include <commands.h>
-#include <settings.h>
-#include <SortingIcons.h>
-#include <ConfigurationMenu.h>
-
-#define yUI_VERSION 1.4
-#define yUI_VERSION_STR "1.4d"
-#define yUI_STR "yUI"
-
-PluginHandle	g_pluginHandle = kPluginHandle_Invalid;
-
-extern float g_flt178, g_flt17C, g_flt180, g_flt184;
 
 void MessageHandler(NVSEMessagingInterface::Message* msg)
 {
@@ -22,42 +8,28 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 		g_dataHandler = DataHandler::GetSingleton();
 		Log(FormatString("%s", yUI_VERSION_STR), 2);
 
-		PrintAndClearQueuedConsoleMessages();
-		FillCraftingComponents();
+		ConsolePrintQueue();
 
-		if (g_ySI_Sort || g_ySI_Icons || g_ySI_Hotkeys || g_ySI_Categories) LoadSIMapsFromFiles();
+		// call all deferred init functions
+		for (const auto& i : deferredInit) i();
 	}
 	else if (msg->type == NVSEMessagingInterface::kMessage_MainGameLoop)
 	{
-		if (g_FixTablineSelected) FixTablineSelected();
-		if (g_FixReorderMCM) FixReorderMCM();
-		if (g_ySI_Categories) SI::KeyringRefreshPostStewie();
+		// call all mainloop functions
+		for (const auto& i : mainLoop) i();
 
-		if (iDoOnce == 0 && !CdeclCall<bool>(0x702360)) {
+		if (!iDoOnce && !CdeclCall<bool>(0x702360)) {
 			iDoOnce++;
-//			SetNativeEventHandler("OnAdd", reinterpret_cast<EventHandler>(SI::TestFunc));
-//			SetNativeEventHandler("OnDrop", reinterpret_cast<EventHandler>(SI::TestFunc));
 
-			if (g_ySI_Icons) SI::InjectTemplates();
+			// call all do once functions
+			for (const auto& i : mainLoopDoOnce) i();
 		}
-		
 	}
-}
-
-void writePatches()
-{
-	patchSortingHooks		(g_FixIndefiniteSorting || (g_ySI && g_ySI_Sort));
-	patchFixDroppedItems	(g_FixDroppedItems);
-	patchAddIcons			(g_ySI && g_ySI_Icons);
-	patchReplaceHotkeyIcons	(g_ySI && g_ySI_Hotkeys);
-	patchSortingCategories	(g_ySI && g_ySI_Categories);
-	patchMatchedCursor		(g_yMC);
-	patchSortingTabs		(true);
 }
 
 bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 {
-	gLog.Create("yUI.log");
+	gLog.Create(yUI_LOG);
 	gLog.SetModString(yUI_STR);
 	Log("Query", 1);
 
@@ -99,9 +71,7 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	g_messagingInterface = static_cast<NVSEMessagingInterface*>(nvse->QueryInterface(kInterface_Messaging));
 	g_messagingInterface->RegisterListener(g_pluginHandle, "NVSE", MessageHandler);
 
-	nvse->SetOpcodeBase(0x21D0);
-	REG_CMD_STR(ySIGetTrait);
-	REG_CMD(ySISetTrait);
+	Inits();
 
 	if (nvse->isEditor)	return true;
 
@@ -124,17 +94,8 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	SetNativeEventHandler = g_eventInterface->SetNativeEventHandler;
 	RemoveNativeEventHandler = g_eventInterface->RemoveNativeEventHandler;
 
-/*
-	RegisterTraitID("&runsnig;", 2032);
-	RegisterTraitID("runsnig", 2032);
-	WriteRelJump(0xA095D1, reinterpret_cast<UInt32>(funpatch));
-*/
-	if (g_FixReorderMCM) WriteMCMHooks();
-
-//	CaptureLambdaVars = static_cast<_CaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaSaveVariableList));
-//	UncaptureLambdaVars = static_cast<_UncaptureLambdaVars>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_LambdaUnsaveVariableList));
-	handleINIOptions();
-	writePatches();
+	// call all plugin load functions
+	for (const auto& i : pluginLoad) i();
 
 	return true;
 }

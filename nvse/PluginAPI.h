@@ -3,20 +3,13 @@
 #include <GameAPI.h>
 #include <Utilities.h>
 
-struct CommandInfo;
-struct ParamInfo;
-class TESObjectREFR;
-class Script;
-class TESForm;
-struct ScriptEventList;
-struct ArrayKey;
 namespace PluginAPI { class ArrayAPI; }
-struct PluginInfo;
 
 typedef UInt32	PluginHandle;	// treat this as an opaque type
 
-#define REG_CMD(name)				nvse->RegisterCommand(&kCommandInfo_ ##name)
-#define REG_CMD_STR(name)			nvse->RegisterTypedCommand(&kCommandInfo_##name, kRetnType_String)
+#define SET_OPCODE_BASE(base)		g_nvseInterface->SetOpcodeBase(##base)
+#define REG_CMD(name)				g_nvseInterface->RegisterCommand(&kCommandInfo_ ##name)
+#define REG_CMD_STR(name)			g_nvseInterface->RegisterTypedCommand(&kCommandInfo_##name, kRetnType_String)
 
 enum
 {
@@ -938,3 +931,38 @@ typedef bool (* _NVSEPlugin_Load)(const NVSEInterface * nvse);
  *	previous implementations.
  *	
  ******************************************************************************/
+
+typedef void				(*EventHandler)(TESObjectREFR* thisObj, void* parameters);
+typedef bool				(*_ExtractArgsEx)(COMMAND_ARGS_EX, ...);
+typedef bool				(*_ExtractFormatStringArgs)(UInt32 fmtStringPos, char* buffer, COMMAND_ARGS_EX, UInt32 maxParams, ...);
+typedef bool				(*_HasScriptCommand)(Script* script, CommandInfo* info, CommandInfo* eventBlock);
+typedef CommandInfo*		(*_GetByOpcode)(UInt32 opcode);
+typedef const char*			(*_GetStringVar)(UInt32 var);
+typedef void				(*_SetStringVar)(UInt32, const char*);
+typedef bool				(*_AssignString)(ParamInfo*, void*, TESObjectREFR*, TESObjectREFR*, Script*, ScriptEventList*, double*, UInt32*, const char*);
+typedef	bool				(*_SetNativeEventHandler)(const char* eventName, EventHandler func);
+typedef bool				(*_RemoveNativeEventHandler)(const char* eventName, EventHandler func);
+typedef bool				(*_RegisterEvent)(const char* name, UInt8 numParams, SInt8* paramTypes, UInt32 flags);
+typedef bool				(*_DispatchEvent)(const char* eventName, TESObjectREFR* thisObj, ...);
+typedef bool				(*_CallFunctionAlt)(Script* funcScript, TESObjectREFR* callingObj, UInt8 numArgs, ...);
+typedef Script*				(*_CompileScript)(const char* scriptText);
+typedef Script*				(*_CompileExpression)(const char* expression);
+
+inline _ExtractArgsEx				ExtractArgsEx;
+inline _ExtractFormatStringArgs		ExtractFormatStringArgs;
+inline _HasScriptCommand			HasScriptCommand;
+inline _GetByOpcode					GetByOpcode;
+inline _GetStringVar				GetStringVar;
+inline _SetStringVar				SetStringVar;
+inline _AssignString				AssignString;
+inline _SetNativeEventHandler		SetNativeEventHandler;
+template <typename T> void __forceinline SetEventHandler(const char* eventName, T func)
+{ SetNativeEventHandler(eventName, reinterpret_cast<EventHandler>(func)); }
+inline _RemoveNativeEventHandler	RemoveNativeEventHandler;
+template <typename T> void __forceinline RemoveEventHandler(const char* eventName, T func)
+{ RemoveNativeEventHandler(eventName, reinterpret_cast<EventHandler>(func)); }
+inline _RegisterEvent				RegisterEvent;
+inline _DispatchEvent				DispatchEvent;
+inline _CallFunctionAlt				CallFunctionAlt;
+inline _CompileScript				CompileScript;
+inline _CompileExpression			CompileExpression;

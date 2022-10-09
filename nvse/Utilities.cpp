@@ -6,17 +6,14 @@
 #include <vector>
 
 #include <GameData.h>
-#include <PluginAPI.h>
-#include <PluginManager.h>
 
 #include <GameAPI.h>
 #include <GameForms.h>
 #include <GameScript.h>
-#include <settings.h>
-
-//#include <codecvt>
-//#include <locale>
 #include <stringapiset.h>
+
+#include "ConsoleManager.h"
+#include "InterfaceManager.h"
 
 std::vector<std::string> queuedConsoleMessages;
 
@@ -224,7 +221,7 @@ void PrintLog(const char* fmt, ...)
 	va_end(args);
 }
 
-void PrintAndClearQueuedConsoleMessages()
+void ConsolePrintQueue()
 {
 	for (const auto& iter : queuedConsoleMessages)
 		PrintConsole("%s: %s", gLog.GetModString().c_str(), iter.c_str());
@@ -233,7 +230,7 @@ void PrintAndClearQueuedConsoleMessages()
 
 extern DataHandler* g_dataHandler;
 
-void ConsoleQueueOrPrint(const std::string& msg)
+void PrintConsoleOrQueue(const std::string& msg)
 {
 	if (*reinterpret_cast<ConsoleManager**>(0x11D8CE8) || g_dataHandler) // g_dataHandler will be non-null if Deferred init has been called
 		PrintConsole("%s: %s", gLog.GetModString().c_str(), msg.c_str());
@@ -241,11 +238,13 @@ void ConsoleQueueOrPrint(const std::string& msg)
 		queuedConsoleMessages.push_back(msg);
 }
 
+inline int							g_logLevel = 0;
+
 void Log(const std::string& msg, UInt32 loglevel)
 {
 	if (loglevel == 0) loglevel = g_logLevel;
 	if (loglevel >= 1) PrintLog("%s", msg.c_str());
-	if (loglevel >= 2) ConsoleQueueOrPrint(msg);
+	if (loglevel >= 2) PrintConsoleOrQueue(msg);
 }
 
 void DumpClass(void* theClassPtr, UInt32 nIntsToDump)
@@ -930,16 +929,6 @@ void GeckExtenderMessageLog(const char* fmt, ...)
 	SendMessage(window, 0x8004, 0, reinterpret_cast<LPARAM>(buffer));
 }
 
-bool Cmd_Default_Execute(COMMAND_ARGS)
-{
-	return true;
-}
-
-bool Cmd_Default_Eval(COMMAND_ARGS_EVAL)
-{
-	return true;
-}
-
 memcpy_t _memcpy = memcpy, _memmove = memmove;
 
 __declspec(naked) int __vectorcall ifloor(float value)
@@ -1359,7 +1348,7 @@ std::string GetCurPath()
 {
 	char buffer[MAX_PATH] = { 0 };
 	GetModuleFileName(nullptr, buffer, MAX_PATH);
-	std::string::size_type pos = std::string(buffer).find_last_of("\\/");
+	const std::string::size_type pos = std::string(buffer).find_last_of("\\/");
 	return std::string(buffer).substr(0, pos);
 }
 

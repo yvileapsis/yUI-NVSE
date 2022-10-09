@@ -154,9 +154,10 @@ public:
 
 extern DebugLog gLog;
 
+void ConsolePrintQueue();
+void PrintConsoleOrQueue(const std::string& msg);
+
 void PrintLog(const char* fmt, ...);
-void PrintAndClearQueuedConsoleMessages();
-void ConsoleQueueOrPrint(const std::string& msg);
 void Log(const std::string& msg, UInt32 loglevel = 0);
 
 class Script;

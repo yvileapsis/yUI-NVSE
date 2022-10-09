@@ -2,13 +2,8 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="dllmain.c" />
-    <ClCompile Include="LambdaVariableContext.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="functions.cpp" />
-    <ClCompile Include="patches.cpp" />
-    <ClCompile Include="settings.cpp" />
-    <ClCompile Include="ConfigurationMenu.cpp" />
-    <ClCompile Include="SortingIcons.cpp" />
     <ClCompile Include="..\nvse\printf.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
@@ -18,115 +13,98 @@
     <ClCompile Include="..\nvse\Utilities.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="..\nvse\GameAPI.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
-    <ClCompile Include="..\nvse\GameBSExtraData.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
-    <ClCompile Include="..\nvse\GameData.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
-    <ClCompile Include="..\nvse\GameExtraData.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
-    <ClCompile Include="..\nvse\GameForms.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
-    <ClCompile Include="..\nvse\GameObjects.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
-    <ClCompile Include="..\nvse\GameOSDepend.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
-    <ClCompile Include="..\nvse\GameRTTI.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
-    <ClCompile Include="..\nvse\GameScript.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
-    <ClCompile Include="..\nvse\GameSettings.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
-    <ClCompile Include="..\nvse\GameSound.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
-    <ClCompile Include="..\nvse\GameTasks.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
-    <ClCompile Include="..\nvse\GameTiles.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
-    <ClCompile Include="..\nvse\GameTypes.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
-    <ClCompile Include="..\nvse\GameUI.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
-    <ClCompile Include="commands.cpp" />
     <ClCompile Include="..\nvse\dinput8.cpp">
       <Filter>nvse</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigurationMenu\ConfigurationMenu.cpp">
+      <Filter>features\ConfigurationMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="SortingIcons\SI.cpp">
+      <Filter>features\SortingIcons</Filter>
+    </ClCompile>
+    <ClCompile Include="SortingIcons\SIFiles.cpp">
+      <Filter>features\SortingIcons</Filter>
+    </ClCompile>
+    <ClCompile Include="SortingIcons\SIIcons.cpp">
+      <Filter>features\SortingIcons</Filter>
+    </ClCompile>
+    <ClCompile Include="SortingIcons\SISorting.cpp">
+      <Filter>features\SortingIcons</Filter>
+    </ClCompile>
+    <ClCompile Include="SortingIcons\SIPatches.cpp">
+      <Filter>features\SortingIcons</Filter>
+    </ClCompile>
+    <ClCompile Include="SortingIcons\SICommands.cpp">
+      <Filter>features\SortingIcons</Filter>
+    </ClCompile>
+    <ClCompile Include="MiscFeatures\FixDroppedItems.cpp">
+      <Filter>features</Filter>
+    </ClCompile>
+    <ClCompile Include="MiscFeatures\FixTablineSelected.cpp">
+      <Filter>features</Filter>
+    </ClCompile>
+    <ClCompile Include="MiscFeatures\PatchMatchedCursor.cpp">
+      <Filter>features</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\GameAPI.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\GameBSExtraData.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\GameData.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\GameExtraData.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\GameForms.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\GameObjects.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\GameOSDepend.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\GameRTTI.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\GameScript.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\GameSettings.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\GameSound.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\GameTasks.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\InterfaceTiles.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\GameTypes.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\InterfaceMenus.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\ConsoleManager.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\SaveLoadGame.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\InterfaceManager.cpp">
+      <Filter>game</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h" />
-    <ClInclude Include="ConfigurationMenu.h" />
-    <ClInclude Include="patches.h" />
-    <ClInclude Include="settings.h" />
-    <ClInclude Include="LambdaVariableContext.h" />
+    <ClInclude Include="definitions.h" />
     <ClInclude Include="main.h" />
-    <ClInclude Include="SortingIcons.h" />
-    <ClInclude Include="..\nvse\GameAPI.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\GameBSExtraData.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\GameData.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\GameEffects.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\GameExtraData.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\GameForms.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\GameObjects.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\GameOSDepend.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\GameProcess.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\GameRTTI.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\GameScript.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\GameSettings.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\GameSound.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\GameTasks.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\GameTiles.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\GameTypes.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\GameUI.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
     <ClInclude Include="..\nvse\Utilities.h">
       <Filter>nvse</Filter>
     </ClInclude>
@@ -136,20 +114,7 @@
     <ClInclude Include="..\libraries\json.h">
       <Filter>libraries</Filter>
     </ClInclude>
-    <ClInclude Include="..\nvse\NiTypes.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\NiObjects.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\NiNodes.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
     <ClInclude Include="..\nvse\SafeWrite.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="commands.h" />
-    <ClInclude Include="..\nvse\CommandTable.h">
       <Filter>nvse</Filter>
     </ClInclude>
     <ClInclude Include="..\nvse\prefix.h">
@@ -164,11 +129,92 @@
     <ClInclude Include="..\nvse\dinput8.h">
       <Filter>nvse</Filter>
     </ClInclude>
+    <ClInclude Include="ConfigurationMenu\ConfigurationMenu.h">
+      <Filter>features\ConfigurationMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="SortingIcons\SI.h">
+      <Filter>features\SortingIcons</Filter>
+    </ClInclude>
+    <ClInclude Include="SortingIcons\SIHooks.h">
+      <Filter>features\SortingIcons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\GameAPI.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\GameBSExtraData.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\GameData.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\GameEffects.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\GameExtraData.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\GameForms.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\GameObjects.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\GameOSDepend.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\GameProcess.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\GameRTTI.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\GameScript.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\GameSettings.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\GameSound.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\GameTasks.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\InterfaceTiles.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\GameTypes.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\InterfaceMenus.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\CommandTable.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\NiNodes.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\NiObjects.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\NiTypes.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\ConsoleManager.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\SaveLoadGame.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\InterfaceManager.h">
+      <Filter>game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
-    <None Include="..\nvse\GameRTTI.inc">
-      <Filter>nvse</Filter>
+    <None Include="..\game\GameRTTI.inc">
+      <Filter>game</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -177,6 +223,18 @@
     </Filter>
     <Filter Include="libraries">
       <UniqueIdentifier>{42cf9c9c-4ade-4f54-8cfd-9a8c9c5a321f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features">
+      <UniqueIdentifier>{d0bf9d47-c82a-45bb-9e99-d960a45cd8f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features\SortingIcons">
+      <UniqueIdentifier>{3900deab-0329-4a99-991d-f283bf3f8df4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features\ConfigurationMenu">
+      <UniqueIdentifier>{656ac85f-09be-4ed7-ae30-677b09f38f26}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="game">
+      <UniqueIdentifier>{a015f998-0a48-4aa3-a1b7-bb3274a03bde}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

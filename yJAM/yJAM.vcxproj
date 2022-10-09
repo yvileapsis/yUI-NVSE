@@ -110,20 +110,20 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\nvse\dinput8.cpp" />
-    <ClCompile Include="..\nvse\GameAPI.cpp" />
-    <ClCompile Include="..\nvse\GameBSExtraData.cpp" />
-    <ClCompile Include="..\nvse\GameData.cpp" />
-    <ClCompile Include="..\nvse\GameExtraData.cpp" />
-    <ClCompile Include="..\nvse\GameForms.cpp" />
-    <ClCompile Include="..\nvse\GameObjects.cpp" />
-    <ClCompile Include="..\nvse\GameRTTI.cpp" />
-    <ClCompile Include="..\nvse\GameScript.cpp" />
-    <ClCompile Include="..\nvse\GameSettings.cpp" />
-    <ClCompile Include="..\nvse\GameTasks.cpp" />
-    <ClCompile Include="..\nvse\GameTiles.cpp" />
-    <ClCompile Include="..\nvse\GameTypes.cpp" />
-    <ClCompile Include="..\nvse\GameUI.cpp" />
-    <ClCompile Include="..\nvse\GameSound.cpp" />
+    <ClCompile Include="..\game\GameAPI.cpp" />
+    <ClCompile Include="..\game\GameBSExtraData.cpp" />
+    <ClCompile Include="..\game\GameData.cpp" />
+    <ClCompile Include="..\game\GameExtraData.cpp" />
+    <ClCompile Include="..\game\GameForms.cpp" />
+    <ClCompile Include="..\game\GameObjects.cpp" />
+    <ClCompile Include="..\game\GameRTTI.cpp" />
+    <ClCompile Include="..\game\GameScript.cpp" />
+    <ClCompile Include="..\game\GameSettings.cpp" />
+    <ClCompile Include="..\game\GameTasks.cpp" />
+    <ClCompile Include="..\game\GameTiles.cpp" />
+    <ClCompile Include="..\game\GameTypes.cpp" />
+    <ClCompile Include="..\game\GameUI.cpp" />
+    <ClCompile Include="..\game\GameSound.cpp" />
     <ClCompile Include="..\nvse\printf.cpp" />
     <ClCompile Include="..\nvse\SafeWrite.cpp" />
     <ClCompile Include="..\nvse\Utilities.cpp" />
@@ -149,28 +149,28 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\libraries\json.h" />
-    <ClInclude Include="..\nvse\CommandTable.h" />
+    <ClInclude Include="..\game\CommandTable.h" />
     <ClInclude Include="..\nvse\dinput8.h" />
-    <ClInclude Include="..\nvse\GameAPI.h" />
-    <ClInclude Include="..\nvse\GameBSExtraData.h" />
-    <ClInclude Include="..\nvse\GameData.h" />
-    <ClInclude Include="..\nvse\GameEffects.h" />
-    <ClInclude Include="..\nvse\GameExtraData.h" />
-    <ClInclude Include="..\nvse\GameForms.h" />
-    <ClInclude Include="..\nvse\GameObjects.h" />
-    <ClInclude Include="..\nvse\GameOSDepend.h" />
-    <ClInclude Include="..\nvse\GameProcess.h" />
-    <ClInclude Include="..\nvse\GameRTTI.h" />
-    <ClInclude Include="..\nvse\GameScript.h" />
-    <ClInclude Include="..\nvse\GameSettings.h" />
-    <ClInclude Include="..\nvse\GameSound.h" />
-    <ClInclude Include="..\nvse\GameTasks.h" />
-    <ClInclude Include="..\nvse\GameTiles.h" />
-    <ClInclude Include="..\nvse\GameTypes.h" />
-    <ClInclude Include="..\nvse\GameUI.h" />
-    <ClInclude Include="..\nvse\NiNodes.h" />
-    <ClInclude Include="..\nvse\NiObjects.h" />
-    <ClInclude Include="..\nvse\NiTypes.h" />
+    <ClInclude Include="..\game\GameAPI.h" />
+    <ClInclude Include="..\game\GameBSExtraData.h" />
+    <ClInclude Include="..\game\GameData.h" />
+    <ClInclude Include="..\game\GameEffects.h" />
+    <ClInclude Include="..\game\GameExtraData.h" />
+    <ClInclude Include="..\game\GameForms.h" />
+    <ClInclude Include="..\game\GameObjects.h" />
+    <ClInclude Include="..\game\GameOSDepend.h" />
+    <ClInclude Include="..\game\GameProcess.h" />
+    <ClInclude Include="..\game\GameRTTI.h" />
+    <ClInclude Include="..\game\GameScript.h" />
+    <ClInclude Include="..\game\GameSettings.h" />
+    <ClInclude Include="..\game\GameSound.h" />
+    <ClInclude Include="..\game\GameTasks.h" />
+    <ClInclude Include="..\game\GameTiles.h" />
+    <ClInclude Include="..\game\GameTypes.h" />
+    <ClInclude Include="..\game\GameUI.h" />
+    <ClInclude Include="..\game\NiNodes.h" />
+    <ClInclude Include="..\game\NiObjects.h" />
+    <ClInclude Include="..\game\NiTypes.h" />
     <ClInclude Include="..\nvse\PluginAPI.h" />
     <ClInclude Include="..\nvse\PluginManager.h" />
     <ClInclude Include="..\nvse\prefix.h" />
@@ -192,7 +192,7 @@
     <ClInclude Include="..\libraries\SimpleINILibrary.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\nvse\GameRTTI.inc" />
+    <None Include="..\game\GameRTTI.inc" />
     <None Include="exports.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

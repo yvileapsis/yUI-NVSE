@@ -1,13 +1,14 @@
 #include <functions.h>
 #include <Utilities.h>
 #include <GameProcess.h>
-#include <GameUI.h>
 #include <GameAPI.h>
 #include <GameData.h>
-#include <settings.h>
 #include <GameRTTI.h>
 #include <SafeWrite.h>
 #include <algorithm>
+
+#include "GameObjects.h"
+#include <InterfaceMenus.h>
 
 extern DataHandler* g_dataHandler;
 
@@ -127,9 +128,9 @@ float TESObjectWEAP::GetWeaponValue(UInt32 whichVal)
 	case eWeap_SightUsage:			return sightUsage;
 	case eWeap_ReqStr:				return strRequired;
 	case eWeap_ReqSkill:			return skillRequirement;
-	case eWeap_LongBursts:			return weaponFlags2.IsSet(eFlag_LongBurst);
-	case eWeap_Flags1:				return weaponFlags1.Get();
-	case eWeap_Flags2:				return weaponFlags2.Get();
+	case eWeap_LongBursts:			return weaponFlags2 & (eFlag_LongBurst);
+	case eWeap_Flags1:				return weaponFlags1;
+	case eWeap_Flags2:				return weaponFlags2;
 	case eWeap_HasScope:			return HasScope();
 	case eWeap_IgnoresDTDR:			return IgnoresDTDR();
 	case eWeap_SoundLevel:			return soundLevel;
@@ -284,25 +285,12 @@ bool TryGetTypeOfForm(TESForm* form)
 
 
 void Tile::SetStringRecursive(const UInt32 tileValue, const char* changeto, const char* tochange) {
-	if (GetValue(tileValue))// && (!tochange || !_strcmpi(GetValue(tileValue)->str, tochange)))
-	{
+	if (GetValue(tileValue))
 		SetString(tileValue, changeto, true);
-	}
-	for (auto iter = this->children.Head(); iter; iter = iter->next)
-		iter->data->SetStringRecursive(tileValue, changeto, tochange);
+	for (const auto iter : this->children)
+		iter->SetStringRecursive(tileValue, changeto, tochange);
 }
 
-void __fastcall CursorTileSetStringValue(Tile* tile, void* dummyEDX, eTileValue tilevalue, char* src, char propagate)
-{
-	tile->SetFloat(kTileValue_zoom, -1, propagate);
-	tile->SetFloat(kTileValue_systemcolor, 1, propagate);
-}
-
-void __fastcall CursorTileSetIntValue(Tile* tile, void* dummyEDX, eTileValue tilevalue, int value)
-{
-	tile->SetFloat(kTileValue_visible, value, true);
-	ThisCall(0xA0B350, InterfaceManager::GetSingleton()->cursor, 1, 0);
-}
 
 char* __fastcall StrFromINI(DWORD *address)
 {
@@ -314,7 +302,7 @@ void RegisterTraitID(const char* var1, UInt32 var2) { RegTraitID(var1, var2);  }
 
 void purefun()
 {
-	ConsoleQueueOrPrint("AAAAA");
+	PrintConsoleOrQueue("AAAAA");
 }
 
 __declspec(naked) void funpatch()
@@ -332,34 +320,108 @@ __declspec(naked) void funpatch()
 	}
 }
 
-TList<TESObjectREFR>::Node* iterDroppedItem;
+#if 0
 
-void* __fastcall FixGetDroppedWeaponPre(ExtraDataList* extradatalist)
+#include <patches.h>
+#include <SafeWrite.h>
+#include <functions.h>
+
+
+float __cdecl WeaponSpread(float a1, float a2)
 {
-	const auto xDropped = reinterpret_cast<ExtraDroppedItemList*>(extradatalist->GetByType(kExtraData_DroppedItemList));
-	if (!xDropped) return nullptr;
-	iterDroppedItem = xDropped->itemRefs.Head();
-	if (!iterDroppedItem) return nullptr;
-	return iterDroppedItem->data;
+	return a2;
+};
+
+float __fastcall MyFunc2(Actor* actor, void* edx, int i)
+{
+	return 0;
 }
 
-void* __fastcall FixGetDroppedWeaponMid()
+/*
+	RegisterTraitID("&runsnig;", 2032);
+	RegisterTraitID("runsnig", 2032);
+	WriteRelJump(0xA095D1, reinterpret_cast<UInt32>(funpatch));
+*/
+
+void Patch1080pUI()
 {
-	iterDroppedItem = iterDroppedItem->next;
-	if (!iterDroppedItem) return nullptr;
-	return iterDroppedItem->data;
+	//	WriteRelJump(0x715D5F, 0x715D8D);
+	//	WriteRelJump(0x715DAE, 0x715DED);
+
+	//	WriteRelJump(0x715DE7, testetest);
+
+	//	WriteRelCall(0x76C0F1, ret1080);
+	//	WriteRelCall(0x76C0FE, ret1920);
+		//	WriteRelCall(0x70B9CE, UInt32(Tile_SetStringValueCursor));
+	//	WriteRelCall(0x70B320, UInt32(Tile_SetStringValueCursor));
+	//	WriteRelCall(0x70CC1F, UInt32(Tile_SetStringValueCursor));
+
+		/*
+		WriteRelJump(0x715D54, UInt32(UIWidth));
+		WriteRelCall(0x715DA6, 0x4DC200);
+		WriteRelJump(0x715DB4, UInt32(UIHeight));
+
+
+		WriteRelJump(0x713037, UInt32(UIWidth2));
+		WriteRelJump(0x713040, UInt32(UIHeight2));
+		WriteRelJump(0x7FBBDC, UInt32(UIWidth3));
+		WriteRelJump(0x7FBBE5, UInt32(UIHeight3));
+		*/
+
+		/*
+		SafeWriteBuf(0x106EC38, "\x00\x00\xF0\x44", 4); //1280
+		SafeWriteBuf(0x106F2DC, "\x00\x00\x87\x44", 4); //960
+		SafeWriteBuf(0x106E960, "\x00\x00\x00\x00\x00\x00\x9E\x40", 8); //1280
+		SafeWriteBuf(0x106E7F8, "\x00\x00\x00\x00\x00\xe0\x90\x40", 8); //960
+		SafeWriteBuf(0x1021790, "\x1D\xC7\x71\x1C\xC7\x71\xFC\x3F", 8); //1.3333
+		SafeWriteBuf(0x1078128, "\x1D\xC7\x71\x1C\xC7\x71\xFC\x3F", 8); //1.3333
+		SafeWriteBuf(0x713040, "\xDD\x05\xF8\xE7\x06\x01", 6);
+
+		*/
+
+		//	`DC 0D 60 E9 06 01`
+		//	`D9 05 DC F2 06 01`
+		//	SafeWriteBuf(0x11A0190, "\x60\x05\x00\x00", 4); //960
+
+
+		//	SafeWriteBuf(0x106F070, "\x00\x00\x00\x00\x00\x60\x78\x40", 8);
+			//	SafeWriteBuf(0x1021790, "\x00\x00\x00\x00\x00\x00\xF8\x3F", 8);
+
+			//01189488 0118948C 01189490 01189494 01189498
+
+		//	SafeWriteBuf(0x71302B, "\x66\x0F\x1F\x44\x00\x00", 6);
+		//	SafeWriteBuf(0x713031, "\x66\x0F\x1F\x44\x00\x00", 6);
+		//	SafeWriteBuf(0x713037, "\xD9\x05\x38\xEC\x06\x01", 6);
+			// sub_E68A80 Tile_A04640
 }
 
-bool fixTablineSelected = false;
-
-void FixTablineSelected()
+void PatchAddyCMToSettingsMenu()
 {
-	if (CdeclCall<bool>(0x702360) && InterfaceManager::IsMenuVisible(kMenuType_Inventory))	{
-		if (fixTablineSelected)	{
-			fixTablineSelected = false;
-			const auto tabline = InventoryMenu::GetSingleton()->tile->GetChild("GLOW_BRANCH")->GetChild("IM_Tabline");
-			if (!tabline) return;
-			for (const auto iter : tabline->children) iter->SetFloat(kTileValue_mouseover, 0, false);
-		}
-	} else fixTablineSelected = true;
+
+	WriteRelCall(0x7CC9D4, UInt32(AddyCMToSettingsMenu));
+	WriteRelJump(0x7CCA43, 0x7CCAAD);
+
+	//	SafeWriteBuf(0x7CBF77
+
+	//	SafeWriteBuf(0x7CBF8C, "\x66\x0F\x1F\x44\x00\x00", 6);//
+	//	SafeWriteBuf(0x7CB674, "\x0F\x1F\x44\x00\x00", 5);
+	//	SafeWriteBuf(0x7CB686, "\x0F\x1F\x44\x00\x00", 5);
+	//	SafeWriteBuf(0x7CB698, "\x0F\x1F\x44\x00\x00", 5);
+	//	SafeWriteBuf(0x7CB6AA, "\x0F\x1F\x44\x00\x00", 5);
+	//	SafeWriteBuf(0x7CB6BC, "\x0F\x1F\x44\x00\x00", 5);
+	//	SafeWriteBuf(0x7CB6CE, "\x0F\x1F\x44\x00\x00", 5);
+	//	SafeWriteBuf(0x7CB6E0, "\x0F\x1F\x44\x00\x00", 5);
+	//	SafeWriteBuf(0x7CBE50, "\x81\x7A\x08\x50\x05\x7D\x00", 7);
+
+	/*	SafeWriteBuf(0x7CC044, "\x0F\x1F\x44\x00\x00", 5);
+		SafeWriteBuf(0x7CC392, "\x0F\x1F\x44\x00\x00", 5);
+		SafeWriteBuf(0x7CC23E, "\x0F\x1F\x44\x00\x00", 5);
+		SafeWriteBuf(0x7CC0C3, "\x0F\x1F\x44\x00\x00", 5);
+		SafeWriteBuf(0x7CC044, "\x0F\x1F\x44\x00\x00", 5);
+		SafeWriteBuf(0x7CC416, "\x0F\x1F\x44\x00\x00", 5);
+		SafeWriteBuf(0x7CC582, "\x0F\x1F\x44\x00\x00", 5);*/
+		//	SafeWriteBuf(0x7CBF59, "\x0F\x1F\x44\x00\x00", 5);
+		//	SafeWriteBuf(0x7CC01F, "\x0F\x1F\x44\x00\x00", 5);
+
 }
+#endif

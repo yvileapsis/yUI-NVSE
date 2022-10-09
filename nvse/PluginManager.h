@@ -1,9 +1,8 @@
 #pragma once
+#include <PluginAPI.h>
 
 #include <string>
 #include <vector>
-
-#include "nvse/PluginAPI.h"
 
 class PluginManager
 {
