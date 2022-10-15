@@ -20,14 +20,16 @@ These NVSE plugins are developed by yvileapsis with liberal borrowing of code fr
 These plugins wouldn't exist without efforts of many community members such as LuthienAnarion, JazzIsParis, lStewieAl, c6, carxt, korri123 and Demorome and many others.
 
 ## yUI
-NVSE plugin aiming to fix UI issues and add additional UI features. Currently includes several bugfixes and Sorting and Icons module.
+NVSE plugin aiming to fix issues and add additional features. Currently includes several bugfixes and Sorting and Icons module, Time Multiplier module and others.
 
-## yGTM-NVSE
-NVSE plugin aiming to resolve issues with global time multiplier. Mainly this is achieved by adding local time multipliers for each mod that changes timescale with SGTM command.
+## Sorting and Icons module
+
+## Time Multiplier module
+This module aims to resolve issues with global time multiplier. Mainly this is achieved by adding local time multipliers for each mod. What this means is that every time multiplier change goes through yUI and yUI decides whether to alter time multiplier or leave it be based on new arguments of SGTM.
 
 (float) GetGlobalTimeMultiplier *modIndex:int*
 
-SetGlobalTimeMultiplier *multiplier:float*
+SetGlobalTimeMultiplier *multiplier:float* *immediateChange:int* *modIndex:int*
 
 modIndex:
 
