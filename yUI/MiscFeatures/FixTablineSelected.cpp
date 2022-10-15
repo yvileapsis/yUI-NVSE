@@ -1,15 +1,27 @@
+#include <main.h>
 #include <InterfaceMenus.h>
 #include <InterfaceManager.h>
-#include <main.h>
+
 #include <SimpleINILibrary.h>
 
-
-namespace Fix::TS
+namespace Fix::TablineSelected
 {
 	inline int bEnable = 1;
 
 	bool needToFix = false;
 	Tile* tabline = nullptr;
+
+	void HandleINIs()
+	{
+		CSimpleIniA ini;
+		ini.SetUnicode();
+		const auto iniPath = GetCurPath() + yUI_INI;
+		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
+
+		bEnable = ini.GetOrCreate("General", "bFixTablineSelected", 1, "; fix the issue where Inventory Menu tabline shows up with buttons already selected");
+
+		ini.SaveFile(iniPath.c_str(), false);
+	}
 
 	void MainLoop()
 	{
@@ -27,23 +39,10 @@ namespace Fix::TS
 		else needToFix = true;
 	}
 
-	void HandleINIs()
-	{
-		CSimpleIniA ini;
-		ini.SetUnicode();
-		const auto iniPath = GetCurPath() + yUI_INI;
-		if (const auto errVal = ini.LoadFile(iniPath.c_str()); errVal == SI_FILE) { return; }
-		bEnable = ini.GetOrCreate("General", "bFixTablineSelected", 1, "; fix the issue where Inventory Menu tabline shows up with buttons already selected");
-		if (const auto errVal = ini.SaveFile(iniPath.c_str(), false); errVal == SI_FILE) { return; }
-	}
-}
-
-namespace Fix::TablineSelected
-{
 	extern void Init()
 	{
 		if (g_nvseInterface->isEditor) return;
-		TS::HandleINIs();
-		mainLoop.emplace_back(TS::MainLoop);
+		HandleINIs();
+		if (bEnable) mainLoop.emplace_back(MainLoop);
 	}
 }

@@ -3,7 +3,6 @@
 #include <GameData.h>
 #include <GameObjects.h>
 #include <definitions.h>
-#include <set>
 #include <deque>
 #include <functional>
 

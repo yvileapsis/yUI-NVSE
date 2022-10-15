@@ -90,16 +90,6 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	const auto cmdTable = static_cast<NVSECommandTableInterface*>(nvse->QueryInterface(kInterface_CommandTable));
 
 	GetByOpcode = cmdTable->GetByOpcode;
-
-	if (g_yTM)
-	{
-		GetByOpcode(0x22B0)->numParams = 1;
-		GetByOpcode(0x22B0)->params = kParams_OneOptionalInt;
-
-		GetByOpcode(0x1186)->numParams = 2;
-		GetByOpcode(0x1186)->params = kParams_OneOptionalFloat_OneOptionalInt;
-	}
-
 	/*
 	GetByOpcode(0x11E2)->numParams = 5;
 	GetByOpcode(0x11E2)->params = kParams_OneForm_OneOptionalForm;
@@ -112,11 +102,6 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	g_scriptInterface = static_cast<NVSEScriptInterface*>(nvse->QueryInterface(kInterface_Script));
 	ExtractArgsEx = g_scriptInterface->ExtractArgsEx;
 
-	if (g_yTM)
-	{
-		GetByOpcode(0x22B0)->execute = Cmd_GetGlobalTimeMultiplierAlt_Execute;
-		GetByOpcode(0x1186)->execute = Cmd_SetGlobalTimeMultiplierAlt_Execute;
-	}
 //	GetByOpcode(0x11E2)->execute = Cmd_FireWeaponAlt_Execute;
 
 	handleINIOptions();

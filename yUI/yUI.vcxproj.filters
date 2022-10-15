@@ -100,6 +100,10 @@
     <ClCompile Include="..\game\InterfaceManager.cpp">
       <Filter>game</Filter>
     </ClCompile>
+    <ClCompile Include="definitions.cpp" />
+    <ClCompile Include="MiscFeatures\PatchTimeMult.cpp">
+      <Filter>features</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h" />

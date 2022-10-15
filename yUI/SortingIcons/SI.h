@@ -4,8 +4,7 @@
 #include <filesystem>
 #include <unordered_set>
 
-
-namespace SI
+namespace SortingIcons
 {
 	inline int g_FixIndefiniteSorting = 1;
 
@@ -162,12 +161,12 @@ namespace SI
 	inline std::vector<std::filesystem::path>								g_XMLPaths;
 }
 
-namespace SI::Commands
+namespace SortingIcons::Commands
 {
 	void Register();
 }
 
-namespace SI::Patches
+namespace SortingIcons::Patches
 {
 	void AlterSorting(const bool bEnable);
 	void AddIcons(const bool bEnable);
@@ -176,14 +175,14 @@ namespace SI::Patches
 	void AddTabs(const bool bEnable);
 }
 
-namespace SI::Files
+namespace SortingIcons::Files
 {
 	bool AssignCategoryToItem(TESForm* form);
 	bool AssignFiltersToItem(TESForm* form);
 	void HandleSIJson(const std::filesystem::path& path);
 }
 
-namespace SI::Sorting
+namespace SortingIcons::Sorting
 {
 	void KeyringRefreshPostStewie();
 	std::string GetCategoryForItem(TESForm* form);
@@ -214,7 +213,7 @@ namespace SI::Sorting
 	bool __fastcall KeyringShowCategories(Tile* tile);
 }
 
-namespace SI::Icons
+namespace SortingIcons::Icons
 {
 	void InjectTemplates();
 	void InjectIconTile(const Category& category, MenuItemEntryList* list, Tile* tile, ContChangesEntry* entry);

@@ -4,7 +4,7 @@
 
 #include "InterfaceManager.h"
 
-namespace SI::Icons
+namespace SortingIcons::Icons
 {
 	Float32 compassRoseX = 0, compassRoseY = 0;
 

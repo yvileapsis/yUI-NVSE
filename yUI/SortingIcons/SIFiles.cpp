@@ -11,7 +11,7 @@
 #include <functions.h>
 #include <json.h>
 
-namespace SI::Files
+namespace SortingIcons::Files
 {
 	void ItemRecursiveEmplace(const Item::Common&, TESForm*);
 

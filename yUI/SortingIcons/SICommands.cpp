@@ -4,7 +4,7 @@
 #include <GameObjects.h>
 #include <PluginAPI.h>
 
-namespace SI::Commands
+namespace SortingIcons::Commands
 {
 	ParamInfo kParams_OneString_OneOptionalForm[] =
 	{
@@ -39,12 +39,12 @@ namespace SI::Commands
 		if (!form) return true;
 		const auto tochange = std::string(src);
 		if (tochange == "category" || tochange == "tag" || tochange == "string") {
-			const std::string tag = SI::Sorting::GetCategoryForItem(form);
+			const std::string tag = Sorting::GetCategoryForItem(form);
 			AssignString(PASS_COMMAND_ARGS, tag.c_str());
 		}
 		else if (tochange == "icon" || tochange == "filename") {
-			const std::string tag = SI::Sorting::GetCategoryForItem(form);
-			const std::string icon = SI::g_StringToCategory[tag].filename;
+			const std::string tag = Sorting::GetCategoryForItem(form);
+			const std::string icon = g_StringToCategory[tag].filename;
 			AssignString(PASS_COMMAND_ARGS, icon.c_str());
 		}
 		return true;
@@ -65,7 +65,7 @@ namespace SI::Commands
 			*result = 1;
 		}
 		else if (tochange == "icon" || tochange == "filename") {
-			const std::string tag = SI::Sorting::GetCategoryForItem(form);
+			const std::string tag = Sorting::GetCategoryForItem(form);
 			g_StringToCategory[tag].filename = std::string(newstring);
 			*result = 1;
 		}

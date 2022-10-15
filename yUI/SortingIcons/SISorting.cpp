@@ -4,7 +4,7 @@
 
 #include "InterfaceManager.h"
 
-namespace SI::Sorting
+namespace SortingIcons::Sorting
 {
 
 	std::string openCategory;

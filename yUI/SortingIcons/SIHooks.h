@@ -1,7 +1,7 @@
 #include <prefix.h>
 #include "SI.h"
 
-namespace SI::Hooks
+namespace SortingIcons::Hooks
 {
 	template <UInt32 retn> __declspec(naked) void TileSetStringValueIconInject() {
 		static const auto SetStringValue = reinterpret_cast<UInt32>(Icons::SetTileStringInjectTile);

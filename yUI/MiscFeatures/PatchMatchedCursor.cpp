@@ -1,10 +1,10 @@
 #include <main.h>
-#include <SimpleINILibrary.h>
-#include <SafeWrite.h>
-#include <InterfaceMenus.h>
 #include <InterfaceManager.h>
+#include <SafeWrite.h>
 
-namespace Patch::MC
+#include <SimpleINILibrary.h>
+
+namespace Patch::MatchedCursor
 {
 	inline int bEnable = 0;
 
@@ -12,10 +12,12 @@ namespace Patch::MC
 	{
 		CSimpleIniA ini;
 		ini.SetUnicode();
-		const auto iniPath = GetCurPath() + R"(\Data\NVSE\Plugins\yUI.ini)";
-		if (const auto errVal = ini.LoadFile(iniPath.c_str()); errVal == SI_FILE) { return; }
+		const auto iniPath = GetCurPath() + yUI_INI;
+		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
+
 		bEnable = ini.GetOrCreate("General", "bMatchingCursor", 0, "; match cursor color to HUD color");
-		if (const auto errVal = ini.SaveFile(iniPath.c_str(), false); errVal == SI_FILE) { return; }
+
+		ini.SaveFile(iniPath.c_str(), false);
 	}
 
 	void __fastcall CursorTileSetStringValue(Tile* tile, void* dummyEDX, eTileValue tilevalue, char* src, char propagate)
@@ -30,7 +32,7 @@ namespace Patch::MC
 		ThisCall(0xA0B350, InterfaceManager::GetSingleton()->cursor, 1, 0);
 	}
 
-	void PatchMatchedCursor(const bool bEnable)
+	void Patch(const bool bEnable)
 	{
 		if (bEnable)
 		{
@@ -44,18 +46,10 @@ namespace Patch::MC
 		}
 	}
 
-	void Patch()
-	{
-		PatchMatchedCursor(bEnable);
-	}
-}
-
-namespace Patch::MatchedCursor
-{
 	extern void Init()
 	{
 		if (g_nvseInterface->isEditor) return;
-		MC::HandleINIs();
-		MC::Patch();
+		HandleINIs();
+		Patch(bEnable);
 	}
 }

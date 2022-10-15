@@ -7,17 +7,4 @@
 
 #define MO2_VFS_DLL_NAME "usvfs_x86.dll"
 
-namespace SortingIcons { extern void Init(); }
-namespace Fix::DroppedItems { extern void Init(); }
-namespace Fix::TablineSelected { extern void Init(); }
-namespace Fix::ReorderMCM { extern void Init(); }
-namespace Patch::MatchedCursor { extern void Init(); }
-
-inline void Inits()
-{
-	SortingIcons::Init();
-	Fix::DroppedItems::Init();
-	Fix::TablineSelected::Init();
-	Fix::ReorderMCM::Init();
-	Patch::MatchedCursor::Init();
-}
+void Inits();

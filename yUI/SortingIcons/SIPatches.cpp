@@ -2,7 +2,7 @@
 #include "SIHooks.h"
 #include <SafeWrite.h>
 
-namespace SI::Patches
+namespace SortingIcons::Patches
 {
 	void AlterSorting(const bool bEnable)
 	{

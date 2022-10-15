@@ -5,7 +5,7 @@
 #include <functions.h>
 #include <SimpleINILibrary.h>
 
-namespace SI
+namespace SortingIcons
 {
 	void HandleINIs()
 	{
@@ -99,28 +99,21 @@ namespace SI
 		Log(FormatString("Loaded items, categories and tabs in %d ms", diff.count()));
 	}
 
-	void Patch()
+	extern void Init()
 	{
+		Commands::Register();
+		if (g_nvseInterface->isEditor) return;
+		HandleINIs();
+
 		Patches::AlterSorting(g_FixIndefiniteSorting || (g_SI && bSort));
 		Patches::AddIcons(g_SI && bIcons);
 		Patches::ReplaceHotkeyIcons(g_SI && bHotkeys);
 		Patches::AddKeyrings(g_SI && bCategories);
 		Patches::AddTabs(true);
-	}
-}
 
-namespace SortingIcons
-{
-	extern void Init()
-	{
-		SI::Commands::Register();
-		if (g_nvseInterface->isEditor) return;
-		SI::HandleINIs();
-
-		pluginLoad.emplace_back(SI::Patch);
 		deferredInit.emplace_back(FillCraftingComponents);
-		if (SI::bSort || SI::bIcons || SI::bHotkeys || SI::bCategories) deferredInit.emplace_back(SI::ProcessFiles);
-		if (SI::bCategories) mainLoop.emplace_back(SI::Sorting::KeyringRefreshPostStewie);
-		if (SI::bIcons) mainLoopDoOnce.emplace_back(SI::Icons::InjectTemplates);
+		if (bSort || bIcons || bHotkeys || bCategories) deferredInit.emplace_back(ProcessFiles);
+		if (bCategories) mainLoop.emplace_back(Sorting::KeyringRefreshPostStewie);
+		if (bIcons) mainLoopDoOnce.emplace_back(Icons::InjectTemplates);
 	}
 }
