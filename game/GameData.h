@@ -170,11 +170,11 @@ struct ModList
 static_assert(sizeof(ModList) == 0x408);
 
 // 5B8
-class DataHandler
+class TESDataHandler
 {
 public:
-	DataHandler();
-	~DataHandler();
+	TESDataHandler();
+	~TESDataHandler();
 	int _DoAddForm_GetPtr();
 
 	UInt32							unk00;					// 000
@@ -264,7 +264,7 @@ public:
 	UInt32							unk634;					// 634
 	UInt32							unk638;					// 638
 
-	static DataHandler* GetSingleton() { return *reinterpret_cast<DataHandler**>(0x011C3F2C); }
+	static TESDataHandler* GetSingleton() { return *reinterpret_cast<TESDataHandler**>(0x011C3F2C); }
 	const ModInfo ** GetActiveModList();		// returns array of modEntry* corresponding to loaded mods sorted by mod index
 	const ModInfo* LookupModByName(const char* modName);
 	UInt8 GetModIndex(const char* modName);
@@ -275,7 +275,7 @@ public:
 	UInt32 DoAddForm(TESForm* pForm) { return ThisCall<UInt32>(0x004603B0, this, pForm); }
 	TESQuest* GetQuestByName(const char* questName);
 };
-static_assert(sizeof(DataHandler) == 0x63C);
+static_assert(sizeof(TESDataHandler) == 0x63C);
 
 // A0
 struct WaterSurfaceManager

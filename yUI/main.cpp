@@ -5,7 +5,7 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	if (msg->type == NVSEMessagingInterface::kMessage_DeferredInit)
 	{
 		g_player = PlayerCharacter::GetSingleton();
-		g_dataHandler = DataHandler::GetSingleton();
+		g_TESDataHandler = TESDataHandler::GetSingleton();
 		Log(FormatString("%s", yUI_VERSION_STR), 2);
 
 		ConsolePrintQueue();

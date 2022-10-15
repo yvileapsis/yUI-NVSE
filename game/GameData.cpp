@@ -14,21 +14,21 @@ public:
 	}
 };
 
-const ModInfo * DataHandler::LookupModByName(const char * modName)
+const ModInfo * TESDataHandler::LookupModByName(const char * modName)
 {
 	return modList.modInfoList.Find(LoadedModFinder(modName));
 }
 
-const ModInfo ** DataHandler::GetActiveModList()
+const ModInfo ** TESDataHandler::GetActiveModList()
 {
 	static const ModInfo* activeModList[0x100] = { 0 };
 
 	if (!(*activeModList))
 	{
 		UInt16 index = 0;
-		for (index = 0  ; index < DataHandler::GetSingleton()->modList.modInfoList.Count() ; index++)
+		for (index = 0  ; index < TESDataHandler::GetSingleton()->modList.modInfoList.Count() ; index++)
 		{
-			ModInfo* entry = DataHandler::GetSingleton()->modList.modInfoList.GetNthItem(index);
+			ModInfo* entry = TESDataHandler::GetSingleton()->modList.modInfoList.GetNthItem(index);
 			if (entry->IsLoaded())
 				activeModList[index] = entry;
 		}
@@ -37,12 +37,12 @@ const ModInfo ** DataHandler::GetActiveModList()
 	return activeModList;
 }
 
-UInt8 DataHandler::GetModIndex(const char* modName)
+UInt8 TESDataHandler::GetModIndex(const char* modName)
 {
 	return modList.modInfoList.GetIndexOf(LoadedModFinder(modName));
 }
 
-const char* DataHandler::GetNthModName(UInt32 modIndex)
+const char* TESDataHandler::GetNthModName(UInt32 modIndex)
 {
 	const ModInfo** activeModList = GetActiveModList();
 	if (modIndex < GetActiveModCount() && activeModList[modIndex])
@@ -51,7 +51,7 @@ const char* DataHandler::GetNthModName(UInt32 modIndex)
 		return "";
 }
 
-void DataHandler::DisableAssignFormIDs(bool shouldAsssign)
+void TESDataHandler::DisableAssignFormIDs(bool shouldAsssign)
 {
 	ThisStdCall(0x464D30, this, shouldAsssign);
 }
@@ -63,7 +63,7 @@ struct IsModLoaded
 	}
 };
 
-UInt8 DataHandler::GetActiveModCount() const
+UInt8 TESDataHandler::GetActiveModCount() const
 {
 	UInt32 count = modList.modInfoList.CountIf(IsModLoaded());
 	return count;

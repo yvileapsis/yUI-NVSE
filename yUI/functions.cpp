@@ -10,7 +10,7 @@
 #include "GameObjects.h"
 #include <InterfaceMenus.h>
 
-extern DataHandler* g_dataHandler;
+extern TESDataHandler* g_TESDataHandler;
 
 __declspec(naked) void UIWidth()
 {
@@ -77,7 +77,7 @@ __declspec(naked) void UIHeight3()
 
 void FillCraftingComponents()
 {
-	for (const auto mIter : g_dataHandler->recipeList)
+	for (const auto mIter : g_TESDataHandler->recipeList)
 	{
 		for (const auto node : mIter->inputs)
 			if (node && node->item) g_CraftingComponents.emplace(node->item);
@@ -98,7 +98,7 @@ bool IsCraftingProduct(TESForm* form)
 
 TESForm* GetRefFromString(char* mod, char* id)
 {
-	const auto itemID = (g_dataHandler->GetModIndex(mod) << 24) | strtoul(id, nullptr, 0);
+	const auto itemID = (g_TESDataHandler->GetModIndex(mod) << 24) | strtoul(id, nullptr, 0);
 	return LookupFormByRefID(itemID);
 }
 

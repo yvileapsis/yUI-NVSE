@@ -23,7 +23,7 @@ inline DIHookControl*				g_DIHook				= nullptr;
 inline PlayerCharacter*				g_player				= nullptr;
 inline ActorValueOwner*				g_playerAVOwner			= nullptr;
 inline BaseProcess*					g_playerProcess			= nullptr;
-inline DataHandler*					g_dataHandler			= nullptr;
+inline TESDataHandler*					g_TESDataHandler			= nullptr;
 
 inline int iDoOnce = 0;
 

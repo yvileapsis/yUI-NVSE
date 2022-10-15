@@ -2,7 +2,6 @@
 #include <GameRTTI.h>
 #include <GameExtraData.h>
 #include <GameTasks.h>
-#include <InterfaceTiles.h>
 #include <SafeWrite.h>
 #include <NiObjects.h>
 #include <unordered_set>
@@ -101,14 +100,14 @@ Float64 TESObjectREFR::GetInventoryWeight()
 	return 0;
 }
 
-std::vector<ContChangesEntry*> TESObjectREFR::GetAllItems(UInt32 reclvl)
+std::vector<InventoryChanges*> TESObjectREFR::GetAllItems(UInt32 reclvl)
 {
-	std::vector<ContChangesEntry*> vector;
+	std::vector<InventoryChanges*> vector;
 	
-	ContChangesEntry* entry = nullptr;
+	InventoryChanges* entry = nullptr;
 	void* iterator = nullptr;
 	ThisCall(0x575510, this, 0, &iterator, &entry);
-	if (iterator && entry) for (auto iter = ThisCall<ContChangesEntry*>(0x4CA330, entry, iterator); iter; iter = ThisCall<ContChangesEntry*>(0x4CA330, entry, iterator))
+	if (iterator && entry) for (auto iter = ThisCall<InventoryChanges*>(0x4CA330, entry, iterator); iter; iter = ThisCall<InventoryChanges*>(0x4CA330, entry, iterator))
 		if (iter->ShouldDisplay()) vector.push_back(iter);
 
 	// Vanilla method is more than twice as slow but it does a lot of stuff, like removing LvlItem garbage, combining throwables, etc
@@ -118,7 +117,7 @@ std::vector<ContChangesEntry*> TESObjectREFR::GetAllItems(UInt32 reclvl)
 		if (iter->countDelta > 0) vector.push_back(iter);
 
 	if (const auto container = GetContainer()) for (const auto iter : container->formCountList)
-		if (iter->form->typeID != kFormType_TESLevItem && iter->count > 0) vector.push_back(ContChangesEntry::Create(iter->form, iter->count));
+		if (iter->form->typeID != kFormType_TESLevItem && iter->count > 0) vector.push_back(InventoryChanges::Create(iter->form, iter->count));
 	*/
 
 	// Process linked ref for vendor containers, recursive, but hopefully no one links container on itself
@@ -133,7 +132,7 @@ std::vector<ContChangesEntry*> TESObjectREFR::GetAllItems(UInt32 reclvl)
 
 	if (this->IsActor())
 		if (const auto xDropped = reinterpret_cast<ExtraDroppedItemList*>(this->extraDataList.GetByType(kExtraData_DroppedItemList)))
-			for (const auto iter : xDropped->itemRefs) vector.push_back(ContChangesEntry::Create(iter, 1));
+			for (const auto iter : xDropped->itemRefs) vector.push_back(InventoryChanges::Create(iter, 1));
 
 	return vector;
 }
@@ -188,39 +187,39 @@ void Actor::UnequipItem(TESForm* objType, UInt32 unk1, ExtraDataList* itemExtraL
 	ThisStdCall(0x0088C790, this, objType, unk1, itemExtraList, unk3, lockUnequip, unk5);
 }
 
-EquippedItemsList Actor::GetEquippedItems()
+std::vector<TESForm*> Actor::GetEquippedItems()
 {
-	EquippedItemsList itemList;
+	std::vector<TESForm*> itemList;
 	if (const auto xChanges = static_cast<ExtraContainerChanges *>(extraDataList.GetByType(kExtraData_ContainerChanges))) {
-		ContChangesArray outEntryData;
-		ContChangesExtendArray outExtendData;
+		InventoryChangesArray outEntryData;
+		ExtendDataArray outExtendData;
 		const UInt32 count = xChanges->GetAllEquipped(outEntryData, outExtendData);
 		for (UInt32 i = 0; i < count ; i++) itemList.push_back(outEntryData[i]->form);
 	}
 	return itemList;
 }
 
-ContChangesArray Actor::GetEquippedEntryDataList()
+InventoryChangesArray Actor::GetEquippedEntryDataList()
 {
-	ContChangesArray itemArray;
-	ContChangesExtendArray outExtendData;
+	InventoryChangesArray itemArray;
+	ExtendDataArray outExtendData;
 	if(const auto xChanges = static_cast<ExtraContainerChanges *>(extraDataList.GetByType(kExtraData_ContainerChanges)))
 		xChanges->GetAllEquipped(itemArray, outExtendData);
 	return itemArray;
 }
 
-ContChangesExtendArray	Actor::GetEquippedExtendDataList()
+ExtendDataArray	Actor::GetEquippedExtendDataList()
 {
-	ContChangesArray itemArray;
-	ContChangesExtendArray outExtendData;
+	InventoryChangesArray itemArray;
+	ExtendDataArray outExtendData;
 	if(const auto xChanges = static_cast<ExtraContainerChanges *>(extraDataList.GetByType(kExtraData_ContainerChanges)))
 		xChanges->GetAllEquipped(itemArray, outExtendData);
 	return outExtendData;
 }
 
-Float64 Actor::GetCalculatedSpread(UInt32 mode, ContChangesEntry* entry)
+Float64 Actor::GetCalculatedSpread(UInt32 mode, InventoryChanges* entry)
 {
-	if (!entry) entry = reinterpret_cast<ContChangesEntry*>(this->baseProcess->GetWeaponInfo());
+	if (!entry) entry = reinterpret_cast<InventoryChanges*>(this->baseProcess->GetWeaponInfo());
 
 	if (!entry || !entry->form) return 0;
 
@@ -380,7 +379,7 @@ bool TESObjectREFR::GetInventoryItems(InventoryItemsMap &invItems)
 
 	TESForm *item;
 	SInt32 countDelta;
-	ContChangesEntry *entry;
+	InventoryChanges *entry;
 
 	for (const auto contIter : container->formCountList)
 	{
@@ -410,7 +409,7 @@ bool TESObjectREFR::GetInventoryItems(InventoryItemsMap &invItems)
 	return !invItems.empty();
 }
 
-__declspec(naked) ContChangesList* TESObjectREFR::GetContainerChangesList()
+__declspec(naked) InventoryChangesList* TESObjectREFR::GetContainerChangesList()
 {
 	__asm
 	{
@@ -682,96 +681,6 @@ NiAVObject* TESObjectREFR::GetNifBlock(UInt32 pcNode, const char* blockName)
 	return GetNifBlock2(this, pcNode, blockName);
 }
 
-ExtraDataList* ContChangesEntry::GetEquippedExtra()
-{
-	return GetCustomExtra(kExtraData_Worn);
-}
-
-ExtraDataList* ContChangesEntry::GetCustomExtra(UInt32 whichVal)
-{
-	if (!extendData) return nullptr;
-	const TListNode<ExtraDataList>* xdlIter = extendData->Head();
-	do if (const auto xData = xdlIter->data; xData && xData->HasType(whichVal)) return xData;
-	while ((xdlIter = xdlIter->next));
-	return nullptr;
-}
-
-BSExtraData* ContChangesEntry::GetExtraData(UInt32 whichVal)
-{
-	const auto extra = GetCustomExtra(whichVal);
-	return extra ? extra->GetByType(whichVal) : nullptr;
-}
-
-UInt32 ContChangesEntry::GetWeaponNumProjectiles(Actor* owner)
-{
-	return ThisCall<UInt8>(0x525B20, this->form, this->HasWeaponMod(0xC), 0, owner);
-}
-
-inline bool ContChangesEntry::ShouldDisplay()
-{
-	return this->form->IsItemPlayable() && *this->form->GetTheName();
-}
-
-UInt8 ContChangesEntry::GetWeaponMod()
-{
-	const auto xModFlags = reinterpret_cast<ExtraWeaponModFlags*>(this->GetExtraData(kExtraData_WeaponModFlags));
-	return xModFlags ? xModFlags->flags : 0;
-}
-
-Float64 ExtraContainerChanges::EntryData::GetHealthPercentAlt(bool axonisFix)
-{
-	Float64 healthPer = -1;
-
-	if (const auto healthForm = DYNAMIC_CAST(form->TryGetREFRParent(), TESForm, TESHealthForm))
-	{
-		const auto xHealth = form->GetIsReference() ? reinterpret_cast<ExtraHealth*>(reinterpret_cast<TESObjectREFR*>(form)->extraDataList.GetByType(kExtraData_Health)) : reinterpret_cast<ExtraHealth*>(this->GetExtraData(kExtraData_Health));
-
-		healthPer = xHealth ? xHealth->health / ((int)healthForm->health + (
-				            HasWeaponMod(TESObjectWEAP::kWeaponModEffect_IncreaseMaxCondition)
-					            ? reinterpret_cast<TESObjectWEAP*>(form)->GetEffectModValue(TESObjectWEAP::kWeaponModEffect_IncreaseMaxCondition)
-					            : 0))
-							: 1;
-	}
-	else
-	{
-		const auto destructible = DYNAMIC_CAST(form->TryGetREFRParent(), TESForm, BGSDestructibleObjectForm);
-		if (destructible && destructible->data)
-		{
-			const auto xObjHealth = form->GetIsReference() ? reinterpret_cast<ExtraObjectHealth*>(reinterpret_cast<TESObjectREFR*>(form)->extraDataList.GetByType(kExtraData_ObjectHealth)) : reinterpret_cast<ExtraObjectHealth*>(this->GetExtraData(kExtraData_ObjectHealth));
-			healthPer = xObjHealth ? xObjHealth->health / (int) destructible->data->health : 1;
-		}
-	}
-	return axonisFix ? healthPer >= 0.995 ? 1 : healthPer >= 95 ? 0.95 : healthPer : healthPer;
-}
-
-bool ContChangesEntry::GetEquipped()
-{
-	if (reinterpret_cast<ExtraWorn*>(this->GetExtraData(kExtraData_Worn))) return true;
-	if (reinterpret_cast<ExtraWornLeft*>(this->GetExtraData(kExtraData_WornLeft))) return true;
-	return false;
-}
-
-__declspec(naked) ContChangesEntry* ContChangesList::FindForItem(TESForm* item)
-{
-	__asm
-	{
-		mov		edx, [esp + 4]
-	listIter:
-		mov		eax, [ecx]
-		test	eax, eax
-		jz		listNext
-		cmp[eax + 8], edx
-		jz		done
-	listNext :
-		mov		ecx, [ecx + 4]
-		test	ecx, ecx
-		jnz		listIter
-		xor eax, eax
-	done :
-		retn	4
-	}
-}
-
 PlayerCharacter*		PlayerCharacter::GetSingleton() { return *reinterpret_cast<PlayerCharacter**>(0x011DEA3C); }
 QuestObjectiveTargets*	PlayerCharacter::GetCurrentQuestObjectiveTargets() { return ThisStdCall<QuestObjectiveTargets*>(s_PlayerCharacter_GetCurrentQuestTargets, this); }
 TESObjectREFR*			PlayerCharacter::GetPlacedMarkerOrTeleportLink() { return ThisStdCall<TESObjectREFR*>(0x77A400, this); }
@@ -901,3 +810,5 @@ TESObjectREFR* TESObjectREFR::ResolveAshpile()
 			return xAshPileRef->sourceRef;
 	return this;
 }
+
+bool TESObjectREFR::IsLocked() { return this->GetLockData() ? this->GetLockData()->IsLocked() : false; }

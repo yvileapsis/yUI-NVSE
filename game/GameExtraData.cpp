@@ -17,10 +17,10 @@ struct GetMatchingEquipped {
 		m_found.pExtraData = NULL;
 	}
 
-	bool Accept(ContChangesEntry* pEntryData) {
+	bool Accept(InventoryChanges* pEntryData) {
 		if (pEntryData) {
 			// quick check - needs an extendData or can't be equipped
-			ExtraContainerChanges::ExtendDataList* pExtendList = pEntryData->extendData;
+			const auto pExtendList = pEntryData->extendData;
 			if (pExtendList && m_matcher.Matches(pEntryData->form)) { 
 				SInt32 n = 0;
 				ExtraDataList* pExtraDataList = pExtendList->GetNthItem(n);
@@ -107,7 +107,7 @@ void CallSemaphore4(void * Semaphore, UInt32 SemaphoreFunc)
 	_asm popad
 };
 
-SInt32 ExtraContainerChanges::ExtendDataList::AddAt(ExtraDataList* item, SInt32 index)
+SInt32 ExtendDataList::AddAt(ExtraDataList* item, SInt32 index)
 {
 	//CallSemaphore4(GetExtraSemaphore(), s_SemaphoreWait);
 	const SInt32 Result = TList<ExtraDataList>::AddAt(item, index);
@@ -115,196 +115,22 @@ SInt32 ExtraContainerChanges::ExtendDataList::AddAt(ExtraDataList* item, SInt32 
 	return Result;
 };
 
-void ExtraContainerChanges::ExtendDataList::RemoveAll() const
+void ExtendDataList::RemoveAll() const
 {
 	//CallSemaphore4(GetExtraSemaphore(), s_SemaphoreWait);
 	TList<ExtraDataList>::RemoveAll();
 	//CallSemaphore(GetExtraSemaphore(), s_SemaphoreLeave);
 };
 
-ExtraDataList* ExtraContainerChanges::ExtendDataList::RemoveNth(SInt32 n)
+ExtraDataList* ExtendDataList::RemoveNth(SInt32 n)
 {
 	//CallSemaphore4(GetExtraSemaphore(), s_SemaphoreWait);
 	ExtraDataList* Result = TList<ExtraDataList>::RemoveNth(n);
 	//CallSemaphore(GetExtraSemaphore(), s_SemaphoreLeave);
 	return Result;
-};
-
-ExtraContainerChanges::ExtendDataList* ExtraContainerChangesExtendDataListCreate(ExtraDataList* pExtraDataList)
-{
-	auto xData = (ExtraContainerChanges::ExtendDataList*)FormHeap_Allocate(sizeof(ExtraContainerChanges::ExtendDataList));
-	if (xData) {
-		memset(xData, 0, sizeof(ExtraContainerChanges::ExtendDataList));
-		if (pExtraDataList)
-			if (xData->AddAt(pExtraDataList, eListEnd)==eListInvalid) {
-				FormHeap_Free(xData);
-				xData = NULL;
-			}
-	}
-	return xData;
 }
 
-static void ExtraContainerChangesExtendDataListFree(ExtraContainerChanges::ExtendDataList* xData, bool bFreeList)
-{
-	if (xData)
-	{
-		if (bFreeList)
-		{
-			UInt32 i = 0;
-			ExtraDataList* pExtraDataList = xData->GetNthItem(i);
-			while (pExtraDataList)
-			{
-				for (UInt32 j = 0 ; j<0xFF ; j++)
-					pExtraDataList->RemoveByType(j);
-				i++;
-				pExtraDataList = xData->GetNthItem(i);
-			}
-		}
-		FormHeap_Free(xData);
-	}
-}
-
-static bool ExtraContainerChangesExtendDataListAdd(ExtraContainerChanges::ExtendDataList* xData, ExtraDataList* xList) {
-	if (xData && xList) {
-		xData->AddAt(xList, eListEnd);
-		return true;
-	}
-	return false;
-}
-
-static bool ExtraContainerChangesExtendDataListRemove(ExtraContainerChanges::ExtendDataList* xData, ExtraDataList* xList, bool bFreeList) {
-	if (xData && xList) {
-		UInt32 i = 0;
-		ExtraDataList* pExtraDataList = xData->GetNthItem(i);
-		while (pExtraDataList && pExtraDataList != xList) {
-				i++;
-				pExtraDataList = xData->GetNthItem(i);
-		}
-		if (pExtraDataList == xList) {
-			xData->RemoveNth(i);
-			if (bFreeList) {
-				for (UInt32 j = 0 ; j<0xFF ; j++)
-					pExtraDataList->RemoveByType(j);
-				FormHeap_Free(xList);
-			}
-			return true;
-		}
-	}
-	return false;
-}
-
-void ContChangesEntry::Cleanup()
-{
-	// Didn't find the hook, let's fake it
-	if (!extendData) return;
-
-	for (const auto iter : *extendData)
-	{
-		if (const auto xCount = reinterpret_cast<ExtraCount*>(iter->GetByType(kExtraData_Count)); xCount &&
-			xCount->count <= 1)
-			iter->RemoveByType(kExtraData_Count);
-
-		if (!countDelta && !iter->m_data) // There are other extras than count like ExtraWorn :)
-			extendData->RemoveIf(ExtraDataListInExtendDataListMatcher(iter));
-	}
-	extendData->RemoveIf(ExtraDataListInExtendDataListMatcher(nullptr));
-}
-
-ContChangesEntry* ContChangesEntry::Create(TESForm* pForm, UInt32 count, ExtendDataList* pExtendDataList)
-{
-	const auto xData = static_cast<ContChangesEntry*>(FormHeap_Allocate(sizeof(ContChangesEntry)));
-	if (xData) {
-		memset(xData, 0, sizeof(ContChangesEntry));
-		if (pForm) {
-			xData->form = pForm;
-			xData->countDelta = count;
-			if (pExtendDataList == nullptr)
-			{
-				pExtendDataList = static_cast<ExtendDataList*>(FormHeap_Allocate(sizeof(ExtendDataList)));
-				if (pExtendDataList) memset(pExtendDataList, 0, sizeof(ExtendDataList));
-			}
-			xData->extendData = pExtendDataList;
-		}
-	}
-	return xData;
-}
-
-ExtraContainerChanges::ExtendDataList* ContChangesEntry::Add(ExtraDataList* newList)
-{
-	if (extendData)
-		extendData->AddAt(newList, eListEnd);
-	else
-		extendData = ExtraContainerChangesExtendDataListCreate(newList);
-	const auto xCount = (ExtraCount*)newList->GetByType(kExtraData_Count);
-	countDelta += xCount ? xCount->count : 1;
-	return extendData;
-}
-
-bool ContChangesEntry::Remove(ExtraDataList* toRemove, bool bFree)
-{
-	if (extendData && toRemove) {
-		const SInt32 index = extendData->GetIndexOf(ExtraDataListInExtendDataListMatcher(toRemove));
-		if (index >= 0) {
-			const auto xCount = (ExtraCount*)toRemove->GetByType(kExtraData_Count);
-			const SInt16 count = xCount ? xCount->count : 1;
-
-			extendData->RemoveNth(index);
-			countDelta -= count;
-			if (bFree) {
-				toRemove->RemoveAll(true);
-				FormHeap_Free(toRemove);
-			}
-			return true;
-		}
-
-	}
-	return false;
-}
-
-bool ContChangesEntry::HasExtraLeveledItem()
-{
-	if (!extendData) return false;
-	for (const auto iter : *extendData)	if (iter->HasType(kExtraData_LeveledItem)) return true;
-	return false;
-}
-
-void ExtraContainerChangesEntryDataFree(ContChangesEntry* xData, bool bFreeList) {
-	if (xData) {
-		if (xData->extendData) {
-			ExtraContainerChangesExtendDataListFree(xData->extendData, bFreeList);
-		}
-		FormHeap_Free(xData);
-	}
-}
-
-ContChangesList* ExtraContainerChangesEntryDataListCreate(UInt32 refID, UInt32 count, ExtraContainerChanges::ExtendDataList* pExtendDataList)
-{
-#ifdef RUNTIME
-	const auto xData = (ContChangesList*)FormHeap_Allocate(sizeof(ContChangesList));
-	if (xData) {
-		memset(xData, 0, sizeof(ContChangesList));
-		xData->AddAt(ContChangesEntry::Create(GetFormByID(refID), count, pExtendDataList), eListEnd);
-	}
-	return xData;
-#else
-	return NULL;
-#endif
-}
-
-void ExtraContainerChangesEntryDataListFree(ContChangesList* xData, bool bFreeList) {
-	if (xData) {
-		UInt32 i = 0;
-		ContChangesEntry* pX = xData->GetNthItem(i);
-		if (pX) {
-			ExtraContainerChangesEntryDataFree(pX, bFreeList);
-			i++;
-			pX = xData->GetNthItem(i);
-		}
-		FormHeap_Free(xData);
-	}
-}
-
-ExtraContainerChanges::ExtendDataList* ExtraContainerChanges::Add(TESForm* form, ExtraDataList* dataList)
+ExtendDataList* ExtraContainerChanges::Add(TESForm* form, ExtraDataList* dataList)
 {
 	if (!data) {
 		// wtf
@@ -313,14 +139,14 @@ ExtraContainerChanges::ExtendDataList* ExtraContainerChanges::Add(TESForm* form,
 	}
 
 	if (!data->objList) {
-		data->objList = ExtraContainerChangesEntryDataListCreate();
+		data->objList = InventoryChangesList::Create(0, 0, nullptr);
 	}
 
 	// try to locate the form
-	EntryData* found = data->objList->Find(ItemInEntryDataListMatcher(form));
+	InventoryChanges* found = data->objList->Find(ItemInEntryDataListMatcher(form));
 	if (!found) {
 		// add it to the list with a count delta of 0
-		found = EntryData::Create(form, 0);
+		found = InventoryChanges::Create(form, 0);
 		data->objList->AddAt(found, eListEnd);
 	}
 
@@ -334,9 +160,9 @@ ExtraContainerChanges* ExtraContainerChanges::Create()
 	return xChanges;
 }
 
-ExtraContainerChanges::Data* ExtraContainerChanges::Data::Create(TESObjectREFR* owner)
+ExtraContainerChangesData* ExtraContainerChangesData::Create(TESObjectREFR* owner)
 {
-	const auto data = static_cast<Data*>(FormHeap_Allocate(sizeof(Data)));
+	const auto data = static_cast<ExtraContainerChangesData*>(FormHeap_Allocate(sizeof(ExtraContainerChangesData)));
 	if (data) {
 		data->owner = owner;
 		data->objList = nullptr;
@@ -346,7 +172,7 @@ ExtraContainerChanges::Data* ExtraContainerChanges::Data::Create(TESObjectREFR* 
 	return data;
 }
 
-Float64 ExtraContainerChanges::Data::GetInventoryWeight()
+Float64 ExtraContainerChangesData::GetInventoryWeight()
 {
 	return ThisCall<Float64>(0x4D0900, this, PlayerCharacter::GetSingleton()->isHardcore);
 }
@@ -355,9 +181,9 @@ ExtraContainerChanges* ExtraContainerChanges::Create(TESObjectREFR* thisObj, UIn
 {
 	const auto xData = (ExtraContainerChanges*)BSExtraData::Create(kExtraData_ContainerChanges, sizeof(ExtraContainerChanges), s_ExtraContainerChangesVtbl);
 	if (xData) {
-		xData->data = Data::Create(thisObj);
+		xData->data = ExtraContainerChangesData::Create(thisObj);
 		if (refID) {
-			xData->data->objList = ExtraContainerChangesEntryDataListCreate(refID, count, pExtendDataList);
+			xData->data->objList = InventoryChangesList::Create(refID, count, pExtendDataList);
 		}
 	}
 	return xData;
@@ -367,7 +193,7 @@ void ExtraContainerChangesFree(ExtraContainerChanges* xData, bool bFreeList) {
 	if (xData) {
 		if (xData->data) {
 			if (xData->data->objList && bFreeList) {
-				ExtraContainerChangesEntryDataListFree(xData->data->objList, true);
+				xData->data->objList->Free(true);
 			}
 			FormHeap_Free(xData->data);
 		}
@@ -415,7 +241,7 @@ ExtraDataList* ExtraContainerChanges::SetEquipped(TESForm* obj, bool bEquipped, 
 					else if (bEquipped && (bForce || !iter->HasType(kExtraData_CannotWear)))
 							Possible = iter;
 			if (!xData->extendData)
-				xData->extendData = ExtraContainerChangesExtendDataListCreate(nullptr);
+				xData->extendData = ExtendDataList::Create(nullptr);
 			if (Possible) {
 				Possible->Add(ExtraWorn::Create());
 				return Possible; 
@@ -484,7 +310,7 @@ ExtraContainerChanges* ExtraContainerChanges::GetForRef(TESObjectREFR* refr)
 	return xChanges;
 }
 
-UInt32 ExtraContainerChanges::GetAllEquipped(std::vector<EntryData*>& outEntryData, std::vector<ExtendDataList*>& outExtendData)
+UInt32 ExtraContainerChanges::GetAllEquipped(std::vector<InventoryChanges*>& outEntryData, std::vector<ExtendDataList*>& outExtendData)
 {
 	if (data && data->objList)
 	{
@@ -543,8 +369,8 @@ ExtraCannotWear* ExtraCannotWear::Create()
 ExtraLock* ExtraLock::Create()
 {
 	const auto xLock = (ExtraLock*)BSExtraData::Create(kExtraData_Lock, sizeof(ExtraLock), s_ExtraLockVtbl);
-	const auto lockData = (Data*)FormHeap_Allocate(sizeof(Data));
-	memset(lockData, 0, sizeof(Data));
+	const auto lockData = (ExtraLockData*)FormHeap_Allocate(sizeof(ExtraLockData));
+	memset(lockData, 0, sizeof(ExtraLockData));
 	xLock->data = lockData;
 	return xLock;
 }

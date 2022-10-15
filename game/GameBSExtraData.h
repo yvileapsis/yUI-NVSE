@@ -322,11 +322,65 @@ struct ExtraDataList : public BaseExtraList
 };
 static_assert(sizeof(ExtraDataList) == 0x020);
 
-
 class ExtendDataList : public TList<ExtraDataList>
 {
 public:
+	static ExtendDataList* Create(ExtraDataList* pExtraDataList = nullptr);
+	static void Free(ExtendDataList* xData, bool bFreeList = false);
+	static bool Add(ExtendDataList* xData, ExtraDataList* xList);
+	static bool Remove(ExtendDataList* xData, ExtraDataList* xList, bool bFreeList = false);
+
 	SInt32 AddAt(ExtraDataList* item, SInt32 index);
 	void RemoveAll() const;
 	ExtraDataList* RemoveNth(SInt32 n);
 };
+
+typedef std::vector<ExtendDataList*> ExtendDataArray;
+
+struct InventoryChanges
+{
+	ExtendDataList*			extendData;		// 00
+	SInt32					countDelta;		// 04
+	TESForm*				form;			// 08
+
+	void					Free(bool bFreeList = false);
+	void					Cleanup();
+	static InventoryChanges*Create(TESForm* pForm, UInt32 count = 1, ExtendDataList* pExtendDataList = nullptr);
+	ExtendDataList*			Add(ExtraDataList* newList);
+	bool					Remove(ExtraDataList* toRemove, bool bFree = false);
+	bool					HasExtraLeveledItem();
+	void					RemoveCannotWear();
+	float					GetItemHealthPerc(bool arg1 = true);
+	ExtraDataList*			GetEquippedExtra();
+	ExtraDataList*			GetCustomExtra(UInt32 whichVal);
+	BSExtraData*			GetExtraData(UInt32 whichVal);
+	float					CalculateWeaponDamage(float condition, TESForm* ammo);
+	float					GetValue();
+	bool					HasWeaponMod(UInt32 modEffect) { return ThisStdCall<bool>(0x4BDA70, this, modEffect); }
+	UInt32					GetWeaponNumProjectiles(Actor* owner);
+	bool					ShouldDisplay();
+
+	UInt8					GetWeaponMod();
+	__forceinline Float64	GetHealthPercent(char a1 = 0) { return ThisCall<Float64>(0x4BCDB0, this, a1); };
+	Float64					GetHealthPercentAlt(bool axonisFix = false);
+	bool					GetEquipped();
+};
+static_assert(sizeof(InventoryChanges) == 0xC);
+
+struct InventoryChangesList : TList<InventoryChanges>
+{
+	InventoryChanges*				FindForItem(TESForm* item);
+	void							Free(bool bFreeList);
+	static InventoryChangesList*	Create(UInt32 refID, UInt32 count, ExtendDataList* pExtendDataList);
+};
+
+struct InventoryItemData
+{
+	SInt32								count;
+	InventoryChanges* entry;
+
+	InventoryItemData(SInt32 count, InventoryChanges* entry) : count(count), entry(entry) {}
+};
+static_assert(sizeof(InventoryItemData) == 0x08);
+
+typedef std::vector<InventoryChanges*> InventoryChangesArray;

@@ -1,7 +1,4 @@
 #pragma once
-
-#include "GameForms.h"
-#include "NiTypes.h"
 #include "GameTypes.h"
 #include "Utilities.h"
 

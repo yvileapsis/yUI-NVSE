@@ -1,8 +1,5 @@
 #pragma once
-#include <NiTypes.h>
-#include <Utilities.h>
 #include <GameTypes.h>
-
 // 254
 class BSSoundInfo
 {

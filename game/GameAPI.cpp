@@ -59,11 +59,11 @@ const char* GetFullName(TESForm * baseForm)
 	return "<no name>";
 }
 
-extern DataHandler* g_dataHandler;
+extern TESDataHandler* g_TESDataHandler;
 
 TESForm* GetFormByID(const char* mod, UInt32 refID)
 {
-	return GetFormByID((g_dataHandler->GetModIndex(mod) << 24) + (refID & 0x00FFFFFF));
+	return GetFormByID((g_TESDataHandler->GetModIndex(mod) << 24) + (refID & 0x00FFFFFF));
 }
 
 bool s_InsideOnActorEquipHook = false;

@@ -1,7 +1,5 @@
 #pragma once
-#include "NiNodes.h"
-#include "GameForms.h"
-#include "GameExtraData.h"
+#include "GameTypes.h"
 
 enum AnimAction : SInt16
 {
@@ -44,11 +42,11 @@ enum QueuedIdleFlags
 
 // Straight from OBSE. Needs to be debugged ! ! ! 
 // This is used all over the game code to manage actors and occassionally other objects.
-class ActorProcessManager
+class ActorProcessLists
 {
 public:
-	ActorProcessManager();
-	~ActorProcessManager();
+	ActorProcessLists();
+	~ActorProcessLists();
 
 	struct ActorList {
 		TList<Actor>			head;
@@ -75,7 +73,7 @@ public:
 	UInt32					unk74;					// 74 Possibly not a member. Definitely no more members following this.
 };
 
-extern ActorProcessManager * g_actorProcessManager;
+extern ActorProcessLists * g_actorProcessLists;
 
 class AmmoInfo
 {
@@ -241,7 +239,7 @@ public:
 	virtual void			Unk_57(void);
 	virtual void			Unk_58(void);
 	virtual void			Unk_59(void);
-	virtual void			UpdateAmmoInfo(ContChangesEntry*);
+	virtual void			UpdateAmmoInfo(InventoryChanges*);
 	virtual void			Unk_5B(void);
 	virtual void			Unk_5C(void);
 	virtual void			Unk_5D(void);	// Called by 5E with count itemExtraList item
@@ -856,7 +854,7 @@ public:
 	UInt8								byte229;			// 229
 	UInt16								byte22A;			// 22A
 	UInt32								unk22C;				// 22C
-	TList<ContChangesEntry>				queuedEquipItems;	// 230	ContChangesEntry*
+	TList<InventoryChanges>				queuedEquipItems;	// 230	InventoryChanges*
 	float								rads238;			// 238
 	float								waterRadsSec;		// 23C
 	ActorHitData*						lastHitData;			// 240 ActorHitData*

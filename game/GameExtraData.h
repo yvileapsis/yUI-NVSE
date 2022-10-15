@@ -1,9 +1,6 @@
 #pragma once
-#include <GameTypes.h>
-#include <GameBSExtraData.h>
-#include <GameForms.h>
 #include <GameSound.h>
-#include <vector>
+#include <GameForms.h>
 
 #define GetByTypeCast(xDataList, Type) DYNAMIC_CAST(xDataList.GetByType(kExtraData_ ## Type), BSExtraData, Extra ## Type)
 extern char*		GetExtraDataValue(BSExtraData* traverse);
@@ -56,52 +53,24 @@ public:
 };
 static_assert(sizeof(ExtraScript) == 0x14);
 
+struct ExtraContainerChangesData
+{
+	InventoryChangesList*	objList;	// 000
+	TESObjectREFR*			owner;		// 004
+	float					unk2;		// 008	OnEquip: at the begining, stored into unk3 and forced to -1.0 before checking owner
+	float					unk3;		// 00C
+	UInt8					byte10;		// 010	referenced in relation to scripts in container
+	UInt8					pad[3];
+
+	static ExtraContainerChangesData*	Create(TESObjectREFR* owner);
+	Float64								GetInventoryWeight();
+};
+
 class ExtraContainerChanges : public BSExtraData
 {
 public:
 	ExtraContainerChanges();
 	virtual ~ExtraContainerChanges();
-
-	class ExtendDataList: public TList<ExtraDataList>
-	{
-	public:
-		SInt32				AddAt(ExtraDataList* item, SInt32 index);
-		void				RemoveAll() const;
-		ExtraDataList*		RemoveNth(SInt32 n);
-	};
-
-	struct EntryData
-	{
-		ExtendDataList*		extendData;		// 00
-		SInt32				countDelta;		// 04
-		TESForm*			form;			// 08
-
-		void					Cleanup();
-		static EntryData*		Create(TESForm* pForm, UInt32 count = 1, ExtendDataList* pExtendDataList = nullptr);
-		ExtendDataList*			Add(ExtraDataList* newList);
-		bool					Remove(ExtraDataList* toRemove, bool bFree = false);
-		bool					HasExtraLeveledItem();
-		void					RemoveCannotWear();
-		float					GetItemHealthPerc(bool arg1 = true);
-		ExtraDataList*			GetEquippedExtra();
-		ExtraDataList*			GetCustomExtra(UInt32 whichVal);
-		BSExtraData*			GetExtraData(UInt32 whichVal);
-		float					CalculateWeaponDamage(float condition, TESForm* ammo);
-		float					GetValue();
-		bool					HasWeaponMod(UInt32 modEffect) { return ThisStdCall<bool>(0x4BDA70, this, modEffect); }
-		UInt32					GetWeaponNumProjectiles(Actor* owner);
-		bool					ShouldDisplay();
-
-		UInt8					GetWeaponMod();
-		__forceinline Float64	GetHealthPercent(char a1 = 0) { return ThisCall<Float64>(0x4BCDB0, this, a1); };
-		Float64					GetHealthPercentAlt(bool axonisFix = false);
-		bool					GetEquipped();
-	};
-
-	struct EntryDataList : TList<EntryData>
-	{
-		EntryData* FindForItem(TESForm* item);
-	};
 
 	// find the equipped item whose form matches the passed matcher
 	struct FoundEquipData {
@@ -109,74 +78,35 @@ public:
 		ExtraDataList*	pExtraData;
 	};
 
-	typedef std::vector<EntryData*> DataArray;
-	typedef std::vector<ExtendDataList*> ExtendDataArray;
+	ExtraContainerChangesData*		data;	// 00C
 
-	struct Data
-	{
-		EntryDataList*	objList;	// 000
-		TESObjectREFR*	owner;		// 004
-		float			unk2;		// 008	OnEquip: at the begining, stored into unk3 and forced to -1.0 before checking owner
-		float			unk3;		// 00C
-		UInt8			byte10;		// 010	referenced in relation to scripts in container
-		UInt8			pad[3];
-
-		static Data*	Create(TESObjectREFR* owner);
-		Float64			GetInventoryWeight();
-	};
-
-	Data*				data;	// 00C
-
-	EntryData*						GetByType(TESForm * type);
+	InventoryChanges*				GetByType(TESForm * type);
 	void							DebugDump();
 	void							Cleanup();	// clean up unneeded extra data from each EntryData
 	ExtendDataList*					Add(TESForm* form, ExtraDataList* dataList = NULL);
 	bool							Remove(TESForm* form, ExtraDataList* dataList = NULL, bool bFree = false);
 	ExtraDataList*					SetEquipped(TESForm* obj, bool bEquipped, bool bForce = false);
 	// get EntryData and ExtendData for all equipped objects, return num objects equipped
-	UInt32							GetAllEquipped(DataArray& outEntryData, ExtendDataArray& outExtendData);
+	UInt32							GetAllEquipped(InventoryChangesArray& outEntryData, ExtendDataArray& outExtendData);
 	static ExtraContainerChanges*	Create();
 	static ExtraContainerChanges*	Create(TESObjectREFR* thisObj, UInt32 refID = 0, UInt32 count = 1,
 	                                     ExtendDataList* pExtendDataList = NULL);
 	static ExtraContainerChanges*	GetForRef(TESObjectREFR* refr);
 	FoundEquipData					FindEquipped(FormMatcher& matcher) const;
-	EntryDataList*					GetEntryDataList() const { return data ? data->objList : nullptr; }
+	InventoryChangesList*			GetEntryDataList() const { return data ? data->objList : nullptr; }
 };
-
-
 static_assert(sizeof(ExtraContainerChanges) == 0x10);
 
-typedef ExtraContainerChanges::ExtendDataArray ContChangesExtendArray;
-
-typedef ExtraContainerChanges::EntryData ContChangesEntry;
-static_assert(sizeof(ContChangesEntry) == 0xC);
-
-class TileContChangesEntryUnk
+class TileInventoryChangesUnk
 {
 public:
 	Tile*				tile = nullptr;
-	ContChangesEntry*	entry = nullptr;
+	InventoryChanges*	entry = nullptr;
 	UInt32				count = 0;
 
-	TileContChangesEntryUnk() = default;
-	TileContChangesEntryUnk(ContChangesEntry* entry, Tile* tile = nullptr) : tile(tile), entry(entry), count(entry->countDelta) {}
+	TileInventoryChangesUnk() = default;
+	TileInventoryChangesUnk(InventoryChanges* entry, Tile* tile = nullptr) : tile(tile), entry(entry), count(entry->countDelta) {}
 };
-
-typedef ExtraContainerChanges::DataArray ContChangesArray;
-
-typedef ExtraContainerChanges::EntryDataList ContChangesList;
-static_assert(sizeof(ContChangesList) == 0x8);
-
-struct InventoryItemData
-{
-	SInt32								count;
-	ContChangesEntry*					entry;
-
-	InventoryItemData(SInt32 count, ContChangesEntry* entry) : count(count), entry(entry) {}
-};
-static_assert(sizeof(InventoryItemData) == 0x08);
-
-typedef std::unordered_map<TESForm*, InventoryItemData> InventoryItemsMap;
 
 // Finds an ExtraDataList in an ExtendDataList
 class ExtraDataListInExtendDataListMatcher
@@ -195,27 +125,27 @@ class ExtraDataListInEntryDataListMatcher
 public:
 	ExtraDataListInEntryDataListMatcher(ExtraDataList* match) : m_toMatch(match) { }
 
-	bool Accept(ContChangesEntry* match);
+	bool Accept(InventoryChanges* match);
 };
 
 // Finds an ExtendDataList in an EntryDataList
 class ExtendDataListInEntryDataListMatcher
 {
-	ExtraContainerChanges::ExtendDataList* m_toMatch;
+	ExtendDataList* m_toMatch;
 public:
-	ExtendDataListInEntryDataListMatcher(ExtraContainerChanges::ExtendDataList* match) : m_toMatch(match) { }
+	ExtendDataListInEntryDataListMatcher(ExtendDataList* match) : m_toMatch(match) { }
 
-	bool Accept(ContChangesEntry* match) { return match && match->extendData ? match->extendData == m_toMatch : false; }
+	bool Accept(InventoryChanges* match) { return match && match->extendData ? match->extendData == m_toMatch : false; }
 };
 
 // Finds an EntryData in an EntryDataList
 class EntryDataInEntryDataListMatcher
 {
-	ContChangesEntry* m_toMatch;
+	InventoryChanges* m_toMatch;
 public:
-	EntryDataInEntryDataListMatcher(ContChangesEntry* match) : m_toMatch(match) { }
+	EntryDataInEntryDataListMatcher(InventoryChanges* match) : m_toMatch(match) { }
 
-	bool Accept(ContChangesEntry* match) { return (m_toMatch == match); }
+	bool Accept(InventoryChanges* match) { return (m_toMatch == match); }
 };
 
 // Finds an Item (type) in an EntryDataList
@@ -225,7 +155,7 @@ class ItemInEntryDataListMatcher
 public:
 	ItemInEntryDataListMatcher(TESForm* match) : m_toMatch(match) { }
 
-	bool Accept(ContChangesEntry* match) { return (match && m_toMatch == match->form); }
+	bool Accept(InventoryChanges* match) { return (match && m_toMatch == match->form); }
 };
 
 // Finds an Item from its base form in an EntryDataList
@@ -235,7 +165,7 @@ class BaseInEntryDataLastMatcher
 public:
 	BaseInEntryDataLastMatcher(TESForm* match) : m_toMatch(match) { }
 
-	bool Accept(ContChangesEntry* match) { return (match && match->form && m_toMatch == match->form->TryGetREFRParent()); }
+	bool Accept(InventoryChanges* match) { return (match && match->form && m_toMatch == match->form->TryGetREFRParent()); }
 };
 
 // Finds an item by refID in an EntryDataList
@@ -245,7 +175,7 @@ class RefIDInEntryDataListMatcher
 public:
 	RefIDInEntryDataListMatcher(UInt32 match) : m_toMatch(match) { }
 
-	bool Accept(ContChangesEntry* match) { return (match && match->form && m_toMatch == match->form->refID); }
+	bool Accept(InventoryChanges* match) { return (match && match->form && m_toMatch == match->form->refID); }
 };
 
 // Finds an item by the refID of its base form in an EntryDataList
@@ -255,22 +185,10 @@ class BaseIDInEntryDataListMatcher
 public:
 	BaseIDInEntryDataListMatcher(UInt32 match) : m_toMatch(match) { }
 
-	bool Accept(ContChangesEntry* match) { return (match && match->form && match->form->TryGetREFRParent() && m_toMatch == match->form->TryGetREFRParent()->refID); }
+	bool Accept(InventoryChanges* match) { return (match && match->form && match->form->TryGetREFRParent() && m_toMatch == match->form->TryGetREFRParent()->refID); }
 };
 
 typedef ExtraContainerChanges::FoundEquipData EquipData;
-
-extern ExtraContainerChanges::ExtendDataList* ExtraContainerChangesExtendDataListCreate(ExtraDataList* pExtraDataList = NULL);
-extern void ExtraContainerChangesExtendDataListFree(ExtraContainerChanges::ExtendDataList* xData, bool bFreeList = false);
-extern bool ExtraContainerChangesExtendDataListAdd(ExtraContainerChanges::ExtendDataList* xData, ExtraDataList* xList);
-extern bool ExtraContainerChangesExtendDataListRemove(ExtraContainerChanges::ExtendDataList* xData, ExtraDataList* xList, bool bFreeList = false);
-
-extern void ExtraContainerChangesEntryDataFree(ContChangesEntry* xData, bool bFreeList = false);
-
-extern ContChangesList* ExtraContainerChangesEntryDataListCreate(UInt32 refID = 0, UInt32 count = 1, ExtraContainerChanges::ExtendDataList* pExtendDataList = NULL);
-extern void ExtraContainerChangesEntryDataListFree(ContChangesList* xData, bool bFreeList = false);
-
-extern void ExtraContainerChangesFree(ExtraContainerChanges* xData, bool bFreeList = false);
 
 class ExtraHealth : public BSExtraData
 {
@@ -338,30 +256,30 @@ public:
 };
 static_assert(sizeof(ExtraCount) == 0x10);
 
+struct ExtraLockData
+{
+	enum
+	{
+		kLocked = 1
+	};
+
+	UInt32	lockLevel;	// 00
+	TESKey* key;		// 04
+	UInt8	flags;		// 08
+	UInt8	pad[3];
+	UInt32  unk0C;		// 0C introduced since form version 0x10
+	UInt32	unk10;		// 10
+
+	bool IsLocked() { return flags & kLocked; };
+};
+
 class ExtraLock : public BSExtraData
 {
 public:
 	ExtraLock();
 	virtual ~ExtraLock();
 
-	struct Data
-	{
-		enum
-		{
-			kLocked = 1
-		};
-
-		UInt32	lockLevel;	// 00
-		TESKey* key;		// 04
-		UInt8	flags;		// 08
-		UInt8	pad[3];
-		UInt32  unk0C;		// 0C introduced since form version 0x10
-		UInt32	unk10;		// 10
-
-		bool IsLocked() { return flags & kLocked; };
-	};
-
-	Data*	data;		// 00C
+	ExtraLockData*	data;		// 00C
 
 	static ExtraLock* Create();
 };
@@ -538,6 +456,14 @@ public:
 };
 static_assert(sizeof(ExtraReferencePointer) == 0x10);
 
+struct ExtraMapMarkerData
+{
+	TESFullName		fullName;            // not all markers have this
+	UInt16			flags;
+	UInt16			type;
+	TESForm*		reputation;            // not all markers have this
+};
+
 // Provided by "Luthien Anarion"
 class ExtraMapMarker : BSExtraData
 {
@@ -570,14 +496,7 @@ public:
         kType_Vault,
     };
 
-    struct MarkerData
-    {
-        TESFullName		fullName;            // not all markers have this
-        UInt16			flags;
-        UInt16			type;
-        TESForm*		reputation;            // not all markers have this
-    };
-    MarkerData*			data;
+	ExtraMapMarkerData*	data;
 
     // flag member functions
 	bool IsVisible()				{ return (data->flags & kFlag_Visible) == kFlag_Visible; }

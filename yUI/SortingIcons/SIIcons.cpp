@@ -28,7 +28,7 @@ namespace SortingIcons::Icons
 		return true;
 	}
 
-	void InjectIconTile(const Category& category, MenuItemEntryList* list, Tile* tile, ContChangesEntry* entry)
+	void InjectIconTile(const Category& category, MenuItemEntryList* list, Tile* tile, InventoryChanges* entry)
 	{
 		//	if (g_Items.find(entry->type) == g_Items.end()) return;
 		if (category.filename.empty()) return;
@@ -73,13 +73,13 @@ namespace SortingIcons::Icons
 		text->SetFloat(kTileValue_wrapwidth, text->GetFloat(kTileValue_wrapwidth) - x, true);
 	}
 
-	void __fastcall SetTileStringInjectTile(Tile* tile, ContChangesEntry* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate)
+	void __fastcall SetTileStringInjectTile(Tile* tile, InventoryChanges* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate)
 	{
 		tile->SetString(tilevalue, tileText, propagate);
 		if (entry && entry->form && TryGetTypeOfForm(entry->form)) InjectIconTile(g_StringToCategory[Sorting::GetCategoryForItem(entry)], list, tile, entry);
 	}
 
-	void __fastcall SetStringValueTagImage(Tile* tile, ContChangesEntry* entry, eTileValue tilevalue, char* src, char propagate)
+	void __fastcall SetStringValueTagImage(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate)
 	{
 		if (!tile) return;
 
@@ -100,7 +100,7 @@ namespace SortingIcons::Icons
 		tile->SetString(tilevalue, g_StringToCategory[tag].filename.empty() ? src : g_StringToCategory[tag].filename.c_str(), propagate);
 	}
 
-	void __fastcall SetStringValueTagRose(Tile* tile, ContChangesEntry* entry, eTileValue tilevalue, char* src, char propagate)
+	void __fastcall SetStringValueTagRose(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate)
 	{
 		if (!tile) return;
 

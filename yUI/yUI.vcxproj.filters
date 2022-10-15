@@ -104,6 +104,18 @@
     <ClCompile Include="MiscFeatures\PatchTimeMult.cpp">
       <Filter>features</Filter>
     </ClCompile>
+    <ClCompile Include="MiscFeatures\FixProjectileEffects.cpp">
+      <Filter>features</Filter>
+    </ClCompile>
+    <ClCompile Include="MiscFeatures\PatchAlterSpread.cpp">
+      <Filter>features</Filter>
+    </ClCompile>
+    <ClCompile Include="MiscFeatures\PatchArmedUnarmed.cpp">
+      <Filter>features</Filter>
+    </ClCompile>
+    <ClCompile Include="MiscFeatures\PatchExplosionForce.cpp">
+      <Filter>features</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h" />

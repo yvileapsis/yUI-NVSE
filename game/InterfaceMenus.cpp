@@ -11,7 +11,7 @@ void(__cdecl* MenuButton_Downloads)() = reinterpret_cast<void(*)()>(0x7D0550);
 
 void MenuButton_DownloadsClick() { MenuButton_Downloads(); }
 
-ContChangesEntry** g_modMenuTarget = reinterpret_cast<ContChangesEntry**>(0x11D9F58);
+InventoryChanges** g_modMenuTarget = reinterpret_cast<InventoryChanges**>(0x11D9F58);
 
 
 bool Menu::GetTemplateExists(const char* templateName)

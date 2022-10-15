@@ -59,7 +59,7 @@ namespace SortingIcons::Hooks
 	template<UInt32 retn> __declspec(naked) void SortingInventoryMenu()
 	{
 		static const auto CompareItems = reinterpret_cast<UInt32>(Sorting::CompareItemsWithTags);
-		static const UInt32 ContChangesEntry_GetFullName = 0x4BE2D0;
+		static const UInt32 InventoryChanges_GetFullName = 0x4BE2D0;
 		static const UInt32 retnAddr = retn;
 		_asm
 		{
@@ -77,7 +77,7 @@ namespace SortingIcons::Hooks
 		got0 :
 			mov		edx, [ebp + 0xC]
 			mov		ecx, [edx + 0x4]
-			call	ContChangesEntry_GetFullName
+			call	InventoryChanges_GetFullName
 			jmp		retnAddr
 		}
 	}

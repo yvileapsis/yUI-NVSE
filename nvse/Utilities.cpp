@@ -228,17 +228,17 @@ void ConsolePrintQueue()
 	queuedConsoleMessages.clear();
 }
 
-extern DataHandler* g_dataHandler;
+extern TESDataHandler* g_TESDataHandler;
 
 void PrintConsoleOrQueue(const std::string& msg)
 {
-	if (*reinterpret_cast<ConsoleManager**>(0x11D8CE8) || g_dataHandler) // g_dataHandler will be non-null if Deferred init has been called
+	if (*reinterpret_cast<ConsoleManager**>(0x11D8CE8) || g_TESDataHandler) // g_TESDataHandler will be non-null if Deferred init has been called
 		PrintConsole("%s: %s", gLog.GetModString().c_str(), msg.c_str());
 	else
 		queuedConsoleMessages.push_back(msg);
 }
 
-inline int							g_logLevel = 0;
+inline int	g_logLevel = 1;
 
 void Log(const std::string& msg, UInt32 loglevel)
 {
@@ -847,7 +847,7 @@ const char* GetModName(const TESForm* script)
 	const char* modName = "In-game console";
 	if (script->modIndex != 0xFF)
 	{
-		modName = DataHandler::GetSingleton()->GetNthModName(script->modIndex);
+		modName = TESDataHandler::GetSingleton()->GetNthModName(script->modIndex);
 		if (!modName || !modName[0])
 			modName = "Unknown";
 	}

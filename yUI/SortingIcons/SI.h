@@ -186,17 +186,17 @@ namespace SortingIcons::Sorting
 {
 	void KeyringRefreshPostStewie();
 	std::string GetCategoryForItem(TESForm* form);
-	std::string GetCategoryForItem(ContChangesEntry* entry);
+	std::string GetCategoryForItem(InventoryChanges* entry);
 	bool IsTagForItem(TESForm* form);
-	bool IsTagForItem(ContChangesEntry* entry);
+	bool IsTagForItem(InventoryChanges* entry);
 
-	SInt32 __fastcall CompareItemsWithTags(const TileContChangesEntryUnk* unk1, const TileContChangesEntryUnk* unk2);
+	SInt32 __fastcall CompareItemsWithTags(const TileInventoryChangesUnk* unk1, const TileInventoryChangesUnk* unk2);
 
 	void __fastcall HideNonKeysGetTile(InventoryMenu* invmenu, Tile* tile);
 	void __fastcall AddSortingCategories();
 
-	bool __fastcall KeyringHideKeys(ContChangesEntry* entry);
-	UInt8 __fastcall InventoryMenuShouldHideItem(ContChangesEntry* entry);
+	bool __fastcall KeyringHideKeys(InventoryChanges* entry);
+	UInt8 __fastcall InventoryMenuShouldHideItem(InventoryChanges* entry);
 	void __fastcall KeyringEnableCancelHook(Tile* tile, void* dummyEDX, eTileValue tilevalue, signed int a1);
 	void __fastcall KeyringPipBoyIconHook(Tile* tile, void* dummyEDX, eTileValue tilevalue, char* string, int propagate);
 	void SetUpTabline(TileRect* tabline, int traitID, const char* strWeapon, const char* strApparel, const char* strAid,
@@ -209,15 +209,15 @@ namespace SortingIcons::Sorting
 	void InventoryMenuRestoreScrollPosition();
 
 
-	bool __fastcall HasContainerChangesEntry(ContChangesEntry* entry);
+	bool __fastcall HasContainerChangesEntry(InventoryChanges* entry);
 	bool __fastcall KeyringShowCategories(Tile* tile);
 }
 
 namespace SortingIcons::Icons
 {
 	void InjectTemplates();
-	void InjectIconTile(const Category& category, MenuItemEntryList* list, Tile* tile, ContChangesEntry* entry);
-	void __fastcall SetTileStringInjectTile(Tile* tile, ContChangesEntry* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate);
-	void __fastcall SetStringValueTagImage(Tile* tile, ContChangesEntry* entry, eTileValue tilevalue, char* src, char propagate);
-	void __fastcall SetStringValueTagRose(Tile* tile, ContChangesEntry* entry, eTileValue tilevalue, char* src, char propagate);
+	void InjectIconTile(const Category& category, MenuItemEntryList* list, Tile* tile, InventoryChanges* entry);
+	void __fastcall SetTileStringInjectTile(Tile* tile, InventoryChanges* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate);
+	void __fastcall SetStringValueTagImage(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate);
+	void __fastcall SetStringValueTagRose(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate);
 }

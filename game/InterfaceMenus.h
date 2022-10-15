@@ -158,7 +158,7 @@ public:
 	enum
 	{
 		kFlag_RecalculateHeightsOnInsert = 1,
-		kFlag_FreeContChangeOnListItemDestruction = 2, // assumes the object is a ContChangesEntry - do not set this if the object isn't one...
+		kFlag_FreeContChangeOnListItemDestruction = 2, // assumes the object is a InventoryChanges - do not set this if the object isn't one...
 	};
 
 	Tile*			parentTile;			// 0C
@@ -473,7 +473,7 @@ public:
 	__forceinline void			HideTitle(bool noFadeIn) { ThisCall(0xA1DC20, this, noFadeIn); };
 };
 
-class MenuItemEntryList : public ListBox<ContChangesEntry>
+class MenuItemEntryList : public ListBox<InventoryChanges>
 {
 public:
 	void RestoreScrollPositionProxy(Float32 listIndex, Float32 scrollbarPos) { ThisCall(0x7832E0, this, listIndex, scrollbarPos); }
@@ -573,8 +573,8 @@ public:
 	Sound				menuSound;		// 100
 
 	static ContainerMenu*		GetSingleton() { return *reinterpret_cast<ContainerMenu**>(0x11D93F8); }
-	static ContChangesEntry*	GetSelection() { return *reinterpret_cast<ContChangesEntry**>(0x11D93FC); }
-	static void					SetSelection(ContChangesEntry* entry) { *reinterpret_cast<ContChangesEntry**>(0x11D93FC) = entry; }
+	static InventoryChanges*	GetSelection() { return *reinterpret_cast<InventoryChanges**>(0x11D93FC); }
+	static void					SetSelection(InventoryChanges* entry) { *reinterpret_cast<InventoryChanges**>(0x11D93FC) = entry; }
 	void __forceinline			Refresh(TESForm* form = nullptr) { ThisCall(0x75C280, form); }
 
 };
@@ -1279,7 +1279,7 @@ public:
 	MenuItemEntryList itemModList;
 
 	static ItemModMenu* GetSingleton() { return *reinterpret_cast<ItemModMenu**>(0x11D9F54); };
-	static ContChangesEntry* GetTarget() { return *reinterpret_cast<ContChangesEntry**>(0x11D9F58); };
+	static InventoryChanges* GetTarget() { return *reinterpret_cast<InventoryChanges**>(0x11D9F58); };
 };
 
 class TraitMenu : Menu
@@ -1362,8 +1362,8 @@ public:
 	MenuItemEntryList		repairItems;	// 5C
 
 	static RepairMenu* GetSingleton() { return *reinterpret_cast<RepairMenu**>(0x11DA75C); };
-	static ContChangesEntry* GetSelection() { return *reinterpret_cast<ContChangesEntry**>(0x11DA760); };
-	static void SetSelection(ContChangesEntry* entry) { *reinterpret_cast<ContChangesEntry**>(0x11DA760) = entry; };
+	static InventoryChanges* GetSelection() { return *reinterpret_cast<InventoryChanges**>(0x11DA760); };
+	static void SetSelection(InventoryChanges* entry) { *reinterpret_cast<InventoryChanges**>(0x11DA760) = entry; };
 };
 
 struct VATSTargetInfo
@@ -1564,11 +1564,11 @@ public:
 	ScrollPos				tabScrollPositions[6];	// 088, the scroll index for Weapons, Apparel, Aid, Misc, Ammo and the Keyring
 	MenuItemEntryList		itemsList;				// 0B8
 	HotKeyWheel				hotkeyWheel;			// 0E8
-	TList<ContChangesEntry> changedItemsList;		// 11C
+	TList<InventoryChanges> changedItemsList;		// 11C
 
 	static InventoryMenu*		GetSingleton() { return *reinterpret_cast<InventoryMenu**>(0x11D9EA4); }
 	static UInt32				GetMenuID() { return 1002; }
-	static ContChangesEntry*	GetSelection() { return *reinterpret_cast<ContChangesEntry**>(0x11D9EA8); }
+	static InventoryChanges*	GetSelection() { return *reinterpret_cast<InventoryChanges**>(0x11D9EA8); }
 	static bool					IsKeyringOpen();
 	static void					RestoreScrollPosition() { CdeclCall(0x7800C0); }
 
@@ -1577,7 +1577,7 @@ public:
 static_assert(sizeof(InventoryMenu) == 0x124);
 
 
-typedef TList<ContChangesEntry> BarterItemList;
+typedef TList<InventoryChanges> BarterItemList;
 class BarterMenu : public Menu			// 1053
 {
 public:

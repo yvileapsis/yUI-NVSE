@@ -83,7 +83,7 @@ namespace Patch::TimeMult
 	{
 		std::vector<Script*> vec;
 
-		for (auto iter : g_dataHandler->scriptList) vec.push_back(iter);
+		for (auto iter : g_TESDataHandler->scriptList) vec.push_back(iter);
 		for (const auto& iter : std::ranges::reverse_view(vec))
 		{
 			if (g_specialMods.contains(iter->modIndex)) continue;
@@ -262,8 +262,10 @@ namespace Patch::TimeMult
 	extern void Init()
 	{
 		HandleINIs();
-		Patch(g_yTM);
 		if (g_yTM) pluginLoad.emplace_back(PluginLoad);
+
+		if (g_nvseInterface->isEditor) return;
+		Patch(g_yTM);
 		if (g_yTM) deferredInit.emplace_back(FillMaps);
 	}
 }

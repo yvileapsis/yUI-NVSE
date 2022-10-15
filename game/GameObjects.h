@@ -1,7 +1,9 @@
 #pragma once
-#include <NiNodes.h>
 #include <GameForms.h>
-#include <GameExtraData.h>
+#include <GameSound.h>
+#include <GameBSExtraData.h>
+
+typedef std::unordered_map<TESForm*, InventoryItemData> InventoryItemsMap;
 
 class TESChildCell
 {
@@ -143,7 +145,7 @@ public:
 
 	bool					GetDisabled();
 	ExtraContainerChanges*	GetOrCreateContainerChanges();
-	ContChangesList*		GetContainerChangesList();
+	InventoryChangesList*	GetContainerChangesList();
 	SInt32					GetItemCount(TESForm* form);
 	void					AddItemAlt(TESForm* item, UInt32 count, float condition, bool doEquip);
 	bool					GetInventoryItems(UInt8 typeID);
@@ -166,7 +168,7 @@ public:
 	NiNode* __fastcall		GetNode(const char* nodeName);
 	hkpRigidBody*			GetRigidBody(const char* nodeName);
 	bool					RunScriptSource(const char* sourceStr);
-	ExtraLock::Data*		GetLockData() { return ThisCall<ExtraLock::Data*>(0x569160, this); }
+	ExtraLockData*			GetLockData() { return ThisCall<ExtraLockData*>(0x569160, this); }
 	void					SetScale(float scale);
 	bool					IsOwnedByActor(Actor* actor, bool includeFactionOwnership) { return ThisCall<bool>(0x5785E0, this, actor, includeFactionOwnership); };
 	TESObjectREFR*			ResolveOwnership() { return ThisCall<TESObjectREFR*>(0x567790, this); };
@@ -178,13 +180,13 @@ public:
 	NiPoint3				GetDimensions() const;
 	__forceinline Float32	GetScale() { return ThisCall<float>(0x567400, this); }
 	TESObjectREFR*			ResolveAshpile();
-	__forceinline bool		IsLocked() { return this->GetLockData() ? this->GetLockData()->IsLocked() : false; }
+	__forceinline bool		IsLocked();
 
 	__forceinline bool		Activate(Actor* activator, UInt32 unk1, UInt32 unk2, UInt32 unk3) { return ThisCall<bool>(0x573170, this, activator, unk1, unk2, unk3); }
 
 	Float64					GetInventoryWeight();
 
-	std::vector<ContChangesEntry*> GetAllItems(UInt32 reclvl = 0);
+	std::vector<InventoryChanges*> GetAllItems(UInt32 reclvl = 0);
 
 	void					OpenCloseContainer(bool open = false, bool sounds = true);
 };
@@ -380,8 +382,6 @@ public:
 		// bit 7 = walk
 		// bit 0 = keep moving (Q)
 };
-
-typedef std::vector<TESForm*> EquippedItemsList;
 
 enum LifeStates
 {
@@ -635,10 +635,10 @@ public:
 	void								UnequipItem(TESForm* objType, UInt32 unequipCount = 1, ExtraDataList* itemExtraList = nullptr, UInt32 unk3 = 1,
 													bool lockEquip = false, UInt32 unk5 = 1);
 
-	EquippedItemsList					GetEquippedItems();
-	ContChangesArray					GetEquippedEntryDataList();
-	ContChangesExtendArray				GetEquippedExtendDataList();
-	Float64								GetCalculatedSpread(UInt32 mode = 0, ContChangesEntry* entry = nullptr);
+	std::vector<TESForm*>				GetEquippedItems();
+	InventoryChangesArray				GetEquippedEntryDataList();
+	ExtendDataArray						GetEquippedExtendDataList();
+	Float64								GetCalculatedSpread(UInt32 mode = 0, InventoryChanges* entry = nullptr);
 
 	bool								IsDoingAttackAnim() { return ThisCall<bool>(0x894900, this); }
 	bool								IsCombatTarget(const Actor* source);
@@ -725,8 +725,8 @@ public:
 
 	struct MapMarkerInfo
 	{
-		ExtraMapMarker::MarkerData*	markerData;
-		TESObjectREFR*				markerRef;
+		ExtraMapMarkerData*	markerData;
+		TESObjectREFR*		markerRef;
 	};
 
 	struct CompassTarget
@@ -984,7 +984,7 @@ public:
 	Sound					passPlayerSound;	// 0x128
 	Sound					countDownSound;		// 0x134
 	UInt32					unk140;				// 0x140
-	ContChangesEntry*		RILContChange;		// 0x144
+	InventoryChanges*		RILContChange;		// 0x144
 	UInt8					hasPlayedPassPlayerSound;// 0x148
 	UInt8					pad149[3];			// 0x149
 	Float32					maxrange;

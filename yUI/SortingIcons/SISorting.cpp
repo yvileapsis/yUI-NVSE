@@ -16,7 +16,7 @@ namespace SortingIcons::Sorting
 		return false;
 	}
 
-	bool IsTagForItem(ContChangesEntry* entry)
+	bool IsTagForItem(InventoryChanges* entry)
 	{
 		if (entry && entry->form && g_ItemToCategory.contains(entry->form)) return true;
 		return false;
@@ -29,7 +29,7 @@ namespace SortingIcons::Sorting
 		return g_ItemToCategory[form];
 	}
 
-	std::string GetCategoryForItem(ContChangesEntry* entry)
+	std::string GetCategoryForItem(InventoryChanges* entry)
 	{
 		if (!entry || !entry->form) return "";
 		if (!IsTagForItem(entry)) Files::AssignCategoryToItem(entry->form);
@@ -42,14 +42,14 @@ namespace SortingIcons::Sorting
 		return false;
 	}
 
-	bool IsFilterForItem(ContChangesEntry* entry)
+	bool IsFilterForItem(InventoryChanges* entry)
 	{
 		if (entry && entry->form && g_ItemToFilter.contains(entry->form)) return true;
 		return false;
 	}
 
 
-	SInt32 __fastcall CompareItemsWithTags(const TileContChangesEntryUnk* unk1, const TileContChangesEntryUnk* unk2)
+	SInt32 __fastcall CompareItemsWithTags(const TileInventoryChangesUnk* unk1, const TileInventoryChangesUnk* unk2)
 	{
 		const auto a1 = unk1->entry;
 		const auto a2 = unk2->entry;
@@ -154,14 +154,14 @@ namespace SortingIcons::Sorting
 		return false;
 	}
 
-	bool __fastcall KeyringHideKeys(ContChangesEntry* entry)
+	bool __fastcall KeyringHideKeys(InventoryChanges* entry)
 	{
 		if (!entry || !entry->form) return false;
 		if (!g_StringToCategory[GetCategoryForItem(entry)].category.empty()) return true;
 		return false;
 	}
 
-	bool __cdecl KeyringHideNonKeys(ContChangesEntry* entry)
+	bool __cdecl KeyringHideNonKeys(InventoryChanges* entry)
 	{
 		if (!entry || !entry->form) return true;
 		if (g_StringToCategory[GetCategoryForItem(entry)].category._Equal(openCategory)) {
@@ -175,7 +175,7 @@ namespace SortingIcons::Sorting
 	{
 		if (tile && tile->GetValue(kTileValue_user16)) openCategory = tile->GetValue(kTileValue_user16)->str; else openCategory = "";
 		invmenu->itemsList.Filter(KeyringHideNonKeys);
-		invmenu->itemsList.ForEach((void(__cdecl*)(Tile*, ContChangesEntry*))0x780C00);
+		invmenu->itemsList.ForEach((void(__cdecl*)(Tile*, InventoryChanges*))0x780C00);
 		invmenu->ResetInventorySelectionAndHideDataTile();
 	}
 
@@ -212,7 +212,7 @@ namespace SortingIcons::Sorting
 		}
 	}
 
-	bool __fastcall HasContainerChangesEntry(ContChangesEntry* entry)
+	bool __fastcall HasContainerChangesEntry(InventoryChanges* entry)
 	{
 		if (entry && entry->form) return false;
 		return true;
@@ -289,7 +289,7 @@ namespace SortingIcons::Sorting
 		}
 		else if (listIndex == 4) {
 			ThisCall(0x718630, &InterfaceManager::GetSingleton()->help, InterfaceManager::kHelpAmmo, InventoryMenu::GetMenuID(), 500);
-			menu->itemsList.ForEach(reinterpret_cast<ListBox<ContChangesEntry>::ForEachFunc>(0x782850), 0, 0x7FFFFFFF);
+			menu->itemsList.ForEach(reinterpret_cast<ListBox<InventoryChanges>::ForEachFunc>(0x782850), 0, 0x7FFFFFFF);
 		}
 		else {
 			menu->tileModButton->SetFloat(kTileValue_visible, false);
@@ -358,7 +358,7 @@ namespace SortingIcons::Sorting
 		menu->itemsList.RestoreScrollPositionProxy(listIndex, currentValue);
 	}
 
-	UInt8 __fastcall InventoryMenuShouldHideItem(ContChangesEntry* entry)
+	UInt8 __fastcall InventoryMenuShouldHideItem(InventoryChanges* entry)
 	{
 		if (!entry || !entry->form) return true;
 
@@ -395,7 +395,7 @@ namespace SortingIcons::Sorting
 				if (const auto string = stew->GetValue(kTileValue_string)->str; !stringStewie._Equal(string)) {
 					stringStewie = string;
 					InventoryMenu::GetSingleton()->itemsList.Filter(KeyringHideNonKeys);
-					InventoryMenu::GetSingleton()->itemsList.ForEach(reinterpret_cast<void(*)(Tile*, ContChangesEntry*)>(0x780C00));
+					InventoryMenu::GetSingleton()->itemsList.ForEach(reinterpret_cast<void(*)(Tile*, InventoryChanges*)>(0x780C00));
 				}
 			}
 			else stringStewie.clear();

@@ -41,7 +41,7 @@ namespace SortingIcons::Files
 		if (elem.contains("mod") && elem.contains("form"))
 		{
 			auto modName = elem.contains("mod") ? elem["mod"].get<std::string>() : "";
-			const auto mod = !modName.empty() ? DataHandler::GetSingleton()->LookupModByName(modName.c_str()) : nullptr;
+			const auto mod = !modName.empty() ? TESDataHandler::GetSingleton()->LookupModByName(modName.c_str()) : nullptr;
 
 			UInt8 modIndex;
 			if (modName == "FF") modIndex = 0xFF;
@@ -126,7 +126,7 @@ namespace SortingIcons::Files
 			if (elem.contains("ammoMod") && elem.contains("ammoForm"))
 			{
 				auto ammoModName = elem["ammoMod"].get<std::string>();
-				const auto ammoMod = !ammoModName.empty() ? DataHandler::GetSingleton()->LookupModByName(ammoModName.c_str()) : nullptr;
+				const auto ammoMod = !ammoModName.empty() ? TESDataHandler::GetSingleton()->LookupModByName(ammoModName.c_str()) : nullptr;
 				auto ammoForm = GetFormByID((ammoMod->modIndex << 24) + (strToFormID(elem["ammoForm"].get<std::string>()) & 0x00FFFFFF));
 				weapon.ammo = ammoForm;
 			}

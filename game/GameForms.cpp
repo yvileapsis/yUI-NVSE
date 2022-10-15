@@ -37,7 +37,7 @@ const char* TESForm::GetTheName()
 
 void TESForm::DoAddForm(TESForm* newForm, bool persist, bool record)
 {
-	DataHandler::GetSingleton()->DoAddForm(newForm);
+	TESDataHandler::GetSingleton()->DoAddForm(newForm);
 
 	if (persist)
 	{
