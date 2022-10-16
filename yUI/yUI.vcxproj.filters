@@ -116,6 +116,9 @@
     <ClCompile Include="MiscFeatures\PatchExplosionForce.cpp">
       <Filter>features</Filter>
     </ClCompile>
+    <ClCompile Include="MiscFeatures\PatchMultiplicativeShots.cpp">
+      <Filter>features</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h" />

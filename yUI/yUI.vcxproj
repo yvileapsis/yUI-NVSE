@@ -148,6 +148,7 @@
     <ClCompile Include="MiscFeatures\PatchArmedUnarmed.cpp" />
     <ClCompile Include="MiscFeatures\PatchExplosionForce.cpp" />
     <ClCompile Include="MiscFeatures\PatchMatchedCursor.cpp" />
+    <ClCompile Include="MiscFeatures\PatchMultiplicativeShots.cpp" />
     <ClCompile Include="MiscFeatures\PatchTimeMult.cpp" />
     <ClCompile Include="SortingIcons\SICommands.cpp" />
     <ClCompile Include="SortingIcons\SIFiles.cpp" />

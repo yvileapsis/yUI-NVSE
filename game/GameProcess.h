@@ -75,12 +75,9 @@ public:
 
 extern ActorProcessLists * g_actorProcessLists;
 
-class AmmoInfo
+class AmmoInfo : public InventoryChanges
 {
 public:
-	ExtraDataList** xData;	// 00
-	UInt32			count;	// 04
-	TESAmmo*		ammo;	// 08
 	UInt32			unk0C;	// 0C
 	UInt32			unk10;	// 10
 	UInt32			unk14;	// 14
@@ -95,20 +92,10 @@ public:
 	UInt32			unk38;	// 38
 	UInt32			unk3C;	// 3C
 	UInt32			unk40;	// 40
-	TESObjectWEAP*	weapon;	// 44
+	TESObjectWEAP*	ammoWeapon;	// 44
 };
-class WeaponInfo
-{
-public:
-	ExtraDataList** xData;
-	UInt32			count;
-	TESObjectWEAP*	weapon;
 
-	ExtraDataList* GetExtraData()
-	{
-		return xData ? *xData : NULL;
-	}
-};
+class WeaponInfo : public InventoryChanges {};
 
 class BaseProcess
 {
@@ -239,7 +226,7 @@ public:
 	virtual void			Unk_57(void);
 	virtual void			Unk_58(void);
 	virtual void			Unk_59(void);
-	virtual void			UpdateAmmoInfo(InventoryChanges*);
+	virtual void			UpdateAmmoInfo(AmmoInfo* ammoInfo);
 	virtual void			Unk_5B(void);
 	virtual void			Unk_5C(void);
 	virtual void			Unk_5D(void);	// Called by 5E with count itemExtraList item

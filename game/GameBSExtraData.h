@@ -341,7 +341,12 @@ struct InventoryChanges
 {
 	ExtendDataList*			extendData;		// 00
 	SInt32					countDelta;		// 04
-	TESForm*				form;			// 08
+	union
+	{
+		TESForm*			form;			// 08
+		TESObjectWEAP*		weapon;			// 08
+		TESAmmo*			ammo;			// 08
+	};
 
 	void					Free(bool bFreeList = false);
 	void					Cleanup();
@@ -364,6 +369,10 @@ struct InventoryChanges
 	__forceinline Float64	GetHealthPercent(char a1 = 0) { return ThisCall<Float64>(0x4BCDB0, this, a1); };
 	Float64					GetHealthPercentAlt(bool axonisFix = false);
 	bool					GetEquipped();
+	ExtraDataList* GetExtraData()
+	{
+		return extendData ? extendData->first.data : nullptr;
+	}
 };
 static_assert(sizeof(InventoryChanges) == 0xC);
 

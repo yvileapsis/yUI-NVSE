@@ -160,7 +160,6 @@ namespace Fix::ProjectileEffects
 	void __fastcall PostCalculateHitDamageHook1(ActorHitData* hitData, void* dummyedx, Projectile* projectile);
 	void __fastcall PostCalculateHitDamageHook2(ActorHitData* hitData);
 	void __fastcall PostCalculateHitDamageHook3(ActorHitData* hitData);
-	UInt8 __fastcall TESObjectWEAPGetNumProjectilesHook(TESObjectWEAP* weapon, void* dummyEdx, char hasWeaponMod, char dontCheckAmmo, TESForm* form);
 
 	TESObjectWEAP* __fastcall EffectGetWeapon(InventoryChanges* entry, Projectile* projectile);
 	EnchantmentItem* __fastcall EffectGetEnchantment(InventoryChanges* entry, Projectile* projectile);
@@ -501,6 +500,17 @@ extern inline bool Cmd_FireWeaponAlt_Execute(COMMAND_ARGS)
 }
 */
 
+/*
+char __fastcall Test1(MagicCaster* caster, void* dummyedx, TESObjectWEAP* a3)
+{
+	return ThisCall<char>(0x815870, caster, a3);
+}
+
+ActiveEffect* __fastcall Test2(MagicCaster* wah, void* dummyedx, MagicItem* magicitem, EffectItem* effectitem, TESForm* weapon)
+{
+	return wah->CreateActiveEffect(magicitem, effectitem, weapon);
+}
+*/
 	extern void Init()
 	{
 		if (g_nvseInterface->isEditor) return;
