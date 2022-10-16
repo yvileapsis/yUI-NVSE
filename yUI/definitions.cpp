@@ -9,9 +9,12 @@ INIT_MODULE(Fix::TablineSelected)
 INIT_MODULE(Fix::ReorderMCM)
 INIT_MODULE(Fix::ProjectileEffects)
 
-INIT_MODULE(Patch::MatchedCursor)
-INIT_MODULE(Patch::TimeMult)
+INIT_MODULE(Patch::RestoreFO3Spread)
+INIT_MODULE(Patch::ArmedUnarmed)
 INIT_MODULE(Patch::ExplosionForce)
+INIT_MODULE(Patch::MatchedCursor)
+INIT_MODULE(Patch::MultiplicativeShots)
+INIT_MODULE(Patch::TimeMult)
 
 void Inits()
 {
@@ -22,8 +25,11 @@ void Inits()
 	Fix::ReorderMCM::Init();
 	Fix::ProjectileEffects::Init();
 
-	Patch::MatchedCursor::Init();
-	Patch::TimeMult::Init();
+	Patch::RestoreFO3Spread::Init();
+	Patch::ArmedUnarmed::Init();
 	Patch::ExplosionForce::Init();
+	Patch::MatchedCursor::Init();
+	Patch::MultiplicativeShots::Init();
+	Patch::TimeMult::Init();
 
 }
