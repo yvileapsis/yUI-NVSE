@@ -1,0 +1,301 @@
+<_JAMExists> 1 </_JAMExists>
+
+<rect name="JVO">
+
+	<_Exists> 1 </_Exists>
+	
+	<_ScreenWidth> <copy src="screen()" trait="width"/> </_ScreenWidth>
+	<_ScreenHeight> <copy src="screen()" trait="height"/> </_ScreenHeight>
+
+	<_InCombat> 0 </_InCombat>
+
+	<_HeightBase> 36 </_HeightBase>
+	<_WidthBase> 24 </_WidthBase>
+
+	<_Height> <copy src="me()" trait="_HeightBase"/> <mul src="me()" trait="_Scale"/> </_Height>
+	<_Width> <copy src="me()" trait="_WidthBase"/> <mul src="me()" trait="_Scale"/> </_Width>
+
+	<_AlphaBase> 0 </_AlphaBase>
+	<_AlphaCW> 0 </_AlphaCW>
+	<_Alpha> <copy src="me()" trait="_AlphaCW"/> <onlyifnot src="me()" trait="_AlphaBase"/> <add src="me()" trait="_AlphaBase"/> </_Alpha>
+	<_AlphaMult> 0.60 </_AlphaMult>
+
+	<_RadiusMax> 0.060 </_RadiusMax>
+	<_TextVisible> 1 </_TextVisible>
+	<_DistanceVisible> 2 </_DistanceVisible>
+	<_OffsetWidth> 0.02 </_OffsetWidth>
+	<_OffsetHeight> 0.01 </_OffsetHeight>
+
+	<_OffsetMarker> 0 </_OffsetMarker>
+	<_OffsetText> 0 </_OffsetText>
+
+	<font>0</font> 
+	<_FontBase> 0 </_FontBase>
+	<_Font> 
+		<copy> 
+			<copy> 3 </copy>
+			<onlyifnot src="io()" trait="_DUIF3"/>
+			<add>
+				<copy> 4 </copy>			
+				<onlyif src="io()" trait="_DUIF3"/>
+			</add>
+		</copy>
+		<onlyifnot src="me()" trait="_FontBase"/>
+		<onlyifnot src="me()" trait="font"/>
+		<add src="me()" trait="_FontBase"/>			
+		<add src="me()" trait="font"/>
+	</_Font>
+
+	<_FontYBase> 0 </_FontYBase>
+	<_FontY>
+		<copy> 0 </copy>
+		<add>
+			<copy src="JVO" trait="_Font"/>
+			<copy src="globals" trait="_VUI+FontY_"/>
+			<onlyif src="globals" trait="_VUI+"/>
+		</add>
+		<add>
+			<copy src="JVO" trait="_Font"/>
+			<copy src="io()" trait="_DarNFontY_"/>
+			<onlyif src="io()" trait="_DUIF3"/>
+		</add>
+		<add>
+			<copy src="JWH" trait="_JWHFont"/>
+			<copy src="io()" trait="_VNLAFontY_"/>
+			<onlyifnot>
+				<copy src="io()" trait="_DUIF3"/>
+				<or src="globals" trait="_VUI+"/>
+			</onlyifnot>
+		</add>
+		<onlyifnot src="me()" trait="_FontYBase"/>
+		<add src="me()" trait="_FontYBase"/>
+	</_FontY>
+
+	<_ResizeMultiplier> 1 </_ResizeMultiplier>
+
+	<_Scale>
+		<copy> 1 </copy>
+		<mul>
+			<copy src="io()" trait="_duiscale_65"/>
+			<onlyif src="io()" trait="_DUIF3"/>
+			<add>
+				<copy> 1 </copy>
+				<onlyifnot src="io()" trait="_DUIF3"/>
+			</add>
+		</mul>
+		<mul src="me()" trait="_ResizeMultiplier"/>
+	</_Scale>
+
+	<_Visible> 1 </_Visible>
+	
+	<visible>
+		<copy> 0 </copy> 
+		<or>
+			<copy src="ReticleCenter" trait="visible"/>
+			<or src="AmmoTypeLabel" trait="visible"/>
+			<or src="ActionPoints" trait="visible"/>
+			<or src="HitPoints" trait="visible"/>
+			<and> 
+				<copy src="me()" trait="_Visible"/>
+				<eq> 1 </eq>
+			</and>
+		</or>
+		<or>
+			<copy src="me()" trait="_Visible"/>
+			<eq> -1 </eq>
+		</or>
+	</visible>
+
+	<red>255</red>
+	<green>255</green>
+	<blue>255</blue>
+</rect>
+
+<template name="JVOContainer"> <rect name="JVOContainer">
+</rect> </template>
+
+<template name="JVOMarker"> <rect name="JVOMarker"> 
+	<visible> <copy src="me()" trait="_InDistance"/> </visible>
+	<_Hostile> 0 </_Hostile>
+	<_InDistance> 1 </_InDistance>
+	<_Font> <copy src="JVO" trait="_Font"/> </_Font>
+	<_TextVisible> <copy src="JVO" trait="_TextVisible"/> </_TextVisible>
+	<_DistanceVisible> <copy src="JVO" trait="_DistanceVisible"/> </_DistanceVisible>
+	<_Width> <copy src="JVO" trait="_Width"/> </_Width>
+	<_Height> <copy src="JVO" trait="_Height"/> </_Height>
+	<_FontY> <copy src="JVO" trait="_FontY"/> </_FontY>
+	<_RadiusMax> <copy src="JVO" trait="_RadiusMax"/> <mul src="JVO" trait="_RadiusMax"/> </_RadiusMax>
+	<_OffsetWidth> <copy src="JVO" trait="_OffsetWidth"/> </_OffsetWidth>
+	<_OffsetHeight> <copy src="JVO" trait="_OffsetHeight"/> </_OffsetHeight>
+	<_Text>Location Name</_Text>
+	<_Distance>Distance</_Distance>
+	<_OffsetMarker> <copy src="JVO" trait="_OffsetMarker"/> </_OffsetMarker>
+	<_OffsetText> <copy src="JVO" trait="_OffsetText"/> </_OffsetText>
+	<_X> -1 </_X>
+	<_Y> -1 </_Y>
+	<_Filename_0> Interface\JVO\JVOClassic.dds </_Filename_0>
+	<_Filename_1> Interface\JVO\JVOClassicAlt.dds </_Filename_1>
+	<_AltMarker> 0 </_AltMarker>
+	<_Filename> <copy src="me()" trait="_AltMarker"/> <copy src="me()" trait="_Filename_"/> </_Filename>
+	<x>
+		<copy src="me()" trait="_X"/>
+		<min> 
+			<copy> 1 </copy>
+			<sub src="me()" trait="_OffsetWidth"/>
+		</min>
+		<max src="me()" trait="_OffsetWidth"/>
+		<mul src="screen()" trait="width"/>
+	</x>
+	<y>
+		<copy src="me()" trait="_Y"/>
+		<min> 
+			<copy> 1 </copy>
+			<sub src="me()" trait="_OffsetHeight"/>
+		</min>
+		<max src="me()" trait="_OffsetHeight"/>
+		<mul src="screen()" trait="height"/>
+		<add src="me()" trait="_OffsetMarker"/>
+	</y>
+
+	<_XDelta>
+		<copy src="me()" trait="_X"/> <sub> 0.5 </sub>
+		<mul src="screen()" trait="width"/>	<div src="screen()" trait="height"/>
+	</_XDelta>
+				
+	<_YDelta> <copy src="me()" trait="_Y"/> <sub> 0.5 </sub> </_YDelta>
+
+	<_Radius>
+		<copy> <copy src="me()" trait="_XDelta"/> <mul src="me()" trait="_XDelta"/> </copy>
+		<add> <copy src="me()" trait="_YDelta"/> <mul src="me()" trait="_YDelta"/> </add>
+	</_Radius>
+
+	<_InFocus> <copy src="me()" trait="_Radius"/> <lte src="me()" trait="_RadiusMax"/> </_InFocus>
+	
+	<systemcolor> 
+		<copy> 0 </copy>
+		<add> <copy> &hudmain; </copy> <onlyifnot> <copy src="me()" trait="_Hostile"/> </onlyifnot> </add>
+		<add> <copy> &hudalt; </copy> <onlyif> <copy src="me()" trait="_Hostile"/> </onlyif> </add>
+	</systemcolor>
+	
+	<alpha>
+		<copy src="JVO" trait="_Alpha"/>
+		<mul> 
+			<copy> 1 </copy> <onlyif src="me()" trait="_InFocus"/>
+			<add> <copy src="JVO" trait="_AlphaMult"/> <onlyifnot src="me()" trait="_InFocus"/> </add>
+		</mul>
+	</alpha>
+
+	<red> <copy src="JVO" trait="red"/> </red>
+	<green> <copy src="JVO" trait="green"/> </green>
+	<blue> <copy src="JVO" trait="blue"/> </blue>
+
+	<locus> &true; </locus>
+	
+	<_DepthBase> -20 </_DepthBase>
+	<_Depth> 0 </_Depth>
+	<depth> <copy src="me()" trait="_DepthBase"/> <add src="me()" trait="_Depth"/> </depth>
+
+	<image name="Image">
+		<filename> <copy src="parent()" trait="_Filename"/> </filename>
+		<x> <copy src="me()" trait="width"/> <div> -2 </div> </x>
+		<y> <copy src="me()" trait="height"/> <div> -1 </div> </y>
+		<depth> <copy src="parent()" trait="depth"/> <sub> 1 </sub> </depth>
+		<width> <copy src="parent()" trait="_Width"/> </width>
+		<height> <copy src="parent()" trait="_Height"/> </height>
+		<rotateangle> 3.141593 </rotateangle>
+		<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx> 
+		<Rotateaxisy> <copy src="me()" trait="height"/> <div> 2 </div> </Rotateaxisy>
+		<zoom> &scale; </zoom>
+		<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+	</image>
+	
+	<text name="Distance">
+		<visible>
+			<copy src="parent()" trait="_InFocus"/>
+			<add src="parent()" trait="_DistanceVisible"/>
+			<sub src="JVO" trait="_InCombat"/>
+			<gte> 2 </gte>
+		</visible>
+		<depth> <copy src="parent()" trait="depth"/> <sub> 2 </sub> </depth>
+		<string> <copy src="parent()" trait="_Distance"/> </string>
+		<font> <copy src="parent()" trait="_Font"/> </font>
+		<justify> &center; </justify>
+		<clips> <copy src="parent()" trait="clips"/> </clips>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<x>
+			<copy> 0 </copy>
+			<add>
+				<copy src="me()" trait="width"/>
+				<div> 2 </div>
+				<sub src="parent()" trait="x"/>
+				<max> 0 </max>
+			</add>
+			<sub>
+				<copy src="me()" trait="width"/>
+				<div> 2 </div>
+				<sub src="screen()" trait="width"/>
+				<add src="parent()" trait="x"/>
+				<max> 0 </max>				
+			</sub>
+		</x>
+		<y>
+			<copy src="parent()" trait="_OffsetText"/>
+			<sub> <copy src="me()" trait="height"/> <onlyif src="me()" trait="visible"/> </sub>
+			<sub src="sibling(Image)" trait="height"/>
+			<add src="parent()" trait="_FontY"/>
+		</y>
+		<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+	</text>
+	
+	<text name="Text">
+		<visible>
+			<copy src="parent()" trait="_InFocus"/>
+			<add src="parent()" trait="_TextVisible"/>
+			<sub src="JVO" trait="_InCombat"/>
+			<gte> 2 </gte>
+		</visible>
+		<depth> <copy src="parent()" trait="depth"/> <sub> 3 </sub> </depth>
+		<string> <copy src="parent()" trait="_Text"/> </string>
+		<font> <copy src="parent()" trait="_Font"/> </font>
+		<justify> &center; </justify>
+		<clips> <copy src="parent()" trait="clips"/> </clips>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<wrapwidth> 300	</wrapwidth>
+		<x>
+			<copy> 0 </copy>
+			<add>
+				<copy src="me()" trait="width"/>
+				<div> 2 </div>
+				<sub src="parent()" trait="x"/>
+				<max> 0 </max>
+			</add>
+			<sub>
+				<copy src="me()" trait="width"/>
+				<div> 2 </div>
+				<sub src="screen()" trait="width"/>
+				<add src="parent()" trait="x"/>
+				<max> 0 </max>				
+			</sub>
+		</x>
+		<y>
+			<copy src="parent()" trait="_OffsetText"/>
+			<sub> <copy src="sibling(Distance)" trait="height"/> <onlyif src="sibling(Distance)" trait="visible"/> </sub>
+			<sub> <copy src="me()" trait="height"/> <onlyif src="me()" trait="visible"/> </sub>
+			<sub src="sibling(Image)" trait="height"/>
+			<add src="parent()" trait="_FontY"/>
+		</y>
+		<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+	</text>
+</rect> </template>
