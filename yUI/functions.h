@@ -1,10 +1,15 @@
 #pragma once
-#include <InterfaceTiles.h>
-#include <GameExtraData.h>
-#include <unordered_set>
+#include <string>
 
-inline std::unordered_set<TESForm*> g_CraftingComponents;
-inline std::unordered_set<TESForm*> g_CraftingProducts;
+#include "GameOSDepend.h"
+#include "NiTypes.h"
+
+namespace CraftingComponents
+{
+	void Fill();
+	bool IsComponent(TESForm* form);
+	bool IsProduct(TESForm* form);
+}
 
 void UIWidth();
 void UIHeight();
@@ -12,19 +17,12 @@ void UIWidth2();
 void UIHeight2();
 void UIWidth3();
 void UIHeight3();
-void __fastcall AddyCMToSettingsMenu(BSSimpleArray<StartMenuOption*>*, void*, StartMenuOption**);
+//void __fastcall AddyCMToSettingsMenu(BSSimpleArray<StartMenuOption*>*, void*, StartMenuOption**);
 
-void FillCraftingComponents();
 
 TESForm* GetRefFromString(char*, char*);
 
-bool IsAddictive(TESForm*);
-bool IsFood(TESForm*);
-bool IsMedicine(TESForm*);
-bool IsPoisonous(TESForm*);
 bool HasBaseEffectChangesAV(TESForm*, int);
-bool IsCraftingComponent(TESForm*);
-bool IsCraftingProduct(TESForm*);
 
 bool ends_with(std::string const& value, std::string const& ending);
 
@@ -38,20 +36,29 @@ bool IsPlayersOtherAnimData(AnimData* animData);
 
 AnimData* GetThirdPersonAnimData(AnimData* animData);
 
-void PatchPause(UInt32 ptr);
-
-void SetUIStringFull(const char *, const char* , UInt32);
-
 bool TryGetTypeOfForm(TESForm* form);
-
-void __fastcall CursorTileSetStringValue(Tile* tile, void* dummyEDX, eTileValue tilevalue, char* src, char propagate);
-void __fastcall CursorTileSetIntValue(Tile* tile, void* dummyEDX, eTileValue tilevalue, int value);
 
 char* __fastcall StrFromINI(DWORD* address);
 std::string GetStringFromGameSettingFromString(const std::string& settingName);
 
-
 void RegisterTraitID(const char* var1, UInt32 var2);
 void funpatch();
 
-void FixTablineSelected();
+inline Tile* g_TileReticleCenter = nullptr;
+extern PlayerCharacter* g_player;
+
+void InitFunctions();
+
+bool WorldToScreen(NiPoint3* posXYZ, NiPoint3& posOut, float offscreenHandling);
+
+Float32 GetJIPAuxVarOrDefault(const char* auxvar, SInt32 index, Float32 def);
+Float32 SetJIPAuxVarOrDefault(const char* auxvar, SInt32 index, Float32 value);
+
+bool GetCannibalPrompt(TESObjectREFR* ref);
+
+bool IsKeyPressed(UInt32 key, UInt32 flags = 0);
+void DisableKey(UInt32 key, bool disable, UInt32 mask = 0);
+bool IsButtonPressed(UInt32 button);
+UInt32 GetControl(UInt32 whichControl, UInt32 type = OSInputGlobals::kControlType_Keyboard);
+void SetNativeHandlerFunctionBool(bool trueorfalse);
+bool ToggleVanityWheel(bool toggle);

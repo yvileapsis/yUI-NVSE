@@ -4,6 +4,13 @@
 
 INIT_MODULE(SortingIcons)
 
+INIT_MODULE(UserInterface::EventLayer)
+INIT_MODULE(UserInterface::DynamicCrosshair)
+INIT_MODULE(UserInterface::HitMarker)
+INIT_MODULE(UserInterface::HitIndicator)
+INIT_MODULE(UserInterface::VisualObjectives)
+INIT_MODULE(UserInterface::LootMenu)
+
 INIT_MODULE(Fix::DroppedItems)
 INIT_MODULE(Fix::TablineSelected)
 INIT_MODULE(Fix::ReorderMCM)
@@ -20,16 +27,22 @@ void Inits()
 {
 	SortingIcons::Init();
 
+	UserInterface::EventLayer::Init();
+	UserInterface::DynamicCrosshair::Init();
+//	UserInterface::HitMarker::Init();
+//	UserInterface::HitIndicator::Init();
+//	UserInterface::VisualObjectives::Init();
+//	UserInterface::LootMenu::Init();
+
 	Fix::DroppedItems::Init();
 	Fix::TablineSelected::Init();
 	Fix::ReorderMCM::Init();
 	Fix::ProjectileEffects::Init();
 
-	Patch::RestoreFO3Spread::Init();
-	Patch::ArmedUnarmed::Init();
-	Patch::ExplosionForce::Init();
+//	Patch::RestoreFO3Spread::Init();
+//	Patch::ArmedUnarmed::Init();
+//	Patch::ExplosionForce::Init();
 	Patch::MatchedCursor::Init();
-	Patch::MultiplicativeShots::Init();
+//	Patch::MultiplicativeShots::Init();
 	Patch::TimeMult::Init();
-
 }

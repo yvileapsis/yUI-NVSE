@@ -110,6 +110,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\game\ConsoleManager.cpp" />
+    <ClCompile Include="..\game\Containers.cpp" />
     <ClCompile Include="..\game\SaveLoadGame.cpp" />
     <ClCompile Include="..\game\InterfaceManager.cpp" />
     <ClCompile Include="..\nvse\dinput8.cpp" />
@@ -118,16 +119,16 @@
     <ClCompile Include="..\game\GameData.cpp" />
     <ClCompile Include="..\game\GameExtraData.cpp" />
     <ClCompile Include="..\game\GameForms.cpp" />
-    <ClCompile Include="..\game\GameObjects.cpp" />
+    <ClCompile Include="..\game\Objects.cpp" />
     <ClCompile Include="..\game\GameOSDepend.cpp" />
     <ClCompile Include="..\game\GameRTTI.cpp" />
     <ClCompile Include="..\game\GameScript.cpp" />
     <ClCompile Include="..\game\GameSettings.cpp" />
     <ClCompile Include="..\game\GameTasks.cpp" />
-    <ClCompile Include="..\game\InterfaceTiles.cpp" />
-    <ClCompile Include="..\game\GameTypes.cpp" />
-    <ClCompile Include="..\game\InterfaceMenus.cpp" />
-    <ClCompile Include="..\game\GameSound.cpp" />
+    <ClCompile Include="..\game\Tiles.cpp" />
+    <ClCompile Include="..\game\Types.cpp" />
+    <ClCompile Include="..\game\Menus.cpp" />
+    <ClCompile Include="..\game\Sound.cpp" />
     <ClCompile Include="..\nvse\printf.cpp" />
     <ClCompile Include="..\nvse\SafeWrite.cpp" />
     <ClCompile Include="..\nvse\Utilities.cpp" />
@@ -139,6 +140,7 @@
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ForcedIncludeFiles>
     </ClCompile>
+    <ClCompile Include="events.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="MiscFeatures\FixDroppedItems.cpp" />
@@ -156,9 +158,15 @@
     <ClCompile Include="SortingIcons\SI.cpp" />
     <ClCompile Include="SortingIcons\SIPatches.cpp" />
     <ClCompile Include="SortingIcons\SISorting.cpp" />
+    <ClCompile Include="UserInterface\DynamicCrosshair.cpp" />
+    <ClCompile Include="UserInterface\HitIndicator.cpp" />
+    <ClCompile Include="UserInterface\HitMarker.cpp" />
+    <ClCompile Include="UserInterface\LootMenu.cpp" />
+    <ClCompile Include="UserInterface\VisualObjectives.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\game\ConsoleManager.h" />
+    <ClInclude Include="..\game\Containers.h" />
     <ClInclude Include="..\game\SaveLoadGame.h" />
     <ClInclude Include="..\game\InterfaceManager.h" />
     <ClInclude Include="..\libraries\json.h" />
@@ -170,17 +178,17 @@
     <ClInclude Include="..\game\GameEffects.h" />
     <ClInclude Include="..\game\GameExtraData.h" />
     <ClInclude Include="..\game\GameForms.h" />
-    <ClInclude Include="..\game\GameObjects.h" />
+    <ClInclude Include="..\game\Objects.h" />
     <ClInclude Include="..\game\GameOSDepend.h" />
     <ClInclude Include="..\game\GameProcess.h" />
     <ClInclude Include="..\game\GameRTTI.h" />
     <ClInclude Include="..\game\GameScript.h" />
     <ClInclude Include="..\game\GameSettings.h" />
-    <ClInclude Include="..\game\GameSound.h" />
+    <ClInclude Include="..\game\Sound.h" />
     <ClInclude Include="..\game\GameTasks.h" />
-    <ClInclude Include="..\game\InterfaceTiles.h" />
-    <ClInclude Include="..\game\GameTypes.h" />
-    <ClInclude Include="..\game\InterfaceMenus.h" />
+    <ClInclude Include="..\game\Tiles.h" />
+    <ClInclude Include="..\game\Types.h" />
+    <ClInclude Include="..\game\Menus.h" />
     <ClInclude Include="..\game\NiNodes.h" />
     <ClInclude Include="..\game\NiObjects.h" />
     <ClInclude Include="..\game\NiTypes.h" />

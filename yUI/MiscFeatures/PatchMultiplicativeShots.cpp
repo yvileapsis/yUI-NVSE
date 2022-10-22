@@ -5,6 +5,8 @@
 
 #include <GameRTTI.h>
 
+#include "GameForms.h"
+
 namespace Patch::MultiplicativeShots
 {
 	void HandleINIs()

@@ -1,4 +1,4 @@
-#include "GameTypes.h"
+#include "Types.h"
 #include "GameSettings.h"
 
 	GameSettingCollection ** g_GameSettingCollection = (GameSettingCollection**)0x011C8048;

@@ -1,8 +1,7 @@
 #pragma once
 #include <PluginAPI.h>
-#include <GameData.h>
-#include <GameObjects.h>
 #include <definitions.h>
+
 #include <deque>
 #include <functional>
 
@@ -22,10 +21,10 @@ inline NVSEEventManagerInterface*	g_eventInterface		= nullptr;
 inline DIHookControl*				g_DIHook				= nullptr;
 inline PlayerCharacter*				g_player				= nullptr;
 inline ActorValueOwner*				g_playerAVOwner			= nullptr;
-inline BaseProcess*					g_playerProcess			= nullptr;
-inline TESDataHandler*					g_TESDataHandler			= nullptr;
+inline TESDataHandler*				g_TESDataHandler		= nullptr;
+inline HUDMainMenu*					g_HUDMainMenu			= nullptr;
 
-inline int iDoOnce = 0;
+inline int iMainLoopDoOnce = 0;
 
 inline std::deque<std::function<void()>> pluginLoad;
 inline std::deque<std::function<void()>> deferredInit;

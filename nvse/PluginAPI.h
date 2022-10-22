@@ -1,6 +1,5 @@
 #pragma once
 #include <CommandTable.h>
-#include <GameAPI.h>
 #include <Utilities.h>
 
 namespace PluginAPI { class ArrayAPI; }
@@ -749,7 +748,7 @@ struct NVSESerializationInterface
 
 struct NVSEEventManagerInterface
 {
-	typedef void (*EventHandler)(TESObjectREFR* thisObj, void* parameters);
+	typedef void (*NativeEventHandler)(TESObjectREFR* thisObj, void* parameters);
 
 	// Mostly just used for filtering information.
 	enum ParamType : int8_t
@@ -774,12 +773,40 @@ struct NVSEEventManagerInterface
 		eParamType_BaseForm,
 
 		eParamType_Invalid,
-		eParamType_Anything
+		eParamType_Anything,
+
+		// The Ptr-type params signify a pointer to a value will be passed, which will be dereferenced between each call.
+		// Otherwise, they work like their regular counterparts.
+		// This is useful if a param needs to have its value updated in-between calls to event handlers.
+		// NOTE: if passing a ptr to a thread-safe dispatch function, it MUST point to a statically-defined value, to avoid using an invalid pointer if the dispatch was delayed.
+		eParamType_FloatPtr,
+		eParamType_IntPtr,
+		eParamType_StringPtr,
+		eParamType_ArrayPtr,
+		eParamType_RefVarPtr,
+		eParamType_AnyFormPtr = eParamType_RefVarPtr,
+		eParamType_ReferencePtr,
+		eParamType_BaseFormPtr
 	};
-	static bool IsFormParam(ParamType pType)
+
+	static [[nodiscard]] bool IsFormParam(ParamType pType)
 	{
 		return pType == eParamType_RefVar || pType == eParamType_Reference || pType == eParamType_BaseForm
 		 || pType == eParamType_Anything;
+	}
+
+	static [[nodiscard]] bool IsPtrParam(ParamType pType)
+	{
+		return (pType >= eParamType_FloatPtr) && (pType <= eParamType_BaseFormPtr);
+	}
+
+	static [[nodiscard]] ParamType GetNonPtrParamType(ParamType pType)
+	{
+		if (IsPtrParam(pType))
+		{
+			return static_cast<ParamType>(pType - 9);
+		}
+		return pType;
 	}
 
 	enum EventFlags : UInt32
@@ -805,6 +832,7 @@ struct NVSEEventManagerInterface
 	};
 
 	// Registers a new event which can be dispatched to scripts and plugins. Returns false if event with name already exists.
+	// Returns false if event with name already exists.
 	bool			(*RegisterEvent)(const char* name, UInt8 numParams, SInt8* paramTypes, UInt32 flags);
 
 	// Dispatch an event that has been registered with RegisterEvent.
@@ -827,11 +855,28 @@ struct NVSEEventManagerInterface
 	// anyData arg is passed to the callbacks.
 	DispatchReturn	(*DispatchEventAlt)(const char* eventName, DispatchCallback resultCallback, void* anyData, TESObjectREFR* thisObj, ...);
 
+	// Special priorities used for the event priority system.
+	// Greatest priority = will run first, lowest = will run last.
+	enum SpecialHandlerPriorities : int
+	{
+		// Used as a special case when searching through handlers; invalid priority = unfiltered for priority.
+		// A handler CANNOT be set with this priority.
+		// However, negative priorities ARE allowed to be set.
+		// When removing handlers, this value can be used to remove handlers regardless of priority.
+		kHandlerPriority_Invalid = 0,
+
+		// When setting a handler, used if no priority is specified.
+		kHandlerPriority_Default = 1,
+
+		kHandlerPriority_Max = 9999,
+		kHandlerPriority_Min = -9999
+	};
+
 	// Similar to script function SetEventHandler, allows you to set a native function that gets called back on events
-	bool			(*SetNativeEventHandler)(const char* eventName, EventHandler func);
+	bool			(*SetNativeEventHandler)(const char* eventName, NativeEventHandler func);
 
 	// Same as script function RemoveEventHandler but for native functions
-	bool			(*RemoveNativeEventHandler)(const char* eventName, EventHandler func);
+	bool			(*RemoveNativeEventHandler)(const char* eventName, NativeEventHandler func);
 
 	bool			(*RegisterEventWithAlias)(const char* name, const char* alias, UInt8 numParams, ParamType* paramTypes, EventFlags flags);
 
@@ -856,6 +901,48 @@ struct NVSEEventManagerInterface
 	// WARNING: must ensure the pointer remains valid AFTER the native EventHandler function is executed.
 	// The pointer can be invalidated during or after a DispatchCallback.
 	void			(*SetNativeHandlerFunctionValue)(NVSEArrayVarInterface::Element& value);
+
+	// 'pluginHandle' and 'handlerName' provide easier debugging, i.e. when dumping handlers.
+	// Returns false if providing an invalid PluginHandle (can pass null handlerName, but not recommended).
+	bool (*SetNativeEventHandlerWithPriority)(const char* eventName, NativeEventHandler func,
+		PluginHandle pluginHandle, const char* handlerName, int priority);
+
+	bool(*RemoveNativeEventHandlerWithPriority)(const char* eventName, NativeEventHandler func, int priority);
+
+	// A quick way to check for a handler priority conflict, i.e. if a handler is expected to run first. 
+	/* If any non-excluded handlers are found above or at 'priority', returns false.
+	 * 'startPriority' is assumed to NOT be 0 (which is an invalid priority).
+	 * 	Returns false if 'func' is not found at 'startPriority'. It can appear elsewhere and will be ignored.
+	*/
+	// All '...ToIgnore' parameters are optional, i.e they can be nullptr and the 'num...' args can be set to 0.
+	// 'scriptsToIgnore' can be nullptr, a Script*, or a formlist.
+	bool (*IsEventHandlerFirst)(const char* eventName, NativeEventHandler func, int startPriority,
+		TESForm** scriptsToIgnore, UInt32 numScriptsToIgnore,
+		const char** pluginsToIgnore, UInt32 numPluginsToIgnore,
+		const char** pluginHandlersToIgnore, UInt32 numPluginHandlersToIgnore);
+
+	bool (*IsEventHandlerLast)(const char* eventName, NativeEventHandler func, int startPriority,
+		TESForm** scriptsToIgnore, UInt32 numScriptsToIgnore,
+		const char** pluginsToIgnore, UInt32 numPluginsToIgnore,
+		const char** pluginHandlersToIgnore, UInt32 numPluginHandlersToIgnore);
+
+	// Returns a Map-type array with all the priority-conflicting event handlers, i.e the events that will run before the 'func' handler. 
+	// Each key in the map is a priority, and each value is a 2-element array containing:
+	//		[0] = the handler, [1] = a stringmap of filters.
+	/* 'priority' is assumed to NOT be 0 (which is an invalid priority).
+	 * The array includes handlers that are at 'priority', as they can potentially lead to conflicts.
+	*/
+	// All '...ToIgnore' parameters are optional, i.e they can be nullptr and the 'num...' args can be set to 0.
+	// Returns nullptr if 'func' is not found at 'priority'. It can appear elsewhere and will be ignored.
+	NVSEArrayVarInterface::Array* (*GetHigherPriorityEventHandlers)(const char* eventName, NativeEventHandler func, int priority,
+		TESForm** scriptsToIgnore, UInt32 numScriptsToIgnore,
+		const char** pluginsToIgnore, UInt32 numPluginsToIgnore,
+		const char** pluginHandlersToIgnore, UInt32 numPluginHandlersToIgnore);
+
+	NVSEArrayVarInterface::Array* (*GetLowerPriorityEventHandlers)(const char* eventName, NativeEventHandler func, int priority,
+		TESForm** scriptsToIgnore, UInt32 numScriptsToIgnore,
+		const char** pluginsToIgnore, UInt32 numPluginsToIgnore,
+		const char** pluginHandlersToIgnore, UInt32 numPluginHandlersToIgnore);
 };
 #endif
 

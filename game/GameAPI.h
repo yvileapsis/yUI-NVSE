@@ -1,6 +1,4 @@
 #pragma once
-#include <GameTypes.h>
-#include <NiNodes.h>
 #include <GameScript.h>
 
 constexpr auto playerID = 0x7;

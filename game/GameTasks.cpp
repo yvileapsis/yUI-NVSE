@@ -1,7 +1,7 @@
 #include "GameTasks.h"
 #include "GameAPI.h"
 #include "GameForms.h"
-#include "GameObjects.h"
+#include "Objects.h"
 
 // IOManager** g_ioManager = (IOManager**)0x00B33A10;
 ModelLoader** g_modelLoader = (ModelLoader**)0x011C3B3C;

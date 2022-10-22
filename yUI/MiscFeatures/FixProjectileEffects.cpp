@@ -2,16 +2,15 @@
 #include <SafeWrite.h>
 #include <SimpleINILibrary.h>
 
-#include "GameProcess.h"
-#include "GameObjects.h"
-#include "GameExtraData.h"
-#include "GameRTTI.h"
+#include <Objects.h>
+#include <GameExtraData.h>
+#include <GameRTTI.h>
 
 namespace Fix::ProjectileEffects
 {
-	inline int g_CorrectAmmoEffects = 0;
-	inline int g_CorrectMeltdownEffects = 0;
-	inline int g_CorrectWeaponEffects = 0;
+	inline int effectsAmmo = 0;
+	inline int effectsMeltdown = 0;
+	inline int effectsWeapon = 0;
 
 	void HandleINIs()
 	{
@@ -20,9 +19,9 @@ namespace Fix::ProjectileEffects
 		const auto iniPath = GetCurPath() + yUI_INI;
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
-		g_CorrectAmmoEffects = ini.GetOrCreate("Projectile Bugfixes", "bCorrectAmmoEffects", 0, "; EXPERIMENTAL DO NOT TOUCH");
-		g_CorrectMeltdownEffects = ini.GetOrCreate("Projectile Bugfixes", "bCorrectMeltdownEffects", 0, "; EXPERIMENTAL DO NOT TOUCH");
-		g_CorrectWeaponEffects = ini.GetOrCreate("Projectile Bugfixes", "bCorrectWeaponEffects", 0, "; EXPERIMENTAL DO NOT TOUCH");
+		effectsAmmo = ini.GetOrCreate("Projectile Bugfixes", "bCorrectAmmoEffects", 0, "; EXPERIMENTAL DO NOT TOUCH");
+		effectsMeltdown = ini.GetOrCreate("Projectile Bugfixes", "bCorrectMeltdownEffects", 0, "; EXPERIMENTAL DO NOT TOUCH");
+		effectsWeapon = ini.GetOrCreate("Projectile Bugfixes", "bCorrectWeaponEffects", 0, "; EXPERIMENTAL DO NOT TOUCH");
 
 		ini.SaveFile(iniPath.c_str(), false);
 	}
@@ -515,8 +514,8 @@ ActiveEffect* __fastcall Test2(MagicCaster* wah, void* dummyedx, MagicItem* magi
 	{
 		if (g_nvseInterface->isEditor) return;
 		HandleINIs();
-		patchCorrectAmmoEffects(g_CorrectAmmoEffects);
-		patchCorrectWeaponEffects(g_CorrectWeaponEffects);
-		patchCorrectMeltdownEffects(g_CorrectMeltdownEffects);
+		patchCorrectAmmoEffects(effectsAmmo);
+		patchCorrectWeaponEffects(effectsWeapon);
+		patchCorrectMeltdownEffects(effectsMeltdown);
 	}
 }

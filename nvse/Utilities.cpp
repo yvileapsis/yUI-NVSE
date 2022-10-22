@@ -1,19 +1,11 @@
-#include <Utilities.h>
-#include <SafeWrite.h>
-#include <string>
 #include <algorithm>
 #include <unordered_set>
-#include <vector>
-
-#include <GameData.h>
-
-#include <GameAPI.h>
-#include <GameForms.h>
-#include <GameScript.h>
-#include <stringapiset.h>
+#include <Utilities.h>
 
 #include "ConsoleManager.h"
 #include "InterfaceManager.h"
+#include "GameData.h"
+#include "GameScript.h"
 
 std::vector<std::string> queuedConsoleMessages;
 

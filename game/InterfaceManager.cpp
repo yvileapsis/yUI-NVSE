@@ -1,7 +1,7 @@
 #include <InterfaceManager.h>
-#include <InterfaceMenus.h>
+#include <Menus.h>
 
-#include "GameObjects.h"
+#include "Objects.h"
 #include "SafeWrite.h"
 
 UInt8* g_menuVisibility = reinterpret_cast<UInt8*>(0x011F308F);

@@ -61,7 +61,7 @@
     <ClCompile Include="..\game\GameForms.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\GameObjects.cpp">
+    <ClCompile Include="..\game\Objects.cpp">
       <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="..\game\GameOSDepend.cpp">
@@ -76,19 +76,19 @@
     <ClCompile Include="..\game\GameSettings.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\GameSound.cpp">
+    <ClCompile Include="..\game\Sound.cpp">
       <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="..\game\GameTasks.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\InterfaceTiles.cpp">
+    <ClCompile Include="..\game\Tiles.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\GameTypes.cpp">
+    <ClCompile Include="..\game\Types.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\InterfaceMenus.cpp">
+    <ClCompile Include="..\game\Menus.cpp">
       <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="..\game\ConsoleManager.cpp">
@@ -118,6 +118,27 @@
     </ClCompile>
     <ClCompile Include="MiscFeatures\PatchMultiplicativeShots.cpp">
       <Filter>features</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\Containers.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInterface\DynamicCrosshair.cpp">
+      <Filter>features\UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInterface\HitMarker.cpp">
+      <Filter>features\UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInterface\LootMenu.cpp">
+      <Filter>features\UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInterface\VisualObjectives.cpp">
+      <Filter>features\UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="events.cpp">
+      <Filter>features\UserInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInterface\HitIndicator.cpp">
+      <Filter>features\UserInterface</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -175,7 +196,7 @@
     <ClInclude Include="..\game\GameForms.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\GameObjects.h">
+    <ClInclude Include="..\game\Objects.h">
       <Filter>game</Filter>
     </ClInclude>
     <ClInclude Include="..\game\GameOSDepend.h">
@@ -193,19 +214,19 @@
     <ClInclude Include="..\game\GameSettings.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\GameSound.h">
+    <ClInclude Include="..\game\Sound.h">
       <Filter>game</Filter>
     </ClInclude>
     <ClInclude Include="..\game\GameTasks.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\InterfaceTiles.h">
+    <ClInclude Include="..\game\Tiles.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\GameTypes.h">
+    <ClInclude Include="..\game\Types.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\InterfaceMenus.h">
+    <ClInclude Include="..\game\Menus.h">
       <Filter>game</Filter>
     </ClInclude>
     <ClInclude Include="..\game\CommandTable.h">
@@ -227,6 +248,9 @@
       <Filter>game</Filter>
     </ClInclude>
     <ClInclude Include="..\game\InterfaceManager.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Containers.h">
       <Filter>game</Filter>
     </ClInclude>
   </ItemGroup>
@@ -254,6 +278,9 @@
     </Filter>
     <Filter Include="game">
       <UniqueIdentifier>{a015f998-0a48-4aa3-a1b7-bb3274a03bde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="features\UserInterface">
+      <UniqueIdentifier>{c2809161-6d98-4828-951b-1677e5f45c6b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

@@ -1,7 +1,7 @@
 #include <GameBSExtraData.h>
 
 #include <GameExtraData.h>
-#include <GameObjects.h>
+#include <Objects.h>
 #include <GameAPI.h>
 #include <GameRTTI.h>
 

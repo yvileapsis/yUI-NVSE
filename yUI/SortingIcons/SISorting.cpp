@@ -1,6 +1,6 @@
 #include "SI.h"
 #include <GameSettings.h>
-#include <InterfaceTiles.h>
+#include <Tiles.h>
 
 #include "InterfaceManager.h"
 

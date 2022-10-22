@@ -1,6 +1,8 @@
 #pragma once
+#include <NiTypes.h>
+#include <NiObjects.h>
+#include <Containers.h>
 #include <GameBSExtraData.h>
-#include <vector>
 
 #define IS_ID(form, type) ((form)->typeID == kFormType_##type)
 #define NOT_ID(form, type) ((form)->typeID != kFormType_##type)
@@ -6333,6 +6335,58 @@ public:
 
 	UInt32 unk018[(0x170 - 0x18) >> 2];
 };
+
+
+/**** BSTempEffects ****/
+
+// 18
+class BSTempEffect : public NiObject
+{
+public:
+	BSTempEffect();
+	~BSTempEffect();
+
+	float			duration;		// 08
+	TESObjectCELL* cell;			// 0C
+	float			unk10;			// 10
+	UInt8			unk14;			// 14
+	UInt8			pad15[3];
+};
+
+// 28
+class MagicHitEffect : public BSTempEffect
+{
+public:
+	MagicHitEffect();
+	~MagicHitEffect();
+
+	ActiveEffect* activeEffect;	// 18	
+	TESObjectREFR* target;		// 1C
+	float			unk20;			// 20	Init'd from ActiveEffect.timeElapsed
+	UInt8			unk24;			// 24	from ActiveEffect.EffectFlag
+	UInt8			pad25[3];
+};
+
+class ParticleShaderProperty;
+
+// 6C
+class MagicShaderHitEffect : public MagicHitEffect
+{
+public:
+	MagicShaderHitEffect();
+	~MagicShaderHitEffect();
+
+	UInt8					unk28;						// 28	Init'd to byte, OK for first offset.
+	UInt8					pad29[3];
+	UInt32					unk2C;						// 2C	Init'd to DWord
+	TESEffectShader* effectShader;				// 30	Init'd to *effectShader
+	float					unk34;						// 34	Init'd to float
+	BSSimpleArray<NiPointer<ParticleShaderProperty>>	unk38;	// 38	Init'd to BSSimpleArray<NiPointer<ParticleShaderProperty>>
+	// the remainder is not validated..
+	void* textureEffectData;		// 48 seen TextureEffectData< BSSahderLightingProperty >, init'd to RefNiObject
+};	// Alloc'd to 6C, 68 is RefNiObject, 60 is Init'd to 1.0, 64 also
+	// 4C is byte, Init'd to 0 for non player, otherwize = Player.1stPersonSkeleton.Flags0030.Bit0 is null
+
 
 // BGSExplosion (A4)
 class BGSExplosion : public TESBoundObject

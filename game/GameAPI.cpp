@@ -1,8 +1,8 @@
 #include <GameAPI.h>
 #include <GameRTTI.h>
 #include <GameForms.h>
-#include <GameObjects.h>
-#include <GameTypes.h>
+#include <Objects.h>
+#include <Types.h>
 #include <GameData.h>
 #include <GameScript.h>
 #include <ConsoleManager.h>

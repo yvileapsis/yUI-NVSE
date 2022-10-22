@@ -1,9 +1,9 @@
 #pragma once
-#include <InterfaceTiles.h>
+#include <Tiles.h>
 #include <CommandTable.h>
 #include <unordered_set>
 
-#include "InterfaceMenus.h"
+#include "Menus.h"
 #include "InterfaceManager.h"
 
 bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS);

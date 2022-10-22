@@ -1,0 +1,22 @@
+{
+"tags": [
+
+	{ "priority": 150, "tag": "(aba1)", "mod": "Vicious Wastes.esp",		"form": ["046E93", "126C10", "126C11", "126C15", "126C17", "126C18", "126C1B"], "formlist": 1 },
+	{ "priority": 150, "tag": "(aba1)", "mod": "Vicious Wastes.esp",		"form": ["126C1D", "126C1E", "126C1F", "126C20", "126C21", "139EB6"], "formlist": 1 },
+	{ "priority": 150, "tag": "(aba1)", "mod": "Vicious Wastes.esp",		"form": ["126C22", "126C23", "126C27", "126C29", "126C2A", "126C2D", "126C2F"], "formlist": 1 },
+	{ "priority": 150, "tag": "(aba1)", "mod": "Vicious Wastes.esp",		"form": ["126C30", "126C31", "126C32", "126C33", "139EB7"], "formlist": 1 },
+
+	{ "priority": 150, "tag": "(abb1)", "mod": "Vicious Wastes.esp",		"form": ["126C12", "126C13", "126C24", "126C25"], "formlist": 1 },
+
+	{ "priority": 150, "tag": "(ada1)", "mod": "Vicious Wastes.esp",		"form": ["1A4739", "1A473A", "1A473B", "1A473C", "1A473D", "1A473E"], "formlist": 1 },
+
+	{ "priority": 150, "tag": "(afa1)", "mod": "Vicious Wastes.esp",		"form": ["1A4FD7", "1A4FDA"], "formlist": 1 },
+
+	{ "priority": 150, "tag": "(aha1)", "mod": "Vicious Wastes.esp",		"form": ["126C16", "126C1A", "126C28", "126C2C", "1A4FD8", "1A4FD9", "1A4FDB", "1A4FDC"], "formlist": 1 },
+	{ "priority": 150, "tag": "(aha1)", "mod": "Vicious Wastes.esp",		"form": ["1A4FDD", "1A4FDE"], "formlist": 1 },
+
+	{ "priority": 150, "tag": "(dba1)", "mod": "Vicious Wastes.esp",		"form": "118F8E", "formlist": 1 },
+	{ "priority": 150, "tag": "(dhd1)", "mod": "Vicious Wastes.esp",		"form": ["153B3A", "153B3B"], "formlist": 1 }
+
+]
+}

@@ -1,0 +1,153 @@
+{
+"tags": [
+
+	{ "priority": 150, "tag": "(fba2)", "mod": "Zeta.esm",					"form": ["006e1e", "00829f"] },
+	{ "priority": 150, "tag": "(fbb1)",	"mod": "Fallout3.esm",				"form": ["004333", "03C07A", "066c76"] },
+	{ "priority": 150, "tag": "(fbb1)",	"mod": "PointLookout.esm",			"form": ["0088de", "00ed14"] },
+	{ "priority": 150, "tag": "(fbb3)",	"mod": "ThePitt.esm",				"form": ["00737c", "00b512"] },
+
+	{ "priority": 150, "tag": "(fbz1)", "mod": "Fallout3.esm",				"form": "00432A" },
+	{ "priority": 150, "tag": "(fbz4)", "mod": "Fallout3.esm",				"form": "004348" },
+	{ "priority": 150, "tag": "(fbz5)", "mod": "Fallout3.esm",				"form": "00434B" },
+
+	{ "priority": 150, "tag": "(fdd1)", "mod": "Zeta.esm",					"form": ["000845", "00A77D"] },
+
+	{ "priority": 150, "tag": "(fdz2)", "mod": "Fallout3.esm",				"form": "004339" },
+	{ "priority": 150, "tag": "(fdz2)", "mod": "PointLookout.esm",			"form": "00C1C3" },
+	{ "priority": 150, "tag": "(fdz0)", "mod": "Fallout3.esm",				"form": "0C80BA" },
+	{ "priority": 150, "tag": "(fdz0)", "mod": "Zeta.esm",					"form": "00A9DD" },
+	{ "priority": 150, "tag": "(fdz3)", "mod": "TaleOfTwoWastelands.esm",	"form": "008AF4" },
+	
+	{ "priority": 150, "tag": "(fjb1)", "mod": "Fallout3.esm",				"form": "004342" },
+	{ "priority": 150, "tag": "(fjb1)", "mod": "TaleOfTwoWastelands.esm",	"form": "008BA1" },
+
+	{ "priority": 150, "tag": "(fla2)",	"mod": "Fallout3.esm",				"form": ["02B3CB", "0CB602", "078440", "078441", "0C553E", "0C80B8", "0C80BE"] },
+	{ "priority": 150, "tag": "(fla2)",	"mod": "Anchorage.esm",				"form": ["003F40", "003F44", "004DAD", "00B554", "00BE37", "00BE38", "00BEB5", "00C07B", "00C07C", "00C38E"] },
+	{ "priority": 150, "tag": "(fla2)",	"mod": "PointLookout.esm",			"form": ["006ab7", "01098A"] },
+	{ "priority": 150, "tag": "(fla2)",	"mod": "Zeta.esm",					"form": ["00083B", "0080B5"] },
+
+	{ "priority": 150, "tag": "(flb2)",	"mod": "PointLookout.esm",			"form": ["00838F", "00ED0F"] },
+	{ "priority": 150, "tag": "(fna2)", "mod": "Fallout3.esm",				"form": "0CAFA9" },
+
+	{ "priority": 150, "tag": "(flz1)", "mod": "Fallout3.esm",				"form": "02D3B7" },
+	{ "priority": 150, "tag": "(flz3)", "mod": "PointLookout.esm",			"form": ["0082B5", "00D5A8"] },
+	
+ 
+ 
+	{ "priority": 150, "tag": "(hba1)", "mod": "Fallout3.esm",				"form": "01CBDD" },
+	{ "priority": 150, "tag": "(hba1)", "mod": "Anchorage.esm",				"form": ["00160F", "002969", "003A02", "00C18F"] },
+	{ "priority": 150, "tag": "(hba1)", "mod": "TaleOfTwoWastelands.esm",	"form": "0094B0" },
+
+	{ "priority": 150, "tag": "(hba2)", "mod": "Anchorage.esm",				"form": "00160E" },
+
+	{ "priority": 150, "tag": "(hba2)", "mod": "TaleOfTwoWastelands.esm",	"form": "0094B4" },
+	{ "priority": 150, "tag": "(hba2)", "mod": "Fallout3.esm",				"form": ["03411C", "0239CB", "07401C"] },
+	{ "priority": 150, "tag": "(hba2)", "mod": "ThePitt.esm",				"form": ["007FC5", "008B8A"] },
+	{ "priority": 150, "tag": "(hba2)", "mod": "Anchorage.esm",				"form": ["003A03", "00C190", "00BC37"] },
+	
+	{ "priority": 150, "tag": "(hbb2)", "mod": "BrokenSteel.esm",			"form": "0088B5" },
+	{ "priority": 150, "tag": "(hbd1)",	"mod": "TaleOfTwoWastelands.esm",	"form": "0094B1" },
+
+
+ 	{ "priority": 200, "tag": "(hbe1)",	"mod": "Fallout3.esm",				"form": "0cb5f9" },
+	{ "priority": 200, "tag": "(hbe1)",	"mod": "BrokenSteel.esm",			"form": ["001081", "002480"] },
+
+	{ "priority": 150, "tag": "(hbe2)",	"mod": "Fallout3.esm",				"form": "0cb5f8" },
+	{ "priority": 150, "tag": "(hbe2)",	"mod": "BrokenSteel.esm",			"form": "001080" },
+	{ "priority": 150, "tag": "(hbe2)",	"mod": "TaleOfTwoWastelands.esm",	"form": ["010fb1", "01ca8e"] },
+
+	{ "priority": 150, "tag": "(hda1)",	"mod": "Zeta.esm",					"form": "0058eb" },
+	{ "priority": 150, "tag": "(hda2)",	"mod": "Zeta.esm",					"form": "00bb63" },
+
+	{ "priority": 150, "tag": "(hfb1)", "mod": "ThePitt.esm",				"form": "00B4B1" },
+	
+	{ "priority": 150, "tag": "(hjb1)",	"mod": "Fallout3.esm",				"form": ["0340EA", "07C17C"] },
+	{ "priority": 150, "tag": "(hjb1)",	"mod": "Anchorage.esm",				"form": ["00A0EC", "00CDE7", "00A6C0", "00BB28"] },
+
+	{ "priority": 150, "tag": "(hjc1)",	"mod": "Fallout3.esm",				"form": "0340da" },
+	{ "priority": 150, "tag": "(hjc1)",	"mod": "BrokenSteel.esm",			"form": "0088e8" },
+
+	{ "priority": 150, "tag": "(hjd1)",	"mod": "Fallout3.esm",				"form": ["0340d2", "0340d3", "0cb603", "05157e", "083c5c"] },
+	{ "priority": 150, "tag": "(hjd1)",	"mod": "Anchorage.esm",				"form": ["00ad7b", "003f3a", "00c189", "00c1ca"] },
+	{ "priority": 150, "tag": "(hjd1)",	"mod": "Zeta.esm",					"form": ["00ab6d", "00c96d"] },
+	{ "priority": 150, "tag": "(hjd1)",	"mod": "TaleOfTwoWastelands.esm",	"form": "008adf" },
+
+	{ "priority": 150, "tag": "(hjd2)",	"mod": "Fallout3.esm",				"form": "087274" },
+	{ "priority": 150, "tag": "(hjd2)",	"mod": "Anchorage.esm",				"form": "00742f" },
+
+	{ "priority": 150, "tag": "(hje1)",	"mod": "Fallout3.esm",				"form": "05A6CA" },
+	{ "priority": 150, "tag": "(hje1)",	"mod": "ThePitt.esm",				"form": "00B4B2" },
+	{ "priority": 150, "tag": "(hje1)",	"mod": "PointLookout.esm",			"form": "00D5C0" },
+
+	{ "priority": 150, "tag": "(hje2)", "mod": "Zeta.esm",					"form": "003306" },
+
+	{ "priority": 150, "tag": "(hje3)",	"mod": "BrokenSteel.esm",			"form": "00b964" },
+
+	{ "priority": 150, "tag": "(hla2)", "mod": "BrokenSteel.esm",			"form": "003B66" },
+
+	{ "priority": 150, "tag": "(hlb1)", "mod": "Fallout3.esm",				"form": "073FEC" },
+	{ "priority": 150, "tag": "(hlb1)", "mod": "PointLookout.esm",			"form": ["00C509", "0110D4"] },
+	{ "priority": 150, "tag": "(hlc1)", "mod": "Fallout3.esm",				"form": ["05A6CB", "0C942D", "078646"] },
+	{ "priority": 150, "tag": "(hlc1)", "mod": "Anchorage.esm",				"form": ["00C18A", "003F39"] },
+	{ "priority": 150, "tag": "(hlc1)", "mod": "TaleOfTwoWastelands.esm",	"form": "008AD8" },
+
+	{ "priority": 150, "tag": "(hld1)", "mod": "Fallout3.esm",				"form": ["0ACDA4"] },
+	{ "priority": 150, "tag": "(hld1)", "mod": "Anchorage.esm",				"form": ["003473"] },
+	{ "priority": 150, "tag": "(hld1)", "mod": "BrokenSteel.esm",			"form": ["00B960"] },
+	{ "priority": 150, "tag": "(hld1)", "mod": "PointLookout.esm",			"form": ["00D5BD", "00832E", "00DE12"] },
+	{ "priority": 150, "tag": "(hld1)", "mod": "TaleOfTwoWastelands.esm",	"form": "079056" },
+
+
+
+	{ "priority": 150, "tag": "(hlf1)", "mod": "Fallout3.esm",				"form": "0340FC" },
+	{ "priority": 150, "tag": "(hlf1)", "mod": "PointLookout.esm",			"form": "006AB4" },
+
+
+
+	{ "priority": 150, "tag": "(dfa1)", "mod": "TaleOfTwoWastelands.esm",	"form": "00dfc2" },
+
+	{ "priority": 150, "tag": "(dha2)", "mod": "TaleOfTwoWastelands.esm",	"form": ["00df9a", "01806b"] },
+	{ "priority": 150, "tag": "(dha2)", "mod": "PointLookout.esm",			"form": ["003fc6", "003fe9"] },
+	
+	{ "priority": 150, "tag": "(dhc1)", "mod": "Fallout3.esm",				"form": "03404d" },
+	{ "priority": 150, "tag": "(dhc1)", "mod": "TaleOfTwoWastelands.esm",	"form": ["004bfd", "007D28", "007D2E", "00df9c", "00dfc1", "00dfc3", "018090", "018092", "018097"] },
+
+	{ "priority": 150, "tag": "(dla1)", "mod": "Zeta.esm",					"form": "006BE3" },
+
+
+
+	{ "priority": 150, "tag": "(jbc1)", "mod": "Zeta.esm",					"form": ["00A9E6", "00A9E9"] },
+
+	{ "priority": 150, "tag": "(jdb0)", "mod": "TaleOfTwoWastelands.esm",	"form": ["001E14", "001E15"] },
+
+	{ "priority": 150, "tag": "(jdb1)", "mod": "TaleOfTwoWastelands.esm",	"form": ["00938F", "009390", "009391", "009392", "009393", "001C02", "001C03"] },
+	{ "priority": 150, "tag": "(jdb1)", "mod": "PointLookout.esm",			"form": ["00CC61", "010BC5"] },
+
+	{ "priority": 150, "tag": "(jdb2)", "mod": "Fallout3.esm",				"form": "02920F" },
+	{ "priority": 150, "tag": "(jdb2)", "mod": "BrokenSteel.esm",			"form": "006530" },
+	{ "priority": 150, "tag": "(jdb2)", "mod": "PointLookout.esm",			"form": "00B5E8" },
+	{ "priority": 150, "tag": "(jdb2)", "mod": "Zeta.esm",					"form": "009A36" },
+	{ "priority": 150, "tag": "(jdb2)", "mod": "TaleOfTwoWastelands.esm",	"form": "00921F" },
+
+	{ "priority": 150, "tag": "(jdc1)", "mod": "Anchorage.esm",				"form": "0024EF" },
+	{ "priority": 150, "tag": "(jdc1)", "mod": "ThePitt.esm",				"form": "005FBB" },
+	{ "priority": 150, "tag": "(jdc1)", "mod": "PointLookout.esm",			"form": "01116D" },
+
+	{ "priority": 150, "tag": "(jdc1)", "mod": "TaleOfTwoWastelands.esm",	"form": ["008BD4", "008B9A", "008AE9"] },
+
+	{ "priority": 150, "tag": "(jdd1)", "mod": "BrokenSteel.esm",			"form": "002E8E" },
+	{ "priority": 150, "tag": "(jdd1)", "mod": "PointLookout.esm",			"form": ["00ECF8", "00C6FD"] },
+ 	
+	{ "priority": 150, "tag": "(jfb1)", "mod": "TaleOfTwoWastelands.esm",	"form": ["007C7C", "007C7D", "00EE4F", "00EE51"] },
+
+
+
+	{ "priority": 150, "tag": "(abb1)", "mod": "Fallout3.esm",				"form": "028EEA" },
+	{ "priority": 150, "tag": "(adb1)", "mod": "TaleOfTwoWastelands.esm",	"form": "018019", "formlist": 1 },
+	{ "priority": 150, "tag": "(adc1)", "mod": "TaleOfTwoWastelands.esm",	"form": "008D4A", "formlist": 1 },
+	{ "priority": 150, "tag": "(ajb1)", "mod": "Fallout3.esm",				"form": "029384" },
+	{ "priority": 150, "tag": "(ajb1)", "mod": "ThePitt.esm",				"form": "0032E3" },
+	{ "priority": 150, "tag": "(ajb1)", "mod": "TaleOfTwoWastelands.esm",	"form": "001B98", "formlist": 1 }
+
+]
+}

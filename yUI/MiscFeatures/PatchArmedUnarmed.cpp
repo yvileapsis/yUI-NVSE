@@ -5,6 +5,9 @@
 #include <SafeWrite.h>
 #include <SimpleINILibrary.h>
 
+#include "GameForms.h"
+#include "Objects.h"
+
 namespace Patch::ArmedUnarmed
 {
 	inline bool g_ArmedUnarmed = false;

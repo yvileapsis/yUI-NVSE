@@ -1,5 +1,6 @@
 #pragma once
-#include "GameTypes.h"
+#include <NiNodes.h>
+#include <GameBSExtraData.h>
 
 enum AnimAction : SInt16
 {
@@ -93,6 +94,20 @@ public:
 	UInt32			unk3C;	// 3C
 	UInt32			unk40;	// 40
 	TESObjectWEAP*	ammoWeapon;	// 44
+};
+
+struct PackageInfo
+{
+	TESPackage*			package;		// 00
+	union								// 04
+	{
+		TESPackageData* packageData;
+		void*			actorPkgData;
+	};
+	TESObjectREFR*		targetRef;		// 08
+	UInt32				unk0C;			// 0C	Initialized to 0FFFFFFFFh, set to 0 on start
+	float				unk10;			// 10	Initialized to -1.0	. Set to GameHour on start so some time
+	UInt32				flags;			// 14	Flags, bit0 would be not created and initialized
 };
 
 class WeaponInfo : public InventoryChanges {};
@@ -1021,34 +1036,34 @@ struct AnimData
 	{
 		struct Unk18
 		{
-			UInt32			unk00[9];
-			UInt32			unk24;
+			UInt32					unk00[9];
+			UInt32					unk24;
 		};
 
-		UInt32			unk00[6];
-		Unk18* unk18;
+		UInt32						unk00[6];
+		Unk18*						unk18;
 	};
 
 	struct Unk128
 	{
-		UInt32			unk00[11];
-		TESIdleForm* idle2C;
+		UInt32						unk00[11];
+		TESIdleForm*				idle2C;
 	};
 
 	UInt32							unk000;				// 000
-	Actor* actor;				// 004
-	NiNode* nSceneRoot;		// 008
-	NiNode* nBip01;			// 00C
+	Actor*  						actor;				// 004
+	NiNode*  						nSceneRoot;		// 008
+	NiNode*  						nBip01;			// 00C
 	NiPoint3						pt010;				// 010
 	NiPoint3						pt01C;				// 01C
-	NiNode* nPelvis;			// 028
-	NiNode* nBip01Copy;		// 02C
-	NiNode* nLForearm;			// 030
-	NiNode* nHead;				// 034
-	NiNode* nWeapon;			// 038
-	NiNode* UNUSED03C;			// 03C
-	NiNode* UNUSED040;			// 040
-	NiNode* nNeck1;			// 044
+	NiNode*  						nPelvis;			// 028
+	NiNode*  						nBip01Copy;		// 02C
+	NiNode*  						nLForearm;			// 030
+	NiNode*							nHead;				// 034
+	NiNode* 						nWeapon;			// 038
+	NiNode*							UNUSED03C;			// 03C
+	NiNode*							UNUSED040;			// 040
+	NiNode*							nNeck1;			// 044
 	float							unk048;				// 048
 	UInt16							groupIDs[8];		// 04C
 	SInt32							sequenceState1[8];	// 05C
@@ -1061,24 +1076,24 @@ struct AnimData
 	UInt8							byte0CF;			// 0CF
 	float							timePassed;			// 0D0
 	UInt32							unk0D4;				// 0D4
-	NiControllerManager* controllerManager;			// 0D8
+	NiControllerManager*  			controllerManager;			// 0D8
 	NiTPointerMap<AnimSequenceBase>* mapAnimSequenceBase;// 0DC
-	BSAnimGroupSequence* animSequence[8];	// 0E0
-	BSAnimGroupSequence* animSeq100;		// 100
-	TList<KFModel>	loadingAnims;
-	float movementSpeedMult;
-	float rateOfFire;
-	float turboSpeedMult;
-	float weaponReloadSpeed;
-	float equipSpeed;
-	bool noBlend120;
-	UInt8 byte121;
-	UInt16 unk122;
-	AnimIdle* idleAnim;
-	AnimIdle* idleAnimQueued;
-	NiNode* node12C;
-	NiNode* node130;
-	TList<void> list134;
+	BSAnimGroupSequence*			animSequence[8];	// 0E0
+	BSAnimGroupSequence*			animSeq100;		// 100
+	TList<KFModel>					loadingAnims;
+	float							movementSpeedMult;
+	float							rateOfFire;
+	float 							turboSpeedMult;
+	float 							weaponReloadSpeed;
+	float 							equipSpeed;
+	bool 							noBlend120;
+	UInt8 							byte121;
+	UInt16 							unk122;
+	AnimIdle* 						idleAnim;
+	AnimIdle* 						idleAnimQueued;
+	NiNode* 						node12C;
+	NiNode* 						node130;
+	TList<void> 					list134;
 
 	AnimGroupID GetNextAttackGroupID() const;
 

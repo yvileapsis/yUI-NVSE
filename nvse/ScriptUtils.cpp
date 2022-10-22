@@ -4,7 +4,7 @@
 
 #include "CommandTable.h"
 #include "GameForms.h"
-#include "GameObjects.h"
+#include "Objects.h"
 #include "Hooks_Script.h"
 #include <string>
 

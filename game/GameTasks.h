@@ -1,7 +1,6 @@
 #pragma once
-
-#include "GameTypes.h"
-#include "NiTypes.h"
+#include <Containers.h>
+#include <NiTypes.h>
 //#include "NiNodes.h"
 
 /*******************************************************

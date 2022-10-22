@@ -1,7 +1,7 @@
 #include "GameAPI.h"
 #include "GameScript.h"
 #include "GameForms.h"
-#include "GameObjects.h"
+#include "Objects.h"
 #include "GameRTTI.h"
 
 UInt32 GetDeclaredVariableType(const char* varName, const char* scriptText)

@@ -1,6 +1,5 @@
 #pragma once
-#include "GameTypes.h"
-#include "Utilities.h"
+#include <NiTypes.h>
 
 /*** class hierarchy
  *
@@ -429,23 +428,8 @@
  *
  ****/
 
-class NiTransformInterpolator;
-class NiAVObject;
-class BSFadeNode;
-class NiStringPalette;
-class NiTextKeyExtraData;
-class NiCamera;
 class NiStream;
-class TESAnimGroup;
-class NiNode;
-class NiGeometry;
-class ParticleShaderProperty;
-class TESObjectCELL;
-class TESObjectREFR;
-class TESEffectShader;
-class ActiveEffect;
-
-const UInt32 kNiObjectNET_GetExtraData = 0x006FF9C0;
+class NiTextKeyExtraData;
 
 class NiMemObject
 {
@@ -472,23 +456,23 @@ public:
 	NiObject();
 	~NiObject();
 
-	virtual NiRTTI *	GetType(void);		// 02
-	virtual NiNode *	GetAsNiNode(void);	// 03 
-	virtual UInt32		Unk_04(void);		// 04
-	virtual UInt32		Unk_05(void);		// 05
-	virtual UInt32		Unk_06(void);		// 06
-	virtual UInt32		Unk_07(void);		// 07
-	virtual UInt32		Unk_08(void);		// 08
-	virtual UInt32		Unk_09(void);		// 09
-	virtual UInt32		Unk_0A(void);		// 0A
-	virtual UInt32		Unk_0B(void);		// 0B
-	virtual UInt32		Unk_0C(void);		// 0C
-	virtual UInt32		Unk_0D(void);		// 0D
-	virtual UInt32		Unk_0E(void);		// 0E
-	virtual UInt32		Unk_0F(void);		// 0F
-	virtual UInt32		Unk_10(void);		// 10
-	virtual UInt32		Unk_11(void);		// 11
-	virtual NiObject *	Copy(void);			// 12 (returns this, GetAsNiObject ?). Big doubt with everything below, except last which is 022
+	virtual NiRTTI*		GetType();		// 02
+	virtual NiNode*		GetAsNiNode();	// 03 
+	virtual UInt32		Unk_04();		// 04
+	virtual UInt32		Unk_05();		// 05
+	virtual UInt32		Unk_06();		// 06
+	virtual UInt32		Unk_07();		// 07
+	virtual UInt32		Unk_08();		// 08
+	virtual UInt32		Unk_09();		// 09
+	virtual UInt32		Unk_0A();		// 0A
+	virtual UInt32		Unk_0B();		// 0B
+	virtual UInt32		Unk_0C();		// 0C
+	virtual UInt32		Unk_0D();		// 0D
+	virtual UInt32		Unk_0E();		// 0E
+	virtual UInt32		Unk_0F();		// 0F
+	virtual UInt32		Unk_10();		// 10
+	virtual UInt32		Unk_11();		// 11
+	virtual NiObject*	Copy();			// 12 (returns this, GetAsNiObject ?). Big doubt with everything below, except last which is 022
 	virtual void		Load(NiStream * stream);
 	virtual void		PostLoad(NiStream * stream);
 	virtual void		FindNodes(NiStream * stream);	// give NiStream all of the NiNodes we own
@@ -496,15 +480,15 @@ public:
 	virtual bool		Compare(NiObject * obj);
 	virtual void		DumpAttributes(NiTArray <char *> * dst);
 	virtual void		DumpChildAttributes(NiTArray <char *> * dst);
-	virtual void		Unk_1A(void);
+	virtual void		Unk_1A();
 	virtual void		Unk_1B(UInt32 arg);
-	virtual void		Unk_1C(void);
-	virtual void		GetType2(void);					// calls GetType
+	virtual void		Unk_1C();
+	virtual void		GetType2();					// calls GetType
 	virtual void		Unk_1E(UInt32 arg);
-	virtual void		Unk_1F(void);
-	virtual void		Unk_20(void);
-	virtual void		Unk_21(void);
-	virtual void		Unk_22(void);
+	virtual void		Unk_1F();
+	virtual void		Unk_20();
+	virtual void		Unk_21();
+	virtual void		Unk_22();
 };
 
 class RefNiObject
@@ -518,12 +502,7 @@ class NiObjectNET : public NiObject
 public:
 	NiObjectNET();
 	~NiObjectNET();
-
-#if RUNTIME
-	MEMBER_FN_PREFIX(NiObjectNET);
-	DEFINE_MEMBER_FN(GetExtraData, NiExtraData*, kNiObjectNET_GetExtraData, const char* name);
-#endif
-
+	
 	const char*			m_pcName;						// 008 - name known
 	NiTimeController*	m_controller;					// 00C - size ok
 
@@ -535,6 +514,11 @@ public:
 	const char* GetName() const { return m_pcName ? m_pcName : "NULL"; }
 	void SetName(const char* newName);
 	NiExtraData* __fastcall GetExtraData(UInt32 vtbl) const;
+	NiExtraData* GetExtraData2(const char* name)
+	{
+		return ThisCall<NiExtraData*>(0x006FF9C0, this, name);
+	}
+
 	__forceinline bool AddExtraData(NiExtraData* xData)
 	{
 		return ThisCall<bool>(0xA5BA40, this, xData);
@@ -1648,55 +1632,6 @@ public:
 	UInt8			pad05[3];		// 05
 	NiCulledGeoList	* m_culledGeo;	// 08
 };
-
-/**** BSTempEffects ****/
-
-// 18
-class BSTempEffect : public NiObject
-{
-public:
-	BSTempEffect();
-	~BSTempEffect();
-
-	float			duration;		// 08
-	TESObjectCELL*	cell;			// 0C
-	float			unk10;			// 10
-	UInt8			unk14;			// 14
-	UInt8			pad15[3];
-};
-
-// 28
-class MagicHitEffect : public BSTempEffect
-{
-public:
-	MagicHitEffect();
-	~MagicHitEffect();
-
-	ActiveEffect	* activeEffect;	// 18	
-	TESObjectREFR	* target;		// 1C
-	float			unk20;			// 20	Init'd from ActiveEffect.timeElapsed
-	UInt8			unk24;			// 24	from ActiveEffect.EffectFlag
-	UInt8			pad25[3];
-};
-
-// 6C
-class MagicShaderHitEffect : public MagicHitEffect
-{
-public:
-	MagicShaderHitEffect();
-	~MagicShaderHitEffect();
-
-	UInt8					unk28;						// 28	Init'd to byte, OK for first offset.
-	UInt8					pad29[3];
-	UInt32					unk2C;						// 2C	Init'd to DWord
-	TESEffectShader			* effectShader;				// 30	Init'd to *effectShader
-	float					unk34;						// 34	Init'd to float
-	BSSimpleArray<NiPointer<ParticleShaderProperty>>	unk38;	// 38	Init'd to BSSimpleArray<NiPointer<ParticleShaderProperty>>
-	// the remainder is not validated..
-	void					* textureEffectData;		// 48 seen TextureEffectData< BSSahderLightingProperty >, init'd to RefNiObject
-};	// Alloc'd to 6C, 68 is RefNiObject, 60 is Init'd to 1.0, 64 also
-	// 4C is byte, Init'd to 0 for non player, otherwize = Player.1stPersonSkeleton.Flags0030.Bit0 is null
-
 
 class NiTextKey : public NiMemObject
 {

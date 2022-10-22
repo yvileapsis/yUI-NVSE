@@ -7,7 +7,7 @@
 #include "ScriptUtils.h"
 #include "SafeWrite.h"
 #include "FunctionScripts.h"
-#include "GameObjects.h"
+#include "Objects.h"
 #include "ThreadLocal.h"
 //#include "common/ICriticalSection.h"
 #include "Hooks_Gameplay.h"

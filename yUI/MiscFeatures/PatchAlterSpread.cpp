@@ -5,6 +5,8 @@
 #include <SafeWrite.h>
 #include <SimpleINILibrary.h>
 
+#include "Objects.h"
+
 namespace Patch::RestoreFO3Spread
 {
 	inline bool g_AlterSpread = false;

@@ -1,0 +1,617 @@
+/* 
+	This is the main file of ySI sorting system, it contains all information yUI needs to sort items, 
+	assign icons to tags and assign tag to items. It consists of two main sections, "tags" and "icons".
+	While this file contains all information the mod needs by default, additional .json files with
+	additional "tags" or "icons" sections could be provided and yUI will treat them like part of the
+	original file.
+	
+	"tags" section is responsible for assigning virtual sorting tags to the items. When game launches
+	each inventory item goes through all the lines in "tags" and stops at the highest "priority" one,
+	if the item satisfies the other conditions of the line, of course.
+	
+	There are two main ways of adding tag conditions, having a set of conditions like "formType", 
+	"weaponSkill", etc and explicitly naming base forms with "mod" and "form". "formlist" allows you 
+	to pass entire formlists of which each item will get assigned a tag.
+	
+	"icons" section is responsible for assigning .xml templates, icons and categories to the tags. It
+	allows for easy creation of additional keyring-like categories.
+*/
+{
+"items": [
+
+	/* WEAPONS - AUTOMATIC SORTING */
+
+	{ "priority": 100, "tag": "(fba2)", "formType": 40, "weaponSkill": 41, "weaponType": [3, 4] },
+	{ "priority": 110, "tag": "(fba1)", "formType": 40, "weaponSkill": 41, "weaponType": [3, 4], "weaponClipRounds": 7 },
+	{ "priority": 120, "tag": "(fba3)", "formType": 40, "weaponSkill": 41, "weaponType": [3, 4], "weaponSoundLevel": 2 },
+	{ "priority": 130, "tag": "(fba4)", "formType": 40, "weaponSkill": 41, "weaponType": [3, 4], "weaponIsAutomatic": 1 },
+	{ "priority": 100, "tag": "(fbb2)", "formType": 40, "weaponSkill": 41, "weaponType": [5, 6, 7] },
+	{ "priority": 110, "tag": "(fbb3)", "formType": 40, "weaponSkill": 41, "weaponType": [5, 6, 7], "weaponIsAutomatic": 1 },
+	{ "priority": 120, "tag": "(fbb4)", "formType": 40, "weaponSkill": 41, "weaponType": [5, 6, 7], "weaponSoundLevel": 2 },
+	{ "priority": 130, "tag": "(fbb5)", "formType": 40, "weaponSkill": 41, "weaponType": [5, 6, 7], "weaponHasScope": 1 },
+	{ "priority": 100, "tag": "(fbd1)", "formType": 40, "weaponSkill": 41, "weaponType": [8, 9] },
+	{ "priority": 140, "tag": "(fbc1)", "formType": 40, "weaponSkill": 41, "weaponNumProjectiles": 4 },
+	{ "priority": 150, "tag": "(fbc2)", "formType": 40, "weaponSkill": 41, "weaponClipRounds": 3, "weaponNumProjectiles": 4 },
+
+	{ "priority": 100, "tag": "(fda1)", "formType": 40, "weaponSkill": 34, "weaponType": [3, 4] },
+	{ "priority": 110, "tag": "(fda2)", "formType": 40, "weaponSkill": 34, "weaponType": [3, 4], "weaponIsAutomatic": 1},
+	{ "priority": 100, "tag": "(fdb1)", "formType": 40, "weaponSkill": 34, "weaponType": [5, 6, 7] },
+	{ "priority": 110, "tag": "(fdb2)", "formType": 40, "weaponSkill": 34, "weaponType": [5, 6, 7], "weaponIsAutomatic": 1 },
+	{ "priority": 120, "tag": "(fdb3)", "formType": 40, "weaponSkill": 34, "weaponType": [5, 6, 7], "weaponHasScope": 1 },
+	{ "priority": 100, "tag": "(fdd1)", "formType": 40, "weaponSkill": 34, "weaponType": [8, 9] },
+	
+	{ "priority": 100, "tag": "(fhd1)", "formType": 40, "weaponSkill": 33 },
+	
+	{ "priority": 150, "tag": "(ffa1)", "weaponType": [3, 4, 5, 6, 7],	"ammoMod": "FalloutNV.esm", "ammoForm": "166F63" },
+	{ "priority": 150, "tag": "(ffd1)", "weaponType": [8, 9],			"ammoMod": "FalloutNV.esm", "ammoForm": "166F63" },
+	
+	{ "priority": 100, "tag": "(fhb1)", "formType": 40, "weaponSkill": 35, "weaponType": [5, 6, 7] },
+	{ "priority": 100, "tag": "(fhd1)", "formType": 40, "weaponSkill": 35, "weaponType": [8, 9] },
+	{ "priority": 100, "tag": "(fla1)", "formType": 40, "weaponSkill": 38, "weaponType": 1 },
+	{ "priority": 110, "tag": "(fla2)", "formType": 40, "weaponSkill": 38, "weaponType": 1, "weaponIgnoresDTDR": 1 },
+	{ "priority": 100, "tag": "(flb1)", "formType": 40, "weaponSkill": 38, "weaponType": 2 },
+	{ "priority": 110, "tag": "(flb2)", "formType": 40, "weaponSkill": 38, "weaponType": 2, "weaponIgnoresDTDR": 1 },
+	{ "priority": 120, "tag": "(flc1)", "formType": 40, "weaponSkill": 38, "weaponAttackAnim": 10 },
+	{ "priority": 130, "tag": "(flc2)", "formType": 40, "weaponSkill": 38, "weaponType": 2, "weaponAttackAnim": 10 },
+	{ "priority": 120, "tag": "(flc3)", "formType": 40, "weaponSkill": 38, "weaponAttackAnim": 11 },
+	{ "priority": 100, "tag": "(fna1)", "formType": 40, "weaponSkill": 45 },
+	{ "priority": 110, "tag": "(fna2)", "formType": 40, "weaponSkill": 45, "weaponIgnoresDTDR": 1 },
+	{ "priority": 100, "tag": "(fja1)", "formType": 40, "weaponType": 10 },
+	{ "priority": 110, "tag": "(fjb1)", "formType": 40, "weaponType": 10, "weaponHandgrip": 3 },
+	{ "priority": 100, "tag": "(fjc1)", "formType": 40, "weaponType": [11, 12] },
+	{ "priority": 100, "tag": "(fjd1)", "formType": 40, "weaponType": 13 },
+	{ "priority": 110, "tag": "(fja1)", "formType": 40, "weaponSkill": 35, "weaponType": 13 },
+
+	/* WEAPONS - MANUAL SORTING*/
+
+	{ "priority": 200, "tag": "(fbz3)", "mod": "LonesomeRoad.esm",			"form": "00925E" },
+	{ "priority": 200, "tag": "(fdz0)", "mod": "FalloutNV.esm",				"form": "004322" },
+	{ "priority": 200, "tag": "(fdz1)", "mod": "FalloutNV.esm",				"form": "14EB3C" },
+	{ "priority": 200, "tag": "(fyz1)", "mod": "FalloutNV.esm",				"form": "0E6346" },
+	{ "priority": 200, "tag": "(fyz3)", "mod": "FalloutNV.esm",				"form": ["14C068", "130041"] },
+	{ "priority": 200, "tag": "(fyz3)", "mod": "HonestHearts.esm",			"form": ["01031A", "010BEF"] },
+	{ "priority": 200, "tag": "(fyz3)", "mod": "OldWorldBlues.esm",			"form": "00E1B0" },
+	{ "priority": 200, "tag": "(fyz3)", "mod": "LonesomeRoad.esm",			"form": "007670" },
+	{ "priority": 200, "tag": "(fyz2)", "mod": "FalloutNV.esm",				"form": ["13621D", "11A208"] },
+	{ "priority": 200, "tag": "(flz2)", "mod": "FalloutNV.esm",				"form": "00434E" },
+	{ "priority": 200, "tag": "(flz2)", "mod": "GunRunnersArsenal.esm",		"form": "00080F" },
+	{ "priority": 200, "tag": "(flz3)", "mod": "FalloutNV.esm",				"form": "11E46F" },
+	
+	{ "priority": 160, "tag": "(fba1)", "mod": "HonestHearts.esm",			"form": "09DBE" },
+	{ "priority": 150, "tag": "(fbb1)", "mod": "FalloutNV.esm",				"form": ["02262C", "034235", "0CEAF3", "0CEAF6", "0DA131", "121149"], "formlist": 2 },
+	{ "priority": 150, "tag": "(fbb2)", "mod": "FalloutNV.esm",				"form": ["0F062A", "106FEF", "0F062B"], "formlist": 2 },
+	{ "priority": 150, "tag": "(fbb2)", "mod": "GunRunnersArsenal.esm",		"form": "000812", "formlist": 2 },
+	{ "priority": 150, "tag": "(fbb3)", "mod": "FalloutNV.esm",				"form": ["10C872", "106FED", "1429D0"], "formlist": 2 },
+	{ "priority": 150, "tag": "(fbb3)", "mod": "DeadMoney.esm",				"form": "013C9B", "formlist": 2 },
+	{ "priority": 150, "tag": "(fbb3)", "mod": "HonestHearts.esm",			"form": "00DD78", "formlist": 2 },
+		
+	{ "priority": 150, "tag": "(fla1)", "mod": "FalloutNV.esm",				"form": ["047FBD", "047FBE", "03D426", "03D427", "1209D3", "171474"], "formlist": 2 },
+	{ "priority": 150, "tag": "(fla1)", "mod": "HonestHearts.esm",			"form": "010341", "formlist": 2 },
+	{ "priority": 150, "tag": "(fla2)", "mod": "FalloutNV.esm",				"form": ["0CC83C", "047FC0", "109A10", "0CEAF5", "0CC83E", "109A11", "11BC5E"], "formlist": 2 },
+	{ "priority": 150, "tag": "(fla2)", "mod": "DeadMoney.esm",				"form": "013FE4", "formlist": 2 },
+	{ "priority": 150, "tag": "(fla2)", "mod": "LonesomeRoad.esm",			"form": ["0046C7", "00A606"], "formlist": 2 },
+	{ "priority": 150, "tag": "(fla2)", "mod": "GunRunnersArsenal.esm",		"form": "000A8C", "formlist": 2 },
+	{ "priority": 150, "tag": "(flb1)", "mod": "FalloutNV.esm",				"form": ["047FC1", "047FC3", "0FC339", "03D422", "03D423", "03D424", "0CD50B"], "formlist": 2 },
+	{ "priority": 150, "tag": "(flb1)", "mod": "OldWorldBlues.esm",			"form": "00C297", "formlist": 2 },
+	{ "priority": 150, "tag": "(flb2)", "mod": "FalloutNV.esm",				"form": ["11BC5D", "17256B", "13E4DE", "143FBA", "105CF5"], "formlist": 2 },
+	{ "priority": 150, "tag": "(flb2)", "mod": "DeadMoney.esm",				"form": "013FE5", "formlist": 2 },
+	{ "priority": 150, "tag": "(flb2)", "mod": "OldWorldBlues.esm",			"form": "01309F", "formlist": 2 },
+	{ "priority": 150, "tag": "(flb2)", "mod": "LonesomeRoad.esm",			"form": ["0076E0", "008B05"], "formlist": 2 },
+
+	{ "priority": 150, "tag": "(fna1)", "mod": "FalloutNV.esm",				"form": ["047FC2", "047FC4", "169B86", "169B87", "169B88", "169B89", "169B8A", "105CF6"], "formlist": 2 },
+	{ "priority": 150, "tag": "(fna1)", "mod": "OldWorldBlues.esm",			"form": "013EA8", "formlist": 2 },
+	{ "priority": 150, "tag": "(fna2)", "mod": "FalloutNV.esm",				"form": ["00432B", "004354", "1568E6", "146C78", "152AEC", "17256A"], "formlist": 2 },
+	{ "priority": 150, "tag": "(fna2)", "mod": "DeadMoney.esm",				"form": "00119D", "formlist": 2 },
+	{ "priority": 150, "tag": "(fna2)", "mod": "HonestHearts.esm",			"form": ["010E5E", "010E5D", "0112FB"], "formlist": 2 },
+	{ "priority": 150, "tag": "(fna2)", "mod": "LonesomeRoad.esm",			"form": ["00CA89", "00CA88", "008CB9"], "formlist": 2 },
+	{ "priority": 150, "tag": "(fna2)", "mod": "GunRunnersArsenal.esm",		"form": "000808", "formlist": 2 },
+
+	{ "priority": 160, "tag": "(fjd1)", "mod": "FalloutNV.esm",				"form": ["14DE1D", "14D2AC", "161246"] },
+	{ "priority": 160, "tag": "(fjd1)", "mod": "DeadMoney.esm",				"form": "00119E" },
+	{ "priority": 160, "tag": "(fjd1)", "mod": "HonestHearts.esm",			"form": "00BCB6" },
+	{ "priority": 160, "tag": "(fjd1)", "mod": "OldWorldBlues.esm",			"form": ["00BB5E", "00BB5F"] },
+	
+	
+	
+	/* AMMO - AUTOMATIC SORTING */
+	
+	{ "priority": 100, "tag": "(aba1)", "formType": 41 },
+
+	/* AMMO - MANUAL SORTING */
+	
+	{ "priority": 150, "tag": "(aba1)", "mod": "FalloutNV.esm",				"form": ["166640", "16664E", "16664F", "166650", "166651"] },
+
+	{ "priority": 150, "tag": "(abb1)", "mod": "FalloutNV.esm",				"form": ["15367E", "15367F"], "formlist": 1 },
+	{ "priority": 150, "tag": "(aja1)", "mod": "FalloutNV.esm",				"form": "02935B", "formlist": 1 },
+	{ "priority": 150, "tag": "(ajb1)", "mod": "LonesomeRoad.esm",			"form": "00D5D0", "formlist": 1 },
+	{ "priority": 150, "tag": "(ajc1)", "mod": "FalloutNV.esm",				"form": "11A207", "formlist": 1 },
+
+	{ "priority": 150, "tag": "(ada1)", "mod": "FalloutNV.esm",				"form": ["06A80D", "158319", "15831A", "15831B"], "formlist": 1 },
+	{ "priority": 150, "tag": "(ada1)", "mod": "FalloutNV.esm",				"form": ["166653", "166654", "166655"], "formlist": 1 },
+	{ "priority": 150, "tag": "(ada1)", "mod": "GunRunnersArsenal.esm",		"form": ["000872", "000874"] },
+ 
+	{ "priority": 150, "tag": "(adb1)", "mod": "FalloutNV.esm",				"form": "029364", "formlist": 1 },
+
+	{ "priority": 150, "tag": "(afa1)", "mod": "FalloutNV.esm",				"form": "166F63", "formlist": 1 },
+	{ "priority": 150, "tag": "(afa1)", "mod": "GunRunnersArsenal.esm",		"form": "000875" },
+	{ "priority": 150, "tag": "(aha1)", "mod": "FalloutNV.esm",				"form": ["059331", "1537ED", "158308", "1537EE"], "formlist": 1 },
+	{ "priority": 150, "tag": "(aha1)", "mod": "LonesomeRoad.esm",			"form": "00B9F6", "formlist": 1 },
+	{ "priority": 150, "tag": "(aha1)", "mod": "GunRunnersArsenal.esm",		"form": "000AC2", "formlist": 1 },
+
+
+
+	/* MISC - AUTOMATIC SORTING */
+
+	{ "priority": 100, "tag": "(jha1)", "formType": 31 },
+	{ "priority": 120, "tag": "(jdb1)", "formType": 31, "questItem": 1 },
+	{ "priority": 110, "tag": "(jfc1)", "formType": 31, "miscComponent": 1 },
+
+	{ "priority": 100, "tag": "(jbc1)", "formType": 116 },
+	{ "priority": 100, "tag": "(jbd1)", "formType": 108 },
+	{ "priority": 100, "tag": "(jde1)", "formType": 115 },
+	{ "priority": 100, "tag": "(jdc1)", "formType": 49 },
+	{ "priority": 100, "tag": "(jdd1)", "formType": 46 },
+	{ "priority": 100, "tag": "(jfa1)", "formType": 103 },
+
+	/* MISC - MANUAL SORTING */
+
+	{ "priority": 150, "tag": "(jda2)", "mod": "FalloutNV.esm",				"form": "1735D2" },
+	{ "priority": 150, "tag": "(aje1)", "mod": "FalloutNV.esm",				"form": "033D84" },
+
+	{ "priority": 150, "tag": "(jde0)", "mod": "FalloutNV.esm",				"form": "15F8C3" },
+
+	{ "priority": 200, "tag": "(jba1)", "mod": "FalloutNV.esm",				"form": "00000F" },
+	{ "priority": 200, "tag": "(jbb1)", "mod": "FalloutNV.esm",				"form": "103B1C" },
+
+	{ "priority": 200, "tag": "(jbc1)", "mod": "FalloutNV.esm",				"form": ["034067", "13A4D8", "13A4D7", "13A4D6", "13A4D9", "137B9D", "173236"] },
+	{ "priority": 200, "tag": "(jbc1)", "mod": "DeadMoney.esm",				"form": "013F71" },
+	{ "priority": 200, "tag": "(jbd1)", "mod": "FalloutNV.esm",				"form": ["022419"] },
+	
+	{ "priority": 200, "tag": "(jda1)", "mod": "FalloutNV.esm",				"form": "00000A" },
+
+	{ "priority": 150, "tag": "(jdb0)", "mod": "FalloutNV.esm",				"form": ["11678E", "1164FB"] },
+
+	{ "priority": 120, "tag": "(jdb1)", "mod": "FalloutNV.esm",				"form": ["15EF5A", "15F011", "15F012", "15F013", "15F014", "15F015", "15F016", "15F017"] },
+	{ "priority": 120, "tag": "(jdb1)", "mod": "FalloutNV.esm",				"form": ["15F018", "15F019", "15F01A", "15F01B", "15F01C", "15F01D", "15F01E", "15F01F"] },
+	{ "priority": 120, "tag": "(jdb1)", "mod": "FalloutNV.esm",				"form": ["15F101", "045258", "045256", "045254", "045252", "04525A", "0604DD", "0604DE"] },
+	{ "priority": 120, "tag": "(jdb1)", "mod": "FalloutNV.esm",				"form": ["08C214", "08C215", "08C216", "08C217", "08C218", "08C219", "07C125", "07C128"] },
+	{ "priority": 120, "tag": "(jdb1)", "mod": "FalloutNV.esm",				"form": ["07C127", "07C126", "07C11D", "028EE6", "003A80", "0504DA", "03E56A"] },
+	
+	{ "priority": 120, "tag": "(jdb1)", "mod": "OldWorldBlues.esm",			"form": ["00E313", "00E314", "00E38B"] },
+
+	{ "priority": 150, "tag": "(jdb2)", "mod": "FalloutNV.esm",				"form": ["028704", "028706", "038832", "038833", "038834", "038850", "03885C", "0388E5", "0388E6", "0388F3"] },
+	{ "priority": 150, "tag": "(jdb2)", "mod": "FalloutNV.esm",				"form": ["038906", "03892F", "038930", "038931", "038950", "038951", "038952", "038953"] },
+	{ "priority": 150, "tag": "(jdb2)", "mod": "FalloutNV.esm",				"form": ["038954", "038955", "038956", "038958", "02EDFB", "040D4D", "02D3A5", "05A6CE"] },
+
+
+	{ "priority": 150, "tag": "(jdc1)", "mod": "FalloutNV.esm",				"form": ["0BAFFA", "0BAFFB", "0BAFFC", "0BAFFD", "0BAFFE", "0BAFFF", "0BB000", "0EFB3C"] },
+	{ "priority": 150, "tag": "(jdc1)", "mod": "FalloutNV.esm",				"form": ["11A581", "17509C", "0C9403", "13722B", "13722C", "144EB6", "16007F", "0E44AA"] },
+	{ "priority": 150, "tag": "(jdc1)", "mod": "FalloutNV.esm",				"form": ["1613D3", "175AB2", "175AAC", "05A795", "0CADE6"] },
+	{ "priority": 150, "tag": "(jdc1)", "mod": "FalloutNV.esm",				"form": ["0FC963", "167F30", "1210FD", "1210FA", "0F4C28", "1210FE", "1210F9", "01CFAF"] },
+	{ "priority": 150, "tag": "(jdc1)", "mod": "DeadMoney.esm",				"form": ["0136F4", "0136F5", "0136F6"] },
+	{ "priority": 150, "tag": "(jdc1)", "mod": "OldWorldBlues.esm",			"form": ["0169E5", "0169E6", "0169E7", "0169E8", "0169E9", "0169EA", "0169EC", "0169ED"] },
+	{ "priority": 150, "tag": "(jdc1)", "mod": "OldWorldBlues.esm",			"form": ["0169EE", "0169EF", "0169F0", "0169F1", "0169F4"] },
+	{ "priority": 150, "tag": "(jdc1)", "mod": "LonesomeRoad.esm",			"form": "009FEB" },
+
+	{ "priority": 150, "tag": "(jdd1)", "mod": "FalloutNV.esm",				"form": ["0347DE", "039B5F", "0F3D50", "115CD4", "1161E9", "0BAFBC"] },
+	{ "priority": 150, "tag": "(jdd1)", "mod": "FalloutNV.esm",				"form": ["11678E", "116A3B", "1344A4", "1554ED", "1645E3", "1645E4", "1645E5", "03997E"] },
+	{ "priority": 150, "tag": "(jdd1)", "mod": "DeadMoney.esm",				"form": ["00661E", "00661F", "009239", "00A846"] },
+
+	{ "priority": 150, "tag": "(jdf1)", "mod": "FalloutNV.esm",				"form": ["01EDC5", "123054", "13FE77", "0391B1"] },
+
+	{ "priority": 150, "tag": "(jfb1)", "mod": "FalloutNV.esm",				"form": ["12115E", "140AA2", "140AA3", "140AA4", "140AA5", "140AA6", "140AA7", "140AA9"] },
+	{ "priority": 150, "tag": "(jfb1)", "mod": "FalloutNV.esm",				"form": ["140AAA", "140AAB", "140AAC", "140AB2", "140AB3", "140ADD", "140ADE", "140ADF"] },
+	{ "priority": 150, "tag": "(jfb1)", "mod": "FalloutNV.esm",				"form": ["140AE0", "140AEA", "140AEB", "140AEC", "140C2F", "1429D3", "15C629", "15C62A"] },
+	{ "priority": 150, "tag": "(jfb1)", "mod": "FalloutNV.esm",				"form": ["15C631", "166656", "166657", "166658", "166659", "16665B", "16665C", "16665D"] },
+	{ "priority": 150, "tag": "(jfb1)", "mod": "FalloutNV.esm",				"form": ["166D4E", "166D4F", "166D50", "166D51", "166D52", "166D53", "166D54", "166D55"] },
+	{ "priority": 150, "tag": "(jfb1)", "mod": "FalloutNV.esm",				"form": ["166D56", "166D57", "173F7E", "173F81", "173F82"] },
+	{ "priority": 150, "tag": "(jfb1)", "mod": "HonestHearts.esm",			"form": ["009E71", "009E72"] },
+
+	{ "priority": 150, "tag": "(jhb1)", "mod": "FalloutNV.esm",				"form": ["03405E", "06F2DA", "06F2D9", "06F2D8", "06EEE7", "074170", "104C0B"] },
+	
+	
+	
+	/* ARMOR - AUTOMATIC SORTING */
+	
+	{ "priority": 100, "tag": "(hja1)", "formType": 24, "armorUpperBody": 1 },
+	{ "priority": 120, "tag": "(hba1)", "formType": 24, "armorUpperBody": 1, "armorClass": 1, "armorDT": 5 },
+	{ "priority": 110, "tag": "(hbb1)", "formType": 24, "armorUpperBody": 1, "armorClass": 2 },
+	{ "priority": 110, "tag": "(hbc1)", "formType": 24, "armorUpperBody": 1, "armorClass": 3 },
+	{ "priority": 120, "tag": "(hbd1)", "formType": 24, "armorUpperBody": 1, "armorPower": 1 },
+	{ "priority": 110, "tag": "(hla1)", "formType": 24, "armorHat": 1, "armorMask": -1 },
+	{ "priority": 100, "tag": "(hla2)", "formType": 24, "armorHair": 1, "armorMouthObject": -1, "armorMask": -1, "armorMask": -1, "armorEyeglasses": -1},
+	{ "priority": 100, "tag": "(hld1)", "formType": 24, "armorEyeglasses": 1, "armorMouthObject": -1, "armorMask": -1, "armorHair": -1, "armorHat": -1},
+	{ "priority": 105, "tag": "(hle1)", "formType": 24, "armorMask": 1 },
+	{ "priority": 145, "tag": "(hba2)", "formType": 24, "armorHead": 1, "armorClass": 1, "armorDT": 2 },
+	{ "priority": 145, "tag": "(hba2)", "formType": 24, "armorHat": 1, "armorClass": 1, "armorDT": 2 },
+	{ "priority": 140, "tag": "(hbb2)", "formType": 24, "armorHead": 1, "armorClass": 2 },
+	{ "priority": 140, "tag": "(hbb2)", "formType": 24, "armorHat": 1, "armorClass": 2 },
+	{ "priority": 140, "tag": "(hbc2)", "formType": 24, "armorHead": 1, "armorClass": 3 },
+	{ "priority": 140, "tag": "(hbc2)", "formType": 24, "armorHat": 1, "armorClass": 3 },
+	{ "priority": 145, "tag": "(hbd2)", "formType": 24, "armorHead": 1, "armorPower": 1 },
+	{ "priority": 145, "tag": "(hbd2)", "formType": 24, "armorHat": 1, "armorPower": 1 },
+	{ "priority": 110, "tag": "(hlb1)", "formType": 24, "armorHeadband": 1, "armorHat": -1, "armorHair": -1, "armorMask": -1, "armorEyeglasses": -1 },
+	{ "priority": 120, "tag": "(hlc1)", "formType": 24, "armorHeadband": 1, "armorHead": 1, "armorHat": 1, "armorHair": 1, "armorMask": -1 },
+	{ "priority": 100, "tag": "(hhb1)", "formType": 24, "armorBackpack": 1 },
+	{ "priority": 100, "tag": "(hfb1)", "formType": 24, "armorMask": 1, "armorMouthObject": 1 },
+	{ "priority": 110, "tag": "(hfb2)", "formType": 24, "armorMouthObject": 1, "armorMask": -1, "armorHat": -1, "armorHair": -1  },
+	{ "priority": 100, "tag": "(hna1)", "formType": 24, "armorChoker": 1 },
+	{ "priority": 100, "tag": "(hyz1)", "formType": 24, "armorPipBoy": 1 },
+	{ "priority": 130, "tag": "(hlf1)", "formType": 24, "armorHair": 1, "armorMask": 1 },
+
+	/* ARMOR - MANUAL SORTING */
+
+	{ "priority": 150, "tag": "(hfz1)", "mod": "FalloutNV.esm",				"form": "100633", "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hba1)", "mod": "FalloutNV.esm",				"form": ["06C587", "075207", "075211", "0BE9D5", "0C7C54", "0CB549", "0CB5F5", "0CB5FC"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hba1)", "mod": "FalloutNV.esm",				"form": ["0CB5FE", "0CB5FF", "0E674A", "0E674B", "0E674C", "0EE47B", "0EE47D", "0EE47E"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hba1)", "mod": "FalloutNV.esm",				"form": ["0EE480", "1046F8", "10D2CD", "138DC2", "13BF53", "157CD2", "15A937", "15FD5C"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hba1)", "mod": "FalloutNV.esm",				"form": ["1735E2"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hba1)", "mod": "DeadMoney.esm",				"form": ["00E1B7", "0109F2", "00E3F0"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hba1)", "mod": "HonestHearts.esm",			"form": ["009FF1", "00A7EC", "00E8E9", "0110FE", "011103", "0116F3"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hba1)", "mod": "LonesomeRoad.esm",			"form": "008B04", "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hba2)", "mod": "FalloutNV.esm",				"form": ["020432", "033598", "05B6E8", "078644", "078645", "08F775", "09B186", "0C111A"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hba2)", "mod": "FalloutNV.esm",				"form": ["0C7C4E", "0CB5FD", "0CB5FE", "0CB600", "0E7091", "0EE485", "0EE486", "0EE487"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hba2)", "mod": "FalloutNV.esm",				"form": ["0EE488", "0EE489", "0EE48A", "0F3797", "0F37D3", "10A0D0", "10B3E9", "138DC3"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hba2)", "mod": "FalloutNV.esm",				"form": ["15A935", "15FD5D"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hba2)", "mod": "DeadMoney.esm",				"form": ["00E3F1", "0109F3"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hba2)", "mod": "HonestHearts.esm",			"form": "00B435", "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hbb1)", "mod": "FalloutNV.esm",				"form": ["023030", "03064D", "075206", "0CB5EF", "0CE553", "0D777A", "0EE47F", "0EE481"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hbb1)", "mod": "FalloutNV.esm",				"form": ["0EE690", "0EE691", "0EE692", "0EE693", "12116A", "1251C9", "129254", "13EC03"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hbb1)", "mod": "FalloutNV.esm",				"form": ["13EC04", "13EC05", "13EC06", "13EC07", "15EF66"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hbb1)", "mod": "HonestHearts.esm",			"form": "010C71", "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hbb1)", "mod": "OldWorldBlues.esm",			"form": ["01199D", "00C12F"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hbb1)", "mod": "LonesomeRoad.esm",			"form": ["00D4C9", "0092E9", "0092E8", "008B03", "008857", "00885B", "008F00"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hbb2)", "mod": "FalloutNV.esm",				"form": ["034105", "07520F", "075212", "0B17A0", "0BE9DE", "0CB5F0", "0CB5FB", "0EE483"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hbb2)", "mod": "FalloutNV.esm",				"form": ["0EE484", "0EE68E", "0EE68F", "10BEE9", "145EC5", "14722A", "15EF67"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hbb2)", "mod": "HonestHearts.esm",			"form": "01124D", "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hbb2)", "mod": "LonesomeRoad.esm",			"form": ["00D4CA", "0092EA", "00C9C0", "00C9C1", "00C9C2", "008859", "00885A"], "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hbc1)", "mod": "FalloutNV.esm",				"form": ["0CB5F6", "075205", "1649DD"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hbc1)", "mod": "HonestHearts.esm",			"form": ["011100", "011102"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hbc1)", "mod": "LonesomeRoad.esm",			"form": "00C716", "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hbc2)", "mod": "FalloutNV.esm",				"form": ["075209", "140D46", "0CB5F7", "13E25A"], "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hbd1)", "mod": "FalloutNV.esm",				"form": ["075213", "075201", "0EE68D", "0D777B", "07836E"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hbd1)", "mod": "LonesomeRoad.esm",			"form": "00C717", "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hbd2)", "mod": "FalloutNV.esm",				"form": ["07520B", "13316B", "13316A", "0D7779"], "formlist": 1, "formType": 24 },
+
+	{ "priority": 160, "tag": "(hbe1)", "mod": "FalloutNV.esm",				"form": ["166DCD", "04443E", "06B464", "08F571", "0CB5F3", "133168"], "formlist": 1, "formType": 24 },
+	{ "priority": 160, "tag": "(hbe2)", "mod": "FalloutNV.esm",				"form": ["06154D", "04443F", "133169", "133167", "134094", "06B465", "0CB5F4"], "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hda1)", "mod": "FalloutNV.esm",				"form": ["033078", "075216", "0CE552", "0C09D4", "01B5BD", "0CB605", "05B6EA"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hda1)", "mod": "OldWorldBlues.esm",			"form": "00DBB7", "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hda2)", "mod": "FalloutNV.esm",				"form": ["0CEE21", "07494C"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hda2)", "mod": "OldWorldBlues.esm",			"form": "00DBB6", "formlist": 1, "formType": 24 },
+	
+	{ "priority": 150, "tag": "(hlb1)", "mod": "FalloutNV.esm",				"form": ["0BE9D7", "17409D", "073D57"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hlb1)", "mod": "OldWorldBlues.esm",			"form": ["014B1C", "00ADBD"], "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hfb2)", "mod": "LonesomeRoad.esm",			"form": "00CEEC", "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hjd2)", "mod": "FalloutNV.esm",				"form": ["0BE9DB", "0ACD5A", "081792", "0340F9"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hjd2)", "mod": "DeadMoney.esm",				"form": "00581A", "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hhz2)", "mod": "FalloutNV.esm",				"form": ["14E834", "02F563", "03D1FE", "0E3791"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hhz2)", "mod": "DeadMoney.esm",				"form": "006E8F", "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hjd1)", "mod": "FalloutNV.esm",				"form": ["0340DE", "0BE9F3", "11689A", "14B053", "06696D", "020429", "15E35D", "0BE9F4", "10D8DB"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hjd1)", "mod": "LonesomeRoad.esm",			"form": ["008EFF", "0076DE", "0076DB", "009257", "009255", "009254", "009253"], "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hld1)", "mod": "FalloutNV.esm",				"form": ["09B188", "05DC82", "075214", "0BE9EB"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hld1)", "mod": "DeadMoney.esm",				"form": "00EF17", "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hld1)", "mod": "OldWorldBlues.esm",			"form": ["00C6F7", "015AE8", "015AE7"], "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hla1)", "mod": "FalloutNV.esm",				"form": ["028FFA", "02DD80", "0340C8", "0340CD", "0340E1", "034126", "06B467", "074950"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hla1)", "mod": "FalloutNV.esm",				"form": ["074952", "078647", "078647", "078648", "07C17D", "0AB491", "0BE9F7", "0CE26D"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hla1)", "mod": "FalloutNV.esm",				"form": ["0E2F40", "0E32F1", "0EE696", "0F3797", "10B3E7", "10B3E8", "10EA7F", "10EA80"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hla1)", "mod": "FalloutNV.esm",				"form": ["10EA81", "11689B", "116E26", "1258C3", "12B86D", "12B86E", "134490", "14B054"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hla1)", "mod": "FalloutNV.esm",				"form": ["15EF8B", "028FF9", "0340C1", "0C72FB", "09B185"], "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hla1)", "mod": "HonestHearts.esm",			"form": ["00A3E0", "00D103", "00ECBE"], "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hla3)", "mod": "FalloutNV.esm",				"form": ["028FF8", "0CDF63", "050E44"], "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hle1)", "mod": "FalloutNV.esm",				"form": ["1168A4", "03E591", "11A970"], "formlist": 1, "formType": 24 },
+	
+	{ "priority": 150, "tag": "(hlf1)", "mod": "FalloutNV.esm",				"form": "0EADDF", "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hjc1)", "mod": "FalloutNV.esm",				"form": ["0C71E1", "0340D9", "0340D7", "10CDA4", "158615", "10C876", "0C24F9", "01CBDC"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hjc1)", "mod": "OldWorldBlues.esm",			"form": ["00E0BF", "00E0BA", "00E0B9", "011278", "00E0B7", "00D56F"], "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hfb1)", "mod": "OldWorldBlues.esm",			"form": ["00E68B", "00E68A"], "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hlj1)", "mod": "FalloutNV.esm",				"form": ["0E78C6", "146F23", "078643"], "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hnb1)", "mod": "FalloutNV.esm",				"form": ["1370FE", "1370FD"], "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hlc1)", "mod": "FalloutNV.esm",				"form": ["16A26F", "08F775", "0BE9DF", "09B189", "02D11B"], "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hjb1)", "mod": "FalloutNV.esm",				"form": ["0340F2", "03411B", "079F09", "0BE9D9", "0BE9F2", "0BF6FD", "0CAFBE", "0EFB23"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hjb1)", "mod": "FalloutNV.esm",				"form": ["0FD175", "0FD561", "0FD771", "104184", "109A92", "109A93", "12B965", "12B966"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hjb1)", "mod": "FalloutNV.esm",				"form": ["1300AF", "1300B0", "13F80E", "13F80F", "153A0E", "15EA6D"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hjb1)", "mod": "DeadMoney.esm",				"form": "00F3A4", "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hjb1)", "mod": "OldWorldBlues.esm",			"form": ["00E689", "014253"], "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hja1)", "mod": "FalloutNV.esm",				"form": ["0340C3", "0340C4", "0340FA", "0340FB", "08198C", "0ABBE2", "0BE9E9", "0CB606"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hja1)", "mod": "FalloutNV.esm",				"form": ["0CB607", "0CB608", "0CB609", "0CB60A", "0CB60B", "11F87B", "11F87C", "11F87D"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hja1)", "mod": "FalloutNV.esm",				"form": ["0340CF", "0340D0", "0340D1", "05BB63", "05BB66", "05BB6F", "05BB70", "01EA6D"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hja1)", "mod": "FalloutNV.esm",				"form": ["0CB60D", "0CB60F"], "formlist": 1, "formType": 24 },
+	
+	{ "priority": 150, "tag": "(hja1)", "mod": "HonestHearts.esm",			"form": "00A3DF", "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hje1)", "mod": "FalloutNV.esm",				"form": ["0340E4", "0340E7", "0BE9DA", "0CB545", "107718", "112DAF", "1350EF", "1370D6"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hje1)", "mod": "FalloutNV.esm",				"form": ["1370D7", "14823E"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hje1)", "mod": "DeadMoney.esm",				"form": "014088", "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hje2)", "mod": "FalloutNV.esm",				"form": ["02042E", "0340F8", "034125", "05C682", "096CB7", "0B1056", "104C23"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hje2)", "mod": "FalloutNV.esm",				"form": ["10C67C", "10E1DD", "10E1DE", "10E1DF", "10E1E0", "110A74", "1176E3", "11BEE2"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hje2)", "mod": "FalloutNV.esm",				"form": ["1258C2", "13002C", "1428EC", "163119"], "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hje2)", "mod": "DeadMoney.esm",				"form": ["006ED6", "00EF16"], "formlist": 1, "formType": 24 },
+
+	{ "priority": 150, "tag": "(hje3)", "mod": "FalloutNV.esm",				"form": ["0340E6", "0C8E07", "0CB60E", "178DB1"], "formlist": 1, "formType": 24 },
+
+
+
+	/* AID - AUTOMATIC SORTING */
+
+	{ "priority": 100, "tag": "(djb1)", "formType": 25 },
+
+	{ "priority": 100, "tag": "(dlb1)", "formType": 47 },
+
+	{ "priority": 110, "tag": "(dha1)", "formType": 47, "aidIsFood": 1 },
+	{ "priority": 120, "tag": "(dhb1)", "formType": 47, "aidIsFood": 1, "aidDamagesAV": 54 },
+	{ "priority": 130, "tag": "(dhc1)", "formType": 47, "aidIsFood": 1, "miscProduct": 1 },
+	{ "priority": 140, "tag": "(dfc1)", "formType": 47, "aidIsFood": 1, "aidIsWater": 1 },
+	{ "priority": 120, "tag": "(dbb2)", "formType": 47, "aidIsMedicine": 1 },
+	{ "priority": 130, "tag": "(dbc3)", "formType": 47, "aidIsMedicine": 1, "aidRestoresAV": 54 },
+	{ "priority": 130, "tag": "(dbc3)", "formType": 47, "aidIsMedicine": 1, "aidRestoresAV": 20 },
+	{ "priority": 140, "tag": "(dba1)", "formType": 47, "aidIsMedicine": 1, "aidRestoresAV": 16 },
+	{ "priority": 120, "tag": "(dda1)", "formType": 47, "aidIsAddictive": 1 },
+	{ "priority": 140, "tag": "(dfa1)", "formType": 47, "aidIsFood": 1, "aidIsAddictive": 1 },
+	{ "priority": 120, "tag": "(ddb1)", "formType": 47, "aidIsPoisonous": 1 },
+
+	/* AID - MANUAL SORTING */
+
+	{ "priority": 150, "tag": "(dfd1)", "mod": "OldWorldBlues.esm",			"form": ["009618", "0098C4", "0133B1", "0133B6"] },
+
+
+	{ "priority": 150, "tag": "(dha1)", "mod": "FalloutNV.esm",				"form": ["02E376", "03404B", "03404C", "03404E", "03404F", "034050", "03C345", "0552CE"] },
+	{ "priority": 150, "tag": "(dha1)", "mod": "FalloutNV.esm",				"form": ["065175", "07C10D", "095F48", "09C957", "11B9AE", "12939E", "13215B", "136E13"] },
+	{ "priority": 150, "tag": "(dha1)", "mod": "FalloutNV.esm",				"form": ["143FE0", "1449CA", "151F7D", "157FFB", "15D225", "15D9B2", "15E5CB", "15E5CC"] },
+	{ "priority": 150, "tag": "(dha1)", "mod": "FalloutNV.esm",				"form": ["15E5CD", "15EACF", "1613BF", "16D5BA"] },
+	
+	
+	{ "priority": 150, "tag": "(dha1)", "mod": "DeadMoney.esm",				"form": "00CDB1" },
+	
+	{ "priority": 150, "tag": "(dha2)", "mod": "FalloutNV.esm",				"form": ["015196", "015199", "01519C", "01519F", "0151A0", "034049", "038E0C", "0E2F67"] },
+	{ "priority": 150, "tag": "(dha2)", "mod": "FalloutNV.esm",				"form": ["0E2F69", "0E9AD1", "0EACA1", "0EACA4", "0EC01C", "0EC01D", "0EC01E", "13B2B4"] },
+	{ "priority": 150, "tag": "(dha2)", "mod": "FalloutNV.esm",				"form": ["13B2B9", "13B2BA", "143FE2", "143FE3", "143FE4", "143FE5", "143FF2", "15F0E7"] },
+	{ "priority": 150, "tag": "(dha2)", "mod": "FalloutNV.esm",				"form": ["15F0E8", "15F0E9"] },
+	
+	
+	{ "priority": 150, "tag": "(dha2)", "mod": "HonestHearts.esm",			"form": ["0094BB", "011202"] },
+	{ "priority": 150, "tag": "(dha2)", "mod": "OldWorldBlues.esm",			"form": "01213E" },
+	
+	{ "priority": 150, "tag": "(dhb1)", "mod": "FalloutNV.esm",				"form": ["0293A9", "03359C", "08C551", "08C552", "08C554", "08C556", "08C558"] },
+	{ "priority": 150, "tag": "(dhb1)", "mod": "FalloutNV.esm",				"form": ["08C55A", "08C55C", "08C55E", "08C560", "08C562", "08C564", "143FDF", "143FE6"] },
+	{ "priority": 150, "tag": "(dhb1)", "mod": "FalloutNV.esm",				"form": ["143FE7", "143FE8", "143FE9", "143FEA", "143FEC", "143FED", "143FEE", "143FF0"] },
+	
+	{ "priority": 150, "tag": "(dhb1)", "mod": "DeadMoney.esm",				"form": "010A69" },
+	{ "priority": 150, "tag": "(dhb1)", "mod": "OldWorldBlues.esm",			"form": "01495D" },
+	{ "priority": 150, "tag": "(dhb1)", "mod": "LonesomeRoad.esm",			"form": "00917E" },
+
+	{ "priority": 150, "tag": "(dhc1)", "mod": "FalloutNV.esm",				"form": ["015198", "01519A", "01519B", "01519D", "030A23", "031948", "031949", "03194A"] },
+	{ "priority": 150, "tag": "(dhc1)", "mod": "FalloutNV.esm",				"form": ["049076", "07E173", "0A29D6", "0ABD17", "0E2F64", "0E2F65", "0E2F68", "11A10D"] },
+	{ "priority": 150, "tag": "(dhc1)", "mod": "FalloutNV.esm",				"form": ["13D531", "13D572", "15E3A4", "15E3A5", "1613C0", "1613C1", "1613C2", "1613C3"] },
+	{ "priority": 150, "tag": "(dhc1)", "mod": "FalloutNV.esm",				"form": ["1613C4", "161F18", "175AA8", "175AAE"] },
+	
+	{ "priority": 150, "tag": "(dhc1)", "mod": "OldWorldBlues.esm",			"form": ["0098C5", "0133B3"] },
+		
+	{ "priority": 150, "tag": "(dfc1)", "mod": "FalloutNV.esm",				"form": ["0151A3", "0151A4", "143FF1"] },
+	{ "priority": 150, "tag": "(dfc1)", "mod": "LonesomeRoad.esm",			"form": "009180" },
+	
+	{ "priority": 150, "tag": "(dfb1)", "mod": "FalloutNV.esm",				"form": ["01519E", "0284F9", "040DCB", "0E2F6A", "0E2F6C", "0E2F6D", "103B1E", "11702C"] },
+	{ "priority": 150, "tag": "(dfb1)", "mod": "FalloutNV.esm",				"form": "143FEB" },
+	{ "priority": 150, "tag": "(dfb1)", "mod": "HonestHearts.esm",			"form": "011112" },
+
+	{ "priority": 150, "tag": "(dbb2)", "mod": "FalloutNV.esm",				"form": ["034051", "0CB05C", "0E2C6F", "0F1865", "13B2C3"] },
+	{ "priority": 150, "tag": "(dbb2)", "mod": "HonestHearts.esm",			"form": ["00F948", "00CCF4"] },
+	{ "priority": 150, "tag": "(dbb2)", "mod": "LonesomeRoad.esm",			"form": ["00917B", "00917F"] },
+
+	{ "priority": 150, "tag": "(dba1)", "mod": "FalloutNV.esm",				"form": ["015169", "0CCEF2", "136A1D", "14C11C", "1613BD"] },
+	{ "priority": 150, "tag": "(dba1)", "mod": "HonestHearts.esm",			"form": "01103C" },
+
+	{ "priority": 150, "tag": "(dda1)", "mod": "FalloutNV.esm",				"form": ["015163", "015164", "015165", "015166", "031020", "033068", "050F8F", "07EA1B"] },
+	{ "priority": 150, "tag": "(dda1)", "mod": "FalloutNV.esm",				"form": ["085ABB", "0BF7C5", "0BF7C6", "0BF7C7", "0C9CF4", "0CB5A9", "0CEA5F", "0CED8C"] },
+	{ "priority": 150, "tag": "(dda1)", "mod": "FalloutNV.esm",				"form": ["0EACA3", "120D81", "122B49", "146CCA", "146CCB", "146CCD"] },
+	{ "priority": 150, "tag": "(dda1)", "mod": "DeadMoney.esm",				"form": "012C38" },
+	{ "priority": 150, "tag": "(dda1)", "mod": "HonestHearts.esm",			"form": ["00CCF5", "00CCF6", "01110A"] },
+
+	{ "priority": 150, "tag": "(dfa1)", "mod": "FalloutNV.esm",				"form": ["0151A1", "015197", "032C74", "032C75", "03404A", "115EB1", "118356", "122B4A"] },
+	{ "priority": 150, "tag": "(dfa1)", "mod": "FalloutNV.esm",				"form": ["143FDE", "143FE1", "143FEF", "16163D", "1673D6"] },
+	{ "priority": 150, "tag": "(dfa1)", "mod": "DeadMoney.esm",				"form": "010395" },
+	{ "priority": 150, "tag": "(dfa1)", "mod": "HonestHearts.esm",			"form": ["011111", "0112F9"] },
+	{ "priority": 150, "tag": "(dfa1)", "mod": "OldWorldBlues.esm",			"form": "01495E" },
+
+	{ "priority": 150, "tag": "(dla1)", "mod": "FalloutNV.esm",				"form": "140A68" },
+
+	{ "priority": 150, "tag": "(dlb1)", "mod": "FalloutNV.esm",				"form": ["043E94", "163171"] },
+	{ "priority": 150, "tag": "(dlb1)", "mod": "OldWorldBlues.esm",			"form": "009D4A" },
+	{ "priority": 150, "tag": "(dlb1)", "mod": "LonesomeRoad.esm",			"form": "00CD51" },
+
+	{ "priority": 150, "tag": "(dja1)", "mod": "FalloutNV.esm",				"form": ["0EC4A4", "0EC4A6", "0EC4A7", "0EC4A8", "0EC4A9", "0EC4AA", "0EC4AB", "0EC4AC"] },
+	{ "priority": 150, "tag": "(dja1)", "mod": "FalloutNV.esm",				"form": ["0EC4AD", "0EC4AE", "0EC4AF", "0EC4B0", "0EC4B1", "135689"] }
+	
+],
+
+"categories": [
+	{ "priority": 200, "tag": "",		"template": "ySINoTag",	  "filename": "interface\\icons\\Misc_Unknown.dds" },
+	{ "priority": 100, "tag": "(fba1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapA_Pistol.dds" },
+	{ "priority": 100, "tag": "(fba2)", "template": "ySIDefault", "filename": "interface\\icons\\WeapA_Pistol_Revolver.dds" },
+	{ "priority": 100, "tag": "(fba3)", "template": "ySIDefault", "filename": "interface\\icons\\WeapA_Pistol_Silenced.dds" },
+	{ "priority": 100, "tag": "(fba4)", "template": "ySIDefault", "filename": "interface\\icons\\WeapA_Pistol_SMG.dds" },
+	{ "priority": 100, "tag": "(fbb1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapA_Rifle.dds" },
+	{ "priority": 100, "tag": "(fbb2)", "template": "ySIDefault", "filename": "interface\\icons\\WeapA_Rifle_SemiAuto.dds" },
+	{ "priority": 100, "tag": "(fbb3)", "template": "ySIDefault", "filename": "interface\\icons\\WeapA_Rifle_FullAuto.dds" },
+	{ "priority": 100, "tag": "(fbb4)", "template": "ySIDefault", "filename": "interface\\icons\\WeapA_Rifle_Silenced.dds" },
+	{ "priority": 100, "tag": "(fbb5)", "template": "ySIDefault", "filename": "interface\\icons\\WeapA_Rifle_Sniper.dds" },
+	{ "priority": 100, "tag": "(fbc1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapA_Rifle_Shotgun_NoMag.dds" },
+	{ "priority": 100, "tag": "(fbc2)", "template": "ySIDefault", "filename": "interface\\icons\\WeapA_Rifle_Shotgun_Mag.dds" },
+	{ "priority": 100, "tag": "(fbd1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapA_BigGun_Minigun.dds" },
+	{ "priority": 100, "tag": "(fbz1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapA_Other_DartGun.dds" },
+	{ "priority": 100, "tag": "(fbz2)", "template": "ySIDefault", "filename": "interface\\icons\\WeapA_Other_Watergun.dds" },
+	{ "priority": 100, "tag": "(fbz3)", "template": "ySIDefault", "filename": "interface\\icons\\WeapA_Other_Nailgun.dds" },
+	{ "priority": 100, "tag": "(fbz4)", "template": "ySIDefault", "filename": "interface\\icons\\WeapA_Other_RailwayRifle.dds" },
+	{ "priority": 100, "tag": "(fbz5)", "template": "ySIDefault", "filename": "interface\\icons\\WeapA_Other_RockItLauncher.dds" },
+	{ "priority": 100, "tag": "(fda1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapC_Energy_Pistol.dds" },
+	{ "priority": 100, "tag": "(fda2)", "template": "ySIDefault", "filename": "interface\\icons\\WeapC_Energy_Pistol_Auto.dds" },
+	{ "priority": 100, "tag": "(fdb1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapC_Energy_Rifle.dds" },
+	{ "priority": 100, "tag": "(fdb2)", "template": "ySIDefault", "filename": "interface\\icons\\WeapC_Energy_Rifle_Auto.dds" },
+	{ "priority": 100, "tag": "(fdb3)", "template": "ySIDefault", "filename": "interface\\icons\\WeapC_Energy_Rifle_Sniper.dds" },
+	{ "priority": 100, "tag": "(fdd1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapC_Energy_BigGun.dds" },
+	{ "priority": 100, "tag": "(fdz0)", "template": "ySIDefault", "filename": "interface\\icons\\WeapZ_Unique_AlienBlaster.dds" },
+	{ "priority": 100, "tag": "(fdz1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapZ_Unique_EuclidCFinder.dds" },
+	{ "priority": 100, "tag": "(fdz2)", "template": "ySIDefault", "filename": "interface\\icons\\WeapZ_Unique_Mesmetron.dds" },
+	{ "priority": 100, "tag": "(fdz3)", "template": "ySIDefault", "filename": "interface\\icons\\WeapZ_Unique_Cryolator.dds" },
+	{ "priority": 100, "tag": "(ffa1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapZ_Other_FlamerPistol.dds" },
+	{ "priority": 100, "tag": "(ffd1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapZ_Other_Flamer.dds" },
+	{ "priority": 100, "tag": "(fhb1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapZ_Other_GrenadeLauncher.dds" },
+	{ "priority": 100, "tag": "(fhd1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapZ_Other_FatMan.dds" },
+	{ "priority": 100, "tag": "(fiz1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapZ_Other_Crossbow.dds" },
+	{ "priority": 100, "tag": "(fiz2)", "template": "ySIDefault", "filename": "interface\\icons\\WeapZ_Other_Bow.dds" },
+	{ "priority": 100, "tag": "(fja1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapD_Throw_Grenade.dds"},
+	{ "priority": 100, "tag": "(fjb1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapD_Throw_Bomb.dds" },
+	{ "priority": 100, "tag": "(fjc1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapD_Throw_Mine.dds" },
+	{ "priority": 100, "tag": "(fjd1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapD_Throw_Melee.dds" },
+	{ "priority": 100, "tag": "(fje1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapD_Throw_JerryCan.dds" },
+	{ "priority": 100, "tag": "(fla1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapE_Melee_1H_Blunt.dds" },
+	{ "priority": 100, "tag": "(fla2)", "template": "ySIDefault", "filename": "interface\\icons\\WeapE_Melee_1H_Sharp.dds" },
+	{ "priority": 100, "tag": "(flb1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapE_Melee_2H_Blunt.dds" },
+	{ "priority": 100, "tag": "(flb2)", "template": "ySIDefault", "filename": "interface\\icons\\WeapE_Melee_2H_Sharp.dds" },
+	{ "priority": 100, "tag": "(flc1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapE_Melee_Chainsaw.dds" },
+	{ "priority": 100, "tag": "(flc2)", "template": "ySIDefault", "filename": "interface\\icons\\WeapE_Melee_Chainsaw.dds" },
+	{ "priority": 100, "tag": "(flc3)", "template": "ySIDefault", "filename": "interface\\icons\\WeapE_Melee_ThermicLance.dds" },
+	{ "priority": 100, "tag": "(flz1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapE_Melee_RepellentStick.dds" },
+	{ "priority": 100, "tag": "(flz2)", "template": "ySIDefault", "filename": "interface\\icons\\WeapE_Melee_Shishkebab.dds" },
+	{ "priority": 100, "tag": "(flz3)", "template": "ySIDefault", "filename": "interface\\icons\\WeapE_Melee_Shovel.dds" },
+	{ "priority": 100, "tag": "(fna1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapF_Unarmed_Blunt.dds" },
+	{ "priority": 100, "tag": "(fna2)", "template": "ySIDefault", "filename": "interface\\icons\\WeapF_Unarmed_Blade.dds" },
+	{ "priority": 100, "tag": "(fyz1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapZ_Other_Binoculars.dds" },
+	{ "priority": 100, "tag": "(fyz2)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_Camera.dds" },
+	{ "priority": 100, "tag": "(fyz3)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_Utility.dds" },
+	{ "priority": 100, "tag": "(hba1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_ArmorA_Light.dds" },
+	{ "priority": 100, "tag": "(hba2)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_ArmorA_Light_Helmet.dds" },
+	{ "priority": 100, "tag": "(hbb1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_ArmorB_Medium.dds" },
+	{ "priority": 100, "tag": "(hbb2)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_ArmorB_Medium_Helmet.dds" },
+	{ "priority": 100, "tag": "(hbc1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_ArmorC_Heavy.dds"},
+	{ "priority": 100, "tag": "(hbc2)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_ArmorC_Heavy_Helmet.dds" },
+	{ "priority": 100, "tag": "(hbd1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_ArmorD_Power.dds" },
+	{ "priority": 100, "tag": "(hbd2)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_ArmorD_Power_Helmet.dds" },
+	{ "priority": 100, "tag": "(hbe1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_ArmorE_PowerEnclave.dds" },
+	{ "priority": 100, "tag": "(hbe2)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_ArmorE_PowerEnclave_Helmet.dds" },
+	{ "priority": 100, "tag": "(hda1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_ArmorF_Hazmat.dds" },
+	{ "priority": 100, "tag": "(hda2)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_ArmorF_Hazmat_Helmet.dds" },
+	{ "priority": 100, "tag": "(hfb1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Headgear_MaskGas.dds" },
+	{ "priority": 100, "tag": "(hfb2)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Headgear_MaskGasUlysses.dds" },
+	{ "priority": 100, "tag": "(hfz1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Headgear_Rebreather.dds" },
+	{ "priority": 100, "tag": "(hhb1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Other_Backpack.dds" },
+	{ "priority": 100, "tag": "(hhc1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Other_Bag.dds" },	
+	{ "priority": 100, "tag": "(hhz2)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Other_SlaveCollar.dds" },
+	{ "priority": 100, "tag": "(hja1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Cloth_PreWar.dds" },
+	{ "priority": 100, "tag": "(hjb1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Cloth_Vault.dds" },
+	{ "priority": 100, "tag": "(hjc1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Cloth_LabCoat.dds" },
+	{ "priority": 100, "tag": "(hjd1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Cloth_Coat.dds" },
+	{ "priority": 100, "tag": "(hjd2)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Cloth_Duster.dds" },
+	{ "priority": 100, "tag": "(hje1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Cloth_Wasteland.dds" },
+	{ "priority": 100, "tag": "(hje2)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Cloth_Formal.dds" },
+	{ "priority": 100, "tag": "(hje3)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Cloth_Sexy.dds" },
+	{ "priority": 100, "tag": "(hje4)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Cloth_Robe.dds" },
+	{ "priority": 100, "tag": "(hla1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Headgear_Hat.dds" },
+	{ "priority": 100, "tag": "(hla2)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Headgear_Wig.dds" },
+	{ "priority": 100, "tag": "(hla3)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Headgear_PartyHat.dds" },
+	{ "priority": 100, "tag": "(hlb1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Headgear_Bandana.dds" },
+	{ "priority": 100, "tag": "(hlb2)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Headgear_Headphones.dds" },
+	{ "priority": 100, "tag": "(hlc1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Headgear_Hood.dds" },
+	{ "priority": 100, "tag": "(hld1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Headgear_Glasses.dds" },
+	{ "priority": 100, "tag": "(hle1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Headgear_Mask.dds" },
+	{ "priority": 100, "tag": "(hlf1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Headgear_MaskFull.dds" },
+	{ "priority": 100, "tag": "(hlj1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Headgear_Miner.dds" },
+	{ "priority": 100, "tag": "(hna1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Other_Necklace.dds" },
+	{ "priority": 100, "tag": "(hnb1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Other_Scarf.dds" },
+	{ "priority": 100, "tag": "(hnc1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Other_Cape.dds" },
+	{ "priority": 100, "tag": "(hnd1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Other_Belt.dds" },
+	{ "priority": 100, "tag": "(hne1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Other_Ring.dds" },
+	{ "priority": 100, "tag": "(hya1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Other_Shield.dds" },
+	{ "priority": 100, "tag": "(hyz1)", "template": "ySIDefault", "filename": "interface\\icons\\Apparel_Other_PipBoy.dds" },
+	{ "priority": 100, "tag": "(dba1)", "template": "ySIDefault", "filename": "interface\\icons\\Aid_Stimpak.dds" },
+	{ "priority": 100, "tag": "(dbb2)", "template": "ySIDefault", "filename": "interface\\icons\\Aid_DoctorBag.dds" },
+	{ "priority": 100, "tag": "(dbc3)", "template": "ySIDefault", "filename": "interface\\icons\\Aid_RadAway.dds" },
+	{ "priority": 100, "tag": "(dda1)", "template": "ySIDefault", "filename": "interface\\icons\\Aid_Drug.dds" },
+	{ "priority": 100, "tag": "(ddb1)", "template": "ySIDefault", "filename": "interface\\icons\\Aid_Poison.dds" },
+	{ "priority": 100, "tag": "(dfa1)", "template": "ySIDefault", "filename": "interface\\icons\\Aid_Alcohol.dds" },
+	{ "priority": 100, "tag": "(dfb1)", "template": "ySIDefault", "filename": "interface\\icons\\Aid_NukaCola.dds" },
+	{ "priority": 100, "tag": "(dfc1)", "template": "ySIDefault", "filename": "interface\\icons\\Aid_Water.dds" },
+	{ "priority": 100, "tag": "(dfd1)", "template": "ySIDefault", "filename": "interface\\icons\\Aid_Jar.dds" },
+	{ "priority": 100, "tag": "(dha1)", "template": "ySIDefault", "filename": "interface\\icons\\Aid_Meat.dds" },
+	{ "priority": 100, "tag": "(dha2)", "template": "ySIDefault", "filename": "interface\\icons\\Aid_Plant.dds" },
+	{ "priority": 100, "tag": "(dhb1)", "template": "ySIDefault", "filename": "interface\\icons\\Aid_PreWar.dds" },
+	{ "priority": 100, "tag": "(dhc1)", "template": "ySIDefault", "filename": "interface\\icons\\Aid_CookedMeal.dds" },
+	{ "priority": 100, "tag": "(dja1)", "template": "ySIDefault", "filename": "interface\\icons\\Aid_Magazine.dds" },
+	{ "priority": 100, "tag": "(djb1)", "template": "ySIDefault", "filename": "interface\\icons\\Aid_Book.dds" },
+	{ "priority": 100, "tag": "(dla1)", "template": "ySIDefault", "filename": "interface\\icons\\Aid_WeaponRepairKit.dds" },
+	{ "priority": 100, "tag": "(dlb1)", "template": "ySIDefault", "filename": "interface\\icons\\Aid_GenericDevice.dds" },
+	{ "priority": 100, "tag": "(dyz1)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_Utility.dds" },
+	{ "priority": 100, "tag": "(jba1)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_BottleCap.dds" },
+	{ "priority": 100, "tag": "(jbb1)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_BottleCapStar.dds" },
+	{ "priority": 100, "tag": "(jbc1)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_Money.dds" },
+	{ "priority": 100, "tag": "(jbd1)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_Chip.dds" },
+	{ "priority": 100, "tag": "(jda1)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_BobbyPin.dds" },
+	{ "priority": 100, "tag": "(jda2)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_Flask.dds" },
+	{ "priority": 100, "tag": "(jdb0)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_Chip.dds" },
+	{ "priority": 100, "tag": "(jdb1)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_QuestItem.dds" },
+	{ "priority": 100, "tag": "(jdb2)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_Special.dds" },
+
+	{ "priority": 100, "tag": "(jdc0)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_Note.dds",
+	"name": "&-sNotesToggle;",		"tab": 3, "count": 2, "icon": "Interface\\Icons\\PipboyImages\\Items\\items_research_data.dds" },
+	{ "priority": 100, "tag": "(jdc1)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_Note.dds", "routeToKeyring": "(jdc0)" },
+
+	{ "priority": 100, "tag": "(jdd0)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_Keychain.dds",
+	"name": "&-sKeyring;",			"tab": 3, "count": 2, "icon": "Interface\\Icons\\PipboyImages\\Items\\item_keyring.dds" },
+	{ "priority": 100, "tag": "(jdd1)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_Key.dds",	 "routeToKeyring": "(jdd0)" },
+
+	{ "priority": 100, "tag": "(jde0)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_Card.dds",
+	"name": "&-sCaravanDeckText;",	"tab": 3, "count": 2, "icon": "Interface\\Icons\\PipboyImages\\Items\\item_caravan_deck.dds" }, 
+	{ "priority": 100, "tag": "(jde1)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_Card.dds", "routeToKeyring": "(jde0)" }, 
+
+	{ "priority": 100, "tag": "(jdf1)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_DogTag.dds" },
+	{ "priority": 100, "tag": "(jfa1)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_WeaponMod.dds" },
+	{ "priority": 100, "tag": "(jfb1)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_AmmoComponent.dds" },
+	{ "priority": 100, "tag": "(jfc1)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_Crafting.dds" },
+	{ "priority": 100, "tag": "(jha1)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_Junk.dds" },
+	{ "priority": 100, "tag": "(jhb1)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_Skull.dds" },
+	{ "priority": 100, "tag": "(aba1)", "template": "ySIDefault", "filename": "interface\\icons\\Ammo_Bullet.dds" },
+	{ "priority": 100, "tag": "(abb1)", "template": "ySIDefault", "filename": "interface\\icons\\Ammo_Shotgun.dds" },
+	{ "priority": 100, "tag": "(ada1)", "template": "ySIDefault", "filename": "interface\\icons\\Ammo_Energy.dds" },
+	{ "priority": 100, "tag": "(adb1)", "template": "ySIDefault", "filename": "interface\\icons\\Ammo_Alien.dds" },
+	{ "priority": 100, "tag": "(adc1)", "template": "ySIDefault", "filename": "interface\\icons\\Ammo_Cryolator.dds" },
+	{ "priority": 100, "tag": "(afa1)", "template": "ySIDefault", "filename": "interface\\icons\\Ammo_Flamer.dds" },
+	{ "priority": 100, "tag": "(aha1)", "template": "ySIDefault", "filename": "interface\\icons\\Ammo_Explosive.dds" },
+	{ "priority": 100, "tag": "(aja1)", "template": "ySIDefault", "filename": "interface\\icons\\Ammo_BBs.dds" },
+	{ "priority": 100, "tag": "(ajb1)", "template": "ySIDefault", "filename": "interface\\icons\\Ammo_Arrows.dds" },
+	{ "priority": 100, "tag": "(ajc1)", "template": "ySIDefault", "filename": "interface\\icons\\Misc_Camera.dds" }, /* Misc_Camera.dds is reused for camera films as well */
+	{ "priority": 100, "tag": "(ajd1)", "template": "ySIDefault", "filename": "interface\\icons\\Ammo_Watergun.dds" },
+	{ "priority": 100, "tag": "(aje1)", "template": "ySIDefault", "filename": "interface\\icons\\Ammo_Baseball.dds" },
+	{ "priority": 100, "tag": "(ajf1)", "template": "ySIDefault", "filename": "interface\\icons\\Ammo_SawDisc.dds" }
+],
+
+"tabs": [
+	{ "priority": 100, "tab": "(a1)",  "name": "&-sNew;",				"template": "TabButtonTemplate", "inventory": 1, 				 "tabNew": 1 },
+	{ "priority": 100, "tab": "(d1)",  "name": "&-sInventoryWeapons;",	"template": "TabButtonTemplate", "inventory": 1, "container": 1, "types": [40] },
+	{ "priority": 100, "tab": "(f1)",  "name": "&-sInventoryApparel;",	"template": "TabButtonTemplate", "inventory": 1, "container": 1, "types": [24, 26] },
+	{ "priority": 100, "tab": "(h1)",  "name": "&-sInventoryAid;", 		"template": "TabButtonTemplate", "inventory": 1, "container": 1, "types": [25, 29, 47] },
+	{ "priority": 100, "tab": "(j1)",  "name": "&-sInventoryMisc;", 	"template": "TabButtonTemplate", "inventory": 1, "container": 1, "tabMisc": ["(d1)", "(f1)", "(h1)", "(k1)"] },
+	{ "priority": 100, "tab": "(k1)",  "name": "&-sInventoryAmmoTab;", 	"template": "TabButtonTemplate", "inventory": 1, "container": 1, "types": [41] }
+]
+}

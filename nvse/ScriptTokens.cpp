@@ -2,7 +2,7 @@
 #include "ScriptUtils.h"
 #include "GameRTTI.h"
 #include "SmallObjectsAllocator.h"
-#include "GameObjects.h"
+#include "Objects.h"
 
 #ifdef DBG_EXPR_LEAKS
 	SInt32 TOKEN_COUNT = 0;

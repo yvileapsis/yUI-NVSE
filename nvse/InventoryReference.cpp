@@ -1,5 +1,5 @@
 #include "InventoryReference.h"
-#include "GameObjects.h"
+#include "Objects.h"
 #include "GameAPI.h"
 #include "GameRTTI.h"
 

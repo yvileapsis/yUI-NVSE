@@ -109,9 +109,9 @@ namespace SortingIcons
 		Patches::AddIcons(g_SI && bIcons);
 		Patches::ReplaceHotkeyIcons(g_SI && bHotkeys);
 		Patches::AddKeyrings(g_SI && bCategories);
-		Patches::AddTabs(true);
+//		Patches::AddTabs(true);
 
-		deferredInit.emplace_back(FillCraftingComponents);
+		deferredInit.emplace_back(CraftingComponents::Fill);
 		if (bSort || bIcons || bHotkeys || bCategories) deferredInit.emplace_back(ProcessFiles);
 		if (bCategories) mainLoop.emplace_back(Sorting::KeyringRefreshPostStewie);
 		if (bIcons) mainLoopDoOnce.emplace_back(Icons::InjectTemplates);

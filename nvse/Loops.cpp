@@ -4,7 +4,7 @@
 #include "StringVar.h"
 #include "ScriptUtils.h"
 #include "GameAPI.h"
-#include "GameObjects.h"
+#include "Objects.h"
 #include "GameRTTI.h"
 
 LoopManager* LoopManager::GetSingleton()

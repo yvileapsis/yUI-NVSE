@@ -4,7 +4,7 @@
 
 #include "GameBSExtraData.h"
 #include "GameAPI.h"
-#include "GameObjects.h"
+#include "Objects.h"
 #include "GameRTTI.h"
 #include "GameScript.h"
 

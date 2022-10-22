@@ -21,11 +21,8 @@
 		return *this = NiPoint3(x op v.x, y op v.y, z op v.z); \
 	}
 
-#if RUNTIME
 
 const UInt32 _NiTMap_Lookup = 0x00853130;
-
-#endif
 
 // 8
 struct NiRTTI {
@@ -255,8 +252,7 @@ struct NiPlane
 // not sure on the above, but some code only works if this is true
 // this can obviously lead to fragmentation, but the accessors don't seem to care
 // weird stuff
-template <typename T_Data>
-struct NiTArray
+template <typename T_Data> struct NiTArray
 {
 	virtual void* Destroy(UInt32 doFree);
 

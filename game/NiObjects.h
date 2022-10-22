@@ -1,6 +1,7 @@
 #pragma once
-
-#include "NiNodes.h"
+#include <Containers.h>
+#include <NiTypes.h>
+#include <NiNodes.h>
 
 // UNMODIFIED OBSE FILE. I need NiNode class definition.
 
@@ -137,8 +138,6 @@ public:
 	void DumpParents();
 };
 static_assert(sizeof(NiAVObject) == 0x9C);
-
-
 
 // DC+
 class NiDynamicEffect : public NiAVObject
@@ -391,8 +390,6 @@ public:
 };
 
 // BSTimingNode - unref'd
-
-class Actor;
 
 // 118
 class BSFaceGenNiNode : public NiNode

@@ -1,7 +1,7 @@
 #include "GameForms.h"
 #include "GameAPI.h"
 #include "GameRTTI.h"
-#include "GameObjects.h"
+#include "Objects.h"
 #include "GameData.h"
 #include "SaveLoadGame.h"
 

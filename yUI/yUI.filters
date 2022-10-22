@@ -21,7 +21,7 @@
     <ClCompile Include="..\game\GameForms.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\GameObjects.cpp">
+    <ClCompile Include="..\game\Objects.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
     <ClCompile Include="..\game\GameOSDepend.cpp">
@@ -36,7 +36,7 @@
     <ClCompile Include="..\game\GameSettings.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\GameSound.cpp">
+    <ClCompile Include="..\game\Sound.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
     <ClCompile Include="..\game\GameTasks.cpp">
@@ -45,7 +45,7 @@
     <ClCompile Include="..\game\GameTiles.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\GameTypes.cpp">
+    <ClCompile Include="..\game\Types.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
     <ClCompile Include="..\game\GameUI.cpp">
@@ -83,7 +83,7 @@
     <ClInclude Include="..\game\GameForms.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\GameObjects.h">
+    <ClInclude Include="..\game\Objects.h">
       <Filter>nvse</Filter>
     </ClInclude>
     <ClInclude Include="..\game\GameOSDepend.h">
@@ -95,7 +95,7 @@
     <ClInclude Include="..\game\GameSettings.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClCompile Include="..\game\GameSound.cpp">
+    <ClCompile Include="..\game\Sound.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
     <ClInclude Include="..\game\GameTasks.h">
@@ -104,7 +104,7 @@
     <ClInclude Include="..\game\GameTiles.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\GameTypes.h">
+    <ClInclude Include="..\game\Types.h">
       <Filter>nvse</Filter>
     </ClInclude>
     <ClCompile Include="..\game\GameUI.cpp">
@@ -143,6 +143,6 @@
     <None Include="exports.def" />
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="GameTypes.natvis" />
+    <Natvis Include="Types.natvis" />
   </ItemGroup>
 </Project>

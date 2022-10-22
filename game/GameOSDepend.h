@@ -16,6 +16,14 @@ struct OSInputGlobals
 		kFlag_BackgroundMouse	= 1 << 3,
 	};
 
+
+	enum ControlType
+	{
+		kControlType_Keyboard,
+		kControlType_Mouse,
+		kControlType_Joystick
+	};
+
 	enum
 	{
 		kMaxControlBinds = 0x1C,
@@ -89,7 +97,7 @@ static_assert(sizeof(OSInputGlobals) == 0x1C04);
 static_assert(offsetof(OSInputGlobals, mouseBinds) == 0x1BB0);
 
 #if 0
-#include "GameTypes.h"
+#include "Types.h"
 
 class TESGameSound;
 class NiAVObject;

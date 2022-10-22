@@ -1,13 +1,22 @@
 #include <main.h>
+#include <Objects.h>
+#include <GameData.h>
+#include <Menus.h>
+
+void InitSingletons()
+{
+	g_player = PlayerCharacter::GetSingleton();
+	g_TESDataHandler = TESDataHandler::GetSingleton();
+	g_HUDMainMenu = HUDMainMenu::GetSingleton();
+}
 
 void MessageHandler(NVSEMessagingInterface::Message* msg)
 {
 	if (msg->type == NVSEMessagingInterface::kMessage_DeferredInit)
 	{
-		g_player = PlayerCharacter::GetSingleton();
-		g_TESDataHandler = TESDataHandler::GetSingleton();
-		Log(FormatString("%s", yUI_VERSION_STR), 2);
+		InitSingletons();
 
+		Log(yUI_VERSION_STR, 2);
 		ConsolePrintQueue();
 
 		// call all deferred init functions
@@ -15,15 +24,16 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	}
 	else if (msg->type == NVSEMessagingInterface::kMessage_MainGameLoop)
 	{
-		// call all mainloop functions
-		for (const auto& i : mainLoop) i();
-
-		if (!iDoOnce && !CdeclCall<bool>(0x702360)) {
-			iDoOnce++;
+		if (!iMainLoopDoOnce && !CdeclCall<bool>(0x702360)) {
+			iMainLoopDoOnce++;
 
 			// call all do once functions
 			for (const auto& i : mainLoopDoOnce) i();
 		}
+
+		// call all mainloop functions
+		for (const auto& i : mainLoop) i();
+
 	}
 }
 
@@ -84,16 +94,23 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	g_dataInterface = static_cast<NVSEDataInterface*>(nvse->QueryInterface(kInterface_Data));
 	HasScriptCommand = reinterpret_cast<_HasScriptCommand>(g_dataInterface->GetFunc(NVSEDataInterface::kNVSEData_HasScriptCommand));
 
+	g_DIHook = static_cast<DIHookControl*>(g_dataInterface->GetSingleton(NVSEDataInterface::kNVSEData_DIHookControl));
+
 	g_commandInterface = static_cast<NVSECommandTableInterface*>(nvse->QueryInterface(kInterface_CommandTable));
 	GetByOpcode = g_commandInterface->GetByOpcode;
 
 	g_scriptInterface = static_cast<NVSEScriptInterface*>(nvse->QueryInterface(kInterface_Script));
 	ExtractArgsEx = g_scriptInterface->ExtractArgsEx;
 	ExtractFormatStringArgs = g_scriptInterface->ExtractFormatStringArgs;
+	CallFunctionAlt = g_scriptInterface->CallFunctionAlt;
+	CompileExpression = g_scriptInterface->CompileExpression;
+	CompileScript = g_scriptInterface->CompileScript;
 
 	g_eventInterface = static_cast<NVSEEventManagerInterface*>(nvse->QueryInterface(kInterface_EventManager));
 	SetNativeEventHandler = g_eventInterface->SetNativeEventHandler;
 	RemoveNativeEventHandler = g_eventInterface->RemoveNativeEventHandler;
+	RegisterEvent = g_eventInterface->RegisterEvent;
+	DispatchEvent = g_eventInterface->DispatchEvent;
 
 	// call all plugin load functions
 	for (const auto& i : pluginLoad) i();

@@ -338,8 +338,8 @@ namespace SortingIcons::Files
 			if (entry.common.formType && entry.common.formType != form->typeID) continue;
 
 			if (entry.common.questItem && entry.common.questItem != static_cast<UInt8>(form->IsQuestItem2())) continue;
-			if (entry.common.miscComponent && !IsCraftingComponent(form)) continue;
-			if (entry.common.miscProduct && !IsCraftingProduct(form)) continue;
+			if (entry.common.miscComponent && !CraftingComponents::IsComponent(form)) continue;
+			if (entry.common.miscProduct && !CraftingComponents::IsProduct(form)) continue;
 
 			if (entry.common.formType == 40) {
 				const auto weapon = DYNAMIC_CAST(form, TESForm, TESObjectWEAP);

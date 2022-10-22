@@ -92,8 +92,11 @@ public:
 	void Leave();
 };
 
-inline void* GameHeapAlloc(UInt32 size) { return ThisStdCall<void*>(0xAA3E40, (void*)0x11F6238, size); }
-inline void GameHeapFree(void* ptr) { ThisStdCall(0xAA4060, (void*)0x11F6238, ptr); }
+__forceinline void* GameHeapAlloc(UInt32 size) { return ThisStdCall<void*>(0xAA3E40, (void*)0x11F6238, size); }
+__forceinline void GameHeapFree(void* ptr) { ThisStdCall(0xAA4060, (void*)0x11F6238, ptr); }
+
+__forceinline void* FormHeap_Allocate(UInt32 size) { return CdeclCall<void*>(0x00401000, size); }
+__forceinline void	FormHeap_Free(void* ptr) { CdeclCall(0x00401030, ptr); }
 
 bool __fastcall FileExists(const char* path);
 

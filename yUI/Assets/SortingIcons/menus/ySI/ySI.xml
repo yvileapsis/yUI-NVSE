@@ -1,0 +1,123 @@
+<rect name="ySI">
+
+	<_ySI> 1 </_ySI>
+
+	<_ySIBlanks> 1 </_ySIBlanks>
+
+	<_ySIUIMod> 
+		<copy> 0 </copy>
+		<add src="io()" trait="_DUIF3"/>					<!-- DarNUI -->
+		<add>
+			<copy> 3 </copy>
+			<onlyif>
+				<copy src="globals" trait="_VUI+Vegas"/>		<!-- VUI+ -->
+				<or src="globals" trait="_VUI+Version"/>
+			</onlyif>
+		</add>
+		<add>
+			<copy> -1 </copy>
+			<onlyif src="globals" trait="_VUI+"/>			<!-- Revelations -->
+		</add>
+	</_ySIUIMod>
+	
+	<_ySIPipBoy> <copy src="parent()" trait="class"/> <eq> &InventoryMenu; </eq> </_ySIPipBoy>
+
+	<!-- Vanilla -->
+	<_ySIWidth_0> 32 </_ySIWidth_0>
+	<_ySIHeight_0> 32 </_ySIHeight_0>
+	<_ySISpaceUp_0> 9 </_ySISpaceUp_0>
+	<_ySISpaceLeft_0> -5 </_ySISpaceLeft_0>
+	<_ySISpaceRight_0> 5 </_ySISpaceRight_0>
+
+	<!-- DarNUI -->	
+	<_ySIWidth_1> 19.2 </_ySIWidth_1>
+	<_ySIHeight_1> 19.2 </_ySIHeight_1>
+	<_ySISpaceUp_1> 4 </_ySISpaceUp_1>
+	<_ySISpaceLeft_1> -3 </_ySISpaceLeft_1>
+	<_ySISpaceRight_1> 3 </_ySISpaceRight_1>
+
+	<!-- VUI+ -->
+	<_ySIWidth_2> 32 </_ySIWidth_2>
+	<_ySIHeight_2> 32 </_ySIHeight_2>
+	<_ySISpaceUp_2> 6 </_ySISpaceUp_2>
+	<_ySISpaceLeft_2> -5 </_ySISpaceLeft_2>
+	<_ySISpaceRight_2> 5 </_ySISpaceRight_2>
+
+	<!-- VUI+ Revelations Container and Barter -->
+	<_ySIWidth_3_0> 30 </_ySIWidth_3_0>
+	<_ySIHeight_3_0> 30 </_ySIHeight_3_0>
+	<_ySISpaceUp_3_0> 3 </_ySISpaceUp_3_0>
+	<_ySISpaceLeft_3_0> -5 </_ySISpaceLeft_3_0>
+	<_ySISpaceRight_3_0> 5 </_ySISpaceRight_3_0>
+
+	<!-- VUI+ Revelations PipBoy -->
+	<_ySIWidth_3_1> 32 </_ySIWidth_3_1>
+	<_ySIHeight_3_1> 32 </_ySIHeight_3_1>
+	<_ySISpaceUp_3_1> 6 </_ySISpaceUp_3_1>
+	<_ySISpaceLeft_3_1> -5 </_ySISpaceLeft_3_1>
+	<_ySISpaceRight_3_1> 5 </_ySISpaceRight_3_1>	
+	
+	<!-- VUI+ Revelations -->
+	<_ySIWidth_3> <copy src="me()" trait="_ySIPipBoy"/> <copy src="me()" trait="_ySIWidth_3_"/> </_ySIWidth_3>
+	<_ySIHeight_3> <copy src="me()" trait="_ySIPipBoy"/> <copy src="me()" trait="_ySIHeight_3_"/> </_ySIHeight_3>
+	<_ySISpaceUp_3> <copy src="me()" trait="_ySIPipBoy"/> <copy src="me()" trait="_ySISpaceUp_3_"/> </_ySISpaceUp_3>
+	<_ySISpaceLeft_3> <copy src="me()" trait="_ySIPipBoy"/> <copy src="me()" trait="_ySISpaceLeft_3_"/> </_ySISpaceLeft_3>
+	<_ySISpaceRight_3> <copy src="me()" trait="_ySIPipBoy"/> <copy src="me()" trait="_ySISpaceRight_3_"/> </_ySISpaceRight_3>
+	
+	<!-- Variables -->
+	<_ySIWidth>	<copy src="me()" trait="_ySIUIMod"/> <copy src="me()" trait="_ySIWidth_"/> </_ySIWidth>
+	<_ySIHeight> <copy src="me()" trait="_ySIUIMod"/> <copy src="me()" trait="_ySIHeight_"/> </_ySIHeight>
+	<_ySISpaceUp> <copy src="me()" trait="_ySIUIMod"/> <copy src="me()" trait="_ySISpaceUp_"/> </_ySISpaceUp>
+	<_ySISpaceLeft>	<copy src="me()" trait="_ySIUIMod"/> <copy src="me()" trait="_ySISpaceLeft_"/> </_ySISpaceLeft>
+	<_ySISpaceRight> <copy src="me()" trait="_ySIUIMod"/> <copy src="me()" trait="_ySISpaceRight_"/> </_ySISpaceRight>
+</rect>
+<!-- 
+	New templates can be added freely, but for most purposes the default should be enough.
+	There are a few hardcoded uses of variables:
+	<user0> - Additional space left between equip square and icon.
+	<user1> - Additional space left between icon and text.
+	
+	Traits like <systemcolor> and <filename> could be set up individually for each tag in the .json file.	
+ -->
+<template name="ySIDefault">
+	<image name="ySIImage">
+		<listindex> 1 </listindex>
+		<clips> 1 </clips> 
+		<visible> <copy src="sibling(ListItemText)" trait="visible"/> </visible>
+		<alpha> <copy src="sibling(ListItemText)" trait="alpha"/> </alpha>
+		<brightness> <copy src="sibling(ListItemText)" trait="brightness"/> </brightness>
+		<depth> <copy src="sibling(ListItemText)" trait="depth"/> <sub> 1 </sub> </depth>
+		<filename>interface\icons\Misc_Unknown.dds</filename>
+		<width>	<copy src="ySI" trait="_ySIWidth"/>	</width>
+		<height> <copy src="ySI" trait="_ySIHeight"/> </height>
+		<user0> <copy src="ySI" trait="_ySISpaceLeft"/> </user0>
+		<user1> <copy src="ySI" trait="_ySISpaceRight"/> </user1>
+		<x> 0 </x>
+		<!-- set in code -->
+		<y> <copy src="ySI" trait="_ySISpaceUp"/> </y>
+		<zoom> &scale; </zoom>
+	</image>
+</template>
+<template name="ySINoTag">
+	<image name="ySIImage">
+		<clips> 1 </clips> 
+<!--	<visible> 0 </visible>
+		<alpha> 0 </alpha>-->
+		<alpha> <copy src="sibling(ListItemText)" trait="alpha"/> </alpha>
+		<brightness> <copy src="sibling(ListItemText)" trait="brightness"/> </brightness>
+		<systemcolor> 1 </systemcolor>
+		<depth> <copy src="sibling(ListItemText)" trait="depth"/> <sub> 1 </sub> </depth>
+		<filename> interface\icons\Misc_Unknown.dds </filename>
+		<width> 
+			<copy src="ySI" trait="_ySIWidth"/>
+			<onlyif src="ySI" trait="_ySIBlanks"/>
+		</width>
+		<height> <copy src="ySI" trait="_ySIHeight"/> </height>
+		<user0> <copy src="ySI" trait="_ySISpaceLeft"/> </user0>
+		<user1> <copy src="ySI" trait="_ySISpaceRight"/> </user1>
+		<x> 0 </x>
+		<!-- set in code -->
+		<y> <copy src="ySI" trait="_ySISpaceUp"/> </y>
+		<zoom> &scale; </zoom>
+	</image>
+</template>

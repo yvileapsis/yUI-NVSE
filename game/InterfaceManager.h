@@ -1,5 +1,5 @@
-#include "GameTypes.h"
-#include <InterfaceTiles.h>
+#pragma once
+#include <Tiles.h>
 
 enum
 {

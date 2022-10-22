@@ -9,6 +9,9 @@
 #include <ranges>
 #include <unordered_set>
 
+#include "GameData.h"
+#include "Sound.h"
+
 namespace Patch::TimeMult
 {
 	inline int g_yTM = 1;

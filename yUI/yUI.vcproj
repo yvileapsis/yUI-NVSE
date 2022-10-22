@@ -230,11 +230,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\game\GameObjects.cpp"
+				RelativePath="..\game\Objects.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\game\GameObjects.h"
+				RelativePath="..\game\Objects.h"
 				>
 			</File>
 			<File
@@ -282,11 +282,11 @@
 				>
 			</File>
 			<File
-				RelativePath="..\game\GameTypes.cpp"
+				RelativePath="..\game\Types.cpp"
 				>
 			</File>
 			<File
-				RelativePath="..\game\GameTypes.h"
+				RelativePath="..\game\Types.h"
 				>
 			</File>
 			<File

@@ -3,7 +3,7 @@
 #include "GameAPI.h"
 #include "GameRTTI.h"
 #include "GameForms.h"
-#include "GameObjects.h"
+#include "Objects.h"
 #include "GameExtraData.h"
 
 // Introduced to be available to plugin that needs to manipulate inventory

@@ -1,7 +1,7 @@
 #include "SI.h"
 
 #include <main.h>
-#include <GameObjects.h>
+#include <Objects.h>
 #include <PluginAPI.h>
 
 namespace SortingIcons::Commands

@@ -1,5 +1,6 @@
 #pragma once
-#include <GameTypes.h>
+#include <Containers.h>
+#include <Utilities.h>
 
 /*    Class							     vtbl	  Type  Size
  *   ----------------------------		------		--  --
@@ -277,6 +278,7 @@ enum {
 	kExtraData_0x91						= 0x91,	// referenced in LoadGame but no data
 	kExtraData_SpecialRenderFlags		= 0x92
 };
+#define GetExtraType(xDataList, Type) (Extra ## Type*)xDataList.GetByType(kExtraData_ ## Type)
 
 class BSExtraData
 {

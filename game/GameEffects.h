@@ -1,5 +1,5 @@
 #pragma once
-#include "GameTypes.h"
+#include "Types.h"
 
 class ActiveEffect
 {

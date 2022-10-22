@@ -1,4 +1,5 @@
-#include "GameTypes.h"
+#pragma once
+#include "Containers.h"
 #include "Utilities.h"
 
 void PrintConsole(const char* fmt, ...);
@@ -51,9 +52,9 @@ public:
 	RecordedCommand			recordedCommands[20];
 	char					scofPath[260];
 
-	__forceinline static ConsoleManager* GetSingleton(bool canCreateNew = true) { return CdeclCall<ConsoleManager*>(0x0071B160, canCreateNew); }
+	__forceinline static ConsoleManager*	GetSingleton(bool canCreateNew = true) { return CdeclCall<ConsoleManager*>(0x0071B160, canCreateNew); }
 	void									AppendToSentHistory(const char*);
 	__forceinline void						Print(const char* fmt, va_list args) { ThisCall(0x0071D0A0, this, fmt, args); }
-	static char* GetConsoleOutputFilename(void);
-	static bool								HasConsoleOutputFilename(void);
+	static char*							GetConsoleOutputFilename();
+	static bool								HasConsoleOutputFilename();
 };

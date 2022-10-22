@@ -1,16 +1,39 @@
 #include <functions.h>
-#include <Utilities.h>
-#include <GameProcess.h>
-#include <GameAPI.h>
-#include <GameData.h>
-#include <GameRTTI.h>
-#include <SafeWrite.h>
-#include <algorithm>
+#include <main.h>
 
-#include "GameObjects.h"
-#include <InterfaceMenus.h>
+#include <unordered_set>
 
-extern TESDataHandler* g_TESDataHandler;
+#include "dinput8.h"
+#include "GameData.h"
+#include "GameOSDepend.h"
+#include "Objects.h"
+#include "GameProcess.h"
+#include "Menus.h"
+#include "PluginAPI.h"
+#include "Types.h"
+
+
+namespace CraftingComponents
+{
+	std::unordered_set<TESForm*> g_Components;
+	std::unordered_set<TESForm*> g_Products;
+
+	void Fill()
+	{
+		for (const auto mIter : g_TESDataHandler->recipeList)
+		{
+			for (const auto node : mIter->inputs)
+				if (node && node->item) g_Components.emplace(node->item);
+			for (const auto node : mIter->outputs)
+				if (node && node->item) g_Products.emplace(node->item);
+		}
+	}
+
+	bool IsComponent(TESForm* form) { return g_Components.contains(form); }
+
+	bool IsProduct(TESForm* form) { return g_Products.contains(form); }
+}
+
 
 __declspec(naked) void UIWidth()
 {
@@ -75,33 +98,6 @@ __declspec(naked) void UIHeight3()
 	}
 }
 
-void FillCraftingComponents()
-{
-	for (const auto mIter : g_TESDataHandler->recipeList)
-	{
-		for (const auto node : mIter->inputs)
-			if (node && node->item) g_CraftingComponents.emplace(node->item);
-		for (const auto node : mIter->outputs)
-			if (node && node->item) g_CraftingProducts.emplace(node->item);
-	}
-}
-
-bool IsCraftingComponent(TESForm* form)
-{
-	return g_CraftingComponents.contains(form);
-}
-
-bool IsCraftingProduct(TESForm* form)
-{
-	return g_CraftingProducts.contains(form);
-}
-
-TESForm* GetRefFromString(char* mod, char* id)
-{
-	const auto itemID = (g_TESDataHandler->GetModIndex(mod) << 24) | strtoul(id, nullptr, 0);
-	return LookupFormByRefID(itemID);
-}
-
 bool FindStringCI(const std::string& strHaystack, const std::string& strNeedle)
 {
 	const auto it = ra::search(strHaystack, strNeedle, [](char ch1, char ch2) { return std::toupper(ch1) == std::toupper(ch2); }).begin();
@@ -124,6 +120,7 @@ AnimData* GetThirdPersonAnimData(AnimData* animData)
 	return animData;
 }
 
+/*
 void PatchPause(UInt32 ptr)
 {
 	SafeWriteBuf(ptr, "\xEB\xFE", 2);
@@ -133,6 +130,7 @@ void SetUIStringFull(const char* tochange, const char* changeto, UInt32 tileValu
 {
 	HUDMainMenu::GetSingleton()->tile->SetStringRecursive(tileValue, changeto, tochange);
 }
+*/
 
 bool TryGetTypeOfForm(TESForm* form)
 {
@@ -145,14 +143,14 @@ bool TryGetTypeOfForm(TESForm* form)
 	}
 }
 
-
+/*
 void Tile::SetStringRecursive(const UInt32 tileValue, const char* changeto, const char* tochange) {
 	if (GetValue(tileValue))
 		SetString(tileValue, changeto, true);
 	for (const auto iter : this->children)
 		iter->SetStringRecursive(tileValue, changeto, tochange);
 }
-
+*/
 
 char* __fastcall StrFromINI(DWORD *address)
 {
@@ -287,3 +285,125 @@ void PatchAddyCMToSettingsMenu()
 
 }
 #endif
+
+typedef bool (*_JG_WorldToScreen)(NiPoint3* posXYZ, NiPoint3& posOut, float offscreenHandling);
+_JG_WorldToScreen JG_WorldToScreen;
+
+bool WorldToScreen(NiPoint3* posXYZ, NiPoint3& posOut, float offscreenHandling)
+{
+	if (!JG_WorldToScreen)
+	{
+		HMODULE jg = GetModuleHandle("johnnyguitar");
+		if (jg) JG_WorldToScreen = (_JG_WorldToScreen)GetProcAddress(jg, "JG_WorldToScreen");
+		if (!JG_WorldToScreen) return false;
+	}
+	return JG_WorldToScreen(posXYZ, posOut, offscreenHandling);
+}
+
+bool IsKeyPressed(UInt32 key, UInt32 flags)
+{
+	return g_DIHook->IsKeyPressed(key, flags);
+}
+
+void DisableKey(UInt32 key, bool disable, UInt32 mask)
+{
+	g_DIHook->SetKeyDisableState(key, disable, mask);
+}
+
+Script* LNIsButtonPressed;
+bool IsButtonPressed(UInt32 button)
+{
+	if (!LNIsButtonPressed) LNIsButtonPressed = CompileScript(R"(Begin Function { int button }
+		SetFunctionValue (IsButtonPressed button)
+	end)");
+	NVSEArrayElement element;
+	g_scriptInterface->CallFunction(LNIsButtonPressed, nullptr, nullptr, &element, 1, button);
+	return element.num;
+}
+
+UInt32 GetControl(UInt32 whichControl, UInt32 type)
+{
+	const auto globs = OSInputGlobals::GetSingleton();
+
+	if (whichControl >= globs->kMaxControlBinds)
+		return 0xFF;
+
+	UInt32	result;
+
+	switch (type)
+	{
+	case OSInputGlobals::kControlType_Keyboard:
+		result = globs->keyBinds[whichControl];
+		break;
+
+	case OSInputGlobals::kControlType_Mouse:
+		result = globs->mouseBinds[whichControl];
+
+		if (result != 0xFF) result += 0x100;
+		break;
+
+	case OSInputGlobals::kControlType_Joystick:
+		result = globs->joystickBinds[whichControl];
+		break;
+
+	default:
+		result = 0xFF;
+		break;
+	}
+
+	return result;
+}
+
+NVSEArrayElement nativeHandlerFunctionValue{};
+void SetNativeHandlerFunctionBool(bool trueorfalse)
+{
+	nativeHandlerFunctionValue.dataType = NVSEArrayVarInterface::kType_Numeric;
+	nativeHandlerFunctionValue.num = trueorfalse;
+	g_eventInterface->SetNativeHandlerFunctionValue(nativeHandlerFunctionValue);
+}
+
+Script* JIPToggleVanityWheel;
+bool ToggleVanityWheel(bool toggle)
+{
+	if (!JIPToggleVanityWheel) JIPToggleVanityWheel = CompileScript(R"(Begin Function { int toggle }
+		ToggleVanityWheel toggle
+	end)");
+	NVSEArrayElement element;
+	g_scriptInterface->CallFunction(JIPToggleVanityWheel, nullptr, nullptr, &element, 1, toggle);
+	return element.num;
+}
+
+Script* JIPGetAuxVarOrDefault;
+Float32 GetJIPAuxVarOrDefault(const char* auxvar, SInt32 index, Float32 def)
+{
+	if (!JIPGetAuxVarOrDefault) JIPGetAuxVarOrDefault = CompileScript(R"(Begin Function { string_var auxvar, int index, float def }
+		if PlayerRef.AuxiliaryVariableGetType (auxvar) index
+			SetFunctionValue (PlayerRef.AuxiliaryVariableGetFloat (auxvar) index)
+		else
+			SetFunctionValue def
+		endif
+	End)");
+	NVSEArrayElement element;
+	g_scriptInterface->CallFunction(JIPGetAuxVarOrDefault, nullptr, nullptr, &element, 3, auxvar, index, *(UInt32*)&def);
+	return element.num;
+}
+
+Script* JIPSetAuxVarOrDefault;
+Float32 SetJIPAuxVarOrDefault(const char* auxvar, SInt32 index, Float32 value)
+{
+	if (!JIPSetAuxVarOrDefault) JIPSetAuxVarOrDefault = CompileScript(R"(Begin Function { string_var auxvar, int index, float value }
+		PlayerRef.AuxiliaryVariableSetFloat (auxvar) value index
+	End)");
+	NVSEArrayElement element;
+	g_scriptInterface->CallFunction(JIPSetAuxVarOrDefault, nullptr, nullptr, &element, 3, auxvar, index, *(UInt32*)&value);
+	return element.num;
+}
+
+TList<void*> activationPromptTList;
+bool GetCannibalPrompt(TESObjectREFR* ref)
+{
+	activationPromptTList.RemoveAll();
+	activationPromptTList.Init();
+	ApplyPerkModifiers(0x1B, g_player, ref, &activationPromptTList, ref);
+	return activationPromptTList.Empty();
+}
