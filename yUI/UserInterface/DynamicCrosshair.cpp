@@ -38,7 +38,7 @@ namespace UserInterface::DynamicCrosshair
 
 	bool		noNodeSighting	= true;
 	bool		shotgunAlt		= true;
-	bool		dynamic			= true;
+	UInt32		dynamic			= 1;
 
 
 

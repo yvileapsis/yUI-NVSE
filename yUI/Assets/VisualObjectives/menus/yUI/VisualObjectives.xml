@@ -4,9 +4,6 @@
 
 	<_Exists> 1 </_Exists>
 	
-	<_ScreenWidth> <copy src="screen()" trait="width"/> </_ScreenWidth>
-	<_ScreenHeight> <copy src="screen()" trait="height"/> </_ScreenHeight>
-
 	<_InCombat> 0 </_InCombat>
 
 	<_HeightBase> 36 </_HeightBase>
@@ -157,6 +154,12 @@
 		<add src="me()" trait="_OffsetMarker"/>
 	</y>
 
+	<_TotalHeight>
+		<copy src="child(Image)" trait="height"/>
+		<add> <copy src="child(Distance)" trait="height"/> <onlyif src="child(Distance)" trait="visible"/> </add>
+		<add> <copy src="child(Text)" trait="height"/> <onlyif src="child(Text)" trait="visible"/> </add>
+	</_TotalHeight>
+
 	<_XDelta>
 		<copy src="me()" trait="_X"/> <sub> 0.5 </sub>
 		<mul src="screen()" trait="width"/>	<div src="screen()" trait="height"/>
@@ -198,7 +201,19 @@
 	<image name="Image">
 		<filename> <copy src="parent()" trait="_Filename"/> </filename>
 		<x> <copy src="me()" trait="width"/> <div> -2 </div> </x>
-		<y> <copy src="me()" trait="height"/> <div> -1 </div> </y>
+		<y> <copy src="me()" trait="height"/> <div> -1 </div> 
+		
+			<add>
+				<copy src="parent()" trait="_TotalHeight"/>
+				<sub src="parent()" trait="y"/> 
+				<max> 0 </max>
+			</add>
+			<sub>
+				<copy src="me()" trait="_TotalHeight"/>
+				<sub src="screen()" trait="height"/> <add src="parent()" trait="y"/>
+				<max> 0 </max>
+			</sub>
+		</y>
 		<depth> <copy src="parent()" trait="depth"/> <sub> 1 </sub> </depth>
 		<width> <copy src="parent()" trait="_Width"/> </width>
 		<height> <copy src="parent()" trait="_Height"/> </height>
@@ -247,6 +262,16 @@
 			<sub> <copy src="me()" trait="height"/> <onlyif src="me()" trait="visible"/> </sub>
 			<sub src="sibling(Image)" trait="height"/>
 			<add src="parent()" trait="_FontY"/>
+			<add>
+				<copy src="parent()" trait="_TotalHeight"/>
+				<sub src="parent()" trait="y"/> 
+				<max> 0 </max>
+			</add>
+			<sub>
+				<copy src="me()" trait="_TotalHeight"/>
+				<sub src="screen()" trait="height"/> <add src="parent()" trait="y"/>
+				<max> 0 </max>
+			</sub>
 		</y>
 		<alpha> <copy src="parent()" trait="alpha"/> </alpha>
 		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
@@ -291,6 +316,16 @@
 			<sub> <copy src="me()" trait="height"/> <onlyif src="me()" trait="visible"/> </sub>
 			<sub src="sibling(Image)" trait="height"/>
 			<add src="parent()" trait="_FontY"/>
+			<add>
+				<copy src="parent()" trait="_TotalHeight"/>
+				<sub src="parent()" trait="y"/> 
+				<max> 0 </max>
+			</add>
+			<sub>
+				<copy src="me()" trait="_TotalHeight"/>
+				<sub src="screen()" trait="height"/> <add src="parent()" trait="y"/>
+				<max> 0 </max>
+			</sub>
 		</y>
 		<alpha> <copy src="parent()" trait="alpha"/> </alpha>
 		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>

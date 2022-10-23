@@ -130,8 +130,6 @@ namespace UserInterface::LootMenu
 		}
 	}
 
-
-	
 	void Display()
 	{
 		if (offset + tiles > items.size()) { offset = items.size() > tiles ? items.size() - tiles : 0; }
@@ -550,7 +548,7 @@ namespace UserInterface::LootMenu
 		weightVisible	= ini.GetOrCreate("JLM", "iWeightVisible", 2, nullptr);
 		weightAltColor	= ini.GetOrCreate("JLM", "iWeightAltColor", 1, nullptr);
 		font			= ini.GetOrCreate("JLM", "iFont", 0, nullptr);
-		fontHead		= ini.GetOrCreate("JLM", "iFont", 0, nullptr);
+		fontHead		= ini.GetOrCreate("JLM", "iFontHead", 0, nullptr);
 		fontY			= ini.GetOrCreate("JLM", "fFontY", 0.0, nullptr);
 		fontHeadY		= ini.GetOrCreate("JLM", "fFontHeadY", 0.0, nullptr);
 
