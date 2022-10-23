@@ -20,13 +20,13 @@ namespace SortingIcons::Files
 		constexpr auto strToFormID = [](const std::string& formIdStr)
 		{
 			const auto formId = HexStringToInt(formIdStr);
-			if (formId == -1) Log("Form field was incorrectly formatted, got " + formIdStr);
+			if (formId == -1) Log("Form field was incorrectly formatted, got " + formIdStr, logLevel);
 			return formId;
 		};
 
 		if (!elem.is_object())
 		{
-			Log("JSON error: expected object");
+			Log("JSON error: expected object", logLevel);
 			return;
 		}
 		Item::Common common{};
@@ -47,7 +47,7 @@ namespace SortingIcons::Files
 			if (modName == "FF") modIndex = 0xFF;
 			else if (!mod && !modName.empty())
 			{
-				Log("Mod name " + modName + " was not found");
+				Log("Mod name " + modName + " was not found", logLevel);
 				return;
 			}
 			modIndex = mod->modIndex;
@@ -72,9 +72,9 @@ namespace SortingIcons::Files
 				{
 					formId = (modIndex << 24) + (formId & 0x00FFFFFF);
 					common.form = GetFormByID(formId);
-					if (!common.form) { Log(FormatString("Form %X was not found", formId)); continue; }
+					if (!common.form) { Log(FormatString("Form %X was not found", formId), logLevel); continue; }
 					if (!formlist) {
-						Log(FormatString("Tag: '%10s', form: %08X (%50s), individual", common.tag.c_str(), formId, common.form->GetName()));
+						Log(FormatString("Tag: '%10s', form: %08X (%50s), individual", common.tag.c_str(), formId, common.form->GetName()), logLevel);
 						g_Items.emplace_back(common);
 					}
 					else if (formlist == 1) {
@@ -86,7 +86,7 @@ namespace SortingIcons::Files
 								const auto weapon = DYNAMIC_CAST(item, TESForm, TESObjectWEAP);
 								if (!weapon || !weapon->repairItemList.listForm) continue;
 								if (weapon->refID == common.form->refID || weapon->repairItemList.listForm->refID == common.form->refID || weapon->repairItemList.listForm->ContainsRecursive(common.form)) {
-									Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", common.tag.c_str(), item->refID, item->GetName(), formId));
+									Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", common.tag.c_str(), item->refID, item->GetName(), formId), logLevel);
 									g_Items.emplace_back(common, item);
 								}
 							}
@@ -94,7 +94,7 @@ namespace SortingIcons::Files
 								const auto armor = DYNAMIC_CAST(item, TESForm, TESObjectARMO);
 								if (!armor || !armor->repairItemList.listForm) continue;
 								if (armor->refID == common.form->refID || armor->repairItemList.listForm->refID == common.form->refID || armor->repairItemList.listForm->ContainsRecursive(common.form)) {
-									Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", common.tag.c_str(), item->refID, item->GetName(), formId));
+									Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", common.tag.c_str(), item->refID, item->GetName(), formId), logLevel);
 									g_Items.emplace_back(common, item);
 								}
 							}
@@ -103,7 +103,7 @@ namespace SortingIcons::Files
 				}
 			}
 			else {
-				Log(FormatString("Tag: '%10s', mod: '%s'", common.tag.c_str(), modName.c_str()));
+				Log(FormatString("Tag: '%10s', mod: '%s'", common.tag.c_str(), modName.c_str()), logLevel);
 				g_Items.emplace_back(common);
 			}
 		}
@@ -147,12 +147,12 @@ namespace SortingIcons::Files
 				for (auto weaponType : weaponTypes)
 				{
 					weapon.type = weaponType;
-					Log(FormatString("Tag: '%10s', weapon condition, type: %d", common.tag.c_str(), weaponType));
+					Log(FormatString("Tag: '%10s', weapon condition, type: %d", common.tag.c_str(), weaponType), logLevel);
 					g_Items.emplace_back(common, weapon);
 				}
 			}
 			else {
-				Log(FormatString("Tag: '%10s', weapon condition", common.tag.c_str()));
+				Log(FormatString("Tag: '%10s', weapon condition", common.tag.c_str()), logLevel);
 				g_Items.emplace_back(common, weapon);
 			}
 		}
@@ -219,7 +219,7 @@ namespace SortingIcons::Files
 	{
 		if (!elem.is_object())
 		{
-			Log("JSON error: expected object");
+			Log("JSON error: expected object", logLevel);
 			return;
 		}
 
@@ -238,7 +238,7 @@ namespace SortingIcons::Files
 		if (elem.contains("tab"))				category.tab = elem["tab"].get<UInt32>();
 		if (elem.contains("count"))				category.count = elem["count"].get<UInt32>();
 
-		Log(FormatString("Tag: '%10s', icon: '%s'", category.tag.c_str(), category.filename.c_str()));
+		Log(FormatString("Tag: '%10s', icon: '%s'", category.tag.c_str(), category.filename.c_str()), logLevel);
 		g_Categories.emplace_back(category);
 	}
 
@@ -246,7 +246,7 @@ namespace SortingIcons::Files
 	{
 		if (!elem.is_object())
 		{
-			Log("JSON error: expected object with mod, form and folder fields");
+			Log("JSON error: expected object with mod, form and folder fields", logLevel);
 			return;
 		}
 
@@ -282,7 +282,7 @@ namespace SortingIcons::Files
 
 	void HandleSIJson(const std::filesystem::path& path)
 	{
-		Log("\nReading JSON file " + path.string());
+		Log("\nReading JSON file " + path.string(), logLevel);
 
 		try
 		{
@@ -294,24 +294,24 @@ namespace SortingIcons::Files
 			else if (j.contains("tags") && j["tags"].is_array())				// legacy support
 				for (const auto& elem : j["tags"]) HandleItem(elem);
 			else
-				Log(path.string() + " JSON ySI item array not detected");
+				Log(path.string() + " JSON ySI item array not detected", logLevel);
 
 			if (j.contains("categories") && j["categories"].is_array())
 				for (const auto& elem : j["categories"]) HandleCategory(elem);
 			else if (j.contains("icons") && j["icons"].is_array())				// legacy support
 				for (const auto& elem : j["icons"]) HandleCategory(elem);
 			else
-				Log(path.string() + " JSON ySI category array not detected");
+				Log(path.string() + " JSON ySI category array not detected", logLevel);
 
 			if (j.contains("tabs") && j["tabs"].is_array())
 				for (const auto& elem : j["tabs"]) HandleTab(elem);
 			else
-				Log(path.string() + " JSON ySI tab array not detected");
+				Log(path.string() + " JSON ySI tab array not detected", logLevel);
 		}
 		catch (nlohmann::json::exception& e)
 		{
-			Log("The JSON is incorrectly formatted! It will not be applied.");
-			Log(FormatString("JSON error: %s\n", e.what()));
+			Log("The JSON is incorrectly formatted! It will not be applied.", logLevel);
+			Log(FormatString("JSON error: %s\n", e.what()), logLevel);
 		}
 
 	}
@@ -326,7 +326,7 @@ namespace SortingIcons::Files
 				if (iter) ItemRecursiveEmplace(common, iter);
 		}
 		else if (!common.formType || item->typeID == common.formType) {
-			Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive", common.tag.c_str(), item->refID, item->GetName()));
+			Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive", common.tag.c_str(), item->refID, item->GetName()), logLevel);
 			g_Items.emplace_back(common, item);
 		}
 	}

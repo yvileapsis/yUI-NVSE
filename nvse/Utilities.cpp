@@ -230,13 +230,10 @@ void PrintConsoleOrQueue(const std::string& msg)
 		queuedConsoleMessages.push_back(msg);
 }
 
-inline int	g_logLevel = 1;
-
 void Log(const std::string& msg, UInt32 loglevel)
 {
-	if (loglevel == 0) loglevel = g_logLevel;
-	if (loglevel >= 1) PrintLog("%s", msg.c_str());
-	if (loglevel >= 2) PrintConsoleOrQueue(msg);
+	if (loglevel & kToLog) PrintLog("%s", msg.c_str());
+	if (loglevel & kToConsole) PrintConsoleOrQueue(msg);
 }
 
 void DumpClass(void* theClassPtr, UInt32 nIntsToDump)

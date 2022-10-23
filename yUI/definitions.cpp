@@ -30,9 +30,9 @@ void Inits()
 	UserInterface::EventLayer::Init();
 	UserInterface::DynamicCrosshair::Init();
 	UserInterface::HitMarker::Init();
-//	UserInterface::HitIndicator::Init();
+	UserInterface::HitIndicator::Init();
 	UserInterface::VisualObjectives::Init();
-//	UserInterface::LootMenu::Init();
+	UserInterface::LootMenu::Init();
 
 	Fix::DroppedItems::Init();
 	Fix::TablineSelected::Init();

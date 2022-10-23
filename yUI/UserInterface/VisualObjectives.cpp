@@ -243,10 +243,12 @@ namespace UserInterface::VisualObjectives
 
 		if (!enable)
 		{
-			RemoveEventHandler("yJAM:JG:OnRender", OnRender);
+			std::erase(mainLoop, MainLoop);
+			std::erase(onRender, OnRender);
 			return;
 		}
-		SetEventHandler("yJAM:JG:OnRender", OnRender);
+		mainLoop.emplace_back(MainLoop);
+		onRender.emplace_back(OnRender);
 
 		if (tileMain->GetChild("JVO")) tileMain->GetChild("JVOContainer")->Destroy(true);
 		tileMain->AddTileFromTemplate("JVOContainer");
@@ -284,8 +286,6 @@ namespace UserInterface::VisualObjectives
 	extern void Init()
 	{
 		if (g_nvseInterface->isEditor) return;
-
 		mainLoopDoOnce.emplace_back(MainLoopDoOnce);
-		mainLoop.emplace_back(MainLoop);
 	}
 }

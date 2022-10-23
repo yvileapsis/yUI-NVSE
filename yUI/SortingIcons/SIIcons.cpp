@@ -2,7 +2,7 @@
 #include <Tiles.h>
 #include <functions.h>
 
-#include "InterfaceManager.h"
+#include <InterfaceManager.h>
 
 namespace SortingIcons::Icons
 {

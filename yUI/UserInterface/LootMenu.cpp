@@ -4,7 +4,7 @@
 
 #include "dinput8.h"
 #include "NiObjects.h"
-#include <game/GameBSExtraData.h>
+#include <GameBSExtraData.h>
 
 #include "InterfaceManager.h"
 #include "Menus.h"
@@ -12,7 +12,7 @@
 namespace UserInterface::LootMenu
 {
 
-	inline UInt32	g_JLM = 0;
+	UInt32		enable			= 0;
 
 	enum
 	{
@@ -23,61 +23,60 @@ namespace UserInterface::LootMenu
 		kActionOpen = 4,
 	};
 
-	inline UInt32	g_Key1 = 0;
-	inline UInt32	g_Key2 = 0;
-	inline UInt32	g_Key3 = 0;
-	inline UInt32	g_KeyAlt = 42;
-	inline UInt32	g_KeyScrollUp = 264;
-	inline UInt32	g_KeyScrollDown = 265;
+	UInt32		key1Default		= 0;
+	UInt32		key2Default		= 0;
+	UInt32		key3Default		= 0;
+	UInt32		keyAltDefault	= 42;
+	UInt32		keyScrollUp		= 264;
+	UInt32		keyScrollDown	= 265;
 
-	inline UInt32	g_Button1 = 0;
-	inline UInt32	g_Button2 = 0;
-	inline UInt32	g_Button3 = 0;
-	inline UInt32	g_ButtonAlt = 0x2;
+	UInt32		button1Default	= 0;
+	UInt32		button2Default	= 0;
+	UInt32		button3Default	= 0;
+	UInt32		buttonAltDefault= 0x2;
 
-	inline UInt32	g_Mode1 = 0x1;
-	inline UInt32	g_Mode1Alt = 0x2;
-	inline UInt32	g_Mode2 = 0x4;
-	inline UInt32	g_Mode2Alt = 0x3;
-	inline UInt32	g_Mode3 = 0x0;
-	inline UInt32	g_Mode3Alt = 0x0;
+	UInt32		mode1			= 0x1;
+	UInt32		mode1Alt		= 0x2;
+	UInt32		mode2			= 0x4;
+	UInt32		mode2Alt		= 0x3;
+	UInt32		mode3			= 0x0;
+	UInt32		mode3Alt		= 0x0;
 
-	inline UInt32	g_TakeSmartMin = 5;
-	inline UInt32	g_TakeWeightless = 1;
+	UInt32		takeSmartMin	= 5;
+	UInt32		takeWeightless	= 1;
 
-	inline UInt32	g_Block = 0;
-	inline UInt32	g_OverScroll = 0;
-	inline UInt32	g_HidePrompt = 1;
-	inline UInt32	g_HideName = 0;
-	inline UInt32	g_ItemsMax = 5;
+	UInt32		block			= 0;
+	UInt32		overScroll		= 0;
+	UInt32		hidePrompt		= 1;
+	UInt32		hideName		= 0;
+	UInt32		itemsMax		= 5;
 
-	inline UInt32	g_Justify = 3;
-	inline Float64	g_HeightMin = 32.0;
-	inline Float64	g_HeightMax = 640.0;
-	inline Float64	g_WidthMin = 400.0;
-	inline Float64	g_WidthMax = 640.0;
-	inline Float64	g_OffsetX = 0.6;
-	inline Float64	g_OffsetY = 0.5;
+	UInt32		justify			= 3;
+	Float32		heightMin		= 32.0;
+	Float32		heightMax		= 640.0;
+	Float32		widthMin		= 400.0;
+	Float32		widthMax		= 640.0;
+	Float32		offsetX			= 0.625;
+	Float32		offsetY			= 0.5;
 
-	inline Float64	g_IndentItem = 8.0;
-	inline Float64	g_IndentTextX = 10.0;
-	inline Float64	g_IndentTextY = 10.0;
+	Float32		indentItem		= 8.0;
+	Float32		indentTextX		= 10.0;
+	Float32		indentTextY		= 10.0;
 
-	inline UInt32	g_WeightVisible = 2;
-	inline UInt32	g_WeightAltColor = 1;
-	inline UInt32	g_Font = 0;
-	inline UInt32	g_FontHead = 0;
-	inline Float64	g_FontY = 0;
-	inline Float64	g_FontHeadY = 0;
+	UInt32		weightVisible	= 2;
+	UInt32		weightAltColor	= 1;
+	UInt32		font			= 0;
+	UInt32		fontHead		= 0;
+	Float32		fontY			= 0;
+	Float32		fontHeadY		= 0;
 
-	inline UInt32	g_Sounds = 1;
-	inline UInt32	g_ShowEquip = 1;
-	inline UInt32	g_ShowIcon = 1;
-	inline UInt32	g_ShowMeter = 1;
+	UInt32		sounds			= 1;
+	UInt32		showEquip		= 1;
+	UInt32		showIcon		= 1;
+	UInt32		showMeter		= 1;
 
 
-	bool				initialized			= false;
-	Tile*				tileMain			= nullptr;
+	Tile*		tileMain		= nullptr;
 
 	std::vector<InventoryChanges*> items;
 
@@ -114,21 +113,6 @@ namespace UserInterface::LootMenu
 
 	TESObjectREFR*		tookItem			= nullptr;
 	TESObjectREFR*		openedContainer		= nullptr;
-
-
-	void HandleINI(const std::string& iniPath)
-	{
-		CSimpleIniA ini;
-		ini.SetUnicode();
-
-		if (const auto errVal = ini.LoadFile(iniPath.c_str()); errVal == SI_FILE) { return; }
-
-		//		g_JDC				= ini.GetOrCreate("JustMods", "JDC", 1.0, nullptr);
-		//		g_Dynamic			= ini.GetOrCreate("JDC", "Dynamic", 1.0, nullptr);
-
-		if (const auto errVal = ini.SaveFile(iniPath.c_str(), false); errVal == SI_FILE) { return; }
-
-	}
 
 	std::string GetStringForButton(UInt32 button)
 	{
@@ -181,35 +165,35 @@ namespace UserInterface::LootMenu
 
 			fst->SetString(kTileValue_string, string.c_str());
 
-			fst->SetFloat("_JLMEquip", snd->GetEquipped());
+			fst->SetFloat("_Equip", snd->GetEquipped());
 
 			if (const auto condition = snd->GetHealthPercentAlt(true); condition != -1)
 			{
-				fst->SetFloat("_JLMMeter", 1);
-				fst->SetFloat("_JLMMeterValue", condition);
-				fst->SetFloat("_JLMMeterArrow", snd->form->TryGetREFRParent()->typeID == kFormType_TESObjectWEAP ? 0.75 : 0.5);
+				fst->SetFloat("_Meter", 1);
+				fst->SetFloat("_MeterValue", condition);
+				fst->SetFloat("_MeterArrow", snd->form->TryGetREFRParent()->typeID == kFormType_TESObjectWEAP ? 0.75 : 0.5);
 			}
-			else fst->SetFloat("_JLMMeter", 0);
+			else fst->SetFloat("_Meter", 0);
 
-			const auto stringdimensions = FontManager::GetSingleton()->GetStringDimensions(string.c_str(), tileMain->GetFloat("_JLMFont"), fst->GetChild("JLMButtonText")->GetFloat(kTileValue_wrapwidth));
+			const auto stringdimensions = FontManager::GetSingleton()->GetStringDimensions(string.c_str(), tileMain->GetFloat("_Font"), fst->GetChild("ButtonText")->GetFloat(kTileValue_wrapwidth));
 
-			const auto height = g_IndentTextY + stringdimensions->y;
+			const auto height = indentTextY + stringdimensions->y;
 
-			x = max(x, stringdimensions->x + fst->GetFloat("_JLMTextWidth"));
+			x = max(x, stringdimensions->x + fst->GetFloat("_TextWidth"));
 
-			if (y + height > g_HeightMax - 3 * g_IndentItem) break;
+			if (y + height > heightMax - 3 * indentItem) break;
 			y += height;
 
 			tiles++;
 		}
-		tileMain->SetFloat("_JLMItemHeightCur", y);
-		tileMain->SetFloat("_JLMItemWidthCur", x);
+		tileMain->SetFloat("_ItemHeightCur", y);
+		tileMain->SetFloat("_ItemWidthCur", x);
 
 		if (index > tiles - 1) { index = tiles - 1; }
 
 		UInt32 i = 0;
 		for (const auto fst : tileMain->GetChild("JLMContainer")->children) {
-			fst->SetFloat("_JLMActive", i == index);
+			fst->SetFloat("_Active", i == index);
 			if (i == index)
 			{
 				// TODO: send out event
@@ -240,17 +224,17 @@ namespace UserInterface::LootMenu
 
 	void MinorUpdate()
 	{
-		if (g_HidePrompt && (!info && container || (info && !container)))
+		if (hidePrompt && (!info && container || (info && !container)))
 		{
 			info = !info;
 			SetJIPAuxVarOrDefault("*_JAMInfoDisable", 0, (!info ? -1 : 1) + GetJIPAuxVarOrDefault("*_JAMInfoDisable", 0, 0));
 		}
 
-		if (g_HidePrompt) g_HUDMainMenu->tileInfo->SetFloat(kTileValue_visible, GetJIPAuxVarOrDefault("*_JAMInfoDisable", 0, 0) == 0);
+		if (hidePrompt) g_HUDMainMenu->tileInfo->SetFloat(kTileValue_visible, GetJIPAuxVarOrDefault("*_JAMInfoDisable", 0, 0) == 0);
 
 		if (!container)
 		{
-			tileMain->SetFloat("_JLMVisible", 0);
+			tileMain->SetFloat("_Visible", 0);
 			ToggleVanityWheel(true);
 			if (key1) DisableKey(key1, false);
 			if (key2) DisableKey(key2, false);
@@ -265,16 +249,16 @@ namespace UserInterface::LootMenu
 		if (keyAlt) DisableKey(keyAlt, true);
 
 		owned = container->IsCrimeOrEnemy();
-		tileMain->SetString("_JLMTitle", container->GetTheName());
-		tileMain->SetFloat("_JLMSystemColor", 1 + owned);
-		tileMain->SetFloat("_JLMAlphaAC", g_HUDMainMenu->tileActionPointsMeterText1->GetFloat(kTileValue_alpha));
+		tileMain->SetString("_Title", container->GetTheName());
+		tileMain->SetFloat("_SystemColor", 1 + owned);
+		tileMain->SetFloat("_AlphaAC", g_HUDMainMenu->tileActionPointsMeterText1->GetFloat(kTileValue_alpha));
 
 		Display();
 
-		tileMain->SetFloat("_JLMArrowUp", offset > 0);
-		tileMain->SetFloat("_JLMArrowDown", offset < items.size() - tiles);
+		tileMain->SetFloat("_ArrowUp", offset > 0);
+		tileMain->SetFloat("_ArrowDown", offset < items.size() - tiles);
 
-		tileMain->SetFloat("_JLMVisible", 1);
+		tileMain->SetFloat("_Visible", 1);
 	}
 
 
@@ -293,7 +277,7 @@ namespace UserInterface::LootMenu
 	void HandleContainerChange(TESObjectREFR* container, TESObjectREFR* newcontainer)
 	{
 		if (tookItem) { g_player->SendStealingAlarm(tookItem, true); tookItem = nullptr; }
-		if (openedContainer) { container->OpenCloseContainer(false, g_Sounds & 0x1); openedContainer = nullptr; }
+		if (openedContainer) { container->OpenCloseContainer(false, sounds & 0x1); openedContainer = nullptr; }
 
 		offset = 0;
 		index = 0;
@@ -330,7 +314,7 @@ namespace UserInterface::LootMenu
 
 	void MainLoop()
 	{
-		if (!g_JLM) return;
+		if (!enable) return;
 
 		if (MenuMode()) UpdateContainer(nullptr);
 
@@ -347,12 +331,12 @@ namespace UserInterface::LootMenu
 		if (!IsKeyPressed(265)) {}
 		else if (index < tiles - 1)				{ update = true; index++; }
 		else if (offset < items.size() - tiles)	{ update = true; offset++; }
-		else if (g_OverScroll)					{ update = true; offset = 0; index = 0; }
+		else if (overScroll)					{ update = true; offset = 0; index = 0; }
 
 		if (!IsKeyPressed(264)) {}
 		else if (index > 0)						{ update = true; index--; }
 		else if (offset > 0)					{ update = true; offset--; }
-		else if (g_OverScroll)					{ update = true; offset = items.size() - tiles; index = tiles - 1; }
+		else if (overScroll)					{ update = true; offset = items.size() - tiles; index = tiles - 1; }
 
 		if (update)
 		{
@@ -363,29 +347,29 @@ namespace UserInterface::LootMenu
 
 	void Weight()
 	{
-		if (!g_WeightVisible) return;
+		if (!weightVisible) return;
 
 		auto weight = g_player->GetActorValue(kAVCode_InventoryWeight);
 		const auto weightmax = g_player->GetMaxCarryWeight();
 
-		if (g_WeightVisible == 1 && weight / weightmax < 0.9)
+		if (weightVisible == 1 && weight / weightmax < 0.9)
 		{
-			tileMain->SetFloat("_JLMWeightVisible", 0);
+			tileMain->SetFloat("_WeightVisible", 0);
 			return;
 		}
 
-		tileMain->SetFloat("_JLMWeightVisible", 1);
-		tileMain->SetString("_JLMWeight", FormatString("%.0f/%.0f", weight, weightmax).c_str());
+		tileMain->SetFloat("_WeightVisible", 1);
+		tileMain->SetString("_Weight", FormatString("%.0f/%.0f", weight, weightmax).c_str());
 
-		if (!g_WeightAltColor) return;
+		if (!weightAltColor) return;
 
-		if (g_WeightAltColor == 2 && !items.empty())
+		if (weightAltColor == 2 && !items.empty())
 		{
 			const auto item = (items.begin() + index + offset);
 			if (item < items.end()) weight += CdeclCall<Float64>(0x48EBC0, (*item)->form, g_player->isHardcore);
 		}
 
-		tileMain->SetFloat("_JLMWeightColor", weight > weightmax);
+		tileMain->SetFloat("_WeightColor", weight > weightmax);
 
 	}
 
@@ -405,7 +389,7 @@ namespace UserInterface::LootMenu
 
 	void Action(UInt32 action)
 	{
-		if (!openedContainer) { container->OpenCloseContainer(true, g_Sounds & 0x1); openedContainer = container; }
+		if (!openedContainer) { container->OpenCloseContainer(true, sounds & 0x1); openedContainer = container; }
 
 		const auto keepowner = owned;
 
@@ -430,7 +414,7 @@ namespace UserInterface::LootMenu
 
 		bool takeall = false;
 		if (CdeclCall<Float64>(0x48EBC0, entry->form, g_player->isHardcore) < 0.02) takeall = true;
-		if (entry->countDelta > g_TakeSmartMin) takeall = true;
+		if (entry->countDelta > takeSmartMin) takeall = true;
 
 		g_player->PlayPickupPutdownSounds(entry->form, action != kActionEquip, action == kActionEquip);
 		HandleTakeItem(entry, takeall, keepowner, action == kActionEquip);
@@ -443,22 +427,22 @@ namespace UserInterface::LootMenu
 		const auto alt = keyAlt && IsKeyPressed(keyAlt, DIHookControl::kFlag_RawState) || buttonAlt && IsButtonPressed(buttonAlt);
 		owned = container->IsCrimeOrEnemy();
 
-		auto action = (alt ? g_Mode1Alt : g_Mode1) << 1;
+		auto action = (alt ? mode1Alt : mode1) << 1;
 		if (action > 0) action -= !owned;
-		tileMain->SetFloat("_JLMAction1", action);
+		tileMain->SetFloat("_Action1", action);
 
-		action = (alt ? g_Mode2Alt : g_Mode2) << 1;
+		action = (alt ? mode2Alt : mode2) << 1;
 		if (action > 0) action -= !owned;
-		tileMain->SetFloat("_JLMAction2", action);
+		tileMain->SetFloat("_Action2", action);
 
-		action = (alt ? g_Mode3Alt : g_Mode3) << 1;
+		action = (alt ? mode3Alt : mode3) << 1;
 		if (action > 0) action -= !owned;
-		tileMain->SetFloat("_JLMAction3", action);
+		tileMain->SetFloat("_Action3", action);
 	}
 
 	void OnRender()
 	{
-		if (!initialized) return;
+		if (!enable) return;
 
 		UpdateContainer(!MenuMode() ? InterfaceManager::GetSingleton()->crosshairRef : nullptr);
 
@@ -474,19 +458,13 @@ namespace UserInterface::LootMenu
 			Weight();
 			HandleScroll();
 			UpdateKeys();
-			if (g_HidePrompt) g_HUDMainMenu->tileInfo->SetFloat(kTileValue_visible, GetJIPAuxVarOrDefault("*_JAMInfoDisable", 0, 0) == 0);
+			if (hidePrompt) g_HUDMainMenu->tileInfo->SetFloat(kTileValue_visible, GetJIPAuxVarOrDefault("*_JAMInfoDisable", 0, 0) == 0);
 		}
 	}
 
-	struct ReferenceForm
+	void OnAddDropUpdate(TESObjectREFR* thisObj, TESObjectREFR* droppedFrom, TESForm* noidea)
 	{
-		TESObjectREFR* ref;
-		TESForm* form;
-	};
-
-	void OnAddDropUpdate(TESObjectREFR* thisObj, void* parameters)
-	{
-		if (const auto ptr = static_cast<ReferenceForm*>(parameters); container && ptr && ptr->ref == container) MajorUpdate();
+		if (container && droppedFrom && droppedFrom == container) MajorUpdate();
 	}
 
 	struct ReferenceBool
@@ -498,9 +476,9 @@ namespace UserInterface::LootMenu
 	UInt32 ActionToTake()
 	{
 		const auto alt = keyAlt && IsKeyPressed(keyAlt, DIHookControl::kFlag_RawState) || buttonAlt && IsButtonPressed(buttonAlt);
-		if (key1 && IsKeyPressed(key1, DIHookControl::kFlag_RawState) || button1 && IsButtonPressed(button1)) return alt ? g_Mode1Alt : g_Mode1;
-		if (key2 && IsKeyPressed(key2, DIHookControl::kFlag_RawState) || button2 && IsButtonPressed(button2)) return alt ? g_Mode2Alt : g_Mode2;
-		if (key3 && IsKeyPressed(key3, DIHookControl::kFlag_RawState) || button3 && IsButtonPressed(button3)) return alt ? g_Mode3Alt : g_Mode3;
+		if (key1 && IsKeyPressed(key1, DIHookControl::kFlag_RawState) || button1 && IsButtonPressed(button1)) return alt ? mode1Alt : mode1;
+		if (key2 && IsKeyPressed(key2, DIHookControl::kFlag_RawState) || button2 && IsButtonPressed(button2)) return alt ? mode2Alt : mode2;
+		if (key3 && IsKeyPressed(key3, DIHookControl::kFlag_RawState) || button3 && IsButtonPressed(button3)) return alt ? mode3Alt : mode3;
 		return kActionNone;
 	}
 
@@ -518,55 +496,68 @@ namespace UserInterface::LootMenu
 		Action(action);
 	}
 
+
+	void HandleINI()
+	{
+		const auto iniPath = GetCurPath() + R"(\Data\Config\JustMods.ini)";
+		CSimpleIniA ini;
+		ini.SetUnicode();
+
+		if (const auto errVal = ini.LoadFile(iniPath.c_str()); errVal == SI_FILE) { return; }
+
+		enable = ini.GetOrCreate("JustMods", "bLootMenu", 1, nullptr);
+		//		g_Dynamic			= ini.GetOrCreate("JDC", "Dynamic", 1.0, nullptr);
+
+		if (const auto errVal = ini.SaveFile(iniPath.c_str(), false); errVal == SI_FILE) { return; }
+
+	}
+
 	void Reset()
 	{
-		HandleINI(GetCurPath() + R"(\Data\Config\JustMods.ini)");
+		HandleINI();
 
-		if (!g_JLM)
+		if (!enable)
 		{
-			RemoveEventHandler("yJAM:MainLoop", MainLoop);
-			RemoveEventHandler("yJAM:JG:OnRender", OnRender);
+			std::erase(onRender, OnRender);
+			std::erase(onAddDrop, OnAddDropUpdate);
 			return;
 		}
-
-		SetEventHandler("yJAM:MainLoop", MainLoop);
-		SetEventHandler("yJAM:JG:OnRender", OnRender);
-		SetEventHandler("OnAdd", OnAddDropUpdate);
-		SetEventHandler("OnDrop", OnAddDropUpdate);
+		onRender.emplace_back(OnRender);
+		onAddDrop.emplace_back(OnAddDropUpdate);
 		SetEventHandler("ShowOff:OnPreActivate", OnPreActivate);
 
-		tileMain->SetFloat("_JLMFontBase", g_Font);
-		tileMain->SetFloat("_JLMFontYBase", g_FontY);
-		tileMain->SetFloat("_JLMFontHeadBase", g_FontHead);
-		tileMain->SetFloat("_JLMFontHeadYBase", g_FontHeadY);
+		tileMain->SetFloat("_FontBase", font);
+		tileMain->SetFloat("_FontYBase", fontY);
+		tileMain->SetFloat("_FontHeadBase", fontHead);
+		tileMain->SetFloat("_FontHeadYBase", fontHeadY);
 
-		tileMain->SetFloat("_JLMItemHeightMin", g_HeightMin);
-		tileMain->SetFloat("_JLMItemHeightMax", g_HeightMax);
-		tileMain->SetFloat("_JLMItemWidthMin", g_WidthMin);
-		tileMain->SetFloat("_JLMItemWidthMax", g_WidthMax);
+		tileMain->SetFloat("_ItemHeightMin", heightMin);
+		tileMain->SetFloat("_ItemHeightMax", heightMax);
+		tileMain->SetFloat("_ItemWidthMin", widthMin);
+		tileMain->SetFloat("_ItemWidthMax", widthMax);
 
-		tileMain->SetFloat("_JLMOffsetX", g_OffsetX);
-		tileMain->SetFloat("_JLMOffsetY", g_OffsetY);
+		tileMain->SetFloat("_OffsetX", offsetX);
+		tileMain->SetFloat("_OffsetY", offsetY);
 
-		tileMain->SetFloat("_JLMItemIndent", g_IndentItem);
-		tileMain->SetFloat("_JLMTextIndentX", g_IndentTextX);
-		tileMain->SetFloat("_JLMTextIndentY", g_IndentTextY);
+		tileMain->SetFloat("_ItemIndent", indentItem);
+		tileMain->SetFloat("_TextIndentX", indentTextX);
+		tileMain->SetFloat("_TextIndentY", indentTextY);
 
-		tileMain->SetFloat("_JLMBracketTitle", 1 - g_HideName);
+		tileMain->SetFloat("_BracketTitle", 1 - hideName);
 
-		tileMain->SetFloat("_JLMShowEquip", g_ShowEquip);
-		tileMain->SetFloat("_JLMShowIcon", g_ShowIcon);
-		tileMain->SetFloat("_JLMShowMeter", g_ShowMeter);
+		tileMain->SetFloat("_ShowEquip", showEquip);
+		tileMain->SetFloat("_ShowIcon", showIcon);
+		tileMain->SetFloat("_ShowMeter", showMeter);
 
-		tileMain->SetFloat("_JLMJustifyX", g_Justify % 3);
-		tileMain->SetFloat("_JLMJustifyY", floor(g_Justify / 3));
+		tileMain->SetFloat("_JustifyX", justify % 3);
+		tileMain->SetFloat("_JustifyY", floor(justify / 3));
 
-		tileMain->SetFloat("_JLMWeightVisible", 0);
+		tileMain->SetFloat("_WeightVisible", 0);
 
 		if (tileMain->GetChild("JLMContainer")) tileMain->GetChild("JLMContainer")->Destroy(true);
 		tileMain->AddTileFromTemplate("JLMContainer");
 
-		for (UInt32 i = 0; i < g_ItemsMax; i++)	tileMain->GetChild("JLMContainer")->AddTileFromTemplate("JLMInjected");
+		for (UInt32 i = 0; i < itemsMax; i++)	tileMain->GetChild("JLMContainer")->AddTileFromTemplate("JLMInjected");
 
 		if (!formEVE) formEVE = GetFormByID("EVE FNV - ALL DLC.esp", 0x02E612);
 		if (!formEVE) formEVE = GetFormByID("EVE FNV - NO DLC.esp", 0x02E612);
@@ -576,44 +567,43 @@ namespace UserInterface::LootMenu
 		if (!formShovel)		formShovel = GetFormByID("PointLookout.esm", 0x0082B5);
 		if (!formShovelUnique)	formShovelUnique = GetFormByID("PointLookout.esm", 0x00D5A8);
 
-		key1 = g_Key1 ? g_Key1 : GetControl(5, OSInputGlobals::kControlType_Keyboard);
-		key2 = g_Key2 ? g_Key2 : GetControl(7, OSInputGlobals::kControlType_Keyboard);
-		key3 = g_Key3 ? g_Key3 : GetControl(16, OSInputGlobals::kControlType_Keyboard);
-		keyAlt = g_KeyAlt ? g_KeyAlt : GetControl(9, OSInputGlobals::kControlType_Keyboard);
+		key1 = key1Default ? key1Default : GetControl(5, OSInputGlobals::kControlType_Keyboard);
+		key2 = key2Default ? key2Default : GetControl(7, OSInputGlobals::kControlType_Keyboard);
+		key3 = key3Default ? key3Default : GetControl(16, OSInputGlobals::kControlType_Keyboard);
+		keyAlt = keyAltDefault ? keyAltDefault : GetControl(9, OSInputGlobals::kControlType_Keyboard);
 
-		button1 = g_Button1 ? g_Button1 : GetControl(5, OSInputGlobals::kControlType_Joystick);
-		button2 = g_Button2 ? g_Button2 : GetControl(7, OSInputGlobals::kControlType_Joystick);
-		button3 = g_Button3 ? g_Button3 : GetControl(16, OSInputGlobals::kControlType_Joystick);
-		buttonAlt = g_ButtonAlt ? g_Button3 : GetControl(9, OSInputGlobals::kControlType_Joystick);
+		button1 = button1Default ? button1Default : GetControl(5, OSInputGlobals::kControlType_Joystick);
+		button2 = button2Default ? button2Default : GetControl(7, OSInputGlobals::kControlType_Joystick);
+		button3 = button3Default ? button3Default : GetControl(16, OSInputGlobals::kControlType_Joystick);
+		buttonAlt = buttonAltDefault ? buttonAltDefault : GetControl(9, OSInputGlobals::kControlType_Joystick);
 
 		if (CdeclCall<bool>(0x4B71D0))
 		{
-			GetStringForButton(button1).empty() ? tileMain->SetFloat("_JLMButton1", button1) : tileMain->SetString("_JLMKeyString1", button1 ? (GetStringForButton(button1) + ")").c_str() : "");
-			GetStringForButton(button2).empty() ? tileMain->SetFloat("_JLMButton2", button2) : tileMain->SetString("_JLMKeyString2", button2 ? (GetStringForButton(button2) + ")").c_str() : "");
-			GetStringForButton(button3).empty() ? tileMain->SetFloat("_JLMButton3", button3) : tileMain->SetString("_JLMKeyString3", button3 ? (GetStringForButton(button3) + ")").c_str() : "");
+			GetStringForButton(button1).empty() ? tileMain->SetFloat("_Button1", button1) : tileMain->SetString("_KeyString1", button1 ? (GetStringForButton(button1) + ")").c_str() : "");
+			GetStringForButton(button2).empty() ? tileMain->SetFloat("_Button2", button2) : tileMain->SetString("_KeyString2", button2 ? (GetStringForButton(button2) + ")").c_str() : "");
+			GetStringForButton(button3).empty() ? tileMain->SetFloat("_Button3", button3) : tileMain->SetString("_KeyString3", button3 ? (GetStringForButton(button3) + ")").c_str() : "");
 		}
 		else
 		{
-			tileMain->SetString("_JLMKeyString1", key1 ? (GetDXDescription(key1) + ")").c_str() : "");
-			tileMain->SetString("_JLMKeyString2", key2 ? (GetDXDescription(key2) + ")").c_str() : "");
-			tileMain->SetString("_JLMKeyString3", key3 ? (GetDXDescription(key3) + ")").c_str() : "");
+			tileMain->SetString("_KeyString1", key1 ? (GetDXDescription(key1) + ")").c_str() : "");
+			tileMain->SetString("_KeyString2", key2 ? (GetDXDescription(key2) + ")").c_str() : "");
+			tileMain->SetString("_KeyString3", key3 ? (GetDXDescription(key3) + ")").c_str() : "");
 		}
 	}
 
 
 	void MainLoopDoOnce()
 	{
-		initialized = true;
 		tileMain = g_HUDMainMenu->tile->GetChild("JLM");
 		if (!tileMain)
 		{
-			g_HUDMainMenu->tile->InjectUIXML(R"(Data\menus\prefabs\JLM\JLM.xml)");
+			g_HUDMainMenu->tile->InjectUIXML(R"(Data\menus\yUI\LootMenu.xml)");
 			tileMain = g_HUDMainMenu->tile->GetChild("JLM");
 		}
 		if (!tileMain) return;
 		RegisterEvent("JLM:Reset", 0, nullptr, 4);
 		SetEventHandler("JLM:Reset", Reset);
-		DispatchEvent("JLM:Reset", nullptr);
+		Reset();
 	}
 
 	extern void Init()

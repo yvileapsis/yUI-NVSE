@@ -161,6 +161,13 @@ void ConsolePrintQueue();
 void PrintConsoleOrQueue(const std::string& msg);
 
 void PrintLog(const char* fmt, ...);
+enum Log
+{
+	kToNone = 0,
+	kToLog = 1,
+	kToConsole = 2,
+	kToBoth = kToLog | kToConsole
+};
 void Log(const std::string& msg, UInt32 loglevel = 0);
 
 class Script;

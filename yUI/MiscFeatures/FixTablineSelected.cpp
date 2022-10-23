@@ -6,19 +6,19 @@
 
 namespace Fix::TablineSelected
 {
-	inline int bEnable = 1;
+	inline int enable = 1;
 
 	bool needToFix = false;
 	Tile* tabline = nullptr;
 
 	void HandleINIs()
 	{
+		const auto iniPath = GetCurPath() + yUI_INI;
 		CSimpleIniA ini;
 		ini.SetUnicode();
-		const auto iniPath = GetCurPath() + yUI_INI;
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
-		bEnable = ini.GetOrCreate("General", "bFixTablineSelected", 1, "; fix the issue where Inventory Menu tabline shows up with buttons already selected");
+		enable = ini.GetOrCreate("General", "bFixTablineSelected", 1, "; fix the issue where Inventory Menu tabline shows up with buttons already selected");
 
 		ini.SaveFile(iniPath.c_str(), false);
 	}
@@ -43,6 +43,6 @@ namespace Fix::TablineSelected
 	{
 		if (g_nvseInterface->isEditor) return;
 		HandleINIs();
-		if (bEnable) mainLoop.emplace_back(MainLoop);
+		if (enable) mainLoop.emplace_back(MainLoop);
 	}
 }

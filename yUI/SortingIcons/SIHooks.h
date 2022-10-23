@@ -1,4 +1,4 @@
-#include <prefix.h>
+#pragma once
 #include "SI.h"
 
 namespace SortingIcons::Hooks

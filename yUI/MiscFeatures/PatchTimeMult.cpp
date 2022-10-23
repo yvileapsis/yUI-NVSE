@@ -32,20 +32,6 @@ namespace Patch::TimeMult
 	CommandInfo* cmd_GGTM = nullptr;
 	CommandInfo* cmd_SGTM = nullptr;
 
-	void HandleINIs()
-	{
-		const auto iniPath = GetCurPath() + yUI_INI;
-		CSimpleIniA ini;
-		ini.SetUnicode();
-		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
-
-		g_yTM = ini.GetOrCreate("General", "bTimeMultChanges", 1, "; enable 'Game Time Mult' section of this .ini file.");
-		g_yTM_Mode = ini.GetOrCreate("Game Time Mult", "bTimeMultMode", 1, "; select which mods are handled by yGTM, with 0 disabling handling of mods altogether, 1 handling mods that use SGTM command and 2 handling all mods.");
-		g_yTM_MinMax = ini.GetOrCreate("Game Time Mult", "bTimeMultMinMax", 1, "; use multiplication of minimum and maximum local values instead of a multiplication of all local values. Provides a more sane range of TimeMult values.");
-
-		ini.SaveFile(iniPath.c_str(), false);
-	}
-
 	void Set(TimeGlobal* timeGlobal = TimeGlobal::GetSingleton(), char isImmediateChange = 1)
 	{
 		timeGlobal->Set(g_timeMult, isImmediateChange);
@@ -260,6 +246,20 @@ namespace Patch::TimeMult
 			UndoSafeWrite(0x761953);
 
 		}
+	}
+
+	void HandleINIs()
+	{
+		const auto iniPath = GetCurPath() + yUI_INI;
+		CSimpleIniA ini;
+		ini.SetUnicode();
+		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
+
+		g_yTM = ini.GetOrCreate("General", "bTimeMultChanges", 1, "; enable 'Game Time Mult' section of this .ini file.");
+		g_yTM_Mode = ini.GetOrCreate("Game Time Mult", "bTimeMultMode", 1, "; select which mods are handled by yGTM, with 0 disabling handling of mods altogether, 1 handling mods that use SGTM command and 2 handling all mods.");
+		g_yTM_MinMax = ini.GetOrCreate("Game Time Mult", "bTimeMultMinMax", 1, "; use multiplication of minimum and maximum local values instead of a multiplication of all local values. Provides a more sane range of TimeMult values.");
+
+		ini.SaveFile(iniPath.c_str(), false);
 	}
 
 	extern void Init()

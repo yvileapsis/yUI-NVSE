@@ -8,16 +8,16 @@
 
 namespace Patch::ExplosionForce
 {
-	inline bool bEnable = true;
+	inline bool enable = true;
 
 	void HandleINIs()
 	{
+		const auto iniPath = GetCurPath() + yUI_INI;
 		CSimpleIniA ini;
 		ini.SetUnicode();
-		const auto iniPath = GetCurPath() + yUI_INI;
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
-		bEnable = ini.GetOrCreate("General", "bFixExplosionPushForce", 1, "; fix force of the explosions to scale both with distance (like explosion damage) and with actual force of the explosion's baseform.");
+		enable = ini.GetOrCreate("General", "bFixExplosionPushForce", 1, "; fix force of the explosions to scale both with distance (like explosion damage) and with actual force of the explosion's baseform.");
 
 		ini.SaveFile(iniPath.c_str(), false);
 	}
@@ -50,9 +50,9 @@ namespace Patch::ExplosionForce
 		}
 	}
 
-	void patchFixExplosionPushForce(const bool bEnable)
+	void patchFixExplosionPushForce(const bool enable)
 	{
-		if (bEnable) { // stooee
+		if (enable) { // stooee
 			WriteRelJump(0x89C8CF, HitKnockbackHook<0x89C8D4>);
 			SafeWriteBuf(0x89C8E3, "\x41\x08\x85\xC0\x0F\x44\xC2\x83\xC0\x30\x0F\x1F\x40\x00", 14);
 		} else {
@@ -65,6 +65,6 @@ namespace Patch::ExplosionForce
 	{
 		if (g_nvseInterface->isEditor) return;
 		HandleINIs();
-		patchFixExplosionPushForce(bEnable);
+		patchFixExplosionPushForce(enable);
 	}
 }

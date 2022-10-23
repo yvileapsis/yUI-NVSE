@@ -1,0 +1,1032 @@
+<_JAMExists> 1 </_JAMExists>
+
+<rect name="JLM">
+
+	<_Exists> 1 </_Exists>
+
+	<locus> &true; </locus>
+
+	<_Visible> 0 </_Visible>
+	<visible>
+		<copy> 0 </copy> 
+		<or>
+			<copy src="ReticleCenter" trait="visible"/>
+			<or src="AmmoTypeLabel" trait="visible"/>
+			<or src="ActionPoints" trait="visible"/>
+			<or src="HitPoints" trait="visible"/>
+			<and> 
+				<copy src="me()" trait="_Visible"/>
+				<eq> 1 </eq>
+			</and>
+		</or>
+		<or>
+			<copy src="me()" trait="_Visible"/>
+			<eq> -1 </eq>
+		</or>
+	</visible>
+
+	<_ArrowUp> 0 </_ArrowUp>
+	<_ArrowDown> 0 </_ArrowDown>
+
+	<_KeyString1></_KeyString1>
+	<_KeyString2></_KeyString2>
+	<_KeyString3></_KeyString3>
+	<_Button1>0</_Button1>
+	<_Button2>0</_Button2>
+	<_Button3>0</_Button3>
+	
+	<_String_1> &sTargetTypeTake; </_String_1>
+	<_String_2> &sSteal; </_String_2>
+	<_String_3> &-sInventoryEquip; </_String_3>
+	<_String_4> &sSteal; </_String_4>
+	<_String_5> &-sTakeAll; </_String_5>
+	<_String_6> &-sTakeAll; </_String_6>
+	<_String_7> &sTargetTypeOpen; </_String_7> 
+	<_String_8> &sTargetTypeOpen; </_String_8> 
+
+	<_ButtonPath_4> glow_general_button_l.dds </_ButtonPath_4>
+	<_ButtonPath_8> glow_general_button_r.dds </_ButtonPath_8>
+	<_ButtonPath_32> glow_general_button_back.dds </_ButtonPath_32>
+	<_ButtonPath_64> glow_general_button_ls.dds </_ButtonPath_64>
+	<_ButtonPath_128> glow_general_button_rs.dds </_ButtonPath_128>
+	<_ButtonPath_256> glow_general_button_lb.dds </_ButtonPath_256>
+	<_ButtonPath_512> glow_general_button_rb.dds </_ButtonPath_512>
+	<_ButtonPath_4096> glow_general_button_a.dds </_ButtonPath_4096>
+	<_ButtonPath_8192> glow_general_button_b.dds </_ButtonPath_8192>
+	<_ButtonPath_16384> glow_general_button_x.dds </_ButtonPath_16384>
+	<_ButtonPath_32768> glow_general_button_y.dds </_ButtonPath_32768>
+	
+	<_Action1> 1 </_Action1>
+	<_Action2> 7 </_Action2>
+	<_Action3> 0 </_Action3>
+
+	<_ActionString1> <copy src="me()" trait="_Action1"/> <copy src="me()" trait="_String_"/> </_ActionString1>
+	<_ActionString2> <copy src="me()" trait="_Action2"/> <copy src="me()" trait="_String_"/> </_ActionString2>
+	<_ActionString3> <copy src="me()" trait="_Action3"/> <copy src="me()" trait="_String_"/> </_ActionString3> 
+
+	<_ButtonPath1> <copy src="me()" trait="_Button1"/> <copy src="me()" trait="_ButtonPath_"/> </_ButtonPath1>
+	<_ButtonPath2> <copy src="me()" trait="_Button2"/> <copy src="me()" trait="_ButtonPath_"/> </_ButtonPath2>
+	<_ButtonPath3> <copy src="me()" trait="_Button3"/> <copy src="me()" trait="_ButtonPath_"/> </_ButtonPath3>
+
+	<_Title> </_Title>
+
+	<_ItemIndent> 8 </_ItemIndent>
+	<_TextIndentX> 10 </_TextIndentX>
+	<_TextIndentY> 10 </_TextIndentY>
+
+	<_FontHead> <copy src="me()" trait="_Font"/> </_FontHead>
+	
+	<font>0</font> 
+	<_FontBase> 0 </_FontBase>
+	<_Font> 
+		<copy> 
+			<copy> 3 </copy> <onlyifnot src="io()" trait="_DUIF3"/>
+			<add> <copy> 4 </copy> <onlyif src="io()" trait="_DUIF3"/> </add>
+		</copy>
+		<onlyifnot src="me()" trait="_FontBase"/>
+		<add src="me()" trait="_FontBase"/> <onlyifnot src="me()" trait="font"/>
+		<add src="me()" trait="font"/>
+	</_Font>
+
+	<_FontYBase> 0 </_FontYBase>
+	<_FontY>
+		<copy> 0 </copy>
+		<add> <copy src="JLM" trait="_Font"/> <copy src="globals" trait="_VUI+FontY_"/> <onlyif src="globals" trait="_VUI+"/> </add>
+		<add> <copy src="JLM" trait="_Font"/> <copy src="io()" trait="_DarNFontY_"/> <onlyif src="io()" trait="_DUIF3"/> </add>
+		<add> <copy src="JLM" trait="_Font"/> <copy src="io()" trait="_VNLAFontY_"/> <onlyifnot> <copy src="io()" trait="_DUIF3"/> <or src="globals" trait="_VUI+"/> </onlyifnot> </add>
+		<onlyifnot src="me()" trait="_FontYBase"/>
+		<add src="me()" trait="_FontYBase"/>
+	</_FontY>
+	
+	<font>0</font> 
+	<_FontHeadBase> 0 </_FontHeadBase>
+	<_FontHead> 
+		<copy> 
+			<copy> 3 </copy> <onlyifnot src="io()" trait="_DUIF3"/>
+			<add> <copy> 4 </copy> <onlyif src="io()" trait="_DUIF3"/> </add>
+		</copy>
+		<onlyifnot src="me()" trait="_FontHeadBase"/> <onlyifnot src="me()" trait="font"/>
+		<add src="me()" trait="_FontHeadBase"/> <add src="me()" trait="font"/>
+	</_FontHead>
+
+	<_FontHeadYBase> 0 </_FontHeadYBase>
+	<_FontHeadY>
+		<copy> 0 </copy>
+		<add> <copy src="JLM" trait="_FontHead"/> <copy src="globals" trait="_VUI+FontY_"/> <onlyif src="globals" trait="_VUI+"/> </add>
+		<add> <copy src="JLM" trait="_FontHead"/> <copy src="io()" trait="_DarNFontY_"/> <onlyif src="io()" trait="_DUIF3"/> </add>
+		<add> <copy src="JLM" trait="_Font"/> <copy src="io()" trait="_VNLAFontY_"/> <onlyifnot> <copy src="io()" trait="_DUIF3"/> <or src="globals" trait="_VUI+"/> </onlyifnot> </add>
+		<onlyifnot src="me()" trait="_FontHeadYBase"/>
+		<add src="me()" trait="_FontHeadYBase"/>
+	</_FontHeadY>
+
+	<_ResizeMultiplier> 1 </_ResizeMultiplier>
+
+	<_Scale>
+		<copy> 1 </copy>
+		<mul>
+			<copy src="io()" trait="_duiscale_65"/> <onlyif src="io()" trait="_DUIF3"/>
+			<add> <copy> 1 </copy> <onlyifnot src="io()" trait="_DUIF3"/> </add>
+		</mul>
+		<mul src="me()" trait="_ResizeMultiplier"/>
+	</_Scale>
+
+	<_OffsetX> 0.5 </_OffsetX>
+	<_OffsetY> 0.5 </_OffsetY>
+
+	<_JustifyX> 0 </_JustifyX>
+	<_JustifyY> 1 </_JustifyY>
+	
+	<x> 
+		<copy> 0 </copy>
+		<add>
+			<copy> 0 </copy>
+			<onlyif> <copy src="me()" trait="_JustifyX"/> <eq> 0 </eq> </onlyif>
+		</add>
+		<add>
+			<copy src="me()" trait="width"/> <div> -2 </div>
+			<onlyif> <copy src="me()" trait="_JustifyX"/> <eq> 1 </eq> </onlyif>
+		</add>
+		<add>
+			<copy src="me()" trait="width"/> <div> -1 </div>
+			<onlyif> <copy src="me()" trait="_JustifyX"/> <eq> 2 </eq> </onlyif>
+		</add>
+		<add> <copy src="screen()" trait="width"/> <mul src="me()" trait="_OffsetX"/> </add>
+	</x>
+	<y> 
+		<copy> 0 </copy>
+		<add>
+			<copy> 0 </copy>
+			<onlyif> <copy src="me()" trait="_JustifyY"/> <eq> 0 </eq> </onlyif>
+		</add>
+		<add>
+			<copy src="me()" trait="height"/> <div> -2 </div>
+			<onlyif> <copy src="me()" trait="_JustifyY"/> <eq> 1 </eq> </onlyif>
+		</add>
+		<add>
+			<copy src="me()" trait="height"/> <div> -1 </div>
+			<onlyif> <copy src="me()" trait="_JustifyY"/> <eq> 2 </eq> </onlyif>
+		</add>
+		<add> <copy src="screen()" trait="height"/> <mul src="me()" trait="_OffsetY"/> </add>
+	</y>
+
+	<_ItemHeightMin> 32 </_ItemHeightMin>
+	<_ItemHeightMax> 192 </_ItemHeightMax>
+	<_ItemWidthMin> 350 </_ItemWidthMin>
+	<_ItemWidthMax> 350 </_ItemWidthMax>
+	<_ItemHeightCur> 0 </_ItemHeightCur>
+	<_ItemWidthCur> 0 </_ItemWidthCur>
+
+	<_WeightThing> 
+		<copy> 0 </copy>
+		<add>
+			<copy src="me()" trait="_ItemIndent"/> <div> 2 </div>
+			<add src="child(WeightRelation)" trait="height"/> <onlyif src="me()" trait="_WeightVisible"/>
+		</add> 
+	</_WeightThing>
+
+	<_ItemHeight>
+		<copy src="me()" trait="_ItemHeightCur"/>
+		<add src="me()" trait="_ItemIndent"/>
+		<add>
+			<copy src="me()" trait="_ItemIndent"/> <div> 2 </div>
+			<add src="child(WeightRelation)" trait="height"/> <onlyif src="child(WeightRelation)" trait="visible"/>
+		</add>
+		<max src="me()" trait="_ItemHeightMin"/> <min src="me()" trait="_ItemHeightMax"/>
+	</_ItemHeight>
+		
+	<_ItemWidth>
+		<copy src="me()" trait="_ItemWidthCur"/> <add src="me()" trait="_ItemIndent"/>
+		<max src="me()" trait="_ItemWidthMin"/> <min src="me()" trait="_ItemWidthMax"/>
+	</_ItemWidth>
+	
+	<_Height> <copy src="me()" trait="_ItemHeight"/> <add src="me()" trait="_ItemIndent"/> <sub src="me()" trait="_BracketWidth"/> </_Height>
+	<_Width> <copy src="me()" trait="_ItemWidth"/> <add src="me()" trait="_ItemIndent"/> <add src="me()" trait="_ItemIndent"/> </_Width>
+
+	<_AlphaBase> 0 </_AlphaBase>
+	<_AlphaAC> 0 </_AlphaAC>
+	<_Alpha> <copy src="me()" trait="_AlphaAC"/> <onlyifnot src="me()" trait="_AlphaBase"/> <add src="me()" trait="_AlphaBase"/> </_Alpha>
+
+	<width> <copy src="me()" trait="_Width"/> </width>
+	<height> <copy src="me()" trait="_Height"/> </height>
+	<clips> &true; </clips>
+
+	<_BracketTop> 1 </_BracketTop>
+	<_BracketBot> 1 </_BracketBot>
+	<_BracketTitle> 1 </_BracketTitle>
+
+	<_BracketAlpha> <copy src="me()" trait="_Alpha"/> </_BracketAlpha>
+	<_BracketBrightness> <copy src="globals()" trait="_line_brightness"/> </_BracketBrightness>
+	<_BracketWidth> <copy src="globals()" trait="_line_thickness"/> </_BracketWidth>
+	<_BracketHeightTop> 30 </_BracketHeightTop>
+	<_BracketHeightBot> 30 </_BracketHeightBot>
+
+	<_BackdropAlpha> 150 </_BackdropAlpha>
+	<_BackdropBrightness> 80 </_BackdropBrightness>
+
+	<_BackdropFillAlpha> <copy src="globals()" trait="_background_fill_alpha"/> </_BackdropFillAlpha>
+	<_BackdropBrightness> 80 </_BackdropBrightness> <!--too bright  <copy src="globals()" trait="_background_fill_brightness"/> -->
+
+	<_TextAlpha> <copy src="me()" trait="_Alpha"/> </_TextAlpha>
+	<_TextBrightness> <copy src="globals()" trait="_text_brightness"/> </_TextBrightness>
+	<!-- <copy src="globals()" trait="_gl_HeaderFont"/> -->
+ 
+	<_Weight>200/300</_Weight>
+	
+	<_WeightVisible> 0 </_WeightVisible>
+	<_WeightColor> 0 </_WeightColor>
+
+	<_SystemColor> 0 </_SystemColor>
+	
+	<systemcolor> <copy src="me()" trait="_SystemColor"/> </systemcolor>
+	
+	<_ShowEquip> 1 </_ShowEquip>
+	<_ShowIcon> 1 </_ShowIcon>
+	<_ShowMeter> 1 </_ShowMeter>
+
+	<_ySIWidth>	0 </_ySIWidth>
+	<_ySIHeight> 0 </_ySIHeight>
+	<_ySISpaceLeft> 0 </_ySISpaceLeft>
+	<_ySISpaceRight> 0 </_ySISpaceRight>
+	<_ySISpaceUp> 0 </_ySISpaceUp>
+		
+	<rect name="HeadlineRect">
+		<visible> <copy src="parent()" trait="_BracketTop"/> </visible>
+		<width> <copy src="parent()" trait="_Width"/> </width>
+		<locus> &true; </locus>
+		<systemcolor> <copy src="parent()"  trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_BracketAlpha"/> </alpha>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<brightness> <copy src="parent()" trait="_BracketBrightness"/> </brightness>
+
+		<text name="HeadlineTitle">
+			<visible> <copy src="grandparent()" trait="_BracketTitle"/> </visible>
+			<font> <copy src="grandparent()" trait="_FontHead"/> </font>
+			<string> <copy src="grandparent()" trait="_Title"/> </string>
+			<x> <copy src="sibling(HeadlineHorLeft)" trait="width"/> <add src="grandparent()" trait="_ItemIndent"/> </x>
+			<y> <copy src="me()" trait="height"/> <div> -2 </div>
+				<sub> <copy src="grandparent()" trait="_ItemIndent"/> <onlyifnot src="grandparent()" trait="_WeightVisible"/> </sub>
+				<add src="grandparent()" trait="_FontHeadY"/>
+			</y>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="grandparent()" trait="_TextAlpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="grandparent()" trait="_TextBrightness"/> </brightness>
+		</text>
+
+		<image name="HeadlineVerLeft">
+			<filename> Interface\Shared\Line\fade_to_bottom.dds	</filename>
+			<width> <copy src="grandparent()" trait="_BracketWidth"/> </width>
+			<height> <copy src="grandparent()" trait="_BracketHeightTop"/> </height>
+			<zoom> &scale; </zoom>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</image>
+		
+		<image name="HeadlineHorLeft">
+			<filename> solid.dds </filename>
+			<texatlas> Interface\InterfaceShared.tai </texatlas>
+			<width>
+				<copy> 0 </copy>
+				<add> <copy> 25 </copy> <onlyif src="grandparent()" trait="_BracketTitle"/> </add>
+				<add> <copy src="parent()" trait="width"/> <onlyifnot src="grandparent()" trait="_BracketTitle"/> </add>
+			</width>
+			<height> <copy src="grandparent()" trait="_BracketWidth"/> </height>
+			<clips> &true; </clips>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</image>
+
+		<image name="HeadlineHorRight">
+			<visible> <copy src="grandparent()" trait="_BracketTitle"/> </visible>
+			<filename> solid.dds </filename>
+			<texatlas> Interface\InterfaceShared.tai </texatlas>
+			<width>	<copy src="parent()" trait="width"/> <sub src="me()" trait="x"/> </width>
+			<height> <copy src="grandparent()" trait="_BracketWidth"/> </height>
+			<x>
+				<copy src="sibling(HeadlineTitle)" trait="x"/>
+				<add src="sibling(HeadlineTitle)" trait="width"/>
+				<add src="grandparent()" trait="_ItemIndent"/>
+			</x>
+			<clips> &true; </clips>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</image>
+
+		<image name="HeadlineVerRight">
+			<filename> Interface\Shared\Line\fade_to_bottom.dds	</filename>
+			<width> <copy src="grandparent()" trait="_BracketWidth"/> </width>
+			<height> <copy src="grandparent()" trait="_BracketHeightTop"/> </height>
+			<x>
+				<copy src="sibling(HeadlineHorRight)" trait="x"/>
+				<add src="sibling(HeadlineHorRight)" trait="width"/>
+				<sub src="me()" trait="width"/>
+			</x>
+			<zoom> &scale; </zoom>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</image>
+	</rect>
+
+	<rect name="BottomlineRect">
+		<visible> <copy src="parent()" trait="_BracketBot"/> </visible>
+		<width> <copy src="parent()" trait="_Width"/> </width>
+		<y> <copy src="parent()" trait="_Height"/> </y>
+		<locus> &true; </locus>
+		<systemcolor> <copy src="parent()"  trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_BracketAlpha"/> </alpha>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<brightness> <copy src="parent()" trait="_BracketBrightness"/> </brightness>
+
+		<image name="BottomlineVerLeft">
+			<filename> Interface\Shared\Line\fade_to_top.dds </filename>
+			<width> <copy src="grandparent()" trait="_BracketWidth"/> </width>
+			<height> <copy src="grandparent()" trait="_BracketHeightBot"/> </height>
+			<y> <copy> 0 </copy> <sub src="me()" trait="height"/> </y>
+			<zoom> &scale; </zoom>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</image>
+
+		<image name="BottomlineHor">
+			<filename> solid.dds </filename>
+			<texatlas> Interface\InterfaceShared.tai </texatlas>
+			<width>	<copy src="parent()" trait="width"/> </width>
+			<height> <copy src="grandparent()" trait="_BracketWidth"/> </height>
+			<clips> &true; </clips>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</image>
+
+		<image name="BottomlineVerRight">
+			<filename> Interface\Shared\Line\fade_to_top.dds </filename>
+			<width> <copy src="grandparent()" trait="_BracketWidth"/> </width>
+			<height> <copy src="grandparent()" trait="_BracketHeightBot"/> </height>
+			<x>
+				<copy src="sibling(BottomlineHor)" trait="x"/>
+				<add src="sibling(BottomlineHor)" trait="width"/>
+				<sub src="me()" trait="width"/>
+			</x>
+			<y> <copy> 0 </copy> <sub src="me()" trait="height"/> </y>
+			<zoom> &scale; </zoom>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</image>
+	</rect>
+
+	<image name="Backdrop">
+		<filename> Interface\Shared\Background\solid_black.dds </filename>
+		<width> <copy src="parent()" trait="_Width"/> <mul> 1.05 </mul></width> <!-- 1.05 -->
+		<height> 
+			<copy src="parent()" trait="_Height"/> 
+			<mul> 1.10 </mul>
+			<add> 20 </add>
+<!--		<copy src="parent()" trait="_ItemIndent"/> 
+			<div> -2 </div>-->
+		</height>
+		<x> <copy src="parent()" trait="_Width"/> <sub src="me()" trait="width"/> <div> 2 </div> </x>
+		<y> <copy src="parent()" trait="_Height"/> <sub src="me()" trait="height"/> <div> 2 </div> </y>
+		<depth> -10 </depth>
+		<zoom> &scale; </zoom>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_BackdropAlpha"/> </alpha>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<brightness> <copy src="parent()" trait="_BackdropBrightness"/> </brightness>
+	</image>
+	
+	<text name="WeightRelation">
+		<visible> <copy src="parent()" trait="_WeightVisible"/> </visible>
+		<string> <copy src="parent()" trait="_Weight"/> </string>
+		<font> <copy src="parent()" trait="_Font"/> </font>
+		<x>
+			<copy src="me()" trait="width"/>
+			<div> -1 </div>
+			<add src="parent()" trait="_Width"/>
+			<sub src="parent()" trait="_ItemIndent"/>
+			<sub> 10 </sub>
+		</x>
+		<y> <copy src="parent()" trait="_ItemIndent"/> <add src="parent()" trait="_FontY"/> </y>
+		<zoom> &scale; </zoom>
+		<depth> 2 </depth>
+		<systemcolor>
+			<copy> 0 </copy>
+			<add> <copy src="parent()" trait="systemcolor"/> <onlyifnot src="parent()" trait="_WeightColor"/> </add>
+			<add> <copy> &hudalt; </copy> <onlyif src="parent()" trait="_WeightColor"/> </add>
+		</systemcolor>
+		<alpha> <copy src="parent()" trait="_TextAlpha"/> </alpha>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<brightness> <copy src="parent()" trait="_TextBrightness"/> </brightness>
+	</text>
+	
+	<text name="WeightString">
+		<visible> <copy src="parent()" trait="_WeightVisible"/> </visible>
+		<string> &-sInventoryWeight; </string>
+		<font> <copy src="parent()" trait="_Font"/> </font>
+		<x> <copy src="sibling(WeightRelation)" trait="x"/> <sub> 50 </sub> </x>
+		<y> <copy src="sibling(WeightRelation)" trait="y"/> </y>
+		<zoom> &scale; </zoom>
+		<depth> 2 </depth>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_TextAlpha"/> </alpha>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<brightness> <copy src="parent()" trait="_TextBrightness"/> </brightness>
+	</text>
+	
+	<image name="MoreUp">
+		<visible> <copy src="parent()" trait="_ArrowUp"/> </visible>
+		<filename>Interface\Shared\scrollbar\arrow_up.dds</filename>
+		<width> 20 </width>
+		<height> 8 </height>
+		<x> <copy src="me()" trait="width"/><div> -2 </div> <add src="parent()" trait="_Width"/> </x>
+		<y> <copy src="parent()" trait="_BracketHeightTop"/> </y>
+		<zoom> &scale; </zoom>
+		<depth> 2 </depth>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_BracketAlpha"/> </alpha>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<brightness> <copy src="parent()" trait="_BracketBrightness"/> </brightness>
+	</image>
+	
+	<image name="MoreDown">
+		<visible> <copy src="parent()" trait="_ArrowDown"/> </visible>
+		<filename> Interface\Shared\scrollbar\arrow_down.dds </filename>
+		<width> 20 </width>
+		<height> 8 </height>
+		<x> <copy src="me()" trait="width"/> <div> -2 </div> <add src="parent()" trait="_Width"/> </x>
+		<y>
+			<copy src="parent()" trait="_Height"/> 
+			<sub> <copy src="parent()" trait="_BracketHeightBot"/> <add src="me()" trait="height"/> </sub>
+		</y>
+		<zoom> &scale; </zoom>
+		<depth> 2 </depth>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_BracketAlpha"/> </alpha>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<brightness> <copy src="parent()" trait="_BracketBrightness"/> </brightness>
+	</image>
+
+	<rect name="Key1">
+		<visible> <copy src="parent()" trait="_Action1"/> <neq> 0 </neq> </visible>
+		<width> <copy src="child(ButtonText)" trait="width"/> </width>		
+		<x> <copy src="parent()" trait="_ItemIndent"/> <add> 40 </add> </x>
+		<y> <copy src="parent()" trait="_Height"/> <add src="parent()" trait="_ItemIndent"/> </y>
+		<locus> &true; </locus>
+
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_TextAlpha"/> </alpha>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<brightness> <copy src="parent()" trait="_TextBrightness"/> </brightness>
+
+		<_ActionString> <copy src="parent()" trait="_ActionString1"/> </_ActionString>
+		<_KeyString> <copy src="parent()" trait="_KeyString1"/> </_KeyString>
+		<_Button> <copy src="parent()" trait="_Button1"/> </_Button>
+
+		<text name="ButtonText">
+			<string> <copy src="parent()" trait="_ActionString"/> </string>
+			<font> <copy src="grandparent()" trait="_Font"/> </font>
+			<y>	<copy src="grandparent()" trait="_FontY"/> </y>
+			<justify> &left; </justify>
+			<depth> 2 </depth>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</text>
+
+		<text name="ButtonKey">
+			<visible> <copy> 1 </copy> <onlyifnot src="parent()" trait="_Button"/> </visible>
+			<string> <copy src="parent()" trait="_KeyString"/> </string>
+			<font> <copy src="grandparent()" trait="_Font"/> </font>
+			<x> <copy> 0 </copy> <sub src="me()" trait="width"/> <sub> 5 </sub> </x>
+			<y>	<copy src="grandparent()" trait="_FontY"/> </y>
+			<depth> 2 </depth>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</text>
+		
+		<image name="ButtonImage">
+			<visible> <copy> 1 </copy> <onlyif src="parent()" trait="_Button"/> </visible>
+			<filename> <copy src="grandparent()" trait="_ButtonPath1"/> </filename>
+			<texatlas> Interface\InterfaceShared.tai </texatlas>
+			<zoom> &scale; </zoom>
+			<width> <copy src="sibling(ButtonText)" trait="height"/> <mul> 2 </mul> </width>
+			<height> <copy src="sibling(ButtonText)" trait="height"/> <mul> 2 </mul> </height>
+			<x> <copy> 0 </copy> <sub src="me()" trait="width"/> <mul> 0.75 </mul> <sub> 5 </sub> </x>
+			<y> <copy> 0 </copy> <sub src="me()" trait="height"/> <mul> 0.25 </mul> </y>
+			<depth> 2 </depth>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</image>
+	</rect>
+
+	<rect name="Key2">
+		<visible> <copy src="parent()" trait="_Action2"/> <neq> 0 </neq> </visible>
+
+		<x> <copy src="parent()" trait="_ItemIndent"/> <add src="parent()" trait="_Width"/> <sub src="me()" trait="width"/> <sub> 40 </sub> </x>
+		<y> <copy src="sibling(Key1)" trait="y"/> </y>
+		<width>	<copy src="child(ButtonText)" trait="width"/> </width>
+
+		<locus> &true; </locus>
+
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_TextAlpha"/> </alpha>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<brightness> <copy src="parent()" trait="_TextBrightness"/> </brightness>
+
+		<_ActionString> <copy src="parent()" trait="_ActionString2"/> </_ActionString>
+		<_KeyString> <copy src="parent()" trait="_KeyString2"/> </_KeyString>
+		<_Button> <copy src="parent()" trait="_Button2"/> </_Button>
+
+		<text name="ButtonText">
+			<string> <copy src="parent()" trait="_ActionString"/> </string>
+			<font> <copy src="grandparent()" trait="_Font"/> </font>
+			<y>	<copy src="grandparent()" trait="_FontY"/> </y>
+			<justify> &left; </justify>
+			<depth> 2 </depth>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</text>
+
+		<text name="ButtonKey">
+			<visible> <copy> 1 </copy> <onlyifnot src="parent()" trait="_Button"/> </visible>
+			<string> <copy src="parent()" trait="_KeyString"/> </string>
+			<font> <copy src="grandparent()" trait="_Font"/> </font>
+			<x> <copy> 0 </copy> <sub src="me()" trait="width"/> <sub> 5 </sub> </x>
+			<y>	<copy src="grandparent()" trait="_FontY"/> </y>
+			<depth> 2 </depth>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</text>
+		
+		<image name="ButtonImage">
+			<visible> <copy> 1 </copy> <onlyif src="parent()" trait="_Button"/> </visible>
+			<filename> <copy src="grandparent()" trait="_ButtonPath2"/> </filename>
+			<texatlas> Interface\InterfaceShared.tai </texatlas>
+			<zoom> &scale; </zoom>
+			<width> <copy src="sibling(ButtonText)" trait="height"/> <mul> 2 </mul> </width>
+			<height> <copy src="sibling(ButtonText)" trait="height"/> <mul> 2 </mul> </height>
+			<x> <copy> 0 </copy> <sub src="me()" trait="width"/> <mul> 0.75 </mul> <sub> 5 </sub> </x>
+			<y> <copy> 0 </copy> <sub src="me()" trait="height"/> <mul> 0.25 </mul> </y>
+			<depth> 2 </depth>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</image>
+	</rect>
+	
+	<rect name="Key3">
+		<visible> <copy src="parent()" trait="_Action3"/> <neq> 0 </neq> </visible>
+
+		<x> <copy src="parent()" trait="_Width"/> <sub src="me()" trait="width"/> <div> 2 </div> </x>
+		<y> <copy src="sibling(Key1)" trait="y"/> </y>
+		<width>	<copy src="child(ButtonText)" trait="width"/> </width>
+
+		<locus> &true; </locus>
+		
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_TextAlpha"/> </alpha>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<brightness> <copy src="parent()" trait="_TextBrightness"/> </brightness>
+
+		<_ActionString> <copy src="parent()" trait="_ActionString3"/> </_ActionString>
+		<_KeyString> <copy src="parent()" trait="_KeyString3"/> </_KeyString>
+		<_Button> <copy src="parent()" trait="_Button3"/> </_Button>
+
+		<text name="ButtonText">
+			<string> <copy src="parent()" trait="_ActionString"/> </string>
+			<font> <copy src="grandparent()" trait="_Font"/> </font>
+			<y>	<copy src="grandparent()" trait="_FontY"/> </y>
+			<justify> &left; </justify>
+			<depth> 2 </depth>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</text>
+
+		<text name="ButtonKey">
+			<visible> <copy> 1 </copy> <onlyifnot src="parent()" trait="_Button"/> </visible>
+			<string> <copy src="parent()" trait="_KeyString"/> </string>
+			<font> <copy src="grandparent()" trait="_Font"/> </font>
+			<x> <copy> 0 </copy> <sub src="me()" trait="width"/> <sub> 5 </sub> </x>
+			<y>	<copy src="grandparent()" trait="_FontY"/> </y>
+			<depth> 2 </depth>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</text>
+		
+		<image name="ButtonImage">
+			<visible> <copy> 1 </copy> <onlyif src="parent()" trait="_Button"/></visible>
+			<filename> <copy src="grandparent()" trait="_ButtonPath3"/> </filename>
+			<texatlas> Interface\InterfaceShared.tai </texatlas>
+			<zoom> &scale; </zoom>
+			<width> <copy src="sibling(ButtonText)" trait="height"/> <mul> 2 </mul> </width>
+			<height> <copy src="sibling(ButtonText)" trait="height"/> <mul> 2 </mul> </height>
+			<x> <copy> 0 </copy> <sub src="me()" trait="width"/> <mul> 0.75 </mul> <sub> 5 </sub> </x>
+			<y> <copy> 0 </copy> <sub src="me()" trait="height"/> <mul> 0.25 </mul> </y>
+			<depth> 2 </depth>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</image>
+	</rect>
+
+</rect>
+
+<template name="JLMContainer"> <rect name="JLMContainer">
+	<locus> &true; </locus>
+	<y>
+		<copy src="JLM" trait="_ItemIndent"/>
+		<add>
+			<copy src="parent()" trait="_ItemIndent"/> <div> 2 </div>
+			<add src="sibling(WeightRelation)" trait="height"/> <onlyif src="sibling(WeightRelation)" trait="visible"/>
+		</add>
+	</y>
+</rect> </template>
+
+<template name="JLMInjected"> <rect name="JLMInjected">
+	<visible> 0 </visible>  <!-- set in code -->
+
+	<justify> &left; </justify>
+	<locus> &true; </locus>
+	<clips> &true; </clips> 
+
+	<_Active> 0 </_Active> <!-- set in code -->
+
+	<x> 0 </x>
+	<y> 0 </y> <!-- set in code -->
+	
+	<_BracketBrightness> <copy src="JLM" trait="_BracketBrightness"/> </_BracketBrightness>
+	<_BracketAlpha> <copy src="JLM" trait="_BracketAlpha"/> </_BracketAlpha>
+	<_BracketWidth> <copy src="JLM" trait="_BracketWidth"/> </_BracketWidth>
+	<_BackdropBrightness> <copy src="JLM" trait="_BackdropBrightness"/> </_BackdropBrightness>
+	<_BackdropFillAlpha> <copy src="JLM" trait="_BackdropFillAlpha"/> </_BackdropFillAlpha>
+	<_TextAlpha> <copy src="JLM" trait="_TextAlpha"/> </_TextAlpha>
+	<_TextBrightness> <copy src="JLM" trait="_TextBrightness"/> </_TextBrightness>
+
+	<_TextIndentX> <copy src="JLM" trait="_TextIndentX"/> </_TextIndentX>
+	<_TextIndentY> <copy src="JLM" trait="_TextIndentY"/> </_TextIndentY>
+	<_ItemIndent> <copy src="JLM" trait="_ItemIndent"/> </_ItemIndent>
+	<_FontY> <copy src="JLM" trait="_FontY"/> </_FontY>
+
+	<_ShowEquip> <copy src="JLM" trait="_ShowEquip"/> </_ShowEquip>
+	<_ShowIcon> <copy src="JLM" trait="_ShowIcon"/> </_ShowIcon>
+	<_ShowMeter> <copy src="JLM" trait="_ShowMeter"/> </_ShowMeter>
+		
+	<width>	<copy src="JLM" trait="_ItemWidth"/>	</width>
+	<height> <copy src="child(ButtonText)" trait="height"/> <add src="me()" trait="_TextIndentY"/> </height>
+	
+	<_TextWidth> <copy src="child(ButtonText)" trait="x"/> <add src="me()" trait="_TextIndentX"/> <add src="me()" trait="_IndentMeter"/> </_TextWidth>
+
+	<font> <copy src="JLM" trait="_Font"/> </font>
+	
+	<systemcolor> <copy src="JLM" trait="systemcolor"/> </systemcolor>
+	
+	<string> Sample Item </string>
+
+	<_Equip> 1 </_Equip>
+	<_Icon> 0 </_Icon>
+	<_IconFilename> interface\icons\typeicons\hot_keys_icon_repair_kit.dds </_IconFilename>
+
+	<_Meter> 0 </_Meter>
+	<_MeterValue> 0.5 </_MeterValue>
+	<_MeterArrow> 0.5 </_MeterArrow>
+
+	<_ySIWidth>	<copy src="JLM" trait="_ySIWidth"/> </_ySIWidth>
+	<_ySIHeight> <copy src="JLM" trait="_ySIHeight"/> </_ySIHeight>
+	<_ySISpaceLeft> <copy src="JLM" trait="_ySISpaceLeft"/> </_ySISpaceLeft>
+	<_ySISpaceRight> <copy src="JLM" trait="_ySISpaceRight"/> </_ySISpaceRight>
+	<_ySISpaceUp> <copy src="JLM" trait="_ySISpaceUp"/> </_ySISpaceUp>
+
+	<_IndentBase>
+		<copy src="me()" trait="_TextIndentX"/> <div> 2 </div> 
+		<add> 10 </add>
+		<sub> <copy> 6 </copy> <onlyif src="io()" trait="_DUIF3"/> </sub>
+		<add src="me()" trait="_ItemIndent"/>
+	</_IndentBase>
+	
+	<_IndentEquip> <copy> 0 </copy> <onlyif src="me()" trait="_ShowEquip"/> </_IndentEquip>
+
+	<_IndentIcon>
+		<copy src="child(EquipImage)" trait="width"/>
+		<add> 6 </add>
+		<sub> <copy> 6 </copy> <onlyif src="io()" trait="_DUIF3"/> </sub>
+		<onlyif src="me()" trait="_ShowEquip"/>
+		<add> <copy src="child(IconImage)" trait="user0"/> <onlyif src="me()" trait="_ShowIcon"/> </add>
+	</_IndentIcon>
+
+	<_IndentText> <copy src="child(IconImage)" trait="width"/> <add src="child(IconImage)" trait="user1"/> <onlyif src="me()" trait="_ShowIcon"/> </_IndentText>
+	
+	<_IndentMeter> <copy> <copy src="child(Meter)" trait="width"/> <add src="me()" trait="_TextIndentX"/> </copy> <onlyif src="me()" trait="_Meter"/> </_IndentMeter>
+	
+	<text name="ButtonText">
+		<font> <copy src="parent()" trait="font"/> </font>
+		<string> <copy src="parent()" trait="string"/> </string>
+		<wrapwidth> <copy src="JLM" trait="_ItemWidthMax"/> <sub src="parent()" trait="_TextIndentX"/> <sub src="me()" trait="x"/> </wrapwidth>
+		<x>
+			<copy src="parent()" trait="_IndentBase"/>
+			<add src="parent()" trait="_IndentEquip"/>
+			<add src="parent()" trait="_IndentIcon"/>
+			<add src="parent()" trait="_IndentText"/>
+		</x>
+		<y> <copy src="parent()" trait="_TextIndentY"/> <div> 2 </div> <add src="parent()" trait="_FontY"/> </y>
+		<justify> <copy src="parent()" trait="justify"/> </justify>
+		<depth> 2 </depth>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/>  </systemcolor>
+		<alpha> <copy src="parent()" trait="_TextAlpha"/> </alpha>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<brightness> <copy src="parent()" trait="_TextBrightness"/> </brightness>
+	</text>
+	
+	<image name="EquipImage">
+		<visible> <copy src="parent()" trait="_Equip"/> <and src="parent()" trait="_ShowEquip"/> </visible>
+		<filename> square_filled.dds </filename>
+		<texatlas> Interface\InterfaceShared.tai </texatlas>
+		<width> 20 </width>
+		<height> 20 </height>
+		<x> <copy src="parent()" trait="_IndentBase"/> <add src="parent()" trait="_IndentEquip"/> </x>
+		<y>
+			<copy src="parent()" trait="height"/>
+			<sub> <copy src="me()" trait="height"/> <mul> 0.59 </mul> </sub>
+			<div> 2 </div>
+		</y>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_TextAlpha"/> </alpha>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<brightness> <copy src="parent()" trait="_TextBrightness"/> </brightness>
+	</image>
+	
+	<image name="IconImage">
+		<visible> <copy src="parent()" trait="_Icon"/> <and src="parent()" trait="_ShowIcon"/> </visible>
+		<filename> <copy src="parent()" trait="_IconFilename"/> </filename>
+		<width>	<copy src="parent()" trait="_ySIWidth"/> </width>
+		<height> <copy src="parent()" trait="_ySIHeight"/> </height>
+		<user0>	<copy src="parent()" trait="_ySISpaceLeft"/> </user0>
+		<user1>	<copy src="parent()" trait="_ySISpaceRight"/> </user1>
+		<x> <copy src="parent()" trait="_IndentBase"/> <add src="parent()" trait="_IndentEquip"/> <add src="parent()" trait="_IndentIcon"/> </x>
+		<y> <copy src="parent()" trait="_ySISpaceUp"/> <div> 2 </div> <add> 1 </add> </y>
+		<depth> <copy src="sibling(ButtonText)" trait="depth"/> <sub> 1 </sub> </depth>
+		<zoom> &scale; </zoom>
+		<systemcolor> <copy src="sibling(ButtonText)" trait="systemcolor"/>  </systemcolor>
+		<alpha> <copy src="sibling(ButtonText)" trait="alpha"/> </alpha>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<brightness> <copy src="sibling(ButtonText)" trait="brightness"/> </brightness>
+	</image>
+
+	<rect name="Meter">
+		<visible> <copy src="parent()" trait="_Meter"/> </visible>
+		
+		<_MeterValue> <copy src="parent()" trait="_MeterValue"/> </_MeterValue>
+		<_MeterArrow> <copy src="parent()" trait="_MeterArrow"/> </_MeterArrow>
+
+		<locus> &true; </locus>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_BracketAlpha"/> </alpha>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<brightness> <copy src="parent()" trait="_BracketBrightness"/> </brightness>
+		<depth> <copy src="sibling(ButtonText)" trait="depth"/> <add> 1 </add> </depth>
+
+		<_BackdropFillAlpha> <copy src="parent()" trait="_BackdropFillAlpha"/> </_BackdropFillAlpha> 
+		<_BackdropBrightness> <copy src="parent()" trait="_BackdropBrightness"/> </_BackdropBrightness>
+
+		<x> 
+			<copy src="parent()" trait="width"/>
+			<add src="parent()" trait="_ItemIndent"/>
+			<sub src="me()" trait="width"/>
+			<sub src="parent()" trait="_IndentBase"/>
+		</x>
+		<y> <copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <div> 2 </div> </y>
+		<width> <copy src="me()" trait="height"/> <mul> 4 </mul> </width>
+		<height> <copy src="child(MeterTextDummy)" trait="height"/> <add src="parent()" trait="_TextIndentY"/> <div> 2.5 </div> </height>
+		
+		<text name="MeterTextDummy">
+			<font> <copy src="grandparent()" trait="font"/> </font>
+			<string> ABCDEFG </string>
+			<visible> 0 </visible>
+		</text>
+		
+		<image name="MeterBackGround">
+			<width> <copy src="parent()" trait="width"/> </width>
+			<height> <copy src="parent()" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename> solid.dds </filename>
+			<texatlas> Interface\InterfaceShared.tai </texatlas>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_BackdropFillAlpha"/> </alpha>
+			<brightness> <copy src="parent()" trait="_BackdropBrightness"/> </brightness>
+			<depth> <copy src="parent()" trait="depth"/> <add> 1 </add> </depth>
+		</image>
+		<image name="MeterForeGround">
+			<x> <copy src="sibling(MeterBackGround)" trait="x"/> </x>
+			<y> <copy src="sibling(MeterBackGround)" trait="y"/> </y>
+			<width> <copy src="sibling(MeterBackGround)" trait="width"/> <mul src="parent()" trait="_MeterValue"/> </width>
+			<height> <copy src="sibling(MeterBackGround)" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename>Interface\Shared\solid.dds</filename>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="alpha"/> </alpha>
+			<depth> <copy src="parent()" trait="depth"/> <add> 2 </add> </depth>
+		</image>
+		<image name="MeterArrow">
+			<x>
+				<copy src="sibling(MeterBackGround)" trait="x"/>
+				<add> <copy src="sibling(MeterBackGround)" trait="width"/> <mul src="parent()" trait="_MeterArrow"/> </add>
+				<sub> <copy src="me()" trait="width"/> <div> 4 </div> </sub>
+			</x>
+			<y> <copy src="sibling(MeterBackGround)" trait="y"/> </y>
+			<width> <copy src="sibling(MeterBackGround)" trait="height"/> </width>
+			<height> <copy src="sibling(MeterBackGround)" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename>interface\shared\arrow\repair_meter_pips.dds</filename>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="alpha"/> </alpha>
+			<depth> <copy src="parent()" trait="depth"/> <add> 3 </add> </depth>
+		</image>	
+	</rect>
+
+	<rect name="Box">
+		<visible> <copy src="parent()" trait="_Active"/> </visible>
+		<locus> &true; </locus>
+
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_BracketAlpha"/> </alpha>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<brightness> <copy src="parent()" trait="_BracketBrightness"/> </brightness>
+		<x> <copy src="parent()" trait="_ItemIndent"/> </x>
+		
+		<image name="BoxUp">
+			<filename> solid.dds </filename>
+			<texatlas> Interface\InterfaceShared.tai </texatlas>
+			<width> <copy src="JLM" trait="_ItemWidth"/> </width>
+			<height> <copy src="grandparent()" trait="_BracketWidth"/> </height>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/>  </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</image>
+
+		<image name="BoxLeft">
+			<filename> solid.dds </filename>
+			<texatlas> Interface\InterfaceShared.tai </texatlas>
+			<width> <copy src="grandparent()" trait="_BracketWidth"/> </width>
+			<height> <copy src="grandparent()" trait="height"/> <sub src="sibling(BoxUp)" trait="height"/> <sub src="sibling(BoxUp)" trait="height"/> </height>
+			<y> <copy src="sibling(BoxUp)" trait="height"/> </y>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/>  </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</image>
+
+		<image name="BoxDown">
+			<filename> solid.dds </filename>
+			<texatlas> Interface\InterfaceShared.tai </texatlas>
+			<width> <copy src="JLM" trait="_ItemWidth"/> </width>
+			<height> <copy src="grandparent()" trait="_BracketWidth"/> </height>
+			<y> <copy src="grandparent()" trait="height"/> <sub src="me()" trait="height"/> </y>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/>  </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</image>
+
+		<image name="BoxRight">
+			<filename> solid.dds </filename>
+			<texatlas> Interface\InterfaceShared.tai </texatlas>
+			<width> <copy src="grandparent()" trait="_BracketWidth"/> </width>
+			<height> <copy src="grandparent()" trait="height"/> <sub src="sibling(BoxUp)" trait="height"/> <sub src="sibling(BoxUp)" trait="height"/> </height>
+			<x> <copy src="JLM" trait="_ItemWidth"/> <sub src="me()" trait="width"/> </x>
+			<y> <copy src="sibling(BoxUp)" trait="height"/> </y>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/>  </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</image>
+	</rect>
+
+	<image name="Backdrop">
+		<visible> <copy src="parent()" trait="_Active"/> </visible>
+		<filename> Interface\Shared\Background\solid.dds </filename>
+		<width> <copy src="JLM" trait="_ItemWidth"/> <add src="JLM" trait="_ItemIndent"/> <add src="JLM" trait="_ItemIndent"/> </width>
+		<height> <copy src="parent()" trait="height"/> <mul> 1.27 </mul> </height>
+		<x> 0 </x>
+		<y> <copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <div> 2 </div> </y>
+		<zoom> &scale; </zoom>
+		<depth> -5 </depth>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_BackdropFillAlpha"/> </alpha> 
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<brightness> <copy src="parent()" trait="_BackdropBrightness"/> </brightness>
+	</image>
+
+</rect> </template>

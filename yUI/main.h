@@ -26,7 +26,12 @@ inline HUDMainMenu*					g_HUDMainMenu			= nullptr;
 
 inline int iMainLoopDoOnce = 0;
 
-inline std::deque<std::function<void()>> pluginLoad;
-inline std::deque<std::function<void()>> deferredInit;
-inline std::deque<std::function<void()>> mainLoop;
-inline std::deque<std::function<void()>> mainLoopDoOnce;
+inline std::vector<void(*)()>		pluginLoad;
+inline std::vector<void(*)()>		deferredInit;
+inline std::vector<void(*)()>		mainLoop;
+inline std::vector<void(*)()>		mainLoopDoOnce;
+
+inline std::vector<void(*)()>		onRender;
+inline std::vector<void(*)(Actor*)>	onHit;
+
+inline std::vector<void(*)(TESObjectREFR*, TESObjectREFR*, TESForm*)> onAddDrop;

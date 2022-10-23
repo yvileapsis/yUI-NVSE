@@ -6,22 +6,9 @@
 
 namespace Fix::DroppedItems
 {
-	inline int bEnable = 1;
+	inline int enable = 1;
 
 	TList<TESObjectREFR>::Node* iterDroppedItem;
-
-
-	void HandleINIs()
-	{
-		CSimpleIniA ini;
-		ini.SetUnicode();
-		const auto iniPath = GetCurPath() + yUI_INI;
-		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
-
-		bEnable = ini.GetOrCreate("General", "bFixDroppedItems", 1, "; fix the issue where Container Menu would display only a single dropped item at a time");
-
-		ini.SaveFile(iniPath.c_str(), false);
-	}
 
 	TESObjectREFR* __fastcall GetDroppedWeaponHead(ExtraDataList* extradatalist)
 	{
@@ -54,9 +41,9 @@ namespace Fix::DroppedItems
 		}
 	}
 
-	void Patch(const bool bEnable)
+	void Patch(const bool enable)
 	{
-		if (bEnable)
+		if (enable)
 		{
 			WriteRelCall(0x75C793, GetDroppedWeaponHead);
 			WriteRelJump(0x75C9AB, HookGetDroppedWeaponNext<0x75C798>);
@@ -68,10 +55,22 @@ namespace Fix::DroppedItems
 		}
 	}
 
+	void HandleINIs()
+	{
+		const auto iniPath = GetCurPath() + yUI_INI;
+		CSimpleIniA ini;
+		ini.SetUnicode();
+		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
+
+		enable = ini.GetOrCreate("General", "bFixDroppedItems", 1, "; fix the issue where Container Menu would display only a single dropped item at a time");
+
+		ini.SaveFile(iniPath.c_str(), false);
+	}
+
 	extern void Init()
 	{
 		if (g_nvseInterface->isEditor) return;
 		HandleINIs();
-		Patch(bEnable);
+		Patch(enable);
 	}
 }

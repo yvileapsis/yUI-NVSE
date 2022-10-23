@@ -3,86 +3,62 @@
 #include <SimpleINILibrary.h>
 #include <unordered_set>
 
-#include "Menus.h"
-#include "Tiles.h"
+#include <Menus.h>
+#include <Tiles.h>
 
 namespace UserInterface::HitIndicator
 {
 
-	inline UInt32	g_JHI = 0;
+	UInt32	enable = 0;
 
 	enum kHitIndicatorFlags
 	{
-		kHitIndicatorNothing = 1 << 0,
-		kHitIndicatorNormal = 1 << 1,
-		kHitIndicatorAltColor = 1 << 2,
-		kHitIndicatorDouble = 1 << 3,
-		kHitIndicatorHalfAlpha = 1 << 4,
-		kHitIndicatorOffset = 1 << 5,
-		kHitIndicatorShakeVert = 1 << 6,
-		kHitIndicatorShakeHoriz = 1 << 7,
+		kHitIndicatorNothing	= 1 << 0,
+		kHitIndicatorNormal		= 1 << 1,
+		kHitIndicatorAltColor	= 1 << 2,
+		kHitIndicatorDouble		= 1 << 3,
+		kHitIndicatorHalfAlpha	= 1 << 4,
+		kHitIndicatorOffset		= 1 << 5,
+		kHitIndicatorShakeVert	= 1 << 6,
+		kHitIndicatorShakeHoriz	= 1 << 7,
 	};
 
-	inline Float64	g_Seconds = 1.5;
-	inline Float64	g_Alpha = 400.0;
-	inline Float64	g_Height = 256.0;
-	inline Float64	g_Width = 256.0;
-	inline Float64	g_Offset = 0.0;
-	inline UInt32	g_ModeHit = kHitIndicatorNormal;
-	inline UInt32	g_ModeDead = kHitIndicatorNormal;
-	inline UInt32	g_ModeKill = kHitIndicatorOffset;
-	inline UInt32	g_ModeEnemy = kHitIndicatorAltColor;
-	inline UInt32	g_ModeCrit = kHitIndicatorDouble;
-	inline UInt32	g_ModeHeadshot = kHitIndicatorShakeVert;
-	inline UInt32	g_ModeSelf = kHitIndicatorHalfAlpha;
-	inline UInt32	g_ModeExplosion = kHitIndicatorShakeHoriz;
-	inline UInt32	g_ModeNoAttacker = kHitIndicatorHalfAlpha;
-	inline UInt32	g_ModeNoDamage = kHitIndicatorNothing;
-	inline UInt32	g_EnableOut = 1;
-	inline UInt32	g_EnableSighting = 1;
-	inline UInt32	g_EnableScope = 1;
-	inline UInt32	g_Rotate = 2;
+	Float32		seconds			= 1.5;
+	Float32		alpha			= 400.0;
+	Float32		height			= 256.0;
+	Float32		width			= 256.0;
+	Float32		offset			= 0.0;
+	UInt32		modeHit			= kHitIndicatorNormal;
+	UInt32		modeDead		= kHitIndicatorNormal;
+	UInt32		modeKill		= kHitIndicatorOffset;
+	UInt32		modeEnemy		= kHitIndicatorAltColor;
+	UInt32		modeCrit		= kHitIndicatorDouble;
+	UInt32		modeHeadshot	= kHitIndicatorShakeVert;
+	UInt32		modeSelf		= kHitIndicatorHalfAlpha;
+	UInt32		modeExplosion	= kHitIndicatorShakeHoriz;
+	UInt32		modeNoAttacker	= kHitIndicatorHalfAlpha;
+	UInt32		modeNoDamage	= kHitIndicatorNothing;
+	UInt32		enableOut		= 1;
+	UInt32		enableSighting	= 1;
+	UInt32		enableScope		= 1;
+	UInt32		rotate			= 2;
 
-	bool				initialized						= false;
-	Tile*				tileMain						= nullptr;
+	Tile*		tileMain		= nullptr;
 
-	SInt64				visible							= 0;
-	UInt32				depth							= 0;
-	Float32				angle							= 0;
+	SInt64		visible			= 0;
+	UInt32		depth			= 0;
+	Float32		angle			= 0;
 
-	std::map<TESObjectREFR*, UInt32>					hitQueue;
-	std::unordered_set<Tile*>							tileQueue;
-	std::unordered_map<Tile*, TESObjectREFR*>			tileProcessing;
-
+	std::map<TESObjectREFR*, UInt32>			hitQueue;
+	std::unordered_set<Tile*>					tileQueue;
+	std::unordered_map<Tile*, TESObjectREFR*>	tileProcessing;
 
 
-	void HandleINI(const std::string& iniPath)
-	{
-		CSimpleIniA ini;
-		ini.SetUnicode();
-
-		if (const auto errVal = ini.LoadFile(iniPath.c_str()); errVal == SI_FILE) { return; }
-
-		g_JHI				= ini.GetOrCreate("JustMods", "JHI", 1, nullptr);
-		g_Seconds			= ini.GetOrCreate("JHI", "Seconds", 2.5, nullptr);
-		g_Alpha				= ini.GetOrCreate("JHI", "Alpha", 400.0, nullptr);
-		g_Height			= ini.GetOrCreate("JHI", "Height", 256.0, nullptr);
-		g_Width				= ini.GetOrCreate("JHI", "Width", 256.0, nullptr);
-		g_Offset			= ini.GetOrCreate("JHI", "Offset", 0.0, nullptr);
-//		g_ModeHit			= ini.GetOrCreate("JHI", "ModeHit", static_cast<double>(kHitMarkerNormal), nullptr);
-		g_EnableOut			= ini.GetOrCreate("JHI", "EnableOut", 1, nullptr);
-		g_EnableSighting	= ini.GetOrCreate("JHI", "EnableSighting", 1, nullptr);
-		g_EnableScope		= ini.GetOrCreate("JHI", "EnableScope", 1, nullptr);
-		g_Rotate			= ini.GetOrCreate("JHI", "Rotate", 2, nullptr);
-
-		if (const auto errVal = ini.SaveFile(iniPath.c_str(), false); errVal == SI_FILE) { return; }
-
-	}
 
 	bool ProcessTilesInUse(Tile* tile, TESObjectREFR* target)
 	{
 		if (!tile) return false;
-		if (g_Rotate == 2) tile->SetFloat("_RotateAngle", g_player->GetHeadingAngle(target));
+		if (rotate == 2) tile->SetFloat("_RotateAngle", g_player->GetHeadingAngle(target));
 		const auto val = tile->GetValue("_counter");
 		if (!val) return false;
 		if (val->num < 1) return true;
@@ -118,22 +94,22 @@ namespace UserInterface::HitIndicator
 		tile->SetFloat("_angle", g_player->GetHeadingAngle(target));
 		tile->SetFloat("_alphaMult", flags & kHitIndicatorHalfAlpha ? 0.5 : 1);
 
-		tile->GradualSetFloat("_counter", 0, 1, flags & kHitIndicatorDouble ? 2 * g_Seconds : g_Seconds, GradualSetFloat::StartToEnd);
+		tile->GradualSetFloat("_counter", 0, 1, flags & kHitIndicatorDouble ? 2 * seconds : seconds, GradualSetFloat::StartToEnd);
 	}
 
 	void MainLoop()
 	{
-		if (!g_JHI) return;
+		if (!enable) return;
 
-		if (g_HUDMainMenu->isUsingScope) visible = static_cast<SInt64>(g_EnableScope);
-		else if (g_player->UsingIronSights()) visible = g_EnableSighting;
-		else visible = g_EnableOut;
+		if (g_HUDMainMenu->isUsingScope) visible = static_cast<SInt64>(enableScope);
+		else if (g_player->UsingIronSights()) visible = enableSighting;
+		else visible = enableOut;
 		tileMain->SetFloat("_visible", visible);
 		tileMain->SetFloat("_scope", g_player->UsingIronSights());
 
 		if (!visible) { hitQueue.clear(); return; }
 
-		if (g_Rotate == 1)
+		if (rotate == 1)
 		{
 			const auto newAngle = g_player->pos.z;
 			tileMain->SetFloat("_angleWorld", angle - newAngle);
@@ -147,9 +123,9 @@ namespace UserInterface::HitIndicator
 		hitQueue.clear();
 	}
 
-	void OnHit(const Actor* target, void* args)
+	void OnHit(Actor* target)
 	{
-		if (!initialized || !visible) return;
+		if (!enable || !visible) return;
 
 		if (!target || target != g_player) return;
 
@@ -163,45 +139,75 @@ namespace UserInterface::HitIndicator
 			if (!hitData) return;
 			source = hitData->source;
 
-			flags |= g_ModeHit;
-			if (target->lifeState == kLifeState_Dead || target->lifeState == kLifeState_Dying) flags |= g_ModeDead;
-			if (target->lifeState == kLifeState_Alive && hitData->flags & ActorHitData::kFlag_IsFatal) flags |= g_ModeKill;
-			if (hitData->flags & ActorHitData::kFlag_IsCritical) flags |= g_ModeCrit;
+			flags |= modeHit;
+			if (target->lifeState == kLifeState_Dead || target->lifeState == kLifeState_Dying) flags |= modeDead;
+			if (target->lifeState == kLifeState_Alive && hitData->flags & ActorHitData::kFlag_IsFatal) flags |= modeKill;
+			if (hitData->flags & ActorHitData::kFlag_IsCritical) flags |= modeCrit;
 			if (hitData->hitLocation == BGSBodyPartData::eBodyPart_Brain || hitData->hitLocation ==
-				BGSBodyPartData::eBodyPart_Head1 || hitData->hitLocation == BGSBodyPartData::eBodyPart_Head2) flags |= g_ModeHeadshot;
-			if (hitData->explosion && IS_TYPE(hitData->explosion, Explosion) && hitData->explosion->IsExplosion()) flags |= g_ModeExplosion;
-			if (hitData->dmgMult <= 0) flags |= g_ModeNoDamage;
-			if (!source) flags |= g_ModeNoAttacker;
-			if (source && source->IsCrimeOrEnemy()) flags |= g_ModeEnemy;
-			if (source == g_player) flags |= g_ModeSelf;
+				BGSBodyPartData::eBodyPart_Head1 || hitData->hitLocation == BGSBodyPartData::eBodyPart_Head2) flags |= modeHeadshot;
+			if (hitData->explosion && IS_TYPE(hitData->explosion, Explosion) && hitData->explosion->IsExplosion()) flags |= modeExplosion;
+			if (hitData->dmgMult <= 0) flags |= modeNoDamage;
+			if (!source) flags |= modeNoAttacker;
+			if (source && source->IsCrimeOrEnemy()) flags |= modeEnemy;
+			if (source == g_player) flags |= modeSelf;
 		}
 
 		if (flags & kHitIndicatorNothing) return;
 		hitQueue[source] |= flags;
 	}
 
+	
+	void HandleINI(const std::string& iniPath)
+	{
+		CSimpleIniA ini;
+		ini.SetUnicode();
+
+		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
+
+		enable			= ini.GetOrCreate("JustMods", "JHI", 1, nullptr);
+		seconds			= ini.GetOrCreate("JHI", "Seconds", 2.5, nullptr);
+		alpha			= ini.GetOrCreate("JHI", "Alpha", 400.0, nullptr);
+		height			= ini.GetOrCreate("JHI", "Height", 256.0, nullptr);
+		width			= ini.GetOrCreate("JHI", "Width", 256.0, nullptr);
+		offset			= ini.GetOrCreate("JHI", "Offset", 0.0, nullptr);
+		modeHit			= ini.GetOrCreate("JHI", "ModeHit", kHitIndicatorNormal, nullptr);
+		modeDead		= ini.GetOrCreate("JHI", "ModeHit", kHitIndicatorNormal, nullptr);
+		modeKill		= ini.GetOrCreate("JHI", "ModeHit", kHitIndicatorOffset, nullptr);
+		modeEnemy		= ini.GetOrCreate("JHI", "ModeHit", kHitIndicatorAltColor, nullptr);
+		modeCrit		= ini.GetOrCreate("JHI", "ModeHit", kHitIndicatorDouble, nullptr);
+		modeHeadshot	= ini.GetOrCreate("JHI", "ModeHit", kHitIndicatorShakeVert, nullptr);
+		modeSelf		= ini.GetOrCreate("JHI", "ModeHit", kHitIndicatorHalfAlpha, nullptr);
+		modeExplosion	= ini.GetOrCreate("JHI", "ModeHit", kHitIndicatorShakeHoriz, nullptr);
+		modeNoAttacker	= ini.GetOrCreate("JHI", "ModeHit", kHitIndicatorHalfAlpha, nullptr);
+		modeNoDamage	= ini.GetOrCreate("JHI", "ModeHit", kHitIndicatorNothing, nullptr);
+		enableOut		= ini.GetOrCreate("JHI", "EnableOut", 1, nullptr);
+		enableSighting	= ini.GetOrCreate("JHI", "EnableSighting", 1, nullptr);
+		enableScope		= ini.GetOrCreate("JHI", "EnableScope", 1, nullptr);
+		rotate			= ini.GetOrCreate("JHI", "Rotate", 2, nullptr);
+
+		ini.SaveFile(iniPath.c_str(), false);
+	}
 
 	void Reset()
 	{
 		HandleINI(GetCurPath() + R"(\Data\Config\JustMods.ini)");
 
-		if (!g_JHI)
+		if (!enable)
 		{
-			RemoveNativeEventHandler("yJAM:MainLoop", reinterpret_cast<EventHandler>(MainLoop));
-			RemoveNativeEventHandler("yJAM:JIP:OnHit", reinterpret_cast<EventHandler>(OnHit));
+			std::erase(onHit, OnHit);
+			std::erase(mainLoop, MainLoop);
 			return;
 		}
-
-		SetNativeEventHandler("yJAM:MainLoop", reinterpret_cast<EventHandler>(MainLoop));
-		SetNativeEventHandler("yJAM:JIP:OnHit", reinterpret_cast<EventHandler>(OnHit));
+		onHit.emplace_back(OnHit);
+		mainLoop.emplace_back(MainLoop);
 
 		if (tileMain->GetChild("JHI")) tileMain->GetChild("JHIContainer")->Destroy(true);
 		tileMain->AddTileFromTemplate("JHIContainer");
 
-		tileMain->SetFloat("_AlphaBase", g_Alpha);
-		tileMain->SetFloat("_HeightBase", g_Height);
-		tileMain->SetFloat("_WidthBase", g_Width);
-		tileMain->SetFloat("_OffsetBase", g_Offset);
+		tileMain->SetFloat("_AlphaBase", alpha);
+		tileMain->SetFloat("_HeightBase", height);
+		tileMain->SetFloat("_WidthBase", width);
+		tileMain->SetFloat("_OffsetBase", offset);
 
 		tileMain->GradualSetFloat("_GlobalShaker", -0.05, 0.05, 0.15, GradualSetFloat::StartToEndPerpetual);
 
@@ -211,17 +217,16 @@ namespace UserInterface::HitIndicator
 
 	void MainLoopDoOnce()
 	{
-		initialized = true;
 		tileMain = g_HUDMainMenu->tile->GetChild("JHI");
 		if (!tileMain)
 		{
-			g_HUDMainMenu->tile->InjectUIXML(R"(Data\menus\prefabs\JHI\JHI.xml)");
+			g_HUDMainMenu->tile->InjectUIXML(R"(Data\menus\yUI\HitIndicator.xml)");
 			tileMain = g_HUDMainMenu->tile->GetChild("JHI");
 		}
 		if (!tileMain) return;
 		RegisterEvent("JHI:Reset", 0, nullptr, 4);
 		SetEventHandler("JHI:Reset", Reset);
-		DispatchEvent("JHI:Reset", nullptr);
+		Reset();
 	}
 
 	void Init()
@@ -229,6 +234,5 @@ namespace UserInterface::HitIndicator
 		if (g_nvseInterface->isEditor) return;
 
 		mainLoopDoOnce.emplace_back(MainLoopDoOnce);
-		mainLoop.emplace_back(MainLoop);
 	}
 }

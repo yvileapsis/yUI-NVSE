@@ -16,7 +16,7 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	{
 		InitSingletons();
 
-		Log(yUI_VERSION_STR, 2);
+		Log(yUI_VERSION_STR, kToBoth);
 		ConsolePrintQueue();
 
 		// call all deferred init functions
@@ -52,22 +52,22 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 	if (nvse->isEditor) {
 		if (nvse->editorVersion < CS_VERSION_1_4_0_518)
 		{
-			Log(FormatString("yUI: incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518), 1);
+			Log(FormatString("yUI: incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518), kToLog);
 			return false;
 		}
 	} else {
 		if (nvse->nvseVersion < PACKED_NVSE_VERSION) {
-			Log(FormatString("yUI: NVSE version too old (got %X expected at least %X). Plugin will NOT load! Install the latest version here: https://github.com/xNVSE/NVSE/releases/", nvse->nvseVersion, PACKED_NVSE_VERSION), 1);
+			Log(FormatString("yUI: NVSE version too old (got %X expected at least %X). Plugin will NOT load! Install the latest version here: https://github.com/xNVSE/NVSE/releases/", nvse->nvseVersion, PACKED_NVSE_VERSION), kToLog);
 			return false;
 		}
 
 		if (nvse->runtimeVersion < RUNTIME_VERSION_1_4_0_525) {
-			Log(FormatString("yUI: incorrect runtime version (got %08X need at least %08X)", nvse->runtimeVersion, RUNTIME_VERSION_1_4_0_525), 1);
+			Log(FormatString("yUI: incorrect runtime version (got %08X need at least %08X)", nvse->runtimeVersion, RUNTIME_VERSION_1_4_0_525), kToLog);
 			return false;
 		}
 
 		if (nvse->isNogore) {
-			Log(FormatString("yUI: NoGore is not supported"), 1);
+			Log(FormatString("yUI: NoGore is not supported"), kToLog);
 			return false;
 		}
 	}
@@ -109,6 +109,7 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	g_eventInterface = static_cast<NVSEEventManagerInterface*>(nvse->QueryInterface(kInterface_EventManager));
 	SetNativeEventHandler = g_eventInterface->SetNativeEventHandler;
 	RemoveNativeEventHandler = g_eventInterface->RemoveNativeEventHandler;
+	SetHandlerFunctionValue = g_eventInterface->SetNativeHandlerFunctionValue;
 	RegisterEvent = g_eventInterface->RegisterEvent;
 	DispatchEvent = g_eventInterface->DispatchEvent;
 

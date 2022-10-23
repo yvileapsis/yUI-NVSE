@@ -2,18 +2,16 @@
 
 #include <SafeWrite.h>
 #include <SimpleINILibrary.h>
-
+#include <GameForms.h>
 #include <GameRTTI.h>
-
-#include "GameForms.h"
 
 namespace Patch::MultiplicativeShots
 {
 	void HandleINIs()
 	{
+		const auto iniPath = GetCurPath() + yUI_INI;
 		CSimpleIniA ini;
 		ini.SetUnicode();
-		const auto iniPath = GetCurPath() + yUI_INI;
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
 		ini.SaveFile(iniPath.c_str(), false);

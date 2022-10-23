@@ -1,6 +1,6 @@
 <rect name="JHI">
 
-	<_exists> 1 </_exists>
+	<_Exists> 1 </_Exists>
 	
 	<x> <copy src="screen()" trait="width"/> <div> 2 </div> </x>
 	<y> <copy src="screen()" trait="height"/> <div> 2 </div> </y>
@@ -19,11 +19,7 @@
 	<_Offset> <copy src="me()" trait="_OffsetBase"/> <mul src="me()" trait="_Scale"/> </_Offset>
 
 	<_AlphaBase> 400 </_AlphaBase>
-	<_Alpha> 
-		<copy src="JDC" trait="_JDCAlphaRC"/>
-		<onlyifnot src="me()" trait="_AlphaBase"/>
-		<add src="me()" trait="_AlphaBase"/>			
-	</_Alpha>
+	<_Alpha> <copy src="JDC" trait="_JDCAlphaRC"/> <onlyifnot src="me()" trait="_AlphaBase"/> <add src="me()" trait="_AlphaBase"/> </_Alpha>
 
 	<!-- set in code every frame -->
 	<_visible> 0 </_visible>
@@ -57,15 +53,8 @@
 	<_alphaMult> 1 </_alphaMult>
 	<_Offset> 
 		<copy src="JHI" trait="_Offset"/> 
-		<add> 
-			<copy src="me()" trait="_Height"/> 
-			<mul src="JHI" trait="_GlobalShaker"/>
-			<onlyif src="me()" trait="_ModeShakeVert"/>
-		</add>
-		<div>
-			<copy src="me()" trait="_Mult"/>
-			<onlyif src="me()" trait="_ModeOffset"/>
-		</div>
+		<add> <copy src="me()" trait="_Height"/> <mul src="JHI" trait="_GlobalShaker"/> <onlyif src="me()" trait="_ModeShakeVert"/> </add>
+		<div> <copy src="me()" trait="_Mult"/> <onlyif src="me()" trait="_ModeOffset"/> </div>
 	</_Offset>
 
 	<_angle> 0 </_angle>
@@ -73,19 +62,12 @@
 	<_rotateAngle> 
 		<copy src="me()" trait="_angle"/> 
 		<add src="me()" trait="_angleWorld"/>
-		<add> 
-			<copy src="JHI" trait="_GlobalShaker"/>
-			<onlyif src="me()" trait="_ModeShakeHoriz"/>
-		</add>
+		<add> <copy src="JHI" trait="_GlobalShaker"/> <onlyif src="me()" trait="_ModeShakeHoriz"/> </add>
 	</_rotateAngleF>
 
 	<_depthBase> 100 </_depthBase>
 	<_depth> 0 </_depth>
-	<depth>
-		<copy src="me()" trait="_depth"/>
-		<add src="me()" trait="_depthBase"/>
-		<add src="me()" trait="_alpha"/>
-	</depth>
+	<depth> <copy src="me()" trait="_depth"/> <add src="me()" trait="_depthBase"/> <add src="me()" trait="_alpha"/> </depth>
 	
 	<systemcolor> 1 </systemcolor>
 	<locus> &true; </locus>
@@ -107,11 +89,7 @@
 		</add>
 	</_mult>
 	
-	<alpha> 
-		<copy src="JHI" trait="_alpha"/>
-		<mul src="me()" trait="_alphaMult"/>
-		<mul src="me()" trait="_mult"/>
-	</alpha>
+	<alpha> <copy src="JHI" trait="_alpha"/> <mul src="me()" trait="_alphaMult"/> <mul src="me()" trait="_mult"/> </alpha>
 
 	<red> <copy src="JHI" trait="red"/> </red>
 	<green> <copy src="JHI" trait="green"/> </green>
@@ -120,18 +98,12 @@
 	<image name="Image">
 		<filename> Interface\JHI\JHIHitIndicator.dds </filename>
 		<x> <copy src="me()" trait="width"/> <div> -2 </div> </x>
-		<y> 
-			<copy src="me()" trait="height"/> <div> -2 </div>
-			<sub src="parent()" trait="_Offset"/>
-		</y>
+		<y> <copy src="me()" trait="height"/> <div> -2 </div> <sub src="parent()" trait="_Offset"/> </y>
 		<width> <copy src="parent()" trait="_Width"/> </width>
 		<height> <copy src="parent()" trait="_Height"/> </height>
 		<rotateangle> <copy src="parent()" trait="_rotateAngle"/> </rotateangle>
 		<rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </rotateaxisx> 
-		<rotateaxisy> 
-			<copy src="me()" trait="height"/> <div> 2 </div>
-			<add src="parent()" trait="_Offset"/>
-		</rotateaxisy>
+		<rotateaxisy> <copy src="me()" trait="height"/> <div> 2 </div> <add src="parent()" trait="_Offset"/> </rotateaxisy>
 		<zoom> &scale; </zoom>
 		<depth> <copy src="parent()" trait="depth"/> </depth>
 		<alpha> <copy src="parent()" trait="alpha"/> </alpha>

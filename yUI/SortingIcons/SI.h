@@ -1,6 +1,6 @@
 #pragma once
 #include <Menus.h>
-#include "GameExtraData.h"
+#include <GameExtraData.h>
 #include <filesystem>
 #include <unordered_set>
 
@@ -8,7 +8,9 @@ namespace SortingIcons
 {
 	inline int g_FixIndefiniteSorting = 1;
 
-	inline int g_SI = 0;
+	inline int enable = 0;
+
+	inline int logLevel = kToNone;
 
 	inline int bSort			= 1;
 	inline int bIcons			= 1;

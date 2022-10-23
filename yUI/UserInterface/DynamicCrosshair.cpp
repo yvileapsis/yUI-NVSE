@@ -178,6 +178,13 @@ namespace UserInterface::DynamicCrosshair
 	{
 		HandleINI();
 
+		if (!enable)
+		{
+			std::erase(mainLoop, MainLoop);
+			return;
+		}
+		mainLoop.emplace_back(MainLoop);
+
 		tileMain->SetFloat("_DynamicOffset", dynamic & 1);
 		tileMain->SetFloat("_DynamicLength", dynamic & 2);
 
@@ -222,8 +229,6 @@ namespace UserInterface::DynamicCrosshair
 	extern void Init()
 	{
 		if (g_nvseInterface->isEditor) return;
-
 		mainLoopDoOnce.emplace_back(MainLoopDoOnce);
-		mainLoop.emplace_back(MainLoop);
 	}
 }

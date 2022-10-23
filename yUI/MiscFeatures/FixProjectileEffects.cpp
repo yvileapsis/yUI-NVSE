@@ -14,9 +14,9 @@ namespace Fix::ProjectileEffects
 
 	void HandleINIs()
 	{
+		const auto iniPath = GetCurPath() + yUI_INI;
 		CSimpleIniA ini;
 		ini.SetUnicode();
-		const auto iniPath = GetCurPath() + yUI_INI;
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
 		effectsAmmo = ini.GetOrCreate("Projectile Bugfixes", "bCorrectAmmoEffects", 0, "; EXPERIMENTAL DO NOT TOUCH");
@@ -256,7 +256,7 @@ namespace Fix::ProjectileEffects
 
 		if (!newScript || !newScript->script) return 0;
 
-		auto xData = a2->GetByType(kExtraData_Script);
+		const auto xData = a2->GetByType(kExtraData_Script);
 
 		if (const auto xScript = DYNAMIC_CAST(xData, BSExtraData, ExtraScript)) {
 			xScript->script = newScript->script;

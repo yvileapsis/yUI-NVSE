@@ -1035,6 +1035,9 @@ typedef bool				(*_CallFunctionAlt)(Script* funcScript, TESObjectREFR* callingOb
 typedef Script*				(*_CompileScript)(const char* scriptText);
 typedef Script*				(*_CompileExpression)(const char* expression);
 
+typedef	void				(*_SetNativeHandlerFunctionValue)(NVSEArrayVarInterface::Element& value);
+
+
 inline _ExtractArgsEx				ExtractArgsEx;
 inline _ExtractFormatStringArgs		ExtractFormatStringArgs;
 inline _HasScriptCommand			HasScriptCommand;
@@ -1048,6 +1051,7 @@ template <typename T> void __forceinline SetEventHandler(const char* eventName, 
 inline _RemoveNativeEventHandler	RemoveNativeEventHandler;
 template <typename T> void __forceinline RemoveEventHandler(const char* eventName, T func)
 { RemoveNativeEventHandler(eventName, reinterpret_cast<EventHandler>(func)); }
+inline _SetNativeHandlerFunctionValue SetHandlerFunctionValue;
 inline _RegisterEvent				RegisterEvent;
 inline _DispatchEvent				DispatchEvent;
 inline _CallFunctionAlt				CallFunctionAlt;

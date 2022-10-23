@@ -1,6 +1,7 @@
 #include "SI.h"
 
 #include <main.h>
+#include <GameAPI.h>
 #include <ranges>
 #include <functions.h>
 #include <SimpleINILibrary.h>
@@ -17,7 +18,10 @@ namespace SortingIcons
 
 		g_FixIndefiniteSorting = ini.GetOrCreate("General", "bFixIndefiniteSorting", 1, "; fix the issue where items with different conditions would 'jump around' on update");
 
-		g_SI = ini.GetOrCreate("General", "bSortingIcons", 0, "; enable Sorting and Icons section which controls ySI, don't enable this if you don't have ySI installed unless you know what you are doing");
+		enable = ini.GetOrCreate("General", "bSortingIcons", 0, "; enable Sorting and Icons section which controls ySI, don't enable this if you don't have ySI installed unless you know what you are doing");
+
+		logLevel = ini.GetOrCreate("Sorting and Icons", "iDebug", 0, "; debug output for Sorting and Icons, useful for developers");
+
 		bSort = ini.GetOrCreate("Sorting and Icons", "bSortInventory", 1, "; sort inventory according to tag names supplied in .json");
 		bIcons = ini.GetOrCreate("Sorting and Icons", "bAddInventoryIcons", 1, "; add ycons to inventory, container and barter menus");
 		bHotkeys = ini.GetOrCreate("Sorting and Icons", "bReplaceHotkeyIcons", 1, "; replace hotkey icons with ycons");
@@ -28,7 +32,7 @@ namespace SortingIcons
 		iniPath = GetCurPath() + R"(\Data\menus\ySI\ySI.ini)";
 		if (const auto errVal = ini.LoadFile(iniPath.c_str()); errVal == SI_FILE) { return; }
 
-		if (!g_SI) g_SI = ini.GetLongValue("General", "bSortingIcons", 0);
+		if (!enable) enable = ini.GetLongValue("General", "bSortingIcons", 0);
 
 		if (const auto errVal = ini.SaveFile(iniPath.c_str(), false); errVal == SI_FILE) { return; }
 
@@ -72,7 +76,7 @@ namespace SortingIcons
 
 	void ProcessFiles()
 	{
-		Log("Loading files");
+		Log("Loading files", kToLog | logLevel);
 		const auto dir = GetCurPath() + R"(\Data\menus\ySI)";
 		const auto then = std::chrono::system_clock::now();
 		if (std::filesystem::exists(dir))
@@ -92,11 +96,11 @@ namespace SortingIcons
 				}
 			}
 		else
-			Log(dir + " does not exist.");
+			Log(dir + " does not exist.", kToLog | logLevel);
 		ProcessSIEntries();
 		const auto now = std::chrono::system_clock::now();
 		const auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - then);
-		Log(FormatString("Loaded items, categories and tabs in %d ms", diff.count()));
+		Log(FormatString("Loaded items, categories and tabs in %d ms", diff.count()), kToLog | logLevel);
 	}
 
 	extern void Init()
@@ -105,10 +109,10 @@ namespace SortingIcons
 		if (g_nvseInterface->isEditor) return;
 		HandleINIs();
 
-		Patches::AlterSorting(g_FixIndefiniteSorting || (g_SI && bSort));
-		Patches::AddIcons(g_SI && bIcons);
-		Patches::ReplaceHotkeyIcons(g_SI && bHotkeys);
-		Patches::AddKeyrings(g_SI && bCategories);
+		Patches::AlterSorting(g_FixIndefiniteSorting || (enable && bSort));
+		Patches::AddIcons(enable && bIcons);
+		Patches::ReplaceHotkeyIcons(enable && bHotkeys);
+		Patches::AddKeyrings(enable && bCategories);
 //		Patches::AddTabs(true);
 
 		deferredInit.emplace_back(CraftingComponents::Fill);

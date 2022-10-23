@@ -2,25 +2,39 @@
 
 namespace UserInterface::EventLayer
 {
+	void OnRender() { for (const auto& i : onRender) i(); }
+	void OnHit(Actor* target, void* args) { for (const auto& i : onHit) i(target); }
+
+	struct ReferenceForm
+	{
+		TESObjectREFR* ref;
+		TESForm* form;
+	};
+
+	void OnAddDrop(TESObjectREFR* thisObj, void* parameters)
+	{
+		const auto ptr = static_cast<ReferenceForm*>(parameters);
+		for (const auto i : onAddDrop) i(thisObj, ptr->ref, ptr->form);
+	}
+
 	void MainLoopDoOnce()
 	{
-		RegisterEvent("yJAM:MainLoop", 0, nullptr, 0);
-
-		RegisterEvent("yJAM:JG:OnRender", 0, nullptr, NVSEEventManagerInterface::kFlag_IsUserDefined);
-		auto expression = CompileExpression(R"(SetOnRenderUpdateEventHandler 1 ({} => DispatchEventAlt "yJAM:JG:OnRender") 4)");
-		if (!expression) Log("MISSING REQUIREMENTS - JG WAAAAAAAAAAAAA");
+		RegisterEvent("yUI:JG:OnRender", 0, nullptr, NVSEEventManagerInterface::kFlag_IsUserDefined);
+		auto expression = CompileExpression(R"(SetOnRenderUpdateEventHandler 1 ({} => DispatchEventAlt "yUI:JG:OnRender") 4)");
+		if (!expression) Log("Missing JohnnyGuitar NVSE", 3);
 		CallFunctionAlt(expression, nullptr, 0);
+		SetEventHandler("yUI:JG:OnRender", OnRender);
 
-		//	expression = CompileExpression(R"(SetOnRenderUpdateEventHandler 1 ({} => DispatchEventAlt "yJAM:JG:OnRender") 0)");
-		//	if (!expression) Log("MISSING REQUIREMENTS - JG WAAAAAAAAAAAAA");
-		//	CallFunctionAlt(expression, nullptr, 0);
-
-		RegisterEvent("yJAM:JIP:OnHit", 0, nullptr, NVSEEventManagerInterface::kFlag_IsUserDefined);
-		expression = CompileExpression(R"(SetOnHitEventHandler ({} => (this).DispatchEventAlt "yJAM:JIP:OnHit") 1)");
-		if (!expression) Log("MISSING REQUIREMENTS - JIP LN WAAAAAAAAAAAAA");
+		RegisterEvent("yUI:JIP:OnHit", 0, nullptr, NVSEEventManagerInterface::kFlag_IsUserDefined);
+		expression = CompileExpression(R"(SetOnHitEventHandler ({} => (this).DispatchEventAlt "yUI:JIP:OnHit") 1)");
+		if (!expression) Log("Missing JIP LN NVSE", 3);
 		CallFunctionAlt(expression, nullptr, 0);
+		SetEventHandler("yUI:JIP:OnHit", OnHit);
 
-		//	CallFunctionAlt(expression, nullptr, 0);
+		SetEventHandler("OnAdd", OnAddDrop);
+		SetEventHandler("OnDrop", OnAddDrop);
+
+	//	CallFunctionAlt(expression, nullptr, 0);
 	}
 
 	void Init()

@@ -1,81 +1,59 @@
 <rect name="JHM">
-	<_JHMExists> 1 </_JHMExists>
 
-	<_ScreenWidth> <copy src="screen()" trait="width"/> </_ScreenWidth>
-	<_ScreenHeight> <copy src="screen()" trait="height"/> </_ScreenHeight>	
-	<x> 
-		<copy src="me()" trait="_ScreenWidth"/> 
-		<div> 2 </div> 
-	</x>
-	<y> 
-		<copy src="me()" trait="_ScreenHeight"/> 
-		<div> 2 </div> 
-	</y>
-	<locus> &true; </locus>
-
-	<_JHMGlobalShaker> 0 </_JHMGlobalShaker>
-
-	<_JHMLengthBase> 40 </_JHMLengthBase>
-	<_JHMWidthBase> 8 </_JHMWidthBase>
-	<_JHMOffsetBase> 20 <_JHMOffsetBase>
+	<!-- set in code -->
+	<_LengthBase> 40 </_LengthBase>
+	<_WidthBase> 8 </_WidthBase>
+	<_OffsetBase> 20 <_OffsetBase>
 
 	<_JDCLength> 0 </_JDCLength>
 	<_JDCOffset> 0 <_JDCOffset>
+	
+	<!-- set in code constantly -->
+	<_GlobalShaker> 0 </_GlobalShaker>
+	<!-- 			-->
 
-	<_JHMLength> 
+	<_Exists> 1 </_Exists>
+
+	<x> <copy src="screen()" trait="width"/> <div> 2 </div> </x>
+	<y> <copy src="screen()" trait="height"/> <div> 2 </div> </y>
+	<locus> &true; </locus>
+
+	<_Length> 
 		<copy> 0 </copy>
-		<add> 
-			<copy src="me()" trait="_JHMLengthBase"/> 
-			<onlyifnot src="me()" trait="_JHMJDCLength"/>
-		</add>
-		<add> 
-			<copy src="me()" trait="_JDCLength"/> 
-			<onlyif src="me()" trait="_JHMJDCLength"/>
-		</add>
-		<mul src="me()" trait="_JHMScale"/>
-	</_JHMLength> 
+		<add> <copy src="me()" trait="_LengthBase"/> <onlyifnot src="me()" trait="_JDCLength"/> </add>
+		<add> <copy src="me()" trait="_JDCLength"/> <onlyif src="me()" trait="_JDCLength"/> </add>
+		<mul src="me()" trait="_Scale"/>
+	</_Length> 
 
-	<_JHMWidth>
-		<copy src="me()" trait="_JHMWidthBase"/> 
-		<mul src="me()" trait="_JHMScale"/>
-	</_JHMWidth>
+	<_Width> <copy src="me()" trait="_WidthBase"/> <mul src="me()" trait="_Scale"/> </_Width>
 
-	<_JHMOffset>
-		<copy src="me()" trait="_JHMWidth"/>
+	<_Offset>
+		<copy src="me()" trait="_Width"/>
 		<div> 8 </div>
-		<add> 
-			<copy src="me()" trait="_JHMOffsetBase"/> 
-			<onlyifnot src="me()" trait="_JHMJDCOffset"/>
-		</add>
-		<add> 
-			<copy src="me()" trait="_JDCOffset"/> 
-			<onlyif src="me()" trait="_JHMJDCOffset"/>
-		</add>
-	</_JHMOffset>
+		<add> <copy src="me()" trait="_OffsetBase"/> <onlyifnot src="me()" trait="_JDCOffset"/> </add>
+		<add> <copy src="me()" trait="_JDCOffset"/> <onlyif src="me()" trait="_JDCOffset"/> </add>
+	</_Offset>
 
-	<_JHMAlphaBase> 400 </_JHMAlphaBase>
-	<_JHMAlpha> 
+	<_AlphaBase> 400 </_AlphaBase>
+	<_Alpha> 
 		<copy src="JDC" trait="_JDCAlphaRC"/>
-		<onlyifnot src="me()" trait="_JHMAlphaBase"/>
-		<add src="me()" trait="_JHMAlphaBase"/>			
-	</_JHMAlpha>
+		<onlyifnot src="me()" trait="_AlphaBase"/>
+		<add src="me()" trait="_AlphaBase"/>			
+	</_Alpha>
 	
 	<_ResizeMultiplier> 1 </_ResizeMultiplier>
 
-	<_JHMScale>
+	<_Scale>
 		<copy> 1 </copy>
 		<mul>
 			<copy src="io()" trait="_duiscale_65"/>
 			<onlyif src="io()" trait="_DUIF3"/>
-			<add>
-				<copy> 1 </copy>
-				<onlyifnot src="io()" trait="_DUIF3"/>
-			</add>
+			<add> <copy> 1 </copy> <onlyifnot src="io()" trait="_DUIF3"/> </add>
 		</mul>
 		<mul src="me()" trait="_ResizeMultiplier"/>
-	</_JHMScale>
+	</_Scale>
 
-	<_JHMVisible> 0 </_JHMVisible>
+	<_Visible> 0 </_Visible>
 	<_scope> 0 </_scope>
 	
 	<visible>
@@ -84,15 +62,15 @@
 		<or src="ActionPoints" trait="visible"/>
 		<or src="HitPoints" trait="visible"/>
 		<or src="me()" trait="_scope"/>
-		<and src="me()" trait="_JHMVisible"/>
+		<and src="me()" trait="_Visible"/>
 	</visible>
 	
 	<red>255</red>
 	<green>255</green>
 	<blue>255</blue>
 
-	<_JHMJDCLength> 1 </_JHMJDCLength>
-	<_JHMJDCOffset> 1 </_JHMJDCOffset>
+	<_JDCLength> 1 </_JDCLength>
+	<_JDCOffset> 1 </_JDCOffset>
 </rect>
 
 <template name="JHMContainer"> <rect name="JHMContainer">
@@ -100,21 +78,21 @@
 
 <template name="JHMMarker">	<rect name="JHMMarker"> 
 	<systemcolor> 1 </systemcolor>
-	<_JHMModeShake> 0 </_JHMModeShake>
-	<_JHMModeRotate> 0 </_JHMModeRotate>
-	<_JHMModeOffset> 0 </_JHMModeOffset>
-	<_JHMAlphaMult> 1 </_JHMAlphaMult>
-	<_JHMWidth> <copy src="JHM" trait="_JHMWidth"/> </_JHMWidth>
-	<_JHMLength> <copy src="JHM" trait="_JHMLength"/> </_JHMLength>
-	<_JHMOffsetBase> <copy src="JHM" trait="_JHMOffset"/> </_JHMOffset>
-	<_JHMLength> <copy src="JHM" trait="_JHMLength"/> </_JHMLength>
-	<_JHMFrames> <copy src="JHM" trait="_JHMFrames"/> </_JHMFrames>
-	<_JHMDepthBase> 200 </_JHMDepthBase>
-	<_JHMDepth> 0 </_JHMDepth>
+	<_ModeShake> 0 </_ModeShake>
+	<_ModeRotate> 0 </_ModeRotate>
+	<_ModeOffset> 0 </_ModeOffset>
+	<_AlphaMult> 1 </_AlphaMult>
+	<_Width> <copy src="JHM" trait="_Width"/> </_Width>
+	<_Length> <copy src="JHM" trait="_Length"/> </_Length>
+	<_OffsetBase> <copy src="JHM" trait="_Offset"/> </_Offset>
+	<_Length> <copy src="JHM" trait="_Length"/> </_Length>
+	<_Frames> <copy src="JHM" trait="_Frames"/> </_Frames>
+	<_DepthBase> 200 </_DepthBase>
+	<_Depth> 0 </_Depth>
 	<depth>
-		<copy src="me()" trait="_JHMDepthBase"/>
-		<add src="me()" trait="_JHMDepth"/>
-		<add src="me()" trait="_JHMAlpha"/>
+		<copy src="me()" trait="_DepthBase"/>
+		<add src="me()" trait="_Depth"/>
+		<add src="me()" trait="_Alpha"/>
 	</depth>
 
 	<locus> &true; </locus>
@@ -122,7 +100,7 @@
 	<!-- set in code, changes from 0 to 1 across tile lifetime -->
 	<_counter> 0 </_counter>
 	
-	<_JHMMult>
+	<_Mult>
 		<copy> 1 </copy>
 		<add>
 			<copy src="me()" trait="_counter"/>
@@ -134,35 +112,28 @@
 			<copy src="me()" trait="_counter"/>
 			<mul> -0.75 </mul>
 		</add>
-	</_JHMMult>
+	</_Mult>
 	
-	<_JHMShake>
+	<_Shake>
 		<copy> 0 </copy>
-		<add> 
-			<copy src="JHM" trait="_JHMGlobalShaker"/>
-			<onlyif src="me()" trait="_JHMModeShake"/>
-		</add>
-		<add> 
-			<copy src="me()" trait="_JHMMult"/>
+		<add> <copy src="JHM" trait="_GlobalShaker"/> <onlyif src="me()" trait="_ModeShake"/> </add>
+		<add>
+			<copy src="me()" trait="_Mult"/>
 			<mul> 1.57 </mul>
-			<onlyif src="me()" trait="_JHMModeRotate"/>
+			<onlyif src="me()" trait="_ModeRotate"/>
 		</add>
-		</_JHMShake>
+		</_Shake>
 	
 	<alpha> 
-		<copy src="JHM" trait="_JHMAlpha"/>
-		<mul src="me()" trait="_JHMAlphaMult"/>			
-		<mul src="me()" trait="_JHMMult"/>
+		<copy src="JHM" trait="_Alpha"/>
+		<mul src="me()" trait="_AlphaMult"/>			
+		<mul src="me()" trait="_Mult"/>
 	</alpha>
 
-	<_JHMOffset> 
-		<copy src="me()" trait="_JHMOffsetBase"/>
-		<mul> 1.2142135 </mul>
-		<div>
-			<copy src="me()" trait="_JHMMult"/>
-			<onlyif src="me()" trait="_JHMModeOffset"/>
-		</div>
-	</_JHMOffset>
+	<_Offset> 
+		<copy src="me()" trait="_OffsetBase"/> <mul> 1.2142135 </mul>
+		<div> <copy src="me()" trait="_Mult"/> <onlyif src="me()" trait="_ModeOffset"/> </div>
+	</_Offset>
 
 	<red> <copy src="JHM" trait="red"/> </red>
 	<green> <copy src="JHM" trait="green"/> </green>
@@ -170,7 +141,7 @@
 	
 	<locus> &true; </locus>
 
-	<image name="JHMDownRight">
+	<image name="DownRight">
 		<filename>Interface\JHM\JHMHitMarker.dds</filename>
 		<zoom> &scale; </zoom>
 		<depth> <copy src="parent()" trait="depth"/> </depth>
@@ -179,32 +150,16 @@
 		<red> <copy src="parent()" trait="red"/> </red>
 		<green> <copy src="parent()" trait="green"/> </green>
 		<blue> <copy src="parent()" trait="blue"/> </blue>
-		<width> <copy src="parent()" trait="_JHMWidth"/> </width>
-		<height> <copy src="parent()" trait="_JHMLength"/> </height>
-		<x>
-			<copy> 0 </copy>
-			<sub src="me()" trait="width"/>
-			<div> 2 </div>
-		</x>
-		<y> 
-			<copy> 0 </copy>
-			<add src="parent()" trait="_JHMOffset"/>
-		</y>
-		<Rotateaxisx>
-			<copy src="me()" trait="width"/>
-			<div> 2 </div>
-		</Rotateaxisx> 
-		<Rotateaxisy>
-			<copy> 0 </copy>
-			<sub src="parent()" trait="_JHMOffset"/>
-		</Rotateaxisy>
-		<rotateangle> 
-			<copy> 0.785398 </copy>
-			<add src="parent()" trait="_JHMShake"/>
-		</rotateangle>
+		<width> <copy src="parent()" trait="_Width"/> </width>
+		<height> <copy src="parent()" trait="_Length"/> </height>
+		<x> <copy src="me()" trait="width"/> <div> -2 </div> </x>
+		<y> <copy src="parent()" trait="_Offset"/> </y>
+		<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx>
+		<Rotateaxisy> <copy> 0 </copy> <sub src="parent()" trait="_Offset"/> </Rotateaxisy>
+		<rotateangle> <copy> 0.785398 </copy> <add src="parent()" trait="_Shake"/> </rotateangle>
 	</image>
 
-	<image name="JHMUpRight">
+	<image name="UpRight">
 		<filename>Interface\JHM\JHMHitMarker.dds</filename>
 		<zoom> &scale; </zoom>
 		<depth> <copy src="parent()" trait="depth"/> </depth>
@@ -213,32 +168,16 @@
 		<red> <copy src="parent()" trait="red"/> </red>
 		<green> <copy src="parent()" trait="green"/> </green>
 		<blue> <copy src="parent()" trait="blue"/> </blue>
-		<width> <copy src="parent()" trait="_JHMWidth"/> </width>
-		<height> <copy src="parent()" trait="_JHMLength"/> </height>
-		<x>
-			<copy> 0 </copy>
-			<sub src="me()" trait="width"/>
-			<div> 2 </div>
-		</x>
-		<y> 
-			<copy> 0 </copy>
-			<add src="parent()" trait="_JHMOffset"/>
-		</y>
-		<Rotateaxisx>
-			<copy src="me()" trait="width"/>
-			<div> 2 </div>
-		</Rotateaxisx> 
-		<Rotateaxisy>
-			<copy> 0 </copy>
-			<sub src="parent()" trait="_JHMOffset"/>
-		</Rotateaxisy>
-		<rotateangle>
-			<copy> 2.356194 </copy>
-			<add src="parent()" trait="_JHMShake"/>
-		</rotateangle>
+		<width> <copy src="parent()" trait="_Width"/> </width>
+		<height> <copy src="parent()" trait="_Length"/> </height>
+		<x> <copy src="me()" trait="width"/> <div> -2 </div> </x>
+		<y> <copy src="parent()" trait="_Offset"/> </y>
+		<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx>
+		<Rotateaxisy> <copy> 0 </copy> <sub src="parent()" trait="_Offset"/> </Rotateaxisy>
+		<rotateangle> <copy> 2.356194 </copy> <add src="parent()" trait="_Shake"/> </rotateangle>
 	</image>
 
-	<image name="JHMUpLeft">
+	<image name="UpLeft">
 		<filename>Interface\JHM\JHMHitMarker.dds</filename>
 		<zoom> &scale; </zoom>
 		<depth> <copy src="parent()" trait="depth"/> </depth>
@@ -247,32 +186,16 @@
 		<red> <copy src="parent()" trait="red"/> </red>
 		<green> <copy src="parent()" trait="green"/> </green>
 		<blue> <copy src="parent()" trait="blue"/> </blue>
-		<width> <copy src="parent()" trait="_JHMWidth"/> </width>
-		<height> <copy src="parent()" trait="_JHMLength"/> </height>
-		<x>
-			<copy> 0 </copy>
-			<sub src="me()" trait="width"/>
-			<div> 2 </div>
-		</x>
-		<y> 
-			<copy> 0 </copy>
-			<add src="parent()" trait="_JHMOffset"/>
-		</y>
-		<Rotateaxisx>
-			<copy src="me()" trait="width"/>
-			<div> 2 </div>
-		</Rotateaxisx> 
-		<Rotateaxisy>
-			<copy> 0 </copy>
-			<sub src="parent()" trait="_JHMOffset"/>
-		</Rotateaxisy>
-		<rotateangle>
-			<copy> 3.926991 </copy>
-			<add src="parent()" trait="_JHMShake"/>
-		</rotateangle>
+		<width> <copy src="parent()" trait="_Width"/> </width>
+		<height> <copy src="parent()" trait="_Length"/> </height>
+		<x> <copy src="me()" trait="width"/> <div> -2 </div> </x>
+		<y> <copy src="parent()" trait="_Offset"/> </y>
+		<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx>
+		<Rotateaxisy> <copy> 0 </copy> <sub src="parent()" trait="_Offset"/> </Rotateaxisy>
+		<rotateangle> <copy> 3.926991 </copy> <add src="parent()" trait="_Shake"/> </rotateangle>
 	</image>
 
-	<image name="JHMDownLeft">
+	<image name="DownLeft">
 		<filename>Interface\JHM\JHMHitMarker.dds</filename>
 		<zoom> &scale; </zoom>
 		<depth> <copy src="parent()" trait="depth"/> </depth>
@@ -281,28 +204,12 @@
 		<red> <copy src="parent()" trait="red"/> </red>
 		<green> <copy src="parent()" trait="green"/> </green>
 		<blue> <copy src="parent()" trait="blue"/> </blue>
-		<width> <copy src="parent()" trait="_JHMWidth"/> </width>
-		<height> <copy src="parent()" trait="_JHMLength"/> </height>
-		<x>
-			<copy> 0 </copy>
-			<sub src="me()" trait="width"/>
-			<div> 2 </div>
-		</x>
-		<y> 
-			<copy> 0 </copy>
-			<add src="parent()" trait="_JHMOffset"/>
-		</y>
-		<Rotateaxisx>
-			<copy src="me()" trait="width"/>
-			<div> 2 </div>
-		</Rotateaxisx> 
-		<Rotateaxisy>
-			<copy> 0 </copy>
-			<sub src="parent()" trait="_JHMOffset"/>
-		</Rotateaxisy>
-		<rotateangle>
-			<copy> 5.497787 </copy>
-			<add src="parent()" trait="_JHMShake"/>
-		</rotateangle>
+		<width> <copy src="parent()" trait="_Width"/> </width>
+		<height> <copy src="parent()" trait="_Length"/> </height>
+		<x> <copy src="me()" trait="width"/> <div> -2 </div> </x>
+		<y> <copy src="parent()" trait="_Offset"/> </y>
+		<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx>
+		<Rotateaxisy> <copy> 0 </copy> <sub src="parent()" trait="_Offset"/> </Rotateaxisy>
+		<rotateangle> <copy> 5.497787 </copy> <add src="parent()" trait="_Shake"/> </rotateangle>
 	</image>
 </rect> </template>

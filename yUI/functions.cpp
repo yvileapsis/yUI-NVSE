@@ -5,12 +5,7 @@
 
 #include "dinput8.h"
 #include "GameData.h"
-#include "GameOSDepend.h"
-#include "Objects.h"
-#include "GameProcess.h"
 #include "Menus.h"
-#include "PluginAPI.h"
-#include "Types.h"
 
 
 namespace CraftingComponents
@@ -34,7 +29,7 @@ namespace CraftingComponents
 	bool IsProduct(TESForm* form) { return g_Products.contains(form); }
 }
 
-
+/*
 __declspec(naked) void UIWidth()
 {
 	static const UInt32 retnAddr = 0x715D8D;
@@ -97,6 +92,7 @@ __declspec(naked) void UIHeight3()
 		jmp		retnAddr
 	}
 }
+*/
 
 bool FindStringCI(const std::string& strHaystack, const std::string& strNeedle)
 {
@@ -160,15 +156,11 @@ char* __fastcall StrFromINI(DWORD *address)
 void (*RegTraitID)(const char*, UInt32) = (void (*)(const char*, UInt32))0x9FF8A0;
 void RegisterTraitID(const char* var1, UInt32 var2) { RegTraitID(var1, var2);  }
 
-void purefun()
-{
-	PrintConsoleOrQueue("AAAAA");
-}
 
 __declspec(naked) void funpatch()
 {
 	static const UInt32 retnAddr = 0xA095D8;
-	static const auto purefun2 = reinterpret_cast<UInt32>(purefun);
+	static const auto purefun2 = 0;//reinterpret_cast<UInt32>(purefun);
 	__asm
 	{
 		cmp [ebp - 0x30], 2032
@@ -359,7 +351,7 @@ void SetNativeHandlerFunctionBool(bool trueorfalse)
 {
 	nativeHandlerFunctionValue.dataType = NVSEArrayVarInterface::kType_Numeric;
 	nativeHandlerFunctionValue.num = trueorfalse;
-	g_eventInterface->SetNativeHandlerFunctionValue(nativeHandlerFunctionValue);
+	SetHandlerFunctionValue(nativeHandlerFunctionValue);
 }
 
 Script* JIPToggleVanityWheel;

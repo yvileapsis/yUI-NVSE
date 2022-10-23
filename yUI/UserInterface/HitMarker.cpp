@@ -79,15 +79,15 @@ namespace UserInterface::HitMarker
 	{
 		const auto tile = CreateTileForHitMarker();
 
-		tile->SetFloat("_JHMDepth", depth++);
+		tile->SetFloat("_Depth", depth++);
 
 		tile->SetFloat(kTileValue_systemcolor, 1 + static_cast<bool>(flags & kHitMarkerAltColor));
 
-		tile->SetFloat("_JHMModeOffset", static_cast<bool>(flags & kHitMarkerOffset));
-		tile->SetFloat("_JHMModeShake", static_cast<bool>(flags & kHitMarkerShake));
-		tile->SetFloat("_JHMModeRotate", static_cast<bool>(flags & kHitMarkerRotate));
+		tile->SetFloat("_ModeOffset", static_cast<bool>(flags & kHitMarkerOffset));
+		tile->SetFloat("_ModeShake", static_cast<bool>(flags & kHitMarkerShake));
+		tile->SetFloat("_ModeRotate", static_cast<bool>(flags & kHitMarkerRotate));
 
-		tile->SetFloat("_JHMAlphaMult", flags & kHitMarkerHalfAlpha ? 0.5 : 1);
+		tile->SetFloat("_AlphaMult", flags & kHitMarkerHalfAlpha ? 0.5 : 1);
 
 		tile->GradualSetFloat("_counter", 0, 1, flags & kHitMarkerDouble ? 2 * seconds : seconds, GradualSetFloat::StartToEnd);
 	}
@@ -99,7 +99,7 @@ namespace UserInterface::HitMarker
 		if (g_HUDMainMenu->isUsingScope) visible = static_cast<SInt64>(enableScope);
 		else if (g_player->UsingIronSights()) visible = enableSighting;
 		else visible = enableOut;
-		tileMain->SetFloat("_JHMVisible", visible);
+		tileMain->SetFloat("_Visible", visible);
 		tileMain->SetFloat("_scope", g_player->UsingIronSights());
 
 		if (!visible) { hitMarkers.clear(); return; }
@@ -117,7 +117,7 @@ namespace UserInterface::HitMarker
 		}
 	}
 
-	void OnHit(Actor* target, void* args)
+	void OnHit(Actor* target)
 	{
 		if (!enable || !visible) return;
 
@@ -130,7 +130,6 @@ namespace UserInterface::HitMarker
 			const auto hitData = target->baseProcess->GetLastHitData();
 			if (!hitData || !hitData->source) return;
 			if (hitData->source != g_player && !hitData->source->isTeammate) return;
-
 			flags |= modeHit;
 			if (target->lifeState == kLifeState_Dead || target->lifeState == kLifeState_Dying) flags |= modeDead;
 			if (target->lifeState == kLifeState_Alive && hitData->flags & ActorHitData::kFlag_IsFatal) flags |= modeKill;
@@ -139,7 +138,8 @@ namespace UserInterface::HitMarker
 				BGSBodyPartData::eBodyPart_Head1 || hitData->hitLocation == BGSBodyPartData::eBodyPart_Head2) flags |= modeHeadshot;
 			if (target->IsCrimeOrEnemy()) flags |= modeEnemy;
 			if (hitData->source->isTeammate) flags |= modeCompanion;
-			if (hitData->explosion && hitData->explosion->IsExplosion()) flags |= modeExplosion;
+			// TODO:: remove vtable check, receiving trash (even without projectile fix)
+			if (hitData->explosion && IS_TYPE(hitData->explosion, Explosion) && hitData->explosion->IsExplosion()) flags |= modeExplosion;
 		}
 
 		if (flags & kHitMarkerNothing) return;
@@ -184,25 +184,27 @@ namespace UserInterface::HitMarker
 
 		if (!enable)
 		{
-			RemoveNativeEventHandler("yJAM:JIP:OnHit", reinterpret_cast<EventHandler>(OnHit));
+			std::erase(onHit, OnHit);
+			std::erase(mainLoop, MainLoop);
 			return;
 		}
-		SetNativeEventHandler("yJAM:JIP:OnHit", reinterpret_cast<EventHandler>(OnHit));
+		onHit.emplace_back(OnHit);
+		mainLoop.emplace_back(MainLoop);
 
 		if (tileMain->GetChild("JHM")) tileMain->GetChild("JHMContainer")->Destroy(true);
 		tileMain->AddTileFromTemplate("JHMContainer");
 
-		tileMain->SetFloat("_JHMAlphaBase", alpha);
-		tileMain->SetFloat("_JHMLengthBase", length);
-		tileMain->SetFloat("_JHMWidthBase", width);
-		tileMain->SetFloat("_JHMOffsetBase", offset);
+		tileMain->SetFloat("_AlphaBase", alpha);
+		tileMain->SetFloat("_LengthBase", length);
+		tileMain->SetFloat("_WidthBase", width);
+		tileMain->SetFloat("_OffsetBase", offset);
 
-		tileMain->SetFloat("_JHMJDCLength", dynamic & 1);
-		tileMain->SetFloat("_JHMJDCOffset", dynamic & 2);
+		tileMain->SetFloat("_JDCLength", dynamic & 1);
+		tileMain->SetFloat("_JDCOffset", dynamic & 2);
 
-		tileMain->GradualSetFloat("_JHMGlobalShaker", -0.05, 0.05, 0.15, GradualSetFloat::StartToEndPerpetual);
+		tileMain->GradualSetFloat("_GlobalShaker", -0.05, 0.05, 0.15, GradualSetFloat::StartToEndPerpetual);
 
-		tileMain->SetFloat("_JHMVisible", visible = 0);
+		tileMain->SetFloat("_Visible", visible = 0);
 	}
 
 	void MainLoopDoOnce()
@@ -222,8 +224,6 @@ namespace UserInterface::HitMarker
 	void Init()
 	{
 		if (g_nvseInterface->isEditor) return;
-
-//		mainLoopDoOnce.emplace_back(MainLoopDoOnce);
-//		mainLoop.emplace_back(MainLoop);
+		mainLoopDoOnce.emplace_back(MainLoopDoOnce);
 	}
 }
