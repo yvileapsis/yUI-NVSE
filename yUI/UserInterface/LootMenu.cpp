@@ -2,12 +2,12 @@
 #include <functions.h>
 #include <SimpleINILibrary.h>
 
-#include "dinput8.h"
-#include "NiObjects.h"
-#include <GameBSExtraData.h>
+#include <dinput8.h>
 
-#include "InterfaceManager.h"
-#include "Menus.h"
+#include <Menus.h>
+#include <InterfaceManager.h>
+
+#include "SortingIcons/SI.h"
 
 namespace UserInterface::LootMenu
 {
@@ -164,6 +164,14 @@ namespace UserInterface::LootMenu
 			fst->SetString(kTileValue_string, string.c_str());
 
 			fst->SetFloat("_Equip", snd->GetEquipped());
+
+			const auto category = SortingIcons::Sorting::GetCategoryForItem(snd);
+			if (!category.empty())
+			{
+				fst->SetFloat("_Icon", true);
+				fst->SetString("_IconFilename", SortingIcons::g_StringToCategory[category].filename.c_str());
+			}
+			else fst->SetFloat("_Icon", false);
 
 			if (const auto condition = snd->GetHealthPercentAlt(true); condition != -1)
 			{

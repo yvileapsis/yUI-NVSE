@@ -243,11 +243,11 @@
 	<_ShowIcon> 1 </_ShowIcon>
 	<_ShowMeter> 1 </_ShowMeter>
 
-	<_ySIWidth>	0 </_ySIWidth>
-	<_ySIHeight> 0 </_ySIHeight>
-	<_ySISpaceLeft> 0 </_ySISpaceLeft>
-	<_ySISpaceRight> 0 </_ySISpaceRight>
-	<_ySISpaceUp> 0 </_ySISpaceUp>
+	<_ySIWidth> <copy src="ySI" trait="_ySIWidth"/> </_ySIWidth>
+	<_ySIHeight> <copy src="ySI" trait="_ySIHeight"/> </_ySIHeight>
+	<_ySISpaceLeft> <copy src="ySI" trait="_ySISpaceLeft"/> </_ySISpaceLeft>
+	<_ySISpaceRight> <copy src="ySI" trait="_ySISpaceRight"/> </_ySISpaceRight>
+	<_ySISpaceUp> <copy src="ySI" trait="_ySISpaceUp"/> </_ySISpaceUp>
 		
 	<rect name="HeadlineRect">
 		<visible> <copy src="parent()" trait="_BracketTop"/> </visible>
