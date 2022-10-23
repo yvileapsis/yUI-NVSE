@@ -9,7 +9,7 @@
 namespace UserInterface::HitIndicator
 {
 
-	UInt32		enable			= 0;
+	bool		enable			= false;
 
 	enum kHitIndicatorFlags
 	{
@@ -38,9 +38,9 @@ namespace UserInterface::HitIndicator
 	UInt32		modeExplosion	= kHitIndicatorShakeHoriz;
 	UInt32		modeNoAttacker	= kHitIndicatorHalfAlpha;
 	UInt32		modeNoDamage	= kHitIndicatorNothing;
-	UInt32		enableOut		= 1;
-	UInt32		enableSighting	= 1;
-	UInt32		enableScope		= 1;
+	bool		enableOut		= true;
+	bool		enableSighting	= true;
+	bool		enableScope		= true;
 	UInt32		rotate			= 2;
 
 	Tile*		tileMain		= nullptr;

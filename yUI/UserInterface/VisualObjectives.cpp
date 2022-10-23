@@ -10,9 +10,10 @@
 namespace UserInterface::VisualObjectives
 {
 
-	UInt32		enable				= 0;
+	bool		enable				= false;
+
 	UInt32		key					= 49;
-	UInt32		toggle				= 1;
+	bool		toggle				= true;
 
 	UInt32		offscreenHandling	= 0;
 
@@ -29,15 +30,15 @@ namespace UserInterface::VisualObjectives
 	Float64		offsetHeight		= 0.02;
 	Float64		offsetWidth			= 0.01;
 
-	UInt32		altColor			= 1;
+	bool		altColor			= true;
 
 	Float64		radius				= 0.06;
 	Float64		distanceMin			= -1.0;
 	Float64		distanceMax			= -1.0;
 
-	UInt32		enableOut			= 1;
-	UInt32		enableSighting		= 1;
-	UInt32		enableScope			= 0;
+	bool		enableOut			= true;
+	bool		enableSighting		= true;
+	bool		enableScope			= false;
 
 	UInt32		font				= 0;
 	Float64		fontY				= 0.0;

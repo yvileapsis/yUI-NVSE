@@ -6,6 +6,8 @@
 
 namespace UserInterface::DynamicCrosshair
 {
+	bool		enable			= false;
+
 	enum kFlags
 	{
 		kNothing = 0,
@@ -17,8 +19,6 @@ namespace UserInterface::DynamicCrosshair
 		kCrosshairDotSmall,
 		kCrosshairDotBig
 	};
-
-	UInt32		enable			= 0;
 
 	Float32		distance		= 0;
 	Float32		speed			= 0.25;
@@ -36,9 +36,9 @@ namespace UserInterface::DynamicCrosshair
 	UInt32		modeSighting3rd	= kDotBig;
 	UInt32		modeScope		= kNothing;
 
-	UInt32		noNodeSighting	= 1;
-	UInt32		shotgunAlt		= 1;
-	UInt32		dynamic			= 1;
+	bool		noNodeSighting	= true;
+	bool		shotgunAlt		= true;
+	bool		dynamic			= true;
 
 
 

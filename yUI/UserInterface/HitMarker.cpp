@@ -8,7 +8,7 @@
 
 namespace UserInterface::HitMarker
 {
-	UInt32		enable			= 0;
+	bool		enable			= false;
 
 	enum kHitMarkerFlags
 	{
@@ -35,9 +35,9 @@ namespace UserInterface::HitMarker
 	UInt32		modeHeadshot	= kHitMarkerShake;
 	UInt32		modeCompanion	= kHitMarkerHalfAlpha;
 	UInt32		modeExplosion	= kHitMarkerDouble;
-	UInt32		enableOut		= 1;
-	UInt32		enableSighting	= 1;
-	UInt32		enableScope		= 1;
+	bool		enableOut		= true;
+	bool		enableSighting	= true;
+	bool		enableScope		= true;
 	UInt32		dynamic			= 0;
 	UInt32		maxTiles		= 25;
 
@@ -170,7 +170,7 @@ namespace UserInterface::HitMarker
 		enableOut		= ini.GetOrCreate("JHM", "bEnableOut", true, nullptr);
 		enableSighting	= ini.GetOrCreate("JHM", "bEnableSighting", true, nullptr);
 		enableScope		= ini.GetOrCreate("JHM", "bEnableScope", true, nullptr);
-		dynamic			= ini.GetOrCreate("JHM", "iDynamic", 0.0, nullptr);
+		dynamic			= ini.GetOrCreate("JHM", "iDynamic", 0, nullptr);
 		maxTiles		= ini.GetOrCreate("JHM", "iMaxTiles", 25, nullptr);
 
 		ini.SaveFile(iniPath.c_str(), false);

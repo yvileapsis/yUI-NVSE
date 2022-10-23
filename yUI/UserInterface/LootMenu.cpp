@@ -12,7 +12,7 @@
 namespace UserInterface::LootMenu
 {
 
-	UInt32		enable			= 0;
+	bool		enable			= false;
 
 	enum
 	{
