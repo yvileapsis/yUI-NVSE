@@ -212,7 +212,7 @@ namespace UserInterface::VisualObjectives
 
 		enable				= ini.GetOrCreate("JustMods", "bVisualObjectives", 1, nullptr);
 		key					= ini.GetOrCreate("JVO", "iKey", 49, nullptr);
-		toggle				= ini.GetOrCreate("JVO", "iToggle", 1, nullptr);
+		toggle				= ini.GetOrCreate("JVO", "bToggle", true, nullptr);
 		offscreenHandling	= ini.GetOrCreate("JVO", "iOffscreenHandling", 0, nullptr);
 		distanceHandling	= ini.GetOrCreate("JVO", "iDistanceHandling", 2, nullptr);
 		distanceSystem		= ini.GetOrCreate("JVO", "iDistanceSystem", 1, nullptr);
@@ -224,13 +224,13 @@ namespace UserInterface::VisualObjectives
 		width				= ini.GetOrCreate("JVO", "fWidth", 24.0, nullptr);
 		offsetHeight		= ini.GetOrCreate("JVO", "fOffsetHeight", 0.02, nullptr);
 		offsetWidth			= ini.GetOrCreate("JVO", "fOffsetWidth", 0.01, nullptr);
-		altColor			= ini.GetOrCreate("JVO", "bAltColor", 1.0, nullptr);
+		altColor			= ini.GetOrCreate("JVO", "bAltColor", true, nullptr);
 		radius				= ini.GetOrCreate("JVO", "fRadius", 0.06, nullptr);
 		distanceMin			= ini.GetOrCreate("JVO", "fDistanceMin", -1.0, nullptr);
 		distanceMax			= ini.GetOrCreate("JVO", "fDistanceMax", -1.0, nullptr);
-		enableOut			= ini.GetOrCreate("JVO", "bEnableOut", 1.0, nullptr);
-		enableSighting		= ini.GetOrCreate("JVO", "bEnableSighting", 1.0, nullptr);
-		enableScope			= ini.GetOrCreate("JVO", "bEnableScope", 0.0, nullptr);
+		enableOut			= ini.GetOrCreate("JVO", "bEnableOut", true, nullptr);
+		enableSighting		= ini.GetOrCreate("JVO", "bEnableSighting", true, nullptr);
+		enableScope			= ini.GetOrCreate("JVO", "bEnableScope", false, nullptr);
 		font				= ini.GetOrCreate("JVO", "fFont", 0.0, nullptr);
 		fontY				= ini.GetOrCreate("JVO", "fFontY", 0.0, nullptr);
 

@@ -8,6 +8,8 @@
 
 namespace UserInterface::HitMarker
 {
+	UInt32		enable			= 0;
+
 	enum kHitMarkerFlags
 	{
 		kHitMarkerNothing	= 1 << 0,
@@ -19,8 +21,6 @@ namespace UserInterface::HitMarker
 		kHitMarkerShake		= 1 << 6,
 		kHitMarkerRotate	= 1 << 7,
 	};
-
-	UInt32		enable			= 0;
 
 	Float32		seconds			= 0.5;
 	Float32		alpha			= 400.0;
@@ -63,9 +63,7 @@ namespace UserInterface::HitMarker
 	Tile* CreateTileForHitMarker()
 	{
 		Tile* tile;
-		if (tilesFree.empty()) {
-			tile = tileMain->GetChild("JHMContainer")->AddTileFromTemplate("JHMMarker");
-		}
+		if (tilesFree.empty()) tile = tileMain->GetChild("JHMContainer")->AddTileFromTemplate("JHMMarker");
 		else {
 			const auto iter = tilesFree.begin();
 			tile = *iter;
@@ -112,8 +110,8 @@ namespace UserInterface::HitMarker
 
 		if (const auto tileJDC = g_HUDMainMenu->tile->GetChild("JDC"))
 		{
-			tileMain->SetFloat("_JDCOffset", tileJDC->GetFloat("_JDCOffset"));
-			tileMain->SetFloat("_JDCLength", tileJDC->GetFloat("_JDCLength"));
+			tileMain->SetFloat("_Offset", tileJDC->GetFloat("_Offset"));
+			tileMain->SetFloat("_Length", tileJDC->GetFloat("_Length"));
 		}
 	}
 
@@ -155,25 +153,25 @@ namespace UserInterface::HitMarker
 
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
-		enable			= ini.GetOrCreate("JustMods", "JHM", 1.0, nullptr);
-		seconds			= ini.GetOrCreate("JHM", "Seconds", 0.5, nullptr);
-		alpha			= ini.GetOrCreate("JHM", "Alpha", 400.0, nullptr);
-		length			= ini.GetOrCreate("JHM", "Length", 24.0, nullptr);
-		width			= ini.GetOrCreate("JHM", "Width", 8.0, nullptr);
-		offset			= ini.GetOrCreate("JHM", "Offset", 24.0, nullptr);
-		modeHit			= ini.GetOrCreate("JHM", "ModeHit", static_cast<double>(kHitMarkerNormal), nullptr);
-		modeDead		= ini.GetOrCreate("JHM", "ModeDead", static_cast<double>(kHitMarkerNormal), nullptr);
-		modeKill		= ini.GetOrCreate("JHM", "ModeKill", static_cast<double>(kHitMarkerOffset), nullptr);
-		modeEnemy		= ini.GetOrCreate("JHM", "ModeEnemy", static_cast<double>(kHitMarkerAltColor), nullptr);
-		modeCrit		= ini.GetOrCreate("JHM", "ModeCrit", static_cast<double>(kHitMarkerDouble), nullptr);
-		modeHeadshot	= ini.GetOrCreate("JHM", "ModeHead", static_cast<double>(kHitMarkerShake), nullptr);
-		modeExplosion	= ini.GetOrCreate("JHM", "ModeExplosion", static_cast<double>(kHitMarkerDouble), nullptr);
-		modeCompanion	= ini.GetOrCreate("JHM", "ModeByCompanion", static_cast<double>(kHitMarkerHalfAlpha), nullptr);
-		enableOut		= ini.GetOrCreate("JHM", "EnableOut", 1.0, nullptr);
-		enableSighting	= ini.GetOrCreate("JHM", "EnableSighting", 1.0, nullptr);
-		enableScope		= ini.GetOrCreate("JHM", "EnableScope", 1.0, nullptr);
-		dynamic			= ini.GetOrCreate("JHM", "Dynamic", 0.0, nullptr);
-		maxTiles		= ini.GetOrCreate("JHM", "MaxTiles", 25.0, nullptr);
+		enable			= ini.GetOrCreate("JustMods", "bHitMarker", true, nullptr);
+		seconds			= ini.GetOrCreate("JHM", "fSeconds", 0.5, nullptr);
+		alpha			= ini.GetOrCreate("JHM", "fAlpha", 400.0, nullptr);
+		length			= ini.GetOrCreate("JHM", "fLength", 24.0, nullptr);
+		width			= ini.GetOrCreate("JHM", "fWidth", 8.0, nullptr);
+		offset			= ini.GetOrCreate("JHM", "fOffset", 24.0, nullptr);
+		modeHit			= ini.GetOrCreate("JHM", "iModeHit",kHitMarkerNormal, nullptr);
+		modeDead		= ini.GetOrCreate("JHM", "iModeDead", kHitMarkerNormal, nullptr);
+		modeKill		= ini.GetOrCreate("JHM", "iModeKill", kHitMarkerOffset, nullptr);
+		modeEnemy		= ini.GetOrCreate("JHM", "iModeEnemy", kHitMarkerAltColor, nullptr);
+		modeCrit		= ini.GetOrCreate("JHM", "iModeCrit", kHitMarkerDouble, nullptr);
+		modeHeadshot	= ini.GetOrCreate("JHM", "iModeHead", kHitMarkerShake, nullptr);
+		modeExplosion	= ini.GetOrCreate("JHM", "iModeExplosion", kHitMarkerDouble, nullptr);
+		modeCompanion	= ini.GetOrCreate("JHM", "iModeByCompanion", kHitMarkerHalfAlpha, nullptr);
+		enableOut		= ini.GetOrCreate("JHM", "bEnableOut", true, nullptr);
+		enableSighting	= ini.GetOrCreate("JHM", "bEnableSighting", true, nullptr);
+		enableScope		= ini.GetOrCreate("JHM", "bEnableScope", true, nullptr);
+		dynamic			= ini.GetOrCreate("JHM", "iDynamic", 0.0, nullptr);
+		maxTiles		= ini.GetOrCreate("JHM", "iMaxTiles", 25, nullptr);
 
 		ini.SaveFile(iniPath.c_str(), false);
 	}

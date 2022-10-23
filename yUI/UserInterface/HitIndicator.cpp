@@ -9,7 +9,7 @@
 namespace UserInterface::HitIndicator
 {
 
-	UInt32	enable = 0;
+	UInt32		enable			= 0;
 
 	enum kHitIndicatorFlags
 	{
@@ -52,8 +52,6 @@ namespace UserInterface::HitIndicator
 	std::map<TESObjectREFR*, UInt32>			hitQueue;
 	std::unordered_set<Tile*>					tileQueue;
 	std::unordered_map<Tile*, TESObjectREFR*>	tileProcessing;
-
-
 
 	bool ProcessTilesInUse(Tile* tile, TESObjectREFR* target)
 	{
@@ -164,26 +162,26 @@ namespace UserInterface::HitIndicator
 
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
-		enable			= ini.GetOrCreate("JustMods", "JHI", 1, nullptr);
-		seconds			= ini.GetOrCreate("JHI", "Seconds", 2.5, nullptr);
-		alpha			= ini.GetOrCreate("JHI", "Alpha", 400.0, nullptr);
-		height			= ini.GetOrCreate("JHI", "Height", 256.0, nullptr);
-		width			= ini.GetOrCreate("JHI", "Width", 256.0, nullptr);
-		offset			= ini.GetOrCreate("JHI", "Offset", 0.0, nullptr);
-		modeHit			= ini.GetOrCreate("JHI", "ModeHit", kHitIndicatorNormal, nullptr);
-		modeDead		= ini.GetOrCreate("JHI", "ModeHit", kHitIndicatorNormal, nullptr);
-		modeKill		= ini.GetOrCreate("JHI", "ModeHit", kHitIndicatorOffset, nullptr);
-		modeEnemy		= ini.GetOrCreate("JHI", "ModeHit", kHitIndicatorAltColor, nullptr);
-		modeCrit		= ini.GetOrCreate("JHI", "ModeHit", kHitIndicatorDouble, nullptr);
-		modeHeadshot	= ini.GetOrCreate("JHI", "ModeHit", kHitIndicatorShakeVert, nullptr);
-		modeSelf		= ini.GetOrCreate("JHI", "ModeHit", kHitIndicatorHalfAlpha, nullptr);
-		modeExplosion	= ini.GetOrCreate("JHI", "ModeHit", kHitIndicatorShakeHoriz, nullptr);
-		modeNoAttacker	= ini.GetOrCreate("JHI", "ModeHit", kHitIndicatorHalfAlpha, nullptr);
-		modeNoDamage	= ini.GetOrCreate("JHI", "ModeHit", kHitIndicatorNothing, nullptr);
-		enableOut		= ini.GetOrCreate("JHI", "EnableOut", 1, nullptr);
-		enableSighting	= ini.GetOrCreate("JHI", "EnableSighting", 1, nullptr);
-		enableScope		= ini.GetOrCreate("JHI", "EnableScope", 1, nullptr);
-		rotate			= ini.GetOrCreate("JHI", "Rotate", 2, nullptr);
+		enable			= ini.GetOrCreate("JustMods", "bHitIndicator", 1, nullptr);
+		seconds			= ini.GetOrCreate("JHI", "fSeconds", 2.5, nullptr);
+		alpha			= ini.GetOrCreate("JHI", "fAlpha", 400.0, nullptr);
+		height			= ini.GetOrCreate("JHI", "fHeight", 256.0, nullptr);
+		width			= ini.GetOrCreate("JHI", "fWidth", 256.0, nullptr);
+		offset			= ini.GetOrCreate("JHI", "fOffset", 0.0, nullptr);
+		modeHit			= ini.GetOrCreate("JHI", "iModeHit", kHitIndicatorNormal, nullptr);
+		modeDead		= ini.GetOrCreate("JHI", "iModeDead", kHitIndicatorNormal, nullptr);
+		modeKill		= ini.GetOrCreate("JHI", "iModeKill", kHitIndicatorOffset, nullptr);
+		modeEnemy		= ini.GetOrCreate("JHI", "iModeEnemy", kHitIndicatorAltColor, nullptr);
+		modeCrit		= ini.GetOrCreate("JHI", "iModeCrit", kHitIndicatorDouble, nullptr);
+		modeHeadshot	= ini.GetOrCreate("JHI", "iModeHeadshot", kHitIndicatorShakeVert, nullptr);
+		modeSelf		= ini.GetOrCreate("JHI", "iModeSelf", kHitIndicatorHalfAlpha, nullptr);
+		modeExplosion	= ini.GetOrCreate("JHI", "iModeExplosion", kHitIndicatorShakeHoriz, nullptr);
+		modeNoAttacker	= ini.GetOrCreate("JHI", "iModeNoAttacker", kHitIndicatorHalfAlpha, nullptr);
+		modeNoDamage	= ini.GetOrCreate("JHI", "iModeNoDamage", kHitIndicatorNothing, nullptr);
+		enableOut		= ini.GetOrCreate("JHI", "bEnableOut", true, nullptr);
+		enableSighting	= ini.GetOrCreate("JHI", "bEnableSighting", true, nullptr);
+		enableScope		= ini.GetOrCreate("JHI", "bEnableScope", true, nullptr);
+		rotate			= ini.GetOrCreate("JHI", "iRotate", 2, nullptr);
 
 		ini.SaveFile(iniPath.c_str(), false);
 	}

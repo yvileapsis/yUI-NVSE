@@ -16,39 +16,39 @@ namespace UserInterface::LootMenu
 
 	enum
 	{
-		kActionNone = 0,
-		kActionTake = 1,
-		kActionEquip = 2,
-		kActionTakeAll = 3,
-		kActionOpen = 4,
+		kNone		= 0,
+		kTake		= 1,
+		kEquip		= 2,
+		kTakeAll	= 3,
+		kOpen		= 4,
 	};
 
-	UInt32		key1Default		= 0;
-	UInt32		key2Default		= 0;
-	UInt32		key3Default		= 0;
-	UInt32		keyAltDefault	= 42;
+	UInt32		key1Base		= 0;
+	UInt32		key2Base		= 0;
+	UInt32		key3Base		= 0;
+	UInt32		keyAltBase		= 0;
 	UInt32		keyScrollUp		= 264;
 	UInt32		keyScrollDown	= 265;
 
-	UInt32		button1Default	= 0;
-	UInt32		button2Default	= 0;
-	UInt32		button3Default	= 0;
-	UInt32		buttonAltDefault= 0x2;
+	UInt32		button1Base		= 0;
+	UInt32		button2Base		= 0;
+	UInt32		button3Base		= 0;
+	UInt32		buttonAltBase	= 0;
 
-	UInt32		mode1			= 0x1;
-	UInt32		mode1Alt		= 0x2;
-	UInt32		mode2			= 0x4;
-	UInt32		mode2Alt		= 0x3;
-	UInt32		mode3			= 0x0;
-	UInt32		mode3Alt		= 0x0;
+	UInt32		mode1			= kTake;
+	UInt32		mode1Alt		= kEquip;
+	UInt32		mode2			= kOpen;
+	UInt32		mode2Alt		= kTakeAll;
+	UInt32		mode3			= kNone;
+	UInt32		mode3Alt		= kNone;
 
 	UInt32		takeSmartMin	= 5;
-	UInt32		takeWeightless	= 1;
+	bool		takeWeightless	= true;
 
-	UInt32		block			= 0;
-	UInt32		overScroll		= 0;
-	UInt32		hidePrompt		= 1;
-	UInt32		hideName		= 0;
+	bool		block			= false;
+	bool		overScroll		= false;
+	bool		hidePrompt		= true;
+	bool		hideName		= false;
 	UInt32		itemsMax		= 5;
 
 	UInt32		justify			= 3;
@@ -70,10 +70,10 @@ namespace UserInterface::LootMenu
 	Float32		fontY			= 0;
 	Float32		fontHeadY		= 0;
 
-	UInt32		sounds			= 1;
-	UInt32		showEquip		= 1;
-	UInt32		showIcon		= 1;
-	UInt32		showMeter		= 1;
+	bool		sounds			= true;
+	bool		showEquip		= true;
+	bool		showIcon		= true;
+	bool		showMeter		= true;
 
 
 	Tile*		tileMain		= nullptr;
@@ -393,7 +393,7 @@ namespace UserInterface::LootMenu
 
 		const auto keepowner = owned;
 
-		if (action == kActionTakeAll)
+		if (action == kTakeAll)
 		{
 			PlayGameSound("UIItemTakeAll");
 			if (items.empty()) return;
@@ -416,8 +416,8 @@ namespace UserInterface::LootMenu
 		if (CdeclCall<Float64>(0x48EBC0, entry->form, g_player->isHardcore) < 0.02) takeall = true;
 		if (entry->countDelta > takeSmartMin) takeall = true;
 
-		g_player->PlayPickupPutdownSounds(entry->form, action != kActionEquip, action == kActionEquip);
-		HandleTakeItem(entry, takeall, keepowner, action == kActionEquip);
+		g_player->PlayPickupPutdownSounds(entry->form, action != kEquip, action == kEquip);
+		HandleTakeItem(entry, takeall, keepowner, action == kEquip);
 
 		MajorUpdate();
 	}
@@ -479,20 +479,20 @@ namespace UserInterface::LootMenu
 		if (key1 && IsKeyPressed(key1, DIHookControl::kFlag_RawState) || button1 && IsButtonPressed(button1)) return alt ? mode1Alt : mode1;
 		if (key2 && IsKeyPressed(key2, DIHookControl::kFlag_RawState) || button2 && IsButtonPressed(button2)) return alt ? mode2Alt : mode2;
 		if (key3 && IsKeyPressed(key3, DIHookControl::kFlag_RawState) || button3 && IsButtonPressed(button3)) return alt ? mode3Alt : mode3;
-		return kActionNone;
+		return kNone;
 	}
 
 	void OnPreActivate(TESObjectREFR* thisObj, void *parameters)
 	{
 		const auto ptr = static_cast<ReferenceBool*>(parameters);
 		const auto action = ActionToTake();
-		if (!container || thisObj != container || ptr->ref != g_player || !ptr->isActivationNotPrevented || action == kActionOpen)
+		if (!container || thisObj != container || ptr->ref != g_player || !ptr->isActivationNotPrevented || action == kOpen)
 		{
 			SetNativeHandlerFunctionBool(true);
 			return;
 		}
 		SetNativeHandlerFunctionBool(false);
-		if (action == kActionNone) return;
+		if (action == kNone) return;
 		Action(action);
 	}
 
@@ -503,13 +503,63 @@ namespace UserInterface::LootMenu
 		CSimpleIniA ini;
 		ini.SetUnicode();
 
-		if (const auto errVal = ini.LoadFile(iniPath.c_str()); errVal == SI_FILE) { return; }
+		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return; 
 
 		enable = ini.GetOrCreate("JustMods", "bLootMenu", 1, nullptr);
-		//		g_Dynamic			= ini.GetOrCreate("JDC", "Dynamic", 1.0, nullptr);
 
-		if (const auto errVal = ini.SaveFile(iniPath.c_str(), false); errVal == SI_FILE) { return; }
+		key1Base		= ini.GetOrCreate("JLM", "iKey1", 0, nullptr);
+		key2Base		= ini.GetOrCreate("JLM", "iKey2", 0, nullptr);
+		key3Base		= ini.GetOrCreate("JLM", "iKey3", 0, nullptr);
+		keyAltBase		= ini.GetOrCreate("JLM", "iKeyAlt", 0, nullptr);
+		keyScrollUp		= ini.GetOrCreate("JLM", "iKeyScrollUp", 264, nullptr);
+		keyScrollDown	= ini.GetOrCreate("JLM", "iKeyScrollDown", 265, nullptr);
 
+		button1Base		= ini.GetOrCreate("JLM", "iButton1", 0, nullptr);
+		button2Base		= ini.GetOrCreate("JLM", "iButton2", 0, nullptr);
+		button3Base		= ini.GetOrCreate("JLM", "iButton3", 0, nullptr);
+		buttonAltBase	= ini.GetOrCreate("JLM", "iButtonAlt", 0, nullptr);
+
+		mode1			= ini.GetOrCreate("JLM", "iMode1", kTake, nullptr);
+		mode1Alt		= ini.GetOrCreate("JLM", "iMode1Alt", kEquip, nullptr);
+		mode2			= ini.GetOrCreate("JLM", "iMode", kOpen, nullptr);
+		mode2Alt		= ini.GetOrCreate("JLM", "iMode2Alt", kTakeAll, nullptr);
+		mode3			= ini.GetOrCreate("JLM", "iMode3", kNone, nullptr);
+		mode3Alt		= ini.GetOrCreate("JLM", "iMode3Alt", kNone, nullptr);
+
+		takeSmartMin	= ini.GetOrCreate("JLM", "iTakeSmartMin", 5, nullptr);
+		takeWeightless	= ini.GetOrCreate("JLM", "bTakeWeightless", true, nullptr);
+
+		block			= ini.GetOrCreate("JLM", "bBlockBeforeActivate", false, nullptr);
+		overScroll		= ini.GetOrCreate("JLM", "bOverScroll", false, nullptr);
+		hidePrompt		= ini.GetOrCreate("JLM", "bHidePrompt", true, nullptr);
+		hideName		= ini.GetOrCreate("JLM", "bHideName", false, nullptr);
+		itemsMax		= ini.GetOrCreate("JLM", "iItemsMax", 5, nullptr);
+
+		justify			= ini.GetOrCreate("JLM", "iJustify", 3, nullptr);
+		heightMin		= ini.GetOrCreate("JLM", "fHeightMin", 32.0, nullptr);
+		heightMax		= ini.GetOrCreate("JLM", "fHeightMax", 640.0, nullptr);
+		widthMin		= ini.GetOrCreate("JLM", "fWidthMin", 400.0, nullptr);
+		widthMax		= ini.GetOrCreate("JLM", "fWidthMax", 640.0, nullptr);
+		offsetX			= ini.GetOrCreate("JLM", "fOffsetX", 0.625, nullptr);
+		offsetY			= ini.GetOrCreate("JLM", "fOffsetY", 0.5, nullptr);
+
+		indentItem		= ini.GetOrCreate("JLM", "fIndentItem", 8.0, nullptr);
+		indentTextX		= ini.GetOrCreate("JLM", "fIndentTextX", 10.0, nullptr);
+		indentTextY		= ini.GetOrCreate("JLM", "fIndentTextY", 10.0, nullptr);
+
+		weightVisible	= ini.GetOrCreate("JLM", "iWeightVisible", 2, nullptr);
+		weightAltColor	= ini.GetOrCreate("JLM", "iWeightAltColor", 1, nullptr);
+		font			= ini.GetOrCreate("JLM", "iFont", 0, nullptr);
+		fontHead		= ini.GetOrCreate("JLM", "iFont", 0, nullptr);
+		fontY			= ini.GetOrCreate("JLM", "fFontY", 0.0, nullptr);
+		fontHeadY		= ini.GetOrCreate("JLM", "fFontHeadY", 0.0, nullptr);
+
+		sounds			= ini.GetOrCreate("JLM", "bSounds", true, nullptr);
+		showEquip		= ini.GetOrCreate("JLM", "bShowEquip", true, nullptr);
+		showIcon		= ini.GetOrCreate("JLM", "bShowIcon", true, nullptr);
+		showMeter		= ini.GetOrCreate("JLM", "bShowMeter", true, nullptr);
+
+		ini.SaveFile(iniPath.c_str(), false);
 	}
 
 	void Reset()
@@ -567,15 +617,15 @@ namespace UserInterface::LootMenu
 		if (!formShovel)		formShovel = GetFormByID("PointLookout.esm", 0x0082B5);
 		if (!formShovelUnique)	formShovelUnique = GetFormByID("PointLookout.esm", 0x00D5A8);
 
-		key1 = key1Default ? key1Default : GetControl(5, OSInputGlobals::kControlType_Keyboard);
-		key2 = key2Default ? key2Default : GetControl(7, OSInputGlobals::kControlType_Keyboard);
-		key3 = key3Default ? key3Default : GetControl(16, OSInputGlobals::kControlType_Keyboard);
-		keyAlt = keyAltDefault ? keyAltDefault : GetControl(9, OSInputGlobals::kControlType_Keyboard);
+		key1 = key1Base ? key1Base : GetControl(5, OSInputGlobals::kControlType_Keyboard);
+		key2 = key2Base ? key2Base : GetControl(7, OSInputGlobals::kControlType_Keyboard);
+		key3 = key3Base ? key3Base : GetControl(16, OSInputGlobals::kControlType_Keyboard);
+		keyAlt = keyAltBase ? keyAltBase : GetControl(9, OSInputGlobals::kControlType_Keyboard);
 
-		button1 = button1Default ? button1Default : GetControl(5, OSInputGlobals::kControlType_Joystick);
-		button2 = button2Default ? button2Default : GetControl(7, OSInputGlobals::kControlType_Joystick);
-		button3 = button3Default ? button3Default : GetControl(16, OSInputGlobals::kControlType_Joystick);
-		buttonAlt = buttonAltDefault ? buttonAltDefault : GetControl(9, OSInputGlobals::kControlType_Joystick);
+		button1 = button1Base ? button1Base : GetControl(5, OSInputGlobals::kControlType_Joystick);
+		button2 = button2Base ? button2Base : GetControl(7, OSInputGlobals::kControlType_Joystick);
+		button3 = button3Base ? button3Base : GetControl(16, OSInputGlobals::kControlType_Joystick);
+		buttonAlt = buttonAltBase ? buttonAltBase : GetControl(9, OSInputGlobals::kControlType_Joystick);
 
 		if (CdeclCall<bool>(0x4B71D0))
 		{
