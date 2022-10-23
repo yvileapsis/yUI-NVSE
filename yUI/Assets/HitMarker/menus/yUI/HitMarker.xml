@@ -20,8 +20,8 @@
 
 	<_Length> 
 		<copy> 0 </copy>
-		<add> <copy src="me()" trait="_LengthBase"/> <onlyifnot src="me()" trait="_JDCLength"/> </add>
-		<add> <copy src="me()" trait="_JDCLength"/> <onlyif src="me()" trait="_JDCLength"/> </add>
+		<add> <copy src="me()" trait="_LengthBase"/> <onlyifnot src="me()" trait="_DynamicLength"/> </add>
+		<add> <copy src="me()" trait="_JDCLength"/> <onlyif src="me()" trait="_DynamicLength"/> </add>
 		<mul src="me()" trait="_Scale"/>
 	</_Length> 
 
@@ -30,8 +30,8 @@
 	<_Offset>
 		<copy src="me()" trait="_Width"/>
 		<div> 8 </div>
-		<add> <copy src="me()" trait="_OffsetBase"/> <onlyifnot src="me()" trait="_JDCOffset"/> </add>
-		<add> <copy src="me()" trait="_JDCOffset"/> <onlyif src="me()" trait="_JDCOffset"/> </add>
+		<add> <copy src="me()" trait="_OffsetBase"/> <onlyifnot src="me()" trait="_DynamicOffset"/> </add>
+		<add> <copy src="me()" trait="_JDCOffset"/> <onlyif src="me()" trait="_DynamicOffset"/> </add>
 	</_Offset>
 
 	<_AlphaBase> 400 </_AlphaBase>
@@ -69,8 +69,8 @@
 	<green>255</green>
 	<blue>255</blue>
 
-	<_JDCLength> 1 </_JDCLength>
-	<_JDCOffset> 1 </_JDCOffset>
+	<_DynamicLength> 1 </_DynamicLength>
+	<_DynamicOffset> 1 </_DynamicOffset>
 </rect>
 
 <template name="JHMContainer"> <rect name="JHMContainer">

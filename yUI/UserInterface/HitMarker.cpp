@@ -110,8 +110,8 @@ namespace UserInterface::HitMarker
 
 		if (const auto tileJDC = g_HUDMainMenu->tile->GetChild("JDC"))
 		{
-			tileMain->SetFloat("_Offset", tileJDC->GetFloat("_Offset"));
-			tileMain->SetFloat("_Length", tileJDC->GetFloat("_Length"));
+			tileMain->SetFloat("_JDCOffset", tileJDC->GetFloat("_Offset"));
+			tileMain->SetFloat("_JDCLength", tileJDC->GetFloat("_Length"));
 		}
 	}
 
@@ -197,8 +197,8 @@ namespace UserInterface::HitMarker
 		tileMain->SetFloat("_WidthBase", width);
 		tileMain->SetFloat("_OffsetBase", offset);
 
-		tileMain->SetFloat("_JDCLength", dynamic & 1);
-		tileMain->SetFloat("_JDCOffset", dynamic & 2);
+		tileMain->SetFloat("_DynamicLength", dynamic & 1);
+		tileMain->SetFloat("_DynamicOffset", dynamic & 2);
 
 		tileMain->GradualSetFloat("_GlobalShaker", -0.05, 0.05, 0.15, GradualSetFloat::StartToEndPerpetual);
 
