@@ -1,8 +1,8 @@
 #include "SI.h"
+
 #include <GameSettings.h>
 #include <Tiles.h>
-
-#include "InterfaceManager.h"
+#include <InterfaceManager.h>
 
 namespace SortingIcons::Sorting
 {
@@ -32,8 +32,7 @@ namespace SortingIcons::Sorting
 	std::string GetCategoryForItem(InventoryChanges* entry)
 	{
 		if (!entry || !entry->form) return "";
-		if (!IsTagForItem(entry)) Files::AssignCategoryToItem(entry->form);
-		return g_ItemToCategory[entry->form];
+		return GetCategoryForItem(entry->form->TryGetREFRParent());
 	}
 
 	bool IsFilterForItem(TESForm* form)

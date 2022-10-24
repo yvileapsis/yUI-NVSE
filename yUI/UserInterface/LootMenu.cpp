@@ -165,7 +165,7 @@ namespace UserInterface::LootMenu
 
 			fst->SetFloat("_Equip", snd->GetEquipped());
 
-			const auto category = SortingIcons::Sorting::GetCategoryForItem(snd);
+			const auto category = SortingIcons::Sorting::GetCategoryForItem(snd->form->TryGetREFRParent());
 			if (!category.empty())
 			{
 				fst->SetFloat("_Icon", true);
