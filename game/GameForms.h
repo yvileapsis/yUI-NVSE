@@ -2166,7 +2166,7 @@ public:
 	TESFullName*				GetFullName();
 	const char*					GetTheName();
 	bool						IsCloned() const { return this->modIndex == 0xFF; }
-	bool						HasScript();
+	Script*						GetScript();
 	bool						GetScriptAndEventList(Script*& script, ScriptEventList*& eventList);
 	bool						IsItemPlayable();
 	UInt32						GetItemValue();

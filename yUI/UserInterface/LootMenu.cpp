@@ -114,6 +114,10 @@ namespace UserInterface::LootMenu
 	TESObjectREFR*		tookItem			= nullptr;
 	TESObjectREFR*		openedContainer		= nullptr;
 
+	CommandInfo*		cmd_Activate		= nullptr;
+	CommandInfo*		cmd_OnActivate		= nullptr;
+
+
 	std::string GetStringForButton(UInt32 button)
 	{
 		switch (button)
@@ -292,6 +296,25 @@ namespace UserInterface::LootMenu
 	bool notcannibal2 = true;
 	bool owned2 = false;
 
+	enum SInt8
+	{
+		kDisallow = -1,
+		kCheck = 0,
+		kAllow = 1,
+	};
+
+	std::unordered_map<Script*, SInt8> allowList;
+
+	SInt8 CheckScript(Script* script)
+	{
+		if (!script) return kAllow;
+		if (allowList.contains(script)) return allowList[script];
+		if (HasScriptCommand(script, cmd_Activate, cmd_OnActivate)) allowList[script] = kCheck;
+		else if (HasScriptBlock(script, 2)) allowList[script] = kDisallow;
+		else allowList[script] = kAllow;
+		return allowList[script];
+	}
+	
 	void UpdateContainer(TESObjectREFR* newref)
 	{
 		bool update = false;
@@ -312,7 +335,9 @@ namespace UserInterface::LootMenu
 		if (notcannibal != notcannibal2) { update = true; notcannibal = !notcannibal; }
 
 		if (!update) return;
-		const auto newcontainer = !dead || !open || !notcannibal || !NameNotEmpty(ref) ? nullptr : ref->ResolveAshpile();
+		auto newcontainer = !dead || !open || !notcannibal || !NameNotEmpty(ref) ? nullptr : ref->ResolveAshpile();
+		if (newcontainer && (newcontainer->baseForm->typeID == kFormType_TESObjectACTI)) newcontainer = nullptr;
+		if (newcontainer && CheckScript(newcontainer->baseForm->GetScript()) == kDisallow) newcontainer = nullptr;
 		HandleContainerChange(container, newcontainer);
 		container = newcontainer;
 		MajorUpdate();
@@ -662,10 +687,17 @@ namespace UserInterface::LootMenu
 		Reset();
 	}
 
+	void PluginLoad()
+	{
+		cmd_Activate = GetByOpcode(0x100D);
+		cmd_OnActivate = GetEventCommandInfo(0x2);
+	}
+
 	extern void Init()
 	{
 		if (g_nvseInterface->isEditor) return;
 
+		pluginLoad.emplace_back(PluginLoad);
 		mainLoopDoOnce.emplace_back(MainLoopDoOnce);
 		mainLoop.emplace_back(MainLoop);
 	}

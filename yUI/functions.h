@@ -11,15 +11,6 @@ namespace CraftingComponents
 	bool IsProduct(TESForm* form);
 }
 
-void UIWidth();
-void UIHeight();
-void UIWidth2();
-void UIHeight2();
-void UIWidth3();
-void UIHeight3();
-//void __fastcall AddyCMToSettingsMenu(BSSimpleArray<StartMenuOption*>*, void*, StartMenuOption**);
-
-
 TESForm* GetRefFromString(char*, char*);
 
 bool HasBaseEffectChangesAV(TESForm*, int);
@@ -47,8 +38,6 @@ void funpatch();
 inline Tile* g_TileReticleCenter = nullptr;
 extern PlayerCharacter* g_player;
 
-void InitFunctions();
-
 bool WorldToScreen(NiPoint3* posXYZ, NiPoint3& posOut, float offscreenHandling);
 
 Float32 GetJIPAuxVarOrDefault(const char* auxvar, SInt32 index, Float32 def);
@@ -62,3 +51,4 @@ bool IsButtonPressed(UInt32 button);
 UInt32 GetControl(UInt32 whichControl, UInt32 type = OSInputGlobals::kControlType_Keyboard);
 void SetNativeHandlerFunctionBool(bool trueorfalse);
 bool ToggleVanityWheel(bool toggle);
+bool HasScriptBlock(const Script* script, const UInt32 blockType);

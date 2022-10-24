@@ -35,6 +35,17 @@ const char* TESForm::GetTheName()
 	return fullName ? fullName->name.CStr() : "";
 }
 
+Script* TESForm::GetScript()
+{
+	const auto scriptForm = DYNAMIC_CAST(this, TESForm, TESScriptableForm);
+	Script* script = nullptr;
+	if (scriptForm) // Let's try for a MGEF
+		script = scriptForm ? scriptForm->script : nullptr;
+	else if (const auto effect = DYNAMIC_CAST(this, TESForm, EffectSetting))
+		script = effect->GetScript();
+	return script;
+}
+
 void TESForm::DoAddForm(TESForm* newForm, bool persist, bool record)
 {
 	TESDataHandler::GetSingleton()->DoAddForm(newForm);

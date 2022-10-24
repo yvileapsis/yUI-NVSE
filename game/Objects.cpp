@@ -783,9 +783,9 @@ NiPoint3 TESObjectREFR::GetCenter() const
 		if (const auto bounds = (reinterpret_cast<TESBoundObject*>(this->baseForm)))
 		{
 			NiPoint3 ni3 {};
-			ni3.x = abs(bounds->right.x - bounds->left.x) / 2;
-			ni3.y = abs(bounds->right.y - bounds->left.y) / 2;
-			ni3.z = abs(bounds->right.z - bounds->left.z) / 2;
+			ni3.x = abs(bounds->right.x + bounds->left.x) / 2;
+			ni3.y = abs(bounds->right.y + bounds->left.y) / 2;
+			ni3.z = abs(bounds->right.z + bounds->left.z) / 2;
 
 			const auto rot = this->rot;
 

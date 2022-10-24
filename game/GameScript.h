@@ -249,4 +249,4 @@ struct ScriptBuffer
 
 UInt32 GetDeclaredVariableType(const char* varName, const char* scriptText);	// parses scriptText to determine var type
 Script* GetScriptFromForm(TESForm* form);
-
+CommandInfo* GetEventCommandInfo(UInt16 opcode);

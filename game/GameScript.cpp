@@ -1,8 +1,12 @@
 #include "GameAPI.h"
 #include "GameScript.h"
+
+#include <span>
+
 #include "GameForms.h"
 #include "Objects.h"
 #include "GameRTTI.h"
+#include "CommandTable.h"
 
 UInt32 GetDeclaredVariableType(const char* varName, const char* scriptText)
 {
@@ -45,6 +49,45 @@ Script* GetScriptFromForm(TESForm* form)
 		form = refr->baseForm;
 	const auto scriptable = DYNAMIC_CAST(form, TESForm, TESScriptableForm);
 	return scriptable ? scriptable->script : nullptr;
+}
+
+enum class ScriptOperatorCode
+{
+	kOp_LeftBracket = 0x0,
+	kOp_RightBracket = 0x1,
+	kOp_LogicalAnd = 0x2,
+	kOp_LogicalOr = 0x3,
+	kOp_LessThanOrEqual = 0x4,
+	kOp_LessThan = 0x5,
+	kOp_GreaterThanOrEqual = 0x6,
+	kOp_GreaterThan = 0x7,
+	kOp_Equals = 0x8,
+	kOp_NotEquals = 0x9,
+	kOp_Minus = 0xA,
+	kOp_Plus = 0xB,
+	kOp_Multiply = 0xC,
+	kOp_Divide = 0xD,
+	kOp_Modulo = 0xE,
+	kOp_Tilde = 0xF,
+	kOp_MAX = 0x10,
+};
+
+struct ScriptOperator
+{
+	ScriptOperatorCode code;
+	UInt8 precedence;
+	char operatorString[3];
+};
+//std::span<ActorValueInfo*> g_actorValues = { reinterpret_cast<ActorValueInfo**>(0x11D61C8), eActorVal_FalloutMax };
+
+std::span<CommandInfo> g_eventBlockCommandInfos = { reinterpret_cast<CommandInfo*>(0x118E2F0), 38 };
+std::span<CommandInfo> g_scriptStatementCommandInfos = { reinterpret_cast<CommandInfo*>(0x118CB50), 16 };
+std::span<ScriptOperator> g_gameScriptOperators = { reinterpret_cast<ScriptOperator*>(0x118CAD0), 16 };
+
+CommandInfo* GetEventCommandInfo(UInt16 opcode)
+{
+	if (opcode > 37) return nullptr;
+	return &g_eventBlockCommandInfos[opcode];
 }
 
 UInt32 Script::GetVariableType(VariableInfo* varInfo)
