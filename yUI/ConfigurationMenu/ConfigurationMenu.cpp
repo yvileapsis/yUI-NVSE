@@ -202,6 +202,7 @@ void FixReorderMCM()
 		{
 			fixReorderMCM = false;
 			const auto tileMCM = StartMenu::GetSingleton()->tile->GetChild("MCM");
+			if (!tileMCM) return;
 			tileMCM->children.Sort(SortMCMChildren);
 
 			const auto tileMCMOptions = tileMCM->GetChild("MCM_Options");
