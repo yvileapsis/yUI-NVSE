@@ -2185,7 +2185,8 @@ public:
 	bool						IsInventoryObject() { return CdeclCall<char>(0x00481F30, typeID); }
 	bool						IsInventoryObjectAlt(); 
 	bool						IsCreated() const { return modIndex == 0xFF; }
-	bool						CanContainItems() const { return typeID == kFormType_TESObjectACTI || typeID == kFormType_TESObjectCONT || typeID == kFormType_TESNPC || typeID == kFormType_TESCreature; }
+	__forceinline bool			CanContainItems() const { return typeID == kFormType_TESObjectCONT || typeID == kFormType_TESNPC || typeID == kFormType_TESCreature; }
+	__forceinline bool			IsActivator() const { return typeID == kFormType_TESObjectACTI; }
 };
 static_assert(sizeof(TESForm) == 0x18);
 

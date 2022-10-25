@@ -96,7 +96,7 @@ namespace UserInterface::LootMenu
 	UInt32				offset				= 0;
 	UInt32				index				= 0;
 	UInt32				total				= 0;
-	SInt32				tiles				= 0;
+	UInt32				tiles				= 0;
 
 	bool				info				= false;
 
@@ -111,30 +111,50 @@ namespace UserInterface::LootMenu
 
 	bool				lockTake			= true;
 
+	bool				blockActivation		= true;
+
 	TESObjectREFR*		tookItem			= nullptr;
 	TESObjectREFR*		openedContainer		= nullptr;
 
 	CommandInfo*		cmd_Activate		= nullptr;
 	CommandInfo*		cmd_OnActivate		= nullptr;
+	Cmd_Execute			cmd_Activate_Execute = nullptr;
 
-
-	std::string GetStringForButton(UInt32 button)
+	enum SInt8
 	{
-		switch (button)
-		{
-		case 1 << 0: return "Up)";
-		case 1 << 1: return "Down)";
-		case 1 << 2: return "Left)";
-		case 1 << 3: return "Right)";
-		case 1 << 4: return "Start)";
-		case 1 << 5: case 1 << 6: case 1 << 7: case 1 << 8: case 1 << 9:
-		case 1 << 11: case 1 << 12: case 1 << 13: case 1 << 14:	return "";
-		case 1 << 10: return "Guide)";
-		default: return std::to_string(button);
-		}
+		kDisallow = -1,
+		kCheck = 0,
+		kAllow = 1,
+	};
+
+	std::unordered_map<Script*, SInt8> allowList;
+
+	SInt8 CheckScript(Script* script)
+	{
+		if (!script) return kAllow;
+		if (allowList.contains(script)) return allowList[script];
+		if (HasScriptCommand(script, cmd_Activate, cmd_OnActivate)) allowList[script] = kCheck;
+		else if (HasScriptBlock(script, 2)) allowList[script] = kDisallow;
+		else allowList[script] = kAllow;
+		return allowList[script];
 	}
 
-	void Display()
+	bool ShouldAllowContainerInteractions()
+	{
+		return container && !((CheckScript(ref->baseForm->GetScript()) == kCheck || block) && blockActivation == true);
+	}
+
+	bool NameNotEmpty(TESObjectREFR* ref)
+	{
+		return !std::string(ref->GetTheName()).empty();
+	}
+
+	bool IsDead(TESObjectREFR* ref)
+	{
+		return ref->IsActor() ? (reinterpret_cast<Actor*>(ref)->lifeState == kLifeState_Dead || reinterpret_cast<Actor*>(ref)->lifeState == kLifeState_Dying) : true;
+	}
+
+	void ShowItems()
 	{
 		if (offset + tiles > items.size()) { offset = items.size() > tiles ? items.size() - tiles : 0; }
 
@@ -212,17 +232,6 @@ namespace UserInterface::LootMenu
 		}
 	}
 
-
-	bool NameNotEmpty(TESObjectREFR* ref)
-	{
-		return !std::string(ref->GetTheName()).empty();
-	}
-
-	bool IsDead(TESObjectREFR* ref)
-	{
-		return ref->IsActor() ? (reinterpret_cast<Actor*>(ref)->lifeState == kLifeState_Dead || reinterpret_cast<Actor*>(ref)->lifeState == kLifeState_Dying) : true;
-	}
-
 	UInt32 typeCodes[]{ 116, 46, 49, 25, 115, 108, 41, 40, 103, 24, 26, 47, 31 };
 
 	UInt16 CompareItems(InventoryChanges* first, InventoryChanges* second)
@@ -232,26 +241,18 @@ namespace UserInterface::LootMenu
 		return CdeclCall<SInt16>(0x7824E0, &first_, &second_) != 1 ? 1 : 0;
 	}
 
-	void MinorUpdate()
+	void Hide()
 	{
-		if (hidePrompt && (!info && container || (info && !container)))
-		{
-			info = !info;
-			SetJIPAuxVarOrDefault("*_JAMInfoDisable", 0, (!info ? -1 : 1) + GetJIPAuxVarOrDefault("*_JAMInfoDisable", 0, 0));
-		}
+		tileMain->SetFloat("_Visible", 0);
+		ToggleVanityWheel(true);
+		if (key1) DisableKey(key1, false);
+		if (key2) DisableKey(key2, false);
+		if (key3) DisableKey(key3, false);
+		if (keyAlt) DisableKey(keyAlt, false);
+	}
 
-		if (hidePrompt) g_HUDMainMenu->tileInfo->SetFloat(kTileValue_visible, GetJIPAuxVarOrDefault("*_JAMInfoDisable", 0, 0) == 0);
-
-		if (!container)
-		{
-			tileMain->SetFloat("_Visible", 0);
-			ToggleVanityWheel(true);
-			if (key1) DisableKey(key1, false);
-			if (key2) DisableKey(key2, false);
-			if (key3) DisableKey(key3, false);
-			if (keyAlt) DisableKey(keyAlt, false);
-			return;
-		}
+	void Show()
+	{
 		ToggleVanityWheel(false);
 		if (key1) DisableKey(key1, true);
 		if (key2) DisableKey(key2, true);
@@ -263,7 +264,7 @@ namespace UserInterface::LootMenu
 		tileMain->SetFloat("_SystemColor", 1 + owned);
 		tileMain->SetFloat("_AlphaAC", g_HUDMainMenu->tileActionPointsMeterText1->GetFloat(kTileValue_alpha));
 
-		Display();
+		ShowItems();
 
 		tileMain->SetFloat("_ArrowUp", offset > 0);
 		tileMain->SetFloat("_ArrowDown", offset < items.size() - tiles);
@@ -271,8 +272,7 @@ namespace UserInterface::LootMenu
 		tileMain->SetFloat("_Visible", 1);
 	}
 
-
-	void MajorUpdate()
+	void Update()
 	{
 		items.clear();
 		if (container)
@@ -281,86 +281,70 @@ namespace UserInterface::LootMenu
 			items = container->GetAllItems();
 			ra::sort(items, CompareItems);
 		}
-		MinorUpdate();
+
+		const bool var = ShouldAllowContainerInteractions();
+		if (hidePrompt && (!info && var || (info && !var)))
+		{
+			info = !info;
+			SetJIPAuxVarOrDefault("*_JAMInfoDisable", 0, (!info ? -1 : 1) + GetJIPAuxVarOrDefault("*_JAMInfoDisable", 0, 0));
+		}
+
+		if (hidePrompt) g_HUDMainMenu->tileInfo->SetFloat(kTileValue_visible, GetJIPAuxVarOrDefault("*_JAMInfoDisable", 0, 0) == 0);
+
+		var ? Show() : Hide();
 	}
 
-	void HandleContainerChange(TESObjectREFR* container, TESObjectREFR* newcontainer)
+	void HandleContainerChange(TESObjectREFR* newcontainer)
 	{
-		if (tookItem) { g_player->SendStealingAlarm(tookItem, true); tookItem = nullptr; }
-		if (openedContainer) { container->OpenCloseContainer(false, sounds & 0x1); openedContainer = nullptr; }
+		if (container != newcontainer)
+		{
+			if (tookItem) { g_player->SendStealingAlarm(tookItem, true); tookItem = nullptr; }
+			if (openedContainer) { container->OpenCloseContainer(false, sounds & 0x1); openedContainer = nullptr; }
+		}
 
 		offset = 0;
 		index = 0;
+
+		blockActivation = true;
+
+		container = newcontainer;
 	}
 
-	bool notcannibal2 = true;
-	bool owned2 = false;
-
-	enum SInt8
-	{
-		kDisallow = -1,
-		kCheck = 0,
-		kAllow = 1,
-	};
-
-	std::unordered_map<Script*, SInt8> allowList;
-
-	SInt8 CheckScript(Script* script)
-	{
-		if (!script) return kAllow;
-		if (allowList.contains(script)) return allowList[script];
-		if (HasScriptCommand(script, cmd_Activate, cmd_OnActivate)) allowList[script] = kCheck;
-		else if (HasScriptBlock(script, 2)) allowList[script] = kDisallow;
-		else allowList[script] = kAllow;
-		return allowList[script];
-	}
-	
 	void UpdateContainer(TESObjectREFR* newref)
 	{
 		bool update = false;
+
 		if (ref != newref) update = true;
 		ref = newref;
 
-		if (!ref || !ref->baseForm->CanContainItems())
+		if (ref)
 		{
-			HandleContainerChange(container, nullptr);
-			container = nullptr;
-			MajorUpdate();
-			return;
+			ref = ref->ResolveAshpile();
+
+			if (owned != ref->IsCrimeOrEnemy())			{ update = true; owned = !owned; }
+			if (dead != IsDead(ref))					{ update = true; dead = !dead; }
+			if (open != !ref->IsLocked())				{ update = true; open = !open; }
+			if (notcannibal != GetCannibalPrompt(ref))	{ update = true; notcannibal = !notcannibal; }
+
+			if (!ref->baseForm->CanContainItems() || CheckScript(ref->baseForm->GetScript()) == kDisallow) ref = nullptr;
 		}
 
-		if (owned != owned2) { update = true; owned = !owned; }
-		if (dead != IsDead(ref)) { update = true; dead = !dead; }
-		if (open != !ref->IsLocked()) { update = true; open = !open; }
-		if (notcannibal != notcannibal2) { update = true; notcannibal = !notcannibal; }
-
 		if (!update) return;
-		auto newcontainer = !dead || !open || !notcannibal || !NameNotEmpty(ref) ? nullptr : ref->ResolveAshpile();
-		if (newcontainer && (newcontainer->baseForm->typeID == kFormType_TESObjectACTI)) newcontainer = nullptr;
-		if (newcontainer && CheckScript(newcontainer->baseForm->GetScript()) == kDisallow) newcontainer = nullptr;
-		HandleContainerChange(container, newcontainer);
-		container = newcontainer;
-		MajorUpdate();
-	}
 
-	void MainLoop()
-	{
-		if (!enable) return;
+		ref = ref && dead && open && notcannibal && NameNotEmpty(ref) ? ref : nullptr;
 
-		if (MenuMode()) UpdateContainer(nullptr);
-
-		notcannibal2 = ref ? GetCannibalPrompt(ref) : true;
-		owned2 = ref ? ref->IsCrimeOrEnemy() : false;
+		HandleContainerChange(ref);
+		Update();
 	}
 
 	void HandleScroll()
 	{
-		if (!container) return;
+		if (!ShouldAllowContainerInteractions()) return;
 
 		bool update = false;
 
 		if (!IsKeyPressed(265)) {}
-		else if (index < tiles - 1)				{ update = true; index++; }
+		else if (index + 1 < tiles)				{ update = true; index++; }
 		else if (offset < items.size() - tiles)	{ update = true; offset++; }
 		else if (overScroll)					{ update = true; offset = 0; index = 0; }
 
@@ -372,7 +356,7 @@ namespace UserInterface::LootMenu
 		if (update)
 		{
 			PlayGameSound("UIPipBoyScroll");
-			MinorUpdate();
+			Show();
 		}
 	}
 
@@ -409,7 +393,7 @@ namespace UserInterface::LootMenu
 		const auto form = entry->form->TryGetREFRParent();
 		if (entry->form->GetIsReference()) {
 			g_player->HandlePickupItem(reinterpret_cast<TESObjectREFR*>(entry->form), all ? entry->countDelta : 1, keepowner);
-			g_player->SendStealingAlarm((TESObjectREFR*)entry->form, false);
+			g_player->SendStealingAlarm(static_cast<TESObjectREFR*>(entry->form), false);
 		} else {
 			container->RemoveItem(entry->form, entry->extendData ? entry->extendData->GetFirstItem() : nullptr, (all ||  form->typeID == kFormType_TESAmmo) ? entry->countDelta : 1, !container->IsActor(), 0, g_player, 0, 0, 1, 0);
 			tookItem = container;
@@ -417,9 +401,51 @@ namespace UserInterface::LootMenu
 		if (!keepowner && equip) g_player->EquipItem(form);
 	}
 
-
-	void Action(UInt32 action)
+	void FixActivate()
 	{
+		if (cmd_Activate_Execute) cmd_Activate->execute = cmd_Activate_Execute;
+		cmd_Activate_Execute = nullptr;
+	}
+
+	bool Cmd_ActivateAlt(COMMAND_ARGS)
+	{
+		if (!container || thisObj != container) {
+			const bool newresult = cmd_Activate_Execute(PASS_COMMAND_ARGS);
+			FixActivate();
+			return newresult;
+		}
+		FixActivate();
+		blockActivation = false;
+		Update();
+		if (!openedContainer) { container->OpenCloseContainer(true, sounds & 0x1); openedContainer = container; }
+		return true;
+	}
+
+	void ReplaceActivate()
+	{
+		cmd_Activate_Execute = cmd_Activate->execute;
+		cmd_Activate->execute = Cmd_ActivateAlt;
+	}
+
+	UInt32 ActionToTake()
+	{
+		if (!ShouldAllowContainerInteractions()) return kNone;
+		const auto alt = keyAlt && IsKeyPressed(keyAlt, DIHookControl::kFlag_RawState) || buttonAlt && IsButtonPressed(buttonAlt);
+		if (key1 && IsKeyPressed(key1, DIHookControl::kFlag_RawState) || button1 && IsButtonPressed(button1)) return alt ? mode1Alt : mode1;
+		if (key2 && IsKeyPressed(key2, DIHookControl::kFlag_RawState) || button2 && IsButtonPressed(button2)) return alt ? mode2Alt : mode2;
+		if (key3 && IsKeyPressed(key3, DIHookControl::kFlag_RawState) || button3 && IsButtonPressed(button3)) return alt ? mode3Alt : mode3;
+		return kNone;
+	}
+
+	bool Action(UInt32 action)
+	{
+		if (action == kOpen) return true;
+
+		if (action == kNone) {
+			if (blockActivation) ReplaceActivate();
+			return true;
+		}
+
 		if (!openedContainer) { container->OpenCloseContainer(true, sounds & 0x1); openedContainer = container; }
 
 		const auto keepowner = owned;
@@ -427,20 +453,20 @@ namespace UserInterface::LootMenu
 		if (action == kTakeAll)
 		{
 			PlayGameSound("UIItemTakeAll");
-			if (items.empty()) return;
+			if (items.empty()) return false;
 			for (const auto item : items) HandleTakeItem(item, true, keepowner, false);
-			MajorUpdate();
-			return;
+			Update();
+			return false;
 		}
 
 		if (items.empty())
 		{
 			PlayGameSound("UIActivateNothing");
-			return;
+			return false;
 		}
 
 		const auto item = items.begin() + index + offset;
-		if (item >= items.end()) return;
+		if (item >= items.end()) return false;
 		const auto entry = *item;
 
 		bool takeall = false;
@@ -450,7 +476,8 @@ namespace UserInterface::LootMenu
 		g_player->PlayPickupPutdownSounds(entry->form, action != kEquip, action == kEquip);
 		HandleTakeItem(entry, takeall, keepowner, action == kEquip);
 
-		MajorUpdate();
+		Update();
+		return false;
 	}
 
 	void UpdateKeys()
@@ -471,19 +498,22 @@ namespace UserInterface::LootMenu
 		tileMain->SetFloat("_Action3", action);
 	}
 
+	void MainLoop()
+	{
+		if (MenuMode()) UpdateContainer(nullptr);
+	}
+
 	void OnRender()
 	{
-		if (!enable) return;
-
 		UpdateContainer(!MenuMode() ? InterfaceManager::GetSingleton()->crosshairRef : nullptr);
 
-		if (container)
+		if (ShouldAllowContainerInteractions())
 		{
 			if (key1 && IsKeyPressed(key1, DIHookControl::kFlag_RawState) || button1 && IsButtonPressed(button1) ||
 				key2 && IsKeyPressed(key2, DIHookControl::kFlag_RawState) || button2 && IsButtonPressed(button2) ||
 				key3 && IsKeyPressed(key3, DIHookControl::kFlag_RawState) || button3 && IsButtonPressed(button3))
 			{
-				if (lockTake) { lockTake = false; container->Activate(g_player, 0, 0, 1); }
+				if (lockTake) { lockTake = false; container->Activate(g_player, 0, 0, 1); FixActivate(); }
 			}
 			else lockTake = true;
 			Weight();
@@ -491,42 +521,36 @@ namespace UserInterface::LootMenu
 			UpdateKeys();
 			if (hidePrompt) g_HUDMainMenu->tileInfo->SetFloat(kTileValue_visible, GetJIPAuxVarOrDefault("*_JAMInfoDisable", 0, 0) == 0);
 		}
+		else lockTake = false;
 	}
 
 	void OnAddDropUpdate(TESObjectREFR* thisObj, TESObjectREFR* droppedFrom, TESForm* noidea)
 	{
-		if (container && droppedFrom && droppedFrom == container) MajorUpdate();
+		if (container && droppedFrom == container) Update();
 	}
 
-	struct ReferenceBool
+	bool OnPreActivate(TESObjectREFR* thisObj, Actor* ref, bool isActivationNotPrevented)
 	{
-		TESObjectREFR* ref;
-		bool isActivationNotPrevented;
-	};
-
-	UInt32 ActionToTake()
-	{
-		const auto alt = keyAlt && IsKeyPressed(keyAlt, DIHookControl::kFlag_RawState) || buttonAlt && IsButtonPressed(buttonAlt);
-		if (key1 && IsKeyPressed(key1, DIHookControl::kFlag_RawState) || button1 && IsButtonPressed(button1)) return alt ? mode1Alt : mode1;
-		if (key2 && IsKeyPressed(key2, DIHookControl::kFlag_RawState) || button2 && IsButtonPressed(button2)) return alt ? mode2Alt : mode2;
-		if (key3 && IsKeyPressed(key3, DIHookControl::kFlag_RawState) || button3 && IsButtonPressed(button3)) return alt ? mode3Alt : mode3;
-		return kNone;
+		if (!container || thisObj != container || ref != g_player || !isActivationNotPrevented) return true;
+		const auto val = ActionToTake();
+		return Action(val);
 	}
 
-	void OnPreActivate(TESObjectREFR* thisObj, void *parameters)
+	std::string GetStringForButton(UInt32 button)
 	{
-		const auto ptr = static_cast<ReferenceBool*>(parameters);
-		const auto action = ActionToTake();
-		if (!container || thisObj != container || ptr->ref != g_player || !ptr->isActivationNotPrevented || action == kOpen)
+		switch (button)
 		{
-			SetNativeHandlerFunctionBool(true);
-			return;
+		case 1 << 0: return "Up)";
+		case 1 << 1: return "Down)";
+		case 1 << 2: return "Left)";
+		case 1 << 3: return "Right)";
+		case 1 << 4: return "Start)";
+		case 1 << 5: case 1 << 6: case 1 << 7: case 1 << 8: case 1 << 9:
+		case 1 << 11: case 1 << 12: case 1 << 13: case 1 << 14:	return "";
+		case 1 << 10: return "Guide)";
+		default: return std::to_string(button);
 		}
-		SetNativeHandlerFunctionBool(false);
-		if (action == kNone) return;
-		Action(action);
 	}
-
 
 	void HandleINI()
 	{
@@ -600,12 +624,15 @@ namespace UserInterface::LootMenu
 		if (!enable)
 		{
 			std::erase(onRender, OnRender);
+			std::erase(mainLoop, MainLoop);
 			std::erase(onAddDrop, OnAddDropUpdate);
+			std::erase(onPreActivate, OnPreActivate);
 			return;
 		}
 		onRender.emplace_back(OnRender);
+		mainLoop.emplace_back(MainLoop);
 		onAddDrop.emplace_back(OnAddDropUpdate);
-		SetEventHandler("ShowOff:OnPreActivate", OnPreActivate);
+		onPreActivate.emplace_back(OnPreActivate);
 
 		tileMain->SetFloat("_FontBase", font);
 		tileMain->SetFloat("_FontYBase", fontY);
@@ -672,7 +699,6 @@ namespace UserInterface::LootMenu
 		}
 	}
 
-
 	void MainLoopDoOnce()
 	{
 		tileMain = g_HUDMainMenu->tile->GetChild("JLM");
@@ -699,6 +725,5 @@ namespace UserInterface::LootMenu
 
 		pluginLoad.emplace_back(PluginLoad);
 		mainLoopDoOnce.emplace_back(MainLoopDoOnce);
-		mainLoop.emplace_back(MainLoop);
 	}
 }

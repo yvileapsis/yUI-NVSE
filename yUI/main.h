@@ -35,3 +35,4 @@ inline std::vector<void(*)()>		onRender;
 inline std::vector<void(*)(Actor*)>	onHit;
 
 inline std::vector<void(*)(TESObjectREFR*, TESObjectREFR*, TESForm*)> onAddDrop;
+inline std::vector<bool(*)(TESObjectREFR*, Actor*, bool)> onPreActivate;

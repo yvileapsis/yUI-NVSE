@@ -1,4 +1,5 @@
 #include <main.h>
+#include <functions.h>
 
 namespace UserInterface::EventLayer
 {
@@ -11,10 +12,24 @@ namespace UserInterface::EventLayer
 		TESForm* form;
 	};
 
+	struct ActorBool
+	{
+		Actor* actor;
+		bool isActivationNotPrevented;
+	};
+
 	void OnAddDrop(TESObjectREFR* thisObj, void* parameters)
 	{
 		const auto ptr = static_cast<ReferenceForm*>(parameters);
 		for (const auto i : onAddDrop) i(thisObj, ptr->ref, ptr->form);
+	}
+
+	void OnPreActivate(TESObjectREFR* thisObj, void* parameters)
+	{
+		const auto ptr = static_cast<ActorBool*>(parameters);
+		bool preventActivate = false;
+		for (const auto i : onPreActivate) if (!i(thisObj, ptr->actor, ptr->isActivationNotPrevented)) preventActivate = true;
+		SetNativeHandlerFunctionBool(!preventActivate);
 	}
 
 	void MainLoopDoOnce()
@@ -34,7 +49,7 @@ namespace UserInterface::EventLayer
 		SetEventHandler("OnAdd", OnAddDrop);
 		SetEventHandler("OnDrop", OnAddDrop);
 
-	//	CallFunctionAlt(expression, nullptr, 0);
+		SetEventHandler("ShowOff:OnPreActivate", OnPreActivate);
 	}
 
 	void Init()
