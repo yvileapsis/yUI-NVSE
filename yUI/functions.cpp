@@ -457,5 +457,5 @@ bool HasScriptBlock(const Script* script, const UInt32 blockType)
 {
 	for (ScriptBlockIterator blockIter(static_cast<UInt8*>(script->data), script->info.dataLength); blockIter; ++blockIter)
 		if (*blockIter.TypePtr() == blockType) return true;
-	return true;
+	return false;
 }
