@@ -78,6 +78,7 @@ namespace SortingIcons::Files
 						g_Items.emplace_back(common);
 					}
 					else if (formlist == 1) {
+						common.formType = 0;
 						ItemRecursiveEmplace(common, common.form);
 					}
 					else if (formlist == 2) {
@@ -87,7 +88,9 @@ namespace SortingIcons::Files
 								if (!weapon || !weapon->repairItemList.listForm) continue;
 								if (weapon->refID == common.form->refID || weapon->repairItemList.listForm->refID == common.form->refID || weapon->repairItemList.listForm->ContainsRecursive(common.form)) {
 									Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", common.tag.c_str(), item->refID, item->GetName(), formId), logLevel);
-									g_Items.emplace_back(common, item);
+									auto newCommon = common;
+									newCommon.form = item;
+									g_Items.emplace_back(newCommon);
 								}
 							}
 							else if (item->typeID == kFormType_TESObjectARMO) {
@@ -95,7 +98,9 @@ namespace SortingIcons::Files
 								if (!armor || !armor->repairItemList.listForm) continue;
 								if (armor->refID == common.form->refID || armor->repairItemList.listForm->refID == common.form->refID || armor->repairItemList.listForm->ContainsRecursive(common.form)) {
 									Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", common.tag.c_str(), item->refID, item->GetName(), formId), logLevel);
-									g_Items.emplace_back(common, item);
+									auto newCommon = common;
+									newCommon.form = item;
+									g_Items.emplace_back(newCommon);
 								}
 							}
 						}
@@ -327,7 +332,9 @@ namespace SortingIcons::Files
 		}
 		else if (!common.formType || item->typeID == common.formType) {
 			Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive", common.tag.c_str(), item->refID, item->GetName()), logLevel);
-			g_Items.emplace_back(common, item);
+			auto newCommon = common;
+			newCommon.form = item;
+			g_Items.emplace_back(newCommon);
 		}
 	}
 
@@ -341,7 +348,7 @@ namespace SortingIcons::Files
 			if (entry.common.miscComponent && !CraftingComponents::IsComponent(form)) continue;
 			if (entry.common.miscProduct && !CraftingComponents::IsProduct(form)) continue;
 
-			if (entry.common.formType == 40) {
+			if (entry.common.formType == kFormType_TESObjectWEAP) {
 				const auto weapon = DYNAMIC_CAST(form, TESForm, TESObjectWEAP);
 				if (!weapon) continue;
 				if (entry.weapon.skill && entry.weapon.skill != weapon->weaponSkill) continue;
@@ -358,7 +365,7 @@ namespace SortingIcons::Files
 				if (entry.weapon.soundLevel && entry.weapon.soundLevel != weapon->soundLevel) continue;
 				if (entry.weapon.ammo && !FormContainsRecusive(entry.weapon.ammo, weapon->ammo.ammo)) continue;
 			}
-			else if (entry.common.formType == 24) {
+			else if (entry.common.formType == kFormType_TESObjectARMO) {
 				const auto armor = DYNAMIC_CAST(form, TESForm, TESObjectARMO);
 				if (!armor) continue;
 				if (entry.armor.slotsMaskWL && (entry.armor.slotsMaskWL & armor->GetArmorValue(6)) != entry.armor.slotsMaskWL) continue;
@@ -371,9 +378,9 @@ namespace SortingIcons::Files
 				if (entry.armor.dr && entry.armor.dr > armor->armorRating) continue;
 				//				if (entry.armor.armorChangesAV && entry.armor.armorChangesAV > armor->armorRating) continue;
 			}
-			else if (entry.common.formType == 31) {
+			else if (entry.common.formType == kFormType_TESObjectMISC) {
 			}
-			else if (entry.common.formType == 47) {
+			else if (entry.common.formType == kFormType_AlchemyItem) {
 				const auto aid = DYNAMIC_CAST(form, TESForm, AlchemyItem);
 				if (!aid) continue;
 				if (entry.aid.restoresAV && !aid->HasBaseEffectRestoresAV(entry.aid.restoresAV)) continue;

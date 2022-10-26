@@ -26,7 +26,7 @@ namespace SortingIcons
 		public:
 			std::string		tag;
 			SInt32			priority = 0;
-			TESForm* form = nullptr;
+			TESForm*		form = nullptr;
 			UInt32			formType = 0;
 			UInt8			questItem = 0;
 			UInt8			miscComponent = 0;
@@ -105,7 +105,6 @@ namespace SortingIcons
 		Item(Common common, Armor armor) : common(std::move(common)), armor(armor) {}
 		Item(Common common, Aid aid) : common(std::move(common)), aid(aid) {}
 		Item(Common common, Misc misc) : common(std::move(common)), misc(misc) {}
-		Item(Common common, TESForm* form) : common(std::move(common)) { common.form = form; }
 	};
 
 	class Category
