@@ -57,6 +57,7 @@ namespace Fix::TouchpadScrolling
 	{
 		if (g_nvseInterface->isEditor) return;
 		HandleINIs();
+		Patch(enable);
 		if (enable) mainLoop.emplace_back(MainLoop);
 	}
 }
