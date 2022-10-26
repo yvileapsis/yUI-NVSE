@@ -95,8 +95,8 @@ namespace UserInterface::DynamicCrosshair
 
 		UInt32 mode;
 		if (!IsPlayerWeaponGood())				mode = modeHolstered;
-		else if (g_player->UsingIronSights())	mode = modeScope;
-		else if (g_HUDMainMenu->isUsingScope)	mode = g_player->isInThirdPerson ? modeSighting3rd : modeSighting1st;
+		else if (g_HUDMainMenu->isUsingScope)	mode = modeScope;
+		else if (g_player->UsingIronSights())	mode = g_player->isInThirdPerson ? modeSighting3rd : modeSighting1st;
 		else									mode = g_player->isInThirdPerson ? modeOut3rd : modeOut1st;
 
 		tileMain->SetFloat("_scope", g_HUDMainMenu->isUsingScope);
@@ -138,9 +138,9 @@ namespace UserInterface::DynamicCrosshair
 		{
 			Float64 fDefaultWorldFOV;
 			GetNumericIniSetting("fDefaultWorldFOV:Display", &fDefaultWorldFOV);
-			if (g_player->baseProcess && g_player->baseProcess->GetWeaponInfo() && g_player->baseProcess->GetWeaponInfo()->weapon)
-				spreadTarget *= tan(0.5 * g_player->baseProcess->GetWeaponInfo()->weapon->sightFOV) / tan(0.5 * fDefaultWorldFOV);
+			spreadTarget *= g_player->worldFOV / fDefaultWorldFOV;
 		}
+
 
 		tileMain->SetFloat("_Spread", UpdateCurrentSpread(spreadTarget));
 	}
