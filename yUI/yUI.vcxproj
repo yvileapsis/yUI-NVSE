@@ -48,8 +48,8 @@
     <TargetName>yUI</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
-    <IntDir>$(Configuration)\</IntDir>
+    <OutDir>..\$(Configuration)\</OutDir>
+    <IntDir>..\$(Configuration)\$(ProjectName)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>yUI</TargetName>
   </PropertyGroup>
@@ -146,6 +146,7 @@
     <ClCompile Include="MiscFeatures\FixDroppedItems.cpp" />
     <ClCompile Include="MiscFeatures\FixProjectileEffects.cpp" />
     <ClCompile Include="MiscFeatures\FixTablineSelected.cpp" />
+    <ClCompile Include="MiscFeatures\FixTouchpadScrolling.cpp" />
     <ClCompile Include="MiscFeatures\PatchAlterSpread.cpp" />
     <ClCompile Include="MiscFeatures\PatchArmedUnarmed.cpp" />
     <ClCompile Include="MiscFeatures\PatchExplosionForce.cpp" />

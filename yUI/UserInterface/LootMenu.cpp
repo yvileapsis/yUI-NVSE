@@ -349,7 +349,7 @@ namespace UserInterface::LootMenu
 		else if (offset < items.size() - tiles)	{ update = true; offset++; }
 		else if (overScroll)					{ update = true; offset = 0; index = 0; }
 
-		if (!IsKeyPressed(keyScrollDown)) {}
+		if (!IsKeyPressed(keyScrollUp)) {}
 		else if (index > 0)						{ update = true; index--; }
 		else if (offset > 0)					{ update = true; offset--; }
 		else if (overScroll)					{ update = true; offset = items.size() - tiles; index = tiles - 1; }
@@ -700,22 +700,8 @@ namespace UserInterface::LootMenu
 		}
 	}
 
-	SInt32 __fastcall OSInputGlobals__GetMouseXYOrScrollDelta(OSInputGlobals* osinput, void* dummyedx, int a2)
-	{
-		SInt32 mywheel = 0;
-		if (IsKeyPressed(keyScrollUp)) mywheel += 120;
-		if (IsKeyPressed(keyScrollDown)) mywheel -= 120;
-		return mywheel;
-	}
-
-	void Patch()
-	{
-		WriteRelCall(0x70CE9E, OSInputGlobals__GetMouseXYOrScrollDelta);
-	}
-
 	void MainLoopDoOnce()
 	{
-		Patch();
 		tileMain = g_HUDMainMenu->tile->GetChild("JLM");
 		if (!tileMain)
 		{

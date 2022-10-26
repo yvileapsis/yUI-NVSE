@@ -140,6 +140,9 @@
     <ClCompile Include="UserInterface\HitIndicator.cpp">
       <Filter>features\UserInterface</Filter>
     </ClCompile>
+    <ClCompile Include="MiscFeatures\FixTouchpadScrolling.cpp">
+      <Filter>features</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h" />
