@@ -141,7 +141,6 @@ namespace UserInterface::DynamicCrosshair
 			spreadTarget *= g_player->worldFOV / fDefaultWorldFOV;
 		}
 
-
 		tileMain->SetFloat("_Spread", UpdateCurrentSpread(spreadTarget));
 	}
 
