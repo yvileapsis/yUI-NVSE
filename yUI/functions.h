@@ -51,4 +51,3 @@ bool IsButtonPressed(UInt32 button);
 UInt32 GetControl(UInt32 whichControl, UInt32 type = OSInputGlobals::kControlType_Keyboard);
 void SetNativeHandlerFunctionBool(bool trueorfalse);
 bool ToggleVanityWheel(bool toggle);
-bool HasScriptBlock(const Script* script, const UInt32 blockType);

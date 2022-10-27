@@ -24,6 +24,12 @@ namespace UserInterface::EventLayer
 		for (const auto i : onAddDrop) i(thisObj, ptr->ref, ptr->form);
 	}
 
+	void OnActivate(TESObjectREFR* thisObj, void* parameters)
+	{
+		const auto ptr = static_cast<ReferenceForm*>(parameters);
+		for (const auto i : onActivate) i(thisObj, ptr->ref, ptr->form);
+	}
+
 	void OnPreActivate(TESObjectREFR* thisObj, void* parameters)
 	{
 		const auto ptr = static_cast<ActorBool*>(parameters);
@@ -48,6 +54,8 @@ namespace UserInterface::EventLayer
 
 		SetEventHandler("OnAdd", OnAddDrop);
 		SetEventHandler("OnDrop", OnAddDrop);
+
+		SetEventHandler("OnActivate", OnActivate);
 
 		SetEventHandler("ShowOff:OnPreActivate", OnPreActivate);
 	}

@@ -135,14 +135,19 @@ namespace UserInterface::LootMenu
 		if (!script) return kAllow;
 		if (allowList.contains(script)) return allowList[script];
 		if (HasScriptCommand(script, cmd_Activate, cmd_OnActivate)) allowList[script] = kCheck;
-		else if (HasScriptBlock(script, 2)) allowList[script] = kDisallow;
+		else if (HasScriptCommand(script, cmd_OnActivate, nullptr)) allowList[script] = kDisallow;
 		else allowList[script] = kAllow;
 		return allowList[script];
 	}
 
+	SInt8 CheckContainer(const TESObjectREFR* container)
+	{
+		return CheckScript(container->baseForm->GetScript());
+	}
+
 	bool ShouldAllowContainerInteractions()
 	{
-		return container && !((CheckScript(ref->baseForm->GetScript()) == kCheck || block) && blockActivation == true);
+		return container && !((block || CheckContainer(container) == kCheck) && blockActivation);
 	}
 
 	bool NameNotEmpty(TESObjectREFR* ref)
@@ -327,7 +332,7 @@ namespace UserInterface::LootMenu
 			if (open != !ref->IsLocked())				{ update = true; open = !open; }
 			if (notcannibal != GetCannibalPrompt(ref))	{ update = true; notcannibal = !notcannibal; }
 
-			if (!ref->baseForm->CanContainItems() || CheckScript(ref->baseForm->GetScript()) == kDisallow) ref = nullptr;
+			if (!ref->baseForm->CanContainItems() || CheckContainer(ref) == kDisallow) ref = nullptr;
 		}
 
 		if (!update) return;
@@ -410,15 +415,11 @@ namespace UserInterface::LootMenu
 
 	bool Cmd_ActivateAlt(COMMAND_ARGS)
 	{
-		if (!container || thisObj != container) {
-			const bool newresult = cmd_Activate_Execute(PASS_COMMAND_ARGS);
-			FixActivate();
-			return newresult;
-		}
+		if (!container || thisObj != container) return cmd_Activate_Execute(PASS_COMMAND_ARGS);
 		FixActivate();
 		blockActivation = false;
-		Update();
 		if (!openedContainer) { container->OpenCloseContainer(true, sounds & 0x1); openedContainer = container; }
+		Update();
 		return true;
 	}
 
@@ -443,8 +444,16 @@ namespace UserInterface::LootMenu
 		if (action == kOpen) return true;
 
 		if (action == kNone) {
-			if (blockActivation) ReplaceActivate();
-			return true;
+			if (!blockActivation) return false;
+			if (CheckScript(ref->baseForm->GetScript()) == kCheck)
+			{
+				ReplaceActivate();
+				return true;
+			}
+			blockActivation = false;
+			if (!openedContainer) { container->OpenCloseContainer(true, sounds & 0x1); openedContainer = container; }
+			Update();
+			return false;
 		}
 
 		if (!openedContainer) { container->OpenCloseContainer(true, sounds & 0x1); openedContainer = container; }
@@ -514,7 +523,7 @@ namespace UserInterface::LootMenu
 				key2 && IsKeyPressed(key2, DIHookControl::kFlag_RawState) || button2 && IsButtonPressed(button2) ||
 				key3 && IsKeyPressed(key3, DIHookControl::kFlag_RawState) || button3 && IsButtonPressed(button3))
 			{
-				if (lockTake) { lockTake = false; container->Activate(g_player, 0, 0, 1); FixActivate(); }
+				if (lockTake) { lockTake = false; container->Activate(g_player, 0, 0, 1); }
 			}
 			else lockTake = true;
 			Weight();
@@ -532,9 +541,9 @@ namespace UserInterface::LootMenu
 
 	bool OnPreActivate(TESObjectREFR* thisObj, Actor* ref, bool isActivationNotPrevented)
 	{
+		if (!container) UpdateContainer(thisObj);
 		if (!container || thisObj != container || ref != g_player || !isActivationNotPrevented) return true;
-		const auto val = ActionToTake();
-		return Action(val);
+		return Action(ActionToTake());
 	}
 
 	std::string GetStringForButton(UInt32 button)
@@ -555,65 +564,66 @@ namespace UserInterface::LootMenu
 
 	void HandleINI()
 	{
-		const auto iniPath = GetCurPath() + R"(\Data\Config\JustMods.ini)";
+//		const auto iniPath = GetCurPath() + R"(\Data\Config\JustMods.ini)";
+		const auto iniPath = GetCurPath() + yUI_INI;
 		CSimpleIniA ini;
 		ini.SetUnicode();
 
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return; 
 
-		enable = ini.GetOrCreate("JustMods", "bLootMenu", 1, nullptr);
+		enable			= ini.GetOrCreate("General", "bLootMenu", 1, nullptr);
 
-		key1Base		= ini.GetOrCreate("JLM", "iKey1", 0, nullptr);
-		key2Base		= ini.GetOrCreate("JLM", "iKey2", 0, nullptr);
-		key3Base		= ini.GetOrCreate("JLM", "iKey3", 0, nullptr);
-		keyAltBase		= ini.GetOrCreate("JLM", "iKeyAlt", 0, nullptr);
-		keyScrollUp		= ini.GetOrCreate("JLM", "iKeyScrollUp", 264, nullptr);
-		keyScrollDown	= ini.GetOrCreate("JLM", "iKeyScrollDown", 265, nullptr);
+		key1Base		= ini.GetOrCreate("Loot Menu", "iKey1", 0, nullptr);
+		key2Base		= ini.GetOrCreate("Loot Menu", "iKey2", 0, nullptr);
+		key3Base		= ini.GetOrCreate("Loot Menu", "iKey3", 0, nullptr);
+		keyAltBase		= ini.GetOrCreate("Loot Menu", "iKeyAlt", 0, nullptr);
+		keyScrollUp		= ini.GetOrCreate("Loot Menu", "iKeyScrollUp", 264, nullptr);
+		keyScrollDown	= ini.GetOrCreate("Loot Menu", "iKeyScrollDown", 265, nullptr);
 
-		button1Base		= ini.GetOrCreate("JLM", "iButton1", 0, nullptr);
-		button2Base		= ini.GetOrCreate("JLM", "iButton2", 0, nullptr);
-		button3Base		= ini.GetOrCreate("JLM", "iButton3", 0, nullptr);
-		buttonAltBase	= ini.GetOrCreate("JLM", "iButtonAlt", 0, nullptr);
+		button1Base		= ini.GetOrCreate("Loot Menu", "iButton1", 0, nullptr);
+		button2Base		= ini.GetOrCreate("Loot Menu", "iButton2", 0, nullptr);
+		button3Base		= ini.GetOrCreate("Loot Menu", "iButton3", 0, nullptr);
+		buttonAltBase	= ini.GetOrCreate("Loot Menu", "iButtonAlt", 0, nullptr);
 
-		mode1			= ini.GetOrCreate("JLM", "iMode1", kTake, nullptr);
-		mode1Alt		= ini.GetOrCreate("JLM", "iMode1Alt", kEquip, nullptr);
-		mode2			= ini.GetOrCreate("JLM", "iMode", kOpen, nullptr);
-		mode2Alt		= ini.GetOrCreate("JLM", "iMode2Alt", kTakeAll, nullptr);
-		mode3			= ini.GetOrCreate("JLM", "iMode3", kNone, nullptr);
-		mode3Alt		= ini.GetOrCreate("JLM", "iMode3Alt", kNone, nullptr);
+		mode1			= ini.GetOrCreate("Loot Menu", "iMode1", kTake, nullptr);
+		mode1Alt		= ini.GetOrCreate("Loot Menu", "iMode1Alt", kEquip, nullptr);
+		mode2			= ini.GetOrCreate("Loot Menu", "iMode", kOpen, nullptr);
+		mode2Alt		= ini.GetOrCreate("Loot Menu", "iMode2Alt", kTakeAll, nullptr);
+		mode3			= ini.GetOrCreate("Loot Menu", "iMode3", kNone, nullptr);
+		mode3Alt		= ini.GetOrCreate("Loot Menu", "iMode3Alt", kNone, nullptr);
 
-		takeSmartMin	= ini.GetOrCreate("JLM", "iTakeSmartMin", 5, nullptr);
-		takeWeightless	= ini.GetOrCreate("JLM", "bTakeWeightless", true, nullptr);
+		takeSmartMin	= ini.GetOrCreate("Loot Menu", "iTakeSmartMin", 5, nullptr);
+		takeWeightless	= ini.GetOrCreate("Loot Menu", "bTakeWeightless", true, nullptr);
 
-		block			= ini.GetOrCreate("JLM", "bBlockBeforeActivate", false, nullptr);
-		overScroll		= ini.GetOrCreate("JLM", "bOverScroll", false, nullptr);
-		hidePrompt		= ini.GetOrCreate("JLM", "bHidePrompt", true, nullptr);
-		hideName		= ini.GetOrCreate("JLM", "bHideName", false, nullptr);
-		itemsMax		= ini.GetOrCreate("JLM", "iItemsMax", 5, nullptr);
+		block			= ini.GetOrCreate("Loot Menu", "bBlockBeforeActivate", false, nullptr);
+		overScroll		= ini.GetOrCreate("Loot Menu", "bOverScroll", false, nullptr);
+		hidePrompt		= ini.GetOrCreate("Loot Menu", "bHidePrompt", true, nullptr);
+		hideName		= ini.GetOrCreate("Loot Menu", "bHideName", false, nullptr);
+		itemsMax		= ini.GetOrCreate("Loot Menu", "iItemsMax", 5, nullptr);
 
-		justify			= ini.GetOrCreate("JLM", "iJustify", 3, nullptr);
-		heightMin		= ini.GetOrCreate("JLM", "fHeightMin", 32.0, nullptr);
-		heightMax		= ini.GetOrCreate("JLM", "fHeightMax", 640.0, nullptr);
-		widthMin		= ini.GetOrCreate("JLM", "fWidthMin", 400.0, nullptr);
-		widthMax		= ini.GetOrCreate("JLM", "fWidthMax", 640.0, nullptr);
-		offsetX			= ini.GetOrCreate("JLM", "fOffsetX", 0.625, nullptr);
-		offsetY			= ini.GetOrCreate("JLM", "fOffsetY", 0.5, nullptr);
+		justify			= ini.GetOrCreate("Loot Menu", "iJustify", 3, nullptr);
+		heightMin		= ini.GetOrCreate("Loot Menu", "fHeightMin", 32.0, nullptr);
+		heightMax		= ini.GetOrCreate("Loot Menu", "fHeightMax", 640.0, nullptr);
+		widthMin		= ini.GetOrCreate("Loot Menu", "fWidthMin", 400.0, nullptr);
+		widthMax		= ini.GetOrCreate("Loot Menu", "fWidthMax", 640.0, nullptr);
+		offsetX			= ini.GetOrCreate("Loot Menu", "fOffsetX", 0.625, nullptr);
+		offsetY			= ini.GetOrCreate("Loot Menu", "fOffsetY", 0.5, nullptr);
 
-		indentItem		= ini.GetOrCreate("JLM", "fIndentItem", 8.0, nullptr);
-		indentTextX		= ini.GetOrCreate("JLM", "fIndentTextX", 10.0, nullptr);
-		indentTextY		= ini.GetOrCreate("JLM", "fIndentTextY", 10.0, nullptr);
+		indentItem		= ini.GetOrCreate("Loot Menu", "fIndentItem", 8.0, nullptr);
+		indentTextX		= ini.GetOrCreate("Loot Menu", "fIndentTextX", 10.0, nullptr);
+		indentTextY		= ini.GetOrCreate("Loot Menu", "fIndentTextY", 10.0, nullptr);
 
-		weightVisible	= ini.GetOrCreate("JLM", "iWeightVisible", 2, nullptr);
-		weightAltColor	= ini.GetOrCreate("JLM", "iWeightAltColor", 1, nullptr);
-		font			= ini.GetOrCreate("JLM", "iFont", 0, nullptr);
-		fontHead		= ini.GetOrCreate("JLM", "iFontHead", 0, nullptr);
-		fontY			= ini.GetOrCreate("JLM", "fFontY", 0.0, nullptr);
-		fontHeadY		= ini.GetOrCreate("JLM", "fFontHeadY", 0.0, nullptr);
+		weightVisible	= ini.GetOrCreate("Loot Menu", "iWeightVisible", 2, nullptr);
+		weightAltColor	= ini.GetOrCreate("Loot Menu", "iWeightAltColor", 1, nullptr);
+		font			= ini.GetOrCreate("Loot Menu", "iFont", 0, nullptr);
+		fontHead		= ini.GetOrCreate("Loot Menu", "iFontHead", 0, nullptr);
+		fontY			= ini.GetOrCreate("Loot Menu", "fFontY", 0.0, nullptr);
+		fontHeadY		= ini.GetOrCreate("Loot Menu", "fFontHeadY", 0.0, nullptr);
 
-		sounds			= ini.GetOrCreate("JLM", "bSounds", true, nullptr);
-		showEquip		= ini.GetOrCreate("JLM", "bShowEquip", true, nullptr);
-		showIcon		= ini.GetOrCreate("JLM", "bShowIcon", true, nullptr);
-		showMeter		= ini.GetOrCreate("JLM", "bShowMeter", true, nullptr);
+		sounds			= ini.GetOrCreate("Loot Menu", "bSounds", true, nullptr);
+		showEquip		= ini.GetOrCreate("Loot Menu", "bShowEquip", true, nullptr);
+		showIcon		= ini.GetOrCreate("Loot Menu", "bShowIcon", true, nullptr);
+		showMeter		= ini.GetOrCreate("Loot Menu", "bShowMeter", true, nullptr);
 
 		ini.SaveFile(iniPath.c_str(), false);
 	}

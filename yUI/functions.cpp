@@ -365,6 +365,12 @@ bool ToggleVanityWheel(bool toggle)
 	return element.num;
 }
 
+/*
+	bool s_vanityEnabled = true;
+	s_vanityEnabled = !s_vanityEnabled;
+	SafeWrite8(0x945A29, toggle ? 0x8B : 0x89);
+*/
+
 Script* JIPGetAuxVarOrDefault;
 Float32 GetJIPAuxVarOrDefault(const char* auxvar, SInt32 index, Float32 def)
 {
@@ -398,64 +404,4 @@ bool GetCannibalPrompt(TESObjectREFR* ref)
 	activationPromptTList.Init();
 	ApplyPerkModifiers(0x1B, g_player, ref, &activationPromptTList, ref);
 	return activationPromptTList.Empty();
-}
-
-/* JIP code might change later */
-class ScriptBlockIterator
-{
-	UInt8*		dataPtr;
-	UInt32		length;
-	UInt32		currOffset;
-	UInt8*		typePtr;
-	UInt32		nextOpOffset;
-
-	bool EvalBlock()
-	{
-		if (*(UInt16*)(dataPtr + currOffset) != 0x10) return false;
-		currOffset += 2;
-		const UInt16 opSize = *(UInt16*)(dataPtr + currOffset);
-		currOffset += 2;
-		typePtr = dataPtr + currOffset;
-		nextOpOffset = currOffset + opSize;
-		currOffset += 2;
-		currOffset += *(UInt16*)(dataPtr + currOffset) + opSize - 6;
-		if (*(UInt32*)(dataPtr + currOffset) == 0x11)
-		{
-			currOffset += 4;
-			return true;
-		}
-		return false;
-	}
-
-public:
-	explicit operator bool() const { return length != 0; }
-	void operator++()
-	{
-		if (currOffset < length)
-		{
-			if (EvalBlock()) return;
-			typePtr = nullptr;
-		}
-		length = 0;
-	}
-
-	UInt8* TypePtr() const { return typePtr; }
-	UInt32 NextOpOffset() const { return nextOpOffset; }
-	UInt32 NextBlockOffset() const { return currOffset; }
-
-	ScriptBlockIterator(UInt8* _dataPtr, UInt32 _length) : dataPtr(_dataPtr), length(_length), currOffset(4)
-	{
-		if (!dataPtr || (*(UInt32*)dataPtr != 0x1D) || !EvalBlock())
-		{
-			length = 0;
-			typePtr = nullptr;
-		}
-	}
-};
-
-bool HasScriptBlock(const Script* script, const UInt32 blockType)
-{
-	for (ScriptBlockIterator blockIter(static_cast<UInt8*>(script->data), script->info.dataLength); blockIter; ++blockIter)
-		if (*blockIter.TypePtr() == blockType) return true;
-	return false;
 }
