@@ -17,6 +17,8 @@ namespace Fix::ProjectileEffects
 		const auto iniPath = GetCurPath() + yUI_INI;
 		CSimpleIniA ini;
 		ini.SetUnicode();
+
+
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
 		effectsAmmo = ini.GetOrCreate("Projectile Bugfixes", "bCorrectAmmoEffects", 0, "; EXPERIMENTAL DO NOT TOUCH");

@@ -163,9 +163,6 @@
     <ClInclude Include="..\nvse\prefix.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\nvse\PluginManager.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
     <ClInclude Include="..\nvse\PluginAPI.h">
       <Filter>nvse</Filter>
     </ClInclude>
@@ -255,6 +252,9 @@
     </ClInclude>
     <ClInclude Include="..\game\Containers.h">
       <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nvse\printf.h">
+      <Filter>nvse</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

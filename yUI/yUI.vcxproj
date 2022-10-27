@@ -194,8 +194,8 @@
     <ClInclude Include="..\game\NiObjects.h" />
     <ClInclude Include="..\game\NiTypes.h" />
     <ClInclude Include="..\nvse\PluginAPI.h" />
-    <ClInclude Include="..\nvse\PluginManager.h" />
     <ClInclude Include="..\nvse\prefix.h" />
+    <ClInclude Include="..\nvse\printf.h" />
     <ClInclude Include="..\nvse\SafeWrite.h" />
     <ClInclude Include="..\nvse\Utilities.h" />
     <ClInclude Include="ConfigurationMenu\ConfigurationMenu.h" />

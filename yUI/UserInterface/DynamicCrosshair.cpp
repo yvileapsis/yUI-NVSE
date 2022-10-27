@@ -146,29 +146,30 @@ namespace UserInterface::DynamicCrosshair
 
 	void HandleINI()
 	{
-		const auto iniPath = GetCurPath() + R"(\Data\Config\JustMods.ini)";
+		const auto iniPath = GetCurPath() + yUI_INI;
 		CSimpleIniA ini;
 		ini.SetUnicode();
 
+
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
-		enable			= ini.GetOrCreate("JustMods", "bDynamicCrosshair", 0, nullptr);
-		dynamic			= ini.GetOrCreate("JDC", "iDynamic", 1, nullptr);
-		shotgunAlt		= ini.GetOrCreate("JDC", "bShotgunAlt", 1, nullptr);
-		noNodeSighting	= ini.GetOrCreate("JDC", "bNoNodeSighting", 1, nullptr);
-		modeHolstered	= ini.GetOrCreate("JDC", "iModeHolstered", 1, nullptr);
-		modeOut1st		= ini.GetOrCreate("JDC", "iModeOut1st", 5, nullptr);
-		modeOut3rd		= ini.GetOrCreate("JDC", "iModeOut3rd", 5, nullptr);
-		modeSighting1st	= ini.GetOrCreate("JDC", "iModeSighting1st", 3, nullptr);
-		modeSighting3rd	= ini.GetOrCreate("JDC", "iModeSighting3rd", 3, nullptr);
-		modeScope		= ini.GetOrCreate("JDC", "iModeScope", 0, nullptr);
-		distance		= ini.GetOrCreate("JDC", "fDistance", 0.0, nullptr);
-		speed			= ini.GetOrCreate("JDC", "fSpeed", 0.25, nullptr);
-		lengthMax		= ini.GetOrCreate("JDC", "fLengthMax", 72.0, nullptr);
-		lengthMin		= ini.GetOrCreate("JDC", "fLengthMin", 24.0, nullptr);
-		width			= ini.GetOrCreate("JDC", "fWidth", 8.0, nullptr);
-		offsetMax		= ini.GetOrCreate("JDC", "fOffsetMax", 256.0, nullptr);
-		offsetMin		= ini.GetOrCreate("JDC", "fOffsetMin", 0.0, nullptr);
+		enable			= ini.GetOrCreate("General", "bDynamicCrosshair", true, "; enable 'Dynamic Crosshair' feature. If required files are not found this will do nothing.");
+		dynamic			= ini.GetOrCreate("Dynamic Crosshair", "iDynamic", 1, nullptr);
+		shotgunAlt		= ini.GetOrCreate("Dynamic Crosshair", "bShotgunAlt", 1, nullptr);
+		noNodeSighting	= ini.GetOrCreate("Dynamic Crosshair", "bNoNodeSighting", 1, nullptr);
+		modeHolstered	= ini.GetOrCreate("Dynamic Crosshair", "iModeHolstered", 1, nullptr);
+		modeOut1st		= ini.GetOrCreate("Dynamic Crosshair", "iModeOut1st", 5, nullptr);
+		modeOut3rd		= ini.GetOrCreate("Dynamic Crosshair", "iModeOut3rd", 5, nullptr);
+		modeSighting1st	= ini.GetOrCreate("Dynamic Crosshair", "iModeSighting1st", 3, nullptr);
+		modeSighting3rd	= ini.GetOrCreate("Dynamic Crosshair", "iModeSighting3rd", 3, nullptr);
+		modeScope		= ini.GetOrCreate("Dynamic Crosshair", "iModeScope", 0, nullptr);
+		distance		= ini.GetOrCreate("Dynamic Crosshair", "fDistance", 0.0, nullptr);
+		speed			= ini.GetOrCreate("Dynamic Crosshair", "fSpeed", 0.25, nullptr);
+		lengthMax		= ini.GetOrCreate("Dynamic Crosshair", "fLengthMax", 72.0, nullptr);
+		lengthMin		= ini.GetOrCreate("Dynamic Crosshair", "fLengthMin", 24.0, nullptr);
+		width			= ini.GetOrCreate("Dynamic Crosshair", "fWidth", 8.0, nullptr);
+		offsetMax		= ini.GetOrCreate("Dynamic Crosshair", "fOffsetMax", 256.0, nullptr);
+		offsetMin		= ini.GetOrCreate("Dynamic Crosshair", "fOffsetMin", 0.0, nullptr);
 
 		ini.SaveFile(iniPath.c_str(), false);
 	}
@@ -229,5 +230,6 @@ namespace UserInterface::DynamicCrosshair
 	{
 		if (g_nvseInterface->isEditor) return;
 		mainLoopDoOnce.emplace_back(MainLoopDoOnce);
+		HandleINI();
 	}
 }

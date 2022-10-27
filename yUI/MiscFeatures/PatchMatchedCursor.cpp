@@ -4,6 +4,8 @@
 
 #include <SimpleINILibrary.h>
 
+#include <Tiles.h>
+
 namespace Patch::MatchedCursor
 {
 	inline int enable = 0;
@@ -13,6 +15,8 @@ namespace Patch::MatchedCursor
 		const auto iniPath = GetCurPath() + yUI_INI;
 		CSimpleIniA ini;
 		ini.SetUnicode();
+
+
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
 		enable = ini.GetOrCreate("General", "bMatchingCursor", 0, "; match cursor color to HUD color");

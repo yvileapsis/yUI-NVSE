@@ -105,7 +105,7 @@ namespace UserInterface::HitIndicator
 		tileMain->SetFloat("_visible", visible);
 		tileMain->SetFloat("_scope", g_player->UsingIronSights());
 
-		if (!visible) { hitQueue.clear(); return; }
+		if (MenuMode() || !visible) { hitQueue.clear(); return; }
 
 		if (rotate == 1)
 		{
@@ -155,40 +155,42 @@ namespace UserInterface::HitIndicator
 	}
 
 	
-	void HandleINI(const std::string& iniPath)
+	void HandleINI()
 	{
+		const auto iniPath = GetCurPath() + yUI_INI;
 		CSimpleIniA ini;
 		ini.SetUnicode();
 
+
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
-		enable			= ini.GetOrCreate("JustMods", "bHitIndicator", 1, nullptr);
-		seconds			= ini.GetOrCreate("JHI", "fSeconds", 2.5, nullptr);
-		alpha			= ini.GetOrCreate("JHI", "fAlpha", 400.0, nullptr);
-		height			= ini.GetOrCreate("JHI", "fHeight", 256.0, nullptr);
-		width			= ini.GetOrCreate("JHI", "fWidth", 256.0, nullptr);
-		offset			= ini.GetOrCreate("JHI", "fOffset", 0.0, nullptr);
-		modeHit			= ini.GetOrCreate("JHI", "iModeHit", kHitIndicatorNormal, nullptr);
-		modeDead		= ini.GetOrCreate("JHI", "iModeDead", kHitIndicatorNormal, nullptr);
-		modeKill		= ini.GetOrCreate("JHI", "iModeKill", kHitIndicatorOffset, nullptr);
-		modeEnemy		= ini.GetOrCreate("JHI", "iModeEnemy", kHitIndicatorAltColor, nullptr);
-		modeCrit		= ini.GetOrCreate("JHI", "iModeCrit", kHitIndicatorDouble, nullptr);
-		modeHeadshot	= ini.GetOrCreate("JHI", "iModeHeadshot", kHitIndicatorShakeVert, nullptr);
-		modeSelf		= ini.GetOrCreate("JHI", "iModeSelf", kHitIndicatorHalfAlpha, nullptr);
-		modeExplosion	= ini.GetOrCreate("JHI", "iModeExplosion", kHitIndicatorShakeHoriz, nullptr);
-		modeNoAttacker	= ini.GetOrCreate("JHI", "iModeNoAttacker", kHitIndicatorHalfAlpha, nullptr);
-		modeNoDamage	= ini.GetOrCreate("JHI", "iModeNoDamage", kHitIndicatorNothing, nullptr);
-		enableOut		= ini.GetOrCreate("JHI", "bEnableOut", true, nullptr);
-		enableSighting	= ini.GetOrCreate("JHI", "bEnableSighting", true, nullptr);
-		enableScope		= ini.GetOrCreate("JHI", "bEnableScope", true, nullptr);
-		rotate			= ini.GetOrCreate("JHI", "iRotate", 2, nullptr);
+		enable			= ini.GetOrCreate("General", "bHitIndicator", 1, "; enable 'Hit Indicator' feature. If required files are not found this will do nothing.");
+		seconds			= ini.GetOrCreate("Hit Indicator", "fSeconds", 2.5, nullptr);
+		alpha			= ini.GetOrCreate("Hit Indicator", "fAlpha", 400.0, nullptr);
+		height			= ini.GetOrCreate("Hit Indicator", "fHeight", 256.0, nullptr);
+		width			= ini.GetOrCreate("Hit Indicator", "fWidth", 256.0, nullptr);
+		offset			= ini.GetOrCreate("Hit Indicator", "fOffset", 0.0, nullptr);
+		modeHit			= ini.GetOrCreate("Hit Indicator", "iModeHit", kHitIndicatorNormal, nullptr);
+		modeDead		= ini.GetOrCreate("Hit Indicator", "iModeDead", kHitIndicatorNormal, nullptr);
+		modeKill		= ini.GetOrCreate("Hit Indicator", "iModeKill", kHitIndicatorOffset, nullptr);
+		modeEnemy		= ini.GetOrCreate("Hit Indicator", "iModeEnemy", kHitIndicatorAltColor, nullptr);
+		modeCrit		= ini.GetOrCreate("Hit Indicator", "iModeCrit", kHitIndicatorDouble, nullptr);
+		modeHeadshot	= ini.GetOrCreate("Hit Indicator", "iModeHeadshot", kHitIndicatorShakeVert, nullptr);
+		modeSelf		= ini.GetOrCreate("Hit Indicator", "iModeSelf", kHitIndicatorHalfAlpha, nullptr);
+		modeExplosion	= ini.GetOrCreate("Hit Indicator", "iModeExplosion", kHitIndicatorShakeHoriz, nullptr);
+		modeNoAttacker	= ini.GetOrCreate("Hit Indicator", "iModeNoAttacker", kHitIndicatorHalfAlpha, nullptr);
+		modeNoDamage	= ini.GetOrCreate("Hit Indicator", "iModeNoDamage", kHitIndicatorNothing, nullptr);
+		enableOut		= ini.GetOrCreate("Hit Indicator", "bEnableOut", true, nullptr);
+		enableSighting	= ini.GetOrCreate("Hit Indicator", "bEnableSighting", true, nullptr);
+		enableScope		= ini.GetOrCreate("Hit Indicator", "bEnableScope", true, nullptr);
+		rotate			= ini.GetOrCreate("Hit Indicator", "iRotate", 2, nullptr);
 
 		ini.SaveFile(iniPath.c_str(), false);
 	}
 
 	void Reset()
 	{
-		HandleINI(GetCurPath() + R"(\Data\Config\JustMods.ini)");
+		HandleINI();
 
 		if (!enable)
 		{
@@ -232,5 +234,6 @@ namespace UserInterface::HitIndicator
 		if (g_nvseInterface->isEditor) return;
 
 		mainLoopDoOnce.emplace_back(MainLoopDoOnce);
+		HandleINI();
 	}
 }

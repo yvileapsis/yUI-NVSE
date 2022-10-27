@@ -564,14 +564,15 @@ namespace UserInterface::LootMenu
 
 	void HandleINI()
 	{
-//		const auto iniPath = GetCurPath() + R"(\Data\Config\JustMods.ini)";
+//		const auto iniPath = GetCurPath() + yUI_INI";
 		const auto iniPath = GetCurPath() + yUI_INI;
 		CSimpleIniA ini;
 		ini.SetUnicode();
 
+
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return; 
 
-		enable			= ini.GetOrCreate("General", "bLootMenu", 1, nullptr);
+		enable			= ini.GetOrCreate("General", "bLootMenu", true, "; enable 'Loot Menu' feature. If required files are not found this will do nothing.");
 
 		key1Base		= ini.GetOrCreate("Loot Menu", "iKey1", 0, nullptr);
 		key2Base		= ini.GetOrCreate("Loot Menu", "iKey2", 0, nullptr);
@@ -736,5 +737,6 @@ namespace UserInterface::LootMenu
 
 		pluginLoad.emplace_back(PluginLoad);
 		mainLoopDoOnce.emplace_back(MainLoopDoOnce);
+		HandleINI();
 	}
 }

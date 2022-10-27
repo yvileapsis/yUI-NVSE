@@ -15,6 +15,8 @@ namespace Patch::ExplosionForce
 		const auto iniPath = GetCurPath() + yUI_INI;
 		CSimpleIniA ini;
 		ini.SetUnicode();
+
+
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
 		enable = ini.GetOrCreate("General", "bFixExplosionPushForce", 1, "; fix force of the explosions to scale both with distance (like explosion damage) and with actual force of the explosion's baseform.");

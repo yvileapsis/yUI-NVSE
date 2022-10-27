@@ -1,5 +1,6 @@
 #include <main.h>
 
+#include <GameForms.h>
 #include <Menus.h>
 #include <SimpleINILibrary.h>
 
@@ -100,7 +101,7 @@ namespace UserInterface::HitMarker
 		tileMain->SetFloat("_Visible", visible);
 		tileMain->SetFloat("_scope", g_player->UsingIronSights());
 
-		if (!visible) { hitMarkers.clear(); return; }
+		if (MenuMode() || !visible) { hitMarkers.clear(); return; }
 
 		for (auto i = tilesInUse.begin(); i != tilesInUse.end(); ) if (!ProcessTilesInUse(*i)) tilesInUse.erase(i++); else ++i;
 
@@ -147,31 +148,32 @@ namespace UserInterface::HitMarker
 	
 	void HandleINI()
 	{
-		const auto iniPath = GetCurPath() + R"(\Data\Config\JustMods.ini)";
+		const auto iniPath = GetCurPath() + yUI_INI;
 		CSimpleIniA ini;
 		ini.SetUnicode();
 
+
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
-		enable			= ini.GetOrCreate("JustMods", "bHitMarker", true, nullptr);
-		seconds			= ini.GetOrCreate("JHM", "fSeconds", 0.5, nullptr);
-		alpha			= ini.GetOrCreate("JHM", "fAlpha", 400.0, nullptr);
-		length			= ini.GetOrCreate("JHM", "fLength", 24.0, nullptr);
-		width			= ini.GetOrCreate("JHM", "fWidth", 8.0, nullptr);
-		offset			= ini.GetOrCreate("JHM", "fOffset", 24.0, nullptr);
-		modeHit			= ini.GetOrCreate("JHM", "iModeHit",kHitMarkerNormal, nullptr);
-		modeDead		= ini.GetOrCreate("JHM", "iModeDead", kHitMarkerNormal, nullptr);
-		modeKill		= ini.GetOrCreate("JHM", "iModeKill", kHitMarkerOffset, nullptr);
-		modeEnemy		= ini.GetOrCreate("JHM", "iModeEnemy", kHitMarkerAltColor, nullptr);
-		modeCrit		= ini.GetOrCreate("JHM", "iModeCrit", kHitMarkerDouble, nullptr);
-		modeHeadshot	= ini.GetOrCreate("JHM", "iModeHead", kHitMarkerShake, nullptr);
-		modeExplosion	= ini.GetOrCreate("JHM", "iModeExplosion", kHitMarkerDouble, nullptr);
-		modeCompanion	= ini.GetOrCreate("JHM", "iModeByCompanion", kHitMarkerHalfAlpha, nullptr);
-		enableOut		= ini.GetOrCreate("JHM", "bEnableOut", true, nullptr);
-		enableSighting	= ini.GetOrCreate("JHM", "bEnableSighting", true, nullptr);
-		enableScope		= ini.GetOrCreate("JHM", "bEnableScope", true, nullptr);
-		dynamic			= ini.GetOrCreate("JHM", "iDynamic", 0, nullptr);
-		maxTiles		= ini.GetOrCreate("JHM", "iMaxTiles", 25, nullptr);
+		enable			= ini.GetOrCreate("General", "bHitMarker", true, "; enable 'Hit Marker' feature. If required files are not found this will do nothing.");
+		seconds			= ini.GetOrCreate("Hit Marker", "fSeconds", 0.5, nullptr);
+		alpha			= ini.GetOrCreate("Hit Marker", "fAlpha", 400.0, nullptr);
+		length			= ini.GetOrCreate("Hit Marker", "fLength", 24.0, nullptr);
+		width			= ini.GetOrCreate("Hit Marker", "fWidth", 8.0, nullptr);
+		offset			= ini.GetOrCreate("Hit Marker", "fOffset", 24.0, nullptr);
+		modeHit			= ini.GetOrCreate("Hit Marker", "iModeHit",kHitMarkerNormal, nullptr);
+		modeDead		= ini.GetOrCreate("Hit Marker", "iModeDead", kHitMarkerNormal, nullptr);
+		modeKill		= ini.GetOrCreate("Hit Marker", "iModeKill", kHitMarkerOffset, nullptr);
+		modeEnemy		= ini.GetOrCreate("Hit Marker", "iModeEnemy", kHitMarkerAltColor, nullptr);
+		modeCrit		= ini.GetOrCreate("Hit Marker", "iModeCrit", kHitMarkerDouble, nullptr);
+		modeHeadshot	= ini.GetOrCreate("Hit Marker", "iModeHead", kHitMarkerShake, nullptr);
+		modeExplosion	= ini.GetOrCreate("Hit Marker", "iModeExplosion", kHitMarkerDouble, nullptr);
+		modeCompanion	= ini.GetOrCreate("Hit Marker", "iModeByCompanion", kHitMarkerHalfAlpha, nullptr);
+		enableOut		= ini.GetOrCreate("Hit Marker", "bEnableOut", true, nullptr);
+		enableSighting	= ini.GetOrCreate("Hit Marker", "bEnableSighting", true, nullptr);
+		enableScope		= ini.GetOrCreate("Hit Marker", "bEnableScope", true, nullptr);
+		dynamic			= ini.GetOrCreate("Hit Marker", "iDynamic", 0, nullptr);
+		maxTiles		= ini.GetOrCreate("Hit Marker", "iMaxTiles", 25, nullptr);
 
 		ini.SaveFile(iniPath.c_str(), false);
 	}
@@ -223,5 +225,6 @@ namespace UserInterface::HitMarker
 	{
 		if (g_nvseInterface->isEditor) return;
 		mainLoopDoOnce.emplace_back(MainLoopDoOnce);
+		HandleINI();
 	}
 }

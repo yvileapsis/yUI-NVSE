@@ -14,9 +14,11 @@ namespace Patch::ArmedUnarmed
 
 	void HandleINIs()
 	{
+		const auto iniPath = GetCurPath() + yUI_INI;
 		CSimpleIniA ini;
 		ini.SetUnicode();
-		const auto iniPath = GetCurPath() + yUI_INI;
+
+
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
 		g_ArmedUnarmed = ini.GetOrCreate("General", "bArmedUnarmed", 1, "; Allow for Melee and Unarmed weapons to use ammo and shoot projectiles");

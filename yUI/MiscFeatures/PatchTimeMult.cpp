@@ -253,6 +253,8 @@ namespace Patch::TimeMult
 		const auto iniPath = GetCurPath() + yUI_INI;
 		CSimpleIniA ini;
 		ini.SetUnicode();
+
+
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
 		g_yTM = ini.GetOrCreate("General", "bTimeMultChanges", 1, "; enable 'Game Time Mult' section of this .ini file.");

@@ -12,6 +12,8 @@ namespace Patch::MultiplicativeShots
 		const auto iniPath = GetCurPath() + yUI_INI;
 		CSimpleIniA ini;
 		ini.SetUnicode();
+
+
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
 		ini.SaveFile(iniPath.c_str(), false);

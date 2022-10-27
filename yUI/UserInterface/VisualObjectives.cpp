@@ -205,35 +205,36 @@ namespace UserInterface::VisualObjectives
 
 	void HandleINI()
 	{
-		const auto iniPath = GetCurPath() + R"(\Data\Config\JustMods.ini)";
+		const auto iniPath = GetCurPath() + yUI_INI;
 		CSimpleIniA ini;
 		ini.SetUnicode();
 
+
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
-		enable				= ini.GetOrCreate("JustMods", "bVisualObjectives", 1, nullptr);
-		key					= ini.GetOrCreate("JVO", "iKey", 49, nullptr);
-		toggle				= ini.GetOrCreate("JVO", "bToggle", true, nullptr);
-		offscreenHandling	= ini.GetOrCreate("JVO", "iOffscreenHandling", 0, nullptr);
-		distanceHandling	= ini.GetOrCreate("JVO", "iDistanceHandling", 2, nullptr);
-		distanceSystem		= ini.GetOrCreate("JVO", "iDistanceSystem", 1, nullptr);
-		textHandling		= ini.GetOrCreate("JVO", "iTextHandling", 1, nullptr);
-		textSystem			= ini.GetOrCreate("JVO", "iTextSystem", 1, nullptr);
-		alpha				= ini.GetOrCreate("JVO", "fAlpha", 0.0, nullptr);
-		alphaMult			= ini.GetOrCreate("JVO", "fAlphaMult", 0.6, nullptr);
-		height				= ini.GetOrCreate("JVO", "fHeight", 36.0, nullptr);
-		width				= ini.GetOrCreate("JVO", "fWidth", 24.0, nullptr);
-		offsetHeight		= ini.GetOrCreate("JVO", "fOffsetHeight", 0.02, nullptr);
-		offsetWidth			= ini.GetOrCreate("JVO", "fOffsetWidth", 0.01, nullptr);
-		altColor			= ini.GetOrCreate("JVO", "bAltColor", true, nullptr);
-		radius				= ini.GetOrCreate("JVO", "fRadius", 0.06, nullptr);
-		distanceMin			= ini.GetOrCreate("JVO", "fDistanceMin", -1.0, nullptr);
-		distanceMax			= ini.GetOrCreate("JVO", "fDistanceMax", -1.0, nullptr);
-		enableOut			= ini.GetOrCreate("JVO", "bEnableOut", true, nullptr);
-		enableSighting		= ini.GetOrCreate("JVO", "bEnableSighting", true, nullptr);
-		enableScope			= ini.GetOrCreate("JVO", "bEnableScope", false, nullptr);
-		font				= ini.GetOrCreate("JVO", "fFont", 0.0, nullptr);
-		fontY				= ini.GetOrCreate("JVO", "fFontY", 0.0, nullptr);
+		enable				= ini.GetOrCreate("General", "bVisualObjectives", 1, "; enable 'Visual Objectives' feature. If required files are not found this will do nothing.");
+		key					= ini.GetOrCreate("Visual Objectives", "iKey", 49, nullptr);
+		toggle				= ini.GetOrCreate("Visual Objectives", "bToggle", true, nullptr);
+		offscreenHandling	= ini.GetOrCreate("Visual Objectives", "iOffscreenHandling", 0, nullptr);
+		distanceHandling	= ini.GetOrCreate("Visual Objectives", "iDistanceHandling", 2, nullptr);
+		distanceSystem		= ini.GetOrCreate("Visual Objectives", "iDistanceSystem", 1, nullptr);
+		textHandling		= ini.GetOrCreate("Visual Objectives", "iTextHandling", 1, nullptr);
+		textSystem			= ini.GetOrCreate("Visual Objectives", "iTextSystem", 1, nullptr);
+		alpha				= ini.GetOrCreate("Visual Objectives", "fAlpha", 0.0, nullptr);
+		alphaMult			= ini.GetOrCreate("Visual Objectives", "fAlphaMult", 0.6, nullptr);
+		height				= ini.GetOrCreate("Visual Objectives", "fHeight", 36.0, nullptr);
+		width				= ini.GetOrCreate("Visual Objectives", "fWidth", 24.0, nullptr);
+		offsetHeight		= ini.GetOrCreate("Visual Objectives", "fOffsetHeight", 0.02, nullptr);
+		offsetWidth			= ini.GetOrCreate("Visual Objectives", "fOffsetWidth", 0.01, nullptr);
+		altColor			= ini.GetOrCreate("Visual Objectives", "bAltColor", true, nullptr);
+		radius				= ini.GetOrCreate("Visual Objectives", "fRadius", 0.06, nullptr);
+		distanceMin			= ini.GetOrCreate("Visual Objectives", "fDistanceMin", -1.0, nullptr);
+		distanceMax			= ini.GetOrCreate("Visual Objectives", "fDistanceMax", -1.0, nullptr);
+		enableOut			= ini.GetOrCreate("Visual Objectives", "bEnableOut", true, nullptr);
+		enableSighting		= ini.GetOrCreate("Visual Objectives", "bEnableSighting", true, nullptr);
+		enableScope			= ini.GetOrCreate("Visual Objectives", "bEnableScope", false, nullptr);
+		font				= ini.GetOrCreate("Visual Objectives", "fFont", 0.0, nullptr);
+		fontY				= ini.GetOrCreate("Visual Objectives", "fFontY", 0.0, nullptr);
 
 		ini.SaveFile(iniPath.c_str(), false);
 	}
@@ -288,5 +289,6 @@ namespace UserInterface::VisualObjectives
 	{
 		if (g_nvseInterface->isEditor) return;
 		mainLoopDoOnce.emplace_back(MainLoopDoOnce);
+		HandleINI();
 	}
 }

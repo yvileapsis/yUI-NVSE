@@ -15,6 +15,7 @@ namespace Patch::RestoreFO3Spread
 	{
 		CSimpleIniA ini;
 		ini.SetUnicode();
+
 		const auto iniPath = GetCurPath() + yUI_INI;
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
