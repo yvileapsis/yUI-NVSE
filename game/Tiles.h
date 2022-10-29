@@ -262,26 +262,26 @@ public:
 	struct Value
 	{
 		UInt32		id;			// 00
-		Tile* parent;		// 04
+		Tile*		parent;		// 04
 		float		num;		// 08
-		char* str;		// 0C
-		Action* action;		// 10
+		char*		str;		// 0C
+		Action*		action;		// 10
 
 		__forceinline void __thiscall Refresh(bool string) { ThisCall<void>(0xA09410, this, string); };
 	};
 
 	struct ChildNode
 	{
-		ChildNode* next;		// 000
-		ChildNode* prev;		// 004
-		Tile* child;		// 008
+		ChildNode*				next;		// 000
+		ChildNode*				prev;		// 004
+		Tile*					child;		// 008
 	};
 
 	DList<Tile>					children;	// 04
 	BSSimpleArray<Value*>		values;		// 10
 	String						name;		// 20
-	Tile* parent;		// 28
-	NiNode* node;		// 2C
+	Tile*						parent;		// 28
+	NiNode*						node;		// 2C
 	UInt32						flags;		// 30
 	UInt8						unk34;		// 34
 	UInt8						unk35;		// 35

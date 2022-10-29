@@ -174,6 +174,7 @@ namespace SortingIcons::Patches
 	void ReplaceHotkeyIcons(const bool bEnable);
 	void AddKeyrings(const bool bEnable);
 	void AddTabs(const bool bEnable);
+	void AddPromptIcon();
 }
 
 namespace SortingIcons::Files

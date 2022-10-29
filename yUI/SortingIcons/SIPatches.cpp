@@ -2,6 +2,8 @@
 #include "SIHooks.h"
 #include <SafeWrite.h>
 
+#include "InterfaceManager.h"
+
 namespace SortingIcons::Patches
 {
 	void AlterSorting(const bool bEnable)
@@ -96,6 +98,10 @@ namespace SortingIcons::Patches
 		}
 	}
 
+	void AddPromptIcon()
+	{
+		WriteRelCall(0x7786CF, Tile__PropagateIntValue);
+	}
 
 	void AddTabs(const bool bEnable)
 	{

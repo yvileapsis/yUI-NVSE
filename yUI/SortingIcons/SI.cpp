@@ -114,6 +114,7 @@ namespace SortingIcons
 		Patches::AddIcons(enable && bIcons);
 		Patches::ReplaceHotkeyIcons(enable && bHotkeys);
 		Patches::AddKeyrings(enable && bCategories);
+		Patches::AddPromptIcon();
 //		Patches::AddTabs(true);
 
 		deferredInit.emplace_back(CraftingComponents::Fill);

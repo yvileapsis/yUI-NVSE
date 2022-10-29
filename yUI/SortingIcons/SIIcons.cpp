@@ -121,4 +121,16 @@ namespace SortingIcons::Icons
 
 		tile->SetString(tilevalue, g_StringToCategory[tag].filename.empty() ? src : g_StringToCategory[tag].filename.c_str(), propagate);
 	}
+
+
+	void __fastcall Tile__PropagateIntValue(Tile* tile, void* dummyedx, UInt32 a2, signed int a3)
+	{
+		auto icon = tile->GetChild("ySIImage");
+		if (!icon) icon = tile->AddTileFromTemplate("ySIDefault");
+		const auto stringdimensions = FontManager::GetSingleton()->GetStringDimensions(tile->GetValue(kTileValue_string)->str, 7, tile->GetFloat(kTileValue_wrapwidth));
+		icon->SetFloat(kTileValue_x, -stringdimensions->x / 2 - icon->GetFloat(kTileValue_width) - icon->GetFloat(kTileValue_user1));
+		icon->SetFloat(kTileValue_y, icon->GetFloat(kTileValue_user2) - icon->GetFloat(kTileValue_height) / 4);
+		icon->SetFloat(kTileValue_visible, true, true);
+		tile->SetFloat(a2, a3, true);
+	}
 }
