@@ -268,7 +268,7 @@ namespace SortingIcons::Hooks
 	template <UInt32 retn> __declspec(naked) void InventoryMenuSaveScrollPosition()
 	{
 		static const UInt32 retnAddr = retn;
-		static const auto SaveScroll = reinterpret_cast<UInt32>(InventoryMenuSaveScrollPosition);
+		static const auto SaveScroll = reinterpret_cast<UInt32>(Keyrings::InventoryMenuSaveScrollPosition);
 		__asm
 		{
 			call SaveScroll
@@ -290,7 +290,7 @@ namespace SortingIcons::Hooks
 	template <UInt32 retn> __declspec(naked) void InventoryMenuShouldHideItem()
 	{
 		static const UInt32 retnAddr = retn;
-		static const auto ShouldHide = reinterpret_cast<UInt32>(Keyrings::InventoryMenuShouldHideItem);
+		static const auto ShouldHide = reinterpret_cast<UInt32>(Tabs::InventoryMenuShouldHideItem);
 		__asm
 		{
 			mov ecx, [ebp + 0x8]
@@ -420,7 +420,7 @@ namespace SortingIcons::Patches
 		WriteRelJump(0x7800C6, Hooks::InventoryMenuRestoreScrollPosition<0x78013B>);
 		WriteRelJump(0x782704, Hooks::InventoryMenuShouldHideItem<0x7827F1>);
 
-		WriteRelCall(0x77FDF3, Keyrings::SetUpTabline);
+		WriteRelCall(0x77FDF3, Tabs::SetUpTabline);
 	//	WriteRelJump(0x78232C, 0x782362);
 	}
 

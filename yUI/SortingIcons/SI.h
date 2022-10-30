@@ -175,6 +175,24 @@ namespace SortingIcons::Categories
 	void ItemSetCategory(const InventoryChanges* entry, const CategoryPtr& category);
 }
 
+namespace SortingIcons::Keyrings
+{
+	void KeyringRefreshPostStewie();
+
+	void __fastcall HideNonKeysGetTile(InventoryMenu* invmenu, Tile* tile);
+	void __fastcall AddSortingCategories();
+
+	bool __fastcall KeyringHideKeys(InventoryChanges* entry);
+	void __fastcall KeyringEnableCancelHook(Tile* tile, void* dummyEDX, eTileValue tilevalue, signed int a1);
+	void __fastcall KeyringPipBoyIconHook(Tile* tile, void* dummyEDX, eTileValue tilevalue, char* string, int propagate);
+
+	bool __fastcall HasContainerChangesEntry(InventoryChanges* entry);
+	bool __fastcall KeyringShowCategories(Tile* tile);
+	void InventoryMenuSaveScrollPosition();
+	void InventoryMenuRestoreScrollPosition();
+
+}
+
 namespace SortingIcons::Tabs
 {
 	void ItemAssignTabs(TESForm* form);
@@ -183,6 +201,9 @@ namespace SortingIcons::Tabs
 	Tile* __fastcall InventoryMenuChooseTab(SInt32 key, UInt32 filter);
 	UInt32 __fastcall InventoryMenuHandleClickGetFilter(InventoryMenu* menu, SInt32 tileID, Tile* clickedTile);
 	void __fastcall InventoryMenuSetupData(InventoryMenu* menu, SInt32 tileID, Tile* clickedTile);
+	UInt8 __fastcall InventoryMenuShouldHideItem(InventoryChanges* entry);
+	void SetUpTabline(TileRect* tabline, int traitID, const char* strWeapon, const char* strApparel, const char* strAid,
+		const char* strMisc, const char* strAmmo, char* zero);
 }
 
 namespace SortingIcons::Patches
@@ -201,26 +222,6 @@ namespace SortingIcons::Files
 	void HandleXML(const std::filesystem::path& path);
 }
 
-namespace SortingIcons::Keyrings
-{
-	void KeyringRefreshPostStewie();
-
-	void __fastcall HideNonKeysGetTile(InventoryMenu* invmenu, Tile* tile);
-	void __fastcall AddSortingCategories();
-
-	bool __fastcall KeyringHideKeys(InventoryChanges* entry);
-	UInt8 __fastcall InventoryMenuShouldHideItem(InventoryChanges* entry);
-	void __fastcall KeyringEnableCancelHook(Tile* tile, void* dummyEDX, eTileValue tilevalue, signed int a1);
-	void __fastcall KeyringPipBoyIconHook(Tile* tile, void* dummyEDX, eTileValue tilevalue, char* string, int propagate);
-	void SetUpTabline(TileRect* tabline, int traitID, const char* strWeapon, const char* strApparel, const char* strAid,
-		const char* strMisc, const char* strAmmo, char* zero);
-
-	bool __fastcall HasContainerChangesEntry(InventoryChanges* entry);
-	bool __fastcall KeyringShowCategories(Tile* tile);
-	void InventoryMenuSaveScrollPosition();
-	void InventoryMenuRestoreScrollPosition();
-
-}
 
 namespace SortingIcons::Sorting
 {

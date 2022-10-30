@@ -422,7 +422,6 @@ namespace SortingIcons::Tabs
 
 		return true;
 	}
-
 }
 
 namespace SortingIcons::Sorting
