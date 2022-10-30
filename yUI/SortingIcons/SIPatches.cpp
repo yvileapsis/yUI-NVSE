@@ -2,8 +2,6 @@
 #include "SIHooks.h"
 #include <SafeWrite.h>
 
-#include "InterfaceManager.h"
-
 namespace SortingIcons::Patches
 {
 	void AlterSorting(const bool bEnable)

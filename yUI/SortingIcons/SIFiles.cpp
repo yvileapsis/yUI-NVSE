@@ -9,7 +9,17 @@
 
 namespace SortingIcons::Files
 {
-	void ItemRecursiveEmplace(const Item::Common&, TESForm*);
+	void ItemRecursiveEmplace(const Item::Common& common, TESForm* item)
+	{
+		if (item->typeID == kFormType_BGSListForm)
+			for (const auto iter : reinterpret_cast<BGSListForm*>(item)->list) ItemRecursiveEmplace(common, iter);
+		else if (!common.formType || item->typeID == common.formType) {
+			Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive", common.tag.c_str(), item->refID, item->GetName()), logLevel);
+			auto newCommon = common;
+			newCommon.form = item;
+			g_Items.emplace_back(std::make_shared<Item>(newCommon));
+		}
+	}
 
 	void HandleItem(nlohmann::basic_json<> elem)
 	{
@@ -71,7 +81,7 @@ namespace SortingIcons::Files
 					if (!common.form) { Log(FormatString("Form %X was not found", formId), logLevel); continue; }
 					if (!formlist) {
 						Log(FormatString("Tag: '%10s', form: %08X (%50s), individual", common.tag.c_str(), formId, common.form->GetName()), logLevel);
-						g_Items.emplace_back(common);
+						g_Items.emplace_back(std::make_shared<Item>(common));
 					}
 					else if (formlist == 1) {
 						common.formType = 0;
@@ -86,7 +96,7 @@ namespace SortingIcons::Files
 									Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", common.tag.c_str(), item->refID, item->GetName(), formId), logLevel);
 									auto newCommon = common;
 									newCommon.form = item;
-									g_Items.emplace_back(newCommon);
+									g_Items.emplace_back(std::make_shared<Item>(newCommon));
 								}
 							}
 							else if (item->typeID == kFormType_TESObjectARMO) {
@@ -96,7 +106,7 @@ namespace SortingIcons::Files
 									Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", common.tag.c_str(), item->refID, item->GetName(), formId), logLevel);
 									auto newCommon = common;
 									newCommon.form = item;
-									g_Items.emplace_back(newCommon);
+									g_Items.emplace_back(std::make_shared<Item>(newCommon));
 								}
 							}
 						}
@@ -105,7 +115,7 @@ namespace SortingIcons::Files
 			}
 			else {
 				Log(FormatString("Tag: '%10s', mod: '%s'", common.tag.c_str(), modName.c_str()), logLevel);
-				g_Items.emplace_back(common);
+				g_Items.emplace_back(std::make_shared<Item>(common));
 			}
 		}
 		else if (common.formType == 40)
@@ -149,12 +159,12 @@ namespace SortingIcons::Files
 				{
 					weapon.type = weaponType;
 					Log(FormatString("Tag: '%10s', weapon condition, type: %d", common.tag.c_str(), weaponType), logLevel);
-					g_Items.emplace_back(common, weapon);
+					g_Items.emplace_back(std::make_shared<Item>(common, weapon));
 				}
 			}
 			else {
 				Log(FormatString("Tag: '%10s', weapon condition", common.tag.c_str()), logLevel);
-				g_Items.emplace_back(common, weapon);
+				g_Items.emplace_back(std::make_shared<Item>(common, weapon));
 			}
 		}
 		else if (common.formType == 24)
@@ -191,13 +201,13 @@ namespace SortingIcons::Files
 			if (elem.contains("armorDR"))			armor.dr = elem["armorDR"].get<UInt16>();
 			if (elem.contains("armorChangesAV"))	armor.changesAV = elem["armorChangesAV"].get<UInt16>();
 
-			g_Items.emplace_back(common, armor);
+			g_Items.emplace_back(std::make_shared<Item>(common, armor));
 		}
 		else if (common.formType == 31)
 		{
 			common.formType = 31;
 			Item::Misc misc{};
-			g_Items.emplace_back(common, misc);
+			g_Items.emplace_back(std::make_shared<Item>(common, misc));
 		}
 		else if (common.formType == 47)
 		{
@@ -211,9 +221,9 @@ namespace SortingIcons::Files
 			if (elem.contains("aidIsWater"))			aid.isWater = elem["aidIsWater"].get<UInt8>();
 			if (elem.contains("aidIsMedicine"))			aid.isMedicine = elem["aidIsMedicine"].get<UInt8>();
 			if (elem.contains("aidIsPoisonous"))		aid.isPoisonous = elem["aidIsPoisonous"].get<UInt8>();
-			g_Items.emplace_back(common, aid);
+			g_Items.emplace_back(std::make_shared<Item>(common, aid));
 		}
-		else g_Items.emplace_back(common);
+		else g_Items.emplace_back(std::make_shared<Item>(common));
 	}
 
 	void HandleCategory(nlohmann::basic_json<> elem)
@@ -240,7 +250,7 @@ namespace SortingIcons::Files
 		if (elem.contains("count"))				category.count = elem["count"].get<UInt32>();
 
 		Log(FormatString("Tag: '%10s', icon: '%s'", category.tag.c_str(), category.filename.c_str()), logLevel);
-		g_Categories.emplace_back(category);
+		g_Categories.emplace_back(std::make_shared<Category>(category));
 	}
 
 	void HandleTab(nlohmann::basic_json<> elem)
@@ -278,7 +288,7 @@ namespace SortingIcons::Files
 			else for (const auto& type : elem["tabMisc"]) tab.tabMisc.emplace(type.get<std::string>());
 		}
 
-		g_Tabs.push_back(tab);
+		g_Tabs.emplace_back(std::make_shared<Tab>(tab));
 	}
 
 	void HandleXML(const std::filesystem::path& path)
@@ -288,7 +298,7 @@ namespace SortingIcons::Files
 		g_XMLPaths.emplace_back(std::filesystem::path(relativepath));
 	}
 
-	void HandleJson(const std::filesystem::path& path)
+	void HandleJSON(const std::filesystem::path& path)
 	{
 		Log("\nReading JSON file " + path.string(), logLevel);
 
@@ -322,17 +332,5 @@ namespace SortingIcons::Files
 			Log(FormatString("JSON error: %s\n", e.what()), logLevel);
 		}
 
-	}
-
-	void ItemRecursiveEmplace(const Item::Common& common, TESForm* item)
-	{
-		if (item->typeID == kFormType_BGSListForm) {
-			for (const auto iter : reinterpret_cast<BGSListForm*>(item)->list) if (iter) ItemRecursiveEmplace(common, iter);
-		} else if (!common.formType || item->typeID == common.formType) {
-			Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive", common.tag.c_str(), item->refID, item->GetName()), logLevel);
-			auto newCommon = common;
-			newCommon.form = item;
-			g_Items.emplace_back(newCommon);
-		}
 	}
 }

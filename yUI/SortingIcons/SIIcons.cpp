@@ -7,10 +7,7 @@
 namespace SortingIcons::Icons
 {
 	Float32 compassRoseX = 0, compassRoseY = 0;
-
-	inline std::unordered_map<TESForm*, std::string>						g_ItemToCategory;
-	inline std::unordered_map<TESForm*, std::unordered_set<std::string>>	g_ItemToFilter;
-
+	
 	void InjectTemplates()
 	{
 		for (const auto& iter : g_XMLPaths)
@@ -31,9 +28,11 @@ namespace SortingIcons::Icons
 		return true;
 	}
 
-	void InjectIconTile(const Category& category, MenuItemEntryList* list, Tile* tile, InventoryChanges* entry)
+	void InjectIconTile(const std::shared_ptr<Category>& category_, MenuItemEntryList* list, Tile* tile, InventoryChanges* entry)
 	{
 		//	if (g_Items.find(entry->type) == g_Items.end()) return;
+		const auto& category = *category_;
+
 		if (category.filename.empty()) return;
 
 		TileMenu* menu = tile->GetTileMenu();
@@ -79,7 +78,8 @@ namespace SortingIcons::Icons
 	void __fastcall SetTileStringInjectTile(Tile* tile, InventoryChanges* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate)
 	{
 		tile->SetString(tilevalue, tileText, propagate);
-		if (entry && entry->form && TryGetTypeOfForm(entry->form)) InjectIconTile(g_StringToCategory[Sorting::GetCategoryForItem(entry)], list, tile, entry);
+		const auto item = Categories::ItemGetCategory(entry);
+		if (entry && entry->form && TryGetTypeOfForm(entry->form)) InjectIconTile(item, list, tile, entry);
 	}
 
 	void __fastcall SetStringValueTagImage(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate)
@@ -93,14 +93,8 @@ namespace SortingIcons::Icons
 			icon->SetFloat(kTileValue_y, 8, propagate);
 		}
 
-		const std::string tag = Sorting::GetCategoryForItem(entry);
-
-		if (!Sorting::IsTagForItem(entry)) {
-			tile->SetString(tilevalue, src, propagate);
-			return;
-		}
-
-		tile->SetString(tilevalue, g_StringToCategory[tag].filename.empty() ? src : g_StringToCategory[tag].filename.c_str(), propagate);
+		const auto icon = Categories::ItemGetCategory(entry)->filename;
+		tile->SetString(tilevalue, icon.empty() ? src : icon.c_str(), propagate);
 	}
 
 	void __fastcall SetStringValueTagRose(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate)
@@ -115,14 +109,8 @@ namespace SortingIcons::Icons
 		tile->SetFloat(kTileValue_x, compassRoseX + 3, propagate);
 		tile->SetFloat(kTileValue_y, compassRoseY + 3, propagate);
 
-		const std::string tag = Sorting::GetCategoryForItem(entry);
-
-		if (!Sorting::IsTagForItem(entry)) {
-			tile->SetString(tilevalue, src, propagate);
-			return;
-		}
-
-		tile->SetString(tilevalue, g_StringToCategory[tag].filename.empty() ? src : g_StringToCategory[tag].filename.c_str(), propagate);
+		const auto icon = Categories::ItemGetCategory(entry)->filename;
+		tile->SetString(tilevalue, icon.empty() ? src : icon.c_str(), propagate);
 	}
 
 

@@ -195,14 +195,14 @@ namespace UserInterface::LootMenu
 
 			fst->SetFloat("_Equip", snd->GetEquipped());
 
-			const auto category = SortingIcons::Sorting::GetCategoryForItem(snd->form->TryGetREFRParent());
-			if (!category.empty())
+			const auto category = *SortingIcons::Categories::ItemGetCategory(snd);
+			if (!category.filename.empty())
 			{
 				fst->SetFloat("_Icon", true);
-				fst->SetString("_IconFilename", SortingIcons::g_StringToCategory[category].filename.c_str());
+				fst->SetString("_IconFilename", category.filename.c_str());
 			}
 			else fst->SetFloat("_Icon", false);
-
+			
 			if (const auto condition = snd->GetHealthPercentAlt(true); condition != -1)
 			{
 				fst->SetFloat("_Meter", 1);

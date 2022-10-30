@@ -38,15 +38,10 @@ namespace SortingIcons::Commands
 		if (!form && thisObj) form = thisObj->baseForm;
 		if (!form) return true;
 		const auto tochange = std::string(src);
-		if (tochange == "category" || tochange == "tag" || tochange == "string") {
-			const std::string tag = Sorting::GetCategoryForItem(form);
-			AssignString(PASS_COMMAND_ARGS, tag.c_str());
-		}
-		else if (tochange == "icon" || tochange == "filename") {
-			const std::string tag = Sorting::GetCategoryForItem(form);
-			const std::string icon = g_StringToCategory[tag].filename;
-			AssignString(PASS_COMMAND_ARGS, icon.c_str());
-		}
+		if (tochange == "category" || tochange == "tag" || tochange == "string")
+			AssignString(PASS_COMMAND_ARGS, Categories::ItemGetCategory(form)->tag.c_str());
+		else if (tochange == "icon" || tochange == "filename")
+			AssignString(PASS_COMMAND_ARGS, Categories::ItemGetCategory(form)->filename.c_str());
 		return true;
 	}
 
@@ -61,12 +56,11 @@ namespace SortingIcons::Commands
 		if (!form) return true;
 		const auto tochange = std::string(src);
 		if (tochange == "tag" || tochange == "string") {
-			g_ItemToCategory[form] = std::string(newstring);
+			Categories::ItemSetCategory(form, g_StringToCategory[newstring]);
 			*result = 1;
 		}
 		else if (tochange == "icon" || tochange == "filename") {
-			const std::string tag = Sorting::GetCategoryForItem(form);
-			g_StringToCategory[tag].filename = std::string(newstring);
+			Categories::ItemGetCategory(form)->filename = std::string(newstring);
 			*result = 1;
 		}
 		return true;

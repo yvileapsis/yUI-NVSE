@@ -43,7 +43,7 @@ namespace SortingIcons::Hooks
 
 	inline __declspec(naked) void SortingBarterContainerMenu()
 	{
-		static const auto CompareItems = reinterpret_cast<UInt32>(Sorting::CompareItemsWithTags);
+		static const auto CompareItems = reinterpret_cast<UInt32>(Sorting::CompareItems);
 		_asm
 		{
 			pop		eax
@@ -58,7 +58,7 @@ namespace SortingIcons::Hooks
 	}
 	template<UInt32 retn> __declspec(naked) void SortingInventoryMenu()
 	{
-		static const auto CompareItems = reinterpret_cast<UInt32>(Sorting::CompareItemsWithTags);
+		static const auto CompareItems = reinterpret_cast<UInt32>(Sorting::CompareItems);
 		static const UInt32 InventoryChanges_GetFullName = 0x4BE2D0;
 		static const UInt32 retnAddr = retn;
 		_asm
