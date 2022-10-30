@@ -3,12 +3,98 @@
 #include <GameSettings.h>
 #include <Tiles.h>
 #include <InterfaceManager.h>
+#include <functions.h>
+#include <GameRTTI.h>
 
 namespace SortingIcons::Sorting
 {
 
 	std::string openCategory;
 	std::string stringStewie;
+
+
+	bool AssignCategoryToItem(TESForm* form)
+	{
+		for (const auto& entry : g_Items) {
+			if (entry.common.form && entry.common.form->refID != form->refID) continue;
+			if (entry.common.formType && entry.common.formType != form->typeID) continue;
+
+			if (entry.common.questItem && entry.common.questItem != static_cast<UInt8>(form->IsQuestItem2())) continue;
+			if (entry.common.miscComponent && !CraftingComponents::IsComponent(form)) continue;
+			if (entry.common.miscProduct && !CraftingComponents::IsProduct(form)) continue;
+
+			if (entry.common.formType == kFormType_TESObjectWEAP) {
+				const auto weapon = DYNAMIC_CAST(form, TESForm, TESObjectWEAP);
+				if (!weapon) continue;
+				if (entry.weapon.skill && entry.weapon.skill != weapon->weaponSkill) continue;
+				if (entry.weapon.type && entry.weapon.type != weapon->eWeaponType) continue;
+				if (entry.weapon.handgrip && entry.weapon.handgrip != weapon->HandGrip()) continue;
+				if (entry.weapon.attackAnim && entry.weapon.attackAnim != weapon->AttackAnimation()) continue;
+				if (entry.weapon.reloadAnim && entry.weapon.reloadAnim != weapon->reloadAnim) continue;
+				if (entry.weapon.type && entry.weapon.type != weapon->eWeaponType) continue;
+				if (entry.weapon.isAutomatic && entry.weapon.isAutomatic != static_cast<UInt32>(weapon->IsAutomatic())) continue;
+				if (entry.weapon.hasScope && entry.weapon.hasScope != static_cast<UInt32>(weapon->HasScopeAlt())) continue;
+				if (entry.weapon.ignoresDTDR && entry.weapon.ignoresDTDR != static_cast<UInt32>(weapon->IgnoresDTDR())) continue;
+				if (entry.weapon.clipRounds && entry.weapon.clipRounds > static_cast<UInt32>(weapon->GetClipRounds(false))) continue;
+				if (entry.weapon.numProjectiles && entry.weapon.numProjectiles > weapon->numProjectiles) continue;
+				if (entry.weapon.soundLevel && entry.weapon.soundLevel != weapon->soundLevel) continue;
+				if (entry.weapon.ammo && !FormContainsRecusive(entry.weapon.ammo, weapon->ammo.ammo)) continue;
+			}
+			else if (entry.common.formType == kFormType_TESObjectARMO) {
+				const auto armor = DYNAMIC_CAST(form, TESForm, TESObjectARMO);
+				if (!armor) continue;
+				if (entry.armor.slotsMaskWL && (entry.armor.slotsMaskWL & armor->GetArmorValue(6)) != entry.armor.slotsMaskWL) continue;
+				if (entry.armor.slotsMaskBL && (entry.armor.slotsMaskBL & armor->GetArmorValue(6)) != 0) continue;
+				if (entry.armor.armorClass && entry.armor.armorClass != armor->GetArmorValue(1)) continue;
+				if (entry.armor.powerArmor && entry.armor.powerArmor != armor->GetArmorValue(2)) continue;
+				if (entry.armor.hasBackpack && entry.armor.hasBackpack != armor->GetArmorValue(3)) continue;
+
+				if (entry.armor.dt && entry.armor.dt > armor->damageThreshold) continue;
+				if (entry.armor.dr && entry.armor.dr > armor->armorRating) continue;
+				//				if (entry.armor.armorChangesAV && entry.armor.armorChangesAV > armor->armorRating) continue;
+			}
+			else if (entry.common.formType == kFormType_TESObjectMISC) {
+			}
+			else if (entry.common.formType == kFormType_AlchemyItem) {
+				const auto aid = DYNAMIC_CAST(form, TESForm, AlchemyItem);
+				if (!aid) continue;
+				if (entry.aid.restoresAV && !aid->HasBaseEffectRestoresAV(entry.aid.restoresAV)) continue;
+				if (entry.aid.damagesAV && !aid->HasBaseEffectDamagesAV(entry.aid.damagesAV)) continue;
+				if (entry.aid.isAddictive && !aid->IsAddictive()) continue;
+				if (entry.aid.isFood && !aid->IsFood()) continue;
+				if (entry.aid.isWater && !aid->IsWaterAlt()) continue;
+				if (entry.aid.isPoisonous && !aid->IsPoison()) continue;
+				if (entry.aid.isMedicine && !aid->IsMedicine()) continue;
+			}
+
+			g_ItemToCategory.emplace(form, entry.common.tag);
+			return true;
+		}
+		return false;
+	}
+
+	bool AssignFiltersToItem(TESForm* form)
+	{
+		std::unordered_set<std::string> set;
+		for (const auto& [fst, snd] : g_StringToTabs) {
+			if (!snd.tabMisc.empty()) continue;
+			if (!snd.types.empty() && !snd.types.contains(form->typeID)) continue;
+			if (!snd.categories.empty() && !snd.categories.contains(Sorting::GetCategoryForItem(form))) continue;
+			set.emplace(fst);
+		}
+
+		for (const auto& [fst, snd] : g_StringToTabs) {
+			if (snd.tabMisc.empty()) continue;
+			bool misc = true;
+			for (const auto& it : snd.tabMisc) if (set.contains(it)) { misc = false; break; }
+			if (misc) set.emplace(fst);
+		}
+
+		g_ItemToFilter.emplace(form, std::move(set));
+		return true;
+	}
+
+
 
 	bool IsTagForItem(TESForm* form)
 	{
@@ -25,7 +111,7 @@ namespace SortingIcons::Sorting
 	std::string GetCategoryForItem(TESForm* form)
 	{
 		if (!form) return "";
-		if (!IsTagForItem(form)) Files::AssignCategoryToItem(form);
+		if (!IsTagForItem(form)) AssignCategoryToItem(form);
 		return g_ItemToCategory[form];
 	}
 

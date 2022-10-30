@@ -2,8 +2,8 @@
 
 #include <SimpleINILibrary.h>
 
-#include "functions.h"
-#include "SafeWrite.h"
+#include <functions.h>
+#include <SafeWrite.h>
 
 namespace Fix::TouchpadScrolling
 {
@@ -16,7 +16,6 @@ namespace Fix::TouchpadScrolling
 		CSimpleIniA ini;
 		ini.SetUnicode();
 
-
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
 		enable = ini.GetOrCreate("General", "bFixTouchpadScrolling", 1, "; fix the issue where New Vegas wouldn't recognize touchpad scrolling in menus");
@@ -26,15 +25,12 @@ namespace Fix::TouchpadScrolling
 
 	SInt32 scrollWheel = 0;
 
-	void MainLoop()
-	{
-		if (IsKeyPressed(264)) scrollWheel += scrollValue;
-		if (IsKeyPressed(265)) scrollWheel -= scrollValue;
-	}
-
 
 	SInt32 __fastcall GetMousewheel(OSInputGlobals* osinput, void* dummyedx, int a2)
 	{
+		if (IsKeyPressed(264)) scrollWheel += scrollValue;
+		if (IsKeyPressed(265)) scrollWheel -= scrollValue;
+
 		if (scrollWheel < 120 && scrollWheel > -120) return 0;
 		const SInt32 result = scrollWheel / 120 * 120;
 		scrollWheel = scrollWheel % 120;
@@ -60,6 +56,5 @@ namespace Fix::TouchpadScrolling
 		if (g_nvseInterface->isEditor) return;
 		HandleINIs();
 		Patch(enable);
-		if (enable) mainLoop.emplace_back(MainLoop);
 	}
 }

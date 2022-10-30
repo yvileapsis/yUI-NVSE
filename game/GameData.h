@@ -1,7 +1,7 @@
 #pragma once
-#include "GameForms.h"
-#include "NiObjects.h"
-#include "Utilities.h"
+#include <GameForms.h>
+#include <NiObjects.h>
+#include <Utilities.h>
 
 struct ChunkAndFormType {
 	UInt32		chunkType;	// ie 

@@ -100,7 +100,7 @@ namespace SortingIcons::Patches
 
 	void AddPromptIcon()
 	{
-		WriteRelCall(0x7786CF, Tile__PropagateIntValue);
+		WriteRelCall(0x7786CF, Icons::Tile__PropagateIntValue);
 	}
 
 	void AddTabs(const bool bEnable)

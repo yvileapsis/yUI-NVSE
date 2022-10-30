@@ -4,11 +4,7 @@
 #include <filesystem>
 #include <fstream>
 
-#include <GameAPI.h>
 #include <GameData.h>
-#include <GameRTTI.h>
-
-#include <functions.h>
 #include <json.h>
 
 namespace SortingIcons::Files
@@ -84,7 +80,7 @@ namespace SortingIcons::Files
 					else if (formlist == 2) {
 						for (const auto item : *GetAllForms()) {
 							if (item->typeID == kFormType_TESObjectWEAP) {
-								const auto weapon = DYNAMIC_CAST(item, TESForm, TESObjectWEAP);
+								const auto weapon = reinterpret_cast<TESObjectWEAP*>(item);
 								if (!weapon || !weapon->repairItemList.listForm) continue;
 								if (weapon->refID == common.form->refID || weapon->repairItemList.listForm->refID == common.form->refID || weapon->repairItemList.listForm->ContainsRecursive(common.form)) {
 									Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", common.tag.c_str(), item->refID, item->GetName(), formId), logLevel);
@@ -94,7 +90,7 @@ namespace SortingIcons::Files
 								}
 							}
 							else if (item->typeID == kFormType_TESObjectARMO) {
-								const auto armor = DYNAMIC_CAST(item, TESForm, TESObjectARMO);
+								const auto armor = reinterpret_cast<TESObjectARMO*>(item);
 								if (!armor || !armor->repairItemList.listForm) continue;
 								if (armor->refID == common.form->refID || armor->repairItemList.listForm->refID == common.form->refID || armor->repairItemList.listForm->ContainsRecursive(common.form)) {
 									Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", common.tag.c_str(), item->refID, item->GetName(), formId), logLevel);
@@ -112,7 +108,7 @@ namespace SortingIcons::Files
 				g_Items.emplace_back(common);
 			}
 		}
-		else if (common.formType == 40 || elem.contains("weaponSkill") || elem.contains("weaponType"))
+		else if (common.formType == 40)
 		{
 			common.formType = 40;
 			Item::Weapon weapon{};
@@ -197,13 +193,13 @@ namespace SortingIcons::Files
 
 			g_Items.emplace_back(common, armor);
 		}
-		else if (common.formType == 31 || elem.contains("miscComponent"))
+		else if (common.formType == 31)
 		{
 			common.formType = 31;
 			Item::Misc misc{};
 			g_Items.emplace_back(common, misc);
 		}
-		else if (common.formType == 47 || elem.contains("IsFood") || elem.contains("IsMedicine"))
+		else if (common.formType == 47)
 		{
 			common.formType = 47;
 			Item::Aid aid{};
@@ -285,7 +281,14 @@ namespace SortingIcons::Files
 		g_Tabs.push_back(tab);
 	}
 
-	void HandleSIJson(const std::filesystem::path& path)
+	void HandleXML(const std::filesystem::path& path)
+	{
+		const auto pathstring = path.generic_string();
+		const auto relativepath = pathstring.substr(pathstring.find_last_of("\\Data\\") - 3);
+		g_XMLPaths.emplace_back(std::filesystem::path(relativepath));
+	}
+
+	void HandleJson(const std::filesystem::path& path)
 	{
 		Log("\nReading JSON file " + path.string(), logLevel);
 
@@ -323,99 +326,13 @@ namespace SortingIcons::Files
 
 	void ItemRecursiveEmplace(const Item::Common& common, TESForm* item)
 	{
-		if (item->typeID == kFormType_BGSListForm)
-		{
-			const auto bgslist = DYNAMIC_CAST(item, TESForm, BGSListForm);
-			if (!bgslist) return;
-			for (const auto iter : bgslist->list)
-				if (iter) ItemRecursiveEmplace(common, iter);
-		}
-		else if (!common.formType || item->typeID == common.formType) {
+		if (item->typeID == kFormType_BGSListForm) {
+			for (const auto iter : reinterpret_cast<BGSListForm*>(item)->list) if (iter) ItemRecursiveEmplace(common, iter);
+		} else if (!common.formType || item->typeID == common.formType) {
 			Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive", common.tag.c_str(), item->refID, item->GetName()), logLevel);
 			auto newCommon = common;
 			newCommon.form = item;
 			g_Items.emplace_back(newCommon);
 		}
-	}
-
-	bool AssignCategoryToItem(TESForm* form)
-	{
-		for (const auto& entry : g_Items) {
-			if (entry.common.form && entry.common.form->refID != form->refID) continue;
-			if (entry.common.formType && entry.common.formType != form->typeID) continue;
-
-			if (entry.common.questItem && entry.common.questItem != static_cast<UInt8>(form->IsQuestItem2())) continue;
-			if (entry.common.miscComponent && !CraftingComponents::IsComponent(form)) continue;
-			if (entry.common.miscProduct && !CraftingComponents::IsProduct(form)) continue;
-
-			if (entry.common.formType == kFormType_TESObjectWEAP) {
-				const auto weapon = DYNAMIC_CAST(form, TESForm, TESObjectWEAP);
-				if (!weapon) continue;
-				if (entry.weapon.skill && entry.weapon.skill != weapon->weaponSkill) continue;
-				if (entry.weapon.type && entry.weapon.type != weapon->eWeaponType) continue;
-				if (entry.weapon.handgrip && entry.weapon.handgrip != weapon->HandGrip()) continue;
-				if (entry.weapon.attackAnim && entry.weapon.attackAnim != weapon->AttackAnimation()) continue;
-				if (entry.weapon.reloadAnim && entry.weapon.reloadAnim != weapon->reloadAnim) continue;
-				if (entry.weapon.type && entry.weapon.type != weapon->eWeaponType) continue;
-				if (entry.weapon.isAutomatic && entry.weapon.isAutomatic != static_cast<UInt32>(weapon->IsAutomatic())) continue;
-				if (entry.weapon.hasScope && entry.weapon.hasScope != static_cast<UInt32>(weapon->HasScopeAlt())) continue;
-				if (entry.weapon.ignoresDTDR && entry.weapon.ignoresDTDR != static_cast<UInt32>(weapon->IgnoresDTDR())) continue;
-				if (entry.weapon.clipRounds && entry.weapon.clipRounds > static_cast<UInt32>(weapon->GetClipRounds(false))) continue;
-				if (entry.weapon.numProjectiles && entry.weapon.numProjectiles > weapon->numProjectiles) continue;
-				if (entry.weapon.soundLevel && entry.weapon.soundLevel != weapon->soundLevel) continue;
-				if (entry.weapon.ammo && !FormContainsRecusive(entry.weapon.ammo, weapon->ammo.ammo)) continue;
-			}
-			else if (entry.common.formType == kFormType_TESObjectARMO) {
-				const auto armor = DYNAMIC_CAST(form, TESForm, TESObjectARMO);
-				if (!armor) continue;
-				if (entry.armor.slotsMaskWL && (entry.armor.slotsMaskWL & armor->GetArmorValue(6)) != entry.armor.slotsMaskWL) continue;
-				if (entry.armor.slotsMaskBL && (entry.armor.slotsMaskBL & armor->GetArmorValue(6)) != 0) continue;
-				if (entry.armor.armorClass && entry.armor.armorClass != armor->GetArmorValue(1)) continue;
-				if (entry.armor.powerArmor && entry.armor.powerArmor != armor->GetArmorValue(2)) continue;
-				if (entry.armor.hasBackpack && entry.armor.hasBackpack != armor->GetArmorValue(3)) continue;
-
-				if (entry.armor.dt && entry.armor.dt > armor->damageThreshold) continue;
-				if (entry.armor.dr && entry.armor.dr > armor->armorRating) continue;
-				//				if (entry.armor.armorChangesAV && entry.armor.armorChangesAV > armor->armorRating) continue;
-			}
-			else if (entry.common.formType == kFormType_TESObjectMISC) {
-			}
-			else if (entry.common.formType == kFormType_AlchemyItem) {
-				const auto aid = DYNAMIC_CAST(form, TESForm, AlchemyItem);
-				if (!aid) continue;
-				if (entry.aid.restoresAV && !aid->HasBaseEffectRestoresAV(entry.aid.restoresAV)) continue;
-				if (entry.aid.damagesAV && !aid->HasBaseEffectDamagesAV(entry.aid.damagesAV)) continue;
-				if (entry.aid.isAddictive && !aid->IsAddictive()) continue;
-				if (entry.aid.isFood && !aid->IsFood()) continue;
-				if (entry.aid.isWater && !aid->IsWaterAlt()) continue;
-				if (entry.aid.isPoisonous && !aid->IsPoison()) continue;
-				if (entry.aid.isMedicine && !aid->IsMedicine()) continue;
-			}
-
-			g_ItemToCategory.emplace(form, entry.common.tag);
-			return true;
-		}
-		return false;
-	}
-
-	bool AssignFiltersToItem(TESForm* form)
-	{
-		std::unordered_set<std::string> set;
-		for (const auto& [fst, snd] : g_StringToTabs) {
-			if (!snd.tabMisc.empty()) continue;
-			if (!snd.types.empty() && !snd.types.contains(form->typeID)) continue;
-			if (!snd.categories.empty() && !snd.categories.contains(Sorting::GetCategoryForItem(form))) continue;
-			set.emplace(fst);
-		}
-
-		for (const auto& [fst, snd] : g_StringToTabs) {
-			if (snd.tabMisc.empty()) continue;
-			bool misc = true;
-			for (const auto& it : snd.tabMisc) if (set.contains(it)) { misc = false; break; }
-			if (misc) set.emplace(fst);
-		}
-
-		g_ItemToFilter.emplace(form, std::move(set));
-		return true;
 	}
 }

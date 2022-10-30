@@ -8,14 +8,13 @@
 
 namespace SortingIcons
 {
-	void HandleINIs()
+	void HandleINI()
 	{
 		CSimpleIniA ini;
 		ini.SetUnicode();
 
-
 		auto iniPath = GetCurPath() + yUI_INI;
-		if (const auto errVal = ini.LoadFile(iniPath.c_str()); errVal == SI_FILE) { return; }
+		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
 		enable = ini.GetOrCreate("General", "bSortingIcons", true, "; enable 'Sorting and Icons' feature. If required files are not found this will do nothing.");
 
@@ -28,15 +27,7 @@ namespace SortingIcons
 
 		g_FixIndefiniteSorting = ini.GetOrCreate("General", "bFixIndefiniteSorting", 1, "; fix the issue where items with different conditions would 'jump around' on update");
 
-		if (const auto errVal = ini.SaveFile(iniPath.c_str(), false); errVal == SI_FILE) { return; }
-
-		iniPath = GetCurPath() + R"(\Data\menus\ySI\ySI.ini)";
-		if (const auto errVal = ini.LoadFile(iniPath.c_str()); errVal == SI_FILE) { return; }
-
-		if (!enable) enable = ini.GetLongValue("General", "bSortingIcons", 0);
-
-		if (const auto errVal = ini.SaveFile(iniPath.c_str(), false); errVal == SI_FILE) { return; }
-
+		ini.SaveFile(iniPath.c_str(), false);
 	}
 
 	void ProcessSIEntries()
@@ -80,24 +71,14 @@ namespace SortingIcons
 		Log("Loading files", kToLog | logLevel);
 		const auto dir = GetCurPath() + R"(\Data\menus\ySI)";
 		const auto then = std::chrono::system_clock::now();
-		if (std::filesystem::exists(dir))
-			for (std::filesystem::directory_iterator iter(dir.c_str()), end; iter != end; ++iter)
-			{
-				const auto& path = iter->path();
-				const auto& fileName = path.filename();
-				if (iter->is_directory())
-					Log(iter->path().string() + " found");
-				else if (_stricmp(path.extension().string().c_str(), ".json") == 0)
-					Files::HandleSIJson(iter->path());
-				else if (_stricmp(path.extension().string().c_str(), ".xml") == 0)
-				{
-					auto pathstring = iter->path().generic_string();
-					auto relativepath = pathstring.substr(pathstring.find_last_of("\\Data\\") - 3);
-					g_XMLPaths.emplace_back(std::filesystem::path(relativepath));
-				}
-			}
-		else
-			Log(dir + " does not exist.", kToLog | logLevel);
+		if (!std::filesystem::exists(dir)) Log(dir + " does not exist.", kToLog | logLevel);
+		else for (const auto& iter : std::filesystem::directory_iterator(dir))
+		{
+			const auto& path = iter.path();
+			if (iter.is_directory()) Log(path.string() + " found");
+			else if (path.extension().string() == ".json") Files::HandleJson(path);
+			else if (path.extension().string() == ".xml") Files::HandleXML(path);
+		}
 		ProcessSIEntries();
 		const auto now = std::chrono::system_clock::now();
 		const auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - then);
@@ -108,7 +89,7 @@ namespace SortingIcons
 	{
 		Commands::Register();
 		if (g_nvseInterface->isEditor) return;
-		HandleINIs();
+		HandleINI();
 
 		Patches::AlterSorting(g_FixIndefiniteSorting || (enable && bSort));
 		Patches::AddIcons(enable && bIcons);

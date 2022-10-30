@@ -8,9 +8,12 @@ namespace SortingIcons::Icons
 {
 	Float32 compassRoseX = 0, compassRoseY = 0;
 
+	inline std::unordered_map<TESForm*, std::string>						g_ItemToCategory;
+	inline std::unordered_map<TESForm*, std::unordered_set<std::string>>	g_ItemToFilter;
+
 	void InjectTemplates()
 	{
-		for (auto& iter : g_XMLPaths)
+		for (const auto& iter : g_XMLPaths)
 		{
 			HUDMainMenu::GetSingleton()->tile->InjectUIXML(iter.generic_string().c_str());
 			RepairMenu::GetSingleton()->tile->InjectUIXML(iter.generic_string().c_str());

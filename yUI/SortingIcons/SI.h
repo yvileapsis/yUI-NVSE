@@ -25,12 +25,12 @@ namespace SortingIcons
 		{
 		public:
 			std::string		tag;
-			SInt32			priority = 0;
-			TESForm*		form = nullptr;
-			UInt32			formType = 0;
-			UInt8			questItem = 0;
-			UInt8			miscComponent = 0;
-			UInt8			miscProduct = 0;
+			SInt32			priority		= 0;
+			TESForm*		form			= nullptr;
+			UInt32			formType		= 0;
+			UInt8			questItem		= 0;
+			UInt8			miscComponent	= 0;
+			UInt8			miscProduct		= 0;
 
 			Common() = default;
 		};
@@ -111,18 +111,18 @@ namespace SortingIcons
 	{
 	public:
 		std::string		tag;
-		SInt32			priority = 0;
+		SInt32			priority	= 0;
 
 		std::string		xmltemplate;
 		std::string		filename;
 		std::string		texatlas;
-		SInt32			systemcolor = 0;
+		SInt32			systemcolor	= 0;
 
 		std::string		category;
 		std::string		name;
 		std::string		icon;
-		UInt32			tab = 0;
-		UInt32			count = 0;
+		UInt32			tab			= 0;
+		UInt32			count		= 0;
 
 		Category() = default;
 	};
@@ -131,14 +131,14 @@ namespace SortingIcons
 	{
 	public:
 		std::string		tab;
-		SInt32			priority = 0;
+		SInt32			priority			= 0;
 
 		std::string		name;
-		SInt32			tabPriority = 0;
-		UInt32			tabNew = 0;
+		SInt32			tabPriority			= 0;
+		UInt32			tabNew				= 0;
 		std::unordered_set<std::string>	tabMisc;
-		UInt32			inventory = 0;
-		UInt32			container = 0;
+		UInt32			inventory			= 0;
+		UInt32			container			= 0;
 
 		std::unordered_set<UInt32>			types;
 		std::unordered_set<std::string>		categories;
@@ -153,9 +153,6 @@ namespace SortingIcons
 
 	inline std::unordered_map<std::string, Category>						g_StringToCategory;
 	inline std::unordered_map<std::string, Tab>								g_StringToTabs;
-
-	inline std::unordered_map<TESForm*, std::string>						g_ItemToCategory;
-	inline std::unordered_map<TESForm*, std::unordered_set<std::string>>	g_ItemToFilter;
 
 	inline std::unordered_set<std::string>									g_Keyrings;
 	inline std::vector<std::string>											g_Tabline;
@@ -181,7 +178,8 @@ namespace SortingIcons::Files
 {
 	bool AssignCategoryToItem(TESForm* form);
 	bool AssignFiltersToItem(TESForm* form);
-	void HandleSIJson(const std::filesystem::path& path);
+	void HandleJson(const std::filesystem::path& path);
+	void HandleXML(const std::filesystem::path& path);
 }
 
 namespace SortingIcons::Sorting
@@ -222,4 +220,5 @@ namespace SortingIcons::Icons
 	void __fastcall SetTileStringInjectTile(Tile* tile, InventoryChanges* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate);
 	void __fastcall SetStringValueTagImage(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate);
 	void __fastcall SetStringValueTagRose(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate);
+	void __fastcall Tile__PropagateIntValue(Tile* tile, void* dummyedx, UInt32 a2, signed int a3);
 }
