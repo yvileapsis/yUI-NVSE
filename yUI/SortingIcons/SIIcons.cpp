@@ -28,7 +28,7 @@ namespace SortingIcons::Icons
 		return true;
 	}
 
-	void InjectIconTile(const std::shared_ptr<Category>& category_, MenuItemEntryList* list, Tile* tile, InventoryChanges* entry)
+	void InjectIconTile(const CategoryPtr& category_, MenuItemEntryList* list, Tile* tile, InventoryChanges* entry)
 	{
 		//	if (g_Items.find(entry->type) == g_Items.end()) return;
 		const auto& category = *category_;

@@ -124,8 +124,6 @@ namespace SortingIcons
 		Category() = default;
 	};
 
-	inline std::shared_ptr<Category> categoryDefault;
-
 	class Tab
 	{
 	public:
@@ -146,17 +144,21 @@ namespace SortingIcons
 		Tab() = default;
 	};
 
-	inline Tab tabDefault{};
+	typedef std::shared_ptr<Item> ItemPtr;
+	typedef std::shared_ptr<Category> CategoryPtr;
+	typedef std::shared_ptr<Tab> TabPtr;
 
-	inline std::vector<std::shared_ptr<Item>>		g_Items;
-	inline std::vector<std::shared_ptr<Category>>	g_Categories;
-	inline std::vector<std::shared_ptr<Tab>>		g_Tabs;
+	inline CategoryPtr categoryDefault;
 
-	inline std::unordered_map<std::string, std::shared_ptr<Category>>	g_StringToCategory;
-	inline std::unordered_map<std::string, std::shared_ptr<Tab>>		g_StringToTabs;
+	inline std::vector<ItemPtr>		g_Items;
+	inline std::vector<CategoryPtr>	g_Categories;
+	inline std::vector<TabPtr>		g_Tabs;
 
-	inline std::vector<std::shared_ptr<Category>>						g_Keyrings;
-	inline std::vector<std::shared_ptr<Tab>>							g_Tabline;
+	inline std::unordered_map<std::string, CategoryPtr>	g_StringToCategory;
+	inline std::unordered_map<std::string, TabPtr>		g_StringToTabs;
+
+	inline std::vector<CategoryPtr>						g_Keyrings;
+	inline std::vector<TabPtr>							g_Tabline;
 	inline std::vector<std::filesystem::path>							g_XMLPaths;
 }
 
@@ -167,16 +169,20 @@ namespace SortingIcons::Commands
 
 namespace SortingIcons::Categories
 {
-	std::shared_ptr<Category>& ItemGetCategory(TESForm* form);
-	std::shared_ptr<Category>& ItemGetCategory(const InventoryChanges* form);
-	void ItemSetCategory(TESForm* form, const std::shared_ptr<Category>& category);
-	void ItemSetCategory(const InventoryChanges* entry, const std::shared_ptr<Category>& category);
+	CategoryPtr& ItemGetCategory(TESForm* form);
+	CategoryPtr& ItemGetCategory(const InventoryChanges* form);
+	void ItemSetCategory(TESForm* form, const CategoryPtr& category);
+	void ItemSetCategory(const InventoryChanges* entry, const CategoryPtr& category);
 }
 
 namespace SortingIcons::Tabs
 {
 	void ItemAssignTabs(TESForm* form);
 	void ItemAssignTabs(const InventoryChanges* entry);
+
+	Tile* __fastcall InventoryMenuChooseTab(SInt32 key, UInt32 filter);
+	UInt32 __fastcall InventoryMenuHandleClickGetFilter(InventoryMenu* menu, SInt32 tileID, Tile* clickedTile);
+	void __fastcall InventoryMenuSetupData(InventoryMenu* menu, SInt32 tileID, Tile* clickedTile);
 }
 
 namespace SortingIcons::Patches
@@ -195,11 +201,9 @@ namespace SortingIcons::Files
 	void HandleXML(const std::filesystem::path& path);
 }
 
-namespace SortingIcons::Sorting
+namespace SortingIcons::Keyrings
 {
-
 	void KeyringRefreshPostStewie();
-	SInt32 __fastcall CompareItems(const TileInventoryChangesUnk* unk1, const TileInventoryChangesUnk* unk2);
 
 	void __fastcall HideNonKeysGetTile(InventoryMenu* invmenu, Tile* tile);
 	void __fastcall AddSortingCategories();
@@ -211,22 +215,23 @@ namespace SortingIcons::Sorting
 	void SetUpTabline(TileRect* tabline, int traitID, const char* strWeapon, const char* strApparel, const char* strAid,
 		const char* strMisc, const char* strAmmo, char* zero);
 
-	Tile* __fastcall InventoryMenuChooseTab(SInt32 key, UInt32 filter);
-	void InventoryMenuSaveScrollPosition();
-	UInt32 __fastcall InventoryMenuHandleClickGetFilter(InventoryMenu* menu, SInt32 tileID, Tile* clickedTile);
-	void __fastcall InventoryMenuSetupData(InventoryMenu* menu, SInt32 tileID, Tile* clickedTile);
-	void InventoryMenuRestoreScrollPosition();
-
-
 	bool __fastcall HasContainerChangesEntry(InventoryChanges* entry);
 	bool __fastcall KeyringShowCategories(Tile* tile);
+	void InventoryMenuSaveScrollPosition();
+	void InventoryMenuRestoreScrollPosition();
+
+}
+
+namespace SortingIcons::Sorting
+{
+	SInt32 __fastcall CompareItems(const TileInventoryChangesUnk* unk1, const TileInventoryChangesUnk* unk2);
 }
 
 namespace SortingIcons::Icons
 {
 
 	void InjectTemplates();
-	void InjectIconTile(const std::shared_ptr<Category>& category_, MenuItemEntryList* list, Tile* tile, InventoryChanges* entry);
+	void InjectIconTile(const CategoryPtr& category_, MenuItemEntryList* list, Tile* tile, InventoryChanges* entry);
 	void __fastcall SetTileStringInjectTile(Tile* tile, InventoryChanges* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate);
 	void __fastcall SetStringValueTagImage(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate);
 	void __fastcall SetStringValueTagRose(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate);

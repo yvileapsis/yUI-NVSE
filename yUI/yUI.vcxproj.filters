@@ -175,9 +175,6 @@
     <ClInclude Include="SortingIcons\SI.h">
       <Filter>features\SortingIcons</Filter>
     </ClInclude>
-    <ClInclude Include="SortingIcons\SIHooks.h">
-      <Filter>features\SortingIcons</Filter>
-    </ClInclude>
     <ClInclude Include="..\game\GameAPI.h">
       <Filter>game</Filter>
     </ClInclude>

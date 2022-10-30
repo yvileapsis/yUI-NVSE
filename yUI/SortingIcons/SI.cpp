@@ -26,25 +26,25 @@ namespace SortingIcons
 		ini.SaveFile(iniPath.c_str(), false);
 	}
 
-	void ProcessSIEntries()
+	void ProcessEntries()
 	{
-		ra::sort(g_Items, [&](const std::shared_ptr<Item>& entry1, const std::shared_ptr<Item>& entry2) { return entry1->common.priority > entry2->common.priority; });
-		ra::sort(g_Categories, [&](const std::shared_ptr<Category>& entry1, const std::shared_ptr<Category>& entry2) { return entry1->priority > entry2->priority; });
-		ra::sort(g_Tabs, [&](const std::shared_ptr<Tab>& entry1, const std::shared_ptr<Tab>& entry2) { return entry1->priority > entry2->priority; });
+		ra::sort(g_Items, [&](const ItemPtr& entry1, const ItemPtr& entry2) { return entry1->common.priority > entry2->common.priority; });
+		ra::sort(g_Categories, [&](const CategoryPtr& entry1, const CategoryPtr& entry2) { return entry1->priority > entry2->priority; });
+		ra::sort(g_Tabs, [&](const TabPtr& entry1, const TabPtr& entry2) { return entry1->priority > entry2->priority; });
 
-		for (auto& entry : g_Categories) {
+		for (const auto& entry : g_Categories) {
 			if (!entry->name.empty()) g_Keyrings.emplace_back(entry);
 			if (entry->tag.empty()) categoryDefault = entry;
 			g_StringToCategory.emplace(entry->tag, entry);
 		}
 
-		for (auto& entry : g_Tabs)
+		for (const auto& entry : g_Tabs)
 		{
 			if (entry->inventory) g_Tabline.emplace_back(entry);
 			g_StringToTabs.emplace(entry->tab, entry);
 		}
 
-		ra::sort(g_Tabline, [&](const std::shared_ptr<Tab>& entry1, const std::shared_ptr<Tab>& entry2) { return entry1->tabPriority > entry2->tabPriority; });
+		ra::sort(g_Tabline, [&](const TabPtr& entry1, const TabPtr& entry2) { return entry1->tabPriority > entry2->tabPriority; });
 	}
 
 	void DeferredInit()
@@ -54,12 +54,10 @@ namespace SortingIcons
 		const auto then = std::chrono::system_clock::now();
 		if (!std::filesystem::exists(dir)) Log(dir + " does not exist.", kToLog | logLevel);
 		else for (const auto& iter : std::filesystem::directory_iterator(dir))
-		{
 			if (iter.is_directory()) Log(iter.path().string() + " found");
 			else if (iter.path().extension().string() == ".json") Files::HandleJSON(iter.path());
 			else if (iter.path().extension().string() == ".xml") Files::HandleXML(iter.path());
-		}
-		ProcessSIEntries();
+		ProcessEntries();
 		const auto now = std::chrono::system_clock::now();
 		const auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - then);
 		Log(FormatString("Loaded items, categories and tabs in %d ms", diff.count()), kToLog | logLevel);
@@ -80,7 +78,7 @@ namespace SortingIcons
 
 		deferredInit.emplace_back(CraftingComponents::Fill);
 		if (bSort || bIcons || bHotkeys || bCategories) deferredInit.emplace_back(DeferredInit);
-		if (bCategories) mainLoop.emplace_back(Sorting::KeyringRefreshPostStewie);
+		if (bCategories) mainLoop.emplace_back(Keyrings::KeyringRefreshPostStewie);
 		if (bIcons) mainLoopDoOnce.emplace_back(Icons::InjectTemplates);
 	}
 }

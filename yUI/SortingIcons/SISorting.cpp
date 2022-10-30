@@ -7,7 +7,7 @@
 
 namespace SortingIcons::Categories
 {
-	std::unordered_map<TESForm*, std::shared_ptr<Category>> g_ItemToCategory;
+	std::unordered_map<TESForm*, CategoryPtr> g_ItemToCategory;
 
 	void ItemAssignCategory(TESForm* form)
 	{
@@ -83,157 +83,33 @@ namespace SortingIcons::Categories
 		return ItemHasCategory(entry->form->TryGetREFRParent());
 	}
 
-	std::shared_ptr<Category>& ItemGetCategory(TESForm* form)
+	CategoryPtr& ItemGetCategory(TESForm* form)
 	{
 		if (!ItemHasCategory(form)) ItemAssignCategory(form);
 		return g_ItemToCategory[form];
 	}
 
-	std::shared_ptr<Category>& ItemGetCategory(const InventoryChanges* entry)
+	CategoryPtr& ItemGetCategory(const InventoryChanges* entry)
 	{
 		return ItemGetCategory(entry->form->TryGetREFRParent());
 	}
 
-	void ItemSetCategory(TESForm* form, const std::shared_ptr<Category>& category)
+	void ItemSetCategory(TESForm* form, const CategoryPtr& category)
 	{
 		g_ItemToCategory[form] = category;
 	}
 
-	void ItemSetCategory(const InventoryChanges* entry, const std::shared_ptr<Category>& category)
+	void ItemSetCategory(const InventoryChanges* entry, const CategoryPtr& category)
 	{
 		ItemSetCategory(entry->form->TryGetREFRParent(), category);
 	}
 	
 }
 
-namespace SortingIcons::Tabs
+namespace SortingIcons::Keyrings
 {
-	std::unordered_map<TESForm*, std::unordered_set<std::shared_ptr<Tab>>> g_ItemToTabs;
-
-	
-	void ItemAssignTabs(TESForm* form)
-	{
-		std::unordered_set<std::shared_ptr<Tab>> set;
-
-		for (const auto& iter : g_Tabs) {
-			const auto& entry = *iter;
-			if (!entry.tabMisc.empty()) continue;
-			if (!entry.types.empty() && !entry.types.contains(form->typeID)) continue;
-			if (!entry.categories.empty() && !entry.categories.contains(Categories::ItemGetCategory(form)->category)) continue;
-			set.emplace(iter);
-		}
-
-		for (const auto& iter : g_Tabs) {
-			const auto& entry = *iter;
-			if (entry.tabMisc.empty()) continue;
-			bool misc = true;
-			for (const auto& it : entry.tabMisc) if (set.contains(g_StringToTabs[it])) { misc = false; break; }
-			if (misc) set.emplace(iter);
-		}
-
-		g_ItemToTabs.emplace(form, std::move(set));
-	}
-	
-	void ItemAssignTabs(const InventoryChanges* entry)
-	{
-		return ItemAssignTabs(entry->form->TryGetREFRParent());
-	}
-	
-	bool ItemHasTabs(TESForm* form)
-	{
-		if (!form) return false;
-		if (!g_ItemToTabs.contains(form)) return false;
-		return true;
-	}
-
-	bool ItemHasTabs(const InventoryChanges* entry)
-	{
-		if (!entry) return false;
-		return ItemHasTabs(entry->form->TryGetREFRParent());
-	}
-
-}
-
-namespace SortingIcons::Sorting
-{
-
 	std::string openCategory;
 	std::string stringStewie;
-
-	SInt32 CompareWithTags(const TileInventoryChangesUnk* unk1, const TileInventoryChangesUnk* unk2)
-	{
-		if (bSort)
-		{
-			const auto a1 = unk1->entry;
-			const auto a2 = unk2->entry;
-			const auto tile1 = unk1->tile;
-			const auto tile2 = unk2->tile;
-
-			TESForm* form1 = nullptr, * form2 = nullptr;
-
-			if (a1 && a1->form) form1 = a1->form->TryGetREFRParent();
-			if (a2 && a2->form) form2 = a2->form->TryGetREFRParent();
-
-			std::string tag1, tag2;
-
-			if (form1) tag1 = Categories::ItemGetCategory(form1)->tag;
-			if (form2) tag2 = Categories::ItemGetCategory(form2)->tag;
-
-			if (bCategories && !g_Keyrings.empty())
-			{
-				if (tag1.empty() && tile1 && tile1->GetValue(kTileValue_user16)) tag1 = tile1->GetValue(kTileValue_user16)->str;
-				if (tag2.empty() && tile2 && tile2->GetValue(kTileValue_user16)) tag2 = tile2->GetValue(kTileValue_user16)->str;
-			}
-
-			if (tag1.empty())
-			{
-				if (!tag2.empty()) return 1;
-			}
-			else if (tag2.empty()) return -1;
-			else
-			{
-				const signed int cmp = tag1.compare(tag2);
-				if (cmp > 0) return 1;
-				if (cmp < 0) return -1;
-			}
-		}
-		return 0;
-	}
-
-	SInt32 __fastcall CompareItems(const TileInventoryChangesUnk* unk1, const TileInventoryChangesUnk* unk2)
-	{
-		const auto a1 = unk1->entry;
-		const auto a2 = unk2->entry;
-		const auto tile1 = unk1->tile;
-		const auto tile2 = unk2->tile;
-
-		TESForm* form1 = nullptr, *form2 = nullptr;
-
-		if (a1 && a1->form) form1 = a1->form->TryGetREFRParent();
-		if (a2 && a2->form) form2 = a2->form->TryGetREFRParent();
-
-		if (const auto cmp = CompareWithTags(unk1, unk2)) return cmp;
-
-		std::string name1, name2;
-
-		if (form1) name1 = form1->GetTheName();
-		if (form2) name2 = form2->GetTheName();
-
-		if (name1.empty() && tile1->GetValue(kTileValue_string)) name1 = tile1->GetValue(kTileValue_string)->str;
-		if (name2.empty() && tile2->GetValue(kTileValue_string)) name2 = tile2->GetValue(kTileValue_string)->str;
-
-		if (const auto cmp = name1.compare(name2); cmp != 0) return cmp;
-
-		if (!form1) return form2 ? -1 : 0;
-		if (!form2) return 1;
-		
-		if (const auto weaponMods = a1->GetWeaponMod() <=> a2->GetWeaponMod(); weaponMods != nullptr) return weaponMods._Value;
-		if (const auto condition = a1->GetHealthPercent() <=> a2->GetHealthPercent(); condition != nullptr) return condition._Value;
-		if (const auto equipped = a1->GetEquipped() <=> a2->GetEquipped(); equipped != nullptr) return equipped._Value;
-		if (const auto refID = form1->refID <=> form2->refID; refID != nullptr) return refID._Value;
-
-		return 0;
-	}
 
 	bool __fastcall KeyringShowCategories(Tile* tile)
 	{
@@ -315,10 +191,135 @@ namespace SortingIcons::Sorting
 		}
 	}
 
+
+	std::unordered_map<UInt32, InventoryMenu::ScrollPos> scrollPosTab;
+	std::unordered_map<std::string, InventoryMenu::ScrollPos> scrollPosKeyring;
+
+	void InventoryMenuSaveScrollPosition()
+	{
+		const auto menu = InventoryMenu::GetSingleton();
+		SInt32 listIndex;
+		if (const auto item = menu->itemsList.GetSelectedTile())
+			listIndex = trunc(item->GetFloat(kTileValue_listindex));
+		else
+			listIndex = -1;
+		const SInt32 currentValue = menu->itemsList.scrollBar->GetFloat("_current_value");
+
+		if (InventoryMenu::IsKeyringOpen())
+		{
+			scrollPosKeyring[openCategory].listIndex = listIndex;
+			scrollPosKeyring[openCategory].currentValue = currentValue;
+		}
+		else
+		{
+			scrollPosTab[menu->filter].listIndex = listIndex;
+			scrollPosTab[menu->filter].currentValue = currentValue;
+		}
+
+	}
+
+	void InventoryMenuRestoreScrollPosition()
+	{
+		const auto menu = InventoryMenu::GetSingleton();
+		SInt32 listIndex = 0;
+		SInt32 currentValue = 0;
+		if (InventoryMenu::IsKeyringOpen())
+		{
+			if (scrollPosKeyring.contains(openCategory))
+			{
+				listIndex = scrollPosKeyring[openCategory].listIndex;
+				currentValue = scrollPosKeyring[openCategory].currentValue;
+			}
+		}
+		else
+		{
+			if (const auto filter = menu->filter; scrollPosTab.contains(filter))
+			{
+				listIndex = scrollPosTab[filter].listIndex;
+				currentValue = scrollPosTab[filter].currentValue;
+			}
+		}
+		menu->itemsList.RestoreScrollPositionProxy(listIndex, currentValue);
+	}
+
+	void __fastcall KeyringEnableCancelHook(Tile* tile, void* dummyEDX, eTileValue tilevalue, signed int a1)
+	{
+		tile->SetFloat(tilevalue, InventoryMenu::IsKeyringOpen(), true);
+	}
+
+	void __fastcall KeyringPipBoyIconHook(Tile* tile, void* dummyEDX, eTileValue tilevalue, char* string, int propagate)
+	{
+		std::string stringnew = string;
+		if (const auto clickedtile = InventoryMenu::GetSingleton()->itemsList.selected; clickedtile->GetValue(kTileValue_user16)
+			&& !g_StringToCategory[clickedtile->GetValue(kTileValue_user16)->str]->icon.empty())
+			stringnew = g_StringToCategory[clickedtile->GetValue(kTileValue_user16)->str]->icon;
+		tile->SetString(tilevalue, stringnew.c_str(), true);
+	}
+
+	void KeyringRefreshPostStewie()
+	{
+		if (CdeclCall<bool>(0x702360) && InterfaceManager::IsMenuVisible(kMenuType_Inventory) && InventoryMenu::GetSingleton()->IsKeyringOpen()) {
+			if (Tile* stew = InventoryMenu::GetSingleton()->tile->GetChild("IM_SearchBar"); stew) {
+				if (const auto string = stew->GetValue(kTileValue_string)->str; !stringStewie._Equal(string)) {
+					stringStewie = string;
+					InventoryMenu::GetSingleton()->itemsList.Filter(KeyringHideNonKeys);
+					InventoryMenu::GetSingleton()->itemsList.ForEach(reinterpret_cast<void(*)(Tile*, InventoryChanges*)>(0x780C00));
+				}
+			}
+			else stringStewie.clear();
+		}
+	}
+
 	bool __fastcall HasContainerChangesEntry(InventoryChanges* entry)
 	{
 		if (entry && entry->form) return false;
 		return true;
+	}
+}
+
+namespace SortingIcons::Tabs
+{
+	std::unordered_map<TESForm*, std::unordered_set<TabPtr>> g_ItemToTabs;
+
+	void ItemAssignTabs(TESForm* form)
+	{
+		std::unordered_set<TabPtr> set;
+
+		for (const auto& iter : g_Tabs) {
+			const auto& entry = *iter;
+			if (!entry.tabMisc.empty()) continue;
+			if (!entry.types.empty() && !entry.types.contains(form->typeID)) continue;
+			if (!entry.categories.empty() && !entry.categories.contains(Categories::ItemGetCategory(form)->category)) continue;
+			set.emplace(iter);
+		}
+
+		for (const auto& iter : g_Tabs) {
+			const auto& entry = *iter;
+			if (entry.tabMisc.empty()) continue;
+			bool misc = true;
+			for (const auto& it : entry.tabMisc) if (set.contains(g_StringToTabs[it])) { misc = false; break; }
+			if (misc) set.emplace(iter);
+		}
+
+		g_ItemToTabs.emplace(form, std::move(set));
+	}
+
+	void ItemAssignTabs(const InventoryChanges* entry)
+	{
+		return ItemAssignTabs(entry->form->TryGetREFRParent());
+	}
+
+	bool ItemHasTabs(TESForm* form)
+	{
+		if (!form) return false;
+		if (!g_ItemToTabs.contains(form)) return false;
+		return true;
+	}
+
+	bool ItemHasTabs(const InventoryChanges* entry)
+	{
+		if (!entry) return false;
+		return ItemHasTabs(entry->form->TryGetREFRParent());
 	}
 
 
@@ -409,56 +410,6 @@ namespace SortingIcons::Sorting
 		return tablineTiles[newFilter];
 	}
 
-	std::unordered_map<UInt32, InventoryMenu::ScrollPos> scrollPosTab;
-	std::unordered_map<std::string, InventoryMenu::ScrollPos> scrollPosKeyring;
-
-	void InventoryMenuSaveScrollPosition()
-	{
-		const auto menu = InventoryMenu::GetSingleton();
-		SInt32 listIndex;
-		if (const auto item = menu->itemsList.GetSelectedTile())
-			listIndex = trunc(item->GetFloat(kTileValue_listindex));
-		else
-			listIndex = -1;
-		const SInt32 currentValue = menu->itemsList.scrollBar->GetFloat("_current_value");
-
-		if (InventoryMenu::IsKeyringOpen())
-		{
-			scrollPosKeyring[openCategory].listIndex = listIndex;
-			scrollPosKeyring[openCategory].currentValue = currentValue;
-		}
-		else
-		{
-			scrollPosTab[menu->filter].listIndex = listIndex;
-			scrollPosTab[menu->filter].currentValue = currentValue;
-		}
-
-	}
-
-	void InventoryMenuRestoreScrollPosition()
-	{
-		const auto menu = InventoryMenu::GetSingleton();
-		SInt32 listIndex = 0;
-		SInt32 currentValue = 0;
-		if (InventoryMenu::IsKeyringOpen())
-		{
-			if (scrollPosKeyring.contains(openCategory))
-			{
-				listIndex = scrollPosKeyring[openCategory].listIndex;
-				currentValue = scrollPosKeyring[openCategory].currentValue;
-			}
-		}
-		else
-		{
-			if (const auto filter = menu->filter; scrollPosTab.contains(filter))
-			{
-				listIndex = scrollPosTab[filter].listIndex;
-				currentValue = scrollPosTab[filter].currentValue;
-			}
-		}
-		menu->itemsList.RestoreScrollPositionProxy(listIndex, currentValue);
-	}
-
 	UInt8 __fastcall InventoryMenuShouldHideItem(InventoryChanges* entry)
 	{
 		if (!entry || !entry->form) return true;
@@ -472,31 +423,82 @@ namespace SortingIcons::Sorting
 		return true;
 	}
 
-	void __fastcall KeyringEnableCancelHook(Tile* tile, void* dummyEDX, eTileValue tilevalue, signed int a1)
-	{
-		tile->SetFloat(tilevalue, InventoryMenu::IsKeyringOpen(), true);
-	}
+}
 
-	void __fastcall KeyringPipBoyIconHook(Tile* tile, void* dummyEDX, eTileValue tilevalue, char* string, int propagate)
+namespace SortingIcons::Sorting
+{
+	SInt32 CompareWithTags(const TileInventoryChangesUnk* unk1, const TileInventoryChangesUnk* unk2)
 	{
-		std::string stringnew = string;
-		if (const auto clickedtile = InventoryMenu::GetSingleton()->itemsList.selected; clickedtile->GetValue(kTileValue_user16)
-			&& !g_StringToCategory[clickedtile->GetValue(kTileValue_user16)->str]->icon.empty())
-			stringnew = g_StringToCategory[clickedtile->GetValue(kTileValue_user16)->str]->icon;
-		tile->SetString(tilevalue, stringnew.c_str(), true);
-	}
+		if (bSort)
+		{
+			const auto a1 = unk1->entry;
+			const auto a2 = unk2->entry;
+			const auto tile1 = unk1->tile;
+			const auto tile2 = unk2->tile;
 
-	void KeyringRefreshPostStewie()
-	{
-		if (CdeclCall<bool>(0x702360) && InterfaceManager::IsMenuVisible(kMenuType_Inventory) && InventoryMenu::GetSingleton()->IsKeyringOpen()) {
-			if (Tile* stew = InventoryMenu::GetSingleton()->tile->GetChild("IM_SearchBar"); stew) {
-				if (const auto string = stew->GetValue(kTileValue_string)->str; !stringStewie._Equal(string)) {
-					stringStewie = string;
-					InventoryMenu::GetSingleton()->itemsList.Filter(KeyringHideNonKeys);
-					InventoryMenu::GetSingleton()->itemsList.ForEach(reinterpret_cast<void(*)(Tile*, InventoryChanges*)>(0x780C00));
-				}
+			TESForm* form1 = nullptr, * form2 = nullptr;
+
+			if (a1 && a1->form) form1 = a1->form->TryGetREFRParent();
+			if (a2 && a2->form) form2 = a2->form->TryGetREFRParent();
+
+			std::string tag1, tag2;
+
+			if (form1) tag1 = Categories::ItemGetCategory(form1)->tag;
+			if (form2) tag2 = Categories::ItemGetCategory(form2)->tag;
+
+			if (bCategories && !g_Keyrings.empty())
+			{
+				if (tag1.empty() && tile1 && tile1->GetValue(kTileValue_user16)) tag1 = tile1->GetValue(kTileValue_user16)->str;
+				if (tag2.empty() && tile2 && tile2->GetValue(kTileValue_user16)) tag2 = tile2->GetValue(kTileValue_user16)->str;
 			}
-			else stringStewie.clear();
+
+			if (tag1.empty())
+			{
+				if (!tag2.empty()) return 1;
+			}
+			else if (tag2.empty()) return -1;
+			else
+			{
+				const signed int cmp = tag1.compare(tag2);
+				if (cmp > 0) return 1;
+				if (cmp < 0) return -1;
+			}
 		}
+		return 0;
+	}
+
+	SInt32 __fastcall CompareItems(const TileInventoryChangesUnk* unk1, const TileInventoryChangesUnk* unk2)
+	{
+		const auto a1 = unk1->entry;
+		const auto a2 = unk2->entry;
+		const auto tile1 = unk1->tile;
+		const auto tile2 = unk2->tile;
+
+		TESForm* form1 = nullptr, *form2 = nullptr;
+
+		if (a1 && a1->form) form1 = a1->form->TryGetREFRParent();
+		if (a2 && a2->form) form2 = a2->form->TryGetREFRParent();
+
+		if (const auto cmp = CompareWithTags(unk1, unk2)) return cmp;
+
+		std::string name1, name2;
+
+		if (form1) name1 = form1->GetTheName();
+		if (form2) name2 = form2->GetTheName();
+
+		if (name1.empty() && tile1->GetValue(kTileValue_string)) name1 = tile1->GetValue(kTileValue_string)->str;
+		if (name2.empty() && tile2->GetValue(kTileValue_string)) name2 = tile2->GetValue(kTileValue_string)->str;
+
+		if (const auto cmp = name1.compare(name2); cmp != 0) return cmp;
+
+		if (!form1) return form2 ? -1 : 0;
+		if (!form2) return 1;
+		
+		if (const auto weaponMods = a1->GetWeaponMod() <=> a2->GetWeaponMod(); weaponMods != nullptr) return weaponMods._Value;
+		if (const auto condition = a1->GetHealthPercent() <=> a2->GetHealthPercent(); condition != nullptr) return condition._Value;
+		if (const auto equipped = a1->GetEquipped() <=> a2->GetEquipped(); equipped != nullptr) return equipped._Value;
+		if (const auto refID = form1->refID <=> form2->refID; refID != nullptr) return refID._Value;
+
+		return 0;
 	}
 }
