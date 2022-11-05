@@ -186,7 +186,7 @@ public:
 
 	Float64					GetInventoryWeight();
 
-	std::vector<InventoryChanges*> GetAllItems(UInt32 reclvl = 0);
+	std::vector<InventoryChanges*> GetAllItems(UInt32 checkLinkedRec = 0);
 
 	void					OpenCloseContainer(bool open = false, bool sounds = true);
 };
