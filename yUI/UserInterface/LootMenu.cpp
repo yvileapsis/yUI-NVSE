@@ -1,17 +1,16 @@
 #include <main.h>
 #include <functions.h>
 #include <SimpleINILibrary.h>
+#include <json.h>
 
 #include <dinput8.h>
 #include <fstream>
 
 #include <Menus.h>
+#include <GameData.h>
 #include <InterfaceManager.h>
 
 #include "SortingIcons/SI.h"
-#include <json.h>
-
-#include "GameData.h"
 
 namespace UserInterface::LootMenu
 {
