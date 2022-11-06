@@ -21,15 +21,15 @@ namespace SortingIcons::Files
 		}
 	}
 
+	UInt32 StrToFormID(const std::string& formIdStr)
+	{
+		const auto formId = HexStringToInt(formIdStr);
+		if (formId == -1) Log("Form field was incorrectly formatted, got " + formIdStr, logLevel);
+		return formId;
+	}
+
 	void HandleItem(nlohmann::basic_json<> elem)
 	{
-		constexpr auto strToFormID = [](const std::string& formIdStr)
-		{
-			const auto formId = HexStringToInt(formIdStr);
-			if (formId == -1) Log("Form field was incorrectly formatted, got " + formIdStr, logLevel);
-			return formId;
-		};
-
 		if (!elem.is_object())
 		{
 			Log("JSON error: expected object", logLevel);
@@ -49,73 +49,73 @@ namespace SortingIcons::Files
 			auto modName = elem.contains("mod") ? elem["mod"].get<std::string>() : "";
 			const auto mod = !modName.empty() ? TESDataHandler::GetSingleton()->LookupModByName(modName.c_str()) : nullptr;
 
-			UInt8 modIndex;
+			UInt8 modIndex = mod ? mod->modIndex : 0;
 			if (modName == "FF") modIndex = 0xFF;
 			else if (!mod && !modName.empty())
 			{
 				Log("Mod name " + modName + " was not found", logLevel);
 				return;
 			}
-			modIndex = mod->modIndex;
 
 			UInt32 formlist = 0;
 			if (elem.contains("formlist")) formlist = elem["formlist"].get<UInt32>();
 
-			std::vector<int> formIds;
+			std::vector<UInt32> formIds;
 			if (const auto formElem = elem.contains("form") ? &elem["form"] : nullptr; formElem)
 			{
 				if (formElem->is_array())
-					std::ranges::transform(*formElem, std::back_inserter(formIds), [&](auto& i) {return strToFormID(i.template get<std::string>()); });
+					std::ranges::transform(*formElem, std::back_inserter(formIds), [&](auto& i) {return StrToFormID(i.template get<std::string>()); });
 				else
-					formIds.push_back(strToFormID(formElem->get<std::string>()));
-				if (std::ranges::find(formIds, -1) != formIds.end())
-					return;
+					formIds.push_back(StrToFormID(formElem->get<std::string>()));
+				if (std::ranges::find(formIds, -1) != formIds.end()) return;
 			}
 
-			if (mod && !formIds.empty())
+			if (!mod || formIds.empty())
 			{
-				for (auto formId : formIds)
-				{
-					formId = (modIndex << 24) + (formId & 0x00FFFFFF);
-					common.form = GetFormByID(formId);
-					if (!common.form) { Log(FormatString("Form %X was not found", formId), logLevel); continue; }
-					if (!formlist) {
-						Log(FormatString("Tag: '%10s', form: %08X (%50s), individual", common.tag.c_str(), formId, common.form->GetName()), logLevel);
-						g_Items.emplace_back(std::make_shared<Item>(common));
-					}
-					else if (formlist == 1) {
-						common.formType = 0;
-						ItemRecursiveEmplace(common, common.form);
-					}
-					else if (formlist == 2) {
-						for (const auto item : *GetAllForms()) {
-							if (item->typeID == kFormType_TESObjectWEAP) {
-								const auto weapon = reinterpret_cast<TESObjectWEAP*>(item);
-								if (!weapon || !weapon->repairItemList.listForm) continue;
-								if (weapon->refID == common.form->refID || weapon->repairItemList.listForm->refID == common.form->refID || weapon->repairItemList.listForm->ContainsRecursive(common.form)) {
-									Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", common.tag.c_str(), item->refID, item->GetName(), formId), logLevel);
-									auto newCommon = common;
-									newCommon.form = item;
-									g_Items.emplace_back(std::make_shared<Item>(newCommon));
-								}
-							}
-							else if (item->typeID == kFormType_TESObjectARMO) {
-								const auto armor = reinterpret_cast<TESObjectARMO*>(item);
-								if (!armor || !armor->repairItemList.listForm) continue;
-								if (armor->refID == common.form->refID || armor->repairItemList.listForm->refID == common.form->refID || armor->repairItemList.listForm->ContainsRecursive(common.form)) {
-									Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", common.tag.c_str(), item->refID, item->GetName(), formId), logLevel);
-									auto newCommon = common;
-									newCommon.form = item;
-									g_Items.emplace_back(std::make_shared<Item>(newCommon));
-								}
-							}
-						}
-					}
-				}
-			}
-			else {
 				Log(FormatString("Tag: '%10s', mod: '%s'", common.tag.c_str(), modName.c_str()), logLevel);
 				g_Items.emplace_back(std::make_shared<Item>(common));
+			}
+			else for (auto formId : formIds)
+			{
+				const auto id = (modIndex << 24) + (formId & 0x00FFFFFF);
+				common.form = GetFormByID(id);
+				if (!common.form)
+				{
+					Log(FormatString("Form %X was not found", formId), logLevel);
+					continue;
+				}
+				if (!formlist)
+				{
+					Log(FormatString("Tag: '%10s', form: %08X (%50s), individual", common.tag.c_str(), id, common.form->GetName()), logLevel);
+					g_Items.emplace_back(std::make_shared<Item>(common));
+				}
+				else if (formlist == 1)
+				{
+					common.formType = 0;
+					ItemRecursiveEmplace(common, common.form);
+				}
+				else if (formlist == 2)
+				{
+					for (const auto item : *GetAllForms())
+					{
+						BGSListForm* list = nullptr;
+
+						if (item->typeID == kFormType_TESObjectWEAP)
+							list = reinterpret_cast<TESObjectWEAP*>(item)->repairItemList.listForm;
+						else if (item->typeID == kFormType_TESObjectARMO)
+							list = reinterpret_cast<TESObjectARMO*>(item)->repairItemList.listForm;
+						else continue;
+
+						if (item->refID == common.form->refID || list && list->refID == common.form->refID || list && list->ContainsRecursive(common.form))
+						{
+							Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", common.tag.c_str(), item->refID, item->GetName(), formId), logLevel);
+							auto newCommon = common;
+							newCommon.form = item;
+							g_Items.emplace_back(std::make_shared<Item>(newCommon));
+						}
+
+					}
+				}
 			}
 		}
 		else if (common.formType == 40)
@@ -138,7 +138,7 @@ namespace SortingIcons::Files
 			{
 				auto ammoModName = elem["ammoMod"].get<std::string>();
 				const auto ammoMod = !ammoModName.empty() ? TESDataHandler::GetSingleton()->LookupModByName(ammoModName.c_str()) : nullptr;
-				auto ammoForm = GetFormByID((ammoMod->modIndex << 24) + (strToFormID(elem["ammoForm"].get<std::string>()) & 0x00FFFFFF));
+				auto ammoForm = GetFormByID((ammoMod->modIndex << 24) + (StrToFormID(elem["ammoForm"].get<std::string>()) & 0x00FFFFFF));
 				weapon.ammo = ammoForm;
 			}
 
@@ -301,7 +301,6 @@ namespace SortingIcons::Files
 	void HandleJSON(const std::filesystem::path& path)
 	{
 		Log("\nReading JSON file " + path.string(), logLevel);
-
 		try
 		{
 			std::ifstream i(path);
@@ -331,6 +330,5 @@ namespace SortingIcons::Files
 			Log("The JSON is incorrectly formatted! It will not be applied.", logLevel);
 			Log(FormatString("JSON error: %s\n", e.what()), logLevel);
 		}
-
 	}
 }

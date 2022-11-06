@@ -18,15 +18,35 @@ namespace CraftingComponents
 		for (const auto mIter : g_TESDataHandler->recipeList)
 		{
 			for (const auto node : mIter->inputs)
-				if (node && node->item) g_Components.emplace(node->item);
+				if (node->item) g_Components.emplace(node->item);
 			for (const auto node : mIter->outputs)
-				if (node && node->item) g_Products.emplace(node->item);
+				if (node->item) g_Products.emplace(node->item);
 		}
 	}
 
 	bool IsComponent(TESForm* form) { return g_Components.contains(form); }
 
 	bool IsProduct(TESForm* form) { return g_Products.contains(form); }
+}
+
+namespace HideInfoPrompt
+{
+	UInt32 shouldHide = 0;
+
+	void Hide()
+	{
+		shouldHide++;
+	}
+
+	void Show()
+	{
+		if (shouldHide > 0) shouldHide--;
+	}
+
+	void Update()
+	{
+		g_HUDMainMenu->tileInfo->SetFloat(kTileValue_visible, !shouldHide);
+	}
 }
 
 /*
@@ -404,4 +424,21 @@ bool GetCannibalPrompt(TESObjectREFR* ref)
 	activationPromptTList.Init();
 	ApplyPerkModifiers(0x1B, g_player, ref, &activationPromptTList, ref);
 	return activationPromptTList.Empty();
+}
+
+
+std::string GetStringForButton(UInt32 button)
+{
+	switch (button)
+	{
+	case 1 << 0: return "Up)";
+	case 1 << 1: return "Down)";
+	case 1 << 2: return "Left)";
+	case 1 << 3: return "Right)";
+	case 1 << 4: return "Start)";
+	case 1 << 5: case 1 << 6: case 1 << 7: case 1 << 8: case 1 << 9:
+	case 1 << 11: case 1 << 12: case 1 << 13: case 1 << 14:	return "";
+	case 1 << 10: return "Guide)";
+	default: return std::to_string(button);
+	}
 }

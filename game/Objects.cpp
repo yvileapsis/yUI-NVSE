@@ -100,7 +100,7 @@ Float64 TESObjectREFR::GetInventoryWeight()
 	return 0;
 }
 
-std::vector<InventoryChanges*> TESObjectREFR::GetAllItems(UInt32 reclvl)
+std::vector<InventoryChanges*> TESObjectREFR::GetAllItems(UInt32 checkLinkedRec)
 {
 	std::vector<InventoryChanges*> vector;
 	
@@ -122,11 +122,11 @@ std::vector<InventoryChanges*> TESObjectREFR::GetAllItems(UInt32 reclvl)
 
 	// Process linked ref for vendor containers, recursive, but hopefully no one links container on itself
 	// UPD: someone linked container on itself, ffs
-	if (reclvl > 5) {}
+	if (!checkLinkedRec || checkLinkedRec > 5) {}
 	else if (const auto xLinkedRef = reinterpret_cast<ExtraLinkedRef*>(this->extraDataList.GetByType(kExtraData_LinkedRef)))
 		if (const auto linked = xLinkedRef->linkedRef)
 		{
-			const auto newvector = linked->GetAllItems(reclvl + 1);
+			const auto newvector = linked->GetAllItems(checkLinkedRec + 1);
 			vector.insert(vector.end(), newvector.begin(), newvector.end());
 		}
 

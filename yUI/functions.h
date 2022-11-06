@@ -11,6 +11,13 @@ namespace CraftingComponents
 	bool IsProduct(TESForm* form);
 }
 
+namespace HideInfoPrompt
+{
+	void Show();
+	void Hide();
+	void Update();
+}
+
 TESForm* GetRefFromString(char*, char*);
 
 bool HasBaseEffectChangesAV(TESForm*, int);
@@ -51,3 +58,4 @@ bool IsButtonPressed(UInt32 button);
 UInt32 GetControl(UInt32 whichControl, UInt32 type = OSInputGlobals::kControlType_Keyboard);
 void SetNativeHandlerFunctionBool(bool trueorfalse);
 bool ToggleVanityWheel(bool toggle);
+std::string GetStringForButton(UInt32 button);
