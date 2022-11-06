@@ -1,0 +1,7 @@
+{
+"lootMenu": [
+	{ "mod": "FalloutNV.esm", 	"form": ["1299ba", "12424b", "12424c", "12424d", "1251be"], "action": 1 },
+	{ "mod": "DeadMoney.esm", 	"form": "012267", "action": 1 },
+	{ "mod": "Fallout3.esm", 	"form": "003b8d", "action": 1 }
+]
+}

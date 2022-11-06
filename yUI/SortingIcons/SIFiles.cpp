@@ -28,7 +28,10 @@ namespace SortingIcons::Files
 		if (form->typeID == kFormType_BGSListForm)
 			for (const auto iter : reinterpret_cast<BGSListForm*>(form)->list) ItemRecursiveEmplace(common, iter);
 		else if (common.formType == 0 || common.formType == form->typeID) {
-			Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, list: '%08X' (%50s)", common.tag.c_str(), form->refID, form->GetName(), common.form->refID, common.form->GetName()), logLevel);
+			if (common.form == form)
+				Log(FormatString("Tag: '%10s', form: %08X (%50s), individual", common.tag.c_str(), form->refID, form->GetName()), logLevel);
+			else
+				Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, list: '%08X' (%50s)", common.tag.c_str(), form->refID, form->GetName(), common.form->refID, common.form->GetName()), logLevel);
 			auto newCommon = common;
 			newCommon.form = form;
 			g_Items.emplace_back(std::make_shared<Item>(newCommon));
@@ -75,18 +78,13 @@ namespace SortingIcons::Files
 
 		if (elem.contains("mod") && elem.contains("form"))
 		{
-			UInt32 formlist = 0;
-			if (elem.contains("formlist")) formlist = elem["formlist"].get<UInt32>();
+			UInt32 repairList = 0;
+			if (elem.contains("formlist")) repairList = elem["formlist"].get<UInt32>();
+			if (elem.contains("repairList")) repairList = elem["repairList"].get<UInt32>();
 			for (auto form : GetFormsFromElement(elem, "mod", "form"))
 			{
 				common.form = form;
-				if (formlist == 0)
-				{
-					Log(FormatString("Tag: '%10s', form: %08X (%50s), individual", common.tag.c_str(), form->refID, form->GetName()), logLevel);
-					g_Items.emplace_back(std::make_shared<Item>(common));
-				}
-				else if (formlist == 1) ItemRecursiveEmplace(common, form);
-				else if (formlist == 2) ItemRepairListEmplace(common, form);
+				repairList ? ItemRepairListEmplace(common, form) : ItemRecursiveEmplace(common, form);
 			}
 			return;
 		}

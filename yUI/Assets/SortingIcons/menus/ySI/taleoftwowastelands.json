@@ -95,7 +95,7 @@
 	{ "priority": 150, "tag": "(hld1)", "mod": "Anchorage.esm",				"form": ["003473"] },
 	{ "priority": 150, "tag": "(hld1)", "mod": "BrokenSteel.esm",			"form": ["00B960"] },
 	{ "priority": 150, "tag": "(hld1)", "mod": "PointLookout.esm",			"form": ["00D5BD", "00832E", "00DE12"] },
-	{ "priority": 150, "tag": "(hld1)", "mod": "TaleOfTwoWastelands.esm",	"form": "079056" },
+	{ "priority": 150, "tag": "(hld1)", "mod": "TaleOfTwoWastelands.esm",	"form": ["079056", "079057"] },
 
 
 
@@ -143,11 +143,11 @@
 
 
 	{ "priority": 150, "tag": "(abb1)", "mod": "Fallout3.esm",				"form": "028EEA" },
-	{ "priority": 150, "tag": "(adb1)", "mod": "TaleOfTwoWastelands.esm",	"form": "018019", "formlist": 1 },
-	{ "priority": 150, "tag": "(adc1)", "mod": "TaleOfTwoWastelands.esm",	"form": "008D4A", "formlist": 1 },
+	{ "priority": 150, "tag": "(adb1)", "mod": "TaleOfTwoWastelands.esm",	"form": "018019" },
+	{ "priority": 150, "tag": "(adc1)", "mod": "TaleOfTwoWastelands.esm",	"form": "008D4A" },
 	{ "priority": 150, "tag": "(ajb1)", "mod": "Fallout3.esm",				"form": "029384" },
 	{ "priority": 150, "tag": "(ajb1)", "mod": "ThePitt.esm",				"form": "0032E3" },
-	{ "priority": 150, "tag": "(ajb1)", "mod": "TaleOfTwoWastelands.esm",	"form": "001B98", "formlist": 1 }
+	{ "priority": 150, "tag": "(ajb1)", "mod": "TaleOfTwoWastelands.esm",	"form": "001B98" }
 
 ]
 }

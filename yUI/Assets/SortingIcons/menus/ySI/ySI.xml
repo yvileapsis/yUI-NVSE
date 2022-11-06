@@ -92,9 +92,10 @@
 		<height> <copy src="ySI" trait="_ySIHeight"/> </height>
 		<user0> <copy src="ySI" trait="_ySISpaceLeft"/> </user0>
 		<user1> <copy src="ySI" trait="_ySISpaceRight"/> </user1>
+		<user2> <copy src="ySI" trait="_ySISpaceUp"/> </user2>
 		<x> 0 </x>
 		<!-- set in code -->
-		<y> <copy src="ySI" trait="_ySISpaceUp"/> </y>
+		<y> <copy src="me()" trait="user2"/> </y>
 		<zoom> &scale; </zoom>
 	</image>
 </template>

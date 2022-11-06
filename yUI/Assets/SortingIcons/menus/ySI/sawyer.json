@@ -1,30 +1,30 @@
 {
 "tags": [
 
-	{ "priority": 150, "tag": "(aba1)", "mod": "jsawyer.esp",				"form": "0019EA", "formlist": 1 },
-	{ "priority": 150, "tag": "(aba1)", "mod": "JSawyer Ultimate.esp",		"form": "0013E9", "formlist": 1 },
+	{ "priority": 150, "tag": "(aba1)", "mod": "jsawyer.esp",				"form": "0019EA" },
+	{ "priority": 150, "tag": "(aba1)", "mod": "JSawyer Ultimate.esp",		"form": "0013E9" },
 
 
 
-	{ "priority": 150, "tag": "(hbb1)", "mod": "JSawyer Ultimate.esp",		"form": "08885F", "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hbb1)", "mod": "JSawyer Ultimate.esp",		"form": "08885F", "formType": 24 },
 
-	{ "priority": 150, "tag": "(hbc1)", "mod": "jsawyer.esp",				"form": "00C76A", "formlist": 1, "formType": 24 },
-	{ "priority": 150, "tag": "(hbc1)", "mod": "sawyerbatty.esp",			"form": "00C76A", "formlist": 1, "formType": 24 },
-	{ "priority": 150, "tag": "(hbc1)", "mod": "JSawyer Ultimate.esp",		"form": "034FF6", "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hbc1)", "mod": "jsawyer.esp",				"form": "00C76A", "formType": 24 },
+	{ "priority": 150, "tag": "(hbc1)", "mod": "sawyerbatty.esp",			"form": "00C76A", "formType": 24 },
+	{ "priority": 150, "tag": "(hbc1)", "mod": "JSawyer Ultimate.esp",		"form": "034FF6", "formType": 24 },
 
-	{ "priority": 150, "tag": "(hbd2)", "mod": "JSawyer Ultimate.esp",		"form": "000BF8", "formlist": 1, "formType": 24 },
+	{ "priority": 150, "tag": "(hbd2)", "mod": "JSawyer Ultimate.esp",		"form": "000BF8", "formType": 24 },
 
 
 
-	{ "priority": 150, "tag": "(dba1)", "mod": "jsawyer.esp",				"form": ["004FB4", "004FB6"], "formlist": 1 },
-	{ "priority": 150, "tag": "(dba1)", "mod": "sawyerbatty.esp",			"form": ["004FB4", "004FB6"], "formlist": 1 },
-	{ "priority": 150, "tag": "(dba1)", "mod": "JSawyer Ultimate.esp",		"form": ["04F435", "04F436", "197413", "198005", "1F017F"], "formlist": 1 },
+	{ "priority": 150, "tag": "(dba1)", "mod": "jsawyer.esp",				"form": ["004FB4", "004FB6"] },
+	{ "priority": 150, "tag": "(dba1)", "mod": "sawyerbatty.esp",			"form": ["004FB4", "004FB6"] },
+	{ "priority": 150, "tag": "(dba1)", "mod": "JSawyer Ultimate.esp",		"form": ["04F435", "04F436", "197413", "198005", "1F017F"] },
 
-	{ "priority": 150, "tag": "(dfb1)", "mod": "JSawyer Ultimate.esp",		"form": "0672B1", "formlist": 1 },
+	{ "priority": 150, "tag": "(dfb1)", "mod": "JSawyer Ultimate.esp",		"form": "0672B1" },
 
-	{ "priority": 150, "tag": "(dla1)", "mod": "JSawyer Ultimate.esp",		"form": "006DBF", "formlist": 1 },
-	{ "priority": 150, "tag": "(dhc1)", "mod": "JSawyer Ultimate.esp",		"form": ["036891", "036892", "036894", "036898", "03689A", "03689C", "03689E", "0368A0"], "formlist": 1 },
-	{ "priority": 150, "tag": "(dhc1)", "mod": "JSawyer Ultimate.esp",		"form": ["0368A2", "0368A7"], "formlist": 1 }
+	{ "priority": 150, "tag": "(dla1)", "mod": "JSawyer Ultimate.esp",		"form": "006DBF" },
+	{ "priority": 150, "tag": "(dhc1)", "mod": "JSawyer Ultimate.esp",		"form": ["036891", "036892", "036894", "036898", "03689A", "03689C", "03689E", "0368A0"] },
+	{ "priority": 150, "tag": "(dhc1)", "mod": "JSawyer Ultimate.esp",		"form": ["0368A2", "0368A7"] }
 
 ]
 }
