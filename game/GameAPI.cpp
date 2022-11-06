@@ -63,7 +63,16 @@ extern TESDataHandler* g_TESDataHandler;
 
 TESForm* GetFormByID(const char* mod, UInt32 refID)
 {
-	return GetFormByID((g_TESDataHandler->GetModIndex(mod) << 24) + (refID & 0x00FFFFFF));
+	if (const auto modInfo = g_TESDataHandler->LookupModByName(mod))
+		return GetFormByID((modInfo->modIndex << 24) + (refID & 0x00FFFFFF));
+	return nullptr;
+}
+
+TESForm* GetFormByID(const char* mod, const char* refID)
+{
+	if (const auto modInfo = g_TESDataHandler->LookupModByName(mod))
+		return GetFormByID((modInfo->modIndex << 24) + (HexStringToInt(refID) & 0x00FFFFFF));
+	return nullptr;
 }
 
 bool s_InsideOnActorEquipHook = false;

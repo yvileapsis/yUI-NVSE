@@ -22,7 +22,6 @@ namespace SortingIcons::Categories
 
 			if (entry.common.formType == kFormType_TESObjectWEAP) {
 				const auto weapon = reinterpret_cast<TESObjectWEAP*>(form);
-				if (!weapon) continue;
 				if (entry.weapon.skill &&			entry.weapon.skill != weapon->weaponSkill) continue;
 				if (entry.weapon.type &&			entry.weapon.type != weapon->eWeaponType) continue;
 				if (entry.weapon.handgrip &&		entry.weapon.handgrip != weapon->HandGrip()) continue;
@@ -38,8 +37,8 @@ namespace SortingIcons::Categories
 				if (entry.weapon.ammo &&			!FormContainsRecusive(entry.weapon.ammo, weapon->ammo.ammo)) continue;
 			}
 			else if (entry.common.formType == kFormType_TESObjectARMO) {
+
 				const auto armor = reinterpret_cast<TESObjectARMO*>(form);
-				if (!armor) continue;
 				if (entry.armor.slotsMaskWL &&		(entry.armor.slotsMaskWL & armor->GetArmorValue(6)) != entry.armor.slotsMaskWL) continue;
 				if (entry.armor.slotsMaskBL &&		(entry.armor.slotsMaskBL & armor->GetArmorValue(6)) != 0) continue;
 				if (entry.armor.armorClass &&		entry.armor.armorClass != armor->GetArmorValue(1)) continue;
@@ -50,11 +49,8 @@ namespace SortingIcons::Categories
 				if (entry.armor.dr &&				entry.armor.dr > armor->armorRating) continue;
 //				if (entry.armor.armorChangesAV &&	entry.armor.armorChangesAV > armor->armorRating) continue;
 			}
-			else if (entry.common.formType == kFormType_TESObjectMISC) {
-			}
 			else if (entry.common.formType == kFormType_AlchemyItem) {
 				const auto aid = reinterpret_cast<AlchemyItem*>(form);
-				if (!aid) continue;
 				if (entry.aid.restoresAV &&			!aid->HasBaseEffectRestoresAV(entry.aid.restoresAV)) continue;
 				if (entry.aid.damagesAV &&			!aid->HasBaseEffectDamagesAV(entry.aid.damagesAV)) continue;
 				if (entry.aid.isAddictive &&		!aid->IsAddictive()) continue;
@@ -186,7 +182,7 @@ namespace SortingIcons::Keyrings
 				const auto tile = InventoryMenu::GetSingleton()->itemsList.Insert(nullptr, keyringname.c_str(), nullptr, nullptr);
 				tile->SetFloat(kTileValue_id, 30);
 				tile->SetString(kTileValue_user16, entry.tag.c_str());
-				Icons::InjectIconTile(iter, &InventoryMenu::GetSingleton()->itemsList, tile, nullptr);
+				Icons::InjectIconTile(iter, tile);
 			}
 		}
 	}
@@ -451,17 +447,8 @@ namespace SortingIcons::Sorting
 				if (tag2.empty() && tile2 && tile2->GetValue(kTileValue_user16)) tag2 = tile2->GetValue(kTileValue_user16)->str;
 			}
 
-			if (tag1.empty())
-			{
-				if (!tag2.empty()) return 1;
-			}
-			else if (tag2.empty()) return -1;
-			else
-			{
-				const signed int cmp = tag1.compare(tag2);
-				if (cmp > 0) return 1;
-				if (cmp < 0) return -1;
-			}
+			if (const auto cmp = tag1 <=> tag2; cmp != nullptr) return cmp._Value;
+
 		}
 		return 0;
 	}
@@ -488,15 +475,15 @@ namespace SortingIcons::Sorting
 		if (name1.empty() && tile1->GetValue(kTileValue_string)) name1 = tile1->GetValue(kTileValue_string)->str;
 		if (name2.empty() && tile2->GetValue(kTileValue_string)) name2 = tile2->GetValue(kTileValue_string)->str;
 
-		if (const auto cmp = name1.compare(name2); cmp != 0) return cmp;
+		if (const auto cmp = name1 <=> name2; cmp != nullptr) return cmp._Value;
 
 		if (!form1) return form2 ? -1 : 0;
 		if (!form2) return 1;
 		
-		if (const auto weaponMods = a1->GetWeaponMod() <=> a2->GetWeaponMod(); weaponMods != nullptr) return weaponMods._Value;
-		if (const auto condition = a1->GetHealthPercent() <=> a2->GetHealthPercent(); condition != nullptr) return condition._Value;
-		if (const auto equipped = a1->GetEquipped() <=> a2->GetEquipped(); equipped != nullptr) return equipped._Value;
-		if (const auto refID = form1->refID <=> form2->refID; refID != nullptr) return refID._Value;
+		if (const auto weaponMods = a2->GetWeaponMod() <=> a1->GetWeaponMod(); weaponMods != nullptr) return weaponMods._Value;
+		if (const auto condition = a2->GetHealthPercent() <=> a1->GetHealthPercent(); condition != nullptr) return condition._Value;
+		if (const auto equipped = a2->GetEquipped() <=> a1->GetEquipped(); equipped != nullptr) return equipped._Value;
+		if (const auto refID = form2->refID <=> form1->refID; refID != nullptr) return refID._Value;
 
 		return 0;
 	}

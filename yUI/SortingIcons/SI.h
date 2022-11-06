@@ -35,19 +35,19 @@ namespace SortingIcons
 		class Weapon
 		{
 		public:
-			UInt32			skill;
-			UInt32			type;
-			UInt32			handgrip;
-			UInt32 			attackAnim;
-			UInt32 			reloadAnim;
-			UInt32 			isAutomatic;
-			UInt32 			hasScope;
-			UInt32 			ignoresDTDR;
-			UInt32 			clipRounds;
-			UInt32 			numProjectiles;
-			UInt32 			soundLevel;
+			UInt32			skill			= 0;
+			UInt32			type			= 0;
+			UInt32			handgrip		= 0;
+			UInt32 			attackAnim		= 0;
+			UInt32 			reloadAnim		= 0;
+			UInt32 			isAutomatic		= 0;
+			UInt32 			hasScope		= 0;
+			UInt32 			ignoresDTDR		= 0;
+			UInt32 			clipRounds		= 0;
+			UInt32 			numProjectiles	= 0;
+			UInt32 			soundLevel		= 0;
 
-			TESForm*		ammo;
+			TESForm*		ammo			= nullptr;
 
 			Weapon() = default;
 		};
@@ -55,16 +55,16 @@ namespace SortingIcons
 		class Armor
 		{
 		public:
-			UInt32			slotsMaskWL;
-			UInt32 			slotsMaskBL;
+			UInt32			slotsMaskWL		= 0;
+			UInt32 			slotsMaskBL		= 0;
 
-			UInt16 			armorClass;
-			SInt8 			powerArmor;
-			SInt8 			hasBackpack;
+			UInt16 			armorClass		= 0;
+			SInt8 			powerArmor		= 0;
+			SInt8 			hasBackpack		= 0;
 
-			Float32 		dt;
-			UInt16 			dr;
-			UInt16 			changesAV;
+			Float32 		dt				= 0;
+			UInt16 			dr				= 0;
+			UInt16 			changesAV		= 0;
 
 			Armor() = default;
 		};
@@ -72,36 +72,26 @@ namespace SortingIcons
 		class Aid
 		{
 		public:
-			UInt8  			restoresAV;
-			UInt8  			damagesAV;
-			UInt8  			isAddictive;
-			UInt8  			isWater;
-			UInt8  			isFood;
-			UInt8  			isMedicine;
-			UInt8  			isPoisonous;
+			UInt8  			restoresAV		= 0;
+			UInt8  			damagesAV		= 0;
+			UInt8  			isAddictive		= 0;
+			UInt8  			isWater			= 0;
+			UInt8  			isFood			= 0;
+			UInt8  			isMedicine		= 0;
+			UInt8  			isPoisonous		= 0;
 
 			Aid() = default;
 		};
 
-		class Misc
-		{
-		public:
-			Misc() = default;
-		};
-
 		Common			common{};
-		union {
-			Weapon		weapon;
-			Armor		armor;
-			Aid			aid;
-			Misc		misc{};
-		};
+		Weapon			weapon{};
+		Armor			armor{};
+		Aid				aid{};
 
 		Item(Common common) : common(std::move(common)) {}
 		Item(Common common, Weapon weapon) : common(std::move(common)), weapon(weapon) {}
 		Item(Common common, Armor armor) : common(std::move(common)), armor(armor) {}
 		Item(Common common, Aid aid) : common(std::move(common)), aid(aid) {}
-		Item(Common common, Misc misc) : common(std::move(common)), misc(misc) {}
 	};
 
 	class Category
@@ -232,8 +222,8 @@ namespace SortingIcons::Icons
 {
 
 	void InjectTemplates();
-	void InjectIconTile(const CategoryPtr& category_, MenuItemEntryList* list, Tile* tile, InventoryChanges* entry);
-	void __fastcall SetTileStringInjectTile(Tile* tile, InventoryChanges* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate);
+	void InjectIconTile(const CategoryPtr& category_, Tile* tile);
+	void __fastcall SetTileStringInjectTile(Tile* tile, const InventoryChanges* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate);
 	void __fastcall SetStringValueTagImage(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate);
 	void __fastcall SetStringValueTagRose(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate);
 	void __fastcall Tile__PropagateIntValue(Tile* tile, void* dummyedx, UInt32 a2, signed int a3);

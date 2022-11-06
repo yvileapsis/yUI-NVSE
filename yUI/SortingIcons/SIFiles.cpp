@@ -9,23 +9,52 @@
 
 namespace SortingIcons::Files
 {
-	void ItemRecursiveEmplace(const Item::Common& common, TESForm* item)
+	std::vector<TESForm*> GetFormsFromElement(const nlohmann::basic_json<>& elem, const std::string& mod, const std::string& form)
 	{
-		if (item->typeID == kFormType_BGSListForm)
-			for (const auto iter : reinterpret_cast<BGSListForm*>(item)->list) ItemRecursiveEmplace(common, iter);
-		else if (!common.formType || item->typeID == common.formType) {
-			Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive", common.tag.c_str(), item->refID, item->GetName()), logLevel);
+		const auto modName = elem.contains(mod) ? elem[mod].get<std::string>() : "";
+		std::vector<TESForm*> forms{};
+		if (!elem.contains(form)) {}
+		else if (!elem[form].is_array()) {
+			if (const auto val = GetFormByID(modName.c_str(), elem[form].get<std::string>().c_str())) forms.push_back(val);
+		}
+		else for (const auto& i : elem[form]) {
+			if (const auto val = GetFormByID(modName.c_str(), i.get<std::string>().c_str())) forms.push_back(val);
+		}
+		return forms;
+	}
+
+	void ItemRecursiveEmplace(const Item::Common& common, TESForm* form)
+	{
+		if (form->typeID == kFormType_BGSListForm)
+			for (const auto iter : reinterpret_cast<BGSListForm*>(form)->list) ItemRecursiveEmplace(common, iter);
+		else if (common.formType == 0 || common.formType == form->typeID) {
+			Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, list: '%08X' (%50s)", common.tag.c_str(), form->refID, form->GetName(), common.form->refID, common.form->GetName()), logLevel);
 			auto newCommon = common;
-			newCommon.form = item;
+			newCommon.form = form;
 			g_Items.emplace_back(std::make_shared<Item>(newCommon));
 		}
 	}
 
-	UInt32 StrToFormID(const std::string& formIdStr)
+	void ItemRepairListEmplace(const Item::Common& common, TESForm* form)
 	{
-		const auto formId = HexStringToInt(formIdStr);
-		if (formId == -1) Log("Form field was incorrectly formatted, got " + formIdStr, logLevel);
-		return formId;
+		for (const auto item : *GetAllForms())
+		{
+			BGSListForm* list;
+
+			if (item->typeID == kFormType_TESObjectWEAP)
+				list = reinterpret_cast<TESObjectWEAP*>(item)->repairItemList.listForm;
+			else if (item->typeID == kFormType_TESObjectARMO)
+				list = reinterpret_cast<TESObjectARMO*>(item)->repairItemList.listForm;
+			else continue;
+
+			if (item->refID == form->refID || list && (list->refID == form->refID && list->ContainsRecursive(form)))
+			{
+				Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X' (%50s)", common.tag.c_str(), item->refID, item->GetName(), form->refID, common.form->GetName()), logLevel);
+				auto newCommon = common;
+				newCommon.form = item;
+				g_Items.emplace_back(std::make_shared<Item>(newCommon));
+			}
+		}
 	}
 
 	void HandleItem(nlohmann::basic_json<> elem)
@@ -46,81 +75,24 @@ namespace SortingIcons::Files
 
 		if (elem.contains("mod") && elem.contains("form"))
 		{
-			auto modName = elem.contains("mod") ? elem["mod"].get<std::string>() : "";
-			const auto mod = !modName.empty() ? TESDataHandler::GetSingleton()->LookupModByName(modName.c_str()) : nullptr;
-
-			UInt8 modIndex = mod ? mod->modIndex : 0;
-			if (modName == "FF") modIndex = 0xFF;
-			else if (!mod && !modName.empty())
-			{
-				Log("Mod name " + modName + " was not found", logLevel);
-				return;
-			}
-
 			UInt32 formlist = 0;
 			if (elem.contains("formlist")) formlist = elem["formlist"].get<UInt32>();
-
-			std::vector<UInt32> formIds;
-			if (const auto formElem = elem.contains("form") ? &elem["form"] : nullptr; formElem)
+			for (auto form : GetFormsFromElement(elem, "mod", "form"))
 			{
-				if (formElem->is_array())
-					std::ranges::transform(*formElem, std::back_inserter(formIds), [&](auto& i) {return StrToFormID(i.template get<std::string>()); });
-				else
-					formIds.push_back(StrToFormID(formElem->get<std::string>()));
-				if (std::ranges::find(formIds, -1) != formIds.end()) return;
-			}
-
-			if (!mod || formIds.empty())
-			{
-				Log(FormatString("Tag: '%10s', mod: '%s'", common.tag.c_str(), modName.c_str()), logLevel);
-				g_Items.emplace_back(std::make_shared<Item>(common));
-			}
-			else for (auto formId : formIds)
-			{
-				const auto id = (modIndex << 24) + (formId & 0x00FFFFFF);
-				common.form = GetFormByID(id);
-				if (!common.form)
+				common.form = form;
+				if (formlist == 0)
 				{
-					Log(FormatString("Form %X was not found", formId), logLevel);
-					continue;
-				}
-				if (!formlist)
-				{
-					Log(FormatString("Tag: '%10s', form: %08X (%50s), individual", common.tag.c_str(), id, common.form->GetName()), logLevel);
+					Log(FormatString("Tag: '%10s', form: %08X (%50s), individual", common.tag.c_str(), form->refID, form->GetName()), logLevel);
 					g_Items.emplace_back(std::make_shared<Item>(common));
 				}
-				else if (formlist == 1)
-				{
-					common.formType = 0;
-					ItemRecursiveEmplace(common, common.form);
-				}
-				else if (formlist == 2)
-				{
-					for (const auto item : *GetAllForms())
-					{
-						BGSListForm* list = nullptr;
-
-						if (item->typeID == kFormType_TESObjectWEAP)
-							list = reinterpret_cast<TESObjectWEAP*>(item)->repairItemList.listForm;
-						else if (item->typeID == kFormType_TESObjectARMO)
-							list = reinterpret_cast<TESObjectARMO*>(item)->repairItemList.listForm;
-						else continue;
-
-						if (item->refID == common.form->refID || list && list->refID == common.form->refID || list && list->ContainsRecursive(common.form))
-						{
-							Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X'", common.tag.c_str(), item->refID, item->GetName(), formId), logLevel);
-							auto newCommon = common;
-							newCommon.form = item;
-							g_Items.emplace_back(std::make_shared<Item>(newCommon));
-						}
-
-					}
-				}
+				else if (formlist == 1) ItemRecursiveEmplace(common, form);
+				else if (formlist == 2) ItemRepairListEmplace(common, form);
 			}
+			return;
 		}
-		else if (common.formType == 40)
+
+		if (common.formType == kFormType_TESObjectWEAP)
 		{
-			common.formType = 40;
 			Item::Weapon weapon{};
 
 			if (elem.contains("weaponSkill"))			weapon.skill = elem["weaponSkill"].get<UInt32>();
@@ -134,42 +106,41 @@ namespace SortingIcons::Files
 			if (elem.contains("weaponNumProjectiles"))	weapon.numProjectiles = elem["weaponNumProjectiles"].get<UInt32>();
 			if (elem.contains("weaponSoundLevel"))		weapon.soundLevel = elem["weaponSoundLevel"].get<UInt32>();
 
+			std::vector<TESForm*> ammos;
 			if (elem.contains("ammoMod") && elem.contains("ammoForm"))
+				ammos = GetFormsFromElement(elem, "ammoMod", "ammoForm");
+
+			std::vector<UInt32> weaponTypes;
+			if (elem.contains("weaponType"))
 			{
-				auto ammoModName = elem["ammoMod"].get<std::string>();
-				const auto ammoMod = !ammoModName.empty() ? TESDataHandler::GetSingleton()->LookupModByName(ammoModName.c_str()) : nullptr;
-				auto ammoForm = GetFormByID((ammoMod->modIndex << 24) + (StrToFormID(elem["ammoForm"].get<std::string>()) & 0x00FFFFFF));
-				weapon.ammo = ammoForm;
+				if (!elem["weaponType"].is_array()) weaponTypes.push_back(elem["weaponType"].get<UInt32>());
+				else std::ranges::transform(elem["weaponType"], std::back_inserter(weaponTypes), [&](auto& i) { return i.template get<UInt32>(); });
 			}
 
-			std::vector<int> weaponTypes;
-			if (auto* weaponTypeElem = elem.contains("weaponType") ? &elem["weaponType"] : nullptr; weaponTypeElem)
+			if (!weaponTypes.empty()) for (auto weaponType : weaponTypes)
 			{
-				if (weaponTypeElem->is_array())
-					std::ranges::transform(*weaponTypeElem, std::back_inserter(weaponTypes), [&](auto& i) {return i.template get<UInt32>(); });
-				else
-					weaponTypes.push_back(weaponTypeElem->get<UInt32>());
-				if (std::ranges::find(weaponTypes, -1) != weaponTypes.end())
-					return;
-			}
-
-			if (!weaponTypes.empty())
-			{
-				for (auto weaponType : weaponTypes)
-				{
-					weapon.type = weaponType;
+				weapon.type = weaponType;
+				if (!ammos.empty()) for (auto ammo : ammos) {
+					weapon.ammo = ammo;
+					Log(FormatString("Tag: '%10s', weapon condition, type: %d, ammo form: %08X (%50s)", common.tag.c_str(), weaponType, ammo->refID, ammo->GetName()), logLevel);
+					g_Items.emplace_back(std::make_shared<Item>(common, weapon));
+				} else {
 					Log(FormatString("Tag: '%10s', weapon condition, type: %d", common.tag.c_str(), weaponType), logLevel);
 					g_Items.emplace_back(std::make_shared<Item>(common, weapon));
 				}
-			}
-			else {
-				Log(FormatString("Tag: '%10s', weapon condition", common.tag.c_str()), logLevel);
-				g_Items.emplace_back(std::make_shared<Item>(common, weapon));
+			} else {
+				if (!ammos.empty()) for (auto ammo : ammos) {
+					weapon.ammo = ammo;
+					Log(FormatString("Tag: '%10s', weapon condition, ammo form: %08X (%50s)", common.tag.c_str(), ammo->refID, ammo->GetName()), logLevel);
+					g_Items.emplace_back(std::make_shared<Item>(common, weapon));
+				} else {
+					Log(FormatString("Tag: '%10s', weapon condition", common.tag.c_str()), logLevel);
+					g_Items.emplace_back(std::make_shared<Item>(common, weapon));
+				}
 			}
 		}
-		else if (common.formType == 24)
+		else if (common.formType == kFormType_TESObjectARMO)
 		{
-			common.formType = 24;
 			Item::Armor armor{};
 
 			if (elem.contains("armorHead")) 		(elem["armorHead"].get<SInt8>() == 1 ? armor.slotsMaskWL : armor.slotsMaskBL) += 1;
@@ -201,17 +172,11 @@ namespace SortingIcons::Files
 			if (elem.contains("armorDR"))			armor.dr = elem["armorDR"].get<UInt16>();
 			if (elem.contains("armorChangesAV"))	armor.changesAV = elem["armorChangesAV"].get<UInt16>();
 
+			Log(FormatString("Tag: '%10s', armor condition", common.tag.c_str()), logLevel);
 			g_Items.emplace_back(std::make_shared<Item>(common, armor));
-		}
-		else if (common.formType == 31)
-		{
-			common.formType = 31;
-			Item::Misc misc{};
-			g_Items.emplace_back(std::make_shared<Item>(common, misc));
 		}
 		else if (common.formType == 47)
 		{
-			common.formType = 47;
 			Item::Aid aid{};
 
 			if (elem.contains("aidRestoresAV"))			aid.restoresAV = elem["aidRestoresAV"].get<UInt8>();
@@ -221,6 +186,8 @@ namespace SortingIcons::Files
 			if (elem.contains("aidIsWater"))			aid.isWater = elem["aidIsWater"].get<UInt8>();
 			if (elem.contains("aidIsMedicine"))			aid.isMedicine = elem["aidIsMedicine"].get<UInt8>();
 			if (elem.contains("aidIsPoisonous"))		aid.isPoisonous = elem["aidIsPoisonous"].get<UInt8>();
+
+			Log(FormatString("Tag: '%10s', aid condition", common.tag.c_str()), logLevel);
 			g_Items.emplace_back(std::make_shared<Item>(common, aid));
 		}
 		else g_Items.emplace_back(std::make_shared<Item>(common));

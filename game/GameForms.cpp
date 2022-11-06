@@ -1,4 +1,7 @@
 #include "GameForms.h"
+
+#include <algorithm>
+
 #include "GameAPI.h"
 #include "GameRTTI.h"
 #include "Objects.h"
@@ -529,18 +532,18 @@ SInt32 BGSListForm::ReplaceForm(TESForm* pForm, TESForm* pReplaceWith)
 bool BGSListForm::Contains(TESForm* form)
 {
 	if (!form) return false;
-	for (const auto iter : this->list) if (iter->refID == form->refID) return true;
+	for (const auto iter : list) if (iter->refID == form->refID) return true;
 	return false;
 }
 
 bool BGSListForm::ContainsRecursive(TESForm* form, UInt32 reclvl)
 {
 	if (!form) return false;
-	if (this->Contains(form)) return true;
+	if (Contains(form)) return true;
 	if (reclvl > 100) return false; [[unlikely]]
-	for (const auto iter : this->list)
+	for (const auto iter : list)
 		if (iter->typeID == kFormType_BGSListForm)
-			if (const auto list = DYNAMIC_CAST(this, TESForm, BGSListForm);  list && list->ContainsRecursive(form, reclvl++)) return true;
+			if (reinterpret_cast<BGSListForm*>(iter)->ContainsRecursive(form, reclvl++)) return true;
 	return false;
 }
 
@@ -549,10 +552,7 @@ bool FormContainsRecusive(TESForm* parent, TESForm* child)
 	if (!parent || !child) return false;
 	if (parent->refID == child->refID) return true;
 	if (parent->typeID == kFormType_BGSListForm)
-	{
-		const auto list = DYNAMIC_CAST(parent, TESForm, BGSListForm);
-		if (list && list->ContainsRecursive(child)) return true;
-	}
+		if (reinterpret_cast<BGSListForm*>(parent)->ContainsRecursive(child)) return true;
 	return false;
 }
 

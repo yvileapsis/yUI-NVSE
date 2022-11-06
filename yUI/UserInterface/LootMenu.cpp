@@ -136,50 +136,30 @@ namespace UserInterface::LootMenu
 			return formId;
 		}
 
+		std::vector<TESForm*> GetFormsFromElement(const nlohmann::basic_json<>& elem, const std::string& mod, const std::string& form)
+		{
+			const auto modName = elem.contains(mod) ? elem[mod].get<std::string>() : "";
+			std::vector<TESForm*> forms{};
+			if (!elem.contains(form)) {}
+			else if (!elem[form].is_array()) {
+				if (const auto val = GetFormByID(modName.c_str(), elem[form].get<std::string>().c_str())) forms.push_back(val);
+			}
+			else for (const auto& i : elem[form]) {
+				if (const auto val = GetFormByID(modName.c_str(), i.get<std::string>().c_str())) forms.push_back(val);
+			}
+			return forms;
+		}
+
 		void AddFromJSON(nlohmann::basic_json<> elem)
 		{
-
-			if (!elem.is_object())
-			{
-				Log("JSON error: expected object", logLevel);
-				return;
-			}
+			if (!elem.is_object()) return;
 
 			SInt8 action = 0;
 
 			if (elem.contains("action")) action = elem["action"].get<SInt8>();
 			if (elem.contains("mod") && elem.contains("form"))
-			{
-				const auto modName = elem.contains("mod") ? elem["mod"].get<std::string>() : "";
-				const auto mod = !modName.empty() ? g_TESDataHandler->LookupModByName(modName.c_str()) : nullptr;
-
-				UInt8 modIndex;
-				if (modName == "FF") modIndex = 0xFF;
-				else if (!mod && !modName.empty())
-				{
-					Log("Mod name " + modName + " was not found", logLevel);
-					return;
-				}
-				modIndex = mod ? mod->modIndex : 0;
-
-				std::vector<UInt32> formIds;
-				if (const auto formElem = elem.contains("form") ? &elem["form"] : nullptr; formElem)
-				{
-					if (formElem->is_array())
-						std::ranges::transform(*formElem, std::back_inserter(formIds), [&](auto& i) {return StrToFormID(i.template get<std::string>()); });
-					else
-						formIds.push_back(StrToFormID(formElem->get<std::string>()));
-					if (std::ranges::find(formIds, -1) != formIds.end()) return;
-				}
-
-				if (mod && !formIds.empty()) for (const auto formId : formIds)
-				{
-					if (const auto form = reinterpret_cast<Script*>(GetFormByID((modIndex << 24) + (formId & 0x00FFFFFF))))
-						allowList[form] = action;
-					else
-						Log(FormatString("Form %X was not found", formId), logLevel);
-				}
-			}
+				for (const auto form : GetFormsFromElement(elem, "mod", "form"))
+					allowList[reinterpret_cast<Script*>(form)] = action;
 		}
 
 		SInt8 Check(Script* script)

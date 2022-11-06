@@ -1529,7 +1529,5 @@ int HexStringToInt(const std::string& str)
 {
 	char* p;
 	const auto id = strtoul(str.c_str(), &p, 16);
-	if (*p == 0)
-		return id;
-	return -1;
+	return *p == 0 ? id : -1;
 }

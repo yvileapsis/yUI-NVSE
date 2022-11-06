@@ -474,3 +474,4 @@ __forceinline NiTPointerMap<TESForm>* GetAllForms() { return *reinterpret_cast<N
 __forceinline TESForm* GetFormByID(const char* editorID) { return CdeclCall<TESForm*>(0x483A00, editorID); };
 __forceinline TESForm* GetFormByID(UInt32 refID) { return GetAllForms()->Lookup(refID); };
 TESForm* GetFormByID(const char* mod, UInt32 refID);
+TESForm* GetFormByID(const char* mod, const char* refID);

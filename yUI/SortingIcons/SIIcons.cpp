@@ -28,7 +28,7 @@ namespace SortingIcons::Icons
 		return true;
 	}
 
-	void InjectIconTile(const CategoryPtr& category_, MenuItemEntryList* list, Tile* tile, InventoryChanges* entry)
+	void InjectIconTile(const CategoryPtr& category_, Tile* tile)
 	{
 		//	if (g_Items.find(entry->type) == g_Items.end()) return;
 		const auto& category = *category_;
@@ -61,25 +61,25 @@ namespace SortingIcons::Icons
 			icon->SetFloat(kTileValue_systemcolor, category.systemcolor, false);
 		//	icon->SetFloat(kTileValue_alpha, 255, propagate);
 
-		Float32 x = text->GetFloat(kTileValue_x);
+		const Float32 x = text->GetFloat(kTileValue_x);
+		Float32 width = 0;
 
-		if (icon->GetValue(kTileValue_user0)) x += icon->GetFloat(kTileValue_user0);
+		if (icon->GetValue(kTileValue_user0)) width += icon->GetFloat(kTileValue_user0);
 
-		icon->SetFloat(kTileValue_x, x, true);
+		icon->SetFloat(kTileValue_x, x + width, true);
 
-		x += icon->GetFloat(kTileValue_width);
+		width += icon->GetFloat(kTileValue_width);
 
-		if (icon->GetValue(kTileValue_user1)) x += icon->GetFloat(kTileValue_user1);
+		if (icon->GetValue(kTileValue_user1)) width += icon->GetFloat(kTileValue_user1);
 
-		text->SetFloat(kTileValue_x, x, true);
-		text->SetFloat(kTileValue_wrapwidth, text->GetFloat(kTileValue_wrapwidth) - x, true);
+		text->SetFloat(kTileValue_x, x + width, true);
+//		text->SetFloat(kTileValue_wrapwidth, text->GetFloat(kTileValue_wrapwidth) - width / 2, true);
 	}
 
-	void __fastcall SetTileStringInjectTile(Tile* tile, InventoryChanges* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate)
+	void __fastcall SetTileStringInjectTile(Tile* tile, const InventoryChanges* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate)
 	{
 		tile->SetString(tilevalue, tileText, propagate);
-		const auto item = Categories::ItemGetCategory(entry);
-		if (entry && entry->form && TryGetTypeOfForm(entry->form)) InjectIconTile(item, list, tile, entry);
+		if (entry && entry->form && TryGetTypeOfForm(entry->form)) InjectIconTile(Categories::ItemGetCategory(entry), tile);
 	}
 
 	void __fastcall SetStringValueTagImage(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate)
