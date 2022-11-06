@@ -74,11 +74,11 @@ namespace SortingIcons::Hooks
 			pop		ebp
 			ret
 
-			got0 :
+		got0 :
 			mov		edx, [ebp + 0xC]
-				mov		ecx, [edx + 0x4]
-				call	InventoryChanges_GetFullName
-				jmp		retnAddr
+			mov		ecx, [edx + 0x4]
+			call	InventoryChanges_GetFullName
+			jmp		retnAddr
 		}
 	}
 
