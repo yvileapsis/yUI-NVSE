@@ -33,15 +33,16 @@ namespace SortingIcons
 		ra::sort(g_Tabs, [&](const TabPtr& entry1, const TabPtr& entry2) { return entry1->priority > entry2->priority; });
 
 		for (const auto& entry : g_Categories) {
-			if (!entry->name.empty()) g_Keyrings.emplace_back(entry);
+//			if (!entry->name.empty()) g_Keyrings.emplace_back(entry);
 			if (entry->tag.empty()) categoryDefault = entry;
 			g_StringToCategory.emplace(entry->tag, entry);
 		}
 
 		for (const auto& entry : g_Tabs)
 		{
+			if (entry->keyring) g_Keyrings.emplace_back(entry);
 			if (entry->inventory) g_Tabline.emplace_back(entry);
-			g_StringToTabs.emplace(entry->tab, entry);
+			g_StringToTabs.emplace(entry->tag, entry);
 		}
 
 		ra::sort(g_Tabline, [&](const TabPtr& entry1, const TabPtr& entry2) { return entry1->tabPriority > entry2->tabPriority; });
@@ -78,7 +79,7 @@ namespace SortingIcons
 
 		deferredInit.emplace_back(CraftingComponents::Fill);
 		if (bSort || bIcons || bHotkeys || bCategories) deferredInit.emplace_back(DeferredInit);
-		if (bCategories) mainLoop.emplace_back(Keyrings::KeyringRefreshPostStewie);
+//		if (bCategories) mainLoop.emplace_back(Keyrings::KeyringRefreshPostStewie);
 		if (bIcons) mainLoopDoOnce.emplace_back(Icons::InjectTemplates);
 	}
 }

@@ -81,7 +81,7 @@ namespace SortingIcons::Files
 			UInt32 repairList = 0;
 			if (elem.contains("formlist")) repairList = elem["formlist"].get<UInt32>();
 			if (elem.contains("repairList")) repairList = elem["repairList"].get<UInt32>();
-			for (auto form : GetFormsFromElement(elem, "mod", "form"))
+			for (const auto form : GetFormsFromElement(elem, "mod", "form"))
 			{
 				common.form = form;
 				repairList ? ItemRepairListEmplace(common, form) : ItemRecursiveEmplace(common, form);
@@ -207,13 +207,13 @@ namespace SortingIcons::Files
 		if (elem.contains("filename"))			category.filename = elem["filename"].get<std::string>();
 		if (elem.contains("texatlas"))			category.texatlas = elem["texatlas"].get<std::string>();
 		if (elem.contains("systemcolor"))		category.systemcolor = elem["systemcolor"].get<SInt32>();
+		/*
 		if (elem.contains("category"))			category.category = elem["category"].get<std::string>();
 		if (elem.contains("routeToKeyring"))	category.category = elem["routeToKeyring"].get<std::string>();
 		if (elem.contains("name"))				category.name = UTF8toANSI(elem["name"].get<std::string>());
 		if (elem.contains("icon"))				category.icon = elem["icon"].get<std::string>();
-		if (elem.contains("tab"))				category.tab = elem["tab"].get<UInt32>();
 		if (elem.contains("count"))				category.count = elem["count"].get<UInt32>();
-
+		*/
 		Log(FormatString("Tag: '%10s', icon: '%s'", category.tag.c_str(), category.filename.c_str()), logLevel);
 		g_Categories.emplace_back(std::make_shared<Category>(category));
 	}
@@ -227,13 +227,9 @@ namespace SortingIcons::Files
 		}
 
 		Tab tab{};
-		tab.tab = elem["tab"].get<std::string>();
-		if (elem.contains("name"))			tab.name = UTF8toANSI(elem["name"].get<std::string>());
+		tab.tag = elem["tag"].get<std::string>();
 		if (elem.contains("priority"))		tab.priority = elem["priority"].get<SInt32>();
-		if (elem.contains("tabNew"))		tab.tabNew = elem["tabNew"].get<UInt32>();
-		if (elem.contains("inventory"))		tab.inventory = elem["inventory"].get<UInt32>();
-		if (elem.contains("container"))		tab.container = elem["container"].get<UInt32>();
-		//		if (elem.contains("tabMisc"))		tab.tabMisc =		elem["tabMisc"].get<UInt32>();
+		if (elem.contains("name"))			tab.name = UTF8toANSI(elem["name"].get<std::string>());
 
 		if (const auto types = elem.contains("types") ? &elem["types"] : nullptr; types)
 		{
@@ -247,11 +243,16 @@ namespace SortingIcons::Files
 			else for (const auto& type : elem["categories"]) tab.categories.emplace(type.get<std::string>());
 		}
 
-		if (const auto tabMisc = elem.contains("tabMisc") ? &elem["tabMisc"] : nullptr; tabMisc)
-		{
-			if (!tabMisc->is_array()) tab.tabMisc.emplace(tabMisc->get<std::string>());
-			else for (const auto& type : elem["tabMisc"]) tab.tabMisc.emplace(type.get<std::string>());
-		}
+		if (elem.contains("icon"))			tab.icon = elem["icon"].get<std::string>();
+
+		if (elem.contains("keyring"))		tab.keyring		= elem["keyring"].get<UInt32>();
+		if (elem.contains("inventory"))		tab.inventory	= elem["inventory"].get<UInt32>();
+		if (elem.contains("container"))		tab.container	= elem["container"].get<UInt32>();
+
+		if (elem.contains("tabPriority"))	tab.tabPriority = elem["tabPriority"].get<UInt32>();
+
+		if (elem.contains("tabNew"))		tab.tabNew		= elem["tabNew"].get<UInt32>();
+		if (elem.contains("tabMisc"))		tab.tabMisc		= elem["tabMisc"].get<UInt32>();
 
 		g_Tabs.emplace_back(std::make_shared<Tab>(tab));
 	}

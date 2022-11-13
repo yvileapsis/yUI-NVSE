@@ -97,17 +97,6 @@ public:
 };
 static_assert(sizeof(ExtraContainerChanges) == 0x10);
 
-class TileInventoryChangesUnk
-{
-public:
-	Tile*				tile = nullptr;
-	InventoryChanges*	entry = nullptr;
-	UInt32				count = 0;
-
-	TileInventoryChangesUnk() = default;
-	TileInventoryChangesUnk(InventoryChanges* entry, Tile* tile = nullptr) : tile(tile), entry(entry), count(entry->countDelta) {}
-};
-
 // Finds an ExtraDataList in an ExtendDataList
 class ExtraDataListInExtendDataListMatcher
 {

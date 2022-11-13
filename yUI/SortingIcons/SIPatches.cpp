@@ -95,7 +95,7 @@ namespace SortingIcons::Hooks
 			test	al, al
 			jz		shouldnot
 			jmp		retnAddr1
-			shouldnot :
+		shouldnot :
 			jmp		retnAddr2
 		}
 	}
@@ -104,43 +104,39 @@ namespace SortingIcons::Hooks
 	{
 		static const UInt32 retnAddr = retn;
 		static const auto HasContainerEntry = reinterpret_cast<UInt32>(Keyrings::HasContainerChangesEntry);
-		static const auto ShowCategories = reinterpret_cast<UInt32>(Keyrings::KeyringShowCategories);
+		static const auto Filter = reinterpret_cast<UInt32>(Keyrings::KeyringFilter);
 		__asm
 		{
 			mov		ecx, [ebp + 0x8] // a1
 			call	HasContainerEntry
 			test	al, al
-			jz		hasnot
+			jnz		hasnot
 
-			mov		ecx, [ebp + 0xC]
-			call	ShowCategories
+			mov		ecx, [ebp + 0x8] // a1
+			mov		edx, [ebp + 0xC]
+			call	Filter
+			test	al, al
+			jnz		show
+
+			jmp		retnAddr
+
+		hasnot:
+			mov		eax, 0
+
+		show:
 			mov		esp, ebp
 			pop		ebp
 			ret
-			hasnot :
-			jmp		retnAddr
-		}
-	}
-
-	template<UInt32 retn> __declspec(naked) void KeyringHideNonKeys()
-	{
-		static const UInt32 retnAddr = retn;
-		static const auto HideNonKeysAndGetTile = reinterpret_cast<UInt32>(Keyrings::HideNonKeysGetTile);
-		__asm
-		{
-			mov		edx, [ebp + 0xC]
-			call	HideNonKeysAndGetTile
-			jmp		retnAddr
 		}
 	}
 
 	template<UInt32 retn> __declspec(naked) void KeyringAddCategories()
 	{
 		static const UInt32 retnAddr = retn;
-		static const auto AddCategories = reinterpret_cast<UInt32>(Keyrings::AddSortingCategories);
+//		static const auto AddCategories = reinterpret_cast<UInt32>(Keyrings::EquipUpdate);
 		__asm
 		{
-			call	AddCategories
+//			call	AddCategories
 			jmp		retnAddr
 		}
 	}
@@ -148,9 +144,22 @@ namespace SortingIcons::Hooks
 	template<UInt32 retn> __declspec(naked) void KeyringEnableEquipDrop()
 	{
 		static const UInt32 retnAddr = retn;
+		static const auto AddCategories = reinterpret_cast<UInt32>(Keyrings::EquipUpdate);
 		__asm
 		{
+			call	AddCategories
 			mov		eax, 0
+			jmp		retnAddr
+		}
+	}
+
+	template<UInt32 retn> __declspec(naked) void PostFilterUpdate()
+	{
+		static const UInt32 retnAddr = retn;
+		static const auto AddCategories = reinterpret_cast<UInt32>(Keyrings::PostFilterUpdate);
+		__asm
+		{
+			call	AddCategories
 			jmp		retnAddr
 		}
 	}
@@ -165,8 +174,8 @@ namespace SortingIcons::Hooks
 			push	dword ptr ds : [ecx]		// ListItem->tile
 			push	dword ptr ds : [ecx + 4]	// ListItem->object	
 			jmp		retnAddr
-			//			call	dword ptr ss : [ebp + 8]	// shouldHide
-			//			pop		ecx							// pop the extra pushed arg (ListItem->tile)
+//			call	dword ptr ss : [ebp + 8]	// shouldHide
+//			pop		ecx							// pop the extra pushed arg (ListItem->tile)
 		}
 	}
 
@@ -181,9 +190,9 @@ namespace SortingIcons::Hooks
 			jz		wah
 			mov[ebp - 0x24], 1
 			jmp		retnAddr
-			wah :
+		wah :
 			mov[ebp - 0x24], 0
-				jmp		retnAddr
+			jmp		retnAddr
 		}
 	}
 
@@ -264,7 +273,7 @@ namespace SortingIcons::Hooks
 			jmp retnAddr
 		}
 	}
-
+/*
 	template <UInt32 retn> __declspec(naked) void InventoryMenuSaveScrollPosition()
 	{
 		static const UInt32 retnAddr = retn;
@@ -286,7 +295,7 @@ namespace SortingIcons::Hooks
 			jmp retnAddr
 		}
 	}
-
+	*/
 	template <UInt32 retn> __declspec(naked) void InventoryMenuShouldHideItem()
 	{
 		static const UInt32 retnAddr = retn;
@@ -295,6 +304,30 @@ namespace SortingIcons::Hooks
 		{
 			mov ecx, [ebp + 0x8]
 			call ShouldHide
+			jmp retnAddr
+		}
+	}
+
+	template <UInt32 retn> __declspec(naked) void OpenKeyring()
+	{
+		static const UInt32 retnAddr = retn;
+		static const auto ShouldHide = reinterpret_cast<UInt32>(Keyrings::OpenKeyring);
+		__asm
+		{
+			mov ecx, [ebp + 0xC]
+			call ShouldHide
+			jmp retnAddr
+		}
+	}
+
+	template <UInt32 retn> __declspec(naked) void IsKey()
+	{
+		static const UInt32 retnAddr = retn;
+		static const auto ShouldHide = reinterpret_cast<UInt32>(Keyrings::IsKey);
+		__asm
+		{
+			call ShouldHide
+			mov	[ebp - 0x4], eax
 			jmp retnAddr
 		}
 	}
@@ -354,20 +387,27 @@ namespace SortingIcons::Patches
 			WriteRelJump(0x7824F6, Hooks::SortingInventoryMenu<0x78251B>);
 			WriteRelJump(0x78250B, Hooks::SortingInventoryMenu<0x78251B>);
 
-			WriteRelJump(0x7831C1, Hooks::KeyringAddCategories<0x783213>);
-
 			WriteRelJump(0x7826E4, Hooks::KeyringHideKeys<0x7826EA, 0x7826F1>);
-			WriteRelJump(0x78083A, Hooks::KeyringHideNonKeys<0x78083F>);
+
+
+
+
+			WriteRelJump(0x7831C1, 0x783213);
+			WriteRelJump(0x7807F5, Hooks::OpenKeyring<0x7807FA>);
+			WriteRelJump(0x78281D, Hooks::IsKey<0x78283D>);
+
+
+
+			WriteRelJump(0x780478, Hooks::KeyringEnableEquipDrop<0x78048D>);
+			WriteRelJump(0x780934, Hooks::KeyringEnableEquipDrop<0x78094A>);
+			WriteRelJump(0x782F2E, 0x782F47);
+
+			WriteRelJump(0x7800C6, Hooks::PostFilterUpdate<0x7800FA>);
+
+
 
 			WriteRelJump(0x782665, Hooks::KeyringHideKeysShowCategories<0x782679>);
 
-			WriteRelJump(0x780478, Hooks::KeyringEnableEquipDrop<0x78047D>);
-			WriteRelJump(0x780934, Hooks::KeyringEnableEquipDrop<0x78093A>);
-			WriteRelJump(0x781E6D, Hooks::KeyringEnableEquipDrop<0x781E72>);
-
-			WriteRelCall(0x782F42, Keyrings::KeyringEnableCancelHook);
-
-			WriteRelCall(0x7815A6, Keyrings::KeyringPipBoyIconHook);
 		}
 		else
 		{
@@ -396,7 +436,24 @@ namespace SortingIcons::Patches
 
 	void AddPromptIcon()
 	{
-		WriteRelCall(0x7786CF, Icons::Tile__PropagateIntValue);
+		WriteRelCall(0x7786CF, Icons::PropagateIntValueTagPrompt);
+	}
+
+	void AddKeyrings2(const bool bEnable)
+	{
+
+
+//		WriteRelJump(0x78083A, Hooks::KeyringHideNonKeys<0x78083F>);
+
+//		WriteRelCall(0x7800C6, Keyrings::KeyringShowCategories2);
+
+//		WriteRelCall(0x7807F5, Keyrings::KeyringShowCategories2);
+
+
+
+
+//		WriteRelJump(0x781E6D, Hooks::KeyringEnableEquipDrop<0x781E72>);
+
 	}
 
 	void AddTabs(const bool bEnable)
@@ -416,8 +473,8 @@ namespace SortingIcons::Patches
 		WriteRelJump(0x78027C, Hooks::InventoryMenuHandleClick3<0x780281>);
 		WriteRelJump(0x7802C9, Hooks::InventoryMenuHandleClick4<0x780386>);
 		WriteRelJump(0x78232C, Hooks::InventoryMenuHandleSpecialInput<0x782371>);
-		WriteRelJump(0x77FFD6, Hooks::InventoryMenuSaveScrollPosition<0x7800BB>);
-		WriteRelJump(0x7800C6, Hooks::InventoryMenuRestoreScrollPosition<0x78013B>);
+	//	WriteRelJump(0x77FFD6, Hooks::InventoryMenuSaveScrollPosition<0x7800BB>);
+	//	WriteRelJump(0x7800C6, Hooks::InventoryMenuRestoreScrollPosition<0x78013B>);
 		WriteRelJump(0x782704, Hooks::InventoryMenuShouldHideItem<0x7827F1>);
 
 		WriteRelCall(0x77FDF3, Tabs::SetUpTabline);

@@ -145,10 +145,12 @@ struct EventCallbackScripts;
 
 template <typename Item> struct ListBoxItem
 {
-	Tile* tile;
-	Item* object;
-	UInt8 byte08;
+	Tile* tile			= nullptr;
+	Item* object		= nullptr;
+	UInt8 byte08		= 0;
 	UInt8 pad09[3];
+
+	ListBoxItem(Item* object, Tile* tile = nullptr) : tile(tile), object(object), pad09{} {}
 };
 
 // 30
@@ -274,7 +276,9 @@ public:
 		ThisCall(0x731360, this, playSound);
 	}
 
-	Tile* Insert(Item* item, const char* text, signed int (*sortingFunction)(ListBoxItem<Item>* a1, ListBoxItem<Item>* a2) = nullptr, const char* _templateName = nullptr)
+	typedef SInt32(*SortingFunction)(const ListBoxItem<Item>*, const ListBoxItem<Item>*);
+
+	Tile* Insert(Item* item, const char* text, SortingFunction sortingFunction = nullptr, const char* _templateName = nullptr)
 	{
 		if (!this->parentTile) return nullptr;
 		auto _template = _templateName ? _templateName : this->templateName;
@@ -290,7 +294,7 @@ public:
 			newTile->SetString(kTileValue_string, text);
 		}
 
-		auto listItem = (ListBoxItem<Item>*)GameHeapAlloc(sizeof(ListBoxItem<Item*>));
+		auto listItem = static_cast<ListBoxItem<Item>*>(GameHeapAlloc(sizeof(ListBoxItem<Item*>)));
 		listItem->tile = newTile;
 		listItem->object = item;
 		listItem->byte08 = 0;
@@ -315,7 +319,7 @@ public:
 
 		if (this->itemCount == 1)
 		{
-			auto numVisibleItemsTrait = Tile::TraitNameToID("_number_of_visible_items");
+			const auto numVisibleItemsTrait = Tile::TraitNameToID("_number_of_visible_items");
 			if (this->parentTile->GetFloat(numVisibleItemsTrait) > 0)
 			{
 				auto valPtr = ThisCall<Tile::Value*>(0xA00E90, this->parentTile, kTileValue_height);
@@ -329,6 +333,67 @@ public:
 		}
 
 		return newTile;
+	}
+
+	ListBoxItem<Item>* InsertAlt(Item* item, const char* text, const char* _templateName = nullptr)
+	{
+		if (!this->parentTile) return nullptr;
+		auto _template = _templateName ? _templateName : this->templateName;
+		if (!_template) return nullptr;
+
+		Tile* newTile = this->parentTile->AddTileFromTemplate(_template);
+		if (!newTile->GetValue(kTileValue_id))
+		{
+			newTile->SetFloat(kTileValue_id, -1);
+		}
+		if (text)
+		{
+			newTile->SetString(kTileValue_string, text);
+		}
+
+		auto listItem = static_cast<ListBoxItem<Item>*>(GameHeapAlloc(sizeof(ListBoxItem<Item*>)));
+		listItem->tile = newTile;
+		listItem->object = item;
+		listItem->byte08 = 0;
+
+		return listItem;
+	}
+
+	void SortAlt(ListBoxItem<Item>* listItem, SortingFunction sortingFunction = nullptr)
+	{
+		if (sortingFunction)
+		{
+			ThisCall(0x7A7EB0, &this->list, listItem, sortingFunction); // InsertSorted
+			if (this->flags & kFlag_RecalculateHeightsOnInsert)
+			{
+				ThisCall(0x71A670, this);
+			}
+		}
+		else
+		{
+			this->list.Append(listItem);
+			if (this->flags & kFlag_RecalculateHeightsOnInsert)
+			{
+				ThisCall(0x7269D0, this, listItem->tile);
+				ThisCall(0x71AD30, this);
+			}
+			listItem->tile->SetFloat(kTileValue_listindex, this->itemCount++);
+		}
+
+		if (this->itemCount == 1)
+		{
+			const auto numVisibleItemsTrait = Tile::TraitNameToID("_number_of_visible_items");
+			if (this->parentTile->GetFloat(numVisibleItemsTrait) > 0)
+			{
+				auto valPtr = ThisCall<Tile::Value*>(0xA00E90, this->parentTile, kTileValue_height);
+				ThisCall(0xA09200, valPtr);
+				ThisCall(0xA09130, valPtr, 2000, listItem->tile, kTileValue_height);
+
+				auto numVisible = this->parentTile->GetFloat(numVisibleItemsTrait);
+				ThisCall(0xA09080, valPtr, kTileValue_Mul, numVisible);
+				ThisCall(0xA09410, valPtr, 0);
+			}
+		}
 	}
 
 	Tile* InsertVal(Item item, const char* text, signed int (*sortingFunction)(ListBoxItem<Item>* a1, ListBoxItem<Item>* a2) = nullptr, const char* _templateName = nullptr)
@@ -1571,7 +1636,11 @@ public:
 	static InventoryChanges*	GetSelection() { return *reinterpret_cast<InventoryChanges**>(0x11D9EA8); }
 	static bool					IsKeyringOpen();
 	static void					RestoreScrollPosition() { CdeclCall(0x7800C0); }
-
+	static bool					ShouldHideItem(InventoryChanges* entry) { return CdeclCall<bool>(0x782620, entry); }
+	static SInt32				CompareForSorting(const ListBoxItem<InventoryChanges>* a1, const ListBoxItem<InventoryChanges>* a2)
+	{
+		return CdeclCall<SInt32>(0x7824E0, a1, a2);
+	}
 	void						ResetInventorySelectionAndHideDataTile() { ThisCall(0x781B10, this); }
 };
 static_assert(sizeof(InventoryMenu) == 0x124);

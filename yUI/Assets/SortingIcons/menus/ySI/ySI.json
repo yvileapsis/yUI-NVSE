@@ -607,11 +607,16 @@
 ],
 
 "tabs": [
-	{ "priority": 100, "tab": "(a1)",  "name": "&-sNew;",				"template": "TabButtonTemplate", "inventory": 1, 				 "tabNew": 1 },
-	{ "priority": 100, "tab": "(d1)",  "name": "&-sInventoryWeapons;",	"template": "TabButtonTemplate", "inventory": 1, "container": 1, "types": [40] },
-	{ "priority": 100, "tab": "(f1)",  "name": "&-sInventoryApparel;",	"template": "TabButtonTemplate", "inventory": 1, "container": 1, "types": [24, 26] },
-	{ "priority": 100, "tab": "(h1)",  "name": "&-sInventoryAid;", 		"template": "TabButtonTemplate", "inventory": 1, "container": 1, "types": [25, 29, 47] },
-	{ "priority": 100, "tab": "(j1)",  "name": "&-sInventoryMisc;", 	"template": "TabButtonTemplate", "inventory": 1, "container": 1, "tabMisc": ["(d1)", "(f1)", "(h1)", "(k1)"] },
-	{ "priority": 100, "tab": "(k1)",  "name": "&-sInventoryAmmoTab;", 	"template": "TabButtonTemplate", "inventory": 1, "container": 1, "types": [41] }
+
+	{ "priority": 100, "tag": "(jdc0)", "name": "&-sNotesToggle;",		"keyring": 3, "filename": "Interface\\Icons\\PipboyImages\\Items\\items_research_data.dds", "categories": "jdc1" },
+	{ "priority": 100, "tag": "(jdd0)", "name": "&-sKeyring;",  		"keyring": 3, "filename": "Interface\\Icons\\PipboyImages\\Items\\item_keyring.dds",		"categories": "jdd1" },
+	{ "priority": 100, "tag": "(jde0)", "name": "&-sCaravanDeckText;",	"keyring": 3, "filename": "Interface\\Icons\\PipboyImages\\Items\\item_caravan_deck.dds", 	"categories": "jde1" }, 
+	
+	{ "priority": 100, "tag": "(a1)",  "name": "&-sNew;",				"inventory": 1, 				"tabNew": 1 },
+	{ "priority": 100, "tag": "(d1)",  "name": "&-sInventoryWeapons;",	"inventory": 1, "container": 1, "types": [40] },
+	{ "priority": 100, "tag": "(f1)",  "name": "&-sInventoryApparel;",	"inventory": 1, "container": 1, "types": [24, 26] },
+	{ "priority": 100, "tag": "(h1)",  "name": "&-sInventoryAid;", 		"inventory": 1, "container": 1, "types": [25, 29, 47] },
+	{ "priority": 100, "tag": "(j1)",  "name": "&-sInventoryMisc;", 	"inventory": 1, "container": 1, "tabMisc": ["(d1)", "(f1)", "(h1)", "(k1)"] },
+	{ "priority": 100, "tag": "(k1)",  "name": "&-sInventoryAmmoTab;", 	"inventory": 1, "container": 1, "types": [41] }
 ]
 }

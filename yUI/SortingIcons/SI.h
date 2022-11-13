@@ -105,12 +105,6 @@ namespace SortingIcons
 		std::string		texatlas;
 		SInt32			systemcolor = 0;
 
-		std::string		category;
-		std::string		name;
-		std::string		icon;
-		UInt32			tab = 0;
-		UInt32			count = 0;
-
 		Category() = default;
 	};
 
@@ -118,18 +112,23 @@ namespace SortingIcons
 	{
 	public:
 
-		std::string		tab;
+		std::string		tag;
 		SInt32			priority			= 0;
 
 		std::string		name;
-		SInt32			tabPriority			= 0;
-		UInt32			tabNew				= 0;
-		std::unordered_set<std::string>	tabMisc;
-		UInt32			inventory			= 0;
-		UInt32			container			= 0;
 
 		std::unordered_set<UInt32>			types;
 		std::unordered_set<std::string>		categories;
+
+		std::string		icon;
+		
+		UInt32			keyring				= 0;
+		UInt32			inventory			= 0;
+		UInt32			container			= 0;
+
+		SInt32			tabPriority			= 0;
+		UInt32			tabNew				= 0;
+		UInt32			tabMisc				= 0;
 
 		Tab() = default;
 	};
@@ -147,7 +146,7 @@ namespace SortingIcons
 	inline std::unordered_map<std::string, CategoryPtr>	g_StringToCategory;
 	inline std::unordered_map<std::string, TabPtr>		g_StringToTabs;
 
-	inline std::vector<CategoryPtr>						g_Keyrings;
+	inline std::vector<TabPtr>							g_Keyrings;
 	inline std::vector<TabPtr>							g_Tabline;
 	inline std::vector<std::filesystem::path>							g_XMLPaths;
 }
@@ -167,20 +166,14 @@ namespace SortingIcons::Categories
 
 namespace SortingIcons::Keyrings
 {
-	void KeyringRefreshPostStewie();
-
-	void __fastcall HideNonKeysGetTile(InventoryMenu* invmenu, Tile* tile);
-	void __fastcall AddSortingCategories();
-
+	void EquipUpdate();
+	UInt32 PostFilterUpdate();
+	UInt32 __fastcall OpenKeyring(Tile* tile);
+	UInt32 __fastcall IsKey(InventoryChanges* tile);
 	bool __fastcall KeyringHideKeys(InventoryChanges* entry);
-	void __fastcall KeyringEnableCancelHook(Tile* tile, void* dummyEDX, eTileValue tilevalue, signed int a1);
-	void __fastcall KeyringPipBoyIconHook(Tile* tile, void* dummyEDX, eTileValue tilevalue, char* string, int propagate);
 
 	bool __fastcall HasContainerChangesEntry(InventoryChanges* entry);
-	bool __fastcall KeyringShowCategories(Tile* tile);
-	void InventoryMenuSaveScrollPosition();
-	void InventoryMenuRestoreScrollPosition();
-
+	bool __fastcall KeyringFilter(InventoryChanges* entry, Tile* tile);
 }
 
 namespace SortingIcons::Tabs
@@ -204,6 +197,8 @@ namespace SortingIcons::Patches
 	void AddKeyrings(const bool bEnable);
 	void AddTabs(const bool bEnable);
 	void AddPromptIcon();
+
+	void AddKeyrings2(const bool bEnable);
 }
 
 namespace SortingIcons::Files
@@ -215,7 +210,7 @@ namespace SortingIcons::Files
 
 namespace SortingIcons::Sorting
 {
-	SInt32 __fastcall CompareItems(const TileInventoryChangesUnk* unk1, const TileInventoryChangesUnk* unk2);
+	SInt32 __fastcall CompareItems(const ListBoxItem<InventoryChanges>* unk1, const ListBoxItem<InventoryChanges>* unk2);
 }
 
 namespace SortingIcons::Icons
@@ -226,5 +221,5 @@ namespace SortingIcons::Icons
 	void __fastcall SetTileStringInjectTile(Tile* tile, const InventoryChanges* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate);
 	void __fastcall SetStringValueTagImage(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate);
 	void __fastcall SetStringValueTagRose(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate);
-	void __fastcall Tile__PropagateIntValue(Tile* tile, void* dummyedx, UInt32 a2, signed int a3);
+	void __fastcall PropagateIntValueTagPrompt(Tile* tile, void* dummyedx, UInt32 a2, signed int a3);
 }

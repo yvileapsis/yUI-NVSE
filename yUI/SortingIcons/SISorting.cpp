@@ -4,6 +4,7 @@
 #include <Tiles.h>
 #include <InterfaceManager.h>
 #include <functions.h>
+#include <ranges>
 
 namespace SortingIcons::Categories
 {
@@ -104,53 +105,121 @@ namespace SortingIcons::Categories
 
 namespace SortingIcons::Keyrings
 {
-	std::string openCategory;
+	TabPtr openTab;
 	std::string stringStewie;
 
-	bool __fastcall KeyringShowCategories(Tile* tile)
+	std::unordered_map <TabPtr, UInt32> itemCountsForKeyrings;
+
+	bool update = false;
+
+	void EquipUpdate()
 	{
-		std::string tag;
-		const auto& keyring = *g_StringToCategory[tag];
-		//&& *((UInt32*)0x78028E) == (UInt32)0x782620 && stringStewie.empty()
-		if (tile && tile->GetValue(kTileValue_user16)) tag = tile->GetValue(kTileValue_user16)->str;
-		if (keyring.tab != InventoryMenu::GetSingleton()->filter) return true;
+		update = true;
+    }
 
-		const auto entryDataList = PlayerCharacter::GetSingleton()->GetContainerChangesList();
-		UInt32 keys = 0;
-		if (!entryDataList) return true;
-		for (const auto iter : *entryDataList)
-			if (iter->form && Categories::ItemGetCategory(iter)->category._Equal(tag))
-			{
-				if (keyring.count == 0) { keys = 1; break; }
-				if (keyring.count == 1) keys += 1;
-				else if (keyring.count == 2) keys += iter->countDelta;
-			}
-		if (!keys) return true;
-		std::string keyringname = keyring.name;
-		if (keyringname.find("&-") == 0) keyringname = GetStringFromGameSettingFromString(keyringname.substr(2, keyringname.length() - 3));
-		if (keys > 1) keyringname += " (" + std::to_string(keys) + ")";
+	UInt32 __fastcall OpenKeyring(Tile* tile)
+	{
+		if (!tile) {}
+		else if (const auto val = tile->GetValue(kTileValue_user16))
+			openTab = g_StringToTabs[val->str];
+		return *(UInt32*)0x011D9EB8;
+	}
 
-		tile->SetString(kTileValue_string, keyringname.c_str(), false);
-		return false;
+	UInt32 __fastcall IsKey(InventoryChanges* entry)
+	{
+		if (!entry->form) return true;
+		// todo: should hide regular
+		if (!entry->form->IsItemPlayable()) return true;
+		const auto type = entry->form->TryGetREFRParent()->typeID;
+		const auto category = Categories::ItemGetCategory(entry)->tag;
+		if (openTab->types.contains(type)) return false;
+		if (openTab->categories.contains(category)) return false;
+		return true;
 	}
 
 	bool __fastcall KeyringHideKeys(InventoryChanges* entry)
 	{
 		if (!entry || !entry->form) return false;
-		if (!Categories::ItemGetCategory(entry)->category.empty()) return true;
-		return false;
+		const auto type = entry->form->TryGetREFRParent()->typeID;
+		const auto category = Categories::ItemGetCategory(entry)->tag;
+		bool shouldHide = false;
+		for (const auto& keyring : g_Keyrings)
+		{
+			if (!keyring->types.empty() && !keyring->types.contains(type)) continue;
+			if (!keyring->categories.empty() && !keyring->categories.contains(category)) continue;
+
+			shouldHide = true;
+			if (keyring->keyring == 1) itemCountsForKeyrings[keyring] = 1;
+			else if (keyring->keyring == 2) itemCountsForKeyrings[keyring] += 1;
+			else if (keyring->keyring == 3) itemCountsForKeyrings[keyring] += entry->countDelta;
+		}
+	
+		return shouldHide;
+	}
+
+	UInt32 PostFilterUpdate()
+	{
+
+		if (!update) for (auto list = InventoryMenu::GetSingleton()->itemsList.list; const auto iter : list)
+			if (iter->tile && iter->tile->GetValue(kTileValue_user16)) { iter->tile->Destroy(false); list.Remove(iter); }
+
+
+		for (const auto& key : itemCountsForKeyrings | std::views::keys)
+		{
+			const auto keys = itemCountsForKeyrings[key];
+
+			std::string keyringname = key->name;
+			if (keyringname.find("&-") == 0) keyringname = GetStringFromGameSettingFromString(keyringname.substr(2, keyringname.length() - 3));
+			if (keys > 1) keyringname += " (" + std::to_string(keys) + ")";
+
+			const auto listItem = InventoryMenu::GetSingleton()->itemsList.InsertAlt(nullptr, keyringname.c_str());
+			const auto tile = listItem->tile;
+			tile->SetFloat(kTileValue_id, 30);
+			tile->SetString(kTileValue_user16, key->tag.c_str());
+			InventoryMenu::GetSingleton()->itemsList.SortAlt(listItem, reinterpret_cast<ListBox<InventoryChanges>::SortingFunction>(0x7824E0));
+			Icons::InjectIconTile(g_StringToCategory[key->tag], tile);
+		}
+
+		itemCountsForKeyrings.clear();
+
+		update = false;
+		ThisCall(0x71A670, &InventoryMenu::GetSingleton()->itemsList);
+		return InventoryMenu::GetSingleton()->filter;
+	}
+
+	bool __fastcall KeyringFilter(InventoryChanges* entry, Tile* tile)
+	{
+		const auto type = entry->form->TryGetREFRParent()->typeID;
+		const auto filter = InventoryMenu::GetSingleton()->filter;
+		switch (type)
+		{
+		case kFormType_TESObjectWEAP:	return filter != 0;
+		case kFormType_TESObjectARMO:
+		case kFormType_TESObjectCLOT:	return filter != 1;
+		case kFormType_IngredientItem: 
+		case kFormType_AlchemyItem:
+		case kFormType_TESObjectBOOK:	return filter != 2;
+		case kFormType_TESAmmo:			return filter != 4;
+		default:						return filter != 3;
+		}
 	}
 
 	bool __cdecl KeyringHideNonKeys(InventoryChanges* entry)
 	{
 		if (!entry || !entry->form) return true;
-		if (Categories::ItemGetCategory(entry)->category._Equal(openCategory)) {
+/*		if (Categories::ItemGetCategory(entry)->category._Equal(openCategory)) {
 			if (stringStewie.empty() || stringStewie._Equal("_")) return false;
 			return !stristr(entry->form->GetTheName(), stringStewie.c_str());
-		}
+		}*/
 		return true;
 	}
 
+	bool __fastcall HasContainerChangesEntry(InventoryChanges* entry)
+	{
+		if (entry && entry->form) return false;
+		return true;
+	}
+	/*
 	void __fastcall HideNonKeysGetTile(InventoryMenu* invmenu, Tile* tile)
 	{
 		if (tile && tile->GetValue(kTileValue_user16)) openCategory = tile->GetValue(kTileValue_user16)->str; else openCategory = "";
@@ -158,34 +227,9 @@ namespace SortingIcons::Keyrings
 		invmenu->itemsList.ForEach(reinterpret_cast<void(*)(Tile*, InventoryChanges*)>(0x780C00));
 		invmenu->ResetInventorySelectionAndHideDataTile();
 	}
+	*/
 
-	void __fastcall AddSortingCategories()
-	{
-		const auto entryDataList = PlayerCharacter::GetSingleton()->GetContainerChangesList();
-		if (!entryDataList) return;
-		for (const auto& iter : g_Keyrings)
-		{
-			const auto& entry = *iter;
-			UInt32 keys = 0;
-			for (const auto changes : *entryDataList)
-			{
-				if (!changes->form) continue;
-				if (!Categories::ItemGetCategory(changes)->category._Equal(entry.category)) continue;
-				if (entry.count == 0) { keys = 1; break; }
-				if (entry.count == 1) keys += 1;
-				else if (entry.count == 2) keys += changes->countDelta;
-			}
-			if (keys) {
-				std::string keyringname = entry.name;
-				if (keyringname.find("&-") == 0) keyringname = GetStringFromGameSettingFromString(keyringname.substr(2, keyringname.length() - 3));
-				if (keys > 1) keyringname += " (" + std::to_string(keys) + ")";
-				const auto tile = InventoryMenu::GetSingleton()->itemsList.Insert(nullptr, keyringname.c_str(), nullptr, nullptr);
-				tile->SetFloat(kTileValue_id, 30);
-				tile->SetString(kTileValue_user16, entry.tag.c_str());
-				Icons::InjectIconTile(iter, tile);
-			}
-		}
-	}
+	/*
 
 
 	std::unordered_map<UInt32, InventoryMenu::ScrollPos> scrollPosTab;
@@ -203,8 +247,8 @@ namespace SortingIcons::Keyrings
 
 		if (InventoryMenu::IsKeyringOpen())
 		{
-			scrollPosKeyring[openCategory].listIndex = listIndex;
-			scrollPosKeyring[openCategory].currentValue = currentValue;
+//			scrollPosKeyring[openCategory].listIndex = listIndex;
+//			scrollPosKeyring[openCategory].currentValue = currentValue;
 		}
 		else
 		{
@@ -221,10 +265,10 @@ namespace SortingIcons::Keyrings
 		SInt32 currentValue = 0;
 		if (InventoryMenu::IsKeyringOpen())
 		{
-			if (scrollPosKeyring.contains(openCategory))
+//			if (scrollPosKeyring.contains(openCategory))
 			{
-				listIndex = scrollPosKeyring[openCategory].listIndex;
-				currentValue = scrollPosKeyring[openCategory].currentValue;
+//				listIndex = scrollPosKeyring[openCategory].listIndex;
+//				currentValue = scrollPosKeyring[openCategory].currentValue;
 			}
 		}
 		else
@@ -238,13 +282,9 @@ namespace SortingIcons::Keyrings
 		menu->itemsList.RestoreScrollPositionProxy(listIndex, currentValue);
 	}
 
-	void __fastcall KeyringEnableCancelHook(Tile* tile, void* dummyEDX, eTileValue tilevalue, signed int a1)
-	{
-		tile->SetFloat(tilevalue, InventoryMenu::IsKeyringOpen(), true);
-	}
-
 	void __fastcall KeyringPipBoyIconHook(Tile* tile, void* dummyEDX, eTileValue tilevalue, char* string, int propagate)
 	{
+		
 		std::string stringnew = string;
 		if (const auto clickedtile = InventoryMenu::GetSingleton()->itemsList.selected; clickedtile->GetValue(kTileValue_user16)
 			&& !g_StringToCategory[clickedtile->GetValue(kTileValue_user16)->str]->icon.empty())
@@ -265,12 +305,7 @@ namespace SortingIcons::Keyrings
 			else stringStewie.clear();
 		}
 	}
-
-	bool __fastcall HasContainerChangesEntry(InventoryChanges* entry)
-	{
-		if (entry && entry->form) return false;
-		return true;
-	}
+	*/
 }
 
 namespace SortingIcons::Tabs
@@ -280,24 +315,24 @@ namespace SortingIcons::Tabs
 	void ItemAssignTabs(TESForm* form)
 	{
 		std::unordered_set<TabPtr> set;
-
+/*
 		for (const auto& iter : g_Tabs) {
 			const auto& entry = *iter;
-			if (!entry.tabMisc.empty()) continue;
+//			if (!entry.tabMisc.empty()) continue;
 			if (!entry.types.empty() && !entry.types.contains(form->typeID)) continue;
-			if (!entry.categories.empty() && !entry.categories.contains(Categories::ItemGetCategory(form)->category)) continue;
+//			if (!entry.categories.empty() && !entry.categories.contains(Categories::ItemGetCategory(form)->category)) continue;
 			set.emplace(iter);
 		}
 
 		for (const auto& iter : g_Tabs) {
 			const auto& entry = *iter;
-			if (entry.tabMisc.empty()) continue;
+//			if (entry.tabMisc.empty()) continue;
 			bool misc = true;
 			for (const auto& it : entry.tabMisc) if (set.contains(g_StringToTabs[it])) { misc = false; break; }
 			if (misc) set.emplace(iter);
 		}
 
-		g_ItemToTabs.emplace(form, std::move(set));
+		g_ItemToTabs.emplace(form, std::move(set));*/
 	}
 
 	void ItemAssignTabs(const InventoryChanges* entry)
@@ -335,7 +370,7 @@ namespace SortingIcons::Tabs
 			const auto tile = menu->AddTileFromTemplate(tabline, "TabButtonTemplate", 0);
 
 			auto string = tab->name;
-			Log(tab->tab);
+	//		Log(tab->tab);
 			Log(string);
 			if (string.find("&-") == 0)
 				string = GetStringFromGameSettingFromString(string.substr(2, string.length() - 3));
@@ -422,12 +457,12 @@ namespace SortingIcons::Tabs
 
 namespace SortingIcons::Sorting
 {
-	SInt32 CompareWithTags(const TileInventoryChangesUnk* unk1, const TileInventoryChangesUnk* unk2)
+	SInt32 CompareWithTags(const ListBoxItem<InventoryChanges>* unk1, const ListBoxItem<InventoryChanges>* unk2)
 	{
 		if (bSort)
 		{
-			const auto a1 = unk1->entry;
-			const auto a2 = unk2->entry;
+			const auto a1 = unk1->object;
+			const auto a2 = unk2->object;
 			const auto tile1 = unk1->tile;
 			const auto tile2 = unk2->tile;
 
@@ -453,10 +488,10 @@ namespace SortingIcons::Sorting
 		return 0;
 	}
 
-	SInt32 __fastcall CompareItems(const TileInventoryChangesUnk* unk1, const TileInventoryChangesUnk* unk2)
+	SInt32 __fastcall CompareItems(const ListBoxItem<InventoryChanges>* unk1, const ListBoxItem<InventoryChanges>* unk2)
 	{
-		const auto a1 = unk1->entry;
-		const auto a2 = unk2->entry;
+		const auto a1 = unk1->object;
+		const auto a2 = unk2->object;
 		const auto tile1 = unk1->tile;
 		const auto tile2 = unk2->tile;
 

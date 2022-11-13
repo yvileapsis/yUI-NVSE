@@ -301,8 +301,8 @@ namespace UserInterface::LootMenu
 
 		UInt16 CompareItems(InventoryChanges* first, InventoryChanges* second)
 		{
-			TileInventoryChangesUnk first_(first);
-			TileInventoryChangesUnk second_(second);
+			ListBoxItem first_(first);
+			ListBoxItem second_(second);
 			return CdeclCall<SInt16>(0x7824E0, &first_, &second_) != 1 ? 1 : 0;
 		}
 

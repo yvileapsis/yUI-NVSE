@@ -114,14 +114,24 @@ namespace SortingIcons::Icons
 	}
 
 
-	void __fastcall Tile__PropagateIntValue(Tile* tile, void* dummyedx, UInt32 a2, signed int a3)
+	void __fastcall PropagateIntValueTagPrompt(Tile* tile, void* dummyedx, UInt32 a2, signed int a3)
 	{
+		tile->SetFloat(a2, a3, true);
+
+		const auto ref = HUDMainMenu::GetSingleton()->crosshairRef;
+		const auto item = !ref ? nullptr : ref->baseForm;
 		auto icon = tile->GetChild("ySIImage");
 		if (!icon) icon = tile->AddTileFromTemplate("ySIDefault");
+		if (!item || !item->IsInventoryObjectAlt())
+		{
+			icon->SetFloat(kTileValue_visible, false, true);
+			return;
+		}
 		const auto stringdimensions = FontManager::GetSingleton()->GetStringDimensions(tile->GetValue(kTileValue_string)->str, 7, tile->GetFloat(kTileValue_wrapwidth));
 		icon->SetFloat(kTileValue_x, -stringdimensions->x / 2 - icon->GetFloat(kTileValue_width) - icon->GetFloat(kTileValue_user1));
 		icon->SetFloat(kTileValue_y, icon->GetFloat(kTileValue_user2) - icon->GetFloat(kTileValue_height) / 4);
 		icon->SetFloat(kTileValue_visible, true, true);
-		tile->SetFloat(a2, a3, true);
+
+		icon->SetString(kTileValue_filename, Categories::ItemGetCategory(item)->filename.c_str());
 	}
 }
