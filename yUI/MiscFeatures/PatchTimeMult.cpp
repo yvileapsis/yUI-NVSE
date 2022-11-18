@@ -1,6 +1,8 @@
 #pragma once
 #include <main.h>
 #include <GameAPI.h>
+#include <GameData.h>
+#include <Sound.h>
 #include <ConsoleManager.h>
 #include <SafeWrite.h>
 
@@ -9,14 +11,12 @@
 #include <ranges>
 #include <unordered_set>
 
-#include "GameData.h"
-#include "Sound.h"
 
 namespace Patch::TimeMult
 {
-	inline int g_yTM = 1;
-	inline int g_yTM_Mode = 1;
-	inline int g_yTM_MinMax = 1;
+	inline int enable = 1;
+	inline int mode = 1;
+	inline int minmax = 1;
 
 	enum eGTMValues {
 		eTimeIndexDefault = 0,
@@ -45,9 +45,9 @@ namespace Patch::TimeMult
 
 		g_timeMult = 1;
 
-		if (g_yTM_MinMax == 0)
+		if (minmax == 0)
 			for (const auto val : g_localMults | std::views::values) g_timeMult *= val;
-		else if (g_yTM_MinMax == 1) {
+		else if (minmax == 1) {
 			Float64 min = 1.0, max = 1.0;
 			for (const auto val : g_localMults | std::views::values) {
 				if (val < min) min = val;
@@ -91,9 +91,9 @@ namespace Patch::TimeMult
 		vec.clear();
 	}
 
-	template<UInt32 retn> __declspec(naked) void DialogVATSDestructorHook() {
+	template<UInt32 index> __declspec(naked) void DialogVATSDestructorHook() {
 		Set(TimeGlobal::GetSingleton(), 1);
-		static const UInt32 retnAddr = retn;
+		static const UInt32 retnAddr = index;
 		__asm {
 			mov		eax, [ebp - 0x4]
 			mov		esp, ebp
@@ -101,13 +101,13 @@ namespace Patch::TimeMult
 		}
 	}
 
-	template<UInt32 retn> void __fastcall SetGTMHook(TimeGlobal* timeGlobal, void* dummyEDX, float timeMult, char isImmediateChange) {
-		ModifyMap(timeMult, retn);
+	template<UInt32 index> void __forceinline __fastcall SetGTMHook(TimeGlobal* timeGlobal, void* dummyEDX, float timeMult, char isImmediateChange) {
+		ModifyMap(timeMult, index);
 		Set(timeGlobal, isImmediateChange);
 	}
 
-	template<UInt32 retn> void __fastcall RestoreGTMHook(TimeGlobal* timeGlobal) {
-		ModifyMap(1, retn);
+	template<UInt32 index> void __forceinline __fastcall RestoreGTMHook(TimeGlobal* timeGlobal) {
+		ModifyMap(1, index);
 		Set(timeGlobal, 0);
 	}
 
@@ -188,7 +188,7 @@ namespace Patch::TimeMult
 		cmd_SGTM = GetByOpcode(0x1186);
 		cmd_GGTM = GetByOpcode(0x22B0);
 
-		if (g_yTM)
+		if (enable)
 		{
 			cmd_GGTM->numParams = 1;
 			cmd_GGTM->params = kParams_OneOptionalInt;
@@ -199,7 +199,7 @@ namespace Patch::TimeMult
 
 		if (g_nvseInterface->isEditor) return;
 
-		if (g_yTM)
+		if (enable)
 		{
 			cmd_GGTM->execute = Cmd_GetGlobalTimeMultiplierAlt_Execute;
 			cmd_SGTM->execute = Cmd_SetGlobalTimeMultiplierAlt_Execute;
@@ -257,9 +257,9 @@ namespace Patch::TimeMult
 
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
-		g_yTM = ini.GetOrCreate("General", "bTimeMultChanges", 1, "; enable 'Game Time Mult' section of this .ini file.");
-		g_yTM_Mode = ini.GetOrCreate("Game Time Mult", "bTimeMultMode", 1, "; select which mods are handled by yGTM, with 0 disabling handling of mods altogether, 1 handling mods that use SGTM command and 2 handling all mods.");
-		g_yTM_MinMax = ini.GetOrCreate("Game Time Mult", "bTimeMultMinMax", 1, "; use multiplication of minimum and maximum local values instead of a multiplication of all local values. Provides a more sane range of TimeMult values.");
+		enable = ini.GetOrCreate("General", "bTimeMultChanges", 1, "; enable 'Game Time Mult' section of this .ini file.");
+		mode = ini.GetOrCreate("Game Time Mult", "bTimeMultMode", 1, "; select which mods are handled by yGTM, with 0 disabling handling of mods altogether, 1 handling mods that use SGTM command and 2 handling all mods.");
+		minmax = ini.GetOrCreate("Game Time Mult", "bTimeMultMinMax", 1, "; use multiplication of minimum and maximum local values instead of a multiplication of all local values. Provides a more sane range of TimeMult values.");
 
 		ini.SaveFile(iniPath.c_str(), false);
 	}
@@ -267,10 +267,10 @@ namespace Patch::TimeMult
 	extern void Init()
 	{
 		HandleINIs();
-		if (g_yTM) pluginLoad.emplace_back(PluginLoad);
+		if (enable) pluginLoad.emplace_back(PluginLoad);
 
 		if (g_nvseInterface->isEditor) return;
-		Patch(g_yTM);
-		if (g_yTM) deferredInit.emplace_back(FillMaps);
+		Patch(enable);
+		if (enable) deferredInit.emplace_back(FillMaps);
 	}
 }
