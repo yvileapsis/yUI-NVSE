@@ -22,7 +22,7 @@ void BaseExtraList::MarkType(UInt32 type, bool bCleared)
 
 ExtraDataList* ExtraDataList::Create(BSExtraData* xBSData)
 {
-	ExtraDataList* xData = (ExtraDataList*)FormHeap_Allocate(sizeof(ExtraDataList));
+	ExtraDataList* xData = (ExtraDataList*)FormHeapAlloc(sizeof(ExtraDataList));
 	memset(xData, 0, sizeof(ExtraDataList));
 	((UInt32*)xData)[0] = s_ExtraDataListVtbl;
 	if (xBSData) xData->Add(xBSData);
@@ -32,12 +32,12 @@ ExtraDataList* ExtraDataList::Create(BSExtraData* xBSData)
 
 ExtendDataList* ExtendDataList::Create(ExtraDataList* pExtraDataList)
 {
-	auto xData = (ExtendDataList*)FormHeap_Allocate(sizeof(ExtendDataList));
+	auto xData = (ExtendDataList*)FormHeapAlloc(sizeof(ExtendDataList));
 	if (xData) {
 		memset(xData, 0, sizeof(ExtendDataList));
 		if (pExtraDataList)
 			if (xData->AddAt(pExtraDataList, eListEnd) == eListInvalid) {
-				FormHeap_Free(xData);
+				FormHeapFree(xData);
 				xData = NULL;
 			}
 	}
@@ -60,7 +60,7 @@ void ExtendDataList::Free(ExtendDataList* xData, bool bFreeList)
 				pExtraDataList = xData->GetNthItem(i);
 			}
 		}
-		FormHeap_Free(xData);
+		FormHeapFree(xData);
 	}
 }
 
@@ -85,7 +85,7 @@ bool ExtendDataList::Remove(ExtendDataList* xData, ExtraDataList* xList, bool bF
 			if (bFreeList) {
 				for (UInt32 j = 0; j < 0xFF; j++)
 					pExtraDataList->RemoveByType(j);
-				FormHeap_Free(xList);
+				FormHeapFree(xList);
 			}
 			return true;
 		}
@@ -98,24 +98,6 @@ bool BaseExtraList::IsWorn()
 	return HasType(kExtraData_Worn);
 }
 
-void BaseExtraList::DebugDump() const
-{
-	PrintLog("BaseExtraList Dump:");
-	gLog.Indent();
-
-	if (m_data)
-	{
-		for(BSExtraData * traverse = m_data; traverse; traverse = traverse->next) {
-			PrintLog("%s", GetObjectClassName(traverse));
-			//_MESSAGE("Extra types %4x (%s) %s", traverse->type, GetExtraDataName(traverse->type), GetExtraDataValue(traverse));
-		}
-	}
-	else
-		PrintLog("No data in list");
-
-	gLog.Outdent();
-}
-
 bool BaseExtraList::MarkScriptEvent(UInt32 eventMask, TESForm* eventTarget)
 {
 	return MarkBaseExtraListScriptEvent(eventTarget, this, eventMask);
@@ -125,7 +107,7 @@ void InventoryChanges::Free(bool bFreeList) {
 	if (this->extendData) {
 		ExtendDataList::Free(this->extendData, bFreeList);
 	}
-	FormHeap_Free(this);
+	FormHeapFree(this);
 }
 
 void InventoryChanges::Cleanup()
@@ -147,7 +129,7 @@ void InventoryChanges::Cleanup()
 
 InventoryChanges* InventoryChanges::Create(TESForm* pForm, UInt32 count, ExtendDataList* pExtendDataList)
 {
-	const auto xData = static_cast<InventoryChanges*>(FormHeap_Allocate(sizeof(InventoryChanges)));
+	const auto xData = static_cast<InventoryChanges*>(FormHeapAlloc(sizeof(InventoryChanges)));
 	if (xData) {
 		memset(xData, 0, sizeof(InventoryChanges));
 		if (pForm) {
@@ -155,7 +137,7 @@ InventoryChanges* InventoryChanges::Create(TESForm* pForm, UInt32 count, ExtendD
 			xData->countDelta = count;
 			if (pExtendDataList == nullptr)
 			{
-				pExtendDataList = static_cast<ExtendDataList*>(FormHeap_Allocate(sizeof(ExtendDataList)));
+				pExtendDataList = static_cast<ExtendDataList*>(FormHeapAlloc(sizeof(ExtendDataList)));
 				if (pExtendDataList) memset(pExtendDataList, 0, sizeof(ExtendDataList));
 			}
 			xData->extendData = pExtendDataList;
@@ -187,7 +169,7 @@ bool InventoryChanges::Remove(ExtraDataList* toRemove, bool bFree)
 			countDelta -= count;
 			if (bFree) {
 				toRemove->RemoveAll(true);
-				FormHeap_Free(toRemove);
+				FormHeapFree(toRemove);
 			}
 			return true;
 		}
@@ -296,7 +278,7 @@ __declspec(naked) InventoryChanges* InventoryChangesList::FindForItem(TESForm* i
 
 InventoryChangesList* InventoryChangesList::Create(UInt32 refID, UInt32 count, ExtendDataList* pExtendDataList)
 {
-	const auto xData = (InventoryChangesList*)FormHeap_Allocate(sizeof(InventoryChangesList));
+	const auto xData = (InventoryChangesList*)FormHeapAlloc(sizeof(InventoryChangesList));
 	if (xData) {
 		memset(xData, 0, sizeof(InventoryChangesList));
 		xData->AddAt(InventoryChanges::Create(GetFormByID(refID), count, pExtendDataList), eListEnd);
@@ -312,5 +294,5 @@ void InventoryChangesList::Free(bool bFreeList) {
 		i++;
 		pX = this->GetNthItem(i);
 	}
-	FormHeap_Free(this);
+	FormHeapFree(this);
 }

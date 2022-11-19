@@ -307,7 +307,6 @@ struct BaseExtraList
 	__forceinline void			RemoveAll(bool doFree) { ThisStdCall(0x40FAE0, this, doFree); }
 	bool						MarkScriptEvent(UInt32 eventMask, TESForm* eventTarget);
 	__forceinline void			Copy(BaseExtraList* from) { ThisStdCall(0x411EC0, this, from); }
-	void						DebugDump() const;
 	bool						IsWorn();
 
 	virtual	BaseExtraList*		Destroy(char chr);

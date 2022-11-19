@@ -80,8 +80,6 @@ public:
 
 	ExtraContainerChangesData*		data;	// 00C
 
-	InventoryChanges*				GetByType(TESForm * type);
-	void							DebugDump();
 	void							Cleanup();	// clean up unneeded extra data from each EntryData
 	ExtendDataList*					Add(TESForm* form, ExtraDataList* dataList = NULL);
 	bool							Remove(TESForm* form, ExtraDataList* dataList = NULL, bool bFree = false);

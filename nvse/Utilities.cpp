@@ -1,13 +1,10 @@
-#include <algorithm>
-#include <unordered_set>
 #include <Utilities.h>
 
 #include "ConsoleManager.h"
 #include "InterfaceManager.h"
 #include "GameData.h"
+#include "GameExtraData.h"
 #include "GameScript.h"
-
-std::vector<std::string> queuedConsoleMessages;
 
 ScopedLock::ScopedLock(CriticalSection& critSection) : m_critSection(critSection)
 {
@@ -58,220 +55,6 @@ void SpinLock::Leave()
 {
 	if (owningThread && !--enterCount)
 		owningThread = 0;
-}
-
-bool __fastcall FileExists(const char* path)
-{
-	const auto attr = GetFileAttributes(path);
-	return (attr != INVALID_FILE_ATTRIBUTES) && !(attr & FILE_ATTRIBUTE_DIRECTORY);
-}
-
-
-bool FileStream::Open(const char* filePath)
-{
-	theFile = CreateFile(filePath, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-	if (theFile == INVALID_HANDLE_VALUE)
-		return false;
-	streamLength = GetFileSize(theFile, nullptr);
-	return true;
-}
-
-bool FileStream::OpenAt(const char* filePath, UInt32 inOffset)
-{
-	theFile = CreateFile(filePath, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
-	if (theFile == INVALID_HANDLE_VALUE)
-		return false;
-	streamLength = GetFileSize(theFile, nullptr);
-	streamOffset = inOffset;
-	if (streamOffset >= streamLength)
-	{
-		Close();
-		return false;
-	}
-	if (streamOffset)
-		SetFilePointer(theFile, streamOffset, nullptr, FILE_BEGIN);
-	return true;
-}
-
-bool FileStream::OpenWrite(const char* filePath)
-{
-	theFile = CreateFile(filePath, GENERIC_WRITE, 0, nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-	if (theFile == INVALID_HANDLE_VALUE)
-		return false;
-	streamOffset = streamLength = GetFileSize(theFile, nullptr);
-	SetFilePointer(theFile, streamLength, nullptr, FILE_BEGIN);
-	return true;
-}
-
-bool FileStream::Create(const char* filePath)
-{
-	theFile = CreateFile(filePath, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
-	return theFile != INVALID_HANDLE_VALUE;
-}
-
-bool FileStream::OpenWriteEx(char* filePath, bool append)
-{
-	MakeAllDirs(filePath);
-	if (append)
-	{
-		if (!OpenWrite(filePath))
-			return false;
-		if (streamLength)
-		{
-			char newLn = '\n';
-			WriteBuf(&newLn, 1);
-		}
-	}
-	else if (!Create(filePath))
-		return false;
-	return true;
-}
-
-void FileStream::SetOffset(UInt32 inOffset)
-{
-	if (inOffset > streamLength)
-		streamOffset = streamLength;
-	else streamOffset = inOffset;
-	SetFilePointer(theFile, streamOffset, nullptr, FILE_BEGIN);
-}
-
-void FileStream::ReadBuf(void* outData, UInt32 inLength)
-{
-	UInt32 bytesRead;
-	if (!ReadFile(theFile, outData, inLength, &bytesRead, nullptr)) Log("Filestream Failure!");
-	streamOffset += bytesRead;
-}
-
-void FileStream::WriteBuf(const void* inData, UInt32 inLength)
-{
-	if (streamOffset > streamLength)
-		SetEndOfFile(theFile);
-	UInt32 bytesWritten;
-	WriteFile(theFile, inData, inLength, &bytesWritten, nullptr);
-	streamOffset += bytesWritten;
-	if (streamLength < streamOffset)
-		streamLength = streamOffset;
-}
-
-void FileStream::MakeAllDirs(char* fullPath)
-{
-	char* traverse = fullPath, curr;
-	while (curr = *traverse)
-	{
-		if ((curr == '\\') || (curr == '/'))
-		{
-			*traverse = 0;
-			CreateDirectory(fullPath, nullptr);
-			*traverse = '\\';
-		}
-		traverse++;
-	}
-}
-bool DebugLog::Create(const char* filePath)
-{
-	theFile = _fsopen(filePath, "wb", 0x20);
-	return theFile != nullptr;
-}
-
-const char kIndentLevelStr[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
-
-void DebugLog::Message(const char* msgStr)
-{
-	if (!theFile) return;
-	if (indent < 40)
-		fputs(kIndentLevelStr + indent, theFile);
-	fputs(msgStr, theFile);
-	fputc('\n', theFile);
-	fflush(theFile);
-}
-
-void DebugLog::FmtMessage(const char* fmt, va_list args)
-{
-	if (!theFile) return;
-	if (indent < 40)
-		fputs(kIndentLevelStr + indent, theFile);
-	vfprintf(theFile, fmt, args);
-	fputc('\n', theFile);
-	fflush(theFile);
-}
-
-std::string DebugLog::GetModString()
-{
-	return modString;
-}
-
-void DebugLog::SetModString(const std::string& string)
-{
-	modString = string;
-}
-
-void PrintLog(const char* fmt, ...)
-{
-	va_list args;
-	va_start(args, fmt);
-	gLog.FmtMessage(fmt, args);
-	va_end(args);
-}
-
-void ConsolePrintQueue()
-{
-	for (const auto& iter : queuedConsoleMessages)
-		PrintConsole("%s: %s", gLog.GetModString().c_str(), iter.c_str());
-	queuedConsoleMessages.clear();
-}
-
-extern TESDataHandler* g_TESDataHandler;
-
-void PrintConsoleOrQueue(const std::string& msg)
-{
-	if (*reinterpret_cast<ConsoleManager**>(0x11D8CE8) || g_TESDataHandler) // g_TESDataHandler will be non-null if Deferred init has been called
-		PrintConsole("%s: %s", gLog.GetModString().c_str(), msg.c_str());
-	else
-		queuedConsoleMessages.push_back(msg);
-}
-
-void Log(const std::string& msg, UInt32 loglevel)
-{
-	if (loglevel & kToLog) PrintLog("%s", msg.c_str());
-	if (loglevel & kToConsole) PrintConsoleOrQueue(msg);
-}
-
-void DumpClass(void* theClassPtr, UInt32 nIntsToDump)
-{
-	PrintLog("DumpClass:");
-	UInt32* basePtr = (UInt32*)theClassPtr;
-
-	gLog.Indent();
-
-	if (!theClassPtr) return;
-	for (UInt32 ix = 0; ix < nIntsToDump; ix++) {
-		UInt32* curPtr = basePtr + ix;
-		const char* curPtrName = nullptr;
-		UInt32 otherPtr = 0;
-		float otherFloat = 0.0;
-		const char* otherPtrName = nullptr;
-		if (curPtr) {
-			curPtrName = GetObjectClassName(curPtr);
-
-			__try
-			{
-				otherPtr = *curPtr;
-				otherFloat = *(float*)(curPtr);
-			}
-			__except (EXCEPTION_EXECUTE_HANDLER)
-			{
-				//
-			}
-
-			if (otherPtr) {
-				otherPtrName = GetObjectClassName((void*)otherPtr);
-			}
-		}
-
-		PrintLog("%3d +%03X ptr: 0x%08X: %32s *ptr: 0x%08x | %f: %32s", ix, ix * 4, curPtr, curPtrName, otherPtr, otherFloat, otherPtrName);
-	}
-
-	gLog.Outdent();
 }
 
 #pragma warning (push)
@@ -325,55 +108,51 @@ const char * GetObjectClassName(void * objBase)
 	return result;
 }
 
-const std::string & GetFalloutDirectory(void)
+static std::filesystem::path s_falloutDirectory;
+
+const std::filesystem::path& GetFalloutDirectory()
 {
-	static std::string s_falloutDirectory;
+	if (!s_falloutDirectory.empty()) return s_falloutDirectory;
 
-	if(s_falloutDirectory.empty())
+	// can't determine how many bytes we'll need, hope it's not more than MAX_PATH
+	char	falloutPathBuf[MAX_PATH];
+	const UInt32	falloutPathLength = GetModuleFileName(GetModuleHandle(nullptr), falloutPathBuf, sizeof(falloutPathBuf));
+
+	if (!falloutPathLength || falloutPathLength >= sizeof falloutPathBuf)
 	{
-		// can't determine how many bytes we'll need, hope it's not more than MAX_PATH
-		char	falloutPathBuf[MAX_PATH];
-		const UInt32	falloutPathLength = GetModuleFileName(GetModuleHandle(nullptr), falloutPathBuf, sizeof(falloutPathBuf));
+		Log(FormatString("couldn't find fallout path (len = %d, err = %08X)", falloutPathLength, GetLastError()));
+		return s_falloutDirectory;
+	}
 
-		if(falloutPathLength && (falloutPathLength < sizeof(falloutPathBuf)))
-		{
-			std::string	falloutPath(falloutPathBuf, falloutPathLength);
+	const std::string	falloutPath(falloutPathBuf, falloutPathLength);
 
-			// truncate at last slash
-			const std::string::size_type	lastSlash = falloutPath.rfind('\\');
-			if(lastSlash != std::string::npos)	// if we don't find a slash something is VERY WRONG
-			{
-				s_falloutDirectory = falloutPath.substr(0, lastSlash + 1);
+	// truncate at last slash
+	const std::string::size_type lastSlash = falloutPath.rfind('\\');
 
-				PrintLog("fallout root = %s", s_falloutDirectory.c_str());
-			}
-			else
-			{
-				PrintLog("no slash in fallout path? (%s)", falloutPath.c_str());
-			}
-		}
-		else
-		{
-			PrintLog("couldn't find fallout path (len = %d, err = %08X)", falloutPathLength, GetLastError());
-		}
+	if (lastSlash != std::string::npos)	// if we don't find a slash something is VERY WRONG
+	{
+		s_falloutDirectory = falloutPath.substr(0, lastSlash + 1);
+		Log("fallout root = " + s_falloutDirectory.generic_string());
+	}
+	else
+	{
+		Log("no slash in fallout path? (" + falloutPath + ")");
 	}
 
 	return s_falloutDirectory;
 }
 
-static const std::string & GetNVSEConfigPath(void)
+static std::filesystem::path s_configPath;
+
+static const std::filesystem::path& GetNVSEConfigPath(void)
 {
-	static std::string s_configPath;
 
-	if(s_configPath.empty())
+	if (!s_configPath.empty()) return s_configPath;
+
+	if (const auto& falloutPath = GetFalloutDirectory(); !falloutPath.empty())
 	{
-		std::string	falloutPath = GetFalloutDirectory();
-		if(!falloutPath.empty())
-		{
-			s_configPath = falloutPath + "Data\\NVSE\\nvse_config.ini";
-
-			PrintLog("config path = %s", s_configPath.c_str());
-		}
+		s_configPath = falloutPath.generic_string() + "Data\\NVSE\\nvse_config.ini";
+		Log("config path =" + s_configPath.generic_string());
 	}
 
 	return s_configPath;
@@ -383,13 +162,12 @@ std::string GetNVSEConfigOption(const char * section, const char * key)
 {
 	std::string	result;
 
-	const std::string & configPath = GetNVSEConfigPath();
-	if(!configPath.empty())
+	if (const auto& configPath = GetNVSEConfigPath(); !configPath.empty())
 	{
 		char	resultBuf[256];
 		resultBuf[0] = 0;
 
-		UInt32	resultLen = GetPrivateProfileString(section, key, nullptr, resultBuf, 255, configPath.c_str());
+		GetPrivateProfileString(section, key, nullptr, resultBuf, 255, configPath.generic_string().c_str());
 
 		result = resultBuf;
 	}
@@ -399,11 +177,9 @@ std::string GetNVSEConfigOption(const char * section, const char * key)
 
 bool GetNVSEConfigOption_UInt32(const char * section, const char * key, UInt32 * dataOut)
 {
-	std::string	data = GetNVSEConfigOption(section, key);
-	if(data.empty())
-		return false;
-
-	return (sscanf_s(data.c_str(), "%lu", dataOut) == 1);
+	const auto data = GetNVSEConfigOption(section, key);
+	if (data.empty()) return false;
+	return sscanf_s(data.c_str(), "%lu", dataOut) == 1;
 }
 
 namespace MersenneTwister
@@ -712,7 +488,7 @@ bool ci_equal(char ch1, char ch2)
 
 bool ci_less(const char* lh, const char* rh)
 {
-	ASSERT(lh && rh);
+	assert(lh && rh);
 	while (*lh && *rh) {
 		char l = toupper(*lh);
 		char r = toupper(*rh);
@@ -742,7 +518,7 @@ void MakeLower(std::string& str)
 char* CopyCString(const char* src)
 {
 	UInt32 size = src ? strlen(src) : 0;
-	char* result = (char*)FormHeap_Allocate(size+1);
+	char* result = (char*)FormHeapAlloc(size+1);
 	result[size] = 0;
 	if (size) {
 		strcpy_s(result, size+1, src);
@@ -876,8 +652,7 @@ void ShowRuntimeError(Script* script, const char* fmt, ...)
 			QueueUIMessage(message, 0, reinterpret_cast<const char*>(0x1049638), nullptr, 2.5F, false);
 	}
 
-	PrintConsole(errorHeader);
-	PrintLog(errorHeader);
+	Log(errorHeader);
 
 	va_end(args);
 }
@@ -907,7 +682,7 @@ void GeckExtenderMessageLog(const char* fmt, ...)
 	auto* window = FindWindow("RTEDITLOG", nullptr);
 	if (!window)
 	{
-		PrintLog("Failed to find GECK Extender Message Log window");
+		Log("Failed to find GECK Extender Message Log window");
 		return;
 	}
 	
@@ -1427,62 +1202,7 @@ char* stristr(const char* str1, const char* str2)
 }
 
 #include <cstdlib>
-
-__declspec(noreturn) static void IErrors_Halt(void)
-{
-	// crash
-	*((int*)nullptr) = 0xDEADBEEF;
-}
-
-/**
- *	Report a failed assertion and exit the program
- *
- *	@param file the file where the error occured
- *	@param line the line number where the error occured
- *	@param desc an error message
- */
-void _AssertionFailed(const char* file, unsigned long line, const char* desc)
-{
-	PrintLog("Assertion failed in %s (%d): %s", file, line, desc);
-
-	IErrors_Halt();
-}
-
-/**
- *	Report a failed assertion and exit the program
- *
- *	@param file the file where the error occured
- *	@param line the line number where the error occured
- *	@param desc an error message
- *	@param code the error code
- */
-void _AssertionFailed_ErrCode(const char* file, unsigned long line, const char* desc, unsigned long long code)
-{
-	if (code & 0xFFFFFFFF00000000)
-		PrintLog("Assertion failed in %s (%d): %s (code = %16I64X (%I64d))", file, line, desc, code, code);
-	else
-	{
-		UInt32	code32 = code;
-		PrintLog("Assertion failed in %s (%d): %s (code = %08X (%d))", file, line, desc, code32, code32);
-	}
-
-	IErrors_Halt();
-}
-
-/**
- *	Report a failed assertion and exit the program
- *
- *	@param file the file where the error occured
- *	@param line the line number where the error occured
- *	@param desc an error message
- *	@param code the error code
- */
-void _AssertionFailed_ErrCode(const char* file, unsigned long line, const char* desc, const char* code)
-{
-	PrintLog("Assertion failed in %s (%d): %s (code = %s)", file, line, desc, code);
-
-	IErrors_Halt();
-}
+#include <utility>
 
 std::string UTF8toANSI(const std::string& str)
 {	

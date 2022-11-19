@@ -134,7 +134,7 @@ ExtendDataList* ExtraContainerChanges::Add(TESForm* form, ExtraDataList* dataLis
 {
 	if (!data) {
 		// wtf
-		PrintLog("ExtraContainerChanges::Add() encountered ExtraContainerChanges with NULL data");
+		Log("ExtraContainerChanges::Add() encountered ExtraContainerChanges with NULL data");
 		return NULL;
 	}
 
@@ -162,7 +162,7 @@ ExtraContainerChanges* ExtraContainerChanges::Create()
 
 ExtraContainerChangesData* ExtraContainerChangesData::Create(TESObjectREFR* owner)
 {
-	const auto data = static_cast<ExtraContainerChangesData*>(FormHeap_Allocate(sizeof(ExtraContainerChangesData)));
+	const auto data = static_cast<ExtraContainerChangesData*>(FormHeapAlloc(sizeof(ExtraContainerChangesData)));
 	if (data) {
 		data->owner = owner;
 		data->objList = nullptr;
@@ -195,9 +195,9 @@ void ExtraContainerChangesFree(ExtraContainerChanges* xData, bool bFreeList) {
 			if (xData->data->objList && bFreeList) {
 				xData->data->objList->Free(true);
 			}
-			FormHeap_Free(xData->data);
+			FormHeapFree(xData->data);
 		}
-		FormHeap_Free(xData);
+		FormHeapFree(xData);
 	}
 }
 
@@ -213,7 +213,7 @@ void ExtraContainerChanges::Cleanup()
 			for (SInt32 index = 0; index < iter->extendData->Count(); ) {
 				if (const auto xtendData = iter->extendData->GetNthItem(index); xtendData && !xtendData->m_data) {
 					iter->extendData->RemoveNth(index);
-					FormHeap_Free(xtendData);
+					FormHeapFree(xtendData);
 				}
 				else index++;
 			}
@@ -266,40 +266,6 @@ bool ExtraContainerChanges::Remove(TESForm* obj, ExtraDataList* dataList, bool b
 	return false;
 }
 
-void ExtraContainerChanges::DebugDump()
-{
-	PrintLog("Dumping ExtraContainerChanges");
-	gLog.Indent();
-
-	if (data && data->objList)
-	{
-		for (const auto entry : *data->objList)
-		{
-			PrintLog("Type: %s CountDelta: %d [%08X]", entry->form->GetFullName()->name.CStr(), entry->countDelta, entry);
-			gLog.Indent();
-			if (!entry || !entry->extendData)
-				PrintLog("* No extend data *");
-			else
-			{
-				for (const auto extendData : *entry->extendData)
-				{
-					PrintLog("Extend Data: [%08X]", extendData);
-					gLog.Indent();
-					if (extendData) {
-						extendData->DebugDump();
-						if (const auto xCount = (ExtraCount*)extendData->GetByType(kExtraData_Count))
-							PrintLog("ExtraCount value : %d", xCount->count);
-					}
-					else PrintLog("NULL");
-					gLog.Outdent();
-				}
-			}
-			gLog.Outdent();
-		}
-	}
-	gLog.Outdent();
-}
-
 ExtraContainerChanges* ExtraContainerChanges::GetForRef(TESObjectREFR* refr)
 {
 	auto xChanges = (ExtraContainerChanges*)refr->extraDataList.GetByType(kExtraData_ContainerChanges);
@@ -334,7 +300,7 @@ UInt32 ExtraContainerChanges::GetAllEquipped(std::vector<InventoryChanges*>& out
 // static
 BSExtraData* BSExtraData::Create(UInt8 xType, UInt32 size, UInt32 vtbl)
 {
-	void* memory = FormHeap_Allocate(size);
+	void* memory = FormHeapAlloc(size);
 	memset(memory, 0, size);
 	static_cast<UInt32*>(memory)[0] = vtbl;
 	const auto xData = static_cast<BSExtraData*>(memory);
@@ -369,7 +335,7 @@ ExtraCannotWear* ExtraCannotWear::Create()
 ExtraLock* ExtraLock::Create()
 {
 	const auto xLock = (ExtraLock*)BSExtraData::Create(kExtraData_Lock, sizeof(ExtraLock), s_ExtraLockVtbl);
-	const auto lockData = (ExtraLockData*)FormHeap_Allocate(sizeof(ExtraLockData));
+	const auto lockData = (ExtraLockData*)FormHeapAlloc(sizeof(ExtraLockData));
 	memset(lockData, 0, sizeof(ExtraLockData));
 	xLock->data = lockData;
 	return xLock;
@@ -387,7 +353,7 @@ ExtraTeleport* ExtraTeleport::Create()
 	const auto tele = (ExtraTeleport*)BSExtraData::Create(kExtraData_Teleport, sizeof(ExtraTeleport), s_ExtraTeleportVtbl);
 	
 	// create data
-	const auto data = (Data*)FormHeap_Allocate(sizeof(Data));
+	const auto data = (Data*)FormHeapAlloc(sizeof(Data));
 	data->linkedDoor = NULL;
 	data->yRot = -0.0;
 	data->xRot = 0.0;
@@ -585,14 +551,14 @@ ExtraScript* ExtraScript::Create(TESScriptableForm* pScript, bool create, TESObj
 void ExtraScript::EventCreate(UInt32 eventCode, TESObjectREFR* container) {
 	if (eventList) {
 		// create Event struct
-		const auto pEvent = (ScriptEventList::Event*)FormHeap_Allocate(sizeof(ScriptEventList::Event));
+		const auto pEvent = (ScriptEventList::Event*)FormHeapAlloc(sizeof(ScriptEventList::Event));
 		if (pEvent) {
 			pEvent->eventMask = eventCode;
 			pEvent->object = container;
 		}
 
 		if (!eventList->m_eventList) {
-			eventList->m_eventList = (ScriptEventList::EventList*)FormHeap_Allocate(sizeof(ScriptEventList::EventList));
+			eventList->m_eventList = (ScriptEventList::EventList*)FormHeapAlloc(sizeof(ScriptEventList::EventList));
 			eventList->m_eventList->Init();
 		}
 		if (eventList->m_eventList && pEvent)
@@ -603,7 +569,7 @@ void ExtraScript::EventCreate(UInt32 eventCode, TESObjectREFR* container) {
 ExtraFactionChanges* ExtraFactionChanges::Create()
 {
 	const auto xFactionChanges = (ExtraFactionChanges*)BSExtraData::Create(kExtraData_FactionChanges, sizeof(ExtraFactionChanges), s_ExtraFactionChangesVtbl);
-	const auto FactionChangesData = (FactionListEntry*)FormHeap_Allocate(sizeof(FactionListEntry));
+	const auto FactionChangesData = (FactionListEntry*)FormHeapAlloc(sizeof(FactionListEntry));
 	memset(FactionChangesData, 0, sizeof(FactionListEntry));
 	xFactionChanges->data = FactionChangesData;
 	return xFactionChanges;
@@ -643,7 +609,7 @@ void SetExtraFactionRank(BaseExtraList& xDataList, TESFaction * faction, SInt8 r
 			xFactionChanges = ExtraFactionChanges::Create();
 			xDataList.Add(xFactionChanges);
 		}
-		pData = (ExtraFactionChanges::FactionListData*)FormHeap_Allocate(sizeof(ExtraFactionChanges::FactionListData));
+		pData = (ExtraFactionChanges::FactionListData*)FormHeapAlloc(sizeof(ExtraFactionChanges::FactionListData));
 		if (pData) {
 			pData->faction = faction;
 			pData->rank = rank;

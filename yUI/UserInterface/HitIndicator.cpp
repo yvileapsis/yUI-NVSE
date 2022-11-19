@@ -1,7 +1,6 @@
 #include <main.h>
 #include <functions.h>
 #include <SimpleINILibrary.h>
-#include <unordered_set>
 
 #include <Menus.h>
 #include <Tiles.h>

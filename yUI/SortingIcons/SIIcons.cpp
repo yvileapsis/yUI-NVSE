@@ -12,18 +12,18 @@ namespace SortingIcons::Icons
 	{
 		for (const auto& iter : g_XMLPaths)
 		{
-			HUDMainMenu::GetSingleton()->tile->InjectUIXML(iter.generic_string().c_str());
-			RepairMenu::GetSingleton()->tile->InjectUIXML(iter.generic_string().c_str());
-			InventoryMenu::GetSingleton()->tile->InjectUIXML(iter.generic_string().c_str());
+			HUDMainMenu::GetSingleton()->tile->InjectUIXML(iter);
+			RepairMenu::GetSingleton()->tile->InjectUIXML(iter);
+			InventoryMenu::GetSingleton()->tile->InjectUIXML(iter);
 		}
 	}
 
 	bool InjectTemplatesToMenu(TileMenu* tilemenu, const std::string& templateName) {
-		if (const auto menu = tilemenu->menu; !menu->GetTemplateExists(templateName.c_str()))
+		if (const auto menu = tilemenu->menu; !menu->GetTemplateExists(templateName))
 		{
 			if (menu->id != kMenuType_Barter && menu->id != kMenuType_Container && menu->id != kMenuType_RepairServices) return false;
-			for (auto& iter : g_XMLPaths) tilemenu->InjectUIXML(iter.generic_string().c_str());
-			if (!menu->GetTemplateExists(templateName.c_str())) return false;
+			for (auto& iter : g_XMLPaths) tilemenu->InjectUIXML(iter);
+			if (!menu->GetTemplateExists(templateName)) return false;
 		}
 		return true;
 	}
@@ -73,7 +73,7 @@ namespace SortingIcons::Icons
 		if (icon->GetValue(kTileValue_user1)) width += icon->GetFloat(kTileValue_user1);
 
 		text->SetFloat(kTileValue_x, x + width, true);
-//		text->SetFloat(kTileValue_wrapwidth, text->GetFloat(kTileValue_wrapwidth) - width / 2, true);
+		text->SetFloat(kTileValue_wrapwidth, text->GetFloat(kTileValue_wrapwidth) - width, true);
 	}
 
 	void __fastcall SetTileStringInjectTile(Tile* tile, const InventoryChanges* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate)

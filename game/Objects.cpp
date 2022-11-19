@@ -87,7 +87,7 @@ TESActorBase* Actor::GetActorBase()
 
 TESObjectREFR* TESObjectREFR::Create(bool bTemp)
 {
-	const auto refr = static_cast<TESObjectREFR*>(FormHeap_Allocate(sizeof(TESObjectREFR)));
+	const auto refr = static_cast<TESObjectREFR*>(FormHeapAlloc(sizeof(TESObjectREFR)));
 	ThisStdCall(s_TESObject_REFR_init, refr);
 //	if (bTemp) MarkAsTemporary();
 	return refr;
@@ -681,10 +681,8 @@ NiAVObject* TESObjectREFR::GetNifBlock(UInt32 pcNode, const char* blockName)
 	return GetNifBlock2(this, pcNode, blockName);
 }
 
-PlayerCharacter*		PlayerCharacter::GetSingleton() { return *reinterpret_cast<PlayerCharacter**>(0x011DEA3C); }
 QuestObjectiveTargets*	PlayerCharacter::GetCurrentQuestObjectiveTargets() { return ThisStdCall<QuestObjectiveTargets*>(s_PlayerCharacter_GetCurrentQuestTargets, this); }
 TESObjectREFR*			PlayerCharacter::GetPlacedMarkerOrTeleportLink() { return ThisStdCall<TESObjectREFR*>(0x77A400, this); }
-HighProcess*			PlayerCharacter::GetHighProcess() { return reinterpret_cast<HighProcess*>(baseProcess); }
 
 bool Explosion::CanStoreAmmo()
 {
@@ -702,7 +700,7 @@ UInt16 GetActorRealAnimGroup(Actor* actor, UInt8 groupID)
 	UInt8 animHandType = 0;
 	if (const auto* form = actor->GetWeaponForm())
 		animHandType = g_weaponTypeToAnim[form->eWeaponType];
-	auto moveFlags = actor->actorMover->GetMovementFlags();
+	const auto moveFlags = actor->actorMover->GetMovementFlags();
 	UInt8 moveType = 0;
 	if ((moveFlags & 0x800) != 0)
 		moveType = kAnimMoveType_Swimming;

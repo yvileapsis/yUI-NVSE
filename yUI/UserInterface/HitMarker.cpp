@@ -4,9 +4,6 @@
 #include <Menus.h>
 #include <SimpleINILibrary.h>
 
-#include <unordered_set>
-#include <ranges>
-
 namespace UserInterface::HitMarker
 {
 	bool		enable			= false;

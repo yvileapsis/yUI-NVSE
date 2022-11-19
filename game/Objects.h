@@ -965,13 +965,13 @@ public:
 	UInt32					GetMovementFlags() { return actorMover->GetMovementFlags(); }	// 11: IsSwimming, 9: IsSneaking, 8: IsRunning, 7: IsWalking, 0: keep moving
 	bool					IsPlayerSwimming() { return GetMovementFlags()  >> 11 & 1; }
 
-	static PlayerCharacter*	GetSingleton();
+	__forceinline static PlayerCharacter*	GetSingleton() { return *reinterpret_cast<PlayerCharacter**>(0x011DEA3C); };
 	bool					SetSkeletonPath(const char* newPath);
 	bool					SetSkeletonPath_v1c(const char* newPath);	// Less worse version as used by some modders
 	static void				UpdateHead();
 	QuestObjectiveTargets*	GetCurrentQuestObjectiveTargets();
 	TESObjectREFR*			GetPlacedMarkerOrTeleportLink();
-	HighProcess*			GetHighProcess();
+	HighProcess*			GetHighProcess() { return reinterpret_cast<HighProcess*>(baseProcess); };
 	__forceinline bool		UsingIronSights() { return this->ironSightNode && this->baseProcess->IsWeaponOut() || this->baseProcess->IsAiming(); }
 };
 static_assert(sizeof(PlayerCharacter) == 0xE50);

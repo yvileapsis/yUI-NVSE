@@ -123,40 +123,6 @@ char *Tile::GetComponentFullName(char *resStr)
 	return fullName;
 }
 
-void Tile::Dump(void)
-{
-	PrintLog("%s", name.m_data);
-	gLog.Indent();
-
-	PrintLog("values:");
-
-	gLog.Indent();
-	
-	for(UInt32 i = 0; i < values.size; i++)
-	{
-		const Value* val = values[i];
-		const char* traitName = TraitIDToName(val->id);
-		char traitNameIDBuf[16];
-
-		if (!traitName)
-		{
-			sprintf_s(traitNameIDBuf, "%08X", val->id);
-			traitName = traitNameIDBuf;
-		}
-
-		if (val->str)			PrintLog("%s: %s", traitName, val->str);
-		else if(val->action)	PrintLog("%s: action %08X", traitName, val->action);
-		else					PrintLog("%s: %f", traitName, val->num);
-	}
-
-	gLog.Outdent();
-
-	for(DListNode<Tile>* node = children.Head(); node; node = node->next)
-		if (node && node->data)	node->data->Dump();
-
-	gLog.Outdent();
-}
-
 Tile* Tile::LookUpRectByName(const char* name)
 {
 	return ThisCall<Tile*>(0xA03DA0, this, name);
@@ -176,7 +142,7 @@ void Debug_DumpTraits(void)
 	{
 		for(TraitNameMap::Entry * bucket = g_traitNameMap->buckets[i]; bucket; bucket = bucket->next)
 		{
-			PrintLog("%s,%08X,%d", bucket->key, bucket->data, bucket->data);
+			Log(FormatString("%s,%08X,%d", bucket->key, bucket->data, bucket->data));
 		}
 	}
 }

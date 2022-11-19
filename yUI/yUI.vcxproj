@@ -129,6 +129,7 @@
     <ClCompile Include="..\game\Types.cpp" />
     <ClCompile Include="..\game\Menus.cpp" />
     <ClCompile Include="..\game\Sound.cpp" />
+    <ClCompile Include="..\nvse\Logging.cpp" />
     <ClCompile Include="..\nvse\printf.cpp" />
     <ClCompile Include="..\nvse\SafeWrite.cpp" />
     <ClCompile Include="..\nvse\Utilities.cpp" />
@@ -193,6 +194,7 @@
     <ClInclude Include="..\game\NiNodes.h" />
     <ClInclude Include="..\game\NiObjects.h" />
     <ClInclude Include="..\game\NiTypes.h" />
+    <ClInclude Include="..\nvse\Logging.h" />
     <ClInclude Include="..\nvse\PluginAPI.h" />
     <ClInclude Include="..\nvse\prefix.h" />
     <ClInclude Include="..\nvse\printf.h" />

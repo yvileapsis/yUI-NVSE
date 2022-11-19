@@ -4,8 +4,6 @@
 constexpr auto playerID = 0x7;
 constexpr auto playerRefID = 0x14;
 
-__forceinline bool MenuMode() { return CdeclCall<bool>(0x702360); }
-
 extern bool extraTraces;
 extern bool alternateUpdate3D;
 extern bool s_InsideOnActorEquipHook;

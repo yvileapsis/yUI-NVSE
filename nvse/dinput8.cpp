@@ -1,4 +1,7 @@
 #include "dinput8.h"
+
+#include <cassert>
+
 #include "SafeWrite.h"
 #include <queue>
 
@@ -84,7 +87,7 @@ public:
 		{
 			// mouse
 
-			ASSERT(outDataLen == sizeof(DIMOUSESTATE2));
+			assert(outDataLen == sizeof(DIMOUSESTATE2));
 
 			g_framerateTracker.Update();
 
@@ -395,7 +398,7 @@ void DIHookControl::ProcessMouseData(DIMOUSESTATE2 * data)
 
 HRESULT	DIHookControl::ProcessBufferedData(IDirectInputDevice8 * device, DWORD dataSize, DIDEVICEOBJECTDATA * outData, DWORD * outDataLen, DWORD flags)
 {
-	ASSERT(dataSize == sizeof(DIDEVICEOBJECTDATA));
+	assert(dataSize == sizeof(DIDEVICEOBJECTDATA));
 
 	// if we have nothing to inject, pass through
 	if(m_bufferedPresses.empty())
@@ -423,7 +426,7 @@ HRESULT	DIHookControl::ProcessBufferedData(IDirectInputDevice8 * device, DWORD d
 		if(outData)
 		{
 			// todo: switch from queue to list so we can handle this
-			HALT("DIHookControl::ProcessBufferedData: can't handle non-NULL data in peek mode");
+			FAILED("DIHookControl::ProcessBufferedData: can't handle non-NULL data in peek mode");
 		}
 		else
 		{

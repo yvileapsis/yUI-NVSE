@@ -1,6 +1,7 @@
 #pragma once
 #include <NiNodes.h>
 #include <Containers.h>
+#include <filesystem>
 
 //	Tile			
 //		TileRect		3C	ID=385
@@ -298,8 +299,8 @@ public:
 	Value*						GetComponentValue(const char * componentPath);
 	char*						GetComponentFullName(char *resStr);
 
-	__forceinline Tile*			ReadXML(const char* xmlPath) { return ThisCall<Tile*>(0xA01B00, this, xmlPath); }
-	__forceinline Tile*			InjectUIXML(const char* str) { return FileExists(str) ? this->ReadXML(str) : nullptr; };
+	__forceinline Tile*			ReadXML(const std::filesystem::path& xmlPath) { return ThisCall<Tile*>(0xA01B00, this, xmlPath.generic_string().c_str()); }
+	__forceinline Tile*			InjectUIXML(const std::filesystem::path& str) { return exists(str) ? this->ReadXML(str) : nullptr; };
 
 	__forceinline Float32		GetFloat(const UInt32 id) { return ThisCall<Float32>(0xA011B0, this, id); };
 	__forceinline Float32		GetFloat(const char* id) { return this->GetFloat(TraitNameToID(id)); };
@@ -324,7 +325,6 @@ public:
 	void __fastcall				PokeValue(UInt32 valueID);
 	void						FakeClick();
 
-	void						Dump(void);
 	__forceinline void			HandleChange(UInt32 tilevalue) { ThisCall<void>(0xA074D0, this, tilevalue); }
 	__forceinline Tile*			GetChildByID(UInt32 id) { return ThisCall<Tile*>(0xA03EB0, this, id); }; // THANKS STEWIE
 	__forceinline Tile*			LookUpRectByName(const char* name);

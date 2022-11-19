@@ -4,7 +4,6 @@
 #include <json.h>
 
 #include <dinput8.h>
-#include <fstream>
 
 #include <Menus.h>
 #include <GameData.h>

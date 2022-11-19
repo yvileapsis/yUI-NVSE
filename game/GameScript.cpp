@@ -146,7 +146,7 @@ TList<Script::RefVariable>* Script::GetRefList()
 
 Script* Script::CreateScript()
 {
-	auto* buf = FormHeap_Allocate(sizeof Script);
+	auto* buf = FormHeapAlloc(sizeof Script);
 	return ThisStdCall<Script*>(0x5AA0F0, buf);
 }
 
@@ -267,7 +267,7 @@ UInt32 Script::AddVariable(TESForm * form)
 {
 	UInt32		resultIdx = 1;
 
-	RefVariable	* var = (RefVariable*)FormHeap_Allocate(sizeof(RefVariable));
+	RefVariable	* var = (RefVariable*)FormHeapAlloc(sizeof(RefVariable));
 
 	var->name.Set("");
 	var->form = form;
@@ -287,7 +287,7 @@ UInt32 Script::AddVariable(TESForm * form)
 		RefListEntry	* entry;
 		for(entry = &refList; entry->next; entry = entry->next, resultIdx++) ;
 
-		RefListEntry	* newEntry = (RefListEntry *)FormHeap_Allocate(sizeof(RefListEntry));
+		RefListEntry	* newEntry = (RefListEntry *)FormHeapAlloc(sizeof(RefListEntry));
 
 		newEntry->var = var;
 		newEntry->next = NULL;

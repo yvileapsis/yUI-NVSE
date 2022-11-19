@@ -416,7 +416,7 @@ float TESObjectWEAP::GetWeaponValue(UInt32 whichVal)
 		if (const auto pClipRounds = DYNAMIC_CAST(this, TESForm, BGSClipRoundsForm); pClipRounds) return pClipRounds->clipRounds;
 		break;
 	}
-	default: HALT("unknown weapon value"); break;
+	default: throw std::out_of_range("unknown weapon value");
 	}
 	return false;
 }
@@ -431,7 +431,7 @@ UInt32 TESObjectARMO::GetArmorValue(UInt32 whichVal)
 	case 4:	return armorRating;
 	case 5:	return static_cast<UInt32>(damageThreshold);
 	case 6: return bipedModel.partMask;
-	default: HALT("unknown armor value"); break;
+	default: throw std::out_of_range("unknown armor value");
 	}
 	return false;
 }
@@ -616,7 +616,7 @@ UInt8 TESPackage::TargetData::TargetCodeForString(const char* targetStr)
 
 TESPackage::TargetData* TESPackage::TargetData::Create()
 {
-	const auto data = (TargetData*)FormHeap_Allocate(sizeof(TargetData));
+	const auto data = (TargetData*)FormHeapAlloc(sizeof(TargetData));
 
 	// fill out with same defaults as editor uses
 	data->count = 0;
@@ -669,7 +669,7 @@ void TESPackage::SetTarget(eObjectType typeCode, UInt32 count)
 
 TESPackage::LocationData* TESPackage::LocationData::Create()
 {
-	const auto data = (LocationData*)FormHeap_Allocate(sizeof(LocationData));
+	const auto data = (LocationData*)FormHeapAlloc(sizeof(LocationData));
 
 	data->locationType = kPackLocation_CurrentLocation;
 	data->object.form = nullptr;

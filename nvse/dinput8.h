@@ -26,14 +26,14 @@ template <typename T> class ISingleton
 public:
 	ISingleton()
 	{
-		ASSERT(!ms_Singleton);
+		assert(!ms_Singleton);
 		int offset = (int)(T*)1 - (int)(ISingleton <T> *)(T*)1;
 		ms_Singleton = (T*)((int)this + offset);
 	}
 
 	virtual ~ISingleton()
 	{
-		ASSERT(ms_Singleton);
+		assert(ms_Singleton);
 		ms_Singleton = 0;
 	}
 
@@ -42,7 +42,7 @@ public:
 	 */
 	static T& GetSingleton(void)
 	{
-		ASSERT(ms_Singleton);
+		assert(ms_Singleton);
 		return *ms_Singleton;
 	}
 

@@ -20,7 +20,7 @@ void FontTextReplaced::GetVariableEscapedText(const char* input) { Font__CheckFo
 
 FontInfo* FontInfo::Load(const char* path, UInt32 ID)
 {
-	FontInfo* info = (FontInfo*)FormHeap_Allocate(sizeof(FontInfo));
+	FontInfo* info = (FontInfo*)FormHeapAlloc(sizeof(FontInfo));
 	return (FontInfo*)ThisStdCall(0x00A12020, info, ID, path, 1);
 }
 
@@ -39,14 +39,6 @@ bool FontInfo::GetName(char* out)
 	out[len] = 0;
 
 	return true;
-}
-
-void Debug_DumpFontNames(void)
-{
-	FontInfo** fonts = FontManager::GetSingleton()->fontInfos;
-
-	for (UInt32 i = 0; i < FontArraySize; i++)
-		PrintLog("Font %d is named %s", i + 1, fonts[i]->path);
 }
 
 // IF requires change of skeleton - and back to false when model updated
@@ -249,23 +241,5 @@ __declspec(naked) UInt32 InterfaceManager::GetTopVisibleMenuID()
 		xor eax, eax
 	done :
 		retn
-	}
-}
-
-void Debug_DumpMenus(void)
-{
-	for (UInt32 i = 0; i < g_tileMenuArray->Length(); i++)
-	{
-		TileMenu* tileMenu = g_tileMenuArray->Get(i);
-
-		if (tileMenu)
-		{
-			PrintLog("menu %d at %x:", i, tileMenu);
-			gLog.Indent();
-
-			tileMenu->Dump();
-
-			gLog.Outdent();
-		}
 	}
 }

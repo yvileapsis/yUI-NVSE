@@ -1,4 +1,5 @@
 #pragma once
+#include <cassert>
 #include <NiTypes.h>
 #include <NiObjects.h>
 #include <Containers.h>
@@ -4802,9 +4803,9 @@ public:
 	UInt8					AttackAnimation() const;
 	void					SetAttackAnimation(UInt8 attackAnim);
 	TESObjectIMOD*			GetItemMod(UInt8 which);
-	__forceinline UInt32	GetItemModEffect(UInt8 which)	{ which -= 1; ASSERT(which < 3); return effectMods[which]; }
-	__forceinline Float32	GetItemModValue1(UInt8 which)	{ which -= 1; ASSERT(which < 3); return value1Mod[which]; }
-	__forceinline Float32	GetItemModValue2(UInt8 which)	{ which -= 1; ASSERT(which < 3); return value2Mod[which]; }
+	__forceinline UInt32	GetItemModEffect(UInt8 which)	{ which -= 1; assert(which < 3); return effectMods[which]; }
+	__forceinline Float32	GetItemModValue1(UInt8 which)	{ which -= 1; assert(which < 3); return value1Mod[which]; }
+	__forceinline Float32	GetItemModValue2(UInt8 which)	{ which -= 1; assert(which < 3); return value2Mod[which]; }
 	Float32					GetEffectModValue(kWeaponModEffects value, UInt8 second = 0);
 
 	void					SetPlayable(bool bAuto) { bAuto ? weaponFlags1 |= Eflag_NonPlayable : weaponFlags1 &= ~Eflag_NonPlayable; }
@@ -6494,7 +6495,7 @@ public:
 
 		if (form && IsAddedObject(n))
 			if (numAddedObjects == 0)
-				PrintLog("BGSListForm::RemoveNthForm: numAddedObjects = 0");
+				Log("BGSListForm::RemoveNthForm: numAddedObjects = 0");
 			else
 				numAddedObjects--;
 

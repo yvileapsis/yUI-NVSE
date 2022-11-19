@@ -1,30 +1,24 @@
 #pragma once
 #include <prefix.h>
-#include <string>
-#include <vector>
-#include <functional>
-#include <string>
-#include <intrin.h>
+
+#include <algorithm>
+#include <filesystem>
+#include <fstream>
 #include <memory>
 #include <type_traits>
+#include <chrono>
 
-// These are used for 10h aligning segments in ASM code (massive performance gain, particularly with loops).
-#define EMIT(bt) __asm _emit bt
-#define NOP_0x1 EMIT(0x90)
-#define NOP_0x2 EMIT(0x66) EMIT(0x90)
-#define NOP_0x3 EMIT(0x0F) EMIT(0x1F) EMIT(0x00)
-#define NOP_0x4 EMIT(0x0F) EMIT(0x1F) EMIT(0x40) EMIT(0x00)
-#define NOP_0x5 EMIT(0x0F) EMIT(0x1F) EMIT(0x44) EMIT(0x00) EMIT(0x00)
-#define NOP_0x6 EMIT(0x66) EMIT(0x0F) EMIT(0x1F) EMIT(0x44) EMIT(0x00) EMIT(0x00)
-#define NOP_0x7 EMIT(0x0F) EMIT(0x1F) EMIT(0x80) EMIT(0x00) EMIT(0x00) EMIT(0x00) EMIT(0x00)
-#define NOP_0x8 EMIT(0x0F) EMIT(0x1F) EMIT(0x84) EMIT(0x00) EMIT(0x00) EMIT(0x00) EMIT(0x00) EMIT(0x00)
-#define NOP_0x9 EMIT(0x66) EMIT(0x0F) EMIT(0x1F) EMIT(0x84) EMIT(0x00) EMIT(0x00) EMIT(0x00) EMIT(0x00) EMIT(0x00)
-#define NOP_0xA NOP_0x5 NOP_0x5
-#define NOP_0xB NOP_0x5 NOP_0x6
-#define NOP_0xC NOP_0x6 NOP_0x6
-#define NOP_0xD NOP_0x6 NOP_0x7
-#define NOP_0xE NOP_0x7 NOP_0x7
-#define NOP_0xF NOP_0x7 NOP_0x8
+#include <ranges>
+#include <string>
+#include <vector>
+#include <span>
+#include <unordered_set>
+#include <unordered_map>
+
+#include <functional>
+
+#include <intrin.h>
+#include <Logging.h>
 
 // thread-safe template versions of ThisStdCall()
 template <typename T_Ret = UInt32, typename ...Args>
@@ -97,86 +91,15 @@ public:
 __forceinline void* GameHeapAlloc(UInt32 size) { return ThisStdCall<void*>(0xAA3E40, (void*)0x11F6238, size); }
 __forceinline void GameHeapFree(void* ptr) { ThisStdCall(0xAA4060, (void*)0x11F6238, ptr); }
 
-__forceinline void* FormHeap_Allocate(UInt32 size) { return CdeclCall<void*>(0x00401000, size); }
-__forceinline void	FormHeap_Free(void* ptr) { CdeclCall(0x00401030, ptr); }
+__forceinline void* FormHeapAlloc(UInt32 size) { return CdeclCall<void*>(0x00401000, size); }
+__forceinline void	FormHeapFree(void* ptr) { CdeclCall(0x00401030, ptr); }
 
-bool __fastcall FileExists(const char* path);
-
-class FileStream
-{
-protected:
-	HANDLE		theFile;
-	UInt32		streamLength;
-	UInt32		streamOffset;
-
-public:
-	FileStream() : theFile(INVALID_HANDLE_VALUE), streamLength(0), streamOffset(0) {}
-	~FileStream() { if (theFile != INVALID_HANDLE_VALUE) Close(); }
-
-	bool Good() const { return theFile != INVALID_HANDLE_VALUE; }
-	HANDLE GetHandle() const { return theFile; }
-	UInt32 GetLength() const { return streamLength; }
-	UInt32 GetOffset() const { return streamOffset; }
-	bool HitEOF() const { return streamOffset >= streamLength; }
-
-	bool Open(const char* filePath);
-	bool OpenAt(const char* filePath, UInt32 inOffset);
-	bool OpenWrite(const char* filePath);
-	bool Create(const char* filePath);
-	bool OpenWriteEx(char* filePath, bool append);
-	void SetOffset(UInt32 inOffset);
-
-	void Close()
-	{
-		CloseHandle(theFile);
-		theFile = INVALID_HANDLE_VALUE;
-	}
-
-	void ReadBuf(void* outData, UInt32 inLength);
-	void WriteBuf(const void* inData, UInt32 inLength);
-
-	static void MakeAllDirs(char* fullPath);
-};
-
-class DebugLog
-{
-	FILE*			theFile;
-	UInt32			indent;
-	std::string		modString;
-
-public:
-	DebugLog() : theFile(nullptr), indent(40) {}
-	~DebugLog() { if (theFile) fclose(theFile); }
-
-	bool		Create(const char* filePath);
-	void		Message(const char* msgStr);
-	void		FmtMessage(const char* fmt, va_list args);
-	void		Indent() { if (indent) indent--; }
-	void		Outdent() { if (indent < 40) indent++; }
-	std::string	GetModString();
-	void		SetModString(const std::string& string);
-};
-
-extern DebugLog gLog;
-
-void ConsolePrintQueue();
-void PrintConsoleOrQueue(const std::string& msg);
-
-void PrintLog(const char* fmt, ...);
-enum Log
-{
-	kToNone = 0,
-	kToLog = 1,
-	kToConsole = 2,
-	kToBoth = kToLog | kToConsole
-};
-void Log(const std::string& msg, UInt32 loglevel = 0);
 
 class Script;
 
 void DumpClass(void * theClassPtr, UInt32 nIntsToDump = 512);
 const char * GetObjectClassName(void * obj);
-const std::string & GetFalloutDirectory(void);
+const std::filesystem::path& GetFalloutDirectory();
 std::string GetNVSEConfigOption(const char * section, const char * key);
 bool GetNVSEConfigOption_UInt32(const char * section, const char * key, UInt32 * dataOut);
 
@@ -441,7 +364,7 @@ std::vector<T> MapTo(const V& v, const F& f)
 template <typename T, const UInt32 ConstructorPtr = 0, typename... Args>
 T* New(Args &&... args)
 {
-	auto* alloc = FormHeap_Allocate(sizeof(T));
+	auto* alloc = FormHeapAlloc(sizeof(T));
 	if constexpr (ConstructorPtr)
 	{
 		ThisStdCall(ConstructorPtr, alloc, std::forward<Args>(args)...);
@@ -460,7 +383,7 @@ void Delete(T* t, Args &&... args)
 	{
 		ThisStdCall(DestructorPtr, t, std::forward<Args>(args)...);
 	}
-	FormHeap_Free(t);
+	FormHeapFree(t);
 }
 
 template <typename T>
@@ -594,5 +517,6 @@ StackVector<T*, Size> Filter(S& s, F&& f)
 std::string UTF8toANSI(const std::string& str);
 std::string GetCurPath();
 bool IsConsoleOpen();
+__forceinline bool MenuMode() { return CdeclCall<bool>(0x702360); }
 
 int HexStringToInt(const std::string& str);

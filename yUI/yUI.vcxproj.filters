@@ -143,6 +143,9 @@
     <ClCompile Include="MiscFeatures\FixTouchpadScrolling.cpp">
       <Filter>features</Filter>
     </ClCompile>
+    <ClCompile Include="..\nvse\Logging.cpp">
+      <Filter>nvse</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h" />
@@ -251,6 +254,9 @@
       <Filter>game</Filter>
     </ClInclude>
     <ClInclude Include="..\nvse\printf.h">
+      <Filter>nvse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nvse\Logging.h">
       <Filter>nvse</Filter>
     </ClInclude>
   </ItemGroup>

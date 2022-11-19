@@ -3,9 +3,6 @@
 #include <definitions.h>
 
 #include <deque>
-#include <functional>
-
-inline DebugLog						gLog;
 
 inline PluginHandle					g_pluginHandle			= kPluginHandle_Invalid;
 
@@ -17,6 +14,7 @@ inline NVSEScriptInterface*			g_scriptInterface		= nullptr;
 inline NVSECommandTableInterface*	g_commandInterface		= nullptr;
 inline NVSEDataInterface*			g_dataInterface			= nullptr;
 inline NVSEEventManagerInterface*	g_eventInterface		= nullptr;
+inline NVSELoggingInterface*		g_loggingInterface		= nullptr;
 
 inline DIHookControl*				g_DIHook				= nullptr;
 inline PlayerCharacter*				g_player				= nullptr;

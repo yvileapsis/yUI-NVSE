@@ -1,8 +1,6 @@
 #pragma once
 #include <Menus.h>
 #include <GameExtraData.h>
-#include <filesystem>
-#include <unordered_set>
 
 namespace SortingIcons
 {

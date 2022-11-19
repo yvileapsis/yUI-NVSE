@@ -524,7 +524,7 @@ public:
 
 	Menu*					HandleMenuInput(UInt32 tileID, Tile* clickedTile);
 	__forceinline Tile*		AddTileFromTemplate(Tile* destTile, const char* templateName, UInt32 arg3 = 0)	{ return ThisCall<Tile*>(0xA1DDB0, this, destTile, templateName, arg3); }
-	bool					GetTemplateExists(const char* templateName);
+	bool					GetTemplateExists(const std::string& templateName);
 
 	void					Close()
 	{
@@ -856,7 +856,7 @@ public:
 	Sound						radiationSound;			// 1AC
 	TESObjectREFR*				crosshairRef;			// 1B8
 	UInt32						visibilityFlags;		// 1BC
-	Bitfield32					visibilityOverrides;	// 1C0
+	UInt32						visibilityOverrides;	// 1C0
 	UInt32						stage;					// 1C4
 	HotKeyWheel					hotkeyWheel;			// 1C8	Hokeys\hotkey_selector
 	UInt8						isUsingScope;			// 1FC
@@ -885,7 +885,7 @@ public:
 	TList<UInt32>				list26C;				// 26C
 	float						hudShake;				// 274
 
-	static HUDMainMenu* GetSingleton() { return *reinterpret_cast<HUDMainMenu**>(0x11D96C0); }
+	__forceinline static HUDMainMenu* GetSingleton() { return *reinterpret_cast<HUDMainMenu**>(0x11D96C0); }
 	static void __cdecl SetQuestUpdateText(char* src, bool a2, bool a3) { CdeclCall(0x77A5B0, src, a2, a3); }
 	static float GetOpacity() { return *(float*)0x11D979C; };
 	void RemoveQueuedQuestAndLocationUpdates();

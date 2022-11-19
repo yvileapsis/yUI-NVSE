@@ -4,8 +4,6 @@
 #include <GameData.h>
 #include <functions.h>
 #include <SimpleINILibrary.h>
-#include <ranges>
-#include <unordered_set>
 
 namespace UserInterface::VisualObjectives
 {

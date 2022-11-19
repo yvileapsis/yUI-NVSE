@@ -14,10 +14,10 @@ void MenuButton_DownloadsClick() { MenuButton_Downloads(); }
 InventoryChanges** g_modMenuTarget = reinterpret_cast<InventoryChanges**>(0x11D9F58);
 
 
-bool Menu::GetTemplateExists(const char* templateName)
+bool Menu::GetTemplateExists(const std::string& templateName)
 {
 	for (const auto node : menuTemplates)
-		if (node && !_strcmpi(node->templateName, templateName)) return true;
+		if (templateName == node->templateName) return true;
 	return false;
 }
 

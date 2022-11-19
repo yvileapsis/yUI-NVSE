@@ -4,7 +4,6 @@
 #include <Tiles.h>
 #include <InterfaceManager.h>
 #include <functions.h>
-#include <ranges>
 
 namespace SortingIcons::Categories
 {

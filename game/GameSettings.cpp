@@ -89,7 +89,7 @@ bool Setting::Set(const char* str)
 {
 	if (GetType() == kSetting_String)
 	{
-		char * newVal = (char*)FormHeap_Allocate(strlen(str)+1);
+		char * newVal = (char*)FormHeapAlloc(strlen(str)+1);
 		if (!strcpy_s(newVal, strlen(str)+1, str)) {
 			data.str = newVal;
 			return true;

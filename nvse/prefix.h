@@ -13,6 +13,7 @@
 #include <cstdio>
 #include <cstring>
 #include <cmath>
+#include <cassert>
 
 #include <winsock2.h>
 #include <Windows.h>
@@ -22,9 +23,9 @@
 
 // these have to be macros so they can be used in the .rc
 #define NVSE_VERSION_INTEGER		6
-#define NVSE_VERSION_INTEGER_MINOR	2
-#define NVSE_VERSION_INTEGER_BETA	8
-#define NVSE_VERSION_VERSTRING		"0, 6, 2, 8"
+#define NVSE_VERSION_INTEGER_MINOR	3
+#define NVSE_VERSION_INTEGER_BETA	0
+#define NVSE_VERSION_VERSTRING		"0, 6, 3, 0"
 #define NVSE_VERSION_PADDEDSTRING	"0006"
 
 // build numbers do not appear to follow the same format as with oblivion
@@ -53,78 +54,10 @@ typedef signed long long	SInt64;		//!< A signed 64-bit integer value
 typedef float				Float32;	//!< A 32-bit floating point value
 typedef double				Float64;	//!< A 64-bit floating point value
 
-void _AssertionFailed(const char* file, unsigned long line, const char* desc);
-void _AssertionFailed_ErrCode(const char* file, unsigned long line, const char* desc, unsigned long long code);
-void _AssertionFailed_ErrCode(const char* file, unsigned long line, const char* desc, const char* code);
-
-//! Exit the program if the condition is not true
-#define ASSERT(a)					do { if(!(a)) _AssertionFailed(__FILE__, __LINE__, #a); } while(0)
-//! Exit the program if the condition is not true, with an error message
-#define ASSERT_STR(a, b)			do { if(!(a)) _AssertionFailed(__FILE__, __LINE__, b); } while(0)
-//! Exit the program if the condition is not true, reporting an error code
-#define ASSERT_CODE(a, b)			do { if(!(a)) _AssertionFailed_ErrCode(__FILE__, __LINE__, #a, b); } while(0)
-//! Exit the program if the condition is not true, reporting an error code and message
-#define ASSERT_STR_CODE(a, b, c)	do { if(!(a)) _AssertionFailed_ErrCode(__FILE__, __LINE__, b, c); } while(0)
-//! Exit the program with an error message
-#define HALT(a)						do { _AssertionFailed(__FILE__, __LINE__, a); } while(0)
-//! Exit the program with and error code and message
-#define HALT_CODE(a, b)				do { _AssertionFailed_ErrCode(__FILE__, __LINE__, a, b); } while(0)
-
-// based on the boost implementation of static asserts
-template <bool x> struct StaticAssertFailure;
-template <> struct StaticAssertFailure <true> { enum { a = 1 }; };
-template <int x> struct static_assert_test { };
-
 #define VERSION_CODE(primary, secondary, sub)	(((primary & 0xFFF) << 20) | ((secondary & 0xFFF) << 8) | ((sub & 0xFF) << 0))
 #define VERSION_CODE_PRIMARY(in)				((in >> 20) & 0xFFF)
 #define VERSION_CODE_SECONDARY(in)				((in >> 8) & 0xFFF)
 #define VERSION_CODE_SUB(in)					((in >> 0) & 0xFF)
-
-template <typename T>
-class Bitfield
-{
-public:
-	Bitfield() { }
-	~Bitfield() { }
-
-	void	Clear(void) { field = 0; }						//!< Clears all bits
-	void	RawSet(UInt32 data) { field = data; }			//!< Modifies all bits
-
-	void	Set(UInt32 data) { field |= data; }				//!< Sets individual bits
-	void	Clear(UInt32 data) { field &= ~data; }			//!< Clears individual bits
-	void	UnSet(UInt32 data) { Clear(data); }				//!< Clears individual bits
-	void	Mask(UInt32 data) { field &= data; }			//!< Masks individual bits
-	void	Toggle(UInt32 data) { field ^= data; }			//!< Toggles individual bits
-	void	Write(UInt32 data, bool state)
-	{
-		if (state) Set(data); else Clear(data);
-	}
-
-	T		Get(void) const { return field; }								//!< Gets all bits
-	T		Get(UInt32 data) const { return field & data; }					//!< Gets individual bits
-	T		Extract(UInt32 bit) const { return (field >> bit) & 1; }		//!< Extracts a bit
-	T		ExtractField(UInt32 shift, UInt32 length)						//!< Extracts a series of bits
-	{
-		return (field >> shift) & (0xFFFFFFFF >> (32 - length));
-	}
-
-	bool	IsSet(UInt32 data) const { return field & data ? true : false; }	//!< Are all these bits set?
-	bool	IsUnSet(UInt32 data) const { return field & data ? false : true; }			//!< Are all these bits clear?
-	bool	IsClear(UInt32 data) const { return IsUnSet(data); }							//!< Are all these bits clear?
-
-private:
-	T		field;	//!< bitfield data
-};
-
-typedef Bitfield <UInt8>	Bitfield8;		//!< An 8-bit bitfield
-typedef Bitfield <UInt16>	Bitfield16;		//!< A 16-bit bitfield
-typedef Bitfield <UInt32>	Bitfield32;		//!< A 32-bit bitfield
-static_assert(sizeof(Bitfield8) == 1);
-static_assert(sizeof(Bitfield16) == 2);
-static_assert(sizeof(Bitfield32) == 4);
-
-const float kFloatEpsilon = 0.0001f;
-inline bool FloatEqual(float a, float b) { float magnitude = a - b; if (magnitude < 0) magnitude = -magnitude; return magnitude < kFloatEpsilon; }
 
 class ActiveEffect;
 class Actor;

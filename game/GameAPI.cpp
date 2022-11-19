@@ -84,9 +84,9 @@ void ScriptEventList::Destructor()
 	if (m_eventList)
 		m_eventList->RemoveAll();
 	while (m_vars) {
-		if (m_vars->var) FormHeap_Free(m_vars->var);
+		if (m_vars->var) FormHeapFree(m_vars->var);
 		VarEntry* next = m_vars->next;
-		FormHeap_Free(m_vars);
+		FormHeapFree(m_vars);
 		m_vars = next;
 	}
 }
@@ -198,8 +198,7 @@ void ShowCompilerError(ScriptLineBuffer* lineBuf, const char * fmt, ...)
 	vsprintf_s(errorMsg, 0x200, fmt, args);
 
 	strcat_s(errorHeader, 0x400, errorMsg);
-	PrintConsole(errorHeader);
-	PrintLog(errorHeader);
+	Log(errorHeader);
 
 	va_end(args);
 }
