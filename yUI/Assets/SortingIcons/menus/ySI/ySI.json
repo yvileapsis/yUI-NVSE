@@ -105,6 +105,9 @@
 	{ "priority": 150, "tag": "(fna2)", "mod": "HonestHearts.esm",			"form": ["010E5E", "010E5D", "0112FB"], "repairList": 1 },
 	{ "priority": 150, "tag": "(fna2)", "mod": "LonesomeRoad.esm",			"form": ["00CA89", "00CA88", "008CB9"], "repairList": 1 },
 	{ "priority": 150, "tag": "(fna2)", "mod": "GunRunnersArsenal.esm",		"form": "000808", "repairList": 1 },
+	{ "priority": 160, "tag": "(fna2)", "mod": "FalloutNV.esm",				"form": "004354" },
+	{ "priority": 160, "tag": "(fna2)", "mod": "DeadMoney.esm",				"form": "00119D" },
+	{ "priority": 160, "tag": "(fna2)", "mod": "LonesomeRoad.esm",			"form": "008CB9" },
 
 	{ "priority": 160, "tag": "(fjd1)", "mod": "FalloutNV.esm",				"form": ["14DE1D", "14D2AC", "161246"] },
 	{ "priority": 160, "tag": "(fjd1)", "mod": "DeadMoney.esm",				"form": "00119E" },
@@ -608,15 +611,15 @@
 
 "tabs": [
 
-	{ "priority": 100, "tag": "(jdc0)", "name": "&-sNotesToggle;",		"keyring": 3, "filename": "Interface\\Icons\\PipboyImages\\Items\\items_research_data.dds", "categories": "jdc1" },
-	{ "priority": 100, "tag": "(jdd0)", "name": "&-sKeyring;",  		"keyring": 3, "filename": "Interface\\Icons\\PipboyImages\\Items\\item_keyring.dds",		"categories": "jdd1" },
-	{ "priority": 100, "tag": "(jde0)", "name": "&-sCaravanDeckText;",	"keyring": 3, "filename": "Interface\\Icons\\PipboyImages\\Items\\item_caravan_deck.dds", 	"categories": "jde1" }, 
+	{ "priority": 100, "tag": "(jdc0)", "name": "&-sNotesToggle;",		"keyring": 3, "filename": "Interface\\Icons\\PipboyImages\\Items\\items_research_data.dds", "categories": "(jdc1)" },
+	{ "priority": 100, "tag": "(jdd0)", "name": "&-sKeyring;",  		"keyring": 3, "filename": "Interface\\Icons\\PipboyImages\\Items\\item_keyring.dds",		"categories": ["(jdd1)", "(aba1)"] },
+	{ "priority": 100, "tag": "(jde0)", "name": "&-sCaravanDeckText;",	"keyring": 3, "filename": "Interface\\Icons\\PipboyImages\\Items\\item_caravan_deck.dds", 	"categories": "(jde1)" }, 
 	
 	{ "priority": 100, "tag": "(a1)",  "name": "&-sNew;",				"inventory": 1, 				"tabNew": 1 },
 	{ "priority": 100, "tag": "(d1)",  "name": "&-sInventoryWeapons;",	"inventory": 1, "container": 1, "types": [40] },
 	{ "priority": 100, "tag": "(f1)",  "name": "&-sInventoryApparel;",	"inventory": 1, "container": 1, "types": [24, 26] },
 	{ "priority": 100, "tag": "(h1)",  "name": "&-sInventoryAid;", 		"inventory": 1, "container": 1, "types": [25, 29, 47] },
-	{ "priority": 100, "tag": "(j1)",  "name": "&-sInventoryMisc;", 	"inventory": 1, "container": 1, "tabMisc": ["(d1)", "(f1)", "(h1)", "(k1)"] },
+	{ "priority": 100, "tag": "(j1)",  "name": "&-sInventoryMisc;", 	"inventory": 1, "container": 1, "tabMisc": 1 },
 	{ "priority": 100, "tag": "(k1)",  "name": "&-sInventoryAmmoTab;", 	"inventory": 1, "container": 1, "types": [41] }
 ]
 }
