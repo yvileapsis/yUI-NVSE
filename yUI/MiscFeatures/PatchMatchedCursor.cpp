@@ -1,28 +1,14 @@
 #include <main.h>
 #include <InterfaceManager.h>
+#include <Tiles.h>
 #include <SafeWrite.h>
 
 #include <SimpleINILibrary.h>
 
-#include <Tiles.h>
 
 namespace Patch::MatchedCursor
 {
-	inline int enable = 0;
-
-	void HandleINIs()
-	{
-		const auto iniPath = GetCurPath() + yUI_INI;
-		CSimpleIniA ini;
-		ini.SetUnicode();
-
-
-		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
-
-		enable = ini.GetOrCreate("General", "bMatchingCursor", 0, "; match cursor color to HUD color");
-
-		ini.SaveFile(iniPath.c_str(), false);
-	}
+	bool enable = false;
 
 	void __fastcall CursorTileSetStringValue(Tile* tile, void* dummyEDX, eTileValue tilevalue, char* src, char propagate)
 	{
@@ -48,6 +34,20 @@ namespace Patch::MatchedCursor
 			UndoSafeWrite(0x70B33A);
 			UndoSafeWrite(0x70C727);
 		}
+	}
+
+	void HandleINIs()
+	{
+		const auto iniPath = GetCurPath() + yUI_INI;
+		CSimpleIniA ini;
+		ini.SetUnicode();
+
+
+		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
+
+		enable = ini.GetOrCreate("General", "bMatchingCursor", 0, "; match cursor color to HUD color");
+
+		ini.SaveFile(iniPath.c_str(), false);
 	}
 
 	extern void Init()

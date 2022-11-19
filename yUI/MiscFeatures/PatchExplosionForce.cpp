@@ -10,20 +10,6 @@ namespace Patch::ExplosionForce
 {
 	inline bool enable = true;
 
-	void HandleINIs()
-	{
-		const auto iniPath = GetCurPath() + yUI_INI;
-		CSimpleIniA ini;
-		ini.SetUnicode();
-
-
-		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
-
-		enable = ini.GetOrCreate("General", "bFixExplosionPushForce", 1, "; fix force of the explosions to scale both with distance (like explosion damage) and with actual force of the explosion's baseform.");
-
-		ini.SaveFile(iniPath.c_str(), false);
-	}
-
 	Float64 __cdecl AdjustPushForceAlt(Actor* target, ActorHitData* hitdata, ActorValueOwner* owner, SInt32 force)
 	{
 		Float64 scale = 1.0;
@@ -61,6 +47,20 @@ namespace Patch::ExplosionForce
 			UndoSafeWrite(0x89C8CF);
 			UndoSafeWrite(0x89C8E3);
 		}
+	}
+
+	void HandleINIs()
+	{
+		const auto iniPath = GetCurPath() + yUI_INI;
+		CSimpleIniA ini;
+		ini.SetUnicode();
+
+
+		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
+
+		enable = ini.GetOrCreate("General", "bFixExplosionPushForce", 1, "; fix force of the explosions to scale both with distance (like explosion damage) and with actual force of the explosion's baseform.");
+
+		ini.SaveFile(iniPath.c_str(), false);
 	}
 
 	extern void Init()

@@ -10,6 +10,9 @@ namespace Fix::TouchpadScrolling
 	inline int enable = 1;
 	SInt32 scrollValue = 120;
 
+	UInt32 keyUp = 264;
+	UInt32 keyDown = 265; 
+
 	void HandleINIs()
 	{
 		const auto iniPath = GetCurPath() + yUI_INI;
@@ -18,7 +21,8 @@ namespace Fix::TouchpadScrolling
 
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
-		enable = ini.GetOrCreate("General", "bFixTouchpadScrolling", 1, "; fix the issue where New Vegas wouldn't recognize touchpad scrolling in menus");
+		enable = ini.GetOrCreate("General", "bFixTouchpadScrolling", 1, "; fix the issue where New Vegas wouldn't recognize touchpad scrolling");
+		scrollValue = ini.GetOrCreate("Touchpad Scrolling", "iScrollValue", 120, "; value by which game scrolls up or down per one scroll event");
 
 		ini.SaveFile(iniPath.c_str(), false);
 	}
@@ -28,8 +32,8 @@ namespace Fix::TouchpadScrolling
 
 	SInt32 __fastcall GetMousewheel(OSInputGlobals* osinput, void* dummyedx, int a2)
 	{
-		if (IsKeyPressed(264)) scrollWheel += scrollValue;
-		if (IsKeyPressed(265)) scrollWheel -= scrollValue;
+		if (IsKeyPressed(keyUp)) scrollWheel += scrollValue;
+		if (IsKeyPressed(keyDown)) scrollWheel -= scrollValue;
 
 		if (scrollWheel < 120 && scrollWheel > -120) return 0;
 		const SInt32 result = scrollWheel / 120 * 120;

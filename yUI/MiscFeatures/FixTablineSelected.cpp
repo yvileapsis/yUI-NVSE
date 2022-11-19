@@ -11,20 +11,6 @@ namespace Fix::TablineSelected
 	bool needToFix = false;
 	Tile* tabline = nullptr;
 
-	void HandleINIs()
-	{
-		const auto iniPath = GetCurPath() + yUI_INI;
-		CSimpleIniA ini;
-		ini.SetUnicode();
-
-
-		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
-
-		enable = ini.GetOrCreate("General", "bFixTablineSelected", 1, "; fix the issue where Inventory Menu tabline shows up with buttons already selected");
-
-		ini.SaveFile(iniPath.c_str(), false);
-	}
-
 	void MainLoop()
 	{
 		if (CdeclCall<bool>(0x702360) && InterfaceManager::IsMenuVisible(kMenuType_Inventory)) {
@@ -39,6 +25,20 @@ namespace Fix::TablineSelected
 			}
 		}
 		else needToFix = true;
+	}
+
+	void HandleINIs()
+	{
+		const auto iniPath = GetCurPath() + yUI_INI;
+		CSimpleIniA ini;
+		ini.SetUnicode();
+
+
+		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
+
+		enable = ini.GetOrCreate("General", "bFixTablineSelected", 1, "; fix the issue where Inventory Menu tabline shows up with buttons already selected");
+
+		ini.SaveFile(iniPath.c_str(), false);
 	}
 
 	extern void Init()

@@ -25,12 +25,12 @@ namespace Patch::TimeMult
 		eTimeIndexTurbo = 257,
 	};
 
-	inline std::unordered_set<UInt16> g_specialMods;
-	inline std::unordered_map<UInt16, Float64> g_localMults;
+	inline std::unordered_set<UInt16> specialMods;
+	inline std::unordered_map<UInt16, Float64> localMults;
 	inline Float64 g_timeMult = 1.0;
 
-	CommandInfo* cmd_GGTM = nullptr;
-	CommandInfo* cmd_SGTM = nullptr;
+	CommandInfo* cmdGGTM = nullptr;
+	CommandInfo* cmdSGTM = nullptr;
 
 	void Set(TimeGlobal* timeGlobal = TimeGlobal::GetSingleton(), char isImmediateChange = 1)
 	{
@@ -39,17 +39,17 @@ namespace Patch::TimeMult
 
 	void ModifyMap(const Float64 timeMult, const UInt16 mod)
 	{
-		g_localMults.erase(mod);
-		if (timeMult != 1) g_localMults.emplace(mod, timeMult);
-		if (timeMult == 0) g_localMults.clear();
+		localMults.erase(mod);
+		if (timeMult != 1) localMults.emplace(mod, timeMult);
+		if (timeMult == 0) localMults.clear();
 
 		g_timeMult = 1;
 
 		if (minmax == 0)
-			for (const auto val : g_localMults | std::views::values) g_timeMult *= val;
+			for (const auto val : localMults | std::views::values) g_timeMult *= val;
 		else if (minmax == 1) {
 			Float64 min = 1.0, max = 1.0;
-			for (const auto val : g_localMults | std::views::values) {
+			for (const auto val : localMults | std::views::values) {
 				if (val < min) min = val;
 				if (val > max) max = val;
 			}
@@ -75,14 +75,14 @@ namespace Patch::TimeMult
 		for (auto iter : g_TESDataHandler->scriptList) vec.push_back(iter);
 		for (const auto& iter : std::ranges::reverse_view(vec))
 		{
-			if (g_specialMods.contains(iter->modIndex)) continue;
-			if (wah(iter, cmd_SGTM) == 1)
+			if (specialMods.contains(iter->modIndex)) continue;
+			if (wah(iter, cmdSGTM) == 1)
 			{
-				g_specialMods.emplace(iter->modIndex);
+				specialMods.emplace(iter->modIndex);
 				Log(FormatString("Found SGTM use in mod: %02X (%50s), form: %08X (%50s)", iter->modIndex, GetModName(
 					iter), iter->refID, iter->GetName()));
 			}
-			else if (wah(iter, cmd_SGTM) == -1)
+			else if (wah(iter, cmdSGTM) == -1)
 			{
 				Log(FormatString("Found FATAL FAILURE AND DISAPPOINTMENT use in mod: %02X (%50s), form: %08X (%50s) (to be a bit more serious for a second, this script record is bugged, please look into it)", iter->modIndex, GetModName(
 					iter), iter->refID, iter->GetName()));
@@ -152,7 +152,7 @@ namespace Patch::TimeMult
 
 		if (IsConsoleOpen()) {
 			PrintConsole("Global Time Multiplier >> '%0.2f'", g_timeMult);
-			PrintConsole("Local Time Multiplier >> '%0.2f'", g_localMults.contains(mod) ? g_localMults[mod] : 1.0);
+			PrintConsole("Local Time Multiplier >> '%0.2f'", localMults.contains(mod) ? localMults[mod] : 1.0);
 		}
 		*result = 1;
 		return true;
@@ -165,19 +165,19 @@ namespace Patch::TimeMult
 		*result = 1;
 		if (*reinterpret_cast<UInt16*>(static_cast<UInt8*>(scriptData) + *opcodeOffsetPtr - 2) != 0 && !ExtractArgsEx(EXTRACT_ARGS_EX, &mod)) return true;
 
-		if (!g_specialMods.contains(scriptObj->modIndex)) mod = -1;
+		if (!specialMods.contains(scriptObj->modIndex)) mod = -1;
 		if (mod == -1) {
 			mod = scriptObj->modIndex;
 			*result = TimeGlobal::Get();
 		}
 		else {
 			if (mod == 0) mod = scriptObj->modIndex;
-			*result = g_localMults.contains(mod) ? g_localMults[mod] : 1.0;
+			*result = localMults.contains(mod) ? localMults[mod] : 1.0;
 		}
 
 		if (IsConsoleOpen()) {
 			PrintConsole("Global Time Multiplier >> '%0.2f'", g_timeMult);
-			PrintConsole("Local Time Multiplier >> '%0.2f'", g_localMults.contains(mod) ? g_localMults[mod] : 1.0);
+			PrintConsole("Local Time Multiplier >> '%0.2f'", localMults.contains(mod) ? localMults[mod] : 1.0);
 		}
 
 		return true;
@@ -185,24 +185,24 @@ namespace Patch::TimeMult
 
 	void PluginLoad()
 	{
-		cmd_SGTM = GetByOpcode(0x1186);
-		cmd_GGTM = GetByOpcode(0x22B0);
+		cmdSGTM = GetByOpcode(0x1186);
+		cmdGGTM = GetByOpcode(0x22B0);
 
 		if (enable)
 		{
-			cmd_GGTM->numParams = 1;
-			cmd_GGTM->params = kParams_OneOptionalInt;
+			cmdGGTM->numParams = 1;
+			cmdGGTM->params = kParams_OneOptionalInt;
 
-			cmd_SGTM->numParams = 3;
-			cmd_SGTM->params = kParams_OneOptionalFloat_TwoOptionalInts;
+			cmdSGTM->numParams = 3;
+			cmdSGTM->params = kParams_OneOptionalFloat_TwoOptionalInts;
 		}
 
 		if (g_nvseInterface->isEditor) return;
 
 		if (enable)
 		{
-			cmd_GGTM->execute = Cmd_GetGlobalTimeMultiplierAlt_Execute;
-			cmd_SGTM->execute = Cmd_SetGlobalTimeMultiplierAlt_Execute;
+			cmdGGTM->execute = Cmd_GetGlobalTimeMultiplierAlt_Execute;
+			cmdSGTM->execute = Cmd_SetGlobalTimeMultiplierAlt_Execute;
 		}
 	}
 
