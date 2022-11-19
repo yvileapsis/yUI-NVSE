@@ -50,7 +50,7 @@ namespace SortingIcons::Files
 				list = reinterpret_cast<TESObjectARMO*>(item)->repairItemList.listForm;
 			else continue;
 
-			if (item->refID == form->refID || (list && list->refID == form->refID))
+			if (item->refID == form->refID || list && list->refID == form->refID)
 			{
 				Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X' (%50s)", common.tag.c_str(), item->refID, item->GetName(), form->refID, common.form->GetName()), logLevel);
 				auto newCommon = common;
