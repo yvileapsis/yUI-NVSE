@@ -294,10 +294,19 @@ template <typename T_Data> struct NiTArray
 		T_Data& operator->() const { return *pData; }
 		T_Data& Get() const { return *pData; }
 
-		Iterator(NiTArray& source) : pData(source.data), count(source.firstFreeEntry) {}
+		Iterator& operator=(const Iterator& rhs)
+		{
+			pData = rhs.pData;
+			return *this;
+		}
+		bool operator!=(const Iterator& rhs) { return count > 0; }
+
+		Iterator(NiTArray* source) : pData(source->data), count(source->firstFreeEntry) {}
+		Iterator() : pData(nullptr), count(0) {}
 	};
 
-	Iterator Begin() { return Iterator(*this); }
+	Iterator begin() { return Iterator(this); }
+	Iterator end() { return Iterator(); }
 };
 
 template <typename T> void NiTArray<T>::AddAtIndex(UInt32 index, T* item)

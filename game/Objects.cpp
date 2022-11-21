@@ -147,8 +147,8 @@ void TESObjectREFR::OpenCloseContainer(bool open, bool sounds)
 		{
 			if (const auto sequence = open ? ctrlMgr->FindSequence("Open") : ctrlMgr->FindSequence("Close"))
 			{
-				for (auto iter = ctrlMgr->sequences.Begin(); iter; ++iter)
-					if (*iter && iter->sequenceName && (*(UInt32*)iter->sequenceName != 'eldI'))
+				for (const auto iter : ctrlMgr->sequences)
+					if (iter->sequenceName && (*(UInt32*)iter->sequenceName != 'eldI'))
 						iter->Unk_23(0, 0);
 				if (sequence->Play()) this->MarkAsModified(0x10000000);
 			}

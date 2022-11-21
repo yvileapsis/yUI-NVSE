@@ -54,9 +54,7 @@ NiExtraData* __fastcall NiObjectNET::GetExtraData(UInt32 vtbl) const
 
 NiControllerSequence* NiControllerManager::FindSequence(const char* seqName)
 {
-	for (auto iter = sequences.Begin(); iter; ++iter)
-		if (!StrCompare(iter->sequenceName, seqName))
-			return *iter;
+	for (const auto iter : sequences) if (!StrCompare(iter->sequenceName, seqName)) return iter;
 	return nullptr;
 }
 
