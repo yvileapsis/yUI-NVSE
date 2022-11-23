@@ -12,6 +12,9 @@ enum eEmotion {
 
 class ButtonIcon;
 
+typedef FontManager* (*_FontManager_GetSingleton)(void);
+const _FontManager_GetSingleton FontManager_GetSingleton = reinterpret_cast<_FontManager_GetSingleton>(0x011F33F8);
+
 typedef void (*_ShowMessageBox_Callback)(void);
 extern const _ShowMessageBox_Callback ShowMessageBox_Callback;
 

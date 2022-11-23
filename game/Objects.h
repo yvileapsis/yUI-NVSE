@@ -1,5 +1,5 @@
 #pragma once
-#include <GameForms.h>
+#include <Forms.h>
 #include <GameProcess.h>
 #include <Sound.h>
 
@@ -397,11 +397,13 @@ enum LifeStates
 
 enum ActorValueCode
 {
+	kAVCode_None = -1,
 	kAVCode_Aggression = 0x0,
 	kAVCode_Confidence = 0x1,
 	kAVCode_Energy = 0x2,
 	kAVCode_Responsibility = 0x3,
 	kAVCode_Mood = 0x4,
+
 	kAVCode_Strength = 0x5,
 	kAVCode_Perception = 0x6,
 	kAVCode_Endurance = 0x7,
@@ -409,6 +411,9 @@ enum ActorValueCode
 	kAVCode_Intelligence = 0x9,
 	kAVCode_Agility = 0xA,
 	kAVCode_Luck = 0xB,
+	kAVCode_SpecialStart = kAVCode_Strength,
+	kAVCode_SpecialEnd = kAVCode_Luck,
+
 	kAVCode_ActionPoints = 0xC,
 	kAVCode_CarryWeight = 0xD,
 	kAVCode_CritChance = 0xE,
@@ -422,6 +427,7 @@ enum ActorValueCode
 	kAVCode_Fatigue = 0x16,
 	kAVCode_Karma = 0x17,
 	kAVCode_XP = 0x18,
+
 	kAVCode_PerceptionCondition = 0x19,
 	kAVCode_EnduranceCondition = 0x1A,
 	kAVCode_LeftAttackCondition = 0x1B,
@@ -429,6 +435,9 @@ enum ActorValueCode
 	kAVCode_LeftMobilityCondition = 0x1D,
 	kAVCode_RightMobilityCondition = 0x1E,
 	kAVCode_BrainCondition = 0x1F,
+	kAVCode_BodyPartStart = kAVCode_PerceptionCondition,
+	kAVCode_BodyPartEnd = kAVCode_BrainCondition,
+
 	kAVCode_Barter = 0x20,
 	kAVCode_BigGuns = 0x21,
 	kAVCode_EnergyWeapons = 0x22,
@@ -443,6 +452,9 @@ enum ActorValueCode
 	kAVCode_Speech = 0x2B,
 	kAVCode_Survival = 0x2C,
 	kAVCode_Unarmed = 0x2D,
+	kAVCode_SkillsStart = kAVCode_Barter,
+	kAVCode_SkillsEnd = kAVCode_Unarmed,
+
 	kAVCode_InventoryWeight = 0x2E,
 	kAVCode_Paralysis = 0x2F,
 	kAVCode_Invisibility = 0x30,
@@ -459,6 +471,7 @@ enum ActorValueCode
 	kAVCode_FrostResist = 0x3B,
 	kAVCode_EnergyResist = 0x3C,
 	kAVCode_EmpResist = 0x3D,
+
 	kAVCode_Variable01 = 0x3E,
 	kAVCode_Variable02 = 0x3F,
 	kAVCode_Variable03 = 0x40,
@@ -469,6 +482,7 @@ enum ActorValueCode
 	kAVCode_Variable08 = 0x45,
 	kAVCode_Variable09 = 0x46,
 	kAVCode_Variable10 = 0x47,
+
 	kAVCode_IgnoreCrippledLimbs = 0x48,
 	kAVCode_Dehydration = 0x49,
 	kAVCode_Hunger = 0x4A,
@@ -1199,3 +1213,10 @@ enum AnimMoveTypes
 	kAnimMoveType_Swimming = 0x2,
 	kAnimMoveType_Flying = 0x3,
 };
+
+const char* GetActorValueString(UInt32 actorValue); // should work now
+UInt32 GetActorValueForString(const char* strActorVal, bool bForScript = false);
+
+typedef char* (*_GetActorValueName)(UInt32 actorValueCode);
+extern const _GetActorValueName GetActorValueName;
+UInt32 GetActorValueMax(UInt32 actorValueCode);

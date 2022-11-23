@@ -1,6 +1,6 @@
 #pragma once
 #include <Menus.h>
-#include <GameExtraData.h>
+#include <ExtraData.h>
 
 namespace SortingIcons
 {

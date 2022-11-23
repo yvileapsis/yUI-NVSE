@@ -46,31 +46,28 @@
     <ClCompile Include="MiscFeatures\PatchMatchedCursor.cpp">
       <Filter>features</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\GameAPI.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\game\GameBSExtraData.cpp">
+    <ClCompile Include="..\game\BSExtraData.cpp">
       <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="..\game\GameData.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\GameExtraData.cpp">
+    <ClCompile Include="..\game\ExtraData.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\GameForms.cpp">
+    <ClCompile Include="..\game\Forms.cpp">
       <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="..\game\Objects.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\GameOSDepend.cpp">
+    <ClCompile Include="..\game\OSDepend.cpp">
       <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="..\game\GameRTTI.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\GameScript.cpp">
+    <ClCompile Include="..\game\Script.cpp">
       <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="..\game\GameSettings.cpp">
@@ -149,6 +146,9 @@
     <ClCompile Include="\\Mac\Home\Documents\GitHub\yUI-NVSE\game\NiNodes.cpp">
       <Filter>game</Filter>
     </ClCompile>
+    <ClCompile Include="\\Mac\Home\Documents\GitHub\yUI-NVSE\game\GameProcess.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h" />
@@ -181,10 +181,7 @@
     <ClInclude Include="SortingIcons\SI.h">
       <Filter>features\SortingIcons</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\GameAPI.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\game\GameBSExtraData.h">
+    <ClInclude Include="..\game\BSExtraData.h">
       <Filter>game</Filter>
     </ClInclude>
     <ClInclude Include="..\game\GameData.h">
@@ -193,16 +190,16 @@
     <ClInclude Include="..\game\GameEffects.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\GameExtraData.h">
+    <ClInclude Include="..\game\ExtraData.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\GameForms.h">
+    <ClInclude Include="..\game\Forms.h">
       <Filter>game</Filter>
     </ClInclude>
     <ClInclude Include="..\game\Objects.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\GameOSDepend.h">
+    <ClInclude Include="..\game\OSDepend.h">
       <Filter>game</Filter>
     </ClInclude>
     <ClInclude Include="..\game\GameProcess.h">
@@ -211,7 +208,7 @@
     <ClInclude Include="..\game\GameRTTI.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\GameScript.h">
+    <ClInclude Include="..\game\Script.h">
       <Filter>game</Filter>
     </ClInclude>
     <ClInclude Include="..\game\GameSettings.h">

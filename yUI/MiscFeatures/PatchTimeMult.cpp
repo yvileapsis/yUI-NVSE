@@ -1,15 +1,16 @@
 #pragma once
+
 #include <main.h>
-#include <GameAPI.h>
-#include <GameData.h>
+
+#include <Types.h>
 #include <Sound.h>
+#include <Script.h>
+
+#include <GameData.h>
 #include <ConsoleManager.h>
 #include <SafeWrite.h>
 
 #include <SimpleINILibrary.h>
-
-#include <ranges>
-#include <unordered_set>
 
 
 namespace Patch::TimeMult

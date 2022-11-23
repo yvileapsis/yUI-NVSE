@@ -11,10 +11,10 @@ namespace SortingIcons::Files
 		std::vector<TESForm*> forms{};
 		if (!elem.contains(form)) {}
 		else if (!elem[form].is_array()) {
-			if (const auto val = GetFormByID(modName.c_str(), elem[form].get<std::string>().c_str())) forms.push_back(val);
+			if (const auto val = TESForm::GetByID(modName.c_str(), elem[form].get<std::string>().c_str())) forms.push_back(val);
 		}
 		else for (const auto& i : elem[form]) {
-			if (const auto val = GetFormByID(modName.c_str(), i.get<std::string>().c_str())) forms.push_back(val);
+			if (const auto val = TESForm::GetByID(modName.c_str(), i.get<std::string>().c_str())) forms.push_back(val);
 		}
 		return forms;
 	}
@@ -36,7 +36,7 @@ namespace SortingIcons::Files
 
 	void ItemRepairListEmplace(const Item::Common& common, TESForm* form)
 	{
-		for (const auto item : *GetAllForms())
+		for (const auto item : *TESForm::GetAll())
 		{
 			BGSListForm* list;
 

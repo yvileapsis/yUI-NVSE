@@ -550,6 +550,13 @@ public:
 	}
 };
 
+template <typename T_Key, typename T_Data> class NiTMap : public NiTMapBase<T_Key, T_Data>
+{
+public:
+	NiTMap();
+	~NiTMap();
+};
+
 // 14
 template <typename T_Data> class NiTStringPointerMap : public NiTPointerMap <T_Data>
 {

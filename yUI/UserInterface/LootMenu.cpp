@@ -141,10 +141,10 @@ namespace UserInterface::LootMenu
 			std::vector<TESForm*> forms{};
 			if (!elem.contains(form)) {}
 			else if (!elem[form].is_array()) {
-				if (const auto val = GetFormByID(modName.c_str(), elem[form].get<std::string>().c_str())) forms.push_back(val);
+				if (const auto val = TESForm::GetByID(modName.c_str(), elem[form].get<std::string>().c_str())) forms.push_back(val);
 			}
 			else for (const auto& i : elem[form]) {
-				if (const auto val = GetFormByID(modName.c_str(), i.get<std::string>().c_str())) forms.push_back(val);
+				if (const auto val = TESForm::GetByID(modName.c_str(), i.get<std::string>().c_str())) forms.push_back(val);
 			}
 			return forms;
 		}
@@ -798,12 +798,12 @@ namespace UserInterface::LootMenu
 
 	void DeferredInit()
 	{
-		if (!formVendorScript) formVendorScript = GetFormByID("FalloutNV.esm", 0x07D4E3);
+		if (!formVendorScript) formVendorScript = TESForm::GetByID("FalloutNV.esm", 0x07D4E3);
 
-		if (!formEVE) formEVE = GetFormByID("EVE FNV - ALL DLC.esp", 0x02E612);
-		if (!formEVE) formEVE = GetFormByID("EVE FNV - NO DLC.esp", 0x02E612);
-		if (!formEVE) formEVE = GetFormByID("EVE FNV - NO GRA.esp", 0x02E612);
-		if (!formEVE) formEVE = GetFormByID("RA-Gear.esm", 0x02E612);
+		if (!formEVE) formEVE = TESForm::GetByID("EVE FNV - ALL DLC.esp", 0x02E612);
+		if (!formEVE) formEVE = TESForm::GetByID("EVE FNV - NO DLC.esp", 0x02E612);
+		if (!formEVE) formEVE = TESForm::GetByID("EVE FNV - NO GRA.esp", 0x02E612);
+		if (!formEVE) formEVE = TESForm::GetByID("RA-Gear.esm", 0x02E612);
 
 		cmd_Activate = GetByOpcode(0x100D);
 		cmd_OnActivate = GetEventCommandInfo(0x2);

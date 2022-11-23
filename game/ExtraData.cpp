@@ -1,12 +1,10 @@
-#include "GameExtraData.h"
+#include "ExtraData.h"
 
-#include <algorithm>
 
-#include "GameBSExtraData.h"
-#include "GameAPI.h"
+#include "BSExtraData.h"
 #include "Objects.h"
 #include "GameRTTI.h"
-#include "GameScript.h"
+#include "Script.h"
 
 struct GetMatchingEquipped {
 	FormMatcher& m_matcher;

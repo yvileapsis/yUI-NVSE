@@ -1,6 +1,6 @@
 #pragma once
 #include <Sound.h>
-#include <GameForms.h>
+#include <Forms.h>
 
 #define				GetByTypeCast(xDataList, Type) DYNAMIC_CAST(xDataList.GetByType(kExtraData_ ## Type), BSExtraData, Extra ## Type)
 extern char*		GetExtraDataValue(BSExtraData* traverse);

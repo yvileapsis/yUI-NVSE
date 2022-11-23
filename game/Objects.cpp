@@ -1,6 +1,6 @@
 #include <Objects.h>
 #include <GameRTTI.h>
-#include <GameExtraData.h>
+#include <ExtraData.h>
 #include <GameTasks.h>
 #include <SafeWrite.h>
 #include <NiObjects.h>
@@ -856,3 +856,127 @@ TESObjectREFR* TESObjectREFR::ResolveAshpile()
 }
 
 bool TESObjectREFR::IsLocked() { return this->GetLockData() ? this->GetLockData()->IsLocked() : false; }
+
+
+const _GetActorValueName GetActorValueName = reinterpret_cast<_GetActorValueName>(0x00066EAC0);	// See Cmd_GetActorValue_Eval
+
+// g_baseActorValueNames is only filled in after oblivion's global initializers run
+const char* GetActorValueString(UInt32 actorValue)
+{
+	const char* name = 0;
+	if (actorValue <= kAVCode_Max)
+		name = GetActorValueName(actorValue);
+	if (!name)
+		name = "unknown";
+
+	return name;
+}
+
+UInt32 GetActorValueForScript(const char* avStr)
+{
+	for (UInt32 i = 0; i <= kAVCode_Max; i++) {
+		if (_stricmp(avStr, GetActorValueName(i)) == 0)
+			return i;
+	}
+	return kAVCode_None;
+}
+
+UInt32 GetActorValueForString(const char* strActorVal, bool bForScript)
+{
+	if (bForScript)
+		return GetActorValueForScript(strActorVal);
+
+	for (UInt32 n = 0; n <= kAVCode_Max; n++) {
+		if (_stricmp(strActorVal, GetActorValueName(n)) == 0)
+			return n;
+	}
+	return kAVCode_None;
+}
+
+std::unordered_map<UInt32, UInt32> ActorValueMax = {
+	{ kAVCode_Aggression, 3 },
+	{ kAVCode_Confidence, 4 },
+	{ kAVCode_Energy, 100 },
+	{ kAVCode_Responsibility, 100 },
+	{ kAVCode_Mood, 8 },
+
+	{ kAVCode_Strength, 10 },
+	{ kAVCode_Perception, 10 },
+	{ kAVCode_Endurance, 10 },
+	{ kAVCode_Charisma, 10 },
+	{ kAVCode_Intelligence, 10 },
+	{ kAVCode_Agility, 10 },
+	{ kAVCode_Luck, 10 },
+
+	{ kAVCode_ActionPoints, 0 },
+	{ kAVCode_CarryWeight, 0 },
+	{ kAVCode_CritChance, 100 },
+	{ kAVCode_HealRate, 0 },
+	{ kAVCode_Health, 0 },
+	{ kAVCode_MeleeDamage, 0 },
+	{ kAVCode_DamageResistance, 100 },
+	{ kAVCode_PoisonResist, 100 },
+	{ kAVCode_RadResist, 100 },
+	{ kAVCode_SpeedMult, 0 },
+	{ kAVCode_Fatigue, 0 },
+	{ kAVCode_Karma, 1000 },
+	{ kAVCode_XP, 0 },
+
+	{ kAVCode_PerceptionCondition, 100 },
+	{ kAVCode_EnduranceCondition, 100 },
+	{ kAVCode_LeftAttackCondition, 100 },
+	{ kAVCode_RightAttackCondition, 100 },
+	{ kAVCode_LeftMobilityCondition, 100 },
+	{ kAVCode_RightMobilityCondition, 100 },
+	{ kAVCode_BrainCondition, 100 },
+
+	{ kAVCode_Barter, 100 },
+	{ kAVCode_BigGuns, 100 },
+	{ kAVCode_EnergyWeapons, 100 },
+	{ kAVCode_Explosives, 100 },
+	{ kAVCode_Lockpick, 100 },
+	{ kAVCode_Medicine, 100 },
+	{ kAVCode_MeleeWeapons, 100 },
+	{ kAVCode_Repair, 100 },
+	{ kAVCode_Science, 100 },
+	{ kAVCode_Guns, 100 },
+	{ kAVCode_Sneak, 100 },
+	{ kAVCode_Speech, 100 },
+	{ kAVCode_Survival, 100 },
+	{ kAVCode_Unarmed, 100 },
+
+	{ kAVCode_InventoryWeight, 0 },
+	{ kAVCode_Paralysis, 1 },
+	{ kAVCode_Invisibility, 1 },
+	{ kAVCode_Chameleon, 1 },
+	{ kAVCode_NightEye, 1 },
+	{ kAVCode_Turbo, 1 },
+	{ kAVCode_FireResist, 100 },
+	{ kAVCode_WaterBreathing, 1 },
+	{ kAVCode_RadiationRads, 1000 },
+	{ kAVCode_BloodyMess, 1 },
+	{ kAVCode_UnarmedDamage, 100 },
+	{ kAVCode_Assistance, 2 },
+
+	{ kAVCode_ElectricResist, 100 },
+
+	{ kAVCode_FrostResist, 100 },
+	{ kAVCode_EnergyResist, 100 },
+	{ kAVCode_EmpResist, 100 },
+	{ kAVCode_Variable01, 1 },
+	{ kAVCode_Variable02, 1 },
+	{ kAVCode_Variable03, 1 },
+	{ kAVCode_Variable04, 1 },
+	{ kAVCode_Variable05, 1 },
+	{ kAVCode_Variable06, 1 },
+	{ kAVCode_Variable07, 1 },
+	{ kAVCode_Variable08, 1 },
+	{ kAVCode_Variable09, 1 },
+	{ kAVCode_Variable10, 1 },
+
+	{ kAVCode_IgnoreCrippledLimbs, 1 },
+	{ kAVCode_Dehydration, 1000 },
+	{ kAVCode_Hunger, 1000 },
+	{ kAVCode_SleepDeprivation, 1000 },
+	{ kAVCode_DamageThreshold, 100 },
+};

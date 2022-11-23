@@ -1,5 +1,6 @@
 #pragma once
-#include <GameAPI.h>
+#include "NiTypes.h"
+#include "Containers.h"
 
 // 0C
 class Setting

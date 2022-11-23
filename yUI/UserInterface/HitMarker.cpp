@@ -1,6 +1,6 @@
 #include <main.h>
 
-#include <GameForms.h>
+#include <Forms.h>
 #include <Menus.h>
 #include <SimpleINILibrary.h>
 

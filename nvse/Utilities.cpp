@@ -3,8 +3,8 @@
 #include "ConsoleManager.h"
 #include "InterfaceManager.h"
 #include "GameData.h"
-#include "GameExtraData.h"
-#include "GameScript.h"
+#include "ExtraData.h"
+#include "Script.h"
 
 ScopedLock::ScopedLock(CriticalSection& critSection) : m_critSection(critSection)
 {
@@ -1250,4 +1250,18 @@ int HexStringToInt(const std::string& str)
 	char* p;
 	const auto id = strtoul(str.c_str(), &p, 16);
 	return *p == 0 ? id : -1;
+}
+
+char* ConvertLiteralPercents(char* srcPtr)
+{
+	char* endPtr = srcPtr + StrLen(srcPtr);
+	while (srcPtr = strchr(srcPtr, '%'))
+	{
+		srcPtr++;
+		memmove(srcPtr + 1, srcPtr, endPtr - srcPtr);
+		*srcPtr++ = '%';
+		endPtr++;
+	}
+	*endPtr = 0;
+	return endPtr;
 }

@@ -4,8 +4,8 @@
 #include <vector>
 
 #include <ConsoleManager.h>
-#include <GameBSExtraData.h>
-#include <GameExtraData.h>
+#include <BSExtraData.h>
+#include <ExtraData.h>
 #include <InterfaceManager.h>
 #include <Tiles.h>
 #include <Utilities.h>
@@ -201,3 +201,12 @@ void Log(const std::string& msg, UInt32 loglevel)
 	if (loglevel & kToLog) file.Message(msg);
 	if (loglevel & kToConsole) console.Message(msg);
 }
+
+/*void ScriptEventList::Dump(void)
+{
+	const auto nEvents = m_eventList->Count();
+	for (UInt16 n = 0; n < nEvents; ++n)
+		if (const Event* pEvent = m_eventList->GetNthItem(n))
+			Log(FormatString("%08X (%s) %08X", pEvent->object, GetObjectClassName(pEvent->object), pEvent->eventMask));
+}
+*/

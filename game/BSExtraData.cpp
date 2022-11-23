@@ -1,9 +1,10 @@
-#include <GameBSExtraData.h>
+#include <BSExtraData.h>
 
-#include <GameExtraData.h>
+#include <ExtraData.h>
 #include <Objects.h>
-#include <GameAPI.h>
+#include <Script.h>
 #include <GameRTTI.h>
+
 
 static const UInt32 s_ExtraDataListVtbl							= 0x010143E8;	//	0x0100e3a8;
 
@@ -281,7 +282,7 @@ InventoryChangesList* InventoryChangesList::Create(UInt32 refID, UInt32 count, E
 	const auto xData = (InventoryChangesList*)FormHeapAlloc(sizeof(InventoryChangesList));
 	if (xData) {
 		memset(xData, 0, sizeof(InventoryChangesList));
-		xData->AddAt(InventoryChanges::Create(GetFormByID(refID), count, pExtendDataList), eListEnd);
+		xData->AddAt(InventoryChanges::Create(TESForm::GetByID(refID), count, pExtendDataList), eListEnd);
 	}
 	return xData;
 }

@@ -13,10 +13,6 @@ typedef UInt32	PluginHandle;	// treat this as an opaque type
 enum
 {
 	kPluginHandle_Invalid = 0xFFFFFFFF,
-};
-
-enum
-{
 	kPluginOpcode_Debug = kNVSEOpcodeTest,
 };
 

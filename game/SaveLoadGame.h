@@ -1,5 +1,6 @@
-#include "GameAPI.h"
+#include "Containers.h"
 #include "NiTypes.h"
+#include "Utilities.h"
 
 // Form type class: use to preload some information for created objects (?) refr and Cells
 struct formTypeClassData

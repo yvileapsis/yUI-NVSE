@@ -1,9 +1,7 @@
 #pragma once
 #include <Objects.h>
 #include <Tiles.h>
-#include <GameAPI.h>
-#include <GameExtraData.h>
-
+#include <Script.h>
 
 enum
 {
@@ -93,8 +91,6 @@ enum InventoryMenuHotkey
 
 enum
 {
-	kAddr_AddExtraData = 0x40FF60,
-	kAddr_RemoveExtraType = 0x410140,
 	kAddr_LoadModel = 0x447080,
 	kAddr_ApplyAmmoEffects = 0x59A030,
 	kAddr_MoveToMarker = 0x5CCB20,
@@ -105,7 +101,6 @@ enum
 	kAddr_UnequipItem = 0x88C790,
 	kAddr_ReturnTrue = 0x8D0360,
 	kAddr_InitFontInfo = 0xA12020,
-	kAddr_GetItemHealthPerc = 0x4BCDB0,
 	kAddr_GetItemValue = 0x4BD400,
 	kAddr_EvaluateConditions = 0x680C60,
 	kAddr_EvaluateCondition = 0x681600,
@@ -183,8 +178,6 @@ enum MiscStatCode
 	kMiscStat_Max
 };
 
-void Debug_DumpMenus(void);
-
 struct EventCallbackScripts;
 
 template <typename Item> struct ListBoxItem
@@ -219,106 +212,54 @@ public:
 	UInt16			flags;				// 2C
 	UInt16			pad2E;				// 2E
 
-	Item* GetSelected()
-	{
-		TListNode<ListBoxItem<Item>>* iter = BSSimpleList<Item>::list.Head();
-		do
-		{
-			const auto item = iter->data;
-			if (item && (item->tile == selected))
-				return item->object;
-		} while ((iter = iter->next));
-		return nullptr;
-	}
-
 	Tile* GetNthTile(SInt32 index)
 	{
-		if (index >= 0)
+		if (index < 0) return this->list.GetLastItem()->tile;
+		for (const auto iter : this->list)
 		{
-			TListNode<ListBoxItem<Item>>* iter = BSSimpleList<Item>::list.Head();
-			do
-			{
-				if (!index)
-				{
-					return iter->data ? iter->data->tile : NULL;
-				}
-				index--;
-			} while ((iter = iter->next));
+			if (!index) return iter->tile;
+			index--;
 		}
 		return nullptr;
 	}
 
 	void Clear()
 	{
-		TListNode<ListBoxItem<Item>>* iter = BSSimpleList<Item>::list.Head();
-		do
+		for (const auto iter : this->list)
 		{
-			const auto item = iter->data;
-			if (!item) continue;
-			if (item->tile)
-				item->tile->Destroy(true);
-			GameHeapFree(item);
-		} while ((iter = iter->next));
-		BSSimpleList<Item>::list.RemoveAll();
+			if (iter->tile) iter->tile->Destroy(true);
+			GameHeapFree(iter);
+		}
+		this->list.RemoveAll();
 		selected = nullptr;
 		itemCount = 0;
 	}
 
 	typedef bool(__cdecl* FilterFunction)(Item* form);
-	void Filter(FilterFunction callback)
-	{
-		ThisCall(0x729FE0, this, callback);
-	}
+	void Filter(FilterFunction callback) { ThisCall(0x729FE0, this, callback); }
 
 	// identical to Filter, but hooked by InventorySortButton for filtering contchanges
-	void FilterAlt(FilterFunction callback)
-	{
-		ThisCall(0x730BB0, this, callback);
-	}
+	void FilterAlt(FilterFunction callback) { ThisCall(0x730BB0, this, callback); }
 
 	// Identical to Filter, but passing a value instead of a pointer
-	void FilterVal(bool(__cdecl* callback)(Item))
-	{
-		ThisCall(0x730BB0, this, callback);
-	}
+	void FilterVal(bool(__cdecl* callback)(Item)) { ThisCall(0x730BB0, this, callback); }
 
 	typedef void(__cdecl* ForEachFunc)(Tile*, Item*);
-	void ForEach(ForEachFunc func, int maxIndex1 = -1, int maxIndex2 = 0x7FFFFFFF)
-	{
-		ThisCall(0x7314C0, this, func, maxIndex1, maxIndex2);
-	}
+	void ForEach(ForEachFunc func, int maxIndex1 = -1, int maxIndex2 = 0x7FFFFFFF) { ThisCall(0x7314C0, this, func, maxIndex1, maxIndex2); }
 
-	Tile* GetTileFromItem(Item** item)
-	{
-		return ThisCall<Tile*>(0x7A22D0, this, item);
-	}
+	Tile* GetTileFromItem(Item** item) { return ThisCall<Tile*>(0x7A22D0, this, item); }
 
 	Item* GetItemForTile(Tile* tile)
 	{
-		TListNode<ListBoxItem<Item>>* iter = BSSimpleList<Item>::list.Head();
-		do
-		{
-			const auto item = iter->data;
-			if (item && (item->tile == tile))
-				return item->object;
-		} while ((iter = iter->next));
+		for (const auto iter : this->list) if (iter->tile == tile) return iter->object;
 		return nullptr;
 	}
 
-	void SaveScrollPosition()
-	{
-		ThisCall(0x7312E0, this);
-	}
+	Item* GetSelected() { return GetItemForTile(selected); }
 
-	int GetNumVisibleItems()
-	{
-		return ThisCall<int>(0x71AE60, this);
-	}
-
-	void RestorePosition(bool playSound = false)
-	{
-		ThisCall(0x731360, this, playSound);
-	}
+	void SaveScrollPosition() { ThisCall(0x7312E0, this); }
+	int GetNumVisibleItems() { return ThisCall<int>(0x71AE60, this); }
+	void RestorePosition(bool playSound = false) { ThisCall(0x731360, this, playSound); }
 
 	typedef SInt32(*SortingFunction)(const ListBoxItem<Item>*, const ListBoxItem<Item>*);
 
@@ -328,15 +269,9 @@ public:
 		auto _template = _templateName ? _templateName : this->templateName;
 		if (!_template) return nullptr;
 
-		Tile* newTile = this->parentTile->AddTileFromTemplate(_template);
-		if (!newTile->GetValue(kTileValue_id))
-		{
-			newTile->SetFloat(kTileValue_id, -1);
-		}
-		if (text)
-		{
-			newTile->SetString(kTileValue_string, text);
-		}
+		const auto newTile = this->parentTile->AddTileFromTemplate(_template);
+		if (!newTile->GetValue(kTileValue_id)) newTile->SetFloat(kTileValue_id, -1);
+		if (text) newTile->SetString(kTileValue_string, text);
 
 		auto listItem = static_cast<ListBoxItem<Item>*>(GameHeapAlloc(sizeof(ListBoxItem<Item*>)));
 		listItem->tile = newTile;
@@ -385,15 +320,9 @@ public:
 		auto _template = _templateName ? _templateName : this->templateName;
 		if (!_template) return nullptr;
 
-		Tile* newTile = this->parentTile->AddTileFromTemplate(_template);
-		if (!newTile->GetValue(kTileValue_id))
-		{
-			newTile->SetFloat(kTileValue_id, -1);
-		}
-		if (text)
-		{
-			newTile->SetString(kTileValue_string, text);
-		}
+		const auto newTile = this->parentTile->AddTileFromTemplate(_template);
+		if (!newTile->GetValue(kTileValue_id)) newTile->SetFloat(kTileValue_id, -1);
+		if (text) newTile->SetString(kTileValue_string, text);
 
 		auto listItem = static_cast<ListBoxItem<Item>*>(GameHeapAlloc(sizeof(ListBoxItem<Item*>)));
 		listItem->tile = newTile;
@@ -408,10 +337,7 @@ public:
 		if (sortingFunction)
 		{
 			ThisCall(0x7A7EB0, &this->list, listItem, sortingFunction); // InsertSorted
-			if (this->flags & kFlag_RecalculateHeightsOnInsert)
-			{
-				ThisCall(0x71A670, this);
-			}
+			if (this->flags & kFlag_RecalculateHeightsOnInsert) ThisCall(0x71A670, this);
 		}
 		else
 		{
@@ -447,9 +373,7 @@ public:
 
 	void HighlightLastItem()
 	{
-		int lastIndex = this->itemCount - 1;
-		Tile* tile = this->GetNthTile(lastIndex);
-
+		const auto tile = this->GetNthTile(this->itemCount - 1);
 		this->SetSelectedTile(tile);
 		this->ScrollToHighlight();
 	}
@@ -461,28 +385,11 @@ public:
 		this->RestorePosition();
 	}
 
-	void SetParentEnabled(bool isEnabled)
-	{
-		static UInt32 enabledTrait = Tile::TraitNameToID("_enabled");
-		parentTile->SetFloat(enabledTrait, isEnabled);
-	}
-
-	bool IsEnabled()
-	{
-		static UInt32 enabledTrait = Tile::TraitNameToID("_enabled");
-		return parentTile && parentTile->GetFloat(enabledTrait);
-	}
-
-	void Init()
-	{
-		// initialises the fields and appends the menu list to the global listbox array
-		ThisCall(0x723750, this);
-	}
-
-	void Destroy()
-	{
-		ThisCall(0x723820, this);
-	}
+	void SetParentEnabled(bool isEnabled) const { parentTile->SetFloat("_enabled", isEnabled); }
+	bool IsEnabled() const { return parentTile && parentTile->GetFloat("_enabled"); }
+	// initialises the fields and appends the menu list to the global listbox array
+	void Init() { ThisCall(0x723750, this); }
+	void Destroy() { ThisCall(0x723820, this); }
 };
 static_assert(sizeof(ListBox<void*>) == 0x30);
 
@@ -491,28 +398,6 @@ class Menu
 public:
 	Menu() { ThisCall(0xA1C4A0, this); };
 	~Menu() { ThisCall(0xA1C520, this); };
-
-	enum vtable_offsets
-	{
-		kDestructor = 0,
-		kSetTile = 4,
-		kHandleLeftClickPress = 8,
-		kHandleClick = 0xC,
-		kHandleMouseover = 0x10,
-		kHandleUnmouseover = 0x14,
-		kPostDragTileChange = 0x18,
-		kPreDragTileChange = 0x1C,
-		kHandleActiveMenuClickHeld = 0x20,
-		kOnClickHeld = 0x24,
-		kHandleMousewheel = 0x28,
-		kUpdate = 0x2C,
-		kHandleKeyboardInput = 0x30,
-		kGetID = 0x34,
-		kHandleSpecialKeyInput = 0x38,
-		kHandleControllerInput = 0x3C,
-		kOnUpdateUserTrait = 0x40,
-		kHandleControllerConnectOrDisconnect = 0x44
-	};
 	
 	virtual void	Destructor(bool freeMemory);
 	virtual void	SetTile(UInt32 tileID, Tile* value);
@@ -525,9 +410,9 @@ public:
 	virtual void	HandleActiveMenuClickHeld(UInt32 tileID, Tile* activeTile);
 	virtual void	OnClickHeld(UInt32 tileID, Tile* activeTile);
 	virtual void	HandleMousewheel(UInt32 tileID, Tile* tile);
-	virtual void	Update(void);
+	virtual void	Update();
 	virtual bool	HandleKeyboardInput(UInt32 inputChar);	//for keyboard shortcuts, return true if handled
-	virtual UInt32	GetID(void);
+	virtual UInt32	GetID();
 	virtual bool	HandleSpecialKeyInput(MenuSpecialKeyboardInputCode code, float keyState);
 	virtual bool	HandleControllerInput(int a2, Tile* tile) { return false; };
 	virtual void    OnUpdateUserTrait(int tileVal);
@@ -572,7 +457,7 @@ public:
 
 	void					Close()
 	{
-		this->tile->SetFloat(6002, 1);
+		tile->SetFloat(6002, 1);
 		ThisCall(0xA1D910, this);
 	}
 
@@ -592,8 +477,8 @@ public:
 	static Menu*				TempMenuByType(const UInt32 menuType);
 
 	__forceinline static void	RefreshItemsList() { StdCall(0x704AF0); }
-	static bool						RefreshItemsListForm(TESForm* form = nullptr);
-	static void						RefreshItemsListQuick();
+	static bool					RefreshItemsListForm(TESForm* form = nullptr);
+	static void					RefreshItemsListQuick();
 
 };
 
@@ -699,7 +584,7 @@ public:
 	static ContainerMenu*		GetSingleton() { return *reinterpret_cast<ContainerMenu**>(0x11D93F8); }
 	static InventoryChanges*	GetSelection() { return *reinterpret_cast<InventoryChanges**>(0x11D93FC); }
 	static void					SetSelection(InventoryChanges* entry) { *reinterpret_cast<InventoryChanges**>(0x11D93FC) = entry; }
-	void __forceinline			Refresh(TESForm* form = nullptr) { ThisCall(0x75C280, form); }
+	__forceinline void 			Refresh(TESForm* form = nullptr) { ThisCall(0x75C280, form); }
 
 };
 static_assert(sizeof(ContainerMenu) == 0x10C);
@@ -763,23 +648,23 @@ public:
 
 	enum VisibilityFlags
 	{
-		kActionPoints = 0x1,
-		kHitPoints = 0x2,
-		kRadiationMeter = 0x4,
-		kEnemyHealth = 0x8,
-		kQuestReminder = 0x10,
-		kRegionLocation = 0x20,
-		kReticleCenter = 0x40,
-		kSneakMeter = 0x80,
-		kMessages = 0x100,
-		kInfo = 0x200,
-		kSubtitles = 0x400,
-		kHotkeys = 0x800,
-		kXpMeter = 0x1000,
-		kBreathMeter = 0x2000,
-		kExplosivePositioning = 0x4000,
-		kCrippledLimbIndicator = 0x8000,
-		kHardcoreMode = 0x10000,
+		kActionPoints			= 1 << 0,
+		kHitPoints				= 1 << 1,
+		kRadiationMeter			= 1 << 2,
+		kEnemyHealth			= 1 << 3,
+		kQuestReminder			= 1 << 4,
+		kRegionLocation			= 1 << 5,
+		kReticleCenter			= 1 << 6,
+		kSneakMeter				= 1 << 7,
+		kMessages				= 1 << 8,
+		kInfo					= 1 << 9,
+		kSubtitles				= 1 << 10,
+		kHotkeys				= 1 << 11,
+		kXpMeter				= 1 << 12,
+		kBreathMeter			= 1 << 13,
+		kExplosivePositioning	= 1 << 14,
+		kCrippledLimbIndicator	= 1 << 15,
+		kHardcoreMode			= 1 << 16,
 	};
 
 	enum HUDStates
@@ -944,11 +829,9 @@ public:
 	TList<UInt32>				list26C;				// 26C
 	float						hudShake;				// 274
 
-	__forceinline static HUDMainMenu* GetSingleton() { return *reinterpret_cast<HUDMainMenu**>(0x11D96C0); }
-	static void __cdecl SetQuestUpdateText(char* src, bool a2, bool a3) { CdeclCall(0x77A5B0, src, a2, a3); }
-	static float GetOpacity() { return *(float*)0x11D979C; };
-	void RemoveQueuedQuestAndLocationUpdates();
-	void RemoveCrippledLimbIndicator();
+	__forceinline static HUDMainMenu*	GetSingleton() { return *reinterpret_cast<HUDMainMenu**>(0x11D96C0); }
+	__forceinline static void			SetQuestUpdateText(char* src, bool a2, bool a3) { CdeclCall(0x77A5B0, src, a2, a3); }
+	__forceinline static float			GetOpacity() { return *reinterpret_cast<Float32*>(0x11D979C); };
 };
 static_assert(sizeof(HUDMainMenu) == 0x278);
 

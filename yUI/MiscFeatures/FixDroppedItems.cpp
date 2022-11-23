@@ -1,5 +1,5 @@
 #include <main.h>
-#include <GameExtraData.h>
+#include <ExtraData.h>
 #include <SafeWrite.h>
 
 #include <SimpleINILibrary.h>

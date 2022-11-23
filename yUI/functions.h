@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 
-#include "GameOSDepend.h"
+#include "OSDepend.h"
 #include "NiTypes.h"
 
 namespace CraftingComponents

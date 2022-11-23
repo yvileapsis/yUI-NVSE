@@ -1,7 +1,7 @@
 #pragma once
 #include <NiNodes.h>
 #include <Types.h>
-#include <GameBSExtraData.h>
+#include <BSExtraData.h>
 
 enum AnimAction : SInt16
 {
@@ -1100,3 +1100,142 @@ struct AnimData
 
 };
 static_assert(sizeof(AnimData) == 0x13C);
+
+
+enum Coords
+{
+	kCoords_X = 0,	// 00
+	kCoords_Y,		// 01
+	kCoords_Z,		// 02
+	kCoords_Max		// 03
+};
+
+struct NavMeshVertex
+{
+	float coords[kCoords_Max];	// 000
+};	// 00C
+
+enum Vertices
+{
+	kVertices_0 = 0,	// 00
+	kVertices_1,		// 01
+	kVertices_2,		// 02
+	kVertices_Max		// 03
+};
+
+enum Sides
+{
+	kSides_0_1 = 0,	// 00
+	kSides_1_2,		// 01
+	kSides_2_0,		// 02
+	kSides_Max		// 03
+};
+
+struct NavMeshTriangle
+{
+	SInt16	verticesIndex[kVertices_Max];	// 000
+	SInt16	sides[kSides_Max];				// 006
+	UInt32	flags;							// 00C
+};	// Alloc'd by 0x10
+
+struct NavMeshInfo;
+
+struct EdgeExtraInfo
+{
+	struct Connection
+	{
+		NavMeshInfo* navMeshInfo;
+		SInt16			triangle;
+	};
+
+	UInt32	unk000;			// 00
+	Connection connectTo;	// 04
+};	// Alloc'd by 0x0C
+
+struct NavMeshTriangleDoorPortal
+{
+	TESObjectREFR* door;	// 00
+	UInt16			unk004;	// 04
+	UInt16			pad006;	// 06
+};	// Alloc'd to 0x08
+
+struct NavMeshCloseDoorInfo
+{
+	UInt32	unk000;	// 00
+	UInt32	unk004;	// 04
+};	// Alloc'd to 0x08
+
+struct NavMeshPOVData;
+struct ObstacleData;
+struct ObstacleUndoData;
+
+struct NavMeshStaticAvoidNode
+{
+	UInt32	unk000;	// 00
+	UInt32	unk004;	// 04
+	UInt32	unk008;	// 08
+	UInt32	unk00C;	// 0C
+	UInt32	unk010;	// 10
+	UInt32	unk014;	// 14
+	UInt32	unk018;	// 18
+	UInt32	unk01C;	// 1C
+	UInt32	unk020;	// 20
+	UInt32	unk024;	// 24
+};	// Alloc'd to 0x28
+
+
+
+class ScrapHeapQueue
+{
+public:
+	struct QueuedCmdCall
+	{
+		UInt32			opcode;		// 00
+		void* cmdAddr;	// 04
+		UInt32			thisObj;	// 08	refID
+		UInt32			numArgs;	// 0C
+		FunctionArg		args[4];	// 10
+
+		QueuedCmdCall(void* _cmdAddr, UInt32 _thisObj, UInt8 _numArgs) : opcode(0x2B), cmdAddr(_cmdAddr),
+			thisObj(_thisObj), numArgs(_numArgs), args{}
+		{
+		}
+	};
+
+	static ScrapHeapQueue* GetSingleton() { return *reinterpret_cast<ScrapHeapQueue**>(0x11DF1A8); }
+	__forceinline void			AddQueuedCmdCall(QueuedCmdCall qCall) { ThisCall(0x87D160, this, &qCall); }
+};
+
+
+
+inline const UInt32* g_TlsIndexPtr = reinterpret_cast<UInt32*>(0x0126FD98);
+
+struct TLSData
+{
+	// thread local storage
+
+	UInt32			pad000[(0x260 - 0x000) >> 2];	// 000
+	NiNode* lastNiNode;						// 260	248 in FOSE
+	TESObjectREFR* lastNiNodeREFR;					// 264	24C in FOSE
+	UInt8			consoleMode;					// 268
+	UInt8			pad269[3];						// 269
+	// 25C is used as do not head track the player , 
+	// 2B8 is used to init QueudFile::unk0018, 
+	// 28C might count the recursive calls to Activate, limited to 5.
+};
+
+
+static TLSData* GetTLSData()
+{
+	UInt32 TlsIndex = *g_TlsIndexPtr;
+	TLSData* data = nullptr;
+
+	__asm {
+		mov		ecx, [TlsIndex]
+		mov		edx, fs: [2Ch]	// linear address of thread local storage array
+		mov		eax, [edx + ecx * 4]
+		mov[data], eax
+	}
+
+	return data;
+}

@@ -1,12 +1,9 @@
-#include "GameAPI.h"
-#include "GameScript.h"
+#include <Script.h>
 
-#include <span>
-
-#include "GameForms.h"
-#include "Objects.h"
-#include "GameRTTI.h"
-#include "CommandTable.h"
+#include <Forms.h>
+#include <Objects.h>
+#include <GameRTTI.h>
+#include <CommandTable.h>
 
 UInt32 GetDeclaredVariableType(const char* varName, const char* scriptText)
 {
@@ -78,11 +75,11 @@ struct ScriptOperator
 	UInt8 precedence;
 	char operatorString[3];
 };
-//std::span<ActorValueInfo*> g_actorValues = { reinterpret_cast<ActorValueInfo**>(0x11D61C8), eActorVal_FalloutMax };
+//std::span<ActorValueInfo*> g_actorValues = { reinterpret_cast<ActorValueInfo**>(0x11D61C8), kAVCode_Max };
 
-std::span<CommandInfo> g_eventBlockCommandInfos = { reinterpret_cast<CommandInfo*>(0x118E2F0), 38 };
-std::span<CommandInfo> g_scriptStatementCommandInfos = { reinterpret_cast<CommandInfo*>(0x118CB50), 16 };
-std::span<ScriptOperator> g_gameScriptOperators = { reinterpret_cast<ScriptOperator*>(0x118CAD0), 16 };
+std::span g_eventBlockCommandInfos = { reinterpret_cast<CommandInfo*>(0x118E2F0), 38 };
+std::span g_scriptStatementCommandInfos = { reinterpret_cast<CommandInfo*>(0x118CB50), 16 };
+std::span g_gameScriptOperators = { reinterpret_cast<ScriptOperator*>(0x118CAD0), 16 };
 
 CommandInfo* GetEventCommandInfo(UInt16 opcode)
 {
@@ -397,4 +394,84 @@ bool ScriptLineBuffer::WriteFloat(double buf)
 }
 
 
+void ScriptEventList::Destructor()
+{
+	if (m_eventList)
+		m_eventList->RemoveAll();
+	while (m_vars) {
+		if (m_vars->var) FormHeapFree(m_vars->var);
+		VarEntry* next = m_vars->next;
+		FormHeapFree(m_vars);
+		m_vars = next;
+	}
+}
 
+TList<ScriptEventList::Var>* ScriptEventList::GetVars() const
+{
+	return reinterpret_cast<TList<Var>*>(m_vars);
+}
+
+UInt32 ScriptEventList::ResetAllVariables()
+{
+	UInt32 numVars = 0;
+	for (VarEntry* entry = m_vars; entry; entry = entry->next)
+		if (entry->var)
+		{
+			entry->var->data = 0.0;
+			numVars++;
+		}
+	return numVars;
+}
+
+ScriptEventList::Var* ScriptEventList::GetVariable(UInt32 id)
+{
+	for (VarEntry* entry = m_vars; entry; entry = entry->next)
+		if (entry->var && entry->var->id == id) return entry->var;
+	return nullptr;
+}
+
+ScriptEventList* EventListFromForm(TESForm* form)
+{
+	if (const auto refr = DYNAMIC_CAST(form, TESForm, TESObjectREFR))
+		return refr->GetEventList();
+	if (const auto quest = DYNAMIC_CAST(form, TESForm, TESQuest))
+		return quest->scriptEventList;
+	return nullptr;
+}
+
+UInt32 ScriptEventList::Var::GetFormId()
+{
+	return *(UInt32*)(&data);
+}
+
+void ShowCompilerError(ScriptLineBuffer* lineBuf, const char* fmt, ...)
+{
+
+	char errorHeader[0x400];
+	UInt32 offset = sprintf_s(errorHeader, 0x400, "Error on line %d\n\n", lineBuf->lineNumber);
+
+	va_list	args;
+	va_start(args, fmt);
+
+	char	errorMsg[0x200];
+	vsprintf_s(errorMsg, 0x200, fmt, args);
+
+	strcat_s(errorHeader, 0x400, errorMsg);
+	Log(errorHeader);
+
+	va_end(args);
+}
+
+UInt8* GetScriptDataPosition(Script* script, void* scriptDataIn, const UInt32* opcodeOffsetPtrIn)
+{
+	if (scriptDataIn != script->data) // set ... to or if ..., script data is stored on stack and not heap
+	{
+		auto* scriptData = *(static_cast<UInt8**>(scriptDataIn) + 0x1D5);
+		return scriptData + *opcodeOffsetPtrIn + 1;
+	}
+	return static_cast<UInt8*>(scriptDataIn) + *opcodeOffsetPtrIn;
+}
+
+
+const _MarkBaseExtraListScriptEvent MarkBaseExtraListScriptEvent = reinterpret_cast<_MarkBaseExtraListScriptEvent>(0x005AC750);
+const _DoCheckScriptRunnerAndRun DoCheckScriptRunnerAndRun = reinterpret_cast<_DoCheckScriptRunnerAndRun>(0x005AC190);

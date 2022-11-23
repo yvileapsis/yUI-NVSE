@@ -1,14 +1,10 @@
 #pragma once
 
 #include "Utilities.h"
-#include "GameForms.h"
+#include "Forms.h"
 
 struct ScriptEventList;
 struct ScriptBuffer;
-
-#define SCRIPT_SIZE 0x54
-static const UInt32 kScript_ExecuteFnAddr = 0x005AC1E0;
-
 
 extern CRITICAL_SECTION	csGameScript;				// trying to avoid what looks like concurrency issues
 
@@ -112,14 +108,14 @@ public:
 
 	bool			IsUserDefinedFunction() const;
 
-	// no changed flags (TESForm flags)
-	MEMBER_FN_PREFIX(Script);
-	// arg3 appears to be true for result scripts (runs script even if dataLength <= 4)
-	DEFINE_MEMBER_FN(Execute, bool, kScript_ExecuteFnAddr, TESObjectREFR* thisObj, ScriptEventList* eventList, TESObjectREFR* containingObj, bool arg3);
-	DEFINE_MEMBER_FN(Constructor, Script *, 0x005AA0F0);
-	DEFINE_MEMBER_FN(SetText, void, 0x005ABE50, const char * text);
-	DEFINE_MEMBER_FN(Run, bool, 0x005AC400, void * scriptContext, bool unkAlwaysOne, TESObjectREFR * object);
-	DEFINE_MEMBER_FN(Destructor, void, 0x005AA1A0);
+	bool Execute(TESObjectREFR* thisObj, ScriptEventList* eventList, TESObjectREFR* containingObj, bool arg3)
+	{ return ThisCall<bool>(0x005AC1E0, this, thisObj, eventList, containingObj, arg3); }
+
+	Script* Constructor() { return ThisCall<Script*>(0x005AA0F0, this); }
+	void Destructor() { ThisCall(0x005AA1A0, this); }
+	void SetText(const char* text) { ThisCall(0x005ABE50, this, text); }
+	bool Run(void* scriptContext, bool unkAlwaysOne, TESObjectREFR* object)
+	{ return ThisCall<bool>(0x005AC400, this, scriptContext, unkAlwaysOne, object); }
 
 	ScriptEventList	* CreateEventList();
 	UInt32 GetVarCount() const;
@@ -132,7 +128,7 @@ public:
 
 	static Script* CompileFromText(const std::string& text, const std::string& name);
 };
-static_assert(sizeof(Script) == SCRIPT_SIZE);
+static_assert(sizeof(Script) == 0x54);
 
 struct ConditionEntry
 {
@@ -172,9 +168,7 @@ struct QuestStageItem
 	TESQuest		* owningQuest;	// 68;
 };
 
-#if RUNTIME
-static_assert(sizeof(QuestStageItem) == (SCRIPT_SIZE + 0x1C));
-#endif
+static_assert(sizeof(QuestStageItem) == (0x54 + 0x1C));
 
 // 41C
 struct ScriptLineBuffer
@@ -247,6 +241,185 @@ struct ScriptBuffer
 	UInt32	GetVariableType(VariableInfo* varInfo, Script::RefVariable* refVar);
 };
 
+
+// represents the currently executing script context
+class ScriptRunner
+{
+public:
+	static const UInt32	kStackDepth = 10;
+
+	enum
+	{
+		kStackFlags_IF = 1 << 0,
+		kStackFlags_ELSEIF = 1 << 1,
+		/* ELSE and ENDIF modify the above flags*/
+	};
+
+	TESObjectREFR*		containingObj;		/*00*/  // set when executing scripts on inventory objects
+	TESForm*			callingRefBaseForm;	/*04*/ 
+	ScriptEventList*	eventList;			/*08*/ 
+	UInt32				unk0C;				/*0C*/ 
+	UInt32				unk10;				/*10*/  // pointer? set to NULL before executing an instruction
+	Script*				script;				/*14*/ 
+	UInt32				unk18;				/*18*/ // set to 6 after a failed expression evaluation
+	UInt32				unk1C;				/*1C*/ // set to Expression::errorCode
+	UInt32				ifStackDepth;		/*20*/ 
+	UInt32				ifStack[kStackDepth];		/*24*/ // stores flags
+	UInt32				unk4C[(0xA0 - 0x4C) >> 2];	/*4C*/ 
+	UInt8				invalidReferences;	/*A0*/ // set when the dot operator fails to resolve a reference (inside the error message handler)
+	UInt8				unkA1;				/*A1*/// set when the executing CommandInfo's 2nd flag bit (+0x25) is set
+	UInt16				padA2;				/*A2*/ 
+};
+static_assert(sizeof(ScriptRunner) == 0xA4);
+
+// unk1 = 0
+// unk2 = 0
+// callback = may be NULL apparently
+// unk4 = 0
+// unk5 = 0x17 (why?)
+// unk6 = 0
+// unk7 = 0
+// then buttons
+// then NULL
+
+void ShowCompilerError(ScriptLineBuffer* lineBuf, const char* fmt, ...);
+
+// only records individual objects if there's a block that matches it
+// ### how can it tell?
+struct ScriptEventList
+{
+	enum
+	{
+		kEvent_OnAdd					= 1 << 0,
+		kEvent_OnEquip					= 1 << 1,		// Called on Item and on Refr
+		kEvent_OnActorEquip				= kEvent_OnEquip,	// presumably the game checks the type of the object
+		kEvent_OnDrop					= 1 << 2,
+		kEvent_OnUnequip				= 1 << 3,
+		kEvent_OnActorUnequip			= kEvent_OnUnequip,
+		kEvent_OnDeath					= 1 << 4,
+		kEvent_OnMurder					= 1 << 5,
+		kEvent_OnCombatEnd				= 1 << 6,		// See 0x008A083C
+		kEvent_OnHit					= 1 << 7,		// See 0x0089AB12
+		kEvent_OnHitWith				= 1 << 8,		// TESObjectWEAP*	0x0089AB2F
+		kEvent_OnPackageStart			= 1 << 9,
+		kEvent_OnPackageDone			= 1 << 10,
+		kEvent_OnPackageChange			= 1 << 11,
+		kEvent_OnLoad					= 1 << 12,
+		kEvent_OnMagicEffectHit			= 1 << 13,		// EffectSetting* 0x0082326F
+		kEvent_OnSell					= 1 << 14,		// 0x0072FE29 and 0x0072FF05, linked to 'Barter Amount Traded' Misc Stat
+		kEvent_OnStartCombat			= 1 << 15,
+
+		kEvent_OnOpen					= 1 << 16,		// while opening some container, not all
+		kEvent_OnClose					= 1 << 17,		// idem
+		kEvent_SayToDone				= 1 << 18,		// in Func0050 0x005791C1 in relation to SayToTopicInfo (OnSayToDone? or OnSayStart/OnSayEnd?)
+		kEvent_OnGrab					= 1 << 19,		// 0x0095FACD and 0x009604B0 (same func which is called from PlayerCharacter_func001B and 0021)
+		kEvent_OnRelease				= 1 << 20,		// 0x0047ACCA in relation to container
+		kEvent_OnDestructionStageChange	= 1 << 21,		// 0x004763E7/0x0047ADEE
+		kEvent_OnFire					= 1 << 22,		// 0x008BAFB9 (references to package use item and use weapon are close)
+
+		kEvent_OnTrigger				= 1 << 28,		// 0x005D8D6A	Cmd_EnterTrigger_Execute
+		kEvent_OnTriggerEnter			= 1 << 29,		// 0x005D8D50	Cmd_EnterTrigger_Execute
+		kEvent_OnTriggerLeave			= 1 << 30,		// 0x0062C946	OnTriggerLeave ?
+		kEvent_OnReset					= 1 << 31		// 0x0054E5FB
+	};
+
+	struct Event
+	{
+		TESForm	* object;
+		UInt32	eventMask;
+	};
+
+	struct VarEntry;
+
+	struct Var
+	{
+		UInt32		id;
+		VarEntry	* nextEntry;
+		double		data;
+
+		UInt32 GetFormId();
+	};
+
+	struct VarEntry
+	{
+		Var			* var;
+		VarEntry	* next;
+	};
+
+	struct Struct010
+	{
+		UInt8 unk00[8];
+	};
+
+	typedef TList<Event> EventList;
+
+	Script			* m_script;		// 00
+	UInt32			  m_unk1;			// 04
+	EventList		* m_eventList;	// 08
+	VarEntry		* m_vars;		// 0C
+	Struct010		* unk010;		// 10
+
+	Var *	GetVariable(UInt32 id);
+	UInt32	ResetAllVariables();
+
+	void	Destructor();
+	TList<Var>* GetVars() const;
+};
+
+ScriptEventList* EventListFromForm(TESForm* form);
+
+typedef bool (* _MarkBaseExtraListScriptEvent)(TESForm* target, BaseExtraList* extraList, UInt32 eventMask);
+extern const _MarkBaseExtraListScriptEvent MarkBaseExtraListScriptEvent;
+
+typedef void (_cdecl * _DoCheckScriptRunnerAndRun)(TESObjectREFR* refr, BaseExtraList* extraList);
+extern const _DoCheckScriptRunnerAndRun DoCheckScriptRunnerAndRun;
+
+struct ExtractedParam
+{
+	// float/double types are kept as pointers
+	// this avoids problems with storing invalid floats/doubles in to the fp registers which has a side effect
+	// of corrupting data
+
+	enum
+	{
+		kType_Unknown = 0,
+		kType_String,		// str
+		kType_Imm32,		// imm
+		kType_Imm16,		// imm
+		kType_Imm8,			// imm
+		kType_ImmDouble,	// immDouble
+		kType_Form,			// form
+	};
+
+	UInt8	type;
+	bool	isVar;	// if true, data is stored in var, otherwise it's immediate
+
+	union
+	{
+		// immediate
+		UInt32			imm;
+		const double	* immDouble;
+		TESForm			* form;
+		struct
+		{
+			const char	* buf;
+			UInt32		len;
+		} str;
+
+		// variable
+		struct 
+		{
+			ScriptEventList::Var	* var;
+			ScriptEventList			* parent;
+		} var;
+	} data;
+};
+
+
 UInt32 GetDeclaredVariableType(const char* varName, const char* scriptText);	// parses scriptText to determine var type
 Script* GetScriptFromForm(TESForm* form);
 CommandInfo* GetEventCommandInfo(UInt16 opcode);
+
+// Gets the real script data ptr, as it can be a pointer to a buffer on the stack in case of vanilla expressions in set and if statements
+UInt8* GetScriptDataPosition(Script* script, void* scriptDataIn, const UInt32* opcodeOffsetPtrIn);
+

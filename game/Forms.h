@@ -1,9 +1,8 @@
 #pragma once
-#include <cassert>
 #include <NiTypes.h>
 #include <NiObjects.h>
 #include <Containers.h>
-#include <GameBSExtraData.h>
+#include <BSExtraData.h>
 
 #define IS_ID(form, type) ((form)->typeID == kFormType_##type)
 #define NOT_ID(form, type) ((form)->typeID != kFormType_##type)
@@ -2188,6 +2187,13 @@ public:
 	bool						IsCreated() const { return modIndex == 0xFF; }
 	__forceinline bool			CanContainItems() const { return typeID == kFormType_TESObjectCONT || typeID == kFormType_TESNPC || typeID == kFormType_TESCreature; }
 	__forceinline bool			IsActivator() const { return typeID == kFormType_TESObjectACTI; }
+
+
+	__forceinline static NiTPointerMap<TESForm>* GetAll() { return *reinterpret_cast<NiTPointerMap<TESForm>**>(0x11C54C0); }
+	__forceinline static TESForm* GetByID(const char* editorID) { return CdeclCall<TESForm*>(0x483A00, editorID); };
+	__forceinline static TESForm* GetByID(UInt32 refID) { return GetAll()->Lookup(refID); };
+	static TESForm* GetByID(const char* mod, UInt32 refID);
+	static TESForm* GetByID(const char* mod, const char* refID);
 };
 static_assert(sizeof(TESForm) == 0x18);
 
@@ -7134,3 +7140,6 @@ struct FaceGenData
 	UInt32		count;		// 18
 	UInt32		size;		// 1C
 };
+
+typedef TESForm* (*_CreateFormInstance)(UInt8 type);
+extern const _CreateFormInstance CreateFormInstance;

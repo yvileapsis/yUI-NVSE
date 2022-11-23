@@ -1,5 +1,4 @@
 #pragma once
-#include <GameForms.h>
 #include <NiObjects.h>
 #include <Utilities.h>
 
@@ -175,7 +174,6 @@ class TESDataHandler
 public:
 	TESDataHandler();
 	~TESDataHandler();
-	int _DoAddForm_GetPtr();
 
 	UInt32							unk00;					// 000
 	BoundObjectListHead*			boundObjectList;		// 004

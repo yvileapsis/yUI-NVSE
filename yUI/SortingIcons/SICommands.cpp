@@ -23,7 +23,7 @@ namespace SortingIcons::Commands
 
 	extern void Register()
 	{
-		SET_OPCODE_BASE(0x21D0);
+		g_nvseInterface->SetOpcodeBase(0x21D0);
 		REG_CMD_STR(ySIGetTrait);
 		REG_CMD(ySISetTrait);
 	}

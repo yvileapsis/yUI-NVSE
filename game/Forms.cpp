@@ -1,13 +1,12 @@
-#include "GameForms.h"
+#include "Forms.h"
 
-#include <algorithm>
-
-#include "GameAPI.h"
+#include "Script.h"
 #include "GameRTTI.h"
 #include "Objects.h"
 #include "GameData.h"
 #include "SaveLoadGame.h"
 
+const _CreateFormInstance CreateFormInstance = reinterpret_cast<_CreateFormInstance>(0x00465110);
 static const ActorValueInfo** ActorValueInfoPointerArray = (const ActorValueInfo**)0x0011D61C8;		// See GetActorValueInfo
 static const _GetActorValueInfo GetActorValueInfo = (_GetActorValueInfo)0x00066E920;	// See GetActorValueName
 BGSDefaultObjectManager ** g_defaultObjectManager = (BGSDefaultObjectManager**)0x011CA80C;
@@ -180,10 +179,7 @@ const char* TESBipedModelForm::GetPath(UInt32 whichPath, bool bFemalePath)
 
 SInt8 TESActorBaseData::GetFactionRank(TESFaction* faction)
 {
-	for (const auto iter : factionList)
-		if (iter && (iter->faction == faction))
-			return iter->rank;
-
+	for (const auto iter : factionList) if (iter->faction == faction) return iter->rank;
 	return -1;
 }
 
@@ -593,6 +589,22 @@ bool TESForm::IsInventoryObjectAlt()
 	}
 }
 
+extern TESDataHandler* g_TESDataHandler;
+
+TESForm* TESForm::GetByID(const char* mod, UInt32 refID)
+{
+	if (const auto modInfo = g_TESDataHandler->LookupModByName(mod))
+		return GetByID((modInfo->modIndex << 24) + (refID & 0x00FFFFFF));
+	return nullptr;
+}
+
+TESForm* TESForm::GetByID(const char* mod, const char* refID)
+{
+	if (const auto modInfo = g_TESDataHandler->LookupModByName(mod))
+		return GetByID((modInfo->modIndex << 24) + (HexStringToInt(refID) & 0x00FFFFFF));
+	return nullptr;
+}
+
 const char* TESPackage::TargetData::StringForTargetCode(UInt8 targetCode)
 {
 	switch (targetCode)	{
@@ -804,8 +816,7 @@ const char* TESPackage::StringForProcedureCode(eProcedure proc, bool bRemovePref
 
 const char* TESPackage::PackageTime::DayForCode(UInt8 dayCode)
 {
-	dayCode += 1;
-	return (dayCode < sizeof TESPackage_DayStrings) ? TESPackage_DayStrings[dayCode] : "";
+	return (dayCode + 1 < sizeof TESPackage_DayStrings) ? TESPackage_DayStrings[dayCode] : "";
 }
 
 BGSQuestObjective* TESQuest::GetObjective(UInt32 objectiveID) const
@@ -822,8 +833,7 @@ BGSQuestObjective* TESQuest::GetObjective(UInt32 objectiveID) const
 
 const char* TESPackage::PackageTime::MonthForCode(UInt8 monthCode)
 {
-	monthCode += 1;
-	return (monthCode < sizeof TESPackage_MonthString) ? TESPackage_MonthString[monthCode] : "";
+	return (monthCode + 1 < sizeof TESPackage_MonthString) ? TESPackage_MonthString[monthCode] : "";
 }
 
 UInt8 TESPackage::PackageTime::CodeForDay(const char* dayStr)
