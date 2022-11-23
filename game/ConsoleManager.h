@@ -1,6 +1,6 @@
 #pragma once
-#include "Containers.h"
-#include "Utilities.h"
+#include <Containers.h>
+#include <Utilities.h>
 
 void PrintConsole(const char* fmt, ...);
 bool IsConsoleMode();

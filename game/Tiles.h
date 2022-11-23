@@ -1,7 +1,7 @@
 #pragma once
 #include <NiNodes.h>
 #include <Containers.h>
-#include <filesystem>
+#include <Utilities.h>
 
 //	Tile			
 //		TileRect		3C	ID=385
@@ -159,42 +159,9 @@ enum eTileValue {
 	kTileValue_max
 };
 
-class Tile
+// 14
+struct TileValue
 {
-public:
-	Tile();
-	~Tile();
-
-	enum eTileID {
-		kTileID_rect = 0x0385,
-		kTileID_image,
-		kTileID_text,
-		kTileID_3D,
-		kTileID_nif = kTileID_3D,
-		kTileID_menu,
-
-		// Not a Tile descendend
-		kTileID_hotrect,
-		kTileID_window,
-		// This one descend from TileImage
-		kTileID_radial,
-
-		kTileID_max
-	};
-
-	virtual Tile* Destroy(bool noDealloc);
-	virtual void			Init(Tile* parent, const char* name, Tile* replacedChild);
-	virtual NiNode* CalcNode(void);
-	virtual UInt32			GetType(void);		// returns one of kTileValue_XXX
-	virtual const char* GetTypeStr(void);	// 4-byte id
-	virtual bool			Unk_05(UInt32 arg0, UInt32 arg1);
-	virtual UInt32			UpdateField(UInt32 valueID, float floatValue, const char* strValue);
-	virtual void			Unk_07(void);
-	virtual UInt32			Unk_08(void);
-	virtual void			Unk_09(UInt32 arg0, UInt32 arg1, UInt32 arg2);
-
-	struct Value;
-
 	enum ActionType
 	{
 		kAction_copy = 0x7D0,
@@ -232,11 +199,11 @@ public:
 		Action();
 		~Action();
 
-		virtual float	GetFloat();
-		virtual Value* GetValue();
+		virtual float		GetFloat();
+		virtual TileValue*	GetValue();
 
 		UInt32		type;		// 04
-		Action* next;		// 08
+		Action*		next;		// 08
 	};
 
 	// 10
@@ -246,7 +213,7 @@ public:
 		RefValueAction();
 		~RefValueAction();
 
-		Value* tileVal;	// 0C
+		TileValue* tileVal;	// 0C
 	};
 
 	// 10
@@ -259,17 +226,49 @@ public:
 		float		value;		// 0C
 	};
 
-	// 14
-	struct Value
-	{
-		UInt32		id;			// 00
-		Tile*		parent;		// 04
-		float		num;		// 08
-		char*		str;		// 0C
-		Action*		action;		// 10
+	UInt32		id;			// 00
+	Tile*		parent;		// 04
+	float		num;		// 08
+	char*		str;		// 0C
+	Action*		action;		// 10
 
-		__forceinline void __thiscall Refresh(bool string) { ThisCall<void>(0xA09410, this, string); };
+	__forceinline void Refresh(bool string) { ThisCall<void>(0xA09410, this, string); };
+	__forceinline void SetFloat(Float32 flt, char chr) { ThisCall<void>(0xA0A270, this, flt, chr); }
+};
+
+class Tile
+{
+public:
+	Tile();
+	~Tile();
+
+	enum eTileID {
+		kTileID_rect = 0x0385,
+		kTileID_image,
+		kTileID_text,
+		kTileID_3D,
+		kTileID_nif = kTileID_3D,
+		kTileID_menu,
+
+		// Not a Tile descendend
+		kTileID_hotrect,
+		kTileID_window,
+		// This one descend from TileImage
+		kTileID_radial,
+
+		kTileID_max
 	};
+
+	virtual Tile*			Destroy(bool noDealloc);
+	virtual void			Init(Tile* parent, const char* name, Tile* replacedChild);
+	virtual NiNode*			CalcNode(void);
+	virtual UInt32			GetType(void);		// returns one of kTileValue_XXX
+	virtual const char*		GetTypeStr(void);	// 4-byte id
+	virtual bool			Unk_05(UInt32 arg0, UInt32 arg1);
+	virtual UInt32			UpdateField(UInt32 valueID, float floatValue, const char* strValue);
+	virtual void			Unk_07(void);
+	virtual UInt32			Unk_08(void);
+	virtual void			Unk_09(UInt32 arg0, UInt32 arg1, UInt32 arg2);
 
 	struct ChildNode
 	{
@@ -279,7 +278,7 @@ public:
 	};
 
 	DList<Tile>					children;	// 04
-	BSSimpleArray<Value*>		values;		// 10
+	BSSimpleArray<TileValue*>	values;		// 10
 	String						name;		// 20
 	Tile*						parent;		// 28
 	NiNode*						node;		// 2C
@@ -288,28 +287,25 @@ public:
 	UInt8						unk35;		// 35
 	UInt8						pad35[2];	// 36
 
-	static UInt32				TraitNameToID(const char* traitName) { return CdeclCall<UInt32>(0x00A01860, traitName); }
-	static const char* TraitIDToName(int id);	// slow
-	__forceinline Value* __fastcall	GetValue(UInt32 typeID);
-	Value*						GetValue(const char* valueName) { return GetValue(TraitNameToID(valueName)); }
-	DListNode<Tile>*			GetNthChild(UInt32 index);
-	Tile*						GetChild(const char * childName);
-	Tile*						GetComponent(const char * componentTile, const char **trait);
-	Tile*						GetComponentTile(const char * componentTile);
-	Value*						GetComponentValue(const char * componentPath);
-	char*						GetComponentFullName(char *resStr);
+	__forceinline static UInt32	TraitNameToID(const char* traitName) { return CdeclCall<UInt32>(0x00A01860, traitName); }
+	static const char*			TraitIDToName(int id);	// slow
+	__forceinline TileValue* __fastcall	GetValue(UInt32 typeID);
+	TileValue*					GetValue(const char* valueName) { return GetValue(TraitNameToID(valueName)); }
+	Tile*						GetNthChild(UInt32 index);
+	Tile*						GetChild(const std::string& childName) const;
+	Tile*						GetComponent(const std::string& componentPath);
 
 	__forceinline Tile*			ReadXML(const std::filesystem::path& xmlPath) { return ThisCall<Tile*>(0xA01B00, this, xmlPath.generic_string().c_str()); }
-	__forceinline Tile*			InjectUIXML(const std::filesystem::path& str) { return exists(str) ? this->ReadXML(str) : nullptr; };
+	__forceinline Tile*			InjectUIXML(const std::filesystem::path& str) { return exists(str) ? ReadXML(str) : nullptr; };
 
 	__forceinline Float32		GetFloat(const UInt32 id) { return ThisCall<Float32>(0xA011B0, this, id); };
 	__forceinline Float32		GetFloat(const char* id) { return this->GetFloat(TraitNameToID(id)); };
 
 	__forceinline void			SetFloat(UInt32 id, float fltVal, bool bPropagate = true) { ThisCall(0xA012D0, this, id, fltVal, bPropagate); }
-	__forceinline void			SetFloat(const char* id, float fltVal, bool bPropagate = true) { this->SetFloat(TraitNameToID(id), fltVal, bPropagate); }
+	__forceinline void			SetFloat(const char* id, float fltVal, bool bPropagate = true) { SetFloat(TraitNameToID(id), fltVal, bPropagate); }
 
 	__forceinline void			SetString(UInt32 id, const char* strVal, bool bPropagate = true) { ThisCall(0xA01350, this, id, strVal, bPropagate); }
-	__forceinline void			SetString(const char* id, const char* strVal, bool bPropagate = true) { this->SetString(TraitNameToID(id), strVal, bPropagate); }
+	__forceinline void			SetString(const char* id, const char* strVal, bool bPropagate = true) { SetString(TraitNameToID(id), strVal, bPropagate); }
 
 	void						SetStringRecursive(UInt32, const char*, const char*);
 
@@ -317,7 +313,7 @@ public:
 								{ ThisCall(0xA07C60, this, id, startVal, endVal, seconds, changeMode); };
 
 	__forceinline void			GradualSetFloat(const char* id, Float32 startVal, Float32 endVal, Float32 seconds, UInt32 changeMode = 0)
-								{ this->GradualSetFloat(TraitNameToID(id), startVal, endVal, seconds, changeMode); }
+								{ GradualSetFloat(TraitNameToID(id), startVal, endVal, seconds, changeMode); }
 
 	__forceinline Menu*			GetParentMenu() { return ThisCall<Menu*>(0xA03C90, this); };
 	TileMenu*					GetTileMenu();
@@ -346,9 +342,6 @@ class TileMenu : public TileRect
 {
 public:
 	Menu	* menu;	// 3C - confirmed
-
-//	static TileMenu*	GetMenuTile(const UInt32);
-	static TileMenu*	GetTileMenu(UInt32 menuID);
 };
 static_assert(sizeof(TileMenu) == 0x40);
 

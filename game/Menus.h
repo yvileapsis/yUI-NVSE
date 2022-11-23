@@ -4,6 +4,50 @@
 #include <GameAPI.h>
 #include <GameExtraData.h>
 
+
+enum
+{
+	kMenuType_Min = 0x3E9,
+	kMenuType_Message = kMenuType_Min,
+	kMenuType_Inventory,
+	kMenuType_Stats,
+	kMenuType_HUDMain,
+	kMenuType_Loading = 0x3EF,
+	kMenuType_Container,
+	kMenuType_Dialog,
+	kMenuType_SleepWait = 0x3F4,
+	kMenuType_Start,
+	kMenuType_LockPick,
+	kMenuType_Quantity = 0x3F8,
+	kMenuType_Map = 0x3FF,
+	kMenuType_Book = 0x402,
+	kMenuType_LevelUp,
+	kMenuType_Repair = 0x40B,
+	kMenuType_RaceSex,
+	kMenuType_Credits = 0x417,
+	kMenuType_CharGen,
+	kMenuType_TextEdit = 0x41B,
+	kMenuType_Barter = 0x41D,
+	kMenuType_Surgery,
+	kMenuType_Hacking,
+	kMenuType_VATS,
+	kMenuType_Computers,
+	kMenuType_RepairServices,
+	kMenuType_Tutorial,
+	kMenuType_SpecialBook,
+	kMenuType_ItemMod,
+	kMenuType_LoveTester = 0x432,
+	kMenuType_CompanionWheel,
+	kMenuType_TraitSelect,
+	kMenuType_Recipe,
+	kMenuType_SlotMachine = 0x438,
+	kMenuType_Blackjack,
+	kMenuType_Roulette,
+	kMenuType_Caravan,
+	kMenuType_Trait = 0x43C,
+	kMenuType_Max = kMenuType_Trait,
+};
+
 enum MenuSpecialKeyboardInputCode
 {
 	kMenu_Enter = -2,
@@ -322,7 +366,7 @@ public:
 			const auto numVisibleItemsTrait = Tile::TraitNameToID("_number_of_visible_items");
 			if (this->parentTile->GetFloat(numVisibleItemsTrait) > 0)
 			{
-				auto valPtr = ThisCall<Tile::Value*>(0xA00E90, this->parentTile, kTileValue_height);
+				auto valPtr = ThisCall<TileValue*>(0xA00E90, this->parentTile, kTileValue_height);
 				ThisCall(0xA09200, valPtr);
 				ThisCall(0xA09130, valPtr, 2000, newTile, kTileValue_height);
 
@@ -385,7 +429,7 @@ public:
 			const auto numVisibleItemsTrait = Tile::TraitNameToID("_number_of_visible_items");
 			if (this->parentTile->GetFloat(numVisibleItemsTrait) > 0)
 			{
-				auto valPtr = ThisCall<Tile::Value*>(0xA00E90, this->parentTile, kTileValue_height);
+				auto valPtr = ThisCall<TileValue*>(0xA00E90, this->parentTile, kTileValue_height);
 				ThisCall(0xA09200, valPtr);
 				ThisCall(0xA09130, valPtr, 2000, listItem->tile, kTileValue_height);
 
@@ -524,7 +568,7 @@ public:
 
 	Menu*					HandleMenuInput(UInt32 tileID, Tile* clickedTile);
 	__forceinline Tile*		AddTileFromTemplate(Tile* destTile, const char* templateName, UInt32 arg3 = 0)	{ return ThisCall<Tile*>(0xA1DDB0, this, destTile, templateName, arg3); }
-	bool					GetTemplateExists(const std::string& templateName);
+	bool					GetTemplateExists(const std::string& templateName) const;
 
 	void					Close()
 	{
@@ -536,6 +580,21 @@ public:
 
 	__forceinline void			RegisterTile(Tile* tile, bool noAppendToMenuStack) { ThisCall(0xA1DC70, this, tile, noAppendToMenuStack); };
 	__forceinline void			HideTitle(bool noFadeIn) { ThisCall(0xA1DC20, this, noFadeIn); };
+
+
+	static bool					IsVisible(const UInt32 menuType);
+	bool						IsVisible() const;
+	static TileMenu*			GetTileMenu(const UInt32 menuType);
+	TileMenu*					GetTileMenu() const;
+	static TileMenu*			GetTileMenu(const std::string& componentPath);
+	static Menu*				GetMenu(const UInt32 menuType);
+	static Menu*				GetMenu(const std::string& componentPath);
+	static Menu*				TempMenuByType(const UInt32 menuType);
+
+	__forceinline static void	RefreshItemsList() { StdCall(0x704AF0); }
+	static bool						RefreshItemsListForm(TESForm* form = nullptr);
+	static void						RefreshItemsListQuick();
+
 };
 
 class MenuItemEntryList : public ListBox<InventoryChanges>
@@ -1738,7 +1797,7 @@ struct HackingText
 
 	String str;
 	Tile* tileText;
-	Tile::Value* tileValueVisibility;
+	TileValue* tileValueVisibility;
 	UInt32 displayRate;
 	UInt32 flashOnDuration;
 	UInt32 flashOffDuration;
@@ -1827,7 +1886,7 @@ public:
 	TileImage* hacking_password_file_target;
 	UInt32 controllerSelectedTileIdx;
 	UInt32 transitionToComputersMenuTime;
-	Tile::Value* hacking_cursor_visibleTrait;
+	TileValue* hacking_cursor_visibleTrait;
 	UInt8 shouldNotHighlightWordOnHover;
 	UInt8 hasAllowanceBeenReplenished;
 	UInt8 hasShownHelp;
@@ -1886,7 +1945,7 @@ public:
 	ListBox<MenuEntry> terminalMenuItemsListBox;
 	TList<void> subMenuBGSTerminals;
 	UInt32 time0A0;
-	Tile::Value* isComputersCursorVisible;
+	TileValue* isComputersCursorVisible;
 	BGSTerminal* targetRefBaseForm;
 	TESObjectREFR* targetRef;
 	UInt32 stage;
@@ -3255,3 +3314,5 @@ enum Scancodes
 };
 static BSSimpleArray<StartMenuUserOption*>* g_settingsMenuOptions = (BSSimpleArray<StartMenuUserOption*>*)0x11DAB50;
 void MenuButton_DownloadsClick();
+
+TileValue* StringToTilePath(const std::string& componentPath);

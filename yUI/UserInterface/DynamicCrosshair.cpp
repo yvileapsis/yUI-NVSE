@@ -83,7 +83,7 @@ namespace UserInterface::DynamicCrosshair
 	{
 		if (!enable || MenuMode()) return;
 
-		tileMain->SetFloat(tileMain->GetComponentValue("_AlphaRC")->id, tileReticleCenter->GetChild("reticle_center")->GetFloat(kTileValue_alpha));
+		tileMain->SetFloat(tileMain->GetValue("_AlphaRC")->id, tileReticleCenter->GetChild("reticle_center")->GetFloat(kTileValue_alpha));
 
 		if (true && tileReticleCenter->GetChild("reticle_center")->children.Head()) { // TODO:: iHUDEditor
 			tileMain->SetFloat(kTileValue_red, tileReticleCenter->GetChild("reticle_center")->children.Head()->data->GetFloat(kTileValue_red));

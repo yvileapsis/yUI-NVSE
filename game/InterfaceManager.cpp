@@ -1,11 +1,6 @@
 #include <InterfaceManager.h>
-#include <Menus.h>
-
-#include "Objects.h"
-#include "SafeWrite.h"
-
-UInt8* g_menuVisibility = reinterpret_cast<UInt8*>(0x011F308F);
-NiTArray<TileMenu*>* g_tileMenuArray = reinterpret_cast<NiTArray<TileMenu*>*>(0x011F3508);
+#include <Objects.h>
+#include <SafeWrite.h>
 
 const _QueueUIMessage QueueUIMessage = reinterpret_cast<_QueueUIMessage>(0x007052F0);	// Called from Cmd_AddSpell_Execute
 
@@ -41,88 +36,6 @@ bool FontInfo::GetName(char* out)
 	return true;
 }
 
-// IF requires change of skeleton - and back to false when model updated
-bool InterfaceManager::IsMenuVisible(const UInt32 menuType)
-{
-	return menuType >= kMenuType_Min && menuType <= kMenuType_Max ? g_menuVisibility[menuType] != 0 : false;
-}
-
-TileMenu* TileMenu::GetTileMenu(const UInt32 menuType)
-{
-	return menuType >= kMenuType_Min && menuType <= kMenuType_Max ? g_tileMenuArray->Get(menuType - kMenuType_Min) : nullptr;
-}
-
-Menu* InterfaceManager::GetMenuByType(const UInt32 menuType)
-{
-	if (const auto tileMenu = TileMenu::GetTileMenu(menuType)) return tileMenu->menu;
-	return nullptr;
-}
-
-Menu* InterfaceManager::TempMenuByType(UInt32 menuType)
-{
-	return menuType >= kMenuType_Min && menuType <= kMenuType_Max ? CdeclCall<Menu*>(0x00707990, menuType) : nullptr;
-}
-
-const char kMenuNames[] =
-"MessageMenu\0InventoryMenu\0StatsMenu\0HUDMainMenu\0LoadingMenu\0ContainerMenu\0DialogMenu\0SleepWaitMenu\0StartMenu\0\
-LockpickMenu\0QuantityMenu\0MapMenu\0BookMenu\0LevelUpMenu\0RepairMenu\0RaceSexMenu\0CharGenMenu\0TextEditMenu\0BarterMenu\0\
-SurgeryMenu\0HackingMenu\0VATSMenu\0ComputersMenu\0RepairServicesMenu\0TutorialMenu\0SpecialBookMenu\0ItemModMenu\0LoveTesterMenu\0\
-CompanionWheelMenu\0TraitSelectMenu\0RecipeMenu\0SlotMachineMenu\0BlackjackMenu\0RouletteMenu\0CaravanMenu\0TraitMenu";
-const UInt32 kMenuIDs[] =
-{
-	kMenuType_Message, kMenuType_Inventory, kMenuType_Stats, kMenuType_HUDMain, kMenuType_Loading, kMenuType_Container,
-	kMenuType_Dialog, kMenuType_SleepWait, kMenuType_Start, kMenuType_LockPick, kMenuType_Quantity, kMenuType_Map, kMenuType_Book,
-	kMenuType_LevelUp, kMenuType_Repair, kMenuType_RaceSex, kMenuType_CharGen, kMenuType_TextEdit, kMenuType_Barter, kMenuType_Surgery,
-	kMenuType_Hacking, kMenuType_VATS, kMenuType_Computers, kMenuType_RepairServices, kMenuType_Tutorial, kMenuType_SpecialBook,
-	kMenuType_ItemMod, kMenuType_LoveTester, kMenuType_CompanionWheel, kMenuType_TraitSelect, kMenuType_Recipe, kMenuType_SlotMachine,
-	kMenuType_Blackjack, kMenuType_Roulette, kMenuType_Caravan, kMenuType_Trait
-};
-
-std::unordered_map<std::string, UInt32> s_menuNameToID;
-
-// Split component path into "top-level menu name" and "everything else".
-// Path is of format "MenuType/tile/tile/..." following hierarchy defined in menu's xml.
-// Returns pointer to top-level menu or NULL.
-// pSlashPos is set to the slash character after the top-level menu name.
-TileMenu* InterfaceManager::GetMenuByPath(const char* componentPath, const char** pSlashPos)
-{
-	if (s_menuNameToID.empty())
-	{
-		const char* strPos = kMenuNames;
-		UInt32 count = 0;
-		do
-		{
-			s_menuNameToID[strPos] = kMenuIDs[count];
-			strPos += StrLen(strPos) + 1;
-		} while (++count < 36);
-	}
-
-	char* slashPos = SlashPos(componentPath);
-	if (slashPos) *slashPos = 0;
-	*pSlashPos = slashPos;
-	const UInt32 menuID = s_menuNameToID[componentPath];
-	return menuID ? g_tileMenuArray->Get(menuID - kMenuType_Min) : nullptr;
-}
-
-Tile::Value* InterfaceManager::GetMenuComponentValue(const char* componentPath)
-{
-	// path is of format "MenuType/tile/tile/.../traitName" following hierarchy defined in menu's xml
-	const char* slashPos;
-	TileMenu* tileMenu = GetMenuByPath(componentPath, &slashPos);
-	if (tileMenu && slashPos)
-		return tileMenu->GetComponentValue(slashPos + 1);
-	return nullptr;
-}
-
-Tile* InterfaceManager::GetMenuComponentTile(const char* componentPath)
-{
-	// path is of format "MenuType/tile/tile/.../tile" following hierarchy defined in menu's xml
-	const char* slashPos;
-	TileMenu* tileMenu = GetMenuByPath(componentPath, &slashPos);
-	if (tileMenu && slashPos)
-		return tileMenu->GetComponentTile(slashPos + 1);
-	return tileMenu;
-}
 
 void InterfaceManager::VATSHighlightData::AddRef(TESObjectREFR* ref)
 {
@@ -141,62 +54,6 @@ void InterfaceManager::VATSHighlightData::AddRefAndSetFlashing(TESObjectREFR* re
 		this->mode = 1;
 	}
 };
-
-/*
- * Lifted from Stewie's Tweaks
- * RefreshItemsList calls itemsList->FreeAllTiles() and then allocates the memory for all the tiles again
- * instead skip the calls that free/allocate
- */
- /*
- void RefreshItemsList()
- {
-	 SafeWriteBuf(0x75C588, "\xA1\x3C\xEA\x1D\x01", 5);
-	 SafeWriteBuf(0x75C5AC, "\x8B\x8D\x44\xFF\xFF\xFF\x8B\x51\x74", 9);
-	 InterfaceManager::RefreshItemsList();
- }
- */
-bool InterfaceManager::RefreshItemsListForm(TESForm* form)
-{
-	bool refresh = false;
-	if (IsMenuVisible(kMenuType_Barter))
-	{
-		BarterMenu::GetSingleton()->Refresh(form);
-		refresh = true;
-	}
-	if (IsMenuVisible(kMenuType_Container))
-	{
-		ContainerMenu::GetSingleton()->Refresh(form);
-		refresh = true;
-	}
-	if (IsMenuVisible(kMenuType_RepairServices))
-	{
-		RepairServicesMenu::GetSingleton()->Refresh();
-		refresh = true;
-	}
-	return refresh;
-}
-
-void InterfaceManager::RefreshItemsListQuick()
-{
-	SafeWriteBuf(0x78319C, "\xE8\x2F\xCE\xFF\xFF\xEB\x70", 7); // InventoryMenu, call SaveCurrentTabScrollPosition and skip reallocating tiles
-
-	SafeWrite16(0x75C3F5, 0); // ContainerMenu, nop JE by changing dest
-	SafeWrite16(0x75C443, 0x60EB); // ContainerMenu
-
-	SafeWrite16(0x72DC9C, 0); // BarterMenu
-	SafeWrite32(0x72DCD3, 0x0004B2E9); // BarterMenu, jump over code recalculating the selected items for trading
-
-	RefreshItemsList();
-
-	SafeWriteBuf(0x78319C, "\x6A\x00\x6A\x00\x68\x50\x28", 7); // InventoryMenu
-
-	SafeWrite16(0x75C3F5, 0x0182); // ContainerMenu
-	SafeWrite16(0x75C443, 0x4D8B); // ContainerMenu
-
-	SafeWrite16(0x72DC9C, 0x01F6);
-	SafeWrite32(0x72DCD3, 0x00D1840F); // jump over code recalculating the selected items for trading
-}
-
 
 /*
  * Lifted from JIP LN

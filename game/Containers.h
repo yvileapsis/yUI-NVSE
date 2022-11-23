@@ -67,7 +67,7 @@ template <typename Item> struct TListNode
 		return next;
 	}
 
-	TListNode* Append(Item* _data)
+	TListNode<Item>* Append(Item* _data)
 	{
 		const auto newNode = static_cast<TListNode*>(FormHeapAlloc(sizeof(TListNode)));
 		newNode->data = _data;
@@ -76,7 +76,7 @@ template <typename Item> struct TListNode
 		return newNode;
 	}
 
-	TListNode* Insert(Item* _data)
+	TListNode<Item>* Insert(Item* _data)
 	{
 		const auto newNode = static_cast<TListNode*>(FormHeapAlloc(sizeof(TListNode)));
 		newNode->data = data;
@@ -620,6 +620,13 @@ public:
 			}
 			current = current->next;
 		}
+	}
+
+	Node* GetNthChild(UInt32 n)
+	{
+		auto node = first;
+		while (n--) node = node->next;
+		return node;
 	}
 };
 static_assert(sizeof(DList<void*>) == 0xC);

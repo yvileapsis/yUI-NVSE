@@ -1,6 +1,5 @@
 #include <Containers.h>
 #include <Utilities.h>
-#include <algorithm>
 
 String::String() : m_data(NULL), m_dataLen(0), m_bufLen(0) {}
 

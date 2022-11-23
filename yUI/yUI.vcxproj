@@ -165,6 +165,7 @@
     <ClCompile Include="UserInterface\HitMarker.cpp" />
     <ClCompile Include="UserInterface\LootMenu.cpp" />
     <ClCompile Include="UserInterface\VisualObjectives.cpp" />
+    <ClCompile Include="\\Mac\Home\Documents\GitHub\yUI-NVSE\game\NiNodes.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\game\ConsoleManager.h" />

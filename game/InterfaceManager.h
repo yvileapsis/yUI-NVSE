@@ -1,48 +1,6 @@
 #pragma once
-#include <Tiles.h>
-
-enum
-{
-	kMenuType_Min = 0x3E9,
-	kMenuType_Message = kMenuType_Min,
-	kMenuType_Inventory,
-	kMenuType_Stats,
-	kMenuType_HUDMain,
-	kMenuType_Loading = 0x3EF,
-	kMenuType_Container,
-	kMenuType_Dialog,
-	kMenuType_SleepWait = 0x3F4,
-	kMenuType_Start,
-	kMenuType_LockPick,
-	kMenuType_Quantity = 0x3F8,
-	kMenuType_Map = 0x3FF,
-	kMenuType_Book = 0x402,
-	kMenuType_LevelUp,
-	kMenuType_Repair = 0x40B,
-	kMenuType_RaceSex,
-	kMenuType_Credits = 0x417,
-	kMenuType_CharGen,
-	kMenuType_TextEdit = 0x41B,
-	kMenuType_Barter = 0x41D,
-	kMenuType_Surgery,
-	kMenuType_Hacking,
-	kMenuType_VATS,
-	kMenuType_Computers,
-	kMenuType_RepairServices,
-	kMenuType_Tutorial,
-	kMenuType_SpecialBook,
-	kMenuType_ItemMod,
-	kMenuType_LoveTester = 0x432,
-	kMenuType_CompanionWheel,
-	kMenuType_TraitSelect,
-	kMenuType_Recipe,
-	kMenuType_SlotMachine = 0x438,
-	kMenuType_Blackjack,
-	kMenuType_Roulette,
-	kMenuType_Caravan,
-	kMenuType_Trait = 0x43C,
-	kMenuType_Max = kMenuType_Trait,
-};
+#include <NiTypes.h>
+#include <Containers.h>
 
 // can be passed to QueueUIMessage to determine Vaultboy icon displayed
 enum eEmotion {
@@ -341,19 +299,9 @@ public:
 	~InterfaceManager();
 
 	static InterfaceManager*	GetSingleton() { return *reinterpret_cast<InterfaceManager**>(0x11D8A80); };
-	static bool					IsMenuVisible(const UInt32 menuType);
-	static Menu*				GetMenuByType(const UInt32 menuType);
-	static Menu*				TempMenuByType(const UInt32 menuType);
-	static TileMenu*			GetMenuByPath(const char* componentPath, const char** slashPos);
-	static Tile::Value*			GetMenuComponentValue(const char* componentPath);
-	static Tile*				GetMenuComponentTile(const char* componentPath);
-	static Tile::Value*			GetMenuComponentValueAlt(const char* componentPath);
 
 	UInt32						GetTopVisibleMenuID();
 	Tile*						GetActiveTile();
-	static void	__forceinline	RefreshItemsList() { StdCall(0x704AF0); }
-	static void					RefreshItemsListQuick();
-	static bool					RefreshItemsListForm(TESForm* form = nullptr);
 };
 static_assert(sizeof(InterfaceManager) == 0x580);
 static_assert(sizeof(InterfaceManager::Struct0178) == 0x64);
@@ -647,4 +595,3 @@ struct FontHeightData
 	float		heightwGap;
 };
 //s_fontHeightDatas[90];
-void Debug_DumpFontNames();

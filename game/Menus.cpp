@@ -1,6 +1,7 @@
 #include <Utilities.h>
 #include <Menus.h>
 #include <Objects.h>
+#include <SafeWrite.h>
 
 static UInt8*	g_bUpdatePlayerModel		= (UInt8*)0x011C5CB4;	// this is set to true when player confirms change of race in RaceSexMenu -
 
@@ -13,11 +14,54 @@ void MenuButton_DownloadsClick() { MenuButton_Downloads(); }
 
 InventoryChanges** g_modMenuTarget = reinterpret_cast<InventoryChanges**>(0x11D9F58);
 
+UInt8* menuVisibility = reinterpret_cast<UInt8*>(0x011F308F);
+NiTArray<TileMenu*>* tileMenuArray = reinterpret_cast<NiTArray<TileMenu*>*>(0x011F3508);
+// IF requires change of skeleton - and back to false when model updated
+bool Menu::IsVisible(const UInt32 menuType) { return menuType >= kMenuType_Min && menuType <= kMenuType_Max ? menuVisibility[menuType] : false; }
+bool Menu::IsVisible() const { return  menuVisibility[id]; }
+TileMenu* Menu::GetTileMenu(const UInt32 menuType) { return menuType >= kMenuType_Min && menuType <= kMenuType_Max ? tileMenuArray->Get(menuType - kMenuType_Min) : nullptr; }
+TileMenu* Menu::GetTileMenu() const { return tileMenuArray->Get(id - kMenuType_Min); }
 
-bool Menu::GetTemplateExists(const std::string& templateName)
+Menu* Menu::GetMenu(const UInt32 menuType)
 {
-	for (const auto node : menuTemplates)
-		if (templateName == node->templateName) return true;
+	const auto tileMenu = GetTileMenu(menuType);
+	return tileMenu ? tileMenu->menu : nullptr;
+}
+
+std::unordered_map<std::string, UInt32> menuNameToID = {
+	{"MessageMenu", kMenuType_Message},			{"InventoryMenu", kMenuType_Inventory},				{"StatsMenu", kMenuType_Stats},
+	{"HUDMainMenu", kMenuType_HUDMain},			{"LoadingMenu", kMenuType_Loading},					{"ContainerMenu", kMenuType_Container},
+	{"DialogMenu", kMenuType_Dialog},			{"SleepWaitMenu", kMenuType_SleepWait},				{"StartMenu", kMenuType_Start},
+	{"LockpickMenu", kMenuType_LockPick},		{"QuantityMenu", kMenuType_Quantity},				{"MapMenu", kMenuType_Map},
+	{"BookMenu", kMenuType_Book},				{"LevelUpMenu", kMenuType_LevelUp},					{"RepairMenu", kMenuType_Repair},
+	{"RaceSexMenu", kMenuType_RaceSex},			{"CharGenMenu", kMenuType_CharGen},					{"TextEditMenu", kMenuType_TextEdit},
+	{"BarterMenu", kMenuType_Barter},			{"SurgeryMenu", kMenuType_Surgery},					{"HackingMenu", kMenuType_Hacking},
+	{"VATSMenu", kMenuType_VATS},				{"ComputersMenu", kMenuType_Computers},				{"RepairServicesMenu", kMenuType_RepairServices},
+	{"TutorialMenu", kMenuType_Tutorial},		{"SpecialBookMenu", kMenuType_SpecialBook},			{"ItemModMenu", kMenuType_ItemMod},
+	{"LoveTesterMenu", kMenuType_LoveTester},	{"CompanionWheelMenu", kMenuType_CompanionWheel},	{"TraitSelectMenu", kMenuType_TraitSelect},
+	{"RecipeMenu", kMenuType_Recipe},			{"SlotMachineMenu", kMenuType_SlotMachine},			{"BlackjackMenu", kMenuType_Blackjack},
+	{"RouletteMenu", kMenuType_Roulette},		{"CaravanMenu", kMenuType_Caravan},					{"TraitMenu", kMenuType_Trait},
+};
+
+TileMenu* Menu::GetTileMenu(const std::string& componentPath) 
+{
+	return GetTileMenu(menuNameToID[componentPath]);
+}
+
+Menu* Menu::GetMenu(const std::string& componentPath) 
+{
+	const auto tileMenu = GetTileMenu(componentPath);
+	return tileMenu ? tileMenu->menu : nullptr;
+}
+
+Menu* Menu::TempMenuByType(const UInt32 menuType)
+{
+	return menuType >= kMenuType_Min && menuType <= kMenuType_Max ? CdeclCall<Menu*>(0x00707990, menuType) : nullptr;
+}
+
+bool Menu::GetTemplateExists(const std::string& templateName) const
+{
+	for (const auto node : menuTemplates) if (templateName == node->templateName) return true;
 	return false;
 }
 
@@ -35,7 +79,7 @@ bool DialogMenu::IsNPCTalking()
 
 bool IsInStartMenu()
 {
-	auto menu = StartMenu::GetSingleton();
+	const auto menu = StartMenu::GetSingleton();
 	return menu && menu->flags & StartMenu::kInStartMenu;
 }
 
@@ -138,3 +182,61 @@ void RefreshLocalMap()
 	SafeWriteBuf(0x79DF73, "\x6A\x00\x68\xB1\x0F", 5);
 }
 };*/
+
+TileValue* StringToTilePath(const std::string& componentPath)
+{
+	const auto firstSlash = componentPath.find_first_of('/');
+	const auto lastSlash = componentPath.find_last_of('/');
+	const auto tileMenu = Menu::GetTileMenu(componentPath.substr(0, firstSlash - 1));
+	const auto tile = tileMenu->GetComponent(componentPath.substr(firstSlash + 1, lastSlash - 1));
+	const auto component = Tile::TraitNameToID(componentPath.substr(lastSlash + 1).data());
+	return tile->GetValue(component);
+}
+
+/*
+ * Lifted from Stewie's Tweaks
+ * RefreshItemsList calls itemsList->FreeAllTiles() and then allocates the memory for all the tiles again
+ * instead skip the calls that free/allocate
+ */
+
+bool Menu::RefreshItemsListForm(TESForm* form)
+{
+	bool refresh = false;
+	if (const auto menu = BarterMenu::GetSingleton(); menu->IsVisible())
+	{
+		menu->Refresh(form);
+		refresh = true;
+	}
+	if (const auto menu = ContainerMenu::GetSingleton(); menu->IsVisible())
+	{
+		menu->Refresh(form);
+		refresh = true;
+	}
+	if (const auto menu = RepairServicesMenu::GetSingleton(); menu->IsVisible())
+	{
+		menu->Refresh();
+		refresh = true;
+	}
+	return refresh;
+}
+
+void Menu::RefreshItemsListQuick()
+{
+	SafeWriteBuf(0x78319C, "\xE8\x2F\xCE\xFF\xFF\xEB\x70", 7); // InventoryMenu, call SaveCurrentTabScrollPosition and skip reallocating tiles
+
+	SafeWrite16(0x75C3F5, 0); // ContainerMenu, nop JE by changing dest
+	SafeWrite16(0x75C443, 0x60EB); // ContainerMenu
+
+	SafeWrite16(0x72DC9C, 0); // BarterMenu
+	SafeWrite32(0x72DCD3, 0x0004B2E9); // BarterMenu, jump over code recalculating the selected items for trading
+
+	RefreshItemsList();
+
+	SafeWriteBuf(0x78319C, "\x6A\x00\x6A\x00\x68\x50\x28", 7); // InventoryMenu
+
+	SafeWrite16(0x75C3F5, 0x0182); // ContainerMenu
+	SafeWrite16(0x75C443, 0x4D8B); // ContainerMenu
+
+	SafeWrite16(0x72DC9C, 0x01F6);
+	SafeWrite32(0x72DCD3, 0x00D1840F); // jump over code recalculating the selected items for trading
+}

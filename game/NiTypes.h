@@ -1,5 +1,4 @@
 #pragma once
-#include "Utilities.h"
 
 #define DECL_FLOAT_OP(op) \
 	NiPoint3 operator op(const float n) const \
@@ -21,8 +20,6 @@
 		return *this = NiPoint3(x op v.x, y op v.y, z op v.z); \
 	}
 
-
-const UInt32 _NiTMap_Lookup = 0x00853130;
 
 // 8
 struct NiRTTI {
@@ -539,7 +536,7 @@ public:
 	virtual void						Equal(T_Key key1, T_Key key2);					// 002
 	virtual void						FillEntry(Entry entry, T_Key key, T_Data data);	// 003
 	virtual	void						Unk_004(void * arg0);							// 004
-	virtual	void						Unk_005(void);									// 005
+	virtual	void						Unk_005();										// 005
 	virtual	void						Unk_006();										// 006
 
 	//void**	_vtbl;	// 0
@@ -547,7 +544,10 @@ public:
 	Entry**		buckets;	// 8
 	UInt32		numItems;	// C
 
-	DEFINE_MEMBER_FN_LONG(NiTMapBase, Lookup, bool, _NiTMap_Lookup, T_Key key, T_Data * dataOut);
+	__forceinline bool LookUp(T_Key key, T_Data *dataOut)
+	{
+		return ThisCall<bool>(0x00853130, this, key, dataOut);
+	}
 };
 
 // 14

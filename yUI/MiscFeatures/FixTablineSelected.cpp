@@ -13,7 +13,7 @@ namespace Fix::TablineSelected
 
 	void MainLoop()
 	{
-		if (CdeclCall<bool>(0x702360) && InterfaceManager::IsMenuVisible(kMenuType_Inventory)) {
+		if (CdeclCall<bool>(0x702360) && Menu::IsVisible(kMenuType_Inventory)) {
 			if (needToFix) {
 				needToFix = false;
 				if (!tabline)

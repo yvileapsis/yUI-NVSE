@@ -100,7 +100,7 @@ bool Setting::Set(const char* str)
 
 bool GameSettingCollection::GetGameSetting(const char* settingName, Setting** out)
 {
-	return CALL_MEMBER_FN(&settingMap, Lookup)(settingName, out); // ***** hippo fix me ****
+	return settingMap.LookUp(settingName, out);
 }
 
 GameSettingCollection * GameSettingCollection::GetSingleton()

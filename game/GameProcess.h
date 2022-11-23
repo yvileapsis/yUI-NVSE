@@ -1,5 +1,6 @@
 #pragma once
 #include <NiNodes.h>
+#include <Types.h>
 #include <GameBSExtraData.h>
 
 enum AnimAction : SInt16
@@ -1095,7 +1096,7 @@ struct AnimData
 	NiNode* 						node130;
 	TList<void> 					list134;
 
-	AnimGroupID GetNextAttackGroupID() const;
+	TESAnimGroup::AnimGroupID GetNextAttackGroupID() const;
 
 };
 static_assert(sizeof(AnimData) == 0x13C);

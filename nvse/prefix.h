@@ -406,6 +406,7 @@ class TileImage;
 class TileMenu;
 class TileRect;
 class TileText;
+struct TileValue;
 class TraitMenu;
 class TraitSelectMenu;
 class TressPassPackage;

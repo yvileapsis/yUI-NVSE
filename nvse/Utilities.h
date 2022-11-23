@@ -1,6 +1,4 @@
 #pragma once
-#include <prefix.h>
-
 #include <algorithm>
 #include <filesystem>
 #include <fstream>
@@ -95,9 +93,6 @@ __forceinline void* FormHeapAlloc(UInt32 size) { return CdeclCall<void*>(0x00401
 __forceinline void	FormHeapFree(void* ptr) { CdeclCall(0x00401030, ptr); }
 
 
-class Script;
-
-void DumpClass(void * theClassPtr, UInt32 nIntsToDump = 512);
 const char * GetObjectClassName(void * obj);
 const std::filesystem::path& GetFalloutDirectory();
 std::string GetNVSEConfigOption(const char * section, const char * key);

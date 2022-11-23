@@ -63,8 +63,7 @@ bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS)
 	SInt64 grandchild = 0;
 	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &child, &grandchild, &src)) return true;
 	std::string path = MCMPath(child, grandchild, src);
-	Tile::Value* val = InterfaceManager::GetMenuComponentValue(path.c_str());
-	if (val) *result = val->num;
+	if (const auto val = StringToTilePath(path.c_str())) *result = val->num;
 	return true;
 }
 
@@ -77,8 +76,7 @@ bool Cmd_SetyCMFloat_Execute(COMMAND_ARGS)
 	float value = 0;
 	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &child, &grandchild, &src, &value)) return true;
 	std::string path = MCMPath(child, grandchild, src);
-	Tile::Value* val = InterfaceManager::GetMenuComponentValue(path.c_str());
-	if (val) {
+	if (const auto val = StringToTilePath(path.c_str())) {
 		*result = 1;
 		val->parent->SetFloat(val->id, value);
 	}
@@ -93,8 +91,7 @@ bool Cmd_GetyCMString_Execute(COMMAND_ARGS)
 	SInt64 grandchild = 0;
 	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &child, &grandchild, &src)) return true;
 	std::string path = MCMPath(child, grandchild, src);
-	Tile::Value* val = InterfaceManager::GetMenuComponentValue(path.c_str());
-	if (val) AssignString(PASS_COMMAND_ARGS, val->str);
+	if (const auto val = StringToTilePath(path.c_str())) AssignString(PASS_COMMAND_ARGS, val->str);
 	return true;
 }
 
@@ -108,8 +105,7 @@ bool Cmd_SetyCMString_Execute(COMMAND_ARGS)
 	char buffer[0x80];
 	if (!ExtractFormatStringArgs(3, buffer, EXTRACT_ARGS_EX, SetyCMStringParams, &child, &grandchild, &src)) return true;
 	std::string path = MCMPath(child, grandchild, src);
-	Tile::Value* val = InterfaceManager::GetMenuComponentValue(path.c_str());
-	if (val) {
+	if (const auto val = StringToTilePath(path.c_str())) {
 		*result = 1;
 		val->parent->SetString(val->id, buffer);
 	}
@@ -122,7 +118,7 @@ bool Cmd_SetUIFloat_Execute(COMMAND_ARGS)
 	char src[0x100] = "\0";
 	float value = 0;
 	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &src, &value)) return true;
-	if (const auto val = InterfaceManager::GetMenuComponentValue(src)) {
+	if (const auto val = StringToTilePath(src)) {
 		*result = 1;
 		val->parent->SetFloat(val->id, value);
 	}
@@ -207,9 +203,9 @@ void FixReorderMCM()
 
 			const auto tileMCMOptions = tileMCM->GetChild("MCM_Options");
 
-			for (auto iter : tileMCMOptions->children)
+			for (const auto iter : tileMCMOptions->children)
 			{
-				if (iter->GetComponentValue("_optionID"))
+				if (iter->GetValue("_optionID"))
 				{
 					const auto tileValue = iter->GetChild("value");
 					tileValue->children.Sort(SortValueChildren);

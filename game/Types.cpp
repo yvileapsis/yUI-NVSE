@@ -1,56 +1,58 @@
 #include <Types.h>
-#include <GameAPI.h>
 #include <string>
-#include <algorithm>
 #include <Objects.h>
 #include <GameProcess.h>
-#include <unordered_set>
-
 #include "GameData.h"
 /*** String ***/
 
-AnimGroupID AnimData::GetNextAttackGroupID() const
+// an array of structs describing each of the game's anim groups
+static const TESAnimGroup::AnimGroupInfo* s_animGroupInfos = (const TESAnimGroup::AnimGroupInfo*)0x011977D8;
+
+TESAnimGroup::AnimGroupID AnimData::GetNextAttackGroupID() const
 {
-	const auto type = ThisStdCall<char>(0x495E40, this, 0);
-	switch (type)
+	switch (ThisStdCall<char>(0x495E40, this, 0))
 	{
-	case '3':
-		return kAnimGroup_Attack3;
-	case '4':
-		return kAnimGroup_Attack4;
-	case '5':
-		return kAnimGroup_Attack5;
-	case '6':
-		return kAnimGroup_Attack6;
-	case '7':
-		return kAnimGroup_Attack7;
-	case '8':
-		return kAnimGroup_Attack8;
-	case 'l':
-		return kAnimGroup_AttackLeft;
+	case '3': return TESAnimGroup::kAnimGroup_Attack3;
+	case '4': return TESAnimGroup::kAnimGroup_Attack4;
+	case '5': return TESAnimGroup::kAnimGroup_Attack5;
+	case '6': return TESAnimGroup::kAnimGroup_Attack6;
+	case '7': return TESAnimGroup::kAnimGroup_Attack7;
+	case '8': return TESAnimGroup::kAnimGroup_Attack8;
+	case 'l': return TESAnimGroup::kAnimGroup_AttackLeft;
 	default:
-		TESObjectWEAP* weap;
-		if (this->actor->baseProcess->GetWeaponInfo() && (weap = this->actor->baseProcess->GetWeaponInfo()->weapon))
-		{
-			if (weap->attackAnim != 0xFF)
-				return static_cast<AnimGroupID>(weap->attackAnim);
+		if (const auto weaponInfo = this->actor->baseProcess->GetWeaponInfo(); weaponInfo && weaponInfo->weapon)
+			if (const auto attackAnim = weaponInfo->weapon->attackAnim; attackAnim != 0xFF) 
+				return static_cast<TESAnimGroup::AnimGroupID>(attackAnim);
+		return TESAnimGroup::kAnimGroup_AttackRight;
+	}
+}
+
+const char* TESAnimGroup::StringForAnimGroupCode(UInt32 groupCode)
+{
+	return (groupCode < kAnimGroup_Max) ? s_animGroupInfos[groupCode].name : NULL;
+}
+
+UInt32 TESAnimGroup::AnimGroupForString(const char* groupName)
+{
+	for (UInt32 i = 0; i < kAnimGroup_Max; i++) {
+		if (!_stricmp(s_animGroupInfos[i].name, groupName)) {
+			return i;
 		}
-		return kAnimGroup_AttackRight;
+	}
+
+	return kAnimGroup_Max;
+}
+
+void DumpAnimGroups()
+{
+	for (UInt32 i = 0; i < TESAnimGroup::kAnimGroup_Max; i++) {
+		Log(FormatString("%d,%s", i, s_animGroupInfos[i].name));
+		//if (!_stricmp(s_animGroupInfos[i].name, "JumpLandRight"))
+		//	break;
 	}
 }
 
 OSInputGlobals** g_inputGlobals = reinterpret_cast<OSInputGlobals**>(0x11F35CC);
-
-NiExtraData* __fastcall NiObjectNET::GetExtraData(UInt32 vtbl) const
-{
-	for (UInt16 index = 0; index < m_extraDataListLen; index++)
-	{
-		const auto iter = this->m_extraDataList[index];
-		if (*(UInt32*)iter == vtbl)
-			return iter;
-	}
-	return nullptr;
-}
 
 NiControllerSequence* NiControllerManager::FindSequence(const char* seqName)
 {

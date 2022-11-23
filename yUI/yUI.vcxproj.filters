@@ -146,6 +146,9 @@
     <ClCompile Include="..\nvse\Logging.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
+    <ClCompile Include="\\Mac\Home\Documents\GitHub\yUI-NVSE\game\NiNodes.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h" />

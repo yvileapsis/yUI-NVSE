@@ -1,6 +1,6 @@
-#include "NiNodes.h"
+#include <NiNodes.h>
+#include <Utilities.h>
 
-#if RUNTIME
 void TextureFormat::InitFromD3DFMT(UInt32 fmt)
 {
 	typedef void (* _D3DFMTToTextureFormat)(UInt32 d3dfmt, TextureFormat * dst);
@@ -11,8 +11,26 @@ void TextureFormat::InitFromD3DFMT(UInt32 fmt)
 
 static const UInt32 kNiObjectNET_SetNameAddr = 0x00A5B690;
 
-// an array of structs describing each of the game's anim groups
-static const TESAnimGroup::AnimGroupInfo* s_animGroupInfos = (const TESAnimGroup::AnimGroupInfo*)0x011977D8;
+NiExtraData* __fastcall NiObjectNET::GetExtraData(UInt32 vtbl) const
+{
+	for (UInt16 index = 0; index < m_extraDataListLen; index++)
+	{
+		const auto iter = this->m_extraDataList[index];
+		if (*(UInt32*)iter == vtbl)
+			return iter;
+	}
+	return nullptr;
+}
+
+NiExtraData* NiObjectNET::GetExtraData2(const char* name)
+{
+	return ThisCall<NiExtraData*>(0x006FF9C0, this, name);
+}
+
+bool NiObjectNET::AddExtraData(NiExtraData* xData)
+{
+	return ThisCall<bool>(0xA5BA40, this, xData);
+}
 
 void NiObjectNET::SetName(const char* newName)
 {
@@ -27,28 +45,3 @@ void NiObjectNET::SetName(const char* newName)
 	// OBSE : ThisStdCall(kNiObjectNET_SetNameAddr, this, newName);
 }
 
-const char* TESAnimGroup::StringForAnimGroupCode(UInt32 groupCode)
-{
-	return (groupCode < TESAnimGroup::kAnimGroup_Max) ? s_animGroupInfos[groupCode].name : NULL;
-}
-
-UInt32 TESAnimGroup::AnimGroupForString(const char* groupName)
-{
-	for (UInt32 i = 0; i < TESAnimGroup::kAnimGroup_Max; i++) {
-		if (!_stricmp(s_animGroupInfos[i].name, groupName)) {
-			return i;
-		}
-	}
-
-	return TESAnimGroup::kAnimGroup_Max;
-}
-
-void DumpAnimGroups(void)
-{
-	for (UInt32 i = 0; i < TESAnimGroup::kAnimGroup_Max; i++) {
-		_MESSAGE("%d,%s", i , s_animGroupInfos[i].name);
-		//if (!_stricmp(s_animGroupInfos[i].name, "JumpLandRight"))
-		//	break;
-	}
-}
-#endif

@@ -110,7 +110,7 @@ void Dump(Tile* tile)
 
 	for (UInt32 i = 0; i < tile->values.size; i++)
 	{
-		const Tile::Value* val = tile->values[i];
+		const TileValue* val = tile->values[i];
 		const char* traitName = tile->TraitIDToName(val->id);
 		char traitNameIDBuf[16];
 
