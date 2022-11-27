@@ -486,7 +486,6 @@ public:
 
 		Iterator() : m_curr(nullptr) {}
 		Iterator(Node* node) : m_curr(node) {}
-		Iterator(const DList* _list) : m_curr(const_cast<Node*>(& _list->first)) {}
 		Iterator(DList& _list, Item* _item) : m_curr(&_list.first) { Find(_item); }
 		Iterator(DList* _list, Item* _item) : m_curr(&_list->first) { Find(_item); }
 	};
@@ -496,7 +495,7 @@ public:
 	Node* Tail() { return last; }
 	UInt32 Count() const { return count; }
 
-	Iterator begin() const { return Iterator(this); }
+	Iterator begin() const { return Iterator(first); }
 	Iterator end() const { return Iterator(); }
 
 	void ExchangeNodeData(Node* node1, Node* node2)
