@@ -1,22 +1,9 @@
 #pragma once
-#include <Forms.h>
+#include <Object.h>
 #include <GameProcess.h>
 #include <Sound.h>
 
 typedef std::unordered_map<TESForm*, InventoryItemData> InventoryItemsMap;
-
-class TESChildCell
-{
-public:
-	TESChildCell();
-	~TESChildCell();
-
-	// no virtual destructor
-	virtual TESObjectCELL*	GetPersistentCell(void);		// 000
-
-//	void	** vtbl;	// 00
-};
-static_assert(sizeof(TESChildCell) == 0x4);
 
 class TESObjectREFR : public TESForm
 {
@@ -149,7 +136,7 @@ public:
 	SInt32					GetItemCount(TESForm* form);
 	void					AddItemAlt(TESForm* item, UInt32 count, float condition, bool doEquip);
 	bool					GetInventoryItems(UInt8 typeID);
-	TESObjectCELL*			GetParentCell() { return this->parentCell; };
+	TESObjectCELL*			GetParentCell() const { return parentCell; };
 	TESWorldSpace*			GetParentWorld() { return ThisCall<TESWorldSpace*>(0x575D70, this); };
 	bool __fastcall			GetInSameCellOrWorld(TESObjectREFR* target) const;
 	Float32 __vectorcall	GetDistance(TESObjectREFR* target);
@@ -383,17 +370,6 @@ public:
 		// bit 0 = keep moving (Q)
 };
 
-enum LifeStates
-{
-	kLifeState_Alive				= 0,
-	kLifeState_Dying				= 1,
-	kLifeState_Dead					= 2,
-	kLifeState_Unconscious			= 3,
-	kLifeState_Reanimate			= 4,
-	kLifeState_Restrained			= 5,
-	kLifeState_EssentialUnconscious	= 6,
-};
-
 
 enum ActorValueCode
 {
@@ -491,9 +467,21 @@ enum ActorValueCode
 	kAVCode_Max = 0x4D,
 };
 
+enum LifeStates
+{
+	kLifeState_Alive = 0,
+	kLifeState_Dying = 1,
+	kLifeState_Dead = 2,
+	kLifeState_Unconscious = 3,
+	kLifeState_Reanimate = 4,
+	kLifeState_Restrained = 5,
+	kLifeState_EssentialUnconscious = 6,
+};
+
 class Actor : public MobileObject
 {
 public:
+
 	Actor();
 	~Actor();
 
@@ -529,7 +517,7 @@ public:
 	virtual void		CannibalizeActor(void);
 	virtual void		GetRace(void);
 	virtual void		GetHandReachTimesCombatDistance(void);
-	virtual void		Unk_E1(void);
+	virtual void		Unk_E1();
 	virtual void		Unk_E2(void);
 	virtual void		HasRagdoll(void);
 	virtual void		GetActorType(void);	// Creature = 0, Character = 1, PlayerCharacter = 2
@@ -734,12 +722,11 @@ public:
 
 	std::vector<TESForm*>				GetEquippedItems();
 	InventoryChangesArray				GetEquippedEntryDataList();
-	ExtendDataArray						GetEquippedExtendDataList();
 	Float64								GetCalculatedSpread(UInt32 mode = 0, InventoryChanges* entry = nullptr);
 
 	bool								IsDoingAttackAnim() { return ThisCall<bool>(0x894900, this); }
 	bool								IsCombatTarget(const Actor* source);
-	bool								IsHostileCompassTarget();
+	bool								IsHostileCompassTarget() const;
 
 	Float32								GetHitDataValue(UInt32 valueType) const;
 	Float32								GetActorValue(ActorValueCode avcode);
@@ -1130,38 +1117,37 @@ struct ActorHitData
 		kFlag_ArmorPenetrated = 0x80000000	// JIP only
 	};
 
-	Actor* source;			// 00
-	Actor* target;			// 04
+	Actor*				source;			// 00
+	Actor*				target;			// 04
 	union								// 08
 	{
-		Projectile* projectile;
-		Explosion* explosion;
-		Actor* actor;
+		Projectile*		projectile;
+		Explosion*		explosion;
+		Actor*			actor;
 	};
 	UInt32				weaponAV;		// 0C
 	SInt32				hitLocation;	// 10
-	float				healthDmg;		// 14
-	float				wpnBaseDmg;		// 18	Skill and weapon condition modifiers included
-	float				fatigueDmg;		// 1C
-	float				limbDmg;		// 20
-	float				blockDTMod;		// 24
-	float				armorDmg;		// 28
-	float				weaponDmg;		// 2C
-	TESObjectWEAP* weapon;			// 30
+	Float32				healthDmg;		// 14
+	Float32				wpnBaseDmg;		// 18	Skill and weapon condition modifiers included
+	Float32				fatigueDmg;		// 1C
+	Float32				limbDmg;		// 20
+	Float32				blockDTMod;		// 24
+	Float32				armorDmg;		// 28
+	Float32				weaponDmg;		// 2C
+	TESObjectWEAP*		weapon;			// 30
 	Float32				healthPerc;		// 34
 	NiPoint3			impactPos;		// 38
 	NiPoint3			impactAngle;	// 44
 	UInt32				unk50;			// 50
-	void* ptr54;			// 54
+	void*				ptr54;			// 54
 	UInt32				flags;			// 58
-	float				dmgMult;		// 5C
+	Float32				dmgMult;		// 5C
 	SInt32				unk60;			// 60	Unused; rigged by CopyHitDataHook to store hitLocation
 
 	TESAmmo* GetAmmo() const;
 	TESObjectWEAP* GetWeapon() const;
 	Script* GetAmmoScript() const;
 };
-
 
 enum APCostActions
 {
@@ -1188,22 +1174,22 @@ enum APCostActions
 
 struct __declspec(align(4)) VATSQueuedAction
 {
-	APCostActions actionType;
-	UInt8 isSuccess;
-	UInt8 byte05;
-	UInt8 isMysteriousStrangerVisit;
-	UInt8 byte07;
-	UInt8 remainingShotsToFire_Burst;
-	UInt8 count09;
-	UInt8 gap0A[2];
-	TESObjectREFR* unkref;
-	ActorValueCode bodyPart;
-	ActorHitData* hitData;
-	float unk18;
-	float unk1C;
-	float apCost;
-	UInt8 isMissFortuneVisit;
-	UInt8 gap25[3];
+	APCostActions			actionType;
+	UInt8					isSuccess;
+	UInt8					byte05;
+	UInt8					isMysteriousStrangerVisit;
+	UInt8					byte07;
+	UInt8					remainingShotsToFire_Burst;
+	UInt8					count09;
+	UInt8					gap0A[2];
+	TESObjectREFR*			unkref;
+	ActorValueCode			bodyPart;
+	ActorHitData*			hitData;
+	float					unk18;
+	float					unk1C;
+	float					apCost;
+	UInt8					isMissFortuneVisit;
+	UInt8					gap25[3];
 };
 
 enum AnimMoveTypes

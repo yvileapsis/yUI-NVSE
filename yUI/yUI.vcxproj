@@ -116,9 +116,9 @@
     <ClCompile Include="..\nvse\dinput8.cpp" />
     <ClCompile Include="..\game\BSExtraData.cpp" />
     <ClCompile Include="..\game\GameData.cpp" />
-    <ClCompile Include="..\game\ExtraData.cpp" />
-    <ClCompile Include="..\game\Forms.cpp" />
-    <ClCompile Include="..\game\Objects.cpp" />
+    <ClCompile Include="..\game\InventoryChanges.cpp" />
+    <ClCompile Include="..\game\Form.cpp" />
+    <ClCompile Include="..\game\Reference.cpp" />
     <ClCompile Include="..\game\OSDepend.cpp" />
     <ClCompile Include="..\game\GameRTTI.cpp" />
     <ClCompile Include="..\game\Script.cpp" />
@@ -166,6 +166,7 @@
     <ClCompile Include="UserInterface\VisualObjectives.cpp" />
     <ClCompile Include="\\Mac\Home\Documents\GitHub\yUI-NVSE\game\GameProcess.cpp" />
     <ClCompile Include="\\Mac\Home\Documents\GitHub\yUI-NVSE\game\NiNodes.cpp" />
+    <ClCompile Include="\\Mac\Home\Documents\GitHub\yUI-NVSE\game\Object.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\game\ConsoleManager.h" />
@@ -178,9 +179,9 @@
     <ClInclude Include="..\game\BSExtraData.h" />
     <ClInclude Include="..\game\GameData.h" />
     <ClInclude Include="..\game\GameEffects.h" />
-    <ClInclude Include="..\game\ExtraData.h" />
-    <ClInclude Include="..\game\Forms.h" />
-    <ClInclude Include="..\game\Objects.h" />
+    <ClInclude Include="..\game\InventoryChanges.h" />
+    <ClInclude Include="..\game\Form.h" />
+    <ClInclude Include="..\game\Reference.h" />
     <ClInclude Include="..\game\OSDepend.h" />
     <ClInclude Include="..\game\GameProcess.h" />
     <ClInclude Include="..\game\GameRTTI.h" />
@@ -206,6 +207,7 @@
     <ClInclude Include="main.h" />
     <ClInclude Include="..\libraries\SimpleINILibrary.h" />
     <ClInclude Include="SortingIcons\SI.h" />
+    <ClInclude Include="\\Mac\Home\Documents\GitHub\yUI-NVSE\game\Object.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\game\GameRTTI.inc" />

@@ -1,7 +1,7 @@
 #include "SI.h"
 
 #include <main.h>
-#include <Objects.h>
+#include <Reference.h>
 #include <PluginAPI.h>
 
 namespace SortingIcons::Commands

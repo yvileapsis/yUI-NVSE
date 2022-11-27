@@ -1,7 +1,6 @@
 #pragma once
-
 #include "Utilities.h"
-#include "Forms.h"
+#include "Form.h"
 
 struct ScriptEventList;
 struct ScriptBuffer;
@@ -364,6 +363,8 @@ struct ScriptEventList
 
 	void	Destructor();
 	TList<Var>* GetVars() const;
+	void					EventCreate(UInt32 eventCode, TESObjectREFR* container);
+
 };
 
 ScriptEventList* EventListFromForm(TESForm* form);

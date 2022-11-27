@@ -1,7 +1,7 @@
 #include <Script.h>
 
-#include <Forms.h>
-#include <Objects.h>
+#include <Form.h>
+#include <Reference.h>
 #include <GameRTTI.h>
 #include <CommandTable.h>
 
@@ -409,6 +409,23 @@ void ScriptEventList::Destructor()
 TList<ScriptEventList::Var>* ScriptEventList::GetVars() const
 {
 	return reinterpret_cast<TList<Var>*>(m_vars);
+}
+
+void ScriptEventList::EventCreate(UInt32 eventCode, TESObjectREFR* container)
+{
+	// create Event struct
+	const auto pEvent = (ScriptEventList::Event*)FormHeapAlloc(sizeof(ScriptEventList::Event));
+	if (pEvent) {
+		pEvent->eventMask = eventCode;
+		pEvent->object = container;
+	}
+
+	if (!m_eventList) {
+		m_eventList = (ScriptEventList::EventList*)FormHeapAlloc(sizeof(ScriptEventList::EventList));
+		m_eventList->Init();
+	}
+	if (m_eventList && pEvent)
+		m_eventList->AddAt(pEvent, 0);
 }
 
 UInt32 ScriptEventList::ResetAllVariables()

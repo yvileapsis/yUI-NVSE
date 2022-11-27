@@ -658,7 +658,6 @@ public:
 };
 static_assert(sizeof(BaseProcess) == 0x30);
 
-
 class LowProcess : public BaseProcess
 {
 public:
@@ -870,7 +869,6 @@ public:
 };
 static_assert(sizeof(MiddleHighProcess) == 0x25C);
 
-
 // 46C
 class HighProcess : public MiddleHighProcess
 {
@@ -986,7 +984,6 @@ public:
 };
 static_assert(sizeof(HighProcess) == 0x46C);
 
-
 class AnimIdle : public NiRefObject
 {
 public:
@@ -1002,7 +999,6 @@ public:
 	Actor* actor;
 };
 static_assert(sizeof(AnimIdle) == 0x38);
-
 
 class AnimSequenceBase
 {
@@ -1021,8 +1017,6 @@ class AnimSequenceSingle : public AnimSequenceBase
 public:
 	BSAnimGroupSequence* anim;
 };
-
-
 
 // 08
 class AnimSequenceMultiple : public AnimSequenceBase
@@ -1183,8 +1177,6 @@ struct NavMeshStaticAvoidNode
 	UInt32	unk024;	// 24
 };	// Alloc'd to 0x28
 
-
-
 class ScrapHeapQueue
 {
 public:
@@ -1205,8 +1197,6 @@ public:
 	static ScrapHeapQueue* GetSingleton() { return *reinterpret_cast<ScrapHeapQueue**>(0x11DF1A8); }
 	__forceinline void			AddQueuedCmdCall(QueuedCmdCall qCall) { ThisCall(0x87D160, this, &qCall); }
 };
-
-
 
 inline const UInt32* g_TlsIndexPtr = reinterpret_cast<UInt32*>(0x0126FD98);
 

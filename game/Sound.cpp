@@ -1,6 +1,6 @@
 #include <Sound.h>
 #include <NiObjects.h>
-#include <Objects.h>
+#include <Reference.h>
 
 
 void Sound::PlayEDID(const char* soundEDID, UInt32 flags, TESObjectREFR* refr)

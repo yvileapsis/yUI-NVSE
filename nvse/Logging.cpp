@@ -5,10 +5,12 @@
 
 #include <ConsoleManager.h>
 #include <BSExtraData.h>
-#include <ExtraData.h>
+#include <InventoryChanges.h>
 #include <InterfaceManager.h>
 #include <Tiles.h>
 #include <Utilities.h>
+
+#include "Form.h"
 
 typedef void(*LoggingFunction)(std::fstream& file, const std::string& str);
 typedef LoggingFunction(*UpdateFunction)();

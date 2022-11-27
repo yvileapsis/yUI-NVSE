@@ -5,7 +5,7 @@
 #include <SafeWrite.h>
 #include <SimpleINILibrary.h>
 
-#include "Objects.h"
+#include "Reference.h"
 
 namespace Patch::RestoreFO3Spread
 {

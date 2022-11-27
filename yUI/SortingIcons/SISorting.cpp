@@ -34,7 +34,7 @@ namespace SortingIcons::Categories
 				if (entry.weapon.clipRounds &&		entry.weapon.clipRounds > static_cast<UInt32>(weapon->GetClipRounds(false))) continue;
 				if (entry.weapon.numProjectiles &&	entry.weapon.numProjectiles > weapon->numProjectiles) continue;
 				if (entry.weapon.soundLevel &&		entry.weapon.soundLevel != weapon->soundLevel) continue;
-				if (entry.weapon.ammo &&			!FormContainsRecusive(entry.weapon.ammo, weapon->ammo.ammo)) continue;
+				if (entry.weapon.ammo &&			!reinterpret_cast<BGSListForm*>(entry.weapon.ammo)->ContainsRecursive(weapon->ammo.ammo)) continue;
 			}
 			else if (entry.common.formType == kFormType_TESObjectARMO) {
 
@@ -160,7 +160,7 @@ namespace SortingIcons::Keyrings
 	{
 
 		if (!update) for (auto list = InventoryMenu::GetSingleton()->itemsList.list; const auto iter : list)
-			if (iter->tile && iter->tile->GetValue(kTileValue_user16)) { iter->tile->Destroy(false); list.Remove(iter); }
+			if (iter->tile && iter->tile->GetValue(kTileValue_user16)) { iter->tile->Destroy(false); list.RemoveItem(iter); }
 
 
 		for (const auto& key : itemCountsForKeyrings | std::views::keys)

@@ -132,12 +132,6 @@ void Console_Print_Long(const std::string& str);
 
 #define SIZEOF_ARRAY(arrayName, elementType) (sizeof(arrayName) / sizeof(elementType))
 
-class FormMatcher
-{
-public:
-	virtual bool Matches(TESForm* pForm) const = 0;
-};
-
 namespace MersenneTwister
 {
 

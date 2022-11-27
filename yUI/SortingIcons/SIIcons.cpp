@@ -127,10 +127,17 @@ namespace SortingIcons::Icons
 			icon->SetFloat(kTileValue_visible, false, true);
 			return;
 		}
-		const auto stringdimensions = FontManager::GetSingleton()->GetStringDimensions(tile->GetValue(kTileValue_string)->str, 7, tile->GetFloat(kTileValue_wrapwidth));
-		icon->SetFloat(kTileValue_x, -stringdimensions->x / 2 - icon->GetFloat(kTileValue_width) - icon->GetFloat(kTileValue_user1));
-		icon->SetFloat(kTileValue_y, icon->GetFloat(kTileValue_user2) - icon->GetFloat(kTileValue_height) / 4);
+		const auto fontManager = FontManager::GetSingleton();
+		const auto string = tile->GetValue(kTileValue_string)->str;
+		const auto wrapwidth = tile->GetFloat(kTileValue_wrapwidth);
+		const auto font = tile->parent->GetFloat(kTileValue_font);
+		const auto stringDimensions = fontManager->GetStringDimensions(string, 7, wrapwidth);
+		icon->SetFloat(kTileValue_x, -stringDimensions->x / 2 - icon->GetFloat(kTileValue_width) - icon->GetFloat(kTileValue_user1));
+		icon->SetFloat(kTileValue_y, - icon->GetFloat(kTileValue_user2));
 		icon->SetFloat(kTileValue_visible, true, true);
+		icon->SetFloat(kTileValue_systemcolor, tile->GetFloat(kTileValue_systemcolor));
+		icon->SetFloat(kTileValue_brightness, tile->GetFloat(kTileValue_brightness));
+		icon->SetFloat(kTileValue_alpha, tile->GetFloat(kTileValue_alpha));
 
 		icon->SetString(kTileValue_filename, Categories::ItemGetCategory(item)->filename.c_str());
 	}

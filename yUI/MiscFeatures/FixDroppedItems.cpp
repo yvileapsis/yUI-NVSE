@@ -1,8 +1,8 @@
 #include <main.h>
-#include <ExtraData.h>
 #include <SafeWrite.h>
 
 #include <SimpleINILibrary.h>
+#include <BSExtraData.h>
 
 namespace Fix::DroppedItems
 {

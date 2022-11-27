@@ -1,6 +1,6 @@
-#include <Objects.h>
+#include <Reference.h>
 #include <GameRTTI.h>
-#include <ExtraData.h>
+#include <InventoryChanges.h>
 #include <GameTasks.h>
 #include <SafeWrite.h>
 #include <NiObjects.h>
@@ -192,8 +192,7 @@ std::vector<TESForm*> Actor::GetEquippedItems()
 	std::vector<TESForm*> itemList;
 	if (const auto xChanges = static_cast<ExtraContainerChanges *>(extraDataList.GetByType(kExtraData_ContainerChanges))) {
 		InventoryChangesArray outEntryData;
-		ExtendDataArray outExtendData;
-		const UInt32 count = xChanges->GetAllEquipped(outEntryData, outExtendData);
+		const UInt32 count = xChanges->data->GetAllEquipped(outEntryData);
 		for (UInt32 i = 0; i < count ; i++) itemList.push_back(outEntryData[i]->form);
 	}
 	return itemList;
@@ -204,17 +203,8 @@ InventoryChangesArray Actor::GetEquippedEntryDataList()
 	InventoryChangesArray itemArray;
 	ExtendDataArray outExtendData;
 	if(const auto xChanges = static_cast<ExtraContainerChanges *>(extraDataList.GetByType(kExtraData_ContainerChanges)))
-		xChanges->GetAllEquipped(itemArray, outExtendData);
+		xChanges->data->GetAllEquipped(itemArray);
 	return itemArray;
-}
-
-ExtendDataArray	Actor::GetEquippedExtendDataList()
-{
-	InventoryChangesArray itemArray;
-	ExtendDataArray outExtendData;
-	if(const auto xChanges = static_cast<ExtraContainerChanges *>(extraDataList.GetByType(kExtraData_ContainerChanges)))
-		xChanges->GetAllEquipped(itemArray, outExtendData);
-	return outExtendData;
 }
 
 Float64 Actor::GetCalculatedSpread(UInt32 mode, InventoryChanges* entry)
@@ -288,8 +278,9 @@ bool Actor::IsCombatTarget(const Actor* source)
 	return false;
 }
 
-bool Actor::IsHostileCompassTarget() {
-	for (const auto iter : *PlayerCharacter::GetSingleton()->compassTargets)
+bool Actor::IsHostileCompassTarget() const
+{
+	if (const auto player = PlayerCharacter::GetSingleton()) for (const auto iter : *player->compassTargets)
 		if (iter->isHostile && iter->target == this) return true;
 	return false;
 }

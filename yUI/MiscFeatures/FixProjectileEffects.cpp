@@ -1,9 +1,9 @@
-#include <Objects.h>
+#include <Reference.h>
 #include <main.h>
 #include <SafeWrite.h>
 #include <SimpleINILibrary.h>
 
-#include <ExtraData.h>
+#include <InventoryChanges.h>
 #include <GameRTTI.h>
 
 namespace Fix::ProjectileEffects

@@ -235,11 +235,15 @@ namespace UserInterface::LootMenu
 				}
 				else fst->SetFloat("_Meter", 0);
 
-				const auto stringdimensions = FontManager::GetSingleton()->GetStringDimensions(string.c_str(), tileMain->GetFloat("_Font"), fst->GetChild("ButtonText")->GetFloat(kTileValue_wrapwidth));
+				const auto fontManager = FontManager::GetSingleton();
+				const auto font = tileMain->GetFloat("_Font");
+				const auto wrapWidth = fst->GetChild("ButtonText")->GetFloat(kTileValue_wrapwidth);
 
-				const auto height = indentTextY + stringdimensions->y;
+				const auto stringDimensions = fontManager->GetStringDimensions(string.c_str(), font, wrapWidth);
 
-				x = max(x, stringdimensions->x + fst->GetFloat("_TextWidth"));
+				const auto height = indentTextY + stringDimensions->y;
+
+				x = max(x, stringDimensions->x + fst->GetFloat("_TextWidth"));
 
 				if (y + height > heightMax - 3 * indentItem) break;
 				y += height;

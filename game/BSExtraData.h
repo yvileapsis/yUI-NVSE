@@ -1,6 +1,8 @@
 #pragma once
 #include <Containers.h>
 #include <Utilities.h>
+#include <Sound.h>
+#include <InventoryChanges.h>
 
 /*    Class							     vtbl	  Type  Size
  *   ----------------------------		------		--  --
@@ -296,101 +298,442 @@ public:
 };
 static_assert(sizeof(BSExtraData) == 0xC);
 
-struct BaseExtraList
-{
-	bool						HasType(UInt32 type) const;
-	__forceinline BSExtraData*	GetByType(UInt8 type) const { return ThisStdCall<BSExtraData*>(0x410220, this, type); };
-	void						MarkType(UInt32 type, bool bCleared);
-	__forceinline void			Remove(BSExtraData* toRemove, bool doFree) { ThisStdCall(0x410020, this, toRemove, doFree); }
-	__forceinline void			RemoveByType(UInt32 type) { ThisStdCall(0x410140, this, type); }
-	__forceinline BSExtraData*	Add(BSExtraData* toAdd) { return ThisStdCall<BSExtraData*>(0x40FF60, this, toAdd); }
-	__forceinline void			RemoveAll(bool doFree) { ThisStdCall(0x40FAE0, this, doFree); }
-	bool						MarkScriptEvent(UInt32 eventMask, TESForm* eventTarget);
-	__forceinline void			Copy(BaseExtraList* from) { ThisStdCall(0x411EC0, this, from); }
-	bool						IsWorn();
 
-	virtual	BaseExtraList*		Destroy(char chr);
+#define				GetByTypeCast(xDataList, Type) DYNAMIC_CAST(xDataList.GetByType(kExtraData_ ## Type), BSExtraData, Extra ## Type)
+extern const char*	GetExtraDataName(UInt8 ExtraDataType);
+SInt32				GetCountForExtraDataList(ExtraDataList* list);
 
-	BSExtraData*	m_data;						// 004
-	UInt8			m_presenceBitfield[0x15];	// 008 - if a bit is set, then the extralist should contain that extradata
-	UInt8			pad1D[3];					// 01D
-};
-static_assert(sizeof(BaseExtraList) == 0x020);
-
-struct ExtraDataList : public BaseExtraList
-{
-	static ExtraDataList * Create(BSExtraData* xBSData = NULL);
-};
-static_assert(sizeof(ExtraDataList) == 0x020);
-
-class ExtendDataList : public TList<ExtraDataList>
+class ExtraSound : public BSExtraData
 {
 public:
-	static ExtendDataList* Create(ExtraDataList* pExtraDataList = nullptr);
-	static void Free(ExtendDataList* xData, bool bFreeList = false);
-	static bool Add(ExtendDataList* xData, ExtraDataList* xList);
-	static bool Remove(ExtendDataList* xData, ExtraDataList* xList, bool bFreeList = false);
+	ExtraSound();
+	~ExtraSound();
 
-	SInt32 AddAt(ExtraDataList* item, SInt32 index);
-	void RemoveAll() const;
-	ExtraDataList* RemoveNth(SInt32 n);
+	Sound	sound; // 0x0C
 };
+static_assert(sizeof(ExtraSound) == 0x18);
 
-typedef std::vector<ExtendDataList*> ExtendDataArray;
-
-struct InventoryChanges
+class ExtraDroppedItemList : public BSExtraData
 {
-	ExtendDataList*			extendData;		// 00
-	SInt32					countDelta;		// 04
-	union
+public:
+	TList<TESObjectREFR>	itemRefs;	// 0x0C
+};
+static_assert(sizeof(ExtraDroppedItemList) == 0x14);
+
+class ExtraAction : public BSExtraData
+{
+public:
+	ExtraAction();
+	virtual ~ExtraAction();
+
+	UInt8			flags0C;	// 00C	some kind of status or flags: 
+	//		if not RunOnActivateBlock: bit0 and bit1 are set before TESObjectREF::Activate, bit0 is preserved, bit1 is cleared after returning.
+	UInt8			fill0D[3];	// 00D
+	TESForm* actionRef;	// 010
+
+	static ExtraAction* Create();
+};
+static_assert(sizeof(ExtraAction) == 0x14);
+
+class ExtraScript : public BSExtraData
+{
+public:
+	ExtraScript();
+	virtual ~ExtraScript();
+
+	Script* script;		// 00C
+	ScriptEventList* eventList;	// 010
+
+	static ExtraScript*		Create(TESScriptableForm* baseForm = NULL, bool create = true, TESObjectREFR* container = NULL);
+};
+static_assert(sizeof(ExtraScript) == 0x14);
+
+class ExtraContainerChanges : public BSExtraData
+{
+public:
+	ExtraContainerChanges();
+	virtual ~ExtraContainerChanges();
+
+	// find the equipped item whose form matches the passed matcher
+
+	ExtraContainerChangesData* data;	// 00C
+
+	static ExtraContainerChanges*	Create();
+	static ExtraContainerChanges*	Create(TESObjectREFR* thisObj, UInt32 refID = 0, UInt32 count = 1,
+		ExtendDataList* pExtendDataList = NULL);
+	ExtraContainerChanges*  GetForRef(TESObjectREFR* refr);
+
+};
+static_assert(sizeof(ExtraContainerChanges) == 0x10);
+
+class ExtraHealth : public BSExtraData
+{
+public:
+	ExtraHealth();
+	virtual ~ExtraHealth();
+	float health;
+
+	static ExtraHealth* Create();
+};
+static_assert(sizeof(ExtraHealth) == 0x10);
+
+class ExtraWorn : public BSExtraData	// Item is equipped
+{
+public:
+	ExtraWorn();
+	virtual ~ExtraWorn();
+
+	static ExtraWorn* Create();
+};
+static_assert(sizeof(ExtraWorn) == 0x0C);
+
+class ExtraWornLeft : public BSExtraData	// haven't seen used yet
+{
+public:
+	ExtraWornLeft();
+	virtual ~ExtraWornLeft();
+
+	static ExtraWornLeft* Create();
+};
+static_assert(sizeof(ExtraWornLeft) == 0x0C);
+
+class ExtraCannotWear : public BSExtraData	//	Seen used as ForceEquip ! Unused as forceUnequip (bug?)
+{
+public:
+	ExtraCannotWear();
+	virtual ~ExtraCannotWear();
+
+	static ExtraCannotWear* Create();
+};
+static_assert(sizeof(ExtraCannotWear) == 0x0C);
+
+class ExtraHotkey : public BSExtraData
+{
+public:
+	ExtraHotkey();
+	virtual ~ExtraHotkey();
+
+	UInt8	index;		// 00C (is 0-7)
+
+	static ExtraHotkey* Create();
+};
+static_assert(sizeof(ExtraHotkey) == 0x10);
+
+class ExtraCount : public BSExtraData
+{
+public:
+	ExtraCount();
+	virtual ~ExtraCount();
+
+	SInt16	count;	// 00C
+	UInt8	pad[2];	// 00E
+
+	static ExtraCount* Create(UInt32 count = 0);
+};
+static_assert(sizeof(ExtraCount) == 0x10);
+
+class ExtraLock : public BSExtraData
+{
+public:
+	ExtraLock();
+	virtual ~ExtraLock();
+
+	ExtraLockData* data;		// 00C
+
+	static ExtraLock* Create();
+};
+static_assert(sizeof(ExtraLock) == 0x10);
+
+class ExtraUses : public BSExtraData
+{
+public:
+	ExtraUses();
+	~ExtraUses();
+
+	UInt32 unk0;
+
+	static ExtraUses* Create();
+};
+static_assert(sizeof(ExtraUses) == 0x10);
+
+class ExtraTeleport : public BSExtraData
+{
+public:
+	ExtraTeleport();
+	~ExtraTeleport();
+
+	ExtraTeleportData* data;
+
+	static ExtraTeleport* Create();
+};
+static_assert(sizeof(ExtraTeleport) == 0x10);
+
+class ExtraRandomTeleportMarker : public BSExtraData
+{
+public:
+	ExtraRandomTeleportMarker();
+	~ExtraRandomTeleportMarker();
+
+	TESObjectREFR* teleportRef;
+};
+static_assert(sizeof(ExtraRandomTeleportMarker) == 0x10);
+
+class ExtraAmmo : public BSExtraData
+{
+public:
+	ExtraAmmo();
+	~ExtraAmmo();
+
+	TESAmmo* ammo;	// 0xC
+	UInt32		count;	// 0x10
+};
+static_assert(sizeof(ExtraAmmo) == 0x14);
+
+class ExtraOwnership : public BSExtraData
+{
+public:
+	ExtraOwnership();
+	virtual ~ExtraOwnership();
+
+	TESForm* owner;	// maybe this should be a union {TESFaction*; TESNPC*} but it would be more unwieldy to access and modify
+
+	static ExtraOwnership* Create();
+};
+static_assert(sizeof(ExtraOwnership) == 0x10);
+
+class ExtraRank : public BSExtraData
+{
+public:
+	ExtraRank();
+	virtual ~ExtraRank();
+
+	UInt32	rank; // 00C
+
+	static ExtraRank* Create();
+};
+static_assert(sizeof(ExtraRank) == 0x10);
+
+class ExtraGlobal : public BSExtraData
+{								//ownership data, stored separately from ExtraOwnership
+public:
+	ExtraGlobal();
+	virtual ~ExtraGlobal();
+
+	TESGlobal* globalVar;	// 00C
+};
+static_assert(sizeof(ExtraGlobal) == 0x10);
+
+class ExtraWeaponModFlags : public BSExtraData
+{
+public:
+	ExtraWeaponModFlags();
+	~ExtraWeaponModFlags();
+
+	UInt8	flags; // 00C
+
+	static ExtraWeaponModFlags* Create();
+};
+static_assert(sizeof(ExtraWeaponModFlags) == 0x10);
+
+class ExtraFactionChanges : public BSExtraData
+{
+public:
+	ExtraFactionChanges();
+	virtual ~ExtraFactionChanges();
+
+	FactionListData* data;
+
+	static ExtraFactionChanges* Create();
+};
+static_assert(sizeof(ExtraFactionChanges) == 0x10);
+
+FactionListData* GetExtraFactionList(BaseExtraList& xDataList);
+SInt8									GetExtraFactionRank(BaseExtraList& xDataList, TESFaction* faction);
+void									SetExtraFactionRank(BaseExtraList& xDataList, TESFaction* faction, SInt8 rank);
+
+class ExtraLeveledCreature : public BSExtraData
+{
+public:
+	ExtraLeveledCreature();
+	virtual ~ExtraLeveledCreature();
+
+	TESActorBase* baseForm;		// 00C
+	TESActorBase* actorBase;		// 010
+};
+static_assert(sizeof(ExtraLeveledCreature) == 0x14);
+
+// PackageStartLocation = Worldspace or Cell / PosX / PosY / PosZ / and 4 bytes
+
+class ExtraCombatStyle : public BSExtraData
+{
+public:
+	ExtraCombatStyle();
+	virtual ~ExtraCombatStyle();
+
+	TESCombatStyle* combatStyle;	// 00C
+};
+static_assert(sizeof(ExtraCombatStyle) == 0x10);
+
+class ExtraReferencePointer : public BSExtraData
+{
+public:
+	ExtraReferencePointer();
+	virtual ~ExtraReferencePointer();
+
+	TESObjectREFR* refr;			// 00C
+};
+static_assert(sizeof(ExtraReferencePointer) == 0x10);
+
+// Provided by "Luthien Anarion"
+class ExtraMapMarker : BSExtraData
+{
+public:
+	ExtraMapMarker();
+	~ExtraMapMarker();
+
+	ExtraMapMarkerData* data;
+};
+static_assert(sizeof(ExtraMapMarker) == 0x10);
+
+class ExtraNorthRotation : public BSExtraData
+{
+public:
+	ExtraNorthRotation();
+	virtual ~ExtraNorthRotation();
+
+	UInt32				angle;		// 00C
+};
+static_assert(sizeof(ExtraNorthRotation) == 0x10);
+
+class ExtraSeenData : public BSExtraData
+{
+public:
+	ExtraSeenData();
+	virtual ~ExtraSeenData();
+
+	UInt8 unk[0x24 - 0x0C];		// 00C
+};
+static_assert(sizeof(ExtraSeenData) == 0x24);
+
+class ExtraIntSeenData : public ExtraSeenData
+{
+public:
+	ExtraIntSeenData();
+	virtual ~ExtraIntSeenData();
+
+	UInt8				coordX;		// 024
+	UInt8				coordY;		// 025
+	UInt8				filler[2];	// 026
+	ExtraIntSeenData* next;		// 028
+};
+static_assert(sizeof(ExtraIntSeenData) == 0x2C);
+
+// ExtraUsedMarkers is a bitmask of 30 bits.
+
+class ExtraPersistentCell : public BSExtraData
+{
+public:
+	ExtraPersistentCell();
+	virtual ~ExtraPersistentCell();
+
+	TESObjectCELL* persistentCell;	// 0C
+};
+static_assert(sizeof(ExtraPersistentCell) == 0x10);
+
+class ExtraTerminalState : public BSExtraData
+{
+public:
+	ExtraTerminalState();
+	virtual ~ExtraTerminalState();
+
+	enum
 	{
-		TESForm*			form;			// 08
-		TESObjectWEAP*		weapon;			// 08
-		TESAmmo*			ammo;			// 08
+		kFlag_Locked = 1 << 7,        // terminal is locked
 	};
 
-	void					Free(bool bFreeList = false);
-	void					Cleanup();
-	static InventoryChanges*Create(TESForm* pForm, UInt32 count = 1, ExtendDataList* pExtendDataList = nullptr);
-	ExtendDataList*			Add(ExtraDataList* newList);
-	bool					Remove(ExtraDataList* toRemove, bool bFree = false);
-	bool					HasExtraLeveledItem();
-	void					RemoveCannotWear();
-	float					GetItemHealthPerc(bool arg1 = true);
-	ExtraDataList*			GetEquippedExtra();
-	ExtraDataList*			GetCustomExtra(UInt32 whichVal);
-	BSExtraData*			GetExtraData(UInt32 whichVal);
-	float					CalculateWeaponDamage(float condition, TESForm* ammo);
-	float					GetValue();
-	bool					HasWeaponMod(UInt32 modEffect) { return ThisStdCall<bool>(0x4BDA70, this, modEffect); }
-	UInt32					GetWeaponNumProjectiles(Actor* owner);
-	bool					ShouldDisplay();
+	UInt8	flags;
+	UInt8	lockLevel;
+	UInt8	filler[2];
+};
+static_assert(sizeof(ExtraTerminalState) == 0x10);
 
-	UInt8					GetWeaponMod();
-	__forceinline Float64	GetHealthPercent(char a1 = 0) { return ThisCall<Float64>(0x4BCDB0, this, a1); };
-	Float64					GetHealthPercentAlt(bool axonisFix = false);
-	bool					GetEquipped();
-	ExtraDataList* GetExtraData()
+// 10
+class ExtraLinkedRef : public BSExtraData
+{
+public:
+	TESObjectREFR* linkedRef;		// 0C
+
+	static ExtraLinkedRef* __stdcall Create(TESObjectREFR* _linkedRef = NULL);
+};
+
+// 14
+class ExtraLinkedRefChildren : public BSExtraData
+{
+public:
+	TList<TESObjectREFR>	children;	// 0C
+};
+
+// 20
+class ExtraActivateRef : public BSExtraData
+{
+public:
+	struct parentRef
 	{
-		return extendData ? extendData->first.data : nullptr;
-	}
+		TESObjectREFR* ref;
+		float			delay;
+	};
+	TList<parentRef>	parentRefs;
+	UInt32				flags;
+	String              activationPromptOverride;
 };
-static_assert(sizeof(InventoryChanges) == 0xC);
 
-struct InventoryChangesList : TList<InventoryChanges>
+// 10
+class ExtraTalkingActor : public BSExtraData
 {
-	InventoryChanges*				FindForItem(TESForm* item);
-	void							Free(bool bFreeList);
-	static InventoryChangesList*	Create(UInt32 refID, UInt32 count, ExtendDataList* pExtendDataList);
+public:
+	Actor* actor;		// 0C
 };
 
-struct InventoryItemData
+// 10
+class ExtraObjectHealth : public BSExtraData
 {
-	SInt32								count;
-	InventoryChanges* entry;
+public:
+	float			health;		// 0C
 
-	InventoryItemData(SInt32 count, InventoryChanges* entry) : count(count), entry(entry) {}
+	static ExtraObjectHealth* __stdcall Create(float _health);
 };
-static_assert(sizeof(InventoryItemData) == 0x08);
 
-typedef std::vector<InventoryChanges*> InventoryChangesArray;
+
+class ExtraAnim : public BSExtraData
+{
+public:
+	ExtraAnim();
+	virtual ~ExtraAnim();
+
+	struct Animation
+	{
+	};	// 013C
+
+	Animation* data;	// 0C
+};
+static_assert(sizeof(ExtraAnim) == 0x10);
+
+class ExtraPoison : public BSExtraData
+{
+public:
+	ExtraPoison();
+	virtual ~ExtraPoison();
+
+	AlchemyItem* poisonEffect;    // 0C
+};
+static_assert(sizeof(ExtraPoison) == 0x10);
+
+class ExtraAshPileRef : public BSExtraData
+{
+public:
+	ExtraAshPileRef();
+	~ExtraAshPileRef();
+
+	TESObjectREFR* sourceRef;		// 0C
+};
+static_assert(sizeof(ExtraAshPileRef) == 0x10);

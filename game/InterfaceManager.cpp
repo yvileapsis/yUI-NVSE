@@ -1,5 +1,5 @@
 #include <InterfaceManager.h>
-#include <Objects.h>
+#include <Reference.h>
 #include <SafeWrite.h>
 
 const _QueueUIMessage QueueUIMessage = reinterpret_cast<_QueueUIMessage>(0x007052F0);	// Called from Cmd_AddSpell_Execute

@@ -52,13 +52,13 @@
     <ClCompile Include="..\game\GameData.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\ExtraData.cpp">
+    <ClCompile Include="..\game\InventoryChanges.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\Forms.cpp">
+    <ClCompile Include="..\game\Form.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\Objects.cpp">
+    <ClCompile Include="..\game\Reference.cpp">
       <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="..\game\OSDepend.cpp">
@@ -149,6 +149,9 @@
     <ClCompile Include="\\Mac\Home\Documents\GitHub\yUI-NVSE\game\GameProcess.cpp">
       <Filter>game</Filter>
     </ClCompile>
+    <ClCompile Include="\\Mac\Home\Documents\GitHub\yUI-NVSE\game\Object.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h" />
@@ -190,13 +193,13 @@
     <ClInclude Include="..\game\GameEffects.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\ExtraData.h">
+    <ClInclude Include="..\game\InventoryChanges.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\Forms.h">
+    <ClInclude Include="..\game\Form.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\Objects.h">
+    <ClInclude Include="..\game\Reference.h">
       <Filter>game</Filter>
     </ClInclude>
     <ClInclude Include="..\game\OSDepend.h">
@@ -258,6 +261,9 @@
     </ClInclude>
     <ClInclude Include="..\nvse\Logging.h">
       <Filter>nvse</Filter>
+    </ClInclude>
+    <ClInclude Include="\\Mac\Home\Documents\GitHub\yUI-NVSE\game\Object.h">
+      <Filter>game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

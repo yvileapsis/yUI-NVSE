@@ -3,7 +3,7 @@
 #include "ConsoleManager.h"
 #include "InterfaceManager.h"
 #include "GameData.h"
-#include "ExtraData.h"
+#include "InventoryChanges.h"
 #include "Script.h"
 
 ScopedLock::ScopedLock(CriticalSection& critSection) : m_critSection(critSection)

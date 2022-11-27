@@ -94,29 +94,14 @@ public:
 
 	Node	first;
 
-	template <class Op>	UInt32 FreeNodes(Node* node, Op&& compareOp) const
+	Node* GetLastNode() const
 	{
-		static UInt32 nodeCount = 0, numFreed = 0, lastNumFreed = 0;
-		if (node->next)
-		{
-			nodeCount++;
-			FreeNodes(node->next, compareOp);
-			nodeCount--;
-		}
-		if (compareOp.Accept(node->data))
-		{
-			node->RemoveMe();
-			numFreed++;
-		}
-		if (!nodeCount)
-		{
-			lastNumFreed = numFreed;
-			numFreed = 0;
-		}
-		return lastNumFreed;
+		Node* node = Head();
+		while (node->next) node = node->next;
+		return node;
 	}
 
-	Node* GetLastNode(SInt32* outIdx = nullptr) const
+	Node* GetLastNode(SInt32* outIdx) const
 	{
 		Node* node = Head();
 		if (!node) return nullptr;
@@ -130,7 +115,6 @@ public:
 			}
 			*outIdx = index;
 		}
-		else while (node->next) node = node->next;
 		return node;
 	}
 
@@ -169,53 +153,42 @@ public:
 			m_curr = m_curr->next;
 			return *this;
 		}
-		Item* operator->() const { return m_curr->data; }
-		Item*& operator*() const { return m_curr->data; }
-		Iterator& operator=(const Iterator& rhs)
+		Item*		operator->() const { return m_curr->data; }
+		Item*&		operator*() const { return m_curr->data; }
+		Iterator&	operator=(const Iterator& rhs)
 		{
 			m_curr = rhs.m_curr;
 			return *this;
 		}
 		bool		operator!=(const Iterator& rhs) { return m_curr && m_curr->data; }
 
-		Iterator(Node* node = nullptr) : m_curr(node) {}
-		Iterator(TList& _list) : m_curr(&_list.first) {}
-		Iterator(TList* _list) : m_curr(&_list->first) {}
-		Iterator(TList& _list, Item* _item) : m_curr(&_list.first) { Find(_item); }
+		Iterator() : m_curr(nullptr) {}
+		Iterator(Node* node) : m_curr(node) {}
+
+		Iterator(const TList* _list) : m_curr(&_list->first) {}
 		Iterator(TList* _list, Item* _item) : m_curr(&_list->first) { Find(_item); }
 	};
 
-	Iterator begin() const { return Iterator(Head()); }
+	Iterator begin() const { return Iterator(this); }
 	Iterator end() const { return Iterator(); }
 
-	UInt32 Count() const
+	UInt32 count() const
 	{
 		if (!first.data) return 0;
-		UInt32 count = 1;
-		Node* node = Head();
-		while ((node = node->next)) count++;
+		UInt32 count = 0;
+		for (const auto iter : *this) count++;
 		return count;
 	}
 
-	bool Contains(Item* item) const
+	bool contains(Item* item) const
 	{
-		Node* node = Head();
-		do if (node->data == item) return true;
-		while ((node = node->next));
+		for (const auto iter : *this) if (iter == item) return true;
 		return false;
 	}
 
 	Item* GetFirstItem() const { return first.data; }
 
 	Item* GetLastItem() const { return GetLastNode()->data; }
-
-	Item* GetNthItem(SInt32 index) const
-	{
-		if (eListEnd == index)
-			return GetLastNode()->data;
-		Node* node = GetNthNode(index);
-		return node ? node->data : NULL;
-	}
 
 	SInt32 AddAt(Item* item, SInt32 index)
 	{
@@ -270,32 +243,44 @@ public:
 			target = target->Append(source->data);
 	}
 
-	template <class Op>
-	void Visit(Op&& op, Node* prev = nullptr) const
+	class AcceptItem
 	{
-		Node* curr = prev ? prev->next : Head();
-		while (curr)
-		{
-			if (!curr->data || !op.Accept(curr->data)) break;
-			curr = curr->next;
-		}
-	}
+		Item* m_toMatch;
+	public:
+		AcceptItem(Item* match) : m_toMatch(match) {}
+		bool Accept(Item* match) { return m_toMatch == match; }
+	};
 
-	template <class Op>
-	Item* Find(Op&& op) const
+	class AcceptNth
 	{
-		Node* curr = Head();
-		do
+		SInt32 m_toMatch	= 0;
+		SInt32 m_current	= 0;
+	public:
+		AcceptNth(UInt32 match) : m_toMatch(match) {}
+		bool Accept(Item* item)
 		{
-			Item* pItem = curr->data;
-			if (pItem && op.Accept(pItem)) return pItem;
-			curr = curr->next;
-		} while (curr);
+			if (m_toMatch == m_current) return true;
+			m_current++;
+			return false;
+		}
+	};
+
+	class AcceptAll
+	{
+	public:
+		bool Accept(Item* item) { return true; }
+	};
+
+	template <class Op> Item* Find(Op&& op) const
+	{
+		for (const auto iter : *this) if (op.Accept(iter)) return iter;
 		return nullptr;
 	}
 
-	template <class Op>
-	Iterator Find(Op&& op, Iterator& prev) const
+	Item* Find(Item* item) const { return this->Find(AcceptItem(item)); }
+	Item* GetNth(SInt32 index) const { return this->Find(AcceptNth(index)); }
+
+	template <class Op> Iterator Find(Op&& op, Iterator& prev) const
 	{
 		Iterator curIt = prev.End() ? begin() : ++prev;
 		while (!curIt.End())
@@ -306,51 +291,53 @@ public:
 		return curIt;
 	}
 
-	template <class Op>
-	UInt32 CountIf(Op&& op) const
+	template <class Op> UInt32 CountIf(Op&& op) const
 	{
 		UInt32 count = 0;
-		Node* curr = Head();
-		do if (curr->data && op.Accept(curr->data)) count++;
-		while ((curr = curr->next));
+		for (const auto iter : this) if (op.Accept(iter)) count++;
 		return count;
 	}
 
-	class AcceptAll
-	{
-	public:
-		bool Accept(Item* item) { return true; }
-	};
+	UInt32 Count(Item* item) const { return this->CountIf(AcceptItem(item)); }
 
-	void RemoveAll() const
+	template <class Op>	SInt32 GetIndexOf(Op&& op) const
 	{
-		Node* nextNode = Head(), * currNode = nextNode->next;
-		nextNode->data = NULL;
-		nextNode->next = NULL;
-		while (currNode)
+		SInt32 idx = 0;
+		for (const auto iter : *this)
 		{
-			nextNode = currNode->next;
-			GameHeapFree(currNode);
-			currNode = nextNode;
+			if (op.Accept(iter)) return idx;
+			idx++;
 		}
+		return -1;
 	}
 
-	void DeleteAll() const
+	SInt32 GetIndexOfItem(Item* item) const { return this->GetIndexOf(AcceptItem(item)); }
+
+	template <class Op>	UInt32 RemoveIf(Op&& compareOp, Node* node = nullptr) const
 	{
-		Node* nextNode = Head(), * currNode = nextNode->next;
-		GameHeapFree(nextNode->data);
-		nextNode->data = NULL;
-		nextNode->next = NULL;
-		while (currNode)
+		if (!node) node = Head();
+		static UInt32 nodeCount = 0, numFreed = 0, lastNumFreed = 0;
+		if (node->next)
 		{
-			nextNode = currNode->next;
-			currNode->data->~Item();
-			GameHeapFree(currNode->data);
-			GameHeapFree(currNode);
-			currNode = nextNode;
+			nodeCount++;
+			this->RemoveIf(compareOp, node->next);
+			nodeCount--;
 		}
+		if (compareOp.Accept(node->data))
+		{
+			node->RemoveMe();
+			numFreed++;
+		}
+		if (!nodeCount)
+		{
+			lastNumFreed = numFreed;
+			numFreed = 0;
+		}
+		return lastNumFreed;
 	}
 
+	void RemoveAll() const { this->RemoveIf(AcceptAll()); }
+	UInt32 RemoveItem(Item* item) const { return this->RemoveIf(AcceptItem(item)); }
 	Item* RemoveNth(SInt32 idx)
 	{
 		Item* removed = NULL;
@@ -373,24 +360,36 @@ public:
 		return removed;
 	};
 
-	UInt32 Remove(Item* item)
+	void DeleteAll() const
 	{
-		UInt32 removed = 0;
-		Node* curr = Head(), * prev = nullptr;
-		do
+		Node* nextNode = Head(), * currNode = nextNode->next;
+		GameHeapFree(nextNode->data);
+		nextNode->data = NULL;
+		nextNode->next = NULL;
+		while (currNode)
 		{
-			if (curr->data == item)
-			{
-				curr = prev ? prev->RemoveNext() : curr->RemoveMe();
-				removed++;
-			}
-			else
-			{
-				prev = curr;
-				curr = curr->next;
-			}
-		} while (curr);
-		return removed;
+			nextNode = currNode->next;
+			currNode->data->~Item();
+			GameHeapFree(currNode->data);
+			GameHeapFree(currNode);
+			currNode = nextNode;
+		}
+	}
+
+	template <class Op>	UInt32 Replace(Op&& op, Item* replace)
+	{
+		UInt32 replaced = 0;
+		for (auto iter : this) if (op.Accept(iter))
+		{
+			iter = replace;
+			replaced++;
+		}
+		return replaced;
+	}
+
+	UInt32 ReplaceItem(Item* item, Item* replace)
+	{
+		return this->Replace(AcceptItem(item), replace);
 	}
 
 	Item* ReplaceNth(SInt32 index, Item* item)
@@ -412,61 +411,14 @@ public:
 		return replaced;
 	}
 
-	UInt32 Replace(Item* item, Item* replace)
+	template <typename F> void ForEach(const F* f)
 	{
-		UInt32 replaced = 0;
-		Node* curr = Head();
-		do
-		{
-			if (curr->data == item)
-			{
-				curr->data = replace;
-				replaced++;
-			}
-			curr = curr->next;
-		} while (curr);
-		return replaced;
-	}
-
-	template <class Op>	UInt32 RemoveIf(Op&& op)
-	{
-		return FreeNodes(Head(), op);
-	}
-
-	SInt32 GetIndexOf(Item* item)
-	{
-		SInt32 idx = 0;
-		Node* curr = Head();
-		do {
-			if (curr->data == item) return idx;
-			idx++;
-		} while ((curr = curr->next));
-		return -1;
-	}
-
-	template <class Op>	SInt32 GetIndexOf(Op&& op)
-	{
-		SInt32 idx = 0;
-		Node* curr = Head();
-		do {
-			if (curr->data && op.Accept(curr->data)) return idx;
-			idx++;
-		} while ((curr = curr->next));
-		return -1;
-	}
-
-	template <typename F> void ForEach(const F* function)
-	{
-		auto* node = Head();
-		if (!node) return;
-		do function(node->data);
-		while ((node = node->next));
+		for (const auto iter : this) f(iter);
 	}
 
 	template <typename F> void ForEach(const F& f)
 	{
-		for (const auto iter : this)
-			f(iter);
+		for (const auto iter : this) f(iter);
 	}
 };
 static_assert(sizeof(TList<void*>) == 0x8);
@@ -507,8 +459,8 @@ public:
 	typedef DListNode<Item> Node;
 
 private:
-	Node* first = nullptr;
-	Node* last = nullptr;
+	Node*		first = nullptr;
+	Node*		last = nullptr;
 	UInt32		count = 0;
 
 public:
@@ -532,11 +484,11 @@ public:
 		}
 		bool		operator!=(const Iterator& rhs) { return m_curr && m_curr->data; }
 
-		Iterator(Node* node = nullptr) : m_curr(node) {}
-		Iterator(DList& _list) : m_curr(&_list.first) {}
-		Iterator(DList* _list) : m_curr(&_list->first) {}
+		Iterator() : m_curr(nullptr) {}
+		Iterator(Node* node) : m_curr(node) {}
+		Iterator(const DList* _list) : m_curr(&_list->first) {}
+
 		Iterator(DList& _list, Item* _item) : m_curr(&_list.first) { Find(_item); }
-		Iterator(DList* _list, Item* _item) : m_curr(&_list->first) { Find(_item); }
 	};
 
 	bool Empty() const { return !first; }
@@ -544,7 +496,7 @@ public:
 	Node* Tail() { return last; }
 	UInt32 Count() const { return count; }
 
-	Iterator begin() const { return Iterator(first); }
+	Iterator begin() const { return Iterator(this); }
 	Iterator end() const { return Iterator(); }
 
 	void ExchangeNodeData(Node* node1, Node* node2)

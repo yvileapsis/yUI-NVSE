@@ -4,7 +4,7 @@
 #include <SimpleINILibrary.h>
 
 #include <GameRTTI.h>
-#include <Objects.h>
+#include <Reference.h>
 
 namespace Patch::ExplosionForce
 {

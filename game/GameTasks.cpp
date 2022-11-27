@@ -1,5 +1,5 @@
 #include "GameTasks.h"
-#include "Objects.h"
+#include "Reference.h"
 
 // IOManager** g_ioManager = (IOManager**)0x00B33A10;
 ModelLoader** g_modelLoader = (ModelLoader**)0x011C3B3C;

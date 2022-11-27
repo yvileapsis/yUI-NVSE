@@ -5,8 +5,8 @@
 #include <SafeWrite.h>
 #include <SimpleINILibrary.h>
 
-#include "Forms.h"
-#include "Objects.h"
+#include "Form.h"
+#include "Reference.h"
 
 namespace Patch::ArmedUnarmed
 {
