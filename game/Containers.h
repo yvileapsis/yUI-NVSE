@@ -486,7 +486,7 @@ public:
 
 		Iterator() : m_curr(nullptr) {}
 		Iterator(Node* node) : m_curr(node) {}
-		Iterator(const DList* _list) : m_curr(&_list->first) {}
+		Iterator(const DList* _list) : m_curr(const_cast<Node*>(& _list->first)) {}
 		Iterator(DList& _list, Item* _item) : m_curr(&_list.first) { Find(_item); }
 		Iterator(DList* _list, Item* _item) : m_curr(&_list->first) { Find(_item); }
 	};
