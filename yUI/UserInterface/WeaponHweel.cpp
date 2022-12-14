@@ -4,7 +4,7 @@
 #include <Menus.h>
 #include <SimpleINILibrary.h>
 
-namespace UserInterface::HitMarker
+namespace UserInterface::WeaponHweel
 {
 	bool		enable = false;
 
