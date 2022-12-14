@@ -10,6 +10,7 @@ INIT_MODULE(UserInterface::HitMarker)
 INIT_MODULE(UserInterface::HitIndicator)
 INIT_MODULE(UserInterface::VisualObjectives)
 INIT_MODULE(UserInterface::LootMenu)
+INIT_MODULE(UserInterface::WeaponHweel)
 
 INIT_MODULE(Fix::DroppedItems)
 INIT_MODULE(Fix::TablineSelected)
@@ -34,6 +35,7 @@ void Inits()
 	UserInterface::HitIndicator::Init();
 	UserInterface::VisualObjectives::Init();
 	UserInterface::LootMenu::Init();
+	UserInterface::WeaponHweel::Init();
 
 	Fix::DroppedItems::Init();
 	Fix::TablineSelected::Init();

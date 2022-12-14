@@ -1,0 +1,2270 @@
+﻿<_JAMExists> 1 </_JAMExists>
+
+<rect name="JWH">
+
+	<_Exists> 1 </_Exists>
+
+	<_ScreenWidth> <copy src="screen()" trait="width"/> </_ScreenWidth>
+	<_ScreenHeight> <copy src="screen()" trait="height"/> </_ScreenHeight>
+
+	<_GlobalShaker> 0 </_GlobalShaker>
+	<_BoxMult>
+		<copy src="me()" trait="_GlobalShaker"/>
+		<min> 1 </min>
+		<max> 0 </max>
+	</_BoxMult>
+	
+	<_Slice> 11 </_Slice>
+	<_Color> &hudalt; </_Color>
+	
+	<_SliceFilename_1>Interface\JWH\JWHSlice1.dds</_SliceFilename_1>
+	<_SliceFilename_2>Interface\JWH\JWHSlice2.dds</_SliceFilename_2>
+	<_SliceFilename_3>Interface\JWH\JWHSlice3.dds</_SliceFilename_3>
+	<_SliceFilename_4>Interface\JWH\JWHSlice4.dds</_SliceFilename_4>
+	<_SliceFilename_5>Interface\JWH\JWHSlice5.dds</_SliceFilename_5>
+	<_SliceFilename_6>Interface\JWH\JWHSlice6.dds</_SliceFilename_6>
+	<_SliceFilename_7>Interface\JWH\JWHSlice7.dds</_SliceFilename_7>
+	<_SliceFilename_8>Interface\JWH\JWHSlice8.dds</_SliceFilename_8>
+	<_SliceFilename_9>Interface\JWH\JWHSlice9.dds</_SliceFilename_9>
+	<_SliceFilename_10>Interface\JWH\JWHSlice10.dds</_SliceFilename_10>
+	<_SliceFilename_11>Interface\JWH\JWHSlice11.dds</_SliceFilename_11>
+	<_SliceFilename>
+		<copy src="me()" trait="_Slice"/> 
+		<copy src="me()" trait="_SliceFilename_"/>	
+	</_SliceFilename>
+	
+	<_Text></_Text>
+
+	<_Box1Visible>1</_Box1Visible>
+	<_Box1TextLeft>..</_Box1TextLeft>
+	<_Box1TextRight>..</_Box1TextRight>
+	<_Box1Value>0</_Box1Value>
+	<_Box1Arrows>0</_Box1Arrows>
+	<_Box2Visible>1</_Box2Visible>
+	<_Box2TextLeft>..</_Box2TextLeft>
+	<_Box2TextRight>..</_Box2TextRight>
+	<_Box2Value>0</_Box2Value>
+	<_Box2Arrows>0</_Box2Arrows>
+	<_Box3Visible>1</_Box3Visible>
+	<_Box3TextLeft>..</_Box3TextLeft>
+	<_Box3TextRight>..</_Box3TextRight>
+	<_Box3Value>0</_Box3Value>
+	<_Box3Arrows>0</_Box3Arrows>
+	<_Box4Visible>1</_Box4Visible>
+	<_Box4TextLeft>..</_Box4TextLeft>
+	<_Box4TextRight>..</_Box4TextRight>
+	<_Box4Value>0</_Box4Value>
+	<_Box4Arrows>0</_Box4Arrows>
+	<_Box5Visible>1</_Box5Visible>
+	<_Box5TextLeft>..</_Box5TextLeft>
+	<_Box5TextRight>..</_Box5TextRight>
+	<_Box5Value>0</_Box5Value>
+	<_Box5Arrows>0</_Box5Arrows>
+	<_Box6Visible>1</_Box6Visible>
+	<_Box6TextLeft>..</_Box6TextLeft>
+	<_Box6TextRight>..</_Box6TextRight>
+	<_Box6Value>0</_Box6Value>
+	<_Box6Arrows>0</_Box6Arrows>
+	<_Box7Visible>1</_Box7Visible>
+	<_Box7TextLeft>..</_Box7TextLeft>
+	<_Box7TextRight>..</_Box7TextRight>
+	<_Box7Value>0</_Box7Value>
+	<_Box7Arrows>0</_Box7Arrows>
+	<_Box8Visible>1</_Box8Visible>
+	<_Box8TextLeft>..</_Box8TextLeft>
+	<_Box8TextRight>..</_Box8TextRight>
+	<_Box8Value>0</_Box8Value>
+	<_Box8Arrows>0</_Box8Arrows>
+	
+	<_WidthBase> 640 </_WidthBase>
+	<_HeightBase> 640 </_HeightBase>
+
+	<_Height>
+		<copy src="me()" trait="_HeightBase"/>
+		<mul src="me()" trait="_Scale"/>
+	</_Height>
+
+	<_Width>
+		<copy src="me()" trait="_WidthBase"/> 
+		<mul src="me()" trait="_Scale"/>
+	</_Width>
+
+	<_AlphaBase> 0 </_AlphaBase>
+	<_AlphaAC> 0 </_AlphaAC>
+	<_Alpha>
+		<copy src="me()" trait="_AlphaAC"/> 
+		<onlyifnot src="me()" trait="_AlphaBase"/>
+		<add src="me()" trait="_AlphaBase"/>
+	</_Alpha>
+
+	<_AlphaMult> 0.75 </_AlphaMult>
+	<_AlphaBackGround> 
+		<copy src="me()" trait="_Alpha"/> 
+		<mul src="me()" trait="_AlphaMult"/>
+	</_AlphaBackGround>
+	<_AlphaNumbers> 
+		<copy src="me()" trait="_AlphaBackGround"/> 
+		<div> 4 </div>
+	</_AlphaNumbers> 
+
+
+	<_Box1Alpha> 
+		<copy src="me()" trait="_Alpha"/>
+		<onlyifnot src="me()" trait="_Box5Visible"/>
+		<add>
+			<copy src="me()" trait="_BoxMult"/>
+			<mul src="me()" trait="_Alpha"/>	
+			<onlyif src="me()" trait="_Box5Visible"/>
+		</add>
+	</_Box1Alpha>
+	<_Box2Alpha> 
+		<copy src="me()" trait="_Alpha"/>
+		<onlyifnot src="me()" trait="_Box6Visible"/>
+		<add>
+			<copy src="me()" trait="_BoxMult"/>
+			<mul src="me()" trait="_Alpha"/>	
+			<onlyif src="me()" trait="_Box6Visible"/>
+		</add>
+	</_Box2Alpha>
+	<_Box3Alpha> 
+		<copy src="me()" trait="_Alpha"/>
+		<onlyifnot src="me()" trait="_Box7Visible"/>
+		<add>
+			<copy src="me()" trait="_BoxMult"/>
+			<mul src="me()" trait="_Alpha"/>	
+			<onlyif src="me()" trait="_Box7Visible"/>
+		</add>
+	</_Box3Alpha>
+	<_Box4Alpha> 
+		<copy src="me()" trait="_Alpha"/>
+		<onlyifnot src="me()" trait="_Box8Visible"/>
+		<add>
+			<copy src="me()" trait="_BoxMult"/>
+			<mul src="me()" trait="_Alpha"/>	
+			<onlyif src="me()" trait="_Box8Visible"/>
+		</add>
+	</_Box4Alpha>
+	<_Box5Alpha> 
+		<copy> 1 </copy>
+		<sub src="me()" trait="_BoxMult"/>
+		<mul src="me()" trait="_Alpha"/>	
+	</_Box5Alpha>
+	<_Box6Alpha> 
+		<copy> 1 </copy>
+		<sub src="me()" trait="_BoxMult"/>
+		<mul src="me()" trait="_Alpha"/>	
+	</_Box6Alpha>
+	<_Box7Alpha> 
+		<copy> 1 </copy>
+		<sub src="me()" trait="_BoxMult"/>
+		<mul src="me()" trait="_Alpha"/>	
+	</_Box7Alpha>
+	<_Box8Alpha> 
+		<copy> 1 </copy>
+		<sub src="me()" trait="_BoxMult"/>
+		<mul src="me()" trait="_Alpha"/>	
+	</_Box8Alpha>
+
+	<_OffsetHorizontal> 0.5 </_OffsetHorizontal>
+	<_OffsetVertical> 0.5 </_OffsetVertical>	
+
+	<font>0</font> 
+	<_FontBase> 0 </_FontBase>
+	<_Font> 
+		<copy> 
+			<copy> 3 </copy>
+			<onlyifnot src="io()" trait="_DUIF3"/>
+			<add>
+				<copy> 4 </copy>			
+				<onlyif src="io()" trait="_DUIF3"/>
+			</add>
+		</copy>
+		<onlyifnot src="me()" trait="_FontBase"/>
+		<onlyifnot src="me()" trait="font"/>
+		<add src="me()" trait="_FontBase"/>			
+		<add src="me()" trait="font"/>
+	</_Font>
+
+	<_FontYBase> 0 </_FontYBase>
+	<_FontY>
+		<copy> 0 </copy>
+		<add>
+			<copy src="JWH" trait="_Font"/>
+			<copy src="globals" trait="_VUI+FontY_"/>
+			<onlyif src="globals" trait="_VUI+"/>
+		</add>
+		<add>
+			<copy src="JWH" trait="_Font"/>
+			<copy src="io()" trait="_DarNFontY_"/>
+			<onlyif src="io()" trait="_DUIF3"/>
+		</add>
+		<add>
+			<copy src="JWH" trait="_Font"/>
+			<copy src="io()" trait="_VNLAFontY_"/>
+			<onlyifnot>
+				<copy src="io()" trait="_DUIF3"/>
+				<or src="globals" trait="_VUI+"/>
+			</onlyifnot>
+		</add>
+		<onlyifnot src="me()" trait="_FontYBase"/>
+		<add src="me()" trait="_FontYBase"/>
+	</_FontY>
+
+	<_ResizeMultiplier> 1 </_ResizeMultiplier>
+
+	<_Scale>
+		<copy> 1 </copy>
+		<mul src="me()" trait="_ResizeMultiplier"/>
+	</_Scale>
+	
+	<_Visible> 0 </_Visible>
+	<visible>
+		<copy> 0 </copy> 
+		<or>
+			<copy src="ReticleCenter" trait="visible"/>
+			<or src="AmmoTypeLabel" trait="visible"/>
+			<or src="ActionPoints" trait="visible"/>
+			<or src="HitPoints" trait="visible"/>
+			<and> 
+				<copy src="me()" trait="_Visible"/>
+				<eq> 1 </eq>
+			</and>
+		</or>
+		<or>
+			<copy src="me()" trait="_Visible"/>
+			<eq> -1 </eq>
+		</or>
+	</visible>
+	
+	<red>255</red>
+	<green>255</green>
+	<blue>255</blue>
+	
+	<locus> &true; </locus>
+	<systemcolor> <copy src="me()" trait="_Color"/> </systemcolor>
+	<alpha> <copy src="me()" trait="_Alpha"/> </alpha>
+
+	<x>
+		<copy src="screen()" trait="width"/>
+		<mul src="me()" trait="_OffsetHorizontal"/>
+	</x>
+	<y>
+		<copy src="screen()" trait="height"/>
+		<mul src="me()" trait="_OffsetVertical"/>
+	</y>
+
+	<_DAM> &-sInventoryDamage; </_DAM>
+	<_DPS> &-sInventoryDamagePerSecond; </_DPS>	
+	<_STR> &-sInventoryStrReq; </_STR>
+	<_CND> &-sInventoryCondition; </_CND>
+	<_DR> &-sInventoryDamageResistance; </_DR>
+	<_DT> &-sInventoryDamageThreshold; </_DT>
+	<_WG> &-sInventoryWeightUpper; </_WG>
+	<_VAL> &-sInventoryValue; </_VAL>
+	<_HP> &-sHitPointsShort; </_HP>
+
+	<image name="JWHImageBackGround">
+		<filename>Interface\JWH\JWHBackGround.dds</filename>
+		<zoom> &scale; </zoom>
+		<depth> 1000 </depth>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_AlphaBackGround"/> </alpha>
+		<visible> <copy src="parent()" trait="visible"/> </visible> 
+		<width> <copy src="parent()" trait="_Width"/> </width>
+		<height> <copy src="parent()" trait="_Height"/> </height>
+		<x>
+			<copy src="me()" trait="width"/>
+			<div> -2 </div>
+		</x>
+		<y>
+			<copy src="me()" trait="height"/>
+			<div> -2 </div>
+		</y>
+		<red> <copy src="JWH" trait="red"/> </red>
+		<green> <copy src="JWH" trait="green"/> </green>
+		<blue> <copy src="JWH" trait="blue"/> </blue>
+	</image>
+	
+	<image name="JWHImageForeGround">
+		<filename>Interface\JWH\JWHForeGround.dds</filename>
+		<zoom> &scale; </zoom>
+		<depth> 1010 </depth>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_Alpha"/> </alpha>
+		<visible> <copy src="parent()" trait="visible"/> </visible> 
+		<width> <copy src="parent()" trait="_Width"/> </width>
+		<height> <copy src="parent()" trait="_Height"/> </height>
+		<x>
+			<copy src="me()" trait="width" />
+			<div> -2 </div>
+		</x>
+		<y>
+			<copy src="me()" trait="height" />
+			<div> -2 </div>
+		</y>
+		<red> <copy src="JWH" trait="red"/> </red>
+		<green> <copy src="JWH" trait="green"/> </green>
+		<blue> <copy src="JWH" trait="blue"/> </blue>
+	</image>
+	
+	<rect name="JWHBox1">
+		<_BoxVisible> <copy src="parent()" trait="_Box1Visible"/> </_BoxVisible>
+		<_BoxTextLeft> <copy src="parent()" trait="_Box1TextLeft"/> </_BoxTextLeft>
+		<_BoxTextRight> <copy src="parent()" trait="_Box1TextRight"/> </_BoxTextRight>
+		<_BoxValue> <copy src="parent()" trait="_Box1Value"/> </_BoxValue>
+		<_BoxArrows> <copy src="parent()" trait="_Box1Arrows"/> </_BoxArrows>
+		<_Alpha> <copy src="parent()" trait="_Box1Alpha"/> </_Alpha>
+		<_AlphaNumbers> 
+			<copy src="me()" trait="_Alpha"/>
+			<mul src="parent()" trait="_AlphaMult"/>
+			<div> 4 </div>
+		</_AlphaNumbers>
+		<x>
+			<copy src="parent()" trait="_Width"/>
+			<mul> -0.1225 </mul>
+		</x>
+		<y>
+			<copy src="me()" trait="height"/>
+			<mul> 0 </mul>
+			<add> 
+				<copy src="parent()" trait="_Height"/> 
+				<mul> 0.245 </mul>
+			</add>
+		</y>
+		<width>
+			<copy src="me()" trait="x"/>
+			<mul> -1 </mul>
+			<sub>
+				<copy src="parent()" trait="_Width"/> 
+				<mul> 0.005 </mul>
+			</sub>
+		</width>
+		<height> 16 </height>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<locus> &true; </locus>
+		<visible> <copy src="me()" trait="_BoxVisible"/> </visible> 
+		<text name="JWHTextLeft">
+			<visible>
+				<copy src="me()" trait="width"/>
+				<add src="sibling(JWHTextRight)" trait="width"/>
+				<lte src="parent()" trait="width"/>
+				<and>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<eq> 1 </eq>
+				</and>
+				<or>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<neq> 1 </neq>
+				</or>
+				<and>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<neq> 4 </neq>
+				</and>
+			</visible>
+			<y> 
+				<copy src="me()" trait="height"/>
+				<div> -2 </div>
+				<add src="grandparent()" trait="_FontY"/>
+			</y>
+			<justify> &left; </justify>
+			<font> <copy src="grandparent()" trait="_Font"/> </font>
+			<string> <copy src="parent()" trait="_BoxTextLeft"/> </string>
+			<depth> 1050 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</text>
+		<text name="JWHTextRight">
+			<visible>
+				<copy src="parent()" trait="_BoxVisible"/>
+				<eq> 1 </eq>
+			</visible>
+			<x>	<copy src="parent()" trait="width"/> </x>
+			<y> <copy src="sibling(JWHTextLeft)" trait="y"/> </y>
+			<justify> &right; </justify>
+			<font> <copy src="grandparent()" trait="_Font"/> </font>
+			<string> <copy src="parent()" trait="_BoxTextRight"/> </string>
+			<depth> 1060 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</text>
+		<image name="JWHMeterBackGround">
+			<visible>
+				<copy src="parent()" trait="_BoxVisible"/>
+				<mod> 2 </mod>
+				<eq> 0 </eq>
+			</visible>
+			<x>
+				<copy src="sibling(JWHTextLeft)" trait="width"/>
+				<mul src="sibling(JWHTextLeft)" trait="visible"/>
+				<add>
+					<copy src="grandparent()" trait="_Width"/> 
+					<mul> 0.005 </mul>
+				</add>
+			</x>
+			<y>
+				<copy src="me()" trait="height"/>
+				<div> -2 </div>
+			</y>
+			<width> 
+				<copy src="parent()" trait="width"/> 
+				<sub src="me()" trait="x"/> 
+			</width>
+			<height> <copy src="parent()" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename> solid.dds </filename>
+			<texatlas> Interface\InterfaceShared.tai </texatlas>
+			<depth> 1020 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_AlphaNumbers"/> </alpha>
+		</image>
+		<image name="JWHMeterForeGround">
+			<visible> <copy src="sibling(JWHMeterBackGround)" trait="visible"/> </visible>
+			<x> <copy src="sibling(JWHMeterBackGround)" trait="x"/> </x>
+			<y> <copy src="sibling(JWHMeterBackGround)" trait="y"/> </y>
+			<width>
+				<copy src="sibling(JWHMeterBackGround)" trait="width"/>
+				<mul src="parent()" trait="_BoxValue"/>
+			</width>
+			<height> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename>Interface\Shared\solid.dds</filename>
+			<depth> 1040 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</image>
+		<image name="JWHMeterArrows">
+			<visible> 
+				<copy src="sibling(JWHMeterBackGround)" trait="visible"/>
+				<onlyif src="parent()" trait="_BoxArrows"/>
+			</visible>
+			<x>
+				<copy src="sibling(JWHMeterBackGround)" trait="x"/>
+				<add>
+					<copy src="sibling(JWHMeterBackGround)" trait="width"/>
+					<mul src="parent()" trait="_BoxArrows"/>
+				</add>
+				<sub>
+					<copy src="me()" trait="width"/>
+					<div> 4 </div>
+				</sub>
+			</x>
+			<y> <copy src="sibling(JWHMeterBackGround)" trait="y"/> </y>
+			<width> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </width>
+			<height> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename>interface\shared\arrow\repair_meter_pips.dds</filename>
+			<depth> 1050 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</image>	
+	</rect>
+
+	<rect name="JWHBox2">
+		<_BoxVisible> <copy src="parent()" trait="_Box2Visible"/> </_BoxVisible>
+		<_BoxTextLeft> <copy src="parent()" trait="_Box2TextLeft"/> </_BoxTextLeft>
+		<_BoxTextRight> <copy src="parent()" trait="_Box2TextRight"/> </_BoxTextRight>
+		<_BoxValue> <copy src="parent()" trait="_Box2Value"/> </_BoxValue>
+		<_BoxArrows> <copy src="parent()" trait="_Box2Arrows"/> </_BoxArrows>
+		<_Alpha> <copy src="parent()" trait="_Box2Alpha"/> </_Alpha>
+		<_AlphaNumbers> 
+			<copy src="me()" trait="_Alpha"/>
+			<mul src="parent()" trait="_AlphaMult"/>
+			<div> 4 </div>
+		</_AlphaNumbers>
+		<x>
+			<copy src="parent()" trait="_Width"/>
+			<mul> 0.005 </mul>
+		</x>
+		<y>
+			<copy src="me()" trait="height"/>
+			<mul> 0 </mul>
+			<add> 
+				<copy src="parent()" trait="_Height"/> 
+				<mul> 0.245 </mul>
+			</add>
+		</y>
+		<width>
+			<copy src="me()" trait="x"/>
+			<mul> -1 </mul>
+			<sub>
+				<copy src="parent()" trait="_Width"/> 
+				<mul> -0.1225 </mul>
+			</sub>
+		</width>
+		<height> 16 </height>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<locus> &true; </locus>
+		<visible> <copy src="me()" trait="_BoxVisible"/> </visible> 
+		<text name="JWHTextLeft">
+			<visible>
+				<copy src="me()" trait="width"/>
+				<add src="sibling(JWHTextRight)" trait="width"/>
+				<lte src="parent()" trait="width"/>
+				<and>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<eq> 1 </eq>
+				</and>
+				<or>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<neq> 1 </neq>
+				</or>
+				<and>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<neq> 4 </neq>
+				</and>
+			</visible>
+			<y> 
+				<copy src="me()" trait="height"/>
+				<div> -2 </div>
+				<add src="grandparent()" trait="_FontY"/>
+			</y>
+			<justify> &left; </justify>
+			<font> <copy src="grandparent()" trait="_Font"/> </font>
+			<string> <copy src="parent()" trait="_BoxTextLeft"/> </string>
+			<depth> 1050 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</text>
+		<text name="JWHTextRight">
+			<visible>
+				<copy src="parent()" trait="_BoxVisible"/>
+				<eq> 1 </eq>
+			</visible>
+			<x>	<copy src="parent()" trait="width"/> </x>
+			<y> <copy src="sibling(JWHTextLeft)" trait="y"/> </y>
+			<justify> &right; </justify>
+			<font> <copy src="grandparent()" trait="_Font"/> </font>
+			<string> <copy src="parent()" trait="_BoxTextRight"/> </string>
+			<depth> 1060 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</text>
+		<image name="JWHMeterBackGround">
+			<visible>
+				<copy src="parent()" trait="_BoxVisible"/>
+				<mod> 2 </mod>
+				<eq> 0 </eq>
+			</visible>
+			<x>
+				<copy src="sibling(JWHTextLeft)" trait="width"/>
+				<mul src="sibling(JWHTextLeft)" trait="visible"/>
+				<add>
+					<copy src="grandparent()" trait="_Width"/> 
+					<mul> 0.005 </mul>
+				</add>
+			</x>
+			<y>
+				<copy src="me()" trait="height"/>
+				<div> -2 </div>
+			</y>
+			<width> 
+				<copy src="parent()" trait="width"/> 
+				<sub src="me()" trait="x"/> 
+			</width>
+			<height> <copy src="parent()" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename> solid.dds </filename>
+			<texatlas> Interface\InterfaceShared.tai </texatlas>
+			<depth> 1020 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_AlphaNumbers"/> </alpha>
+		</image>
+		<image name="JWHMeterForeGround">
+			<visible> <copy src="sibling(JWHMeterBackGround)" trait="visible"/> </visible>
+			<x> <copy src="sibling(JWHMeterBackGround)" trait="x"/> </x>
+			<y> <copy src="sibling(JWHMeterBackGround)" trait="y"/> </y>
+			<width>
+				<copy src="sibling(JWHMeterBackGround)" trait="width"/>
+				<mul src="parent()" trait="_BoxValue"/>
+			</width>
+			<height> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename>Interface\Shared\solid.dds</filename>
+			<depth> 1040 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</image>
+		<image name="JWHMeterArrows">
+			<visible> 
+				<copy src="sibling(JWHMeterBackGround)" trait="visible"/>
+				<onlyif src="parent()" trait="_BoxArrows"/>
+			</visible>
+			<x>
+				<copy src="sibling(JWHMeterBackGround)" trait="x"/>
+				<add>
+					<copy src="sibling(JWHMeterBackGround)" trait="width"/>
+					<mul src="parent()" trait="_BoxArrows"/>
+				</add>
+				<sub>
+					<copy src="me()" trait="width"/>
+					<div> 4 </div>
+				</sub>
+			</x>
+			<y> <copy src="sibling(JWHMeterBackGround)" trait="y"/> </y>
+			<width> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </width>
+			<height> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename>interface\shared\arrow\repair_meter_pips.dds</filename>
+			<depth> 1050 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</image>
+	</rect>
+
+	<rect name="JWHBox3">
+		<_BoxVisible> <copy src="parent()" trait="_Box3Visible"/> </_BoxVisible>
+		<_BoxTextLeft> <copy src="parent()" trait="_Box3TextLeft"/> </_BoxTextLeft>
+		<_BoxTextRight> <copy src="parent()" trait="_Box3TextRight"/> </_BoxTextRight>
+		<_BoxValue> <copy src="parent()" trait="_Box3Value"/> </_BoxValue>
+		<_BoxArrows> <copy src="parent()" trait="_Box3Arrows"/> </_BoxArrows>
+		<_Alpha> <copy src="parent()" trait="_Box3Alpha"/> </_Alpha>
+		<_AlphaNumbers> 
+			<copy src="me()" trait="_Alpha"/>
+			<mul src="parent()" trait="_AlphaMult"/>
+			<div> 4 </div>
+		</_AlphaNumbers>
+		<x>
+			<copy src="parent()" trait="_Width"/>
+			<mul> -0.1555 </mul>
+		</x>
+		<y>
+			<copy src="me()" trait="height"/>
+			<mul> 0 </mul>
+			<add> 
+				<copy src="parent()" trait="_Height"/> 
+				<mul> 0.3025 </mul>
+			</add>
+		</y>
+		<width>
+			<copy src="me()" trait="x"/>
+			<mul> -1 </mul>
+			<sub>
+				<copy src="parent()" trait="_Width"/> 
+				<mul> 0.005 </mul>
+			</sub>
+		</width>
+		<height> 16 </height>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<locus> &true; </locus>
+		<visible> <copy src="me()" trait="_BoxVisible"/> </visible> 
+		<text name="JWHTextLeft">
+			<visible>
+				<copy src="me()" trait="width"/>
+				<add src="sibling(JWHTextRight)" trait="width"/>
+				<lte src="parent()" trait="width"/>
+				<and>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<eq> 1 </eq>
+				</and>
+				<or>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<neq> 1 </neq>
+				</or>
+				<and>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<neq> 4 </neq>
+				</and>
+			</visible>
+			<y> 
+				<copy src="me()" trait="height"/>
+				<div> -2 </div>
+				<add src="grandparent()" trait="_FontY"/>
+			</y>
+			<justify> &left; </justify>
+			<font> <copy src="grandparent()" trait="_Font"/> </font>
+			<string> <copy src="parent()" trait="_BoxTextLeft"/> </string>
+			<depth> 1050 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</text>
+		<text name="JWHTextRight">
+			<visible>
+				<copy src="parent()" trait="_BoxVisible"/>
+				<eq> 1 </eq>
+			</visible>
+			<x>	<copy src="parent()" trait="width"/> </x>
+			<y> <copy src="sibling(JWHTextLeft)" trait="y"/> </y>
+			<justify> &right; </justify>
+			<font> <copy src="grandparent()" trait="_Font"/> </font>
+			<string> <copy src="parent()" trait="_BoxTextRight"/> </string>
+			<depth> 1060 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</text>
+		<image name="JWHMeterBackGround">
+			<visible>
+				<copy src="parent()" trait="_BoxVisible"/>
+				<mod> 2 </mod>
+				<eq> 0 </eq>
+			</visible>
+			<x>
+				<copy src="sibling(JWHTextLeft)" trait="width"/>
+				<mul src="sibling(JWHTextLeft)" trait="visible"/>
+				<add>
+					<copy src="grandparent()" trait="_Width"/> 
+					<mul> 0.005 </mul>
+				</add>
+			</x>
+			<y>
+				<copy src="me()" trait="height"/>
+				<div> -2 </div>
+			</y>
+			<width> 
+				<copy src="parent()" trait="width"/> 
+				<sub src="me()" trait="x"/> 
+			</width>
+			<height> <copy src="parent()" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename> solid.dds </filename>
+			<texatlas> Interface\InterfaceShared.tai </texatlas>
+			<depth> 1020 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_AlphaNumbers"/> </alpha>
+		</image>
+		<image name="JWHMeterForeGround">
+			<visible> <copy src="sibling(JWHMeterBackGround)" trait="visible"/> </visible>
+			<x> <copy src="sibling(JWHMeterBackGround)" trait="x"/> </x>
+			<y> <copy src="sibling(JWHMeterBackGround)" trait="y"/> </y>
+			<width>
+				<copy src="sibling(JWHMeterBackGround)" trait="width"/>
+				<mul src="parent()" trait="_BoxValue"/>
+			</width>
+			<height> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename>Interface\Shared\solid.dds</filename>
+			<depth> 1040 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</image>
+		<image name="JWHMeterArrows">
+			<visible> 
+				<copy src="sibling(JWHMeterBackGround)" trait="visible"/>
+				<onlyif src="parent()" trait="_BoxArrows"/>
+			</visible>
+			<x>
+				<copy src="sibling(JWHMeterBackGround)" trait="x"/>
+				<add>
+					<copy src="sibling(JWHMeterBackGround)" trait="width"/>
+					<mul src="parent()" trait="_BoxArrows"/>
+				</add>
+				<sub>
+					<copy src="me()" trait="width"/>
+					<div> 4 </div>
+				</sub>
+			</x>
+			<y> <copy src="sibling(JWHMeterBackGround)" trait="y"/> </y>
+			<width> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </width>
+			<height> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename>interface\shared\arrow\repair_meter_pips.dds</filename>
+			<depth> 1050 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</image>	
+	</rect>
+
+	<rect name="JWHBox4">
+		<_BoxVisible> <copy src="parent()" trait="_Box4Visible"/> </_BoxVisible>
+		<_BoxTextLeft> <copy src="parent()" trait="_Box4TextLeft"/> </_BoxTextLeft>
+		<_BoxTextRight> <copy src="parent()" trait="_Box4TextRight"/> </_BoxTextRight>
+		<_BoxValue> <copy src="parent()" trait="_Box4Value"/> </_BoxValue>
+		<_BoxArrows> <copy src="parent()" trait="_Box4Arrows"/> </_BoxArrows>
+		<_Alpha> <copy src="parent()" trait="_Box4Alpha"/> </_Alpha>
+		<_AlphaNumbers> 
+			<copy src="me()" trait="_Alpha"/>
+			<mul src="parent()" trait="_AlphaMult"/>
+			<div> 4 </div>
+		</_AlphaNumbers>
+		<x>
+			<copy src="parent()" trait="_Width"/>
+			<mul> 0.005 </mul>
+		</x>
+		<y>
+			<copy src="me()" trait="height"/>
+			<mul> 0 </mul>
+			<add> 
+				<copy src="parent()" trait="_Height"/> 
+				<mul> 0.3025 </mul>
+			</add>
+		</y>
+		<width>
+			<copy src="me()" trait="x"/>
+			<mul> -1 </mul>
+			<sub>
+				<copy src="parent()" trait="_Width"/> 
+				<mul> -0.1555 </mul>
+			</sub>
+		</width>
+		<height> 16 </height>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<locus> &true; </locus>
+		<visible> <copy src="me()" trait="_BoxVisible"/> </visible> 
+		<text name="JWHTextLeft">
+			<visible>
+				<copy src="me()" trait="width"/>
+				<add src="sibling(JWHTextRight)" trait="width"/>
+				<lte src="parent()" trait="width"/>
+				<and>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<eq> 1 </eq>
+				</and>
+				<or>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<neq> 1 </neq>
+				</or>
+				<and>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<neq> 4 </neq>
+				</and>
+			</visible>
+			<y> 
+				<copy src="me()" trait="height"/>
+				<div> -2 </div>
+				<add src="grandparent()" trait="_FontY"/>
+			</y>
+			<justify> &left; </justify>
+			<font> <copy src="grandparent()" trait="_Font"/> </font>
+			<string> <copy src="parent()" trait="_BoxTextLeft"/> </string>
+			<depth> 1050 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</text>
+		<text name="JWHTextRight">
+			<visible>
+				<copy src="parent()" trait="_BoxVisible"/>
+				<eq> 1 </eq>
+			</visible>
+			<x>	<copy src="parent()" trait="width"/> </x>
+			<y> <copy src="sibling(JWHTextLeft)" trait="y"/> </y>
+			<justify> &right; </justify>
+			<font> <copy src="grandparent()" trait="_Font"/> </font>
+			<string> <copy src="parent()" trait="_BoxTextRight"/> </string>
+			<depth> 1060 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</text>
+		<image name="JWHMeterBackGround">
+			<visible>
+				<copy src="parent()" trait="_BoxVisible"/>
+				<mod> 2 </mod>
+				<eq> 0 </eq>
+			</visible>
+			<x>
+				<copy src="sibling(JWHTextLeft)" trait="width"/>
+				<mul src="sibling(JWHTextLeft)" trait="visible"/>
+				<add>
+					<copy src="grandparent()" trait="_Width"/> 
+					<mul> 0.005 </mul>
+				</add>
+			</x>
+			<y>
+				<copy src="me()" trait="height"/>
+				<div> -2 </div>
+			</y>
+			<width> 
+				<copy src="parent()" trait="width"/> 
+				<sub src="me()" trait="x"/> 
+			</width>
+			<height> <copy src="parent()" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename> solid.dds </filename>
+			<texatlas> Interface\InterfaceShared.tai </texatlas>
+			<depth> 1020 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_AlphaNumbers"/> </alpha>
+		</image>
+		<image name="JWHMeterForeGround">
+			<visible> <copy src="sibling(JWHMeterBackGround)" trait="visible"/> </visible>
+			<x> <copy src="sibling(JWHMeterBackGround)" trait="x"/> </x>
+			<y> <copy src="sibling(JWHMeterBackGround)" trait="y"/> </y>
+			<width>
+				<copy src="sibling(JWHMeterBackGround)" trait="width"/>
+				<mul src="parent()" trait="_BoxValue"/>
+			</width>
+			<height> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename>Interface\Shared\solid.dds</filename>
+			<depth> 1040 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</image>
+		<image name="JWHMeterArrows">
+			<visible> 
+				<copy src="sibling(JWHMeterBackGround)" trait="visible"/>
+				<onlyif src="parent()" trait="_BoxArrows"/>
+			</visible>
+			<x>
+				<copy src="sibling(JWHMeterBackGround)" trait="x"/>
+				<add>
+					<copy src="sibling(JWHMeterBackGround)" trait="width"/>
+					<mul src="parent()" trait="_BoxArrows"/>
+				</add>
+				<sub>
+					<copy src="me()" trait="width"/>
+					<div> 4 </div>
+				</sub>
+			</x>
+			<y> <copy src="sibling(JWHMeterBackGround)" trait="y"/> </y>
+			<width> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </width>
+			<height> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename>interface\shared\arrow\repair_meter_pips.dds</filename>
+			<depth> 1050 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</image>
+	</rect>
+
+	<rect name="JWHBox5">
+		<_BoxVisible> <copy src="parent()" trait="_Box5Visible"/> </_BoxVisible>
+		<_BoxTextLeft> <copy src="parent()" trait="_Box5TextLeft"/> </_BoxTextLeft>
+		<_BoxTextRight> <copy src="parent()" trait="_Box5TextRight"/> </_BoxTextRight>
+		<_BoxValue> <copy src="parent()" trait="_Box5Value"/> </_BoxValue>
+		<_BoxArrows> <copy src="parent()" trait="_Box5Arrows"/> </_BoxArrows>
+		<_Alpha> <copy src="parent()" trait="_Box5Alpha"/> </_Alpha>
+		<_AlphaNumbers> 
+			<copy src="me()" trait="_Alpha"/>
+			<mul src="parent()" trait="_AlphaMult"/>
+			<div> 4 </div>
+		</_AlphaNumbers>
+		<x>
+			<copy src="parent()" trait="_Width"/>
+			<mul> -0.1225 </mul>
+		</x>
+		<y>
+			<copy src="me()" trait="height"/>
+			<mul> 0 </mul>
+			<add> 
+				<copy src="parent()" trait="_Height"/> 
+				<mul> 0.245 </mul>
+			</add>
+		</y>
+		<width>
+			<copy src="me()" trait="x"/>
+			<mul> -1 </mul>
+			<sub>
+				<copy src="parent()" trait="_Width"/> 
+				<mul> 0.005 </mul>
+			</sub>
+		</width>
+		<height> 16 </height>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<locus> &true; </locus>
+		<visible> <copy src="me()" trait="_BoxVisible"/> </visible> 
+		<text name="JWHTextLeft">
+			<visible>
+				<copy src="me()" trait="width"/>
+				<add src="sibling(JWHTextRight)" trait="width"/>
+				<lte src="parent()" trait="width"/>
+				<and>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<eq> 1 </eq>
+				</and>
+				<or>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<neq> 1 </neq>
+				</or>
+				<and>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<neq> 4 </neq>
+				</and>
+			</visible>
+			<y> 
+				<copy src="me()" trait="height"/>
+				<div> -2 </div>
+				<add src="grandparent()" trait="_FontY"/>
+			</y>
+			<justify> &left; </justify>
+			<font> <copy src="grandparent()" trait="_Font"/> </font>
+			<string> <copy src="parent()" trait="_BoxTextLeft"/> </string>
+			<depth> 1050 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</text>
+		<text name="JWHTextRight">
+			<visible>
+				<copy src="parent()" trait="_BoxVisible"/>
+				<eq> 1 </eq>
+			</visible>
+			<x>	<copy src="parent()" trait="width"/> </x>
+			<y> <copy src="sibling(JWHTextLeft)" trait="y"/> </y>
+			<justify> &right; </justify>
+			<font> <copy src="grandparent()" trait="_Font"/> </font>
+			<string> <copy src="parent()" trait="_BoxTextRight"/> </string>
+			<depth> 1060 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</text>
+		<image name="JWHMeterBackGround">
+			<visible>
+				<copy src="parent()" trait="_BoxVisible"/>
+				<mod> 2 </mod>
+				<eq> 0 </eq>
+			</visible>
+			<x>
+				<copy src="sibling(JWHTextLeft)" trait="width"/>
+				<mul src="sibling(JWHTextLeft)" trait="visible"/>
+				<add>
+					<copy src="grandparent()" trait="_Width"/> 
+					<mul> 0.005 </mul>
+				</add>
+			</x>
+			<y>
+				<copy src="me()" trait="height"/>
+				<div> -2 </div>
+			</y>
+			<width> 
+				<copy src="parent()" trait="width"/> 
+				<sub src="me()" trait="x"/> 
+			</width>
+			<height> <copy src="parent()" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename> solid.dds </filename>
+			<texatlas> Interface\InterfaceShared.tai </texatlas>
+			<depth> 1020 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_AlphaNumbers"/> </alpha>
+		</image>
+		<image name="JWHMeterForeGround">
+			<visible> <copy src="sibling(JWHMeterBackGround)" trait="visible"/> </visible>
+			<x> <copy src="sibling(JWHMeterBackGround)" trait="x"/> </x>
+			<y> <copy src="sibling(JWHMeterBackGround)" trait="y"/> </y>
+			<width>
+				<copy src="sibling(JWHMeterBackGround)" trait="width"/>
+				<mul src="parent()" trait="_BoxValue"/>
+			</width>
+			<height> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename>Interface\Shared\solid.dds</filename>
+			<depth> 1040 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</image>
+		<image name="JWHMeterArrows">
+			<visible> 
+				<copy src="sibling(JWHMeterBackGround)" trait="visible"/>
+				<onlyif src="parent()" trait="_BoxArrows"/>
+			</visible>
+			<x>
+				<copy src="sibling(JWHMeterBackGround)" trait="x"/>
+				<add>
+					<copy src="sibling(JWHMeterBackGround)" trait="width"/>
+					<mul src="parent()" trait="_BoxArrows"/>
+				</add>
+				<sub>
+					<copy src="me()" trait="width"/>
+					<div> 4 </div>
+				</sub>
+			</x>
+			<y> <copy src="sibling(JWHMeterBackGround)" trait="y"/> </y>
+			<width> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </width>
+			<height> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename>interface\shared\arrow\repair_meter_pips.dds</filename>
+			<depth> 1050 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</image>
+	</rect>
+
+	<rect name="JWHBox6">
+		<_BoxVisible> <copy src="parent()" trait="_Box6Visible"/> </_BoxVisible>
+		<_BoxTextLeft> <copy src="parent()" trait="_Box6TextLeft"/> </_BoxTextLeft>
+		<_BoxTextRight> <copy src="parent()" trait="_Box6TextRight"/> </_BoxTextRight>
+		<_BoxValue> <copy src="parent()" trait="_Box6Value"/> </_BoxValue>
+		<_BoxArrows> <copy src="parent()" trait="_Box6Arrows"/> </_BoxArrows>
+		<_Alpha> <copy src="parent()" trait="_Box6Alpha"/> </_Alpha>
+		<_AlphaNumbers> 
+			<copy src="me()" trait="_Alpha"/>
+			<mul src="parent()" trait="_AlphaMult"/>
+			<div> 4 </div>
+		</_AlphaNumbers>
+		<x>
+			<copy src="parent()" trait="_Width"/>
+			<mul> 0.005 </mul>
+		</x>
+		<y>
+			<copy src="me()" trait="height"/>
+			<mul> 0 </mul>
+			<add> 
+				<copy src="parent()" trait="_Height"/> 
+				<mul> 0.245 </mul>
+			</add>
+		</y>
+		<width>
+			<copy src="me()" trait="x"/>
+			<mul> -1 </mul>
+			<sub>
+				<copy src="parent()" trait="_Width"/> 
+				<mul> -0.1225 </mul>
+			</sub>
+		</width>
+		<height> 16 </height>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<locus> &true; </locus>
+		<visible> <copy src="me()" trait="_BoxVisible"/> </visible> 
+		<text name="JWHTextLeft">
+			<visible>
+				<copy src="me()" trait="width"/>
+				<add src="sibling(JWHTextRight)" trait="width"/>
+				<lte src="parent()" trait="width"/>
+				<and>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<eq> 1 </eq>
+				</and>
+				<or>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<neq> 1 </neq>
+				</or>
+				<and>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<neq> 4 </neq>
+				</and>
+			</visible>
+			<y> 
+				<copy src="me()" trait="height"/>
+				<div> -2 </div>
+				<add src="grandparent()" trait="_FontY"/>
+			</y>
+			<justify> &left; </justify>
+			<font> <copy src="grandparent()" trait="_Font"/> </font>
+			<string> <copy src="parent()" trait="_BoxTextLeft"/> </string>
+			<depth> 1050 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</text>
+		<text name="JWHTextRight">
+			<visible>
+				<copy src="parent()" trait="_BoxVisible"/>
+				<eq> 1 </eq>
+			</visible>
+			<x>	<copy src="parent()" trait="width"/> </x>
+			<y> <copy src="sibling(JWHTextLeft)" trait="y"/> </y>
+			<justify> &right; </justify>
+			<font> <copy src="grandparent()" trait="_Font"/> </font>
+			<string> <copy src="parent()" trait="_BoxTextRight"/> </string>
+			<depth> 1060 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</text>
+		<image name="JWHMeterBackGround">
+			<visible>
+				<copy src="parent()" trait="_BoxVisible"/>
+				<mod> 2 </mod>
+				<eq> 0 </eq>
+			</visible>
+			<x>
+				<copy src="sibling(JWHTextLeft)" trait="width"/>
+				<mul src="sibling(JWHTextLeft)" trait="visible"/>
+				<add>
+					<copy src="grandparent()" trait="_Width"/> 
+					<mul> 0.005 </mul>
+				</add>
+			</x>
+			<y>
+				<copy src="me()" trait="height"/>
+				<div> -2 </div>
+			</y>
+			<width> 
+				<copy src="parent()" trait="width"/> 
+				<sub src="me()" trait="x"/> 
+			</width>
+			<height> <copy src="parent()" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename> solid.dds </filename>
+			<texatlas> Interface\InterfaceShared.tai </texatlas>
+			<depth> 1020 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_AlphaNumbers"/> </alpha>
+		</image>
+		<image name="JWHMeterForeGround">
+			<visible> <copy src="sibling(JWHMeterBackGround)" trait="visible"/> </visible>
+			<x> <copy src="sibling(JWHMeterBackGround)" trait="x"/> </x>
+			<y> <copy src="sibling(JWHMeterBackGround)" trait="y"/> </y>
+			<width>
+				<copy src="sibling(JWHMeterBackGround)" trait="width"/>
+				<mul src="parent()" trait="_BoxValue"/>
+			</width>
+			<height> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename>Interface\Shared\solid.dds</filename>
+			<depth> 1040 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</image>
+		<image name="JWHMeterArrows">
+			<visible> 
+				<copy src="sibling(JWHMeterBackGround)" trait="visible"/>
+				<onlyif src="parent()" trait="_BoxArrows"/>
+			</visible>
+			<x>
+				<copy src="sibling(JWHMeterBackGround)" trait="x"/>
+				<add>
+					<copy src="sibling(JWHMeterBackGround)" trait="width"/>
+					<mul src="parent()" trait="_BoxArrows"/>
+				</add>
+				<sub>
+					<copy src="me()" trait="width"/>
+					<div> 4 </div>
+				</sub>
+			</x>
+			<y> <copy src="sibling(JWHMeterBackGround)" trait="y"/> </y>
+			<width> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </width>
+			<height> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename>interface\shared\arrow\repair_meter_pips.dds</filename>
+			<depth> 1050 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</image>
+	</rect>
+
+	<rect name="JWHBox7">
+		<_BoxVisible> <copy src="parent()" trait="_Box7Visible"/> </_BoxVisible>
+		<_BoxTextLeft> <copy src="parent()" trait="_Box7TextLeft"/> </_BoxTextLeft>
+		<_BoxTextRight> <copy src="parent()" trait="_Box7TextRight"/> </_BoxTextRight>
+		<_BoxValue> <copy src="parent()" trait="_Box7Value"/> </_BoxValue>
+		<_BoxArrows> <copy src="parent()" trait="_Box7Arrows"/> </_BoxArrows>
+		<_Alpha> <copy src="parent()" trait="_Box7Alpha"/> </_Alpha>
+		<_AlphaNumbers> 
+			<copy src="me()" trait="_Alpha"/>
+			<mul src="parent()" trait="_AlphaMult"/>
+			<div> 4 </div>
+		</_AlphaNumbers>
+		<x>
+			<copy src="parent()" trait="_Width"/>
+			<mul> -0.1555 </mul>
+		</x>
+		<y>
+			<copy src="me()" trait="height"/>
+			<mul> 0 </mul>
+			<add> 
+				<copy src="parent()" trait="_Height"/> 
+				<mul> 0.3025 </mul>
+			</add>
+		</y>
+		<width>
+			<copy src="me()" trait="x"/>
+			<mul> -1 </mul>
+			<sub>
+				<copy src="parent()" trait="_Width"/> 
+				<mul> 0.005 </mul>
+			</sub>
+		</width>
+		<height> 16 </height>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<locus> &true; </locus>
+		<visible> <copy src="me()" trait="_BoxVisible"/> </visible> 
+		<text name="JWHTextLeft">
+			<visible>
+				<copy src="me()" trait="width"/>
+				<add src="sibling(JWHTextRight)" trait="width"/>
+				<lte src="parent()" trait="width"/>
+				<and>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<eq> 1 </eq>
+				</and>
+				<or>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<neq> 1 </neq>
+				</or>
+				<and>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<neq> 4 </neq>
+				</and>
+			</visible>
+			<y> 
+				<copy src="me()" trait="height"/>
+				<div> -2 </div>
+				<add src="grandparent()" trait="_FontY"/>
+			</y>
+			<justify> &left; </justify>
+			<font> <copy src="grandparent()" trait="_Font"/> </font>
+			<string> <copy src="parent()" trait="_BoxTextLeft"/> </string>
+			<depth> 1050 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</text>
+		<text name="JWHTextRight">
+			<visible>
+				<copy src="parent()" trait="_BoxVisible"/>
+				<eq> 1 </eq>
+			</visible>
+			<x>	<copy src="parent()" trait="width"/> </x>
+			<y> <copy src="sibling(JWHTextLeft)" trait="y"/> </y>
+			<justify> &right; </justify>
+			<font> <copy src="grandparent()" trait="_Font"/> </font>
+			<string> <copy src="parent()" trait="_BoxTextRight"/> </string>
+			<depth> 1060 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</text>
+		<image name="JWHMeterBackGround">
+			<visible>
+				<copy src="parent()" trait="_BoxVisible"/>
+				<mod> 2 </mod>
+				<eq> 0 </eq>
+			</visible>
+			<x>
+				<copy src="sibling(JWHTextLeft)" trait="width"/>
+				<mul src="sibling(JWHTextLeft)" trait="visible"/>
+				<add>
+					<copy src="grandparent()" trait="_Width"/> 
+					<mul> 0.005 </mul>
+				</add>
+			</x>
+			<y>
+				<copy src="me()" trait="height"/>
+				<div> -2 </div>
+			</y>
+			<width> 
+				<copy src="parent()" trait="width"/> 
+				<sub src="me()" trait="x"/> 
+			</width>
+			<height> <copy src="parent()" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename> solid.dds </filename>
+			<texatlas> Interface\InterfaceShared.tai </texatlas>
+			<depth> 1020 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_AlphaNumbers"/> </alpha>
+		</image>
+		<image name="JWHMeterForeGround">
+			<visible> <copy src="sibling(JWHMeterBackGround)" trait="visible"/> </visible>
+			<x> <copy src="sibling(JWHMeterBackGround)" trait="x"/> </x>
+			<y> <copy src="sibling(JWHMeterBackGround)" trait="y"/> </y>
+			<width>
+				<copy src="sibling(JWHMeterBackGround)" trait="width"/>
+				<mul src="parent()" trait="_BoxValue"/>
+			</width>
+			<height> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename>Interface\Shared\solid.dds</filename>
+			<depth> 1040 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</image>
+		<image name="JWHMeterArrows">
+			<visible> 
+				<copy src="sibling(JWHMeterBackGround)" trait="visible"/>
+				<onlyif src="parent()" trait="_BoxArrows"/>
+			</visible>
+			<x>
+				<copy src="sibling(JWHMeterBackGround)" trait="x"/>
+				<add>
+					<copy src="sibling(JWHMeterBackGround)" trait="width"/>
+					<mul src="parent()" trait="_BoxArrows"/>
+				</add>
+				<sub>
+					<copy src="me()" trait="width"/>
+					<div> 4 </div>
+				</sub>
+			</x>
+			<y> <copy src="sibling(JWHMeterBackGround)" trait="y"/> </y>
+			<width> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </width>
+			<height> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename>interface\shared\arrow\repair_meter_pips.dds</filename>
+			<depth> 1050 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</image>		</rect>
+
+	<rect name="JWHBox8">
+		<_BoxVisible> <copy src="parent()" trait="_Box8Visible"/> </_BoxVisible>
+		<_BoxTextLeft> <copy src="parent()" trait="_Box8TextLeft"/> </_BoxTextLeft>
+		<_BoxTextRight> <copy src="parent()" trait="_Box8TextRight"/> </_BoxTextRight>
+		<_BoxValue> <copy src="parent()" trait="_Box8Value"/> </_BoxValue>
+		<_BoxArrows> <copy src="parent()" trait="_Box8Arrows"/> </_BoxArrows>
+		<_Alpha> <copy src="parent()" trait="_Box8Alpha"/> </_Alpha>
+		<_AlphaNumbers> 
+			<copy src="me()" trait="_Alpha"/>
+			<mul src="parent()" trait="_AlphaMult"/>
+			<div> 4 </div>
+		</_AlphaNumbers>
+		<x>
+			<copy src="parent()" trait="_Width"/>
+			<mul> 0.005 </mul>
+		</x>
+		<y>
+			<copy src="me()" trait="height"/>
+			<mul> 0 </mul>
+			<add> 
+				<copy src="parent()" trait="_Height"/> 
+				<mul> 0.3025 </mul>
+			</add>
+		</y>
+		<width>
+			<copy src="me()" trait="x"/>
+			<mul> -1 </mul>
+			<sub>
+				<copy src="parent()" trait="_Width"/> 
+				<mul> -0.1555 </mul>
+			</sub>
+		</width>
+		<height> 16 </height>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<locus> &true; </locus>
+		<visible> <copy src="me()" trait="_BoxVisible"/> </visible> 
+		<text name="JWHTextLeft">
+			<visible>
+				<copy src="me()" trait="width"/>
+				<add src="sibling(JWHTextRight)" trait="width"/>
+				<lte src="parent()" trait="width"/>
+				<and>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<eq> 1 </eq>
+				</and>
+				<or>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<neq> 1 </neq>
+				</or>
+				<and>
+					<copy src="parent()" trait="_BoxVisible"/>
+					<neq> 4 </neq>
+				</and>
+			</visible>
+			<y> 
+				<copy src="me()" trait="height"/>
+				<div> -2 </div>
+				<add src="grandparent()" trait="_FontY"/>
+			</y>
+			<justify> &left; </justify>
+			<font> <copy src="grandparent()" trait="_Font"/> </font>
+			<string> <copy src="parent()" trait="_BoxTextLeft"/> </string>
+			<depth> 1050 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</text>
+		<text name="JWHTextRight">
+			<visible>
+				<copy src="parent()" trait="_BoxVisible"/>
+				<eq> 1 </eq>
+			</visible>
+			<x>	<copy src="parent()" trait="width"/> </x>
+			<y> <copy src="sibling(JWHTextLeft)" trait="y"/> </y>
+			<justify> &right; </justify>
+			<font> <copy src="grandparent()" trait="_Font"/> </font>
+			<string> <copy src="parent()" trait="_BoxTextRight"/> </string>
+			<depth> 1060 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</text>
+		<image name="JWHMeterBackGround">
+			<visible>
+				<copy src="parent()" trait="_BoxVisible"/>
+				<mod> 2 </mod>
+				<eq> 0 </eq>
+			</visible>
+			<x>
+				<copy src="sibling(JWHTextLeft)" trait="width"/>
+				<mul src="sibling(JWHTextLeft)" trait="visible"/>
+				<add>
+					<copy src="grandparent()" trait="_Width"/> 
+					<mul> 0.005 </mul>
+				</add>
+			</x>
+			<y>
+				<copy src="me()" trait="height"/>
+				<div> -2 </div>
+			</y>
+			<width> 
+				<copy src="parent()" trait="width"/> 
+				<sub src="me()" trait="x"/> 
+			</width>
+			<height> <copy src="parent()" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename> solid.dds </filename>
+			<texatlas> Interface\InterfaceShared.tai </texatlas>
+			<depth> 1020 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_AlphaNumbers"/> </alpha>
+		</image>
+		<image name="JWHMeterForeGround">
+			<visible> <copy src="sibling(JWHMeterBackGround)" trait="visible"/> </visible>
+			<x> <copy src="sibling(JWHMeterBackGround)" trait="x"/> </x>
+			<y> <copy src="sibling(JWHMeterBackGround)" trait="y"/> </y>
+			<width>
+				<copy src="sibling(JWHMeterBackGround)" trait="width"/>
+				<mul src="parent()" trait="_BoxValue"/>
+			</width>
+			<height> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename>Interface\Shared\solid.dds</filename>
+			<depth> 1040 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</image>
+		<image name="JWHMeterArrows">
+			<visible> 
+				<copy src="sibling(JWHMeterBackGround)" trait="visible"/>
+				<onlyif src="parent()" trait="_BoxArrows"/>
+			</visible>
+			<x>
+				<copy src="sibling(JWHMeterBackGround)" trait="x"/>
+				<add>
+					<copy src="sibling(JWHMeterBackGround)" trait="width"/>
+					<mul src="parent()" trait="_BoxArrows"/>
+				</add>
+				<sub>
+					<copy src="me()" trait="width"/>
+					<div> 4 </div>
+				</sub>
+			</x>
+			<y> <copy src="sibling(JWHMeterBackGround)" trait="y"/> </y>
+			<width> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </width>
+			<height> <copy src="sibling(JWHMeterBackGround)" trait="height"/> </height>
+			<clips> &true; </clips>
+			<zoom> &scale; </zoom>
+			<filename>interface\shared\arrow\repair_meter_pips.dds</filename>
+			<depth> 1050 </depth>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<systemcolor> <copy src="grandparent()" trait="systemcolor"/> </systemcolor>
+			<alpha>	<copy src="parent()" trait="_Alpha"/> </alpha>
+		</image>	
+	</rect>
+
+	<text name="JWHText">
+		<string> <copy src="parent()" trait="_Text"/> </string>
+		<visible>
+			<copy> 1 </copy>
+			<onlyif src="parent()" trait="_Text"/> 
+		</visible>
+		<font> <copy src="parent()" trait="_Font"/> </font>
+		<depth> 1015 </depth>		
+		<justify> &center; </justify>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_Alpha"/> </alpha>
+		<visible> <copy src="parent()" trait="visible"/> </visible>
+		<wrapwidth> 
+			<copy src="parent()" trait="_Width"/> 
+			<mul> 0.3125 </mul>
+		</wrapwidth>
+		<y>
+			<copy src="me()" trait="height"/>
+			<div> -2 </div>
+			<add> 
+				<copy src="parent()" trait="_Height"/> 
+				<mul> -0.275 </mul>
+			</add>
+			<add src="parent()" trait="_FontY"/>
+		</y>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+	</text>
+
+	<image name="JWHSliceImage">
+		<filename> <copy src="parent()" trait="_SliceFilename"/> </filename>
+		<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+		<zoom> &scale; </zoom>
+		<depth> 1013 </depth>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_Alpha"/> </alpha>
+		<visible> <copy src="parent()" trait="visible"/> </visible> 
+		<width> <copy src="parent()" trait="_Width"/> </width>
+		<height> <copy src="parent()" trait="_Height"/> </height>
+		<x>
+			<copy src="me()" trait="width"/>
+			<div> -2 </div>
+		</x>
+		<y>
+			<copy src="me()" trait="height"/>
+			<div> -2 </div>
+		</y>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+	</image>
+	
+	<image name="JWHImage1">
+		<visible> 0 </visible>
+		<depth> 1014 </depth>
+		<filename>interface\companion_Hweel\comp_aggressive_on.dds</filename>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_Alpha"/> </alpha>
+		<width> 
+			<copy src="parent()" trait="_Width"/> 
+			<div> 6 </div>
+		</width>
+		<height> 
+			<copy src="parent()" trait="_Height"/> 
+			<div> 6 </div>
+		</height>		
+		<x>
+			<copy src="me()" trait="width"/>
+			<div> -2 </div>
+			<add> 
+				<copy src="parent()" trait="_Width"/> 
+				<mul> 0.233333338 </mul>
+			</add>
+		</x>
+		<y>
+			<copy src="me()" trait="height"/>
+			<div> -2 </div>
+			<add> 
+				<copy src="parent()" trait="_Height"/> 
+				<mul> -0.230769225 </mul>
+			</add>
+		</y>
+		<zoom> &scale; </zoom>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+	</image>
+
+	<image name="JWHImage2">
+		<visible> 0 </visible>
+		<depth> 1014 </depth>
+		<filename>interface\companion_Hweel\comp_aggressive_on.dds</filename>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_Alpha"/> </alpha>
+		<width> 
+			<copy src="parent()" trait="_Width"/> 
+			<div> 6 </div>
+		</width>
+		<height> 
+			<copy src="parent()" trait="_Height"/> 
+			<div> 6 </div>
+		</height>		
+		<x>
+			<copy src="me()" trait="width"/>
+			<div> -2 </div>
+			<add> 
+				<copy src="parent()" trait="_Width"/> 
+				<mul> 0.3151041663 </mul>
+			</add>
+		</x>
+		<y>
+			<copy src="me()" trait="height"/>
+			<div> -2 </div>
+			<add> 
+				<copy src="parent()" trait="_Height"/> 
+				<mul> -0.080000004 </mul>
+			</add>
+		</y>
+		<zoom> &scale; </zoom>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+	</image>
+
+	<image name="JWHImage3">
+		<visible> 0 </visible>
+		<depth> 1014 </depth>
+		<filename>interface\companion_Hweel\comp_aggressive_on.dds</filename>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_Alpha"/> </alpha>
+		<width> 
+			<copy src="parent()" trait="_Width"/> 
+			<div> 6 </div>
+		</width>
+		<height> 
+			<copy src="parent()" trait="_Height"/> 
+			<div> 6 </div>
+		</height>		
+		<x>
+			<copy src="me()" trait="width"/>
+			<div> -2 </div>
+			<add> 
+				<copy src="parent()" trait="_Width"/> 
+				<mul> 0.3151041663 </mul>
+			</add>
+		</x>
+		<y>
+			<copy src="me()" trait="height"/>
+			<div> -2 </div>
+			<add> 
+				<copy src="parent()" trait="_Height"/> 
+				<mul> 0.080000004 </mul>
+			</add>
+		</y>
+		<zoom> &scale; </zoom>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+	</image>
+
+	<image name="JWHImage4">
+		<visible> 0 </visible>
+		<depth> 1014 </depth>
+		<filename>interface\companion_Hweel\comp_aggressive_on.dds</filename>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_Alpha"/> </alpha>
+		<width> 
+			<copy src="parent()" trait="_Width"/> 
+			<div> 6 </div>
+		</width>
+		<height> 
+			<copy src="parent()" trait="_Height"/> 
+			<div> 6 </div>
+		</height>		
+		<x>
+			<copy src="me()" trait="width"/>
+			<div> -2 </div>
+			<add> 
+				<copy src="parent()" trait="_Width"/> 
+				<mul> 0.233333338 </mul>
+			</add>
+		</x>
+		<y>
+			<copy src="me()" trait="height"/>
+			<div> -2 </div>
+			<add> 
+				<copy src="parent()" trait="_Height"/> 
+				<mul> 0.230769225 </mul>
+			</add>
+		</y>
+		<zoom> &scale; </zoom>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+	</image>
+
+	<image name="JWHImage8">
+		<visible> 0 </visible>
+		<depth> 1014 </depth>
+		<filename>interface\companion_Hweel\comp_aggressive_on.dds</filename>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_Alpha"/> </alpha>
+		<width> 
+			<copy src="parent()" trait="_Width"/> 
+			<div> 6 </div>
+		</width>
+		<height> 
+			<copy src="parent()" trait="_Height"/> 
+			<div> 6 </div>
+		</height>		
+		<x>
+			<copy src="me()" trait="width"/>
+			<div> -2 </div>
+			<add> 
+				<copy src="parent()" trait="_Width"/> 
+				<mul> -0.233333338 </mul>
+			</add>
+		</x>
+		<y>
+			<copy src="me()" trait="height"/>
+			<div> -2 </div>
+			<add> 
+				<copy src="parent()" trait="_Height"/> 
+				<mul> -0.230769225 </mul>
+			</add>
+		</y>
+		<zoom> &scale; </zoom>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+	</image>
+
+	<image name="JWHImage7">
+		<visible> 0 </visible>
+		<depth> 1014 </depth>
+		<filename>interface\companion_Hweel\comp_aggressive_on.dds</filename>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_Alpha"/> </alpha>
+		<width> 
+			<copy src="parent()" trait="_Width"/> 
+			<div> 6 </div>
+		</width>
+		<height> 
+			<copy src="parent()" trait="_Height"/> 
+			<div> 6 </div>
+		</height>		
+		<x>
+			<copy src="me()" trait="width"/>
+			<div> -2 </div>
+			<add> 
+				<copy src="parent()" trait="_Width"/> 
+				<mul> -0.3151041663 </mul>
+			</add>
+		</x>
+		<y>
+			<copy src="me()" trait="height"/>
+			<div> -2 </div>
+			<add> 
+				<copy src="parent()" trait="_Height"/> 
+				<mul> -0.080000004 </mul>
+			</add>
+		</y>
+		<zoom> &scale; </zoom>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+	</image>
+
+	<image name="JWHImage6">
+		<visible> 0 </visible>
+		<depth> 1014 </depth>
+		<filename>interface\companion_Hweel\comp_aggressive_on.dds</filename>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_Alpha"/> </alpha>
+		<width> 
+			<copy src="parent()" trait="_Width"/> 
+			<div> 6 </div>
+		</width>
+		<height> 
+			<copy src="parent()" trait="_Height"/> 
+			<div> 6 </div>
+		</height>		
+		<x>
+			<copy src="me()" trait="width"/>
+			<div> -2 </div>
+			<add> 
+				<copy src="parent()" trait="_Width"/> 
+				<mul> -0.3151041663 </mul>
+			</add>
+		</x>
+		<y>
+			<copy src="me()" trait="height"/>
+			<div> -2 </div>
+			<add> 
+				<copy src="parent()" trait="_Height"/> 
+				<mul> 0.080000004 </mul>
+			</add>
+		</y>
+		<zoom> &scale; </zoom>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+	</image>
+
+	<image name="JWHImage5">
+		<visible> 0 </visible>
+		<depth> 1014 </depth>
+		<filename>interface\companion_Hweel\comp_aggressive_on.dds</filename>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_Alpha"/> </alpha>
+		<width> 
+			<copy src="parent()" trait="_Width"/> 
+			<div> 6 </div>
+		</width>
+		<height> 
+			<copy src="parent()" trait="_Height"/> 
+			<div> 6 </div>
+		</height>		
+		<x>
+			<copy src="me()" trait="width"/>
+			<div> -2 </div>
+			<add> 
+				<copy src="parent()" trait="_Width"/> 
+				<mul> -0.233333338 </mul>
+			</add>
+		</x>
+		<y>
+			<copy src="me()" trait="height"/>
+			<div> -2 </div>
+			<add> 
+				<copy src="parent()" trait="_Height"/> 
+				<mul> 0.230769225 </mul>
+			</add>
+		</y>
+		<zoom> &scale; </zoom>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+	</image>
+
+	<text name="JWHText1">
+		<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<string> 1)</string>
+		<font> <copy src="parent()" trait="_Font"/> </font>
+		<depth> 1012 </depth>		
+		<justify> &center; </justify>
+		<alpha> <copy src="parent()" trait="_AlphaNumbers"/> </alpha>
+		<visible> <copy src="parent()" trait="visible"/> </visible>
+		<x>
+			<copy src="parent()" trait="_Width"/> 
+			<mul> 0.093333335 </mul>
+		</x>
+		<y>
+			<copy src="parent()" trait="_Height"/> 
+			<mul> -0.108461536 </mul>
+		</y>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+	</text>
+
+	<text name="JWHText2">
+		<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<string> 2)</string>
+		<font> <copy src="parent()" trait="_Font"/> </font>
+		<depth> 1012 </depth>		
+		<justify> &center; </justify>
+		<alpha> <copy src="parent()" trait="_AlphaNumbers"/> </alpha>
+		<visible> <copy src="parent()" trait="visible"/> </visible>
+		<x>
+			<copy src="parent()" trait="_Width"/> 
+			<mul> 0.1301041663 </mul>
+		</x>
+		<y>
+			<copy src="parent()" trait="_Height"/> 
+			<mul> -0.047000004 </mul>
+		</y>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+	</text>
+
+	<text name="JWHText3">
+		<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<string> 3)</string>
+		<font> <copy src="parent()" trait="_Font"/> </font>
+		<depth> 1012 </depth>		
+		<justify> &center; </justify>
+		<alpha> <copy src="parent()" trait="_AlphaNumbers"/> </alpha>
+		<visible> <copy src="parent()" trait="visible"/> </visible>
+		<x>
+			<copy src="parent()" trait="_Width"/> 
+			<mul> 0.1301041663 </mul>
+		</x>
+		<y>
+			<copy src="me()" trait="height"/>
+			<div> -2 </div>
+			<add> 
+				<copy src="parent()" trait="_Height"/> 
+				<mul> 0.043000004 </mul>
+			</add>
+		</y>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+	</text>
+
+	<text name="JWHText4">
+		<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<string> 4)</string>
+		<font> <copy src="parent()" trait="_Font"/> </font>
+		<depth> 1012 </depth>		
+		<justify> &center; </justify>
+		<alpha> <copy src="parent()" trait="_AlphaNumbers"/> </alpha>
+		<visible> <copy src="parent()" trait="visible"/> </visible>
+		<x>
+			<copy src="parent()" trait="_Width"/> 
+			<mul> 0.093333335 </mul>
+		</x>
+		<y>
+			<copy src="me()" trait="height"/>
+			<div> -2 </div>
+			<add> 
+				<copy src="parent()" trait="_Height"/> 
+				<mul> 0.108461536 </mul>
+			</add>
+		</y>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+	</text>
+
+	<text name="JWHText8">
+		<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<string>8)</string>
+		<font> <copy src="parent()" trait="_Font"/> </font>
+		<depth> 1012 </depth>		
+		<justify> &center; </justify>
+		<alpha> <copy src="parent()" trait="_AlphaNumbers"/> </alpha>
+		<visible> <copy src="parent()" trait="visible"/> </visible>
+		<x>
+			<copy src="parent()" trait="_Width"/> 
+			<mul> -0.093333335 </mul>
+		</x>
+		<y>
+			<copy src="parent()" trait="_Height"/> 
+			<mul> -0.108461536 </mul>
+		</y>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+	</text>
+
+	<text name="JWHText7">
+		<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<string> 7)</string>
+		<font> <copy src="parent()" trait="_Font"/> </font>
+		<depth> 1012 </depth>		
+		<justify> &center; </justify>
+		<alpha> <copy src="parent()" trait="_AlphaNumbers"/> </alpha>
+		<visible> <copy src="parent()" trait="visible"/> </visible>
+		<x>
+			<copy src="parent()" trait="_Width"/> 
+			<mul> -0.1301041663 </mul>
+		</x>
+		<y>
+			<copy src="parent()" trait="_Height"/> 
+			<mul> -0.047000004 </mul>
+		</y>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+	</text>
+
+	<text name="JWHText6">
+		<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<string> 6)</string>
+		<font> <copy src="parent()" trait="_Font"/> </font>
+		<depth> 1012 </depth>		
+		<justify> &center; </justify>
+		<alpha> <copy src="parent()" trait="_AlphaNumbers"/> </alpha>
+		<visible> <copy src="parent()" trait="visible"/> </visible>
+		<x>
+			<copy src="parent()" trait="_Width"/> 
+			<mul> -0.1301041663 </mul>
+		</x>
+		<y>
+			<copy src="me()" trait="height"/>
+			<div> -2 </div>
+			<add> 
+				<copy src="parent()" trait="_Height"/> 
+				<mul> 0.043000004 </mul>
+			</add>
+		</y>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+	</text>
+
+	<text name="JWHText5">
+		<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<string>5)</string>
+		<font> <copy src="parent()" trait="_Font"/> </font>
+		<depth> 1012 </depth>		
+		<justify> &center; </justify>
+		<alpha> <copy src="parent()" trait="_AlphaNumbers"/> </alpha>
+		<visible> <copy src="parent()" trait="visible"/> </visible>
+		<x>
+			<copy src="parent()" trait="_Width"/> 
+			<mul> -0.093333335 </mul>
+		</x>
+		<y>
+			<copy src="me()" trait="height"/>
+			<div> -2 </div>
+			<add> 
+				<copy src="parent()" trait="_Height"/> 
+				<mul> 0.108461536 </mul>
+			</add>
+		</y>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+	</text>
+	
+	<image name="JWHPreloader1">
+		<visible> 0 </visible>
+		<filename>Interface\JWH\JWHSlice1.dds</filename>
+	</image>
+	<image name="JWHPreloader2">
+		<width> 0 </width> <height> 0 </height>
+		<filename>Interface\JWH\JWHSlice2.dds</filename>
+	</image>
+	<image name="JWHPreloader3">
+		<width> 0 </width> <height> 0 </height>
+		<filename>Interface\JWH\JWHSlice3.dds</filename>
+	</image>
+	<image name="JWHPreloader4">
+		<width> 0 </width> <height> 0 </height>
+		<filename>Interface\JWH\JWHSlice4.dds</filename>
+	</image>
+	<image name="JWHPreloader8">
+		<width> 0 </width> <height> 0 </height>
+		<filename>Interface\JWH\JWHSlice8.dds</filename>
+	</image>
+	<image name="JWHPreloader7">
+		<width> 0 </width> <height> 0 </height>
+		<filename>Interface\JWH\JWHSlice7.dds</filename>
+	</image>
+	<image name="JWHPreloader6">
+		<width> 0 </width> <height> 0 </height>
+		<filename>Interface\JWH\JWHSlice6.dds</filename>
+	</image>
+	<image name="JWHPreloader5">
+		<width> 0 </width> <height> 0 </height>
+		<filename>Interface\JWH\JWHSlice5.dds</filename>
+	</image>
+	<image name="JWHPreloader9">
+		<width> 0 </width> <height> 0 </height>
+		<filename>Interface\JWH\JWHSlice9.dds</filename>
+	</image>
+	<image name="JWHPreloader10">
+		<width> 0 </width> <height> 0 </height>
+		<filename>Interface\JWH\JWHSlice10.dds</filename>
+	</image>
+	<image name="JWHPreloader11">
+		<width> 0 </width> <height> 0 </height>
+		<filename>Interface\JWH\JWHSlice11.dds</filename>
+	</image>
+</rect>
