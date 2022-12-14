@@ -131,7 +131,7 @@ namespace UserInterface::LootMenu
 		UInt32 StrToFormID(const std::string& formIdStr)
 		{
 			const auto formId = HexStringToInt(formIdStr);
-			if (formId == -1) Log("Form field was incorrectly formatted, got " + formIdStr, logLevel);
+			if (formId == -1) Log(logLevel) << "Form field was incorrectly formatted, got " + formIdStr;
 			return formId;
 		}
 
@@ -620,9 +620,9 @@ namespace UserInterface::LootMenu
 	void HandleJSON()
 	{
 		const auto dir = GetCurPath() + R"(\Data\menus\yUI)";
-		if (!std::filesystem::exists(dir)) Log(dir + " does not exist.", kToLog | logLevel);
+		if (!std::filesystem::exists(dir)) Log(Log::kToLog | logLevel) << (dir + " does not exist.");
 		else for (const auto& iter : std::filesystem::directory_iterator(dir))
-			if (iter.is_directory()) Log(iter.path().string() + " found");
+			if (iter.is_directory()) Log(logLevel) << iter.path().string() + " found";
 			else if (iter.path().extension().string() == ".json")
 			{
 				try
@@ -630,13 +630,13 @@ namespace UserInterface::LootMenu
 					std::ifstream i(iter.path());
 					auto j = nlohmann::json::parse(i, nullptr, true, true);
 					if (!j.contains("lootMenu") || !j["lootMenu"].is_array()) 
-						Log(iter.path().string() + " JSON ySI item array not detected", logLevel);
+						Log(logLevel) << (iter.path().string() + " JSON ySI item array not detected");
 					else for (const auto& elem : j["lootMenu"]) ScriptChecker::AddFromJSON(elem);
 				}
 				catch (nlohmann::json::exception& e)
 				{
-					Log("The JSON is incorrectly formatted! It will not be applied.", logLevel);
-					Log(FormatString("JSON error: %s\n", e.what()), logLevel);
+					Log(logLevel) << ("The JSON is incorrectly formatted! It will not be applied.");
+					Log(logLevel) << (FormatString("JSON error: %s\n", e.what()));
 				}
 			}
 	}

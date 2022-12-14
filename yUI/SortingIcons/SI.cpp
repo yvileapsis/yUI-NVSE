@@ -50,18 +50,18 @@ namespace SortingIcons
 
 	void DeferredInit()
 	{
-		Log("Loading files", kToLog | logLevel);
+		Log(Log::kToLog | logLevel) << ("Loading files");
 		const auto dir = GetCurPath() + R"(\Data\menus\ySI)";
 		const auto then = std::chrono::system_clock::now();
-		if (!std::filesystem::exists(dir)) Log(dir + " does not exist.", kToLog | logLevel);
+		if (!std::filesystem::exists(dir)) Log(Log::kToLog | logLevel) << (dir + " does not exist.");
 		else for (const auto& iter : std::filesystem::directory_iterator(dir))
-			if (iter.is_directory()) Log(iter.path().string() + " found");
+			if (iter.is_directory()) Log(logLevel) << (iter.path().string() + " found");
 			else if (iter.path().extension().string() == ".json") Files::HandleJSON(iter.path());
 			else if (iter.path().extension().string() == ".xml") Files::HandleXML(iter.path());
 		ProcessEntries();
 		const auto now = std::chrono::system_clock::now();
 		const auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - then);
-		Log(FormatString("Loaded items, categories and tabs in %d ms", diff.count()), kToLog | logLevel);
+		Log(Log::kToLog | logLevel) << FormatString("Loaded items, categories and tabs in %d ms", diff.count());
 	}
 
 	extern void Init()

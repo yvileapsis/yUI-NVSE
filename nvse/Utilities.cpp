@@ -3,7 +3,6 @@
 #include "ConsoleManager.h"
 #include "InterfaceManager.h"
 #include "GameData.h"
-#include "InventoryChanges.h"
 #include "Script.h"
 
 ScopedLock::ScopedLock(CriticalSection& critSection) : m_critSection(critSection)
@@ -120,7 +119,7 @@ const std::filesystem::path& GetFalloutDirectory()
 
 	if (!falloutPathLength || falloutPathLength >= sizeof falloutPathBuf)
 	{
-		Log(FormatString("couldn't find fallout path (len = %d, err = %08X)", falloutPathLength, GetLastError()));
+		Log() << (FormatString("couldn't find fallout path (len = %d, err = %08X)", falloutPathLength, GetLastError()));
 		return s_falloutDirectory;
 	}
 
@@ -132,11 +131,11 @@ const std::filesystem::path& GetFalloutDirectory()
 	if (lastSlash != std::string::npos)	// if we don't find a slash something is VERY WRONG
 	{
 		s_falloutDirectory = falloutPath.substr(0, lastSlash + 1);
-		Log("fallout root = " + s_falloutDirectory.generic_string());
+		Log() << ("fallout root = " + s_falloutDirectory.generic_string());
 	}
 	else
 	{
-		Log("no slash in fallout path? (" + falloutPath + ")");
+		Log() << ("no slash in fallout path? (" + falloutPath + ")");
 	}
 
 	return s_falloutDirectory;
@@ -152,7 +151,7 @@ static const std::filesystem::path& GetNVSEConfigPath(void)
 	if (const auto& falloutPath = GetFalloutDirectory(); !falloutPath.empty())
 	{
 		s_configPath = falloutPath.generic_string() + "Data\\NVSE\\nvse_config.ini";
-		Log("config path =" + s_configPath.generic_string());
+		Log() << ("config path =" + s_configPath.generic_string());
 	}
 
 	return s_configPath;
@@ -652,7 +651,7 @@ void ShowRuntimeError(Script* script, const char* fmt, ...)
 			QueueUIMessage(message, 0, reinterpret_cast<const char*>(0x1049638), nullptr, 2.5F, false);
 	}
 
-	Log(errorHeader);
+	Log() << errorHeader;
 
 	va_end(args);
 }
@@ -682,7 +681,7 @@ void GeckExtenderMessageLog(const char* fmt, ...)
 	auto* window = FindWindow("RTEDITLOG", nullptr);
 	if (!window)
 	{
-		Log("Failed to find GECK Extender Message Log window");
+		Log() << ("Failed to find GECK Extender Message Log window");
 		return;
 	}
 	

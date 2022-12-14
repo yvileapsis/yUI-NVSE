@@ -32,11 +32,12 @@ public:
 
 	void Create(LoggingFunction rhslogger, const std::filesystem::path& rhspath, const std::string& rhsmodString = "")
 	{
-		logger = (rhslogger);
+		logger = rhslogger;
 		file = std::fstream(rhspath, std::fstream::out | std::fstream::trunc);
 		modString = rhsmodString;
 
-	};
+	}
+
 	void Create(UpdateFunction rhsupdate, const std::string& rhsmodString = "")
 	{
 		update = rhsupdate;
@@ -55,13 +56,19 @@ public:
 		if (!logger && update) logger = update();
 		if (logger)
 		{
-			for (const auto& iter : queuedMessages) logger(file, (modString.empty() ? "" : modString + ":") + iter);
+			for (const auto& iter : queuedMessages) logger(file, (modString.empty() ? "" : modString + ": ") + iter);
 			queuedMessages.clear();
 		}
 	}
 
-	void Indent() { indent++; }
-	void Outdent() { indent--; }
+	DebugLog& operator<<(const std::string& str)
+	{
+		Message(str);
+		return *this;
+	}
+
+	DebugLog& operator++() { indent++; return *this; }
+	DebugLog& operator--() { indent--; return *this; }
 };
 
 inline DebugLog console;
@@ -70,12 +77,18 @@ inline DebugLog file;
 void ConsoleLoggerPrint(std::fstream& file, const std::string& str) { ConsoleManager::GetSingleton()->Print(str.c_str(), nullptr); }
 LoggingFunction ConsoleLoggerUpdate() { return ConsoleManager::GetSingleton() ? ConsoleLoggerPrint : nullptr; }
 
+void FileLoggerPrint(std::fstream& file, const std::string& str)
+{
+	file << str << "\n";
+	file.flush();
+}
+
 void DumpClass(void* theClassPtr, UInt32 nIntsToDump)
 {
-	file.Message("DumpClass:");
+	file << "DumpClass:";
 	UInt32* basePtr = (UInt32*)theClassPtr;
 
-	file.Indent();
+	++file;
 
 	if (!theClassPtr) return;
 	for (UInt32 ix = 0; ix < nIntsToDump; ix++) {
@@ -88,27 +101,28 @@ void DumpClass(void* theClassPtr, UInt32 nIntsToDump)
 			curPtrName = GetObjectClassName(curPtr);
 
 			otherPtr = *curPtr;
-			otherFloat = *(float*)(curPtr);
+			otherFloat = *(float*)curPtr;
 
 			if (otherPtr) {
 				otherPtrName = GetObjectClassName((void*)otherPtr);
 			}
 		}
 
-		file.Message(FormatString("%3d +%03X ptr: 0x%08X: %32s *ptr: 0x%08x | %f: %32s", ix, ix * 4, curPtr, curPtrName, otherPtr, otherFloat, otherPtrName));
+		file << FormatString("%3d +%03X ptr: 0x%08X: %32s *ptr: 0x%08x | %f: %32s", ix, ix * 4, curPtr, curPtrName, otherPtr, otherFloat, otherPtrName);
 	}
 
-	file.Outdent();
+	--file;
 }
 
 void Dump(Tile* tile)
 {
-	file.Message(tile->name.m_data);
-	file.Indent();
+	file << tile->name.m_data;
 
-	file.Message("values:");
+	++file;
 
-	file.Indent();
+	file << "values:";
+
+	++file;
 
 	for (UInt32 i = 0; i < tile->values.size; i++)
 	{
@@ -122,65 +136,65 @@ void Dump(Tile* tile)
 			traitName = traitNameIDBuf;
 		}
 
-		if (val->str)			file.Message(FormatString("%s: %s", traitName, val->str));
-		else if (val->action)	file.Message(FormatString("%s: action %08X", traitName, val->action));
-		else					file.Message(FormatString("%s: %f", traitName, val->num));
+		if (val->str)			file << FormatString("%s: %s", traitName, val->str);
+		else if (val->action)	file << FormatString("%s: action %08X", traitName, val->action);
+		else					file << FormatString("%s: %f", traitName, val->num);
 	}
 
-	file.Outdent();
+	--file;
 
 	for (const auto node : tile->children) Dump(node);
 
-	file.Outdent();
+	--file;
 }
 
 void Dump(BaseExtraList* extra)
 {
-	file.Message("BaseExtraList Dump:");
-	file.Indent();
+	file << "BaseExtraList Dump:";
+	++file;
 
 	if (extra->m_data)
 	{
 		for (auto traverse = extra->m_data; traverse; traverse = traverse->next) {
-			file.Message(GetObjectClassName(traverse));
+			file << GetObjectClassName(traverse);
 			//_MESSAGE("Extra types %4x (%s) %s", traverse->type, GetExtraDataName(traverse->type), GetExtraDataValue(traverse));
 		}
 	}
 	else
-		file.Message("No data in list");
+		file << "No data in list";
 
-	file.Outdent();
+	--file;
 }
 
 void Dump(ExtraContainerChanges* extra)
 {
-	file.Message("Dumping ExtraContainerChanges");
-	file.Indent();
+	file << "Dumping ExtraContainerChanges";
+	++file;
 
 	if (extra->data && extra->data->objList)
 	{
 		for (const auto entry : *extra->data->objList)
 		{
-			file.Message(FormatString("Type: %s CountDelta: %d [%08X]", entry->form->GetFullName()->name.CStr(), entry->countDelta, entry));
-			file.Indent();
+			file << FormatString("Type: %s CountDelta: %d [%08X]", entry->form->GetFullName()->name.CStr(), entry->countDelta, entry);
+			++file;
 			if (!entry || !entry->extendData)
-				file.Message("* No extend data *");
+				file << "* No extend data *";
 			else for (const auto extendData : *entry->extendData)
 			{
-				file.Message(FormatString("Extend Data: [%08X]", extendData));
-				file.Indent();
+				file << FormatString("Extend Data: [%08X]", extendData);
+				++file;
 				if (extendData) {
 					Dump(extendData);
 					if (const auto xCount = (ExtraCount*)extendData->GetByType(kExtraData_Count))
-						file.Message("ExtraCount value : %d", xCount->count);
+						file << FormatString("ExtraCount value : %d", xCount->count);
 				}
-				else file.Message("NULL");
-				file.Outdent();
+				else file << "NULL";
+				--file;
 			}
-			file.Outdent();
+			--file;
 		}
 	}
-	file.Outdent();
+	--file;
 }
 
 void DumpFontNames(void)
@@ -192,16 +206,17 @@ void DumpFontNames(void)
 }
 
 
-void LogInit(const std::filesystem::path& path, const std::string& modName)
+void Log::Init(const std::filesystem::path& path, const std::string& modName)
 {
-	file.Create(ConsoleLoggerPrint, path);
+	file.Create(FileLoggerPrint, path);
 	console.Create(ConsoleLoggerUpdate, modName);
 }
 
-void Log(const std::string& msg, UInt32 loglevel)
+Log& Log::operator<<(const std::string str)
 {
-	if (loglevel & kToLog) file.Message(msg);
-	if (loglevel & kToConsole) console.Message(msg);
+	if (logLevel & kToLog) file << str;
+	if (logLevel & kToConsole) console << str;
+	return *this;
 }
 
 /*void ScriptEventList::Dump(void)

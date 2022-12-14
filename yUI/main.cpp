@@ -16,7 +16,7 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	{
 		InitSingletons();
 
-		Log(yUI_VERSION_STR, kToBoth);
+		Log(Log::kToBoth) << yUI_VERSION_STR;
 
 		// call all deferred init functions
 		for (const auto& i : deferredInit) i();
@@ -47,22 +47,22 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 	if (nvse->isEditor) {
 		if (nvse->editorVersion < CS_VERSION_1_4_0_518)
 		{
-			Log(FormatString("yUI: incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518), kToLog);
+			Log(Log::kToLog) << FormatString("yUI: incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518);
 			return false;
 		}
 	} else {
 		if (nvse->nvseVersion < PACKED_NVSE_VERSION) {
-			Log(FormatString("yUI: NVSE version too old (got %X expected at least %X). Plugin will NOT load! Install the latest version here: https://github.com/xNVSE/NVSE/releases/", nvse->nvseVersion, PACKED_NVSE_VERSION), kToLog);
+			Log(Log::kToLog) << FormatString("yUI: NVSE version too old (got %X expected at least %X). Plugin will NOT load! Install the latest version here: https://github.com/xNVSE/NVSE/releases/", nvse->nvseVersion, PACKED_NVSE_VERSION);
 			return false;
 		}
 
 		if (nvse->runtimeVersion < RUNTIME_VERSION_1_4_0_525) {
-			Log(FormatString("yUI: incorrect runtime version (got %08X need at least %08X)", nvse->runtimeVersion, RUNTIME_VERSION_1_4_0_525), kToLog);
+			Log(Log::kToLog) << FormatString("yUI: incorrect runtime version (got %08X need at least %08X)", nvse->runtimeVersion, RUNTIME_VERSION_1_4_0_525);
 			return false;
 		}
 
 		if (nvse->isNogore) {
-			Log(FormatString("yUI: NoGore is not supported"), kToLog);
+			Log(Log::kToLog) << FormatString("yUI: NoGore is not supported");
 			return false;
 		}
 	}
@@ -111,7 +111,7 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	g_loggingInterface = static_cast<NVSELoggingInterface*>(nvse->QueryInterface(kInterface_LoggingInterface));
 	auto path = std::filesystem::path(g_loggingInterface->logPath);
 	path += yUI_LOG;
-	LogInit(path, yUI_STR);
+	Log::Init(path, yUI_STR);
 	// call all plugin load functions
 	for (const auto& i : pluginLoad) i();
 

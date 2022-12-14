@@ -5291,7 +5291,7 @@ public:
 
 		if (form && IsAddedObject(n))
 			if (numAddedObjects == 0)
-				Log("BGSListForm::RemoveNthForm: numAddedObjects = 0");
+				Log() << ("BGSListForm::RemoveNthForm: numAddedObjects = 0");
 			else
 				numAddedObjects--;
 

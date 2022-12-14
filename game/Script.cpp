@@ -474,7 +474,7 @@ void ShowCompilerError(ScriptLineBuffer* lineBuf, const char* fmt, ...)
 	vsprintf_s(errorMsg, 0x200, fmt, args);
 
 	strcat_s(errorHeader, 0x400, errorMsg);
-	Log(errorHeader);
+	Log() << errorHeader;
 
 	va_end(args);
 }

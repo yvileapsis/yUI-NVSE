@@ -46,7 +46,7 @@ UInt32 TESAnimGroup::AnimGroupForString(const char* groupName)
 void DumpAnimGroups()
 {
 	for (UInt32 i = 0; i < TESAnimGroup::kAnimGroup_Max; i++) {
-		Log(FormatString("%d,%s", i, s_animGroupInfos[i].name));
+		Log() << (FormatString("%d,%s", i, s_animGroupInfos[i].name));
 		//if (!_stricmp(s_animGroupInfos[i].name, "JumpLandRight"))
 		//	break;
 	}

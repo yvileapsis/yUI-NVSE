@@ -80,12 +80,12 @@ namespace Patch::TimeMult
 			if (wah(iter, cmdSGTM) == 1)
 			{
 				specialMods.emplace(iter->modIndex);
-				Log(FormatString("Found SGTM use in mod: %02X (%50s), form: %08X (%50s)", iter->modIndex, GetModName(
+				Log() << (FormatString("Found SGTM use in mod: %02X (%50s), form: %08X (%50s)", iter->modIndex, GetModName(
 					iter), iter->refID, iter->GetName()));
 			}
 			else if (wah(iter, cmdSGTM) == -1)
 			{
-				Log(FormatString("Found FATAL FAILURE AND DISAPPOINTMENT use in mod: %02X (%50s), form: %08X (%50s) (to be a bit more serious for a second, this script record is bugged, please look into it)", iter->modIndex, GetModName(
+				Log() << (FormatString("Found FATAL FAILURE AND DISAPPOINTMENT use in mod: %02X (%50s), form: %08X (%50s) (to be a bit more serious for a second, this script record is bugged, please look into it)", iter->modIndex, GetModName(
 					iter), iter->refID, iter->GetName()));
 			}
 		}

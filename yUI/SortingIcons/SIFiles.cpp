@@ -25,9 +25,9 @@ namespace SortingIcons::Files
 			for (const auto iter : reinterpret_cast<BGSListForm*>(form)->list) ItemRecursiveEmplace(common, iter);
 		else if (common.formType == 0 || common.formType == form->typeID) {
 			if (common.form == form)
-				Log(FormatString("Tag: '%10s', form: %08X (%50s), individual", common.tag.c_str(), form->refID, form->GetName()), logLevel);
+				Log(logLevel) << FormatString("Tag: '%10s', form: %08X (%50s), individual", common.tag.c_str(), form->refID, form->GetName());
 			else
-				Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, list: '%08X' (%50s)", common.tag.c_str(), form->refID, form->GetName(), common.form->refID, common.form->GetName()), logLevel);
+				Log(logLevel) << FormatString("Tag: '%10s', form: %08X (%50s), recursive, list: '%08X' (%50s)", common.tag.c_str(), form->refID, form->GetName(), common.form->refID, common.form->GetName());
 			auto newCommon = common;
 			newCommon.form = form;
 			g_Items.emplace_back(std::make_shared<Item>(newCommon));
@@ -48,7 +48,7 @@ namespace SortingIcons::Files
 
 			if (item->refID == form->refID || list && list->refID == form->refID)
 			{
-				Log(FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X' (%50s)", common.tag.c_str(), item->refID, item->GetName(), form->refID, common.form->GetName()), logLevel);
+				Log(logLevel) << FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X' (%50s)", common.tag.c_str(), item->refID, item->GetName(), form->refID, common.form->GetName());
 				auto newCommon = common;
 				newCommon.form = item;
 				g_Items.emplace_back(std::make_shared<Item>(newCommon));
@@ -60,7 +60,7 @@ namespace SortingIcons::Files
 	{
 		if (!elem.is_object())
 		{
-			Log("JSON error: expected object", logLevel);
+			Log(logLevel) << "JSON error: expected object";
 			return;
 		}
 		Item::Common common{};
@@ -116,19 +116,19 @@ namespace SortingIcons::Files
 				weapon.type = weaponType;
 				if (!ammos.empty()) for (auto ammo : ammos) {
 					weapon.ammo = ammo;
-					Log(FormatString("Tag: '%10s', weapon condition, type: %d, ammo form: %08X (%50s)", common.tag.c_str(), weaponType, ammo->refID, ammo->GetName()), logLevel);
+					Log(logLevel) << FormatString("Tag: '%10s', weapon condition, type: %d, ammo form: %08X (%50s)", common.tag.c_str(), weaponType, ammo->refID, ammo->GetName());
 					g_Items.emplace_back(std::make_shared<Item>(common, weapon));
 				} else {
-					Log(FormatString("Tag: '%10s', weapon condition, type: %d", common.tag.c_str(), weaponType), logLevel);
+					Log(logLevel) << FormatString("Tag: '%10s', weapon condition, type: %d", common.tag.c_str(), weaponType);
 					g_Items.emplace_back(std::make_shared<Item>(common, weapon));
 				}
 			} else {
 				if (!ammos.empty()) for (auto ammo : ammos) {
 					weapon.ammo = ammo;
-					Log(FormatString("Tag: '%10s', weapon condition, ammo form: %08X (%50s)", common.tag.c_str(), ammo->refID, ammo->GetName()), logLevel);
+					Log(logLevel) << FormatString("Tag: '%10s', weapon condition, ammo form: %08X (%50s)", common.tag.c_str(), ammo->refID, ammo->GetName());
 					g_Items.emplace_back(std::make_shared<Item>(common, weapon));
 				} else {
-					Log(FormatString("Tag: '%10s', weapon condition", common.tag.c_str()), logLevel);
+					Log(logLevel) << FormatString("Tag: '%10s', weapon condition", common.tag.c_str());
 					g_Items.emplace_back(std::make_shared<Item>(common, weapon));
 				}
 			}
@@ -166,7 +166,7 @@ namespace SortingIcons::Files
 			if (elem.contains("armorDR"))			armor.dr = elem["armorDR"].get<UInt16>();
 			if (elem.contains("armorChangesAV"))	armor.changesAV = elem["armorChangesAV"].get<UInt16>();
 
-			Log(FormatString("Tag: '%10s', armor condition", common.tag.c_str()), logLevel);
+			Log(logLevel) << FormatString("Tag: '%10s', armor condition", common.tag.c_str());
 			g_Items.emplace_back(std::make_shared<Item>(common, armor));
 		}
 		else if (common.formType == 47)
@@ -181,7 +181,7 @@ namespace SortingIcons::Files
 			if (elem.contains("aidIsMedicine"))			aid.isMedicine = elem["aidIsMedicine"].get<UInt8>();
 			if (elem.contains("aidIsPoisonous"))		aid.isPoisonous = elem["aidIsPoisonous"].get<UInt8>();
 
-			Log(FormatString("Tag: '%10s', aid condition", common.tag.c_str()), logLevel);
+			Log(logLevel) << FormatString("Tag: '%10s', aid condition", common.tag.c_str());
 			g_Items.emplace_back(std::make_shared<Item>(common, aid));
 		}
 		else g_Items.emplace_back(std::make_shared<Item>(common));
@@ -191,7 +191,7 @@ namespace SortingIcons::Files
 	{
 		if (!elem.is_object())
 		{
-			Log("JSON error: expected object", logLevel);
+			Log(logLevel) << "JSON error: expected object";
 			return;
 		}
 
@@ -210,7 +210,7 @@ namespace SortingIcons::Files
 		if (elem.contains("icon"))				category.icon = elem["icon"].get<std::string>();
 		if (elem.contains("count"))				category.count = elem["count"].get<UInt32>();
 		*/
-		Log(FormatString("Tag: '%10s', icon: '%s'", category.tag.c_str(), category.filename.c_str()), logLevel);
+		Log(logLevel) << FormatString("Tag: '%10s', icon: '%s'", category.tag.c_str(), category.filename.c_str());
 		g_Categories.emplace_back(std::make_shared<Category>(category));
 	}
 
@@ -218,7 +218,7 @@ namespace SortingIcons::Files
 	{
 		if (!elem.is_object())
 		{
-			Log("JSON error: expected object with mod, form and folder fields", logLevel);
+			Log(logLevel) << "JSON error: expected object with mod, form and folder fields";
 			return;
 		}
 
@@ -262,7 +262,7 @@ namespace SortingIcons::Files
 
 	void HandleJSON(const std::filesystem::path& path)
 	{
-		Log("\nReading JSON file " + path.string(), logLevel);
+		Log(logLevel) << "\nReading JSON file " + path.string();
 		try
 		{
 			std::ifstream i(path);
@@ -273,24 +273,24 @@ namespace SortingIcons::Files
 			else if (j.contains("tags") && j["tags"].is_array())				// legacy support
 				for (const auto& elem : j["tags"]) HandleItem(elem);
 			else
-				Log(path.string() + " JSON ySI item array not detected", logLevel);
+				Log(logLevel) << path.string() + " JSON ySI item array not detected";
 
 			if (j.contains("categories") && j["categories"].is_array())
 				for (const auto& elem : j["categories"]) HandleCategory(elem);
 			else if (j.contains("icons") && j["icons"].is_array())				// legacy support
 				for (const auto& elem : j["icons"]) HandleCategory(elem);
 			else
-				Log(path.string() + " JSON ySI category array not detected", logLevel);
+				Log(logLevel) << path.string() + " JSON ySI category array not detected";
 
 			if (j.contains("tabs") && j["tabs"].is_array())
 				for (const auto& elem : j["tabs"]) HandleTab(elem);
 			else
-				Log(path.string() + " JSON ySI tab array not detected", logLevel);
+				Log(logLevel) << path.string() + " JSON ySI tab array not detected";
 		}
 		catch (nlohmann::json::exception& e)
 		{
-			Log("The JSON is incorrectly formatted! It will not be applied.", logLevel);
-			Log(FormatString("JSON error: %s\n", e.what()), logLevel);
+			Log(logLevel) << "The JSON is incorrectly formatted! It will not be applied.";
+			Log(logLevel) << FormatString("JSON error: %s\n", e.what());
 		}
 	}
 }

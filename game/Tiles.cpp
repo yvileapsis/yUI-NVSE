@@ -91,7 +91,7 @@ void Debug_DumpTraits(void)
 	{
 		for (auto bucket = g_traitNameMap->buckets[i]; bucket; bucket = bucket->next)
 		{
-			Log(FormatString("%s,%08X,%d", bucket->key, bucket->data, bucket->data));
+			Log() << FormatString("%s,%08X,%d", bucket->key, bucket->data, bucket->data);
 		}
 	}
 }

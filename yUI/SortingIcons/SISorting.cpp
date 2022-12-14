@@ -370,10 +370,10 @@ namespace SortingIcons::Tabs
 
 			auto string = tab->name;
 	//		Log(tab->tab);
-			Log(string);
+			Log() << (string);
 			if (string.find("&-") == 0)
 				string = GetStringFromGameSettingFromString(string.substr(2, string.length() - 3));
-			Log(string);
+			Log() << (string);
 			tile->SetString(kTileValue_string, string.c_str(), true);
 			tile->SetFloat(kTileValue_listindex, listIndex);
 			tile->SetFloat(kTileValue_id, traitID); // + listIndex
