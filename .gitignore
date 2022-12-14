@@ -392,3 +392,4 @@ ipch
 *.recipe
 
 meta.ini
+.DS_Store

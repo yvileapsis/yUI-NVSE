@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="dllmain.c" />
@@ -143,14 +143,17 @@
     <ClCompile Include="..\nvse\Logging.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="\\Mac\Home\Documents\GitHub\yUI-NVSE\game\NiNodes.cpp">
+    <ClCompile Include="..\game\NiNodes.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="\\Mac\Home\Documents\GitHub\yUI-NVSE\game\GameProcess.cpp">
+    <ClCompile Include="..\game\GameProcess.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="\\Mac\Home\Documents\GitHub\yUI-NVSE\game\Object.cpp">
+    <ClCompile Include="..\game\Object.cpp">
       <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInterface\WeaponHweel.cpp">
+      <Filter>features\UserInterface</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -262,7 +265,7 @@
     <ClInclude Include="..\nvse\Logging.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="\\Mac\Home\Documents\GitHub\yUI-NVSE\game\Object.h">
+    <ClInclude Include="..\game\Object.h">
       <Filter>game</Filter>
     </ClInclude>
   </ItemGroup>
