@@ -212,7 +212,7 @@ void Log::Init(const std::filesystem::path& path, const std::string& modName)
 	console.Create(ConsoleLoggerUpdate, modName);
 }
 
-Log& Log::operator<<(const std::string str)
+Log& Log::operator<<(const std::string& str)
 {
 	if (logLevel & kLog) file << str;
 	if (logLevel & kConsole) console << str;
