@@ -9,10 +9,10 @@ public:
 
 	enum
 	{
-		kToNone = 0,
-		kToLog = 1,
-		kToConsole = 2,
-		kToBoth = kToLog | kToConsole
+		kNone = 0,
+		kLog = 1,
+		kConsole = 2,
+		kBoth = kLog | kConsole
 	};
 
 	Log(UInt32 logLevel = 0) : logLevel(logLevel) {};

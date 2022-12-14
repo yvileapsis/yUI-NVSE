@@ -42,13 +42,13 @@ namespace UserInterface::EventLayer
 	{
 		RegisterEvent("yUI:JG:OnRender", 0, nullptr, NVSEEventManagerInterface::kFlag_IsUserDefined);
 		auto expression = CompileExpression(R"(SetOnRenderUpdateEventHandler 1 ({} => DispatchEventAlt "yUI:JG:OnRender") 4)");
-		if (!expression) Log(Log::kToBoth) << "Missing JohnnyGuitar NVSE";
+		if (!expression) Log(Log::kBoth) << "Missing JohnnyGuitar NVSE";
 		CallFunctionAlt(expression, nullptr, 0);
 		SetEventHandler("yUI:JG:OnRender", OnRender);
 
 		RegisterEvent("yUI:JIP:OnHit", 0, nullptr, NVSEEventManagerInterface::kFlag_IsUserDefined);
 		expression = CompileExpression(R"(SetOnHitEventHandler ({} => (this).DispatchEventAlt "yUI:JIP:OnHit") 1)");
-		if (!expression) Log(Log::kToBoth) << "Missing JIP LN NVSE";
+		if (!expression) Log(Log::kBoth) << "Missing JIP LN NVSE";
 		CallFunctionAlt(expression, nullptr, 0);
 		SetEventHandler("yUI:JIP:OnHit", OnHit);
 

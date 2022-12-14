@@ -16,7 +16,7 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	{
 		InitSingletons();
 
-		Log(Log::kToBoth) << yUI_VERSION_STR;
+		Log(Log::kBoth) << yUI_VERSION_STR;
 
 		// call all deferred init functions
 		for (const auto& i : deferredInit) i();
@@ -47,22 +47,22 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 	if (nvse->isEditor) {
 		if (nvse->editorVersion < CS_VERSION_1_4_0_518)
 		{
-			Log(Log::kToLog) << FormatString("yUI: incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518);
+			Log(Log::kLog) << FormatString("yUI: incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518);
 			return false;
 		}
 	} else {
 		if (nvse->nvseVersion < PACKED_NVSE_VERSION) {
-			Log(Log::kToLog) << FormatString("yUI: NVSE version too old (got %X expected at least %X). Plugin will NOT load! Install the latest version here: https://github.com/xNVSE/NVSE/releases/", nvse->nvseVersion, PACKED_NVSE_VERSION);
+			Log(Log::kLog) << FormatString("yUI: NVSE version too old (got %X expected at least %X). Plugin will NOT load! Install the latest version here: https://github.com/xNVSE/NVSE/releases/", nvse->nvseVersion, PACKED_NVSE_VERSION);
 			return false;
 		}
 
 		if (nvse->runtimeVersion < RUNTIME_VERSION_1_4_0_525) {
-			Log(Log::kToLog) << FormatString("yUI: incorrect runtime version (got %08X need at least %08X)", nvse->runtimeVersion, RUNTIME_VERSION_1_4_0_525);
+			Log(Log::kLog) << FormatString("yUI: incorrect runtime version (got %08X need at least %08X)", nvse->runtimeVersion, RUNTIME_VERSION_1_4_0_525);
 			return false;
 		}
 
 		if (nvse->isNogore) {
-			Log(Log::kToLog) << FormatString("yUI: NoGore is not supported");
+			Log(Log::kLog) << FormatString("yUI: NoGore is not supported");
 			return false;
 		}
 	}

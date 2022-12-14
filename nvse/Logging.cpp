@@ -214,8 +214,8 @@ void Log::Init(const std::filesystem::path& path, const std::string& modName)
 
 Log& Log::operator<<(const std::string str)
 {
-	if (logLevel & kToLog) file << str;
-	if (logLevel & kToConsole) console << str;
+	if (logLevel & kLog) file << str;
+	if (logLevel & kConsole) console << str;
 	return *this;
 }
 

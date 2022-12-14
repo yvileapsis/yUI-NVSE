@@ -50,10 +50,10 @@ namespace SortingIcons
 
 	void DeferredInit()
 	{
-		Log(Log::kToLog | logLevel) << ("Loading files");
+		Log(Log::kLog | logLevel) << ("Loading files");
 		const auto dir = GetCurPath() + R"(\Data\menus\ySI)";
 		const auto then = std::chrono::system_clock::now();
-		if (!std::filesystem::exists(dir)) Log(Log::kToLog | logLevel) << (dir + " does not exist.");
+		if (!std::filesystem::exists(dir)) Log(Log::kLog | logLevel) << (dir + " does not exist.");
 		else for (const auto& iter : std::filesystem::directory_iterator(dir))
 			if (iter.is_directory()) Log(logLevel) << (iter.path().string() + " found");
 			else if (iter.path().extension().string() == ".json") Files::HandleJSON(iter.path());
@@ -61,7 +61,7 @@ namespace SortingIcons
 		ProcessEntries();
 		const auto now = std::chrono::system_clock::now();
 		const auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - then);
-		Log(Log::kToLog | logLevel) << FormatString("Loaded items, categories and tabs in %d ms", diff.count());
+		Log(Log::kLog | logLevel) << FormatString("Loaded items, categories and tabs in %d ms", diff.count());
 	}
 
 	extern void Init()

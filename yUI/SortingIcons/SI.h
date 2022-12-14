@@ -6,7 +6,7 @@ namespace SortingIcons
 {
 	inline int enable = 0;
 
-	inline int logLevel = Log::kToNone;
+	inline int logLevel = Log::kNone;
 
 	inline int bSort			= 1;
 	inline int bIcons			= 1;

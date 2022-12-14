@@ -620,7 +620,7 @@ namespace UserInterface::LootMenu
 	void HandleJSON()
 	{
 		const auto dir = GetCurPath() + R"(\Data\menus\yUI)";
-		if (!std::filesystem::exists(dir)) Log(Log::kToLog | logLevel) << (dir + " does not exist.");
+		if (!std::filesystem::exists(dir)) Log(Log::kLog | logLevel) << (dir + " does not exist.");
 		else for (const auto& iter : std::filesystem::directory_iterator(dir))
 			if (iter.is_directory()) Log(logLevel) << iter.path().string() + " found";
 			else if (iter.path().extension().string() == ".json")
