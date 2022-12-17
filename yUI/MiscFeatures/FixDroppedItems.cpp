@@ -10,7 +10,7 @@ namespace Fix::DroppedItems
 
 	TList<TESObjectREFR>::Node* iterDroppedItem;
 
-	TESObjectREFR* __fastcall GetDroppedWeaponHead(ExtraDataList* extradatalist)
+	TESObjectREFR* __fastcall GetHead(ExtraDataList* extradatalist)
 	{
 		const auto xDropped = reinterpret_cast<ExtraDroppedItemList*>(extradatalist->GetByType(kExtraData_DroppedItemList));
 		if (!xDropped) return nullptr;
@@ -19,18 +19,18 @@ namespace Fix::DroppedItems
 		return iterDroppedItem->data;
 	}
 
-	TESObjectREFR* __fastcall GetDroppedWeaponNext()
+	TESObjectREFR* __fastcall GetNext()
 	{
 		iterDroppedItem = iterDroppedItem->next;
 		if (!iterDroppedItem) return nullptr;
 		return iterDroppedItem->data;
 	}
 
-	template <UInt32 retn> __declspec(naked) void HookGetDroppedWeaponNext()
+	template <UInt32 retn> __declspec(naked) void HookGetNext()
 	{
 		static const UInt32 retnAddr = retn;
 		static const UInt32 ProcessWeapon = 0x419970;
-		static const auto GetNextWeapon = reinterpret_cast<UInt32>(GetDroppedWeaponNext);
+		static const auto GetNextWeapon = reinterpret_cast<UInt32>(GetNext);
 		__asm
 		{
 			mov eax, [ecx] // dereference
@@ -45,8 +45,8 @@ namespace Fix::DroppedItems
 	{
 		if (enable)
 		{
-			WriteRelCall(0x75C793, GetDroppedWeaponHead);
-			WriteRelJump(0x75C9AB, HookGetDroppedWeaponNext<0x75C798>);
+			WriteRelCall(0x75C793, GetHead);
+			WriteRelJump(0x75C9AB, HookGetNext<0x75C798>);
 		}
 		else
 		{

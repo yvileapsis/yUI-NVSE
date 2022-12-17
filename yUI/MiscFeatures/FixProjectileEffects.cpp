@@ -325,8 +325,10 @@ namespace Fix::ProjectileEffects
 		explosion->ammo = hitData->GetAmmo();
 	}
 
-	std::unordered_map<MiddleHighProcess*, TESAmmo*> g_ammo;
-	std::unordered_map<MiddleHighProcess*, TESObjectWEAP*> g_weapon;
+	thread_local TESAmmo* g_ammo;
+	thread_local TESObjectWEAP* g_weapon;
+//	std::unordered_map<MiddleHighProcess*, TESAmmo*> g_ammo;
+//	std::unordered_map<MiddleHighProcess*, TESObjectWEAP*> g_weapon;
 
 	void PreCalculateHitDamage(ActorHitData* hitData)
 	{
@@ -334,11 +336,13 @@ namespace Fix::ProjectileEffects
 		auto process = reinterpret_cast<MiddleHighProcess*>(hitData->source->baseProcess);
 
 		if (!process->GetWeaponInfo() || !process->weaponInfo || !process->weaponInfo->weapon) return;
-		g_weapon.emplace(process, process->weaponInfo->weapon);
+		g_weapon = process->weaponInfo->weapon;
+//		g_weapon.emplace(process, process->weaponInfo->weapon);
 		if (const auto weapon = hitData->GetWeapon()) process->weaponInfo->weapon = weapon;
 
 		if (!process->GetAmmoInfo() || !process->ammoInfo || !process->ammoInfo->ammo) return;
-		g_ammo.emplace(process, process->ammoInfo->ammo);
+		g_ammo = process->ammoInfo->ammo;
+//		g_ammo.emplace(process, process->ammoInfo->ammo);
 		if (const auto ammo = hitData->GetAmmo()) process->ammoInfo->ammo = ammo;
 	}
 
@@ -348,18 +352,29 @@ namespace Fix::ProjectileEffects
 		const auto process = reinterpret_cast<MiddleHighProcess*>(hitData->source->baseProcess);
 
 		if (!process->GetWeaponInfo() || !process->weaponInfo || !process->weaponInfo->weapon) return;
-		if (g_weapon.contains(process))
+		if (g_weapon)
+		{
+			process->weaponInfo->weapon = g_weapon;
+			g_weapon = nullptr;
+		}
+/*		if (g_weapon.contains(process))
 		{
 			process->weaponInfo->weapon = g_weapon[process];
 			g_weapon.erase(process);
-		}
+		}*/
 
 		if (!process->GetAmmoInfo() || !process->ammoInfo || !process->ammoInfo->ammo) return;
-		if (g_ammo.contains(process))
+		if (g_ammo)
+		{
+			process->ammoInfo->ammo = g_ammo;
+			g_ammo = nullptr;
+		}
+
+/*		if (g_ammo.contains(process))
 		{
 			process->ammoInfo->ammo = g_ammo[process];
 			g_ammo.erase(process);
-		}
+		}*/
 
 	}
 

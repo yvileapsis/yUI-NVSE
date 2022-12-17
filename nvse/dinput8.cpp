@@ -218,7 +218,7 @@ static HRESULT _stdcall Hook_DirectInput8Create_Execute(HINSTANCE instance, DWOR
 
 	*((IDirectInput8A**)out) = new FakeDirectInput(dinput);
 
-	Log("Hook_DirectInput8Create_Execute");
+	Log(0) << ("Hook_DirectInput8Create_Execute");
 
 	return DI_OK;
 }
