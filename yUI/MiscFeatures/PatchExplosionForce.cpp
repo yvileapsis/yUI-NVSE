@@ -38,7 +38,7 @@ namespace Patch::ExplosionForce
 		}
 	}
 
-	void patchFixExplosionPushForce(const bool enable)
+	void PatchFixExplosionPushForce(const bool enable)
 	{
 		if (enable) { // stooee
 			WriteRelJump(0x89C8CF, HitKnockbackHook<0x89C8D4>);
@@ -67,6 +67,6 @@ namespace Patch::ExplosionForce
 	{
 		if (g_nvseInterface->isEditor) return;
 		HandleINIs();
-		patchFixExplosionPushForce(enable);
+		PatchFixExplosionPushForce(enable);
 	}
 }

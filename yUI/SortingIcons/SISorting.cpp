@@ -35,7 +35,7 @@ namespace SortingIcons::Categories
 				if (entry.weapon.numProjectiles &&	entry.weapon.numProjectiles > weapon->numProjectiles) continue;
 				if (entry.weapon.soundLevel &&		entry.weapon.soundLevel != weapon->soundLevel) continue;
 				if (entry.weapon.ammo &&			!reinterpret_cast<BGSListForm*>(entry.weapon.ammo)->ContainsRecursive(weapon->ammo.ammo)) continue;
-			}
+			}	
 			else if (entry.common.formType == kFormType_TESObjectARMO) {
 
 				const auto armor = reinterpret_cast<TESObjectARMO*>(form);

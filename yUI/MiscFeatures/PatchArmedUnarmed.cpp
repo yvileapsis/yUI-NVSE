@@ -206,16 +206,16 @@ namespace Patch::ArmedUnarmed
 	void patchArmedUnarmed(const bool bEnable)
 	{
 		if (bEnable) {
-			WriteRelCall(0x7724CB, ArmedUnarmed::ShouldNotShowAmmo);
+			WriteRelCall(0x7724CB, ShouldNotShowAmmo);
 
-			WriteRelJump(0x893C37, ArmedUnarmed::ShouldFireHook<0x893C3D, 0x893E2C>);
+			WriteRelJump(0x893C37, ShouldFireHook<0x893C3D, 0x893E2C>);
 
-			WriteRelJump(0x895C9B, ArmedUnarmed::QueuePowerAttackFireHook<0x895CA1>);
-			WriteRelJump(0x895D39, ArmedUnarmed::QueueAttackFireHook<0x895D3E>);
-			WriteRelCall(0x8BADD3, ArmedUnarmed::ExecuteAttackHook);
-			WriteRelJump(0x8BAE53, ArmedUnarmed::ExecuteAttackHook2<0x8BAE58, 0x8BAF03>);
+			WriteRelJump(0x895C9B, QueuePowerAttackFireHook<0x895CA1>);
+			WriteRelJump(0x895D39, QueueAttackFireHook<0x895D3E>);
+			WriteRelCall(0x8BADD3, ExecuteAttackHook);
+			WriteRelJump(0x8BAE53, ExecuteAttackHook2<0x8BAE58, 0x8BAF03>);
 
-			WriteRelJump(0x9492A1, ArmedUnarmed::PlayerAttackRemoveAmmoCheckHook<0x949308, 0x94948D>);
+			WriteRelJump(0x9492A1, PlayerAttackRemoveAmmoCheckHook<0x949308, 0x94948D>);
 		}
 	}
 
