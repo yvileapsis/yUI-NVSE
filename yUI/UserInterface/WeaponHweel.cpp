@@ -83,8 +83,7 @@ namespace UserInterface::WeaponHweel
 				if (itemIter)
 				{
 					TESIcon* icon = nullptr;
-					const auto bipedModel = DYNAMIC_CAST(itemIter->form, TESForm, TESBipedModelForm);
-					if (bipedModel) icon = bipedModel->icon;
+					if (const auto bipedModel = DYNAMIC_CAST(itemIter->form, TESForm, TESBipedModelForm)) icon = bipedModel->icon;
 					else icon = DYNAMIC_CAST(itemIter->form, TESForm, TESIcon);
 					if (icon) image->SetString(kTileValue_filename, icon->ddsPath.CStr());
 					image->SetFloat(kTileValue_visible, true);
