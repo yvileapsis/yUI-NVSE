@@ -375,13 +375,17 @@ void SetNativeHandlerFunctionBool(bool trueorfalse)
 }
 
 Script* JIPToggleVanityWheel;
+UInt32 levelOfToggle;
 bool ToggleVanityWheel(bool toggle)
 {
+	if (!toggle && levelOfToggle > 0) levelOfToggle--;
+	if (toggle) levelOfToggle++;
+
 	if (!JIPToggleVanityWheel) JIPToggleVanityWheel = CompileScript(R"(Begin Function { int toggle }
 		ToggleVanityWheel toggle
 	end)");
 	NVSEArrayElement element;
-	g_scriptInterface->CallFunction(JIPToggleVanityWheel, nullptr, nullptr, &element, 1, toggle);
+	g_scriptInterface->CallFunction(JIPToggleVanityWheel, nullptr, nullptr, &element, 1, levelOfToggle > 0);
 	return element.num;
 }
 

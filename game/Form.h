@@ -2005,28 +2005,30 @@ struct Condition {
 };
 static_assert(sizeof(Condition) == 0x1C);
 
-struct BaseExtraList
+class BaseExtraList
 {
+public:
+	virtual	BaseExtraList* Destroy(char chr);
+
 	bool						HasType(UInt32 type) const;
-	__forceinline BSExtraData* GetByType(UInt8 type) const { return ThisStdCall<BSExtraData*>(0x410220, this, type); };
+	__forceinline BSExtraData*	GetByType(UInt8 type) const { return ThisStdCall<BSExtraData*>(0x410220, this, type); };
 	void						MarkType(UInt32 type, bool bCleared);
 	__forceinline void			Remove(BSExtraData* toRemove, bool doFree) { ThisStdCall(0x410020, this, toRemove, doFree); }
 	__forceinline void			RemoveByType(UInt32 type) { ThisStdCall(0x410140, this, type); }
-	__forceinline BSExtraData* Add(BSExtraData* toAdd) { return ThisStdCall<BSExtraData*>(0x40FF60, this, toAdd); }
+	__forceinline BSExtraData*	Add(BSExtraData* toAdd) { return ThisStdCall<BSExtraData*>(0x40FF60, this, toAdd); }
 	__forceinline void			RemoveAll(bool doFree) { ThisStdCall(0x40FAE0, this, doFree); }
 	bool						MarkScriptEvent(UInt32 eventMask, TESForm* eventTarget);
 	__forceinline void			Copy(BaseExtraList* from) { ThisStdCall(0x411EC0, this, from); }
 
-	virtual	BaseExtraList* Destroy(char chr);
-
-	BSExtraData* m_data;						// 004
+	BSExtraData*	m_data;						// 004
 	UInt8			m_presenceBitfield[0x15];	// 008 - if a bit is set, then the extralist should contain that extradata
 	UInt8			pad1D[3];					// 01D
 };
 static_assert(sizeof(BaseExtraList) == 0x020);
 
-struct ExtraDataList : public BaseExtraList
+class ExtraDataList : public BaseExtraList
 {
+public:
 	static ExtraDataList* Create(BSExtraData* xBSData = NULL);
 };
 static_assert(sizeof(ExtraDataList) == 0x020);

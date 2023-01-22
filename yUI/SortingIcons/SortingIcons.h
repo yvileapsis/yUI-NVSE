@@ -162,53 +162,10 @@ namespace SortingIcons::Categories
 	void ItemSetCategory(const InventoryChanges* entry, const CategoryPtr& category);
 }
 
-namespace SortingIcons::Keyrings
-{
-	void EquipUpdate();
-	UInt32 PostFilterUpdate();
-	UInt32 __fastcall OpenKeyring(Tile* tile);
-	UInt32 __fastcall IsKey(InventoryChanges* tile);
-	bool __fastcall KeyringHideKeys(InventoryChanges* entry);
-
-	bool __fastcall HasContainerChangesEntry(InventoryChanges* entry);
-	bool __fastcall KeyringFilter(InventoryChanges* entry, Tile* tile);
-}
-
-namespace SortingIcons::Tabs
-{
-	void ItemAssignTabs(TESForm* form);
-	void ItemAssignTabs(const InventoryChanges* entry);
-
-	Tile* __fastcall InventoryMenuChooseTab(SInt32 key, UInt32 filter);
-	UInt32 __fastcall InventoryMenuHandleClickGetFilter(InventoryMenu* menu, SInt32 tileID, Tile* clickedTile);
-	void __fastcall InventoryMenuSetupData(InventoryMenu* menu, SInt32 tileID, Tile* clickedTile);
-	UInt8 __fastcall InventoryMenuShouldHideItem(InventoryChanges* entry);
-	void SetUpTabline(TileRect* tabline, int traitID, const char* strWeapon, const char* strApparel, const char* strAid,
-		const char* strMisc, const char* strAmmo, char* zero);
-}
-
-namespace SortingIcons::Patches
-{
-	void AlterSorting(const bool bEnable);
-	void AddIcons(const bool bEnable);
-	void ReplaceHotkeyIcons(const bool bEnable);
-	void AddKeyrings(const bool bEnable);
-	void AddTabs(const bool bEnable);
-	void AddPromptIcon();
-
-	void AddKeyrings2(const bool bEnable);
-}
-
 namespace SortingIcons::Files
 {
 	void HandleJSON(const std::filesystem::path& path);
 	void HandleXML(const std::filesystem::path& path);
-}
-
-
-namespace SortingIcons::Sorting
-{
-	SInt32 __fastcall CompareItems(const ListBoxItem<InventoryChanges>* unk1, const ListBoxItem<InventoryChanges>* unk2);
 }
 
 namespace SortingIcons::Icons
@@ -216,8 +173,16 @@ namespace SortingIcons::Icons
 
 	void InjectTemplates();
 	void InjectIconTile(const CategoryPtr& category_, Tile* tile);
-	void __fastcall SetTileStringInjectTile(Tile* tile, const InventoryChanges* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate);
-	void __fastcall SetStringValueTagImage(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate);
-	void __fastcall SetStringValueTagRose(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate);
-	void __fastcall PropagateIntValueTagPrompt(Tile* tile, void* dummyedx, UInt32 a2, signed int a3);
+}
+
+namespace SortingIcons::Patch
+{
+	void AlterSorting(const bool bEnable);
+	void AddIcons(const bool bEnable);
+	void ReplaceHotkeyIcons(const bool bEnable);
+	void AddKeyrings(const bool bEnable);
+	void AddTabs(const bool bEnable);
+	void AddPromptIcon(const bool bEnable);
+
+	void AddKeyrings2(const bool bEnable);
 }

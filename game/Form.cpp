@@ -200,7 +200,7 @@ bool BGSListForm::Contains(TESForm* form)
 bool BGSListForm::ContainsRecursive(TESForm* form, UInt32 reclvl)
 {
 	if (!form) return false;
-	if (Contains(form)) return true;
+	if (this == form) return true;
 	if (reclvl > 100) return false; [[unlikely]]
 	for (const auto iter : list)
 		if (iter->typeID == kFormType_BGSListForm)

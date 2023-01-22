@@ -19,22 +19,19 @@
     <ClCompile Include="ConfigurationMenu\ConfigurationMenu.cpp">
       <Filter>features\ConfigurationMenu</Filter>
     </ClCompile>
-    <ClCompile Include="SortingIcons\SI.cpp">
+    <ClCompile Include="SortingIcons\SortingIconsMain.cpp">
       <Filter>features\SortingIcons</Filter>
     </ClCompile>
-    <ClCompile Include="SortingIcons\SIFiles.cpp">
+    <ClCompile Include="SortingIcons\SortingIconsFiles.cpp">
       <Filter>features\SortingIcons</Filter>
     </ClCompile>
-    <ClCompile Include="SortingIcons\SIIcons.cpp">
+    <ClCompile Include="SortingIcons\SortingIconsVisual.cpp">
       <Filter>features\SortingIcons</Filter>
     </ClCompile>
-    <ClCompile Include="SortingIcons\SISorting.cpp">
+    <ClCompile Include="SortingIcons\SortingIconsMechanics.cpp">
       <Filter>features\SortingIcons</Filter>
     </ClCompile>
-    <ClCompile Include="SortingIcons\SIPatches.cpp">
-      <Filter>features\SortingIcons</Filter>
-    </ClCompile>
-    <ClCompile Include="SortingIcons\SICommands.cpp">
+    <ClCompile Include="SortingIcons\SortingIconsCommands.cpp">
       <Filter>features\SortingIcons</Filter>
     </ClCompile>
     <ClCompile Include="MiscFeatures\FixDroppedItems.cpp">
@@ -184,7 +181,7 @@
     <ClInclude Include="ConfigurationMenu\ConfigurationMenu.h">
       <Filter>features\ConfigurationMenu</Filter>
     </ClInclude>
-    <ClInclude Include="SortingIcons\SI.h">
+    <ClInclude Include="SortingIcons\SortingIcons.h">
       <Filter>features\SortingIcons</Filter>
     </ClInclude>
     <ClInclude Include="..\game\BSExtraData.h">

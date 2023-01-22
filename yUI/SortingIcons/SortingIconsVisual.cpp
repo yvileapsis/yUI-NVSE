@@ -1,8 +1,10 @@
-#include "SI.h"
+#include "SortingIcons.h"
 #include <Tiles.h>
 #include <functions.h>
 
 #include <InterfaceManager.h>
+
+#include <SafeWrite.h>
 
 namespace SortingIcons::Icons
 {
@@ -140,5 +142,87 @@ namespace SortingIcons::Icons
 		icon->SetFloat(kTileValue_alpha, tile->GetFloat(kTileValue_alpha));
 
 		icon->SetString(kTileValue_filename, Categories::ItemGetCategory(item)->filename.c_str());
+	}
+}
+
+namespace SortingIcons::Icons::Hook
+{
+	template <UInt32 retn> __declspec(naked) void TileSetStringValueIconInject() {
+		static const auto SetStringValue = reinterpret_cast<UInt32>(SetTileStringInjectTile);
+		static const UInt32 retnAddr = retn;
+		__asm
+		{
+//			mov		edx, [ebp - 0x10]	//tile
+//			push	edx
+			mov		edx, [ebp - 0x2C]	//menu item entry list
+			push	edx
+			mov		edx, [ebp + 0x8]	//entry
+			call    SetStringValue
+			jmp		retnAddr
+		}
+	}
+
+	template<UInt32 retn> __declspec(naked) void TileSetStringValueIconHotkeyHUD() {
+		static const auto SetStringValue = reinterpret_cast<UInt32>(SetStringValueTagImage);
+		static const UInt32 retnAddr = retn;
+		__asm
+		{
+			mov		edx, [ebp - 0x24]
+			call    SetStringValue
+			jmp		retnAddr
+		}
+	}
+
+	template<UInt32 retn> __declspec(naked) void TileSetStringValueIconHotkeyPipBoy() {
+		static const auto SetStringValue = reinterpret_cast<UInt32>(SetStringValueTagRose);
+		static const UInt32 retnAddr = retn;
+		static const UInt32 g_inventoryMenuSelection = 0x011D9EA8;
+		__asm
+		{
+			mov		edx, dword ptr ds : [0x011D9EA8]
+			call    SetStringValue
+			jmp		retnAddr
+		}
+	}
+}
+
+namespace SortingIcons::Patch
+{
+	void AddIcons(const bool bEnable)
+	{
+		if (bEnable)
+		{
+			WriteRelJump(0x71A3D5, Icons::Hook::TileSetStringValueIconInject<0x71A3DA>);
+		}
+		else
+		{
+			UndoSafeWrite(0x71A3D5);
+		}
+	}
+
+	void AddPromptIcon(const bool bEnable)
+	{
+		if (bEnable)
+		{
+			WriteRelCall(0x7786CF, Icons::PropagateIntValueTagPrompt);
+		}
+		else
+		{
+			UndoSafeWrite(0x7786CF);
+		}
+	}
+
+	void ReplaceHotkeyIcons(const bool bEnable)
+	{
+		if (bEnable)
+		{
+			WriteRelJump(0x70189E, Icons::Hook::TileSetStringValueIconHotkeyHUD<0x7018A3>);
+			WriteRelJump(0x7814FA, Icons::Hook::TileSetStringValueIconHotkeyPipBoy<0x7814FF>);
+		}
+		else
+		{
+			UndoSafeWrite(0x70189E);
+			UndoSafeWrite(0x7814FA);
+		}
 	}
 }

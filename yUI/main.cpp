@@ -18,20 +18,15 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 
 		Log(Log::kBoth) << yUI_VERSION_STR;
 
-		// call all deferred init functions
-		for (const auto& i : deferredInit) i();
+		for (const auto& i : deferredInit) i(); // call all deferred init functions
 	}
 	else if (msg->type == NVSEMessagingInterface::kMessage_MainGameLoop)
 	{
 		if (!iMainLoopDoOnce && !MenuMode()) {
 			iMainLoopDoOnce++;
-
-			// call all do once functions
-			for (const auto& i : mainLoopDoOnce) i();
+			for (const auto& i : mainLoopDoOnce) i(); // call all do once functions
 		}
-
-		// call all mainloop functions
-		for (const auto& i : mainLoop) i();
+		for (const auto& i : mainLoop) i(); // call all mainloop functions
 
 	}
 }
@@ -112,8 +107,8 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	auto path = std::filesystem::path(g_loggingInterface->logPath);
 	path += yUI_LOG;
 	Log::Init(path, yUI_STR);
-	// call all plugin load functions
-	for (const auto& i : pluginLoad) i();
+	
+	for (const auto& i : pluginLoad) i(); // call all plugin load functions
 
 	return true;
 }

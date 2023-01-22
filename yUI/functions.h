@@ -1,8 +1,9 @@
 #pragma once
 #include <string>
 
-#include "OSDepend.h"
-#include "NiTypes.h"
+#include <InventoryChanges.h>
+#include <OSDepend.h>
+#include <NiTypes.h>
 
 namespace CraftingComponents
 {

@@ -831,7 +831,7 @@ public:
 
 	__forceinline static HUDMainMenu*	GetSingleton() { return *reinterpret_cast<HUDMainMenu**>(0x11D96C0); }
 	__forceinline static void			SetQuestUpdateText(char* src, bool a2, bool a3) { CdeclCall(0x77A5B0, src, a2, a3); }
-	__forceinline static float			GetOpacity() { return *reinterpret_cast<Float32*>(0x11D979C); };
+	__forceinline static Float32		GetOpacity() { return *reinterpret_cast<Float32*>(0x11D979C); };
 };
 static_assert(sizeof(HUDMainMenu) == 0x278);
 

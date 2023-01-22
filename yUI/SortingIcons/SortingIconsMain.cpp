@@ -1,4 +1,4 @@
-#include "SI.h"
+#include "SortingIcons.h"
 
 #include <main.h>
 #include <functions.h>
@@ -70,12 +70,12 @@ namespace SortingIcons
 		if (g_nvseInterface->isEditor) return;
 		HandleINI();
 
-		Patches::AlterSorting(enable && bSort);
-		Patches::AddIcons(enable && bIcons);
-		Patches::ReplaceHotkeyIcons(enable && bHotkeys);
-		Patches::AddKeyrings(enable && bCategories);
-		Patches::AddPromptIcon();
-//		Patches::AddTabs(true);
+		Patch::AlterSorting(enable && bSort);
+		Patch::AddIcons(enable && bIcons);
+		Patch::ReplaceHotkeyIcons(enable && bHotkeys);
+		Patch::AddKeyrings(enable && bCategories);
+		Patch::AddPromptIcon(true);
+//		Patch::AddTabs(true);
 
 		deferredInit.emplace_back(CraftingComponents::Fill);
 		if (bSort || bIcons || bHotkeys || bCategories) deferredInit.emplace_back(DeferredInit);

@@ -9,7 +9,8 @@
 #include <GameData.h>
 #include <InterfaceManager.h>
 
-#include "SortingIcons/SI.h"
+#include "GameSettings.h"
+#include "SortingIcons/SortingIcons.h"
 
 namespace UserInterface::LootMenu
 {
@@ -272,18 +273,24 @@ namespace UserInterface::LootMenu
 
 	namespace Box
 	{
+		bool keysDisabled = false;
+
 		void Show()
 		{
-			ToggleVanityWheel(false);
-			if (key1) DisableKey(key1, true);
-			if (key2) DisableKey(key2, true);
-			if (key3) DisableKey(key3, true);
-			if (keyAlt) DisableKey(keyAlt, true);
+			if (!keysDisabled)
+			{
+				ToggleVanityWheel(false);
+				if (key1) DisableKey(key1, true);
+				if (key2) DisableKey(key2, true);
+				if (key3) DisableKey(key3, true);
+				if (keyAlt) DisableKey(keyAlt, true);
+				keysDisabled = true;
+			}
 
 			owned = container->IsCrimeOrEnemy();
 			tileMain->SetString("_Title", container->GetTheName());
 			tileMain->SetFloat("_SystemColor", 1 + owned);
-			tileMain->SetFloat("_AlphaAC", g_HUDMainMenu->tileActionPointsMeterText1->GetFloat(kTileValue_alpha));
+			tileMain->SetFloat("_AlphaAC", HUDMainMenu::GetOpacity());
 
 			Items::Update();
 
@@ -293,11 +300,15 @@ namespace UserInterface::LootMenu
 		void Hide()
 		{
 			tileMain->SetFloat("_Visible", 0);
-			ToggleVanityWheel(true);
-			if (key1) DisableKey(key1, false);
-			if (key2) DisableKey(key2, false);
-			if (key3) DisableKey(key3, false);
-			if (keyAlt) DisableKey(keyAlt, false);
+			if (keysDisabled)
+			{
+				ToggleVanityWheel(true);
+				if (key1) DisableKey(key1, false);
+				if (key2) DisableKey(key2, false);
+				if (key3) DisableKey(key3, false);
+				if (keyAlt) DisableKey(keyAlt, false);
+				keysDisabled = false;
+			}
 		}
 
 		UInt32 typeCodes[]{ 116, 46, 49, 25, 115, 108, 41, 40, 103, 24, 26, 47, 31 };

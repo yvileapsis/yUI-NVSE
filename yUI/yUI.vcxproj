@@ -78,8 +78,10 @@
       <OptimizeReferences>false</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Message>Installing DLL...</Message>
-      <Command>copy "$(TargetPath)" "$(FalloutNVPath)\Data\NVSE\plugins\$(ProjectName).dll"</Command>
+      <Message>
+      </Message>
+      <Command>copy "$(TargetPath)" "$(FalloutNVPath)\Data\NVSE\plugins\$(ProjectName).dll"
+copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -103,9 +105,10 @@
       <DataExecutionPrevention />
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
+    <PostBuildEvent />
     <PostBuildEvent>
-      <Message>Installing DLL...</Message>
-      <Command>copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\NVSE\Plugins\$(ProjectName).dll"</Command>
+      <Command>copy "$(TargetPath)" "$(FalloutNVPath)\Data\NVSE\plugins\$(ProjectName).dll"
+copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -153,12 +156,11 @@
     <ClCompile Include="MiscFeatures\PatchMatchedCursor.cpp" />
     <ClCompile Include="MiscFeatures\PatchMultiplicativeShots.cpp" />
     <ClCompile Include="MiscFeatures\PatchTimeMult.cpp" />
-    <ClCompile Include="SortingIcons\SICommands.cpp" />
-    <ClCompile Include="SortingIcons\SIFiles.cpp" />
-    <ClCompile Include="SortingIcons\SIIcons.cpp" />
-    <ClCompile Include="SortingIcons\SI.cpp" />
-    <ClCompile Include="SortingIcons\SIPatches.cpp" />
-    <ClCompile Include="SortingIcons\SISorting.cpp" />
+    <ClCompile Include="SortingIcons\SortingIconsCommands.cpp" />
+    <ClCompile Include="SortingIcons\SortingIconsFiles.cpp" />
+    <ClCompile Include="SortingIcons\SortingIconsVisual.cpp" />
+    <ClCompile Include="SortingIcons\SortingIconsMain.cpp" />
+    <ClCompile Include="SortingIcons\SortingIconsMechanics.cpp" />
     <ClCompile Include="UserInterface\DynamicCrosshair.cpp" />
     <ClCompile Include="UserInterface\HitIndicator.cpp" />
     <ClCompile Include="UserInterface\HitMarker.cpp" />
@@ -207,7 +209,7 @@
     <ClInclude Include="functions.h" />
     <ClInclude Include="definitions.h" />
     <ClInclude Include="main.h" />
-    <ClInclude Include="SortingIcons\SI.h" />
+    <ClInclude Include="SortingIcons\SortingIcons.h" />
     <ClInclude Include="ConfigurationMenu\ConfigurationMenu.h" />
   </ItemGroup>
   <ItemGroup>

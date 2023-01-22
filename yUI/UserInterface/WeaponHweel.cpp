@@ -4,6 +4,10 @@
 #include <Menus.h>
 #include <SimpleINILibrary.h>
 
+#include "functions.h"
+#include "dinput8.h"
+#include "GameRTTI.h"
+
 namespace UserInterface::WeaponHweel
 {
 	bool		enable = false;
@@ -60,10 +64,100 @@ namespace UserInterface::WeaponHweel
 		ini.SaveFile(iniPath.c_str(), false);
 	}
 
+	UInt8 selectedHotkey = 7;
+	UInt8 offsetmax = 7;
+
+	namespace Wheel
+	{
+		void Update()
+		{
+			const auto item = InventoryChanges::HotkeyGet(selectedHotkey);
+			const std::string name = item ? item->form->GetFullName()->name.CStr() : "";
+			tileMain->SetString("_Text", name.c_str());
+			tileMain->SetFloat("_Slice", selectedHotkey + 1);
+
+			for (UInt8 i = 0; i < InventoryChanges::kHotkeyStewie; i++)
+			{
+				const auto image = tileMain->GetChild("JWHImage" + std::to_string(i + 1));
+				const auto itemIter = InventoryChanges::HotkeyGet(i);
+				if (itemIter)
+				{
+					TESIcon* icon = nullptr;
+					const auto bipedModel = DYNAMIC_CAST(itemIter->form, TESForm, TESBipedModelForm);
+					if (bipedModel) icon = bipedModel->icon;
+					else icon = DYNAMIC_CAST(itemIter->form, TESForm, TESIcon);
+					if (icon) image->SetString(kTileValue_filename, icon->ddsPath.CStr());
+					image->SetFloat(kTileValue_visible, true);
+				}
+				else
+				{
+					image->SetFloat(kTileValue_visible, false);
+				}
+			}
+		}
+
+		void Activate()
+		{
+			ToggleVanityWheel(false);
+			Update();
+			tileMain->SetFloat("_Visible", true);
+		}
+
+		void Deactivate()
+		{
+			ToggleVanityWheel(true);
+			tileMain->SetFloat("_Visible", false);
+		}
+
+	}
+
+	bool lock = false;
+
+	UInt32		keyScrollUp = 264;
+	UInt32		keyScrollDown = 265;
+	bool		overScroll = false;
+
+
+	namespace Scroll
+	{
+		void Update()
+		{
+			bool update = false;
+
+			if (!IsKeyPressed(keyScrollDown)) {}
+			else if (selectedHotkey < offsetmax) { update = true; selectedHotkey++; }
+			else if (overScroll) { update = true; selectedHotkey = 0; }
+
+			if (!IsKeyPressed(keyScrollUp)) {}
+			else if (selectedHotkey > 0) { update = true; selectedHotkey--; }
+			else if (overScroll) { update = true; selectedHotkey = offsetmax; }
+
+			if (update)
+			{
+				PlayGameSound("UIPipBoyScroll");
+				Wheel::Update();
+			}
+		}
+	}
+
 	void MainLoop() {
 
 
-		tileMain->SetFloat(kTileValue_visible, true);
+		if (lock == true) Scroll::Update();
+
+		if (!IsKeyPressed(0x23, DIHookControl::kFlag_RawState))
+		{
+			if (lock == true)
+			{
+				Wheel::Deactivate();
+			}
+			lock = false;
+		}
+		else if (lock == false)
+		{
+			lock = true;
+			Wheel::Activate();
+		}
 	}
 
 	void Reset()
@@ -80,6 +174,7 @@ namespace UserInterface::WeaponHweel
 //		tileMain->SetFloat("_Color", systemcolor);
 
 		tileMain->SetFloat("_AlphaBase", alpha);
+		tileMain->SetFloat("_AlphaAC", HUDMainMenu::GetOpacity());
 		tileMain->SetFloat("_AlphaMult", alphaMult);
 		tileMain->SetFloat("_WidthBase", width);
 		tileMain->SetFloat("_HeightBase", height);

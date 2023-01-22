@@ -14,28 +14,50 @@ struct InventoryChanges
 		TESAmmo*			ammo;			// 08
 	};
 
-	void					Free(bool bFreeList = false);
-	void					Cleanup();
-	static InventoryChanges* Create(TESForm* pForm, UInt32 count = 1, ExtendDataList* pExtendDataList = nullptr);
-	ExtendDataList* Add(ExtraDataList* newList);
-	bool					Remove(ExtraDataList* toRemove, bool bFree = false);
-	bool					HasExtraLeveledItem();
-	void					RemoveCannotWear();
-	float					GetItemHealthPerc(bool arg1 = true);
-	ExtraDataList*			GetEquippedExtra();
-	ExtraDataList*			GetCustomExtra(UInt32 whichVal);
-	BSExtraData*			GetExtraData(UInt32 whichVal);
-	float					CalculateWeaponDamage(float condition, TESForm* ammo);
-	float					GetValue();
-	bool					HasWeaponMod(UInt32 modEffect) { return ThisStdCall<bool>(0x4BDA70, this, modEffect); }
-	UInt32					GetWeaponNumProjectiles(Actor* owner);
-	bool					ShouldDisplay();
+	void						Free(bool bFreeList = false);
+	void						Cleanup();
+	static InventoryChanges*	Create(TESForm* pForm, UInt32 count = 1, ExtendDataList* pExtendDataList = nullptr);
+	ExtendDataList*				Add(ExtraDataList* newList);
+	bool						Remove(ExtraDataList* toRemove, bool bFree = false);
+	bool						HasExtraLeveledItem();
+	void						RemoveCannotWear();
+	float						GetItemHealthPerc(bool arg1 = true);
+	ExtraDataList*				GetEquippedExtra();
+	ExtraDataList*				GetCustomExtra(UInt32 whichVal);
+	BSExtraData*				GetExtraData(UInt32 whichVal);
+	float						CalculateWeaponDamage(float condition, TESForm* ammo);
+	float						GetValue();
+	bool						HasWeaponMod(UInt32 modEffect) { return ThisStdCall<bool>(0x4BDA70, this, modEffect); }
+	UInt32						GetWeaponNumProjectiles(Actor* owner);
+	bool						ShouldDisplay();
 
-	UInt8					GetWeaponMod();
-	__forceinline Float64	GetHealthPercent(char a1 = 0) { return ThisCall<Float64>(0x4BCDB0, this, a1); };
-	Float64					GetHealthPercentAlt(bool axonisFix = false);
-	bool					GetEquipped();
-	ExtraDataList*			GetExtraData() const ;
+	UInt8						GetWeaponMod();
+	__forceinline Float64		GetHealthPercent(char a1 = 0) { return ThisCall<Float64>(0x4BCDB0, this, a1); };
+	Float64						GetHealthPercentAlt(bool axonisFix = false);
+	bool						GetEquipped();
+	ExtraDataList*				GetExtraData() const ;
+
+	enum
+	{
+		kHotkeyMin = 0,
+		kHotkey0 = kHotkeyMin,
+		kHotkey1,
+		kHotkey2,
+		kHotkey3,
+		kHotkey4,
+		kHotkey5,
+		kHotkey6,
+		kHotkey7,
+		kHotkeyMax = kHotkey7,
+		kHotkey8,
+		kHotkeyStewie = kHotkey8
+	};
+
+	static InventoryChanges*	HotkeyGet(const UInt8 hotkey);
+	static InventoryChanges*	HotkeyClear(const UInt8 hotkey);
+	InventoryChanges*			HotkeySet(const UInt8 hotkey);
+		
+
 };
 static_assert(sizeof(InventoryChanges) == 0xC);
 
