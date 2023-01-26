@@ -715,10 +715,10 @@ public:
 	TESObjectWEAP*						GetWeaponForm() const;
 	bool								IsAnimActionReload() const;
 	TESActorBase*						GetActorBase();
-	void								EquipItem(TESForm* objType, UInt32 equipCount = 1, ExtraDataList* itemExtraList = nullptr, UInt32 unk3 = 1,
-													bool lockEquip = false, UInt32 unk5 = 1);
-	void								UnequipItem(TESForm* objType, UInt32 unequipCount = 1, ExtraDataList* itemExtraList = nullptr, UInt32 unk3 = 1,
-													bool lockEquip = false, UInt32 unk5 = 1);
+	void								EquipItem(TESForm* objType, UInt32 equipCount = 1, ExtraDataList* itemExtraList = nullptr, UInt32 shouldApplyEnchantment = 1,
+													UInt32 lockEquip = false, UInt32 noMessage = 1);
+	void								UnequipItem(TESForm* objType, UInt32 unequipCount = 1, ExtraDataList* itemExtraList = nullptr, UInt32 shouldApplyEnchantment = 1,
+													UInt32 lockUnequip = false, UInt32 noMessage = 1);
 
 	std::vector<TESForm*>				GetEquippedItems();
 	InventoryChangesArray				GetEquippedEntryDataList();

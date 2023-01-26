@@ -14,6 +14,12 @@ struct InventoryChanges
 		TESAmmo*			ammo;			// 08
 	};
 
+	struct WithExtraData
+	{
+		InventoryChanges* entry;
+		ExtraDataList* extra;
+	};
+
 	void						Free(bool bFreeList = false);
 	void						Cleanup();
 	static InventoryChanges*	Create(TESForm* pForm, UInt32 count = 1, ExtendDataList* pExtendDataList = nullptr);
@@ -36,6 +42,7 @@ struct InventoryChanges
 	Float64						GetHealthPercentAlt(bool axonisFix = false);
 	bool						GetEquipped();
 	ExtraDataList*				GetExtraData() const ;
+	void						Equip(Actor* actor, ExtraDataList* extra = nullptr);
 
 	enum
 	{
@@ -53,11 +60,9 @@ struct InventoryChanges
 		kHotkeyStewie = kHotkey8
 	};
 
-	static InventoryChanges*	HotkeyGet(const UInt8 hotkey);
-	static InventoryChanges*	HotkeyClear(const UInt8 hotkey);
-	InventoryChanges*			HotkeySet(const UInt8 hotkey);
-		
-
+	static WithExtraData	HotkeyGet(const UInt8 hotkey);
+	static WithExtraData	HotkeyClear(const UInt8 hotkey);
+	WithExtraData			HotkeySet(const UInt8 hotkey);
 };
 static_assert(sizeof(InventoryChanges) == 0xC);
 

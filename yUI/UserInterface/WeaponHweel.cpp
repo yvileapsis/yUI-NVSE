@@ -64,33 +64,51 @@ namespace UserInterface::WeaponHweel
 		ini.SaveFile(iniPath.c_str(), false);
 	}
 
-	UInt8 selectedHotkey = 7;
+	UInt8 selectedHotkey = 0;
 	UInt8 offsetmax = 7;
 
 	namespace Wheel
 	{
 		void Update()
 		{
-			const auto item = InventoryChanges::HotkeyGet(selectedHotkey);
-			const std::string name = item ? item->form->GetFullName()->name.CStr() : "";
+			const auto [entry, extra] = InventoryChanges::HotkeyGet(selectedHotkey);
+
+			std::string name;
+
+			if (entry)
+			{
+				name = entry->form->GetTheName();
+				if (entry->GetWeaponMod()) name += "+";
+			}
+
+			/*
+			if (const auto condition = snd->GetHealthPercentAlt(true); condition != -1)
+			{
+				fst->SetFloat("_Meter", 1);
+				fst->SetFloat("_MeterValue", condition);
+				fst->SetFloat("_MeterArrow", snd->form->TryGetREFRParent()->typeID == kFormType_TESObjectWEAP ? 0.75 : 0.5);
+			}
+			else fst->SetFloat("_Meter", 0);
+			*/
+
+
 			tileMain->SetString("_Text", name.c_str());
 			tileMain->SetFloat("_Slice", selectedHotkey + 1);
 
 			for (UInt8 i = 0; i < InventoryChanges::kHotkeyStewie; i++)
 			{
-				const auto image = tileMain->GetChild("JWHImage" + std::to_string(i + 1));
-				const auto itemIter = InventoryChanges::HotkeyGet(i);
-				if (itemIter)
+				const auto image = tileMain->GetChild("SliceBox" + std::to_string(i + 1));
+				if (const auto itemIter = InventoryChanges::HotkeyGet(i).entry)
 				{
-					TESIcon* icon = nullptr;
+					TESIcon* icon;
 					if (const auto bipedModel = DYNAMIC_CAST(itemIter->form, TESForm, TESBipedModelForm)) icon = bipedModel->icon;
 					else icon = DYNAMIC_CAST(itemIter->form, TESForm, TESIcon);
-					if (icon) image->SetString(kTileValue_filename, icon->ddsPath.CStr());
-					image->SetFloat(kTileValue_visible, true);
+					if (icon) image->SetString("_ImageFilename", icon->ddsPath.CStr());
+					image->SetFloat("_Image", true);
 				}
 				else
 				{
-					image->SetFloat(kTileValue_visible, false);
+					image->SetFloat("_Image", false);
 				}
 			}
 		}
@@ -98,6 +116,8 @@ namespace UserInterface::WeaponHweel
 		void Activate()
 		{
 			ToggleVanityWheel(false);
+// TODO:			g_HUDMainMenu->tileReticleCenter->GetChild("reticle_center")->SetFloat(kTileValue_visible, false);
+			g_HUDMainMenu->tileInfo->SetFloat(kTileValue_visible, false);
 			Update();
 			tileMain->SetFloat("_Visible", true);
 		}
@@ -105,6 +125,9 @@ namespace UserInterface::WeaponHweel
 		void Deactivate()
 		{
 			ToggleVanityWheel(true);
+// TODO:			g_HUDMainMenu->tileReticleCenter->GetChild("reticle_center")->SetFloat(kTileValue_visible, true);
+			g_HUDMainMenu->tileInfo->SetFloat(kTileValue_visible, true);
+
 			tileMain->SetFloat("_Visible", false);
 		}
 
@@ -139,10 +162,9 @@ namespace UserInterface::WeaponHweel
 		}
 	}
 
+	bool lockTake = false;
+
 	void MainLoop() {
-
-
-		if (lock == true) Scroll::Update();
 
 		if (!IsKeyPressed(0x23, DIHookControl::kFlag_RawState))
 		{
@@ -157,6 +179,29 @@ namespace UserInterface::WeaponHweel
 			lock = true;
 			Wheel::Activate();
 		}
+		
+		if (lock == true)
+		{
+			Scroll::Update();
+
+			if (!IsKeyPressed(GetControl(5, OSInputGlobals::kControlType_Keyboard), DIHookControl::kFlag_RawState))
+			{
+				if (lockTake == true)
+				{
+					//Wheel::Deactivate();
+				}
+				lockTake = false;
+			}
+			else if (lockTake == false)
+			{
+				lockTake = true;
+
+				if (const auto [entry, extra] = InventoryChanges::HotkeyGet(selectedHotkey); entry) entry->Equip(PlayerCharacter::GetSingleton(), extra);
+				//Wheel::Activate();
+			}
+
+		}
+
 	}
 
 	void Reset()

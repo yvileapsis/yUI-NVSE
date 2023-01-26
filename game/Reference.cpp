@@ -177,14 +177,14 @@ TESForm* GetPermanentBaseForm(TESObjectREFR* thisObj)	// For LevelledForm, find 
 	return nullptr;
 }
 
-void Actor::EquipItem(TESForm * objType, UInt32 equipCount, ExtraDataList* itemExtraList, UInt32 unk3, bool lockEquip, UInt32 unk5)
+void Actor::EquipItem(TESForm * objType, UInt32 equipCount, ExtraDataList* itemExtraList, UInt32 shouldApplyEnchantment, UInt32 lockEquip, UInt32 noMessage)
 {
-	ThisStdCall(0x0088C650, this, objType, equipCount, itemExtraList, unk3, lockEquip, unk5);
+	ThisStdCall(0x0088C650, this, objType, equipCount, itemExtraList, shouldApplyEnchantment, lockEquip, noMessage);
 }
 
-void Actor::UnequipItem(TESForm* objType, UInt32 unk1, ExtraDataList* itemExtraList, UInt32 unk3, bool lockUnequip, UInt32 unk5)
+void Actor::UnequipItem(TESForm* objType, UInt32 unequipCount, ExtraDataList* itemExtraList, UInt32 shouldApplyEnchantment, UInt32 lockUnequip, UInt32 noMessage)
 {
-	ThisStdCall(0x0088C790, this, objType, unk1, itemExtraList, unk3, lockUnequip, unk5);
+	ThisStdCall(0x0088C790, this, objType, unequipCount, itemExtraList, shouldApplyEnchantment, lockUnequip, noMessage);
 }
 
 std::vector<TESForm*> Actor::GetEquippedItems()
