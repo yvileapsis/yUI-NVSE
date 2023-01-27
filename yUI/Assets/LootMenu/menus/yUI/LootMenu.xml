@@ -6,23 +6,15 @@
 
 	<locus> &true; </locus>
 
-	<_Visible> 0 </_Visible>
+	<_Visible> 1 </_Visible>
 	<visible>
-		<copy> 0 </copy> 
-		<or>
-			<copy src="ReticleCenter" trait="visible"/>
-			<or src="AmmoTypeLabel" trait="visible"/>
-			<or src="ActionPoints" trait="visible"/>
-			<or src="HitPoints" trait="visible"/>
-			<and> 
-				<copy src="me()" trait="_Visible"/>
-				<eq> 1 </eq>
-			</and>
-		</or>
-		<or>
-			<copy src="me()" trait="_Visible"/>
-			<eq> -1 </eq>
-		</or>
+		<copy src="ReticleCenter" trait="visible"/>
+		<or src="AmmoTypeLabel" trait="visible"/>
+		<or src="ActionPoints" trait="visible"/>
+		<or src="HitPoints" trait="visible"/>
+		<or src="Info" trait="visible"/>
+		<or src="me()" trait="_scope"/>
+		<and src="me()" trait="_Visible"/>
 	</visible>
 
 	<_ArrowUp> 0 </_ArrowUp>
@@ -204,7 +196,12 @@
 
 	<_AlphaBase> 0 </_AlphaBase>
 	<_AlphaAC> 0 </_AlphaAC>
-	<_Alpha> <copy src="me()" trait="_AlphaAC"/> <onlyifnot src="me()" trait="_AlphaBase"/> <add src="me()" trait="_AlphaBase"/> </_Alpha>
+	<_AlphaMult> 0 </_AlphaMult>
+	<_Alpha> 
+		<copy src="me()" trait="_AlphaAC"/> <onlyifnot src="me()" trait="_AlphaBase"/> 
+		<add src="me()" trait="_AlphaBase"/> 
+		<mul src="me()" trait="_AlphaMult"/>
+	</_Alpha>
 
 	<width> <copy src="me()" trait="_Width"/> </width>
 	<height> <copy src="me()" trait="_Height"/> </height>
@@ -220,10 +217,17 @@
 	<_BracketHeightTop> 30 </_BracketHeightTop>
 	<_BracketHeightBot> 30 </_BracketHeightBot>
 
-	<_BackdropAlpha> 150 </_BackdropAlpha>
+	<_BackdropAlphaBase> 150 </_BackdropAlphaBase>
+	<_BackdropAlpha>
+		<copy src="me()" trait="_BackdropAlphaBase"/>
+		<mul src="me()" trait="_AlphaMult"/>
+	</_BackdropAlpha>
 	<_BackdropBrightness> 80 </_BackdropBrightness>
 
-	<_BackdropFillAlpha> <copy src="globals()" trait="_background_fill_alpha"/> </_BackdropFillAlpha>
+	<_BackdropFillAlpha>
+		<copy src="globals()" trait="_background_fill_alpha"/>
+		<mul src="me()" trait="_AlphaMult"/>
+	</_BackdropFillAlpha>
 	<_BackdropBrightness> 80 </_BackdropBrightness> <!--too bright  <copy src="globals()" trait="_background_fill_brightness"/> -->
 
 	<_TextAlpha> <copy src="me()" trait="_Alpha"/> </_TextAlpha>

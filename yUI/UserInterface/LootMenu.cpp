@@ -71,6 +71,8 @@ namespace UserInterface::LootMenu
 	Float32		fontY			= 0;
 	Float32		fontHeadY		= 0;
 
+	Float32		speed			= 0.05;
+
 	bool		sounds			= true;
 	bool		showEquip		= true;
 	bool		showIcon		= true;
@@ -273,42 +275,43 @@ namespace UserInterface::LootMenu
 
 	namespace Box
 	{
-		bool keysDisabled = false;
+		bool isShown = false;
 
 		void Show()
 		{
-			if (!keysDisabled)
-			{
-				ToggleVanityWheel(false);
-				if (key1) DisableKey(key1, true);
-				if (key2) DisableKey(key2, true);
-				if (key3) DisableKey(key3, true);
-				if (keyAlt) DisableKey(keyAlt, true);
-				keysDisabled = true;
-			}
-
 			owned = container->IsCrimeOrEnemy();
 			tileMain->SetString("_Title", container->GetTheName());
 			tileMain->SetFloat("_SystemColor", 1 + owned);
-			tileMain->SetFloat("_AlphaAC", HUDMainMenu::GetOpacity());
 
 			Items::Update();
 
-			tileMain->SetFloat("_Visible", 1);
+			if (isShown) return;
+
+			ToggleVanityWheel(false);
+			if (key1) DisableKey(key1, true);
+			if (key2) DisableKey(key2, true);
+			if (key3) DisableKey(key3, true);
+			if (keyAlt) DisableKey(keyAlt, true);
+
+			tileMain->SetFloat("_AlphaAC", HUDMainMenu::GetOpacity());
+			tileMain->GradualSetFloat("_AlphaMult", 0, 1, speed, 0);
+
+			isShown = true;
 		}
 
 		void Hide()
 		{
-			tileMain->SetFloat("_Visible", 0);
-			if (keysDisabled)
-			{
-				ToggleVanityWheel(true);
-				if (key1) DisableKey(key1, false);
-				if (key2) DisableKey(key2, false);
-				if (key3) DisableKey(key3, false);
-				if (keyAlt) DisableKey(keyAlt, false);
-				keysDisabled = false;
-			}
+			if (!isShown) return;
+
+			ToggleVanityWheel(true);
+			if (key1) DisableKey(key1, false);
+			if (key2) DisableKey(key2, false);
+			if (key3) DisableKey(key3, false);
+			if (keyAlt) DisableKey(keyAlt, false);
+
+			tileMain->GradualSetFloat("_AlphaMult", 1, 0, 2 * speed, 0);
+
+			isShown = false;
 		}
 
 		UInt32 typeCodes[]{ 116, 46, 49, 25, 115, 108, 41, 40, 103, 24, 26, 47, 31 };

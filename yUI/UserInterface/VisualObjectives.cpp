@@ -43,7 +43,7 @@ namespace UserInterface::VisualObjectives
 
 	Tile*		tileMain			= nullptr;
 	
-	SInt64		visible				= 0;
+	SInt8		visible				= 0;
 	UInt32		depth				= 0;
 	bool		show				= true;
 	bool		doonce				= false;
@@ -51,6 +51,8 @@ namespace UserInterface::VisualObjectives
 	Float32		offsetHUDMarker		= 0;
 	Float32		offsetHUDText		= 0;
 	Float32		offsetWorld			= 20;
+
+	Float32		speed				= 0.1;
 
 	std::unordered_set<Tile*>			tilesFree;
 	std::unordered_map<Tile*, NiPoint3>	tilesInUse;
@@ -153,7 +155,9 @@ namespace UserInterface::VisualObjectives
 	{
 		if (!enable) return;
 
-		if (g_HUDMainMenu->isUsingScope)		visible = -1 * static_cast<SInt64>(enableScope);
+		const SInt8 oldVisible = visible;
+
+		if (g_HUDMainMenu->isUsingScope)		visible = -1 * static_cast<SInt8>(enableScope);
 		else if (g_player->UsingIronSights())	visible = enableSighting;
 		else									visible = enableOut;
 
@@ -165,12 +169,14 @@ namespace UserInterface::VisualObjectives
 		}
 		else if (!IsKeyPressed(key)) visible = 0;
 
-		tileMain->SetFloat("_Visible", visible);
+//		tileMain->SetFloat("_Visible", visible);
+
+		if (visible != oldVisible) tileMain->GradualSetFloat("_AlphaMult", oldVisible, abs(visible), speed, 0);
 
 		if (!visible) return;
 
 		tileMain->SetFloat("_InCombat", g_player->pcInCombat);
-		tileMain->SetFloat("_AlphaCW", g_HUDMainMenu->tileHitPointsCompass->GetFloat(kTileValue_alpha));
+		tileMain->SetFloat("_AlphaCW", HUDMainMenu::GetOpacity());
 
 		offsetHUDMarker = GetJIPAuxVarOrDefault("*_Offset", 0, 0);
 		offsetHUDText = GetJIPAuxVarOrDefault("*_Offset", 1, 0);
@@ -257,7 +263,7 @@ namespace UserInterface::VisualObjectives
 		tileMain->SetFloat("_TextVisible", textHandling);
 
 		tileMain->SetFloat("_AlphaBase", alpha);
-		tileMain->SetFloat("_AlphaMult", alphaMult);
+		tileMain->SetFloat("_AlphaMultInactive", alphaMult);
 		tileMain->SetFloat("_RadiusMax", radius);
 
 		tileMain->SetFloat("_WidthBase", width);

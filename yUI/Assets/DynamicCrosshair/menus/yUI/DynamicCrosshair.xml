@@ -80,7 +80,7 @@
 	<_Scale>
 		<copy> 1 </copy>
 		<mul>
-			<copy src="io()" trait="_duiscale_65"/> <onlyif src="io()" trait="_DUIF3"/>
+			<copy src="io()" trait="_duiscale_65"/>	<onlyif src="io()" trait="_DUIF3"/>
 			<add> <copy> 1 </copy> <onlyifnot src="io()" trait="_DUIF3"/> </add>
 		</mul>
 		<mul src="me()" trait="_ResizeMultiplier"/>
@@ -132,7 +132,7 @@
 	<rect name="Circle">
 		<visible> <copy src="parent()" trait="_VisibleCircle"/> </visible>
 		<_Length> <copy src="parent()" trait="_Length"/> </_Length>
-		<_OffsetCircle> <copy src="parent()" trait="_OffsetCircle"/> </_OffsetCircle>
+		<_OffsetCircle>	<copy src="parent()" trait="_OffsetCircle"/> </_OffsetCircle>
 		<_PromptSize> <copy src="parent()" trait="_PromptSize"/> </_PromptSize>
 		<locus> &true; </locus>
 		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
@@ -165,7 +165,7 @@
 			<filename>Interface\JDC\JDCCircle.dds</filename>
 			<width> <copy src="parent()" trait="_Length"/> <mul> 2.6667 </mul> </width>
 			<height> <copy src="parent()" trait="_Length"/> <mul> 1.3333 </mul> </height>
-			<x> <copy src="me()" trait="width"/> <div> -2 </div> </x>
+			<x>	<copy src="me()" trait="width"/> <div> -2 </div> </x>
 			<y> <copy> 0 </copy> <sub src="parent()" trait="_OffsetCircle"/> </y>
 			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx> 
 			<Rotateaxisy> <copy src="parent()" trait="_OffsetCircle"/> </Rotateaxisy>
@@ -184,7 +184,7 @@
 			<filename>Interface\JDC\JDCCircle.dds</filename>
 			<width> <copy src="parent()" trait="_Length"/> <mul> 2.6667 </mul> </width>
 			<height> <copy src="parent()" trait="_Length"/> <mul> 1.3333 </mul> </height>
-			<x> <copy src="me()" trait="width"/> <div> -2 </div> </x>
+			<x>	<copy src="me()" trait="width"/> <div> -2 </div> </x>
 			<y> <copy> 0 </copy> <sub src="parent()" trait="_OffsetCircle"/> </y>
 			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx> 
 			<Rotateaxisy> <copy src="parent()" trait="_OffsetCircle"/> </Rotateaxisy>
@@ -203,7 +203,7 @@
 			<filename>Interface\JDC\JDCCircle.dds</filename>
 			<width> <copy src="parent()" trait="_Length"/> <mul> 2.6667 </mul> </width>
 			<height> <copy src="parent()" trait="_Length"/> <mul> 1.3333 </mul> </height>
-			<x> <copy src="me()" trait="width"/> <div> -2 </div> </x>
+			<x>	<copy src="me()" trait="width"/> <div> -2 </div> </x>
 			<y> <copy> 0 </copy> <sub src="parent()" trait="_OffsetCircle"/> </y>
 			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx> 
 			<Rotateaxisy> <copy src="parent()" trait="_OffsetCircle"/> </Rotateaxisy>
@@ -256,7 +256,7 @@
 			<filename>Interface\JDC\JDCDefault.dds</filename>
 			<width> <copy src="parent()" trait="_Width"/> </width>
 			<height> <copy src="parent()" trait="_Length"/> </height>
-			<x> <copy src="me()" trait="width"/> <div> -2 </div> </x>
+			<x>	<copy src="me()" trait="width"/> <div> -2 </div> </x>
 			<y> <copy src="parent()" trait="_OffsetReticle"/> </y>
 			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx>
 			<Rotateaxisy> <copy> 0 </copy> <sub src="parent()" trait="_OffsetReticle"/> </Rotateaxisy>
@@ -275,7 +275,7 @@
 			<filename>Interface\JDC\JDCDefault.dds</filename>
 			<width> <copy src="parent()" trait="_Width"/> </width>
 			<height> <copy src="parent()" trait="_Length"/> </height>
-			<x> <copy src="me()" trait="width"/> <div> -2 </div> </x>
+			<x>	<copy src="me()" trait="width"/> <div> -2 </div> </x>
 			<y> <copy src="parent()" trait="_OffsetReticle"/> </y>
 			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx>
 			<Rotateaxisy> <copy> 0 </copy> <sub src="parent()" trait="_OffsetReticle"/> </Rotateaxisy>
@@ -294,7 +294,7 @@
 			<filename>Interface\JDC\JDCDefault.dds</filename>
 			<width> <copy src="parent()" trait="_Width"/> </width>
 			<height> <copy src="parent()" trait="_Length"/> </height>
-			<x> <copy src="me()" trait="width"/> <div> -2 </div> </x>
+			<x>	<copy src="me()" trait="width"/> <div> -2 </div> </x>
 			<y> <copy src="parent()" trait="_OffsetReticle"/> </y>
 			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx>
 			<Rotateaxisy> <copy> 0 </copy> <sub src="parent()" trait="_OffsetReticle"/> </Rotateaxisy>
@@ -313,7 +313,7 @@
 			<filename>Interface\JDC\JDCDefault.dds</filename>
 			<width> <copy src="parent()" trait="_Width"/> </width>
 			<height> <copy src="parent()" trait="_Length"/> </height>
-			<x> <copy src="me()" trait="width"/> <div> -2 </div> </x>
+			<x>	<copy src="me()" trait="width"/> <div> -2 </div> </x>
 			<y> <copy src="parent()" trait="_OffsetReticle"/> </y>
 			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx>
 			<Rotateaxisy> <copy> 0 </copy> <sub src="parent()" trait="_OffsetReticle"/> </Rotateaxisy>
@@ -333,8 +333,8 @@
 			<filename>Interface\JDC\JDCDefaultPrompt.dds</filename>
 			<width> <copy src="parent()" trait="_PromptSize"/> </width>
 			<height> <copy src="parent()" trait="_PromptSize"/> </height>
-			<x> <copy src="parent()" trait="_PromptOffsetHorizontal"/> <div> -2 </div> <sub src="me()" trait="width"/> </x>
-			<y> <copy src="parent()" trait="_PromptOffsetVertical"/> <div> -2 </div> <sub src="me()" trait="height" /> </y>
+			<x>	<copy src="parent()" trait="_PromptOffsetHorizontal"/> <div> -2 </div> <sub src="me()" trait="width"/> </x>
+			<y>	<copy src="parent()" trait="_PromptOffsetVertical"/> <div> -2 </div> <sub src="me()" trait="height" /> </y>
 			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx>
 			<Rotateaxisy> <copy src="me()" trait="height"/> <div> 2 </div> </Rotateaxisy>
 			<rotateangle> 0 </rotateangle>
@@ -352,7 +352,7 @@
 			<filename>Interface\JDC\JDCDefaultPrompt.dds</filename>
 			<width> <copy src="parent()" trait="_PromptSize"/> </width>
 			<height> <copy src="parent()" trait="_PromptSize"/> </height>
-			<x> <copy src="parent()" trait="_PromptOffsetHorizontal"/> <div> 2 </div> </x>
+			<x>	<copy src="parent()" trait="_PromptOffsetHorizontal"/> <div> 2 </div> </x>
 			<y> <copy src="parent()" trait="_PromptOffsetVertical"/> <div> -2 </div> <sub src="me()" trait="height" /> </y>
 			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx>
 			<Rotateaxisy> <copy src="me()" trait="height"/> <div> 2 </div> </Rotateaxisy>
@@ -391,8 +391,8 @@
 			<filename>Interface\JDC\JDCDefaultPrompt.dds</filename>
 			<width> <copy src="parent()" trait="_PromptSize"/> </width>
 			<height> <copy src="parent()" trait="_PromptSize"/> </height>
-			<x> <copy src="parent()" trait="_PromptOffsetHorizontal"/> <div> -2 </div> <sub src="me()" trait="width" /> </x>
-			<y> <copy src="parent()" trait="_PromptOffsetVertical"/> <div> -2 </div> </y>
+			<x>	<copy src="parent()" trait="_PromptOffsetHorizontal"/> <div> -2 </div> <sub src="me()" trait="width" /> </x>
+			<y>	<copy src="parent()" trait="_PromptOffsetVertical"/> <div> -2 </div> </y>
 			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx>
 			<Rotateaxisy> <copy src="me()" trait="height"/> <div> 2 </div> </Rotateaxisy>
 			<rotateangle> 1.570796 </rotateangle>

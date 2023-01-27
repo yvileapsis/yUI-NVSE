@@ -14,8 +14,13 @@
 
 	<_AlphaBase> 0 </_AlphaBase>
 	<_AlphaCW> 0 </_AlphaCW>
-	<_Alpha> <copy src="me()" trait="_AlphaCW"/> <onlyifnot src="me()" trait="_AlphaBase"/> <add src="me()" trait="_AlphaBase"/> </_Alpha>
-	<_AlphaMult> 0.60 </_AlphaMult>
+	<_AlphaMult> 0 </_AlphaMult>
+	<_Alpha>
+		<copy src="me()" trait="_AlphaCW"/> <onlyifnot src="me()" trait="_AlphaBase"/> 
+		<add src="me()" trait="_AlphaBase"/> 
+		<mul src="me()" trait="_AlphaMult"/>
+	</_Alpha>
+	<_AlphaMultInactive> 0.60 </_AlphaMultInactive>
 
 	<_RadiusMax> 0.060 </_RadiusMax>
 	<_TextVisible> 1 </_TextVisible>
@@ -86,21 +91,12 @@
 	<_Visible> 1 </_Visible>
 	
 	<visible>
-		<copy> 0 </copy> 
-		<or>
-			<copy src="ReticleCenter" trait="visible"/>
-			<or src="AmmoTypeLabel" trait="visible"/>
-			<or src="ActionPoints" trait="visible"/>
-			<or src="HitPoints" trait="visible"/>
-			<and> 
-				<copy src="me()" trait="_Visible"/>
-				<eq> 1 </eq>
-			</and>
-		</or>
-		<or>
-			<copy src="me()" trait="_Visible"/>
-			<eq> -1 </eq>
-		</or>
+		<copy src="ReticleCenter" trait="visible"/>
+		<or src="AmmoTypeLabel" trait="visible"/>
+		<or src="ActionPoints" trait="visible"/>
+		<or src="HitPoints" trait="visible"/>
+		<or> <copy src="me()" trait="_Visible"/> <eq> -1 </eq> </or>
+		<and src="me()" trait="_Visible"/>
 	</visible>
 
 	<red>255</red>
@@ -184,7 +180,7 @@
 		<copy src="JVO" trait="_Alpha"/>
 		<mul> 
 			<copy> 1 </copy> <onlyif src="me()" trait="_InFocus"/>
-			<add> <copy src="JVO" trait="_AlphaMult"/> <onlyifnot src="me()" trait="_InFocus"/> </add>
+			<add> <copy src="JVO" trait="_AlphaMultInactive"/> <onlyifnot src="me()" trait="_InFocus"/> </add>
 		</mul>
 	</alpha>
 

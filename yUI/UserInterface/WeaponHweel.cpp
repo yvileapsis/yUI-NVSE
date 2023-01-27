@@ -24,8 +24,8 @@ namespace UserInterface::WeaponHweel
 	Float64		alpha = 0.0;
 	Float64		alphaMult = 0.75;
 
-	Float64		height = 640.0;
-	Float64		width = 640.0;
+	Float64		height = 800.0;
+	Float64		width = 800.0;
 
 	Float64		offsetHeight = 0.5;
 	Float64		offsetWidth = 0.5;
