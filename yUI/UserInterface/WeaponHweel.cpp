@@ -98,13 +98,28 @@ namespace UserInterface::WeaponHweel
 			for (UInt8 i = 0; i < InventoryChanges::kHotkeyStewie; i++)
 			{
 				const auto image = tileMain->GetChild("SliceBox" + std::to_string(i + 1));
-				if (const auto itemIter = InventoryChanges::HotkeyGet(i).entry)
+				if (const auto [item, itemExtra] = InventoryChanges::HotkeyGet(i); item)
 				{
 					TESIcon* icon;
-					if (const auto bipedModel = DYNAMIC_CAST(itemIter->form, TESForm, TESBipedModelForm)) icon = bipedModel->icon;
-					else icon = DYNAMIC_CAST(itemIter->form, TESForm, TESIcon);
+					if (const auto bipedModel = DYNAMIC_CAST(item->form, TESForm, TESBipedModelForm)) icon = bipedModel->icon;
+					else icon = DYNAMIC_CAST(item->form, TESForm, TESIcon);
 					if (icon) image->SetString("_ImageFilename", icon->ddsPath.CStr());
 					image->SetFloat("_Image", true);
+
+					const auto extraAmmo = (ExtraAmmo*)itemExtra->GetByType(kExtraData_Ammo);
+					if (extraAmmo && extraAmmo->ammo)
+					{
+						const auto totalAmmo = PlayerCharacter::GetSingleton()->GetItemCount(extraAmmo->ammo);
+						const auto clipSize = min(item->GetClipSize(), extraAmmo->count);
+						std::string ammoCount = std::to_string(clipSize) + "/" + std::to_string(totalAmmo - clipSize);
+						image->SetString("_AmmoCount", ammoCount.c_str());
+						image->SetString("_AmmoName", extraAmmo->ammo->abbreviation.CStr());
+					}
+					else
+					{
+						image->SetString("_AmmoCount", "");
+						image->SetString("_AmmoName", "");
+					}
 				}
 				else
 				{
@@ -116,7 +131,7 @@ namespace UserInterface::WeaponHweel
 		void Activate()
 		{
 			ToggleVanityWheel(false);
-// TODO:			g_HUDMainMenu->tileReticleCenter->GetChild("reticle_center")->SetFloat(kTileValue_visible, false);
+			g_HUDMainMenu->tileReticleCenter->SetFloat(kTileValue_visible, false);
 			g_HUDMainMenu->tileInfo->SetFloat(kTileValue_visible, false);
 			Update();
 			tileMain->SetFloat("_Visible", true);
@@ -125,7 +140,7 @@ namespace UserInterface::WeaponHweel
 		void Deactivate()
 		{
 			ToggleVanityWheel(true);
-// TODO:			g_HUDMainMenu->tileReticleCenter->GetChild("reticle_center")->SetFloat(kTileValue_visible, true);
+			g_HUDMainMenu->tileReticleCenter->SetFloat(kTileValue_visible, true);
 			g_HUDMainMenu->tileInfo->SetFloat(kTileValue_visible, true);
 
 			tileMain->SetFloat("_Visible", false);
@@ -164,8 +179,9 @@ namespace UserInterface::WeaponHweel
 
 	bool lockTake = false;
 
-	void MainLoop() {
 
+	void Controls()
+	{
 		if (!IsKeyPressed(0x23, DIHookControl::kFlag_RawState))
 		{
 			if (lock == true)
@@ -179,7 +195,7 @@ namespace UserInterface::WeaponHweel
 			lock = true;
 			Wheel::Activate();
 		}
-		
+
 		if (lock == true)
 		{
 			Scroll::Update();
@@ -201,6 +217,11 @@ namespace UserInterface::WeaponHweel
 			}
 
 		}
+	}
+
+	void MainLoop() {
+
+		Controls();
 
 	}
 

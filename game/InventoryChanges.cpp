@@ -153,6 +153,12 @@ bool InventoryChanges::GetEquipped()
 
 ExtraDataList* InventoryChanges::GetExtraData() const { return extendData ? extendData->first.data : nullptr; }
 
+UInt32 InventoryChanges::GetClipSize()
+{
+	if (form->typeID != kFormType_TESObjectWEAP) return 0;
+	return reinterpret_cast<TESObjectWEAP*>(form)->GetClipRounds(HasWeaponMod(0x2));
+}
+
 __declspec(naked) InventoryChanges* InventoryChangesList::FindForItem(TESForm* item)
 {
 	__asm
@@ -177,7 +183,7 @@ __declspec(naked) InventoryChanges* InventoryChangesList::FindForItem(TESForm* i
 
 void InventoryChanges::Equip(Actor* actor, ExtraDataList* extra)
 {
-	actor->EquipItem(this->form, this->countDelta, extra ? extra : this->extendData->first.data, 0, 0, 1);
+	actor->EquipItem(form, countDelta, extra ? extra : extendData->first.data, 0, 0, 1);
 }
 
 InventoryChanges::WithExtraData InventoryChanges::HotkeyGet(const UInt8 hotkey)

@@ -76,17 +76,10 @@ namespace UserInterface::VisualObjectives
 		if (target->GetNiNode())
 		{
 			if (const auto niblock = target->GetNifBlock(0, "Bip01 Head"))
-			{
 				in = niblock->m_worldTransform.pos;
-				in.z += offsetWorld;
-			}
 			else
-			{
-				const auto center = target->GetCenter();
-				in.x += center.x;
-				in.y += center.y;
-				in.z += center.z + offsetWorld;
-			}
+				in += target->GetCenter();
+			in.z += offsetWorld;
 		}
 		if (in.z == 0)
 		{

@@ -133,7 +133,7 @@ public:
 	bool					GetDisabled();
 	ExtraContainerChanges*	GetOrCreateContainerChanges();
 	InventoryChangesList*	GetContainerChangesList();
-	SInt32					GetItemCount(TESForm* form);
+	SInt32					GetItemCount(TESForm* form) { return ThisCall<SInt32>(0x575610, this, form); };
 	void					AddItemAlt(TESForm* item, UInt32 count, float condition, bool doEquip);
 	bool					GetInventoryItems(UInt8 typeID);
 	TESObjectCELL*			GetParentCell() const { return parentCell; };

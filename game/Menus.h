@@ -2840,9 +2840,9 @@ public:
 	NiControllerSequence* ctrlSeqForward;	// A8
 	NiControllerSequence* ctrlSeqBackward;	// AC
 	NiControllerSequence* ctrlSeqLeft;		// B0
-	NiQuaternion			quaternionB4;	// B4
-	NiQuaternion			quaternionC4;	// C4
-	NiQuaternion			quaternionD4;	// D4
+	NiPoint4				quaternionB4;	// B4
+	NiPoint4				quaternionC4;	// C4
+	NiPoint4				quaternionD4;	// D4
 
 	static LockPickMenu* GetSingleton() { return *reinterpret_cast<LockPickMenu**>(0x11DA204); };
 };

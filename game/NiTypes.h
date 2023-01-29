@@ -45,11 +45,11 @@ public:
 class NiPoint3
 {
 public:
-	float x;
-	float y;
-	float z;
+	Float32 x;
+	Float32 y;
+	Float32 z;
 
-	void Scale(float scale) {
+	void operator*(Float32 scale) {
 		x *= scale;
 		y *= scale;
 		z *= scale;
@@ -108,7 +108,7 @@ public:
 			v1.x * v2.y - v1.y * v2.x);
 	}
 
-	NiPoint3* Add(NiPoint3* toAdd)
+	NiPoint3* operator+=(NiPoint3* toAdd)
 	{
 		this->x += toAdd->x;
 		this->y += toAdd->y;
@@ -116,7 +116,7 @@ public:
 		return this;
 	}
 
-	NiPoint3* Subtract(NiPoint3* point)
+	NiPoint3* operator-=(NiPoint3* point)
 	{
 		this->x -= point->x;
 		this->y -= point->y;
@@ -133,7 +133,7 @@ public:
 		return deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
 	}
 
-	bool Equals(NiPoint3* compare)
+	bool operator==(NiPoint3* compare)
 	{
 		return x == compare->x && y == compare->y && z == compare->z;
 	}
@@ -150,18 +150,12 @@ static_assert(sizeof(NiPoint3) == 0x00C);
 // 10 - always aligned?
 class NiPoint4 {
 public:
-	float x;
-	float y;
-	float z;
-	float w;
+	Float32 x;
+	Float32 y;
+	Float32 z;
+	Float32 w;
 };
 static_assert(sizeof(NiPoint4) == 0x010);
-
-// 10 - always aligned?
-struct NiQuaternion
-{
-	float	x, y, z, w;
-};
 
 // 24
 class NiMatrix33 {

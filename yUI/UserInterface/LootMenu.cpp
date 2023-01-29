@@ -9,7 +9,6 @@
 #include <GameData.h>
 #include <InterfaceManager.h>
 
-#include "GameSettings.h"
 #include "SortingIcons/SortingIcons.h"
 
 namespace UserInterface::LootMenu

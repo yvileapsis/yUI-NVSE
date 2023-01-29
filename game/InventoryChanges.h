@@ -27,7 +27,6 @@ struct InventoryChanges
 	bool						Remove(ExtraDataList* toRemove, bool bFree = false);
 	bool						HasExtraLeveledItem();
 	void						RemoveCannotWear();
-	float						GetItemHealthPerc(bool arg1 = true);
 	ExtraDataList*				GetEquippedExtra();
 	ExtraDataList*				GetCustomExtra(UInt32 whichVal);
 	BSExtraData*				GetExtraData(UInt32 whichVal);
@@ -41,7 +40,8 @@ struct InventoryChanges
 	__forceinline Float64		GetHealthPercent(char a1 = 0) { return ThisCall<Float64>(0x4BCDB0, this, a1); };
 	Float64						GetHealthPercentAlt(bool axonisFix = false);
 	bool						GetEquipped();
-	ExtraDataList*				GetExtraData() const ;
+	ExtraDataList*				GetExtraData() const;
+	UInt32						GetClipSize();
 	void						Equip(Actor* actor, ExtraDataList* extra = nullptr);
 
 	enum

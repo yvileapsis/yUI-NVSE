@@ -1328,7 +1328,7 @@ public:
 struct NiQuatTransform
 {
 	NiPoint3 m_kTranslate;
-	NiQuaternion m_kRotate;
+	NiPoint4 m_kRotate;
 	float m_fScale;
 };
 
@@ -1351,7 +1351,7 @@ struct NiAnimationKey
 
 struct NiRotKey : NiAnimationKey
 {
-	NiQuaternion m_quat;
+	NiPoint4 m_quat;
 };
 
 struct NiPosKey : NiAnimationKey
