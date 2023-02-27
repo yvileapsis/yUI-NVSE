@@ -12,9 +12,11 @@ namespace SortingIcons::Files
 		if (!elem.contains(form)) {}
 		else if (!elem[form].is_array()) {
 			if (const auto val = TESForm::GetByID(modName.c_str(), elem[form].get<std::string>().c_str())) forms.push_back(val);
+			else Log(logLevel) << FormatString("JSON error: Form Not Found, mod: '%10s', form: %6s", modName.c_str(), elem[form].get<std::string>().c_str());
 		}
 		else for (const auto& i : elem[form]) {
 			if (const auto val = TESForm::GetByID(modName.c_str(), i.get<std::string>().c_str())) forms.push_back(val);
+			else Log(logLevel) << FormatString("JSON error: Form Not Found, mod: '%10s', form: %6s", modName.c_str(), i.get<std::string>().c_str());
 		}
 		return forms;
 	}
@@ -262,7 +264,7 @@ namespace SortingIcons::Files
 
 	void HandleJSON(const std::filesystem::path& path)
 	{
-		Log(logLevel) << "\nReading JSON file " + path.string();
+		Log(logLevel) << "\nJSON log: reading  " + path.string();
 		try
 		{
 			std::ifstream i(path);
@@ -273,23 +275,23 @@ namespace SortingIcons::Files
 			else if (j.contains("tags") && j["tags"].is_array())				// legacy support
 				for (const auto& elem : j["tags"]) HandleItem(elem);
 			else
-				Log(logLevel) << path.string() + " JSON ySI item array not detected";
+				Log(logLevel) << "JSON warning: ySI item array not detected in " + path.string();
 
 			if (j.contains("categories") && j["categories"].is_array())
 				for (const auto& elem : j["categories"]) HandleCategory(elem);
 			else if (j.contains("icons") && j["icons"].is_array())				// legacy support
 				for (const auto& elem : j["icons"]) HandleCategory(elem);
 			else
-				Log(logLevel) << path.string() + " JSON ySI category array not detected";
+				Log(logLevel) << "JSON warning: ySI category array not detected in " + path.string();
 
 			if (j.contains("tabs") && j["tabs"].is_array())
 				for (const auto& elem : j["tabs"]) HandleTab(elem);
 			else
-				Log(logLevel) << path.string() + " JSON ySI tab array not detected";
+				Log(logLevel) << "JSON warning: ySI tab array not detected in " + path.string();
 		}
 		catch (nlohmann::json::exception& e)
 		{
-			Log(logLevel) << "The JSON is incorrectly formatted! It will not be applied.";
+			Log(logLevel) << "JSON error: JSON file is incorrectly formatted! It will not be applied. " + path.string();
 			Log(logLevel) << FormatString("JSON error: %s\n", e.what());
 		}
 	}
