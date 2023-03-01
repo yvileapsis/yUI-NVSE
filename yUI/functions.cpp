@@ -267,35 +267,6 @@ void Patch1080pUI()
 			// sub_E68A80 Tile_A04640
 }
 
-void PatchAddyCMToSettingsMenu()
-{
-
-	WriteRelCall(0x7CC9D4, UInt32(AddyCMToSettingsMenu));
-	WriteRelJump(0x7CCA43, 0x7CCAAD);
-
-	//	SafeWriteBuf(0x7CBF77
-
-	//	SafeWriteBuf(0x7CBF8C, "\x66\x0F\x1F\x44\x00\x00", 6);//
-	//	SafeWriteBuf(0x7CB674, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CB686, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CB698, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CB6AA, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CB6BC, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CB6CE, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CB6E0, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CBE50, "\x81\x7A\x08\x50\x05\x7D\x00", 7);
-
-	/*	SafeWriteBuf(0x7CC044, "\x0F\x1F\x44\x00\x00", 5);
-		SafeWriteBuf(0x7CC392, "\x0F\x1F\x44\x00\x00", 5);
-		SafeWriteBuf(0x7CC23E, "\x0F\x1F\x44\x00\x00", 5);
-		SafeWriteBuf(0x7CC0C3, "\x0F\x1F\x44\x00\x00", 5);
-		SafeWriteBuf(0x7CC044, "\x0F\x1F\x44\x00\x00", 5);
-		SafeWriteBuf(0x7CC416, "\x0F\x1F\x44\x00\x00", 5);
-		SafeWriteBuf(0x7CC582, "\x0F\x1F\x44\x00\x00", 5);*/
-		//	SafeWriteBuf(0x7CBF59, "\x0F\x1F\x44\x00\x00", 5);
-		//	SafeWriteBuf(0x7CC01F, "\x0F\x1F\x44\x00\x00", 5);
-
-}
 #endif
 
 typedef bool (*_JG_WorldToScreen)(NiPoint3* posXYZ, NiPoint3& posOut, float offscreenHandling);

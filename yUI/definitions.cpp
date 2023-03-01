@@ -2,6 +2,8 @@
 
 #define INIT_MODULE(mod) namespace mod { extern void Init(); }
 
+INIT_MODULE(ConfigurationMenu)
+
 INIT_MODULE(SortingIcons)
 
 INIT_MODULE(UserInterface::EventLayer)
@@ -27,6 +29,7 @@ INIT_MODULE(Patch::TimeMult)
 
 void Inits()
 {
+	ConfigurationMenu::Init();
 	SortingIcons::Init();
 
 	UserInterface::EventLayer::Init();

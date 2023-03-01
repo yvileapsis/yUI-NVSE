@@ -144,6 +144,8 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
       </ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="events.cpp" />
+    <ClCompile Include="FixReorderMCM.cpp" />
+    <ClCompile Include="HookMCM.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="MiscFeatures\FixDroppedItems.cpp" />
