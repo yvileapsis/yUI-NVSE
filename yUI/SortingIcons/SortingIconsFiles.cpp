@@ -5,39 +5,49 @@
 
 namespace SortingIcons::Files
 {
-	std::vector<TESForm*> GetFormsFromElement(const nlohmann::basic_json<>& elem, const std::string& mod, const std::string& form)
+	__forceinline std::vector<TESForm*> GetFormsFromElement(const nlohmann::basic_json<>& elem, const std::string& mod, const std::string& form)
 	{
 		const auto modName = elem.contains(mod) ? elem[mod].get<std::string>() : "";
 		std::vector<TESForm*> forms{};
+		std::string log;
 		if (!elem.contains(form)) {}
 		else if (!elem[form].is_array()) {
 			if (const auto val = TESForm::GetByID(modName.c_str(), elem[form].get<std::string>().c_str())) forms.push_back(val);
-			else Log(logLevel) << FormatString("JSON error: Form Not Found, mod: '%10s', form: %6s", modName.c_str(), elem[form].get<std::string>().c_str());
-		}
-		else for (const auto& i : elem[form]) {
+			else log += FormatString("%6s, ", elem[form].get<std::string>().c_str());
+		} else for (const auto& i : elem[form]) {
 			if (const auto val = TESForm::GetByID(modName.c_str(), i.get<std::string>().c_str())) forms.push_back(val);
-			else Log(logLevel) << FormatString("JSON error: Form Not Found, mod: '%10s', form: %6s", modName.c_str(), i.get<std::string>().c_str());
+			else log += FormatString("%6s, ", i.get<std::string>().c_str());
 		}
+		if (!log.empty()) Log(logLevel >= Log::kWarning) << "JSON warning: Failed to find form, mod: " + modName + ", forms: " + log;
 		return forms;
 	}
 
-	void ItemRecursiveEmplace(const Item::Common& common, TESForm* form)
+	template <typename T> std::unordered_set<T> GetSetFromElement(const nlohmann::basic_json<>& elem)
 	{
-		if (form->typeID == kFormType_BGSListForm)
-			for (const auto iter : reinterpret_cast<BGSListForm*>(form)->list) ItemRecursiveEmplace(common, iter);
-		else if (common.formType == 0 || common.formType == form->typeID) {
-			if (common.form == form)
-				Log(logLevel) << FormatString("Tag: '%10s', form: %08X (%50s), individual", common.tag.c_str(), form->refID, form->GetName());
-			else
-				Log(logLevel) << FormatString("Tag: '%10s', form: %08X (%50s), recursive, list: '%08X' (%50s)", common.tag.c_str(), form->refID, form->GetName(), common.form->refID, common.form->GetName());
-			auto newCommon = common;
-			newCommon.form = form;
-			g_Items.emplace_back(std::make_shared<Item>(newCommon));
+		std::unordered_set<T> set{};
+		if (!elem.is_array()) {
+			if (const auto val = elem.get<T>()) set.emplace(val);
 		}
+		else for (const auto& i : elem) {
+			if (const auto val = i.get<T>()) set.emplace(val);
+		}
+		return set;
 	}
 
-	void ItemRepairListEmplace(const Item::Common& common, TESForm* form)
+	std::vector<UInt32> FlattenListForm(TESForm* form)
 	{
+		std::vector<UInt32> output;
+		if (form->typeID != kFormType_BGSListForm)
+			output.push_back(form->refID);
+		else for (const auto iter : reinterpret_cast<BGSListForm*>(form)->list)
+			for (const auto val : FlattenListForm(iter)) output.push_back(val);
+		return output;
+	}
+
+	std::vector<UInt32> FlattenListRepair(TESForm* form)
+	{
+		std::vector<UInt32> output;
+		output.push_back(form->refID);
 		for (const auto item : *TESForm::GetAll())
 		{
 			BGSListForm* list;
@@ -48,152 +58,139 @@ namespace SortingIcons::Files
 				list = reinterpret_cast<TESObjectARMO*>(item)->repairItemList.listForm;
 			else continue;
 
-			if (item->refID == form->refID || list && list->refID == form->refID)
-			{
-				Log(logLevel) << FormatString("Tag: '%10s', form: %08X (%50s), recursive, repair list: '%08X' (%50s)", common.tag.c_str(), item->refID, item->GetName(), form->refID, common.form->GetName());
-				auto newCommon = common;
-				newCommon.form = item;
-				g_Items.emplace_back(std::make_shared<Item>(newCommon));
-			}
+			if (list && list->refID == form->refID) output.push_back(item->refID);
 		}
+		return output;
 	}
 
 	void HandleItem(nlohmann::basic_json<> elem)
 	{
 		if (!elem.is_object())
 		{
-			Log(logLevel) << "JSON error: expected object";
+			Log(logLevel >= Log::kError) << "JSON error: Expected object";
 			return;
 		}
-		Item::Common common{};
 
-		common.tag = elem["tag"].get<std::string>();
-		if (elem.contains("priority"))		common.priority = elem["priority"].get<SInt32>();
-		if (elem.contains("formType"))		common.formType = elem["formType"].get<UInt32>();
-		if (elem.contains("questItem"))		common.questItem = elem["questItem"].get<UInt8>();
-		if (elem.contains("miscComponent"))	common.miscComponent = elem["miscComponent"].get<UInt8>();
-		if (elem.contains("miscProduct"))	common.miscProduct = elem["miscProduct"].get<UInt8>();
+		if (!elem.contains("tag") || !elem.contains("priority"))
+		{
+			Log(logLevel >= Log::kWarning) << "JSON error: Expected tag and priority";
+			return;
+		}
+
+		Item item{};
+
+		item.tag = elem["tag"].get<std::string>();
+		item.priority = elem["priority"].get<SInt32>();
+
+		if (elem.contains("formType"))		item.common.formType = GetSetFromElement<UInt8>(elem["formType"]);
+
+		if (elem.contains("questItem"))		item.common.questItem = elem["questItem"].get<UInt8>();
+		if (elem.contains("miscComponent"))	item.common.miscComponent = elem["miscComponent"].get<UInt8>();
+		if (elem.contains("miscProduct"))	item.common.miscProduct = elem["miscProduct"].get<UInt8>();
 
 		if (elem.contains("mod") && elem.contains("form"))
 		{
 			UInt32 repairList = 0;
-			if (elem.contains("formlist")) repairList = elem["formlist"].get<UInt32>();
-			if (elem.contains("repairList")) repairList = elem["repairList"].get<UInt32>();
+			if (elem.contains("formlist")) repairList = elem["formlist"].get<UInt8>();
+			if (elem.contains("repairList")) repairList = elem["repairList"].get<UInt8>();
+
 			for (const auto form : GetFormsFromElement(elem, "mod", "form"))
 			{
-				common.form = form;
-				repairList ? ItemRepairListEmplace(common, form) : ItemRecursiveEmplace(common, form);
+				const auto vector = repairList ? FlattenListRepair(form) : FlattenListForm(form);
+				item.common.formIDs.insert_range(vector);
 			}
-			return;
-		}
 
-		if (common.formType == kFormType_TESObjectWEAP)
-		{
-			Item::Weapon weapon{};
-
-			if (elem.contains("weaponSkill"))			weapon.skill = elem["weaponSkill"].get<UInt32>();
-			if (elem.contains("weaponHandgrip"))		weapon.handgrip = elem["weaponHandgrip"].get<UInt32>();
-			if (elem.contains("weaponAttackAnim"))		weapon.attackAnim = elem["weaponAttackAnim"].get<UInt32>();
-			if (elem.contains("weaponReloadAnim"))		weapon.reloadAnim = elem["weaponReloadAnim"].get<UInt32>();
-			if (elem.contains("weaponIsAutomatic"))		weapon.isAutomatic = elem["weaponIsAutomatic"].get<UInt32>();
-			if (elem.contains("weaponHasScope"))		weapon.hasScope = elem["weaponHasScope"].get<UInt32>();
-			if (elem.contains("weaponIgnoresDTDR"))		weapon.ignoresDTDR = elem["weaponIgnoresDTDR"].get<UInt32>();
-			if (elem.contains("weaponClipRounds"))		weapon.clipRounds = elem["weaponClipRounds"].get<UInt32>();
-			if (elem.contains("weaponNumProjectiles"))	weapon.numProjectiles = elem["weaponNumProjectiles"].get<UInt32>();
-			if (elem.contains("weaponSoundLevel"))		weapon.soundLevel = elem["weaponSoundLevel"].get<UInt32>();
-
-			std::vector<TESForm*> ammos;
-			if (elem.contains("ammoMod") && elem.contains("ammoForm"))
-				ammos = GetFormsFromElement(elem, "ammoMod", "ammoForm");
-
-			std::vector<UInt32> weaponTypes;
-			if (elem.contains("weaponType"))
+			if (item.common.formIDs.empty())
 			{
-				if (!elem["weaponType"].is_array()) weaponTypes.push_back(elem["weaponType"].get<UInt32>());
-				else std::ranges::transform(elem["weaponType"], std::back_inserter(weaponTypes), [&](auto& i) { return i.template get<UInt32>(); });
-			}
+				Log(logLevel >= Log::kWarning) << FormatString("JSON warning: Failed to find any forms for tag: '%6s', priority: '%03d'", item.tag.c_str(), item.priority);
 
-			if (!weaponTypes.empty()) for (auto weaponType : weaponTypes)
+				return;
+			}
+		}
+
+		if (elem.contains("weaponSkill"))			item.weapon.skill = GetSetFromElement<UInt32>(elem["weaponSkill"]);
+		if (elem.contains("weaponHandgrip"))		item.weapon.handgrip = GetSetFromElement<UInt32>(elem["weaponHandgrip"]);
+		if (elem.contains("weaponAttackAnim"))		item.weapon.attackAnim = GetSetFromElement<UInt32>(elem["weaponAttackAnim"]);
+		if (elem.contains("weaponReloadAnim"))		item.weapon.reloadAnim = GetSetFromElement<UInt32>(elem["weaponReloadAnim"]);
+		if (elem.contains("weaponIsAutomatic"))		item.weapon.isAutomatic = elem["weaponIsAutomatic"].get<UInt8>();
+		if (elem.contains("weaponHasScope"))		item.weapon.hasScope = elem["weaponHasScope"].get<UInt8>();
+		if (elem.contains("weaponIgnoresDTDR"))		item.weapon.ignoresDTDR = elem["weaponIgnoresDTDR"].get<UInt8>();
+		if (elem.contains("weaponClipRounds"))		item.weapon.clipRoundsMin = elem["weaponClipRounds"].get<UInt32>();
+		if (elem.contains("weaponNumProjectiles"))	item.weapon.numProjectilesMin = elem["weaponNumProjectiles"].get<UInt32>();
+		if (elem.contains("weaponSoundLevel"))		item.weapon.soundLevel = GetSetFromElement<UInt32>(elem["weaponSoundLevel"]);
+
+		if (elem.contains("ammoMod") && elem.contains("ammoForm")) for (const auto iter : GetFormsFromElement(elem, "ammoMod", "ammoForm"))
+			item.weapon.ammoIDs.emplace(iter->refID);
+
+		if (elem.contains("weaponType"))			item.weapon.type = GetSetFromElement<UInt32>(elem["weaponType"]);
+
+		if (elem.contains("armorHead")) 			(elem["armorHead"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1;
+		if (elem.contains("armorHair")) 			(elem["armorHair"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 1;
+		if (elem.contains("armorUpperBody")) 		(elem["armorUpperBody"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 2;
+		if (elem.contains("armorLeftHand"))			(elem["armorLeftHand"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 3;
+		if (elem.contains("armorRightHand")) 		(elem["armorRightHand"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 4;
+		if (elem.contains("armorWeapon")) 			(elem["armorWeapon"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 5;
+		if (elem.contains("armorPipBoy")) 			(elem["armorPipBoy"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 6;
+		if (elem.contains("armorBackpack"))			(elem["armorBackpack"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 7;
+		if (elem.contains("armorNecklace"))			(elem["armorNecklace"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 8;
+		if (elem.contains("armorHeadband"))			(elem["armorHeadband"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 9;
+		if (elem.contains("armorHat")) 				(elem["armorHat"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 10;
+		if (elem.contains("armorEyeglasses"))		(elem["armorEyeglasses"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 11;
+		if (elem.contains("armorNosering"))			(elem["armorNosering"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 12;
+		if (elem.contains("armorEarrings"))			(elem["armorEarrings"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 13;
+		if (elem.contains("armorMask")) 			(elem["armorMask"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 14;
+		if (elem.contains("armorChoker")) 			(elem["armorChoker"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 15;
+		if (elem.contains("armorMouthObject"))		(elem["armorMouthObject"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 16;
+		if (elem.contains("armorBodyAddon1"))		(elem["armorBodyAddon1"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 17;
+		if (elem.contains("armorBodyAddon2"))		(elem["armorBodyAddon2"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 18;
+		if (elem.contains("armorBodyAddon3"))		(elem["armorBodyAddon3"].get<SInt8>() == 1? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 19;
+
+		if (elem.contains("armorClass"))			item.armor.armorClass = elem["armorClass"].get<UInt16>();
+		if (elem.contains("armorPower"))			item.armor.powerArmor = elem["armorPower"].get<SInt8>();
+		if (elem.contains("armorHasBackpack"))		item.armor.hasBackpack = elem["armorHasBackpack"].get<SInt8>();
+
+		if (elem.contains("armorDT"))				item.armor.dt = elem["armorDT"].get<float>();
+		if (elem.contains("armorDR"))				item.armor.dr = elem["armorDR"].get<UInt16>();
+		if (elem.contains("armorChangesAV"))		item.armor.changesAV = elem["armorChangesAV"].get<UInt16>();
+
+		if (elem.contains("aidRestoresAV"))			item.aid.restoresAV = elem["aidRestoresAV"].get<UInt8>();
+		if (elem.contains("aidDamagesAV"))			item.aid.damagesAV = elem["aidDamagesAV"].get<UInt8>();
+		if (elem.contains("aidIsAddictive"))		item.aid.isAddictive = elem["aidIsAddictive"].get<UInt8>();
+		if (elem.contains("aidIsFood"))				item.aid.isFood = elem["aidIsFood"].get<UInt8>();
+		if (elem.contains("aidIsWater"))			item.aid.isWater = elem["aidIsWater"].get<UInt8>();
+		if (elem.contains("aidIsMedicine"))			item.aid.isMedicine = elem["aidIsMedicine"].get<UInt8>();
+		if (elem.contains("aidIsPoisonous"))		item.aid.isPoisonous = elem["aidIsPoisonous"].get<UInt8>();
+
+		std::string log = FormatString("JSON message: Tag: '%6s', priority: '%03d'", item.tag.c_str(), item.priority);
+		if (!item.common.formType.empty()) {
+			log += ", types: ";
+			UInt32 i = 0;
+			for (const auto iter : item.common.formType)
 			{
-				weapon.type = weaponType;
-				if (!ammos.empty()) for (auto ammo : ammos) {
-					weapon.ammo = ammo;
-					Log(logLevel) << FormatString("Tag: '%10s', weapon condition, type: %d, ammo form: %08X (%50s)", common.tag.c_str(), weaponType, ammo->refID, ammo->GetName());
-					g_Items.emplace_back(std::make_shared<Item>(common, weapon));
-				} else {
-					Log(logLevel) << FormatString("Tag: '%10s', weapon condition, type: %d", common.tag.c_str(), weaponType);
-					g_Items.emplace_back(std::make_shared<Item>(common, weapon));
-				}
-			} else {
-				if (!ammos.empty()) for (auto ammo : ammos) {
-					weapon.ammo = ammo;
-					Log(logLevel) << FormatString("Tag: '%10s', weapon condition, ammo form: %08X (%50s)", common.tag.c_str(), ammo->refID, ammo->GetName());
-					g_Items.emplace_back(std::make_shared<Item>(common, weapon));
-				} else {
-					Log(logLevel) << FormatString("Tag: '%10s', weapon condition", common.tag.c_str());
-					g_Items.emplace_back(std::make_shared<Item>(common, weapon));
-				}
+				log += std::to_string(iter);
+				if (++i != item.common.formType.size()) log += ", ";
 			}
 		}
-		else if (common.formType == kFormType_TESObjectARMO)
+		if (!item.common.formIDs.empty())
 		{
-			Item::Armor armor{};
-
-			if (elem.contains("armorHead")) 		(elem["armorHead"].get<SInt8>() == 1 ? armor.slotsMaskWL : armor.slotsMaskBL) += 1;
-			if (elem.contains("armorHair")) 		(elem["armorHair"].get<SInt8>() == 1 ? armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 1;
-			if (elem.contains("armorUpperBody")) 	(elem["armorUpperBody"].get<SInt8>() == 1 ? armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 2;
-			if (elem.contains("armorLeftHand")) 	(elem["armorLeftHand"].get<SInt8>() == 1 ? armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 3;
-			if (elem.contains("armorRightHand")) 	(elem["armorRightHand"].get<SInt8>() == 1 ? armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 4;
-			if (elem.contains("armorWeapon")) 		(elem["armorWeapon"].get<SInt8>() == 1 ? armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 5;
-			if (elem.contains("armorPipBoy")) 		(elem["armorPipBoy"].get<SInt8>() == 1 ? armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 6;
-			if (elem.contains("armorBackpack")) 	(elem["armorBackpack"].get<SInt8>() == 1 ? armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 7;
-			if (elem.contains("armorNecklace")) 	(elem["armorNecklace"].get<SInt8>() == 1 ? armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 8;
-			if (elem.contains("armorHeadband")) 	(elem["armorHeadband"].get<SInt8>() == 1 ? armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 9;
-			if (elem.contains("armorHat")) 			(elem["armorHat"].get<SInt8>() == 1 ? armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 10;
-			if (elem.contains("armorEyeglasses")) 	(elem["armorEyeglasses"].get<SInt8>() == 1 ? armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 11;
-			if (elem.contains("armorNosering")) 	(elem["armorNosering"].get<SInt8>() == 1 ? armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 12;
-			if (elem.contains("armorEarrings")) 	(elem["armorEarrings"].get<SInt8>() == 1 ? armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 13;
-			if (elem.contains("armorMask")) 		(elem["armorMask"].get<SInt8>() == 1 ? armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 14;
-			if (elem.contains("armorChoker")) 		(elem["armorChoker"].get<SInt8>() == 1 ? armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 15;
-			if (elem.contains("armorMouthObject"))	(elem["armorMouthObject"].get<SInt8>() == 1 ? armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 16;
-			if (elem.contains("armorBodyAddon1"))	(elem["armorBodyAddon1"].get<SInt8>() == 1 ? armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 17;
-			if (elem.contains("armorBodyAddon2"))	(elem["armorBodyAddon2"].get<SInt8>() == 1 ? armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 18;
-			if (elem.contains("armorBodyAddon3"))	(elem["armorBodyAddon3"].get<SInt8>() == 1 ? armor.slotsMaskWL : armor.slotsMaskBL) += 1 << 19;
-
-			if (elem.contains("armorClass"))		armor.armorClass = elem["armorClass"].get<UInt16>();
-			if (elem.contains("armorPower"))		armor.powerArmor = elem["armorPower"].get<SInt8>();
-			if (elem.contains("armorHasBackpack"))	armor.hasBackpack = elem["armorHasBackpack"].get<SInt8>();
-
-			if (elem.contains("armorDT"))			armor.dt = elem["armorDT"].get<float>();
-			if (elem.contains("armorDR"))			armor.dr = elem["armorDR"].get<UInt16>();
-			if (elem.contains("armorChangesAV"))	armor.changesAV = elem["armorChangesAV"].get<UInt16>();
-
-			Log(logLevel) << FormatString("Tag: '%10s', armor condition", common.tag.c_str());
-			g_Items.emplace_back(std::make_shared<Item>(common, armor));
+			log += ", forms:";
+			log += item.common.formIDs.size() == 1 ? " " : "\n";
+			UInt32 i = 0;
+			for (const auto iter : item.common.formIDs)
+			{
+				log += FormatString("%08X (%40s)", iter, TESForm::GetByID(iter)->GetName());
+				if (++i != item.common.formIDs.size()) log += i % 2 ? ", " : ",\n";
+			}
 		}
-		else if (common.formType == 47)
-		{
-			Item::Aid aid{};
-
-			if (elem.contains("aidRestoresAV"))			aid.restoresAV = elem["aidRestoresAV"].get<UInt8>();
-			if (elem.contains("aidDamagesAV"))			aid.damagesAV = elem["aidDamagesAV"].get<UInt8>();
-			if (elem.contains("aidIsAddictive"))		aid.isAddictive = elem["aidIsAddictive"].get<UInt8>();
-			if (elem.contains("aidIsFood"))				aid.isFood = elem["aidIsFood"].get<UInt8>();
-			if (elem.contains("aidIsWater"))			aid.isWater = elem["aidIsWater"].get<UInt8>();
-			if (elem.contains("aidIsMedicine"))			aid.isMedicine = elem["aidIsMedicine"].get<UInt8>();
-			if (elem.contains("aidIsPoisonous"))		aid.isPoisonous = elem["aidIsPoisonous"].get<UInt8>();
-
-			Log(logLevel) << FormatString("Tag: '%10s', aid condition", common.tag.c_str());
-			g_Items.emplace_back(std::make_shared<Item>(common, aid));
-		}
-		else g_Items.emplace_back(std::make_shared<Item>(common));
+		Log(logLevel >= Log::kMessage) << log;
+		g_Items.emplace_back(std::make_shared<Item>(item));
 	}
 
 	void HandleCategory(nlohmann::basic_json<> elem)
 	{
 		if (!elem.is_object())
 		{
-			Log(logLevel) << "JSON error: expected object";
+			Log(logLevel >= Log::kError) << "JSON error: expected object";
 			return;
 		}
 
@@ -212,7 +209,7 @@ namespace SortingIcons::Files
 		if (elem.contains("icon"))				category.icon = elem["icon"].get<std::string>();
 		if (elem.contains("count"))				category.count = elem["count"].get<UInt32>();
 		*/
-		Log(logLevel) << FormatString("Tag: '%10s', icon: '%s'", category.tag.c_str(), category.filename.c_str());
+		Log(logLevel >= Log::kMessage) << FormatString("Tag: '%6s', icon: '%s'", category.tag.c_str(), category.filename.c_str());
 		g_Categories.emplace_back(std::make_shared<Category>(category));
 	}
 
@@ -220,7 +217,7 @@ namespace SortingIcons::Files
 	{
 		if (!elem.is_object())
 		{
-			Log(logLevel) << "JSON error: expected object with mod, form and folder fields";
+			Log(logLevel >= Log::kError) << "JSON error: expected object with mod, form and folder fields";
 			return;
 		}
 
@@ -264,7 +261,7 @@ namespace SortingIcons::Files
 
 	void HandleJSON(const std::filesystem::path& path)
 	{
-		Log(logLevel) << "\nJSON log: reading  " + path.string();
+		Log(logLevel >= Log::kMessage) << "\nJSON message: reading  " + path.string();
 		try
 		{
 			std::ifstream i(path);
@@ -275,24 +272,24 @@ namespace SortingIcons::Files
 			else if (j.contains("tags") && j["tags"].is_array())				// legacy support
 				for (const auto& elem : j["tags"]) HandleItem(elem);
 			else
-				Log(logLevel) << "JSON warning: ySI item array not detected in " + path.string();
+				Log(logLevel >= Log::kMessage) << "JSON message: ySI item array not detected in " + path.string();
 
 			if (j.contains("categories") && j["categories"].is_array())
 				for (const auto& elem : j["categories"]) HandleCategory(elem);
 			else if (j.contains("icons") && j["icons"].is_array())				// legacy support
 				for (const auto& elem : j["icons"]) HandleCategory(elem);
 			else
-				Log(logLevel) << "JSON warning: ySI category array not detected in " + path.string();
+				Log(logLevel >= Log::kMessage) << "JSON message: ySI category array not detected in " + path.string();
 
 			if (j.contains("tabs") && j["tabs"].is_array())
 				for (const auto& elem : j["tabs"]) HandleTab(elem);
 			else
-				Log(logLevel) << "JSON warning: ySI tab array not detected in " + path.string();
+				Log(logLevel >= Log::kMessage) << "JSON message: ySI tab array not detected in " + path.string();
 		}
 		catch (nlohmann::json::exception& e)
 		{
-			Log(logLevel) << "JSON error: JSON file is incorrectly formatted! It will not be applied. " + path.string();
-			Log(logLevel) << FormatString("JSON error: %s\n", e.what());
+			Log(logLevel >= Log::kError) << "JSON error: JSON file is incorrectly formatted! It will not be applied. " + path.string();
+			Log(logLevel >= Log::kError) << FormatString("JSON error: %s\n", e.what());
 		}
 	}
 }

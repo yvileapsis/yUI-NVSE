@@ -7,62 +7,99 @@
 
 #include <SafeWrite.h>
 
+namespace SortingIcons
+{
+	inline bool Item::Common::Satisfies(TESForm* form) const
+	{
+		if (!formIDs.empty() &&				!formIDs.contains(form->refID)) return false;
+		if (!formType.empty() &&			!formType.contains(form->typeID)) return false;
+
+
+		if (questItem.has_value() &&		questItem.value() != form->IsQuestItem2()) return false;
+		if (miscComponent.has_value() &&	miscComponent.value() != CraftingComponents::IsComponent(form)) return false;
+		if (miscProduct.has_value() &&		miscProduct.value() != CraftingComponents::IsProduct(form)) return false;
+
+		return true;
+	}
+
+	inline bool Item::Weapon::Satisfies(TESObjectWEAP* weapon) const
+	{
+		if (!skill.empty() && !skill.contains(weapon->weaponSkill)) return false;
+		if (!type.empty() && !type.contains(weapon->eWeaponType)) return false;
+		if (!handgrip.empty() && !handgrip.contains(weapon->HandGrip())) return false;
+		if (!attackAnim.empty() && !attackAnim.contains(weapon->AttackAnimation())) return false;
+		if (!reloadAnim.empty() && !reloadAnim.contains(weapon->reloadAnim)) return false;
+		if (!type.empty() && !type.contains(weapon->eWeaponType)) return false;
+
+		if (isAutomatic.has_value() && isAutomatic.value() != weapon->IsAutomatic()) return false;
+		if (hasScope.has_value() && hasScope.value() != weapon->HasScopeAlt()) return false;
+		if (ignoresDTDR.has_value() && ignoresDTDR.value() != weapon->IgnoresDTDR()) return false;
+
+		const auto clipRounds = static_cast<UInt32>(weapon->GetClipRounds(false));
+		if (clipRoundsMin.has_value() && clipRoundsMin.value() > clipRounds) return false;
+		if (clipRoundsMax.has_value() && clipRoundsMax.value() < clipRounds) return false;
+
+		const auto numProjectiles = weapon->numProjectiles;
+		if (numProjectilesMin.has_value() && numProjectilesMin.value() > numProjectiles) return false;
+		if (numProjectilesMax.has_value() && numProjectilesMax.value() < numProjectiles) return false;
+
+		if (!soundLevel.empty() && !soundLevel.contains(weapon->soundLevel)) return false;
+		if (!ammoIDs.empty() && !ammoIDs.contains(weapon->ammo.ammo->refID)) return false;
+
+		return true;
+	}
+
+	inline bool Item::Armor::Satisfies(TESObjectARMO* armor) const
+	{
+		if (slotsMaskWL && (slotsMaskWL & armor->GetArmorValue(6)) != slotsMaskWL) return false;
+		if (slotsMaskBL && (slotsMaskBL & armor->GetArmorValue(6)) != 0) return false;
+		if (armorClass && armorClass != armor->GetArmorValue(1)) return false;
+		if (powerArmor && powerArmor != armor->GetArmorValue(2)) return false;
+		if (hasBackpack && hasBackpack != armor->GetArmorValue(3)) return false;
+
+		if (dt && dt > armor->damageThreshold) return false;
+		if (dr && dr > armor->armorRating) return false;
+		//				if (armorChangesAV &&	armorChangesAV > armor->armorRating) continue;
+
+
+		return true;
+	}
+
+	inline bool Item::Aid::Satisfies(AlchemyItem* aid) const
+	{
+		if (restoresAV && !aid->HasBaseEffectRestoresAV(restoresAV)) return false;
+		if (damagesAV && !aid->HasBaseEffectDamagesAV(damagesAV)) return false;
+		if (isAddictive && !aid->IsAddictive()) return false;
+		if (isFood && !aid->IsFood()) return false;
+		if (isWater && !aid->IsWaterAlt()) return false;
+		if (isPoisonous && !aid->IsPoison()) return false;
+		if (isMedicine && !aid->IsMedicine()) return false;
+
+		return true;
+	}
+
+	inline bool Item::Satisfies(TESForm* form) const
+	{
+		if (!common.Satisfies(form)) return false;
+
+		if (form->typeID == kFormType_TESObjectWEAP && !weapon.Satisfies(reinterpret_cast<TESObjectWEAP*>(form))) return false;
+		if (form->typeID == kFormType_TESObjectARMO && !armor.Satisfies(reinterpret_cast<TESObjectARMO*>(form))) return false;
+		if (form->typeID == kFormType_AlchemyItem && !aid.Satisfies(reinterpret_cast<AlchemyItem*>(form))) return false;
+
+		return true;
+	}
+
+}
+
 namespace SortingIcons::Categories
 {
 	std::unordered_map<TESForm*, CategoryPtr> g_ItemToCategory;
 
 	void ItemAssignCategory(TESForm* form)
 	{
-		for (const auto& iter : g_Items) {
-			const auto& entry = *iter;
-			if (entry.common.form &&				entry.common.form->refID != form->refID) continue;
-			if (entry.common.formType &&			entry.common.formType != form->typeID) continue;
-
-			if (entry.common.questItem &&			entry.common.questItem != static_cast<UInt8>(form->IsQuestItem2())) continue;
-			if (entry.common.miscComponent &&		!CraftingComponents::IsComponent(form)) continue;
-			if (entry.common.miscProduct &&			!CraftingComponents::IsProduct(form)) continue;
-
-			if (entry.common.formType == kFormType_TESObjectWEAP) {
-				const auto weapon = reinterpret_cast<TESObjectWEAP*>(form);
-				if (entry.weapon.skill &&			entry.weapon.skill != weapon->weaponSkill) continue;
-				if (entry.weapon.type &&			entry.weapon.type != weapon->eWeaponType) continue;
-				if (entry.weapon.handgrip &&		entry.weapon.handgrip != weapon->HandGrip()) continue;
-				if (entry.weapon.attackAnim &&		entry.weapon.attackAnim != weapon->AttackAnimation()) continue;
-				if (entry.weapon.reloadAnim &&		entry.weapon.reloadAnim != weapon->reloadAnim) continue;
-				if (entry.weapon.type &&			entry.weapon.type != weapon->eWeaponType) continue;
-				if (entry.weapon.isAutomatic &&		entry.weapon.isAutomatic != static_cast<UInt32>(weapon->IsAutomatic())) continue;
-				if (entry.weapon.hasScope &&		entry.weapon.hasScope != static_cast<UInt32>(weapon->HasScopeAlt())) continue;
-				if (entry.weapon.ignoresDTDR &&		entry.weapon.ignoresDTDR != static_cast<UInt32>(weapon->IgnoresDTDR())) continue;
-				if (entry.weapon.clipRounds &&		entry.weapon.clipRounds > static_cast<UInt32>(weapon->GetClipRounds(false))) continue;
-				if (entry.weapon.numProjectiles &&	entry.weapon.numProjectiles > weapon->numProjectiles) continue;
-				if (entry.weapon.soundLevel &&		entry.weapon.soundLevel != weapon->soundLevel) continue;
-				if (entry.weapon.ammo &&			!reinterpret_cast<BGSListForm*>(entry.weapon.ammo)->ContainsRecursive(weapon->ammo.ammo)) continue;
-			}	
-			else if (entry.common.formType == kFormType_TESObjectARMO) {
-
-				const auto armor = reinterpret_cast<TESObjectARMO*>(form);
-				if (entry.armor.slotsMaskWL &&		(entry.armor.slotsMaskWL & armor->GetArmorValue(6)) != entry.armor.slotsMaskWL) continue;
-				if (entry.armor.slotsMaskBL &&		(entry.armor.slotsMaskBL & armor->GetArmorValue(6)) != 0) continue;
-				if (entry.armor.armorClass &&		entry.armor.armorClass != armor->GetArmorValue(1)) continue;
-				if (entry.armor.powerArmor &&		entry.armor.powerArmor != armor->GetArmorValue(2)) continue;
-				if (entry.armor.hasBackpack &&		entry.armor.hasBackpack != armor->GetArmorValue(3)) continue;
-
-				if (entry.armor.dt &&				entry.armor.dt > armor->damageThreshold) continue;
-				if (entry.armor.dr &&				entry.armor.dr > armor->armorRating) continue;
-//				if (entry.armor.armorChangesAV &&	entry.armor.armorChangesAV > armor->armorRating) continue;
-			}
-			else if (entry.common.formType == kFormType_AlchemyItem) {
-				const auto aid = reinterpret_cast<AlchemyItem*>(form);
-				if (entry.aid.restoresAV &&			!aid->HasBaseEffectRestoresAV(entry.aid.restoresAV)) continue;
-				if (entry.aid.damagesAV &&			!aid->HasBaseEffectDamagesAV(entry.aid.damagesAV)) continue;
-				if (entry.aid.isAddictive &&		!aid->IsAddictive()) continue;
-				if (entry.aid.isFood &&				!aid->IsFood()) continue;
-				if (entry.aid.isWater &&			!aid->IsWaterAlt()) continue;
-				if (entry.aid.isPoisonous &&		!aid->IsPoison()) continue;
-				if (entry.aid.isMedicine &&			!aid->IsMedicine()) continue;
-			}
-
-			g_ItemToCategory.emplace(form, g_StringToCategory[entry.common.tag]);
+		for (const auto& iter : g_Items) if (iter->Satisfies(form))
+		{
+			g_ItemToCategory.emplace(form, g_StringToCategory[iter->tag]);
 			return;
 		}
 		g_ItemToCategory.emplace(form, categoryDefault);

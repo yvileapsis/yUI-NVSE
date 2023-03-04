@@ -6,7 +6,7 @@ namespace SortingIcons
 {
 	inline int enable = 0;
 
-	inline int logLevel = Log::kNone;
+	inline int logLevel = Log::kMessage;
 
 	inline int bSort			= 1;
 	inline int bIcons			= 1;
@@ -19,35 +19,39 @@ namespace SortingIcons
 		class Common
 		{
 		public:
-			std::string		tag;
-			SInt32			priority		= 0;
-			TESForm*		form			= nullptr;
-			UInt32			formType		= 0;
-			UInt8			questItem		= 0;
-			UInt8			miscComponent	= 0;
-			UInt8			miscProduct		= 0;
+			std::unordered_set<UInt32>		formIDs;
 
-			Common() = default;
+			std::unordered_set<UInt8>			formType;
+			std::optional<bool>					questItem;
+			std::optional<bool>					miscComponent;
+			std::optional<bool>					miscProduct;
+
+			__forceinline bool Satisfies(TESForm* form) const;
 		};
 
 		class Weapon
 		{
 		public:
-			UInt32			skill			= 0;
-			UInt32			type			= 0;
-			UInt32			handgrip		= 0;
-			UInt32 			attackAnim		= 0;
-			UInt32 			reloadAnim		= 0;
-			UInt32 			isAutomatic		= 0;
-			UInt32 			hasScope		= 0;
-			UInt32 			ignoresDTDR		= 0;
-			UInt32 			clipRounds		= 0;
-			UInt32 			numProjectiles	= 0;
-			UInt32 			soundLevel		= 0;
+			std::unordered_set<UInt32>			skill;
+			std::unordered_set<UInt32>			type;
+			std::unordered_set<UInt32>			handgrip;
+			std::unordered_set<UInt32> 			attackAnim;
+			std::unordered_set<UInt32> 			reloadAnim;
 
-			TESForm*		ammo			= nullptr;
+			std::optional<bool>	 			isAutomatic;
+			std::optional<bool>	 			hasScope;
+			std::optional<bool>	 			ignoresDTDR;
 
-			Weapon() = default;
+			std::optional<UInt32> 			clipRoundsMin;
+			std::optional<UInt32> 			clipRoundsMax;
+			std::optional<UInt32> 			numProjectilesMin;
+			std::optional<UInt32> 			numProjectilesMax;
+
+			std::unordered_set<UInt32>		soundLevel;
+
+			std::unordered_set<UInt32>		ammoIDs;
+
+			__forceinline bool Satisfies(TESObjectWEAP* weapon) const;
 		};
 
 		class Armor
@@ -64,7 +68,7 @@ namespace SortingIcons
 			UInt16 			dr				= 0;
 			UInt16 			changesAV		= 0;
 
-			Armor() = default;
+			__forceinline bool Satisfies(TESObjectARMO* armor) const;
 		};
 
 		class Aid
@@ -78,19 +82,20 @@ namespace SortingIcons
 			UInt8  			isMedicine		= 0;
 			UInt8  			isPoisonous		= 0;
 
-			Aid() = default;
+			__forceinline bool Satisfies(AlchemyItem* aid) const;
 		};
+
+		std::string		tag;
+		SInt32			priority = 0;
 
 		Common			common{};
 		Weapon			weapon{};
 		Armor			armor{};
 		Aid				aid{};
 
-		Item(Common common) : common(std::move(common)) {}
-		Item(Common common, Weapon weapon) : common(std::move(common)), weapon(weapon) {}
-		Item(Common common, Armor armor) : common(std::move(common)), armor(armor) {}
-		Item(Common common, Aid aid) : common(std::move(common)), aid(aid) {}
+		__forceinline bool Satisfies(TESForm* form) const;
 	};
+
 
 	class Category
 	{

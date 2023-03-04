@@ -4,8 +4,16 @@
 
 class Log
 {
+	UInt32 logDest;
 	UInt32 logLevel;
 public:
+
+	enum
+	{
+		kError = 1,
+		kWarning = 2,
+		kMessage = 3
+	};
 
 	enum
 	{
@@ -15,7 +23,7 @@ public:
 		kBoth = kLog | kConsole
 	};
 
-	Log(UInt32 logLevel = 0) : logLevel(logLevel) {};
+	Log(UInt32 logLevel = kError, UInt32 logDest = kLog) : logDest(logDest), logLevel(logLevel) {};
 	Log& operator<<(const std::string& str);
 
 	static void Init(const std::filesystem::path& path, const std::string& modName);

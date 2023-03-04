@@ -16,7 +16,7 @@ namespace SortingIcons
 
 		enable = ini.GetOrCreate("General", "bSortingIcons", true, "; enable 'Sorting and Icons' feature. If required files are not found this will do nothing.");
 
-		logLevel = ini.GetOrCreate("Sorting and Icons", "iDebug", 0, "; debug output for Sorting and Icons, useful for developers");
+		logLevel = ini.GetOrCreate("Sorting and Icons", "iDebug", 3, "; debug output for Sorting and Icons, useful for developers");
 
 		bSort = ini.GetOrCreate("Sorting and Icons", "bSortInventory", 1, "; sort inventory according to tag names supplied in .json");
 		bIcons = ini.GetOrCreate("Sorting and Icons", "bAddInventoryIcons", 1, "; add ycons to inventory, container and barter menus");
@@ -28,7 +28,7 @@ namespace SortingIcons
 
 	void ProcessEntries()
 	{
-		ra::sort(g_Items, [&](const ItemPtr& entry1, const ItemPtr& entry2) { return entry1->common.priority > entry2->common.priority; });
+		ra::sort(g_Items, [&](const ItemPtr& entry1, const ItemPtr& entry2) { return entry1->priority > entry2->priority; });
 		ra::sort(g_Categories, [&](const CategoryPtr& entry1, const CategoryPtr& entry2) { return entry1->priority > entry2->priority; });
 		ra::sort(g_Tabs, [&](const TabPtr& entry1, const TabPtr& entry2) { return entry1->priority > entry2->priority; });
 
