@@ -18,7 +18,7 @@ StartMenuOption* yCM1;
 
 void __cdecl yCMCallback()
 {
-	Log(Log::kConsole) << "Test";
+	Log(true, Log::kConsole) << "Test";
 //	MenuButton_DownloadsClick();
 	//	ThisCall(0x7D74F0, (void *)( 0x11DAAC0 + 0x0B4), 0);
 	//	static StartMenu* g_StartMenu = StartMenu::GetSingleton();

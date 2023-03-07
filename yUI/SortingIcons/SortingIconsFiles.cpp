@@ -22,14 +22,14 @@ namespace SortingIcons::Files
 		return forms;
 	}
 
-	template <typename T> std::unordered_set<T> GetSetFromElement(const nlohmann::basic_json<>& elem)
+	template <typename T> std::vector<T> GetSetFromElement(const nlohmann::basic_json<>& elem)
 	{
-		std::unordered_set<T> set{};
+		std::vector<T> set{};
 		if (!elem.is_array()) {
-			if (const auto val = elem.get<T>()) set.emplace(val);
+			if (const auto val = elem.get<T>()) set.push_back(val);
 		}
 		else for (const auto& i : elem) {
-			if (const auto val = i.get<T>()) set.emplace(val);
+			if (const auto val = i.get<T>()) set.push_back(val);
 		}
 		return set;
 	}
@@ -82,7 +82,7 @@ namespace SortingIcons::Files
 		item.tag = elem["tag"].get<std::string>();
 		item.priority = elem["priority"].get<SInt32>();
 
-		if (elem.contains("formType"))		item.common.formType = GetSetFromElement<UInt8>(elem["formType"]);
+		if (elem.contains("formType"))		item.common.formType.insert_range(GetSetFromElement<UInt8>(elem["formType"]));
 
 		if (elem.contains("questItem"))		item.common.questItem = elem["questItem"].get<UInt8>();
 		if (elem.contains("miscComponent"))	item.common.miscComponent = elem["miscComponent"].get<UInt8>();
@@ -108,21 +108,21 @@ namespace SortingIcons::Files
 			}
 		}
 
-		if (elem.contains("weaponSkill"))			item.weapon.skill = GetSetFromElement<UInt32>(elem["weaponSkill"]);
-		if (elem.contains("weaponHandgrip"))		item.weapon.handgrip = GetSetFromElement<UInt32>(elem["weaponHandgrip"]);
-		if (elem.contains("weaponAttackAnim"))		item.weapon.attackAnim = GetSetFromElement<UInt32>(elem["weaponAttackAnim"]);
-		if (elem.contains("weaponReloadAnim"))		item.weapon.reloadAnim = GetSetFromElement<UInt32>(elem["weaponReloadAnim"]);
+		if (elem.contains("weaponSkill"))			item.weapon.skill.insert_range(GetSetFromElement<UInt32>(elem["weaponSkill"]));
+		if (elem.contains("weaponHandgrip"))		item.weapon.handgrip.insert_range(GetSetFromElement<UInt32>(elem["weaponHandgrip"]));
+		if (elem.contains("weaponAttackAnim"))		item.weapon.attackAnim.insert_range(GetSetFromElement<UInt32>(elem["weaponAttackAnim"]));
+		if (elem.contains("weaponReloadAnim"))		item.weapon.reloadAnim.insert_range(GetSetFromElement<UInt32>(elem["weaponReloadAnim"]));
 		if (elem.contains("weaponIsAutomatic"))		item.weapon.isAutomatic = elem["weaponIsAutomatic"].get<UInt8>();
 		if (elem.contains("weaponHasScope"))		item.weapon.hasScope = elem["weaponHasScope"].get<UInt8>();
 		if (elem.contains("weaponIgnoresDTDR"))		item.weapon.ignoresDTDR = elem["weaponIgnoresDTDR"].get<UInt8>();
 		if (elem.contains("weaponClipRounds"))		item.weapon.clipRoundsMin = elem["weaponClipRounds"].get<UInt32>();
 		if (elem.contains("weaponNumProjectiles"))	item.weapon.numProjectilesMin = elem["weaponNumProjectiles"].get<UInt32>();
-		if (elem.contains("weaponSoundLevel"))		item.weapon.soundLevel = GetSetFromElement<UInt32>(elem["weaponSoundLevel"]);
+		if (elem.contains("weaponSoundLevel"))		item.weapon.soundLevel.insert_range(GetSetFromElement<UInt32>(elem["weaponSoundLevel"]));
 
 		if (elem.contains("ammoMod") && elem.contains("ammoForm")) for (const auto iter : GetFormsFromElement(elem, "ammoMod", "ammoForm"))
 			item.weapon.ammoIDs.emplace(iter->refID);
 
-		if (elem.contains("weaponType"))			item.weapon.type = GetSetFromElement<UInt32>(elem["weaponType"]);
+		if (elem.contains("weaponType"))			item.weapon.type.insert_range(GetSetFromElement<UInt32>(elem["weaponType"]));
 
 		if (elem.contains("armorHead")) 			(elem["armorHead"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1;
 		if (elem.contains("armorHair")) 			(elem["armorHair"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 1;

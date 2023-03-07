@@ -1710,16 +1710,18 @@
 
 		<_ImageFilename>Interface\companion_wheel\comp_aggressive_on.dds</_ImageFilename>
 		<_Image> 0 </_Image>
-		<_OffsetX> 0.233333338 </_OffsetX>
-		<_OffsetY> -0.230769225 </_OffsetY>
+		<_OffsetX> 0.26 </_OffsetX>
+		<_OffsetY> -0.24 </_OffsetY>
 		
 		<_NumberText>1)</_NumberText>
 		<_AlphaNumbers> <copy src="parent()" trait="_AlphaNumbers"/> </_AlphaNumbers>
 		<_OffsetXText> 0.093333335 </_OffsetXText>
 		<_OffsetYText> -0.108461536 </_OffsetYText>
 
-		<_OffsetXAmmoText> 0.15 </_OffsetXAmmoText>
-		<_OffsetYAmmoText> -0.15 </_OffsetYAmmoText>
+		<_AmmoName>OC</_AmmoName>
+		<_AmmoCount>40/400</_AmmoCount>
+		<_OffsetXAmmoText> 0.16 </_OffsetXAmmoText>
+		<_OffsetYAmmoText> -0.16 </_OffsetYAmmoText>
 		
 		<depth> 1015 </depth>
 		<font> <copy src="parent()" trait="_Font"/> </font>
@@ -1790,9 +1792,9 @@
 			<blue> <copy src="parent()" trait="blue"/> </blue>
 		</text>
 		
-		<text name="AmmoText">
-			<string>(30/400)</string>
-			<zoom> 50 </zoom>
+		<text name="AmmoCount">
+			<string> <copy src="parent()" trait="_AmmoCount"/> </string>
+			<zoom> 100 </zoom>
 			<font> <copy src="parent()" trait="font"/> </font>
 			<justify> &left; </justify>
 			<depth> <copy src="parent()" trait="depth"/> </depth>
@@ -1812,6 +1814,27 @@
 			<blue> <copy src="parent()" trait="blue"/> </blue>
 		</text>
 		
+		<text name="AmmoName">
+			<string> <copy src="parent()" trait="_AmmoName"/> </string>
+			<zoom> 100 </zoom>
+			<font> <copy src="parent()" trait="font"/> </font>
+			<justify> &left; </justify>
+			<depth> <copy src="parent()" trait="depth"/> </depth>
+			<visible> <copy src="parent()" trait="visible"/> </visible>
+			<x>
+				<copy src="me()" trait="width"/> <div> -2 </div>
+				<add> <copy src="parent()" trait="width"/> <mul src="parent()" trait="_OffsetXAmmoText"/> </add>
+			</x>
+			<y>
+				<copy src="sibling(AmmoCount)" trait="height"/> <mul> -1 </mul>
+				<add> <copy src="parent()" trait="height"/> <mul src="parent()" trait="_OffsetYAmmoText"/> </add>
+			</y>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+		</text>		
 	</rect>
 
 	<rect name="SliceBox2">
@@ -1896,6 +1919,50 @@
 			<green> <copy src="parent()" trait="green"/> </green>
 			<blue> <copy src="parent()" trait="blue"/> </blue>
 		</text>
+				
+		<text name="AmmoCount">
+			<string> <copy src="parent()" trait="_AmmoCount"/> </string>
+			<zoom> 100 </zoom>
+			<font> <copy src="parent()" trait="font"/> </font>
+			<justify> &left; </justify>
+			<depth> <copy src="parent()" trait="depth"/> </depth>
+			<visible> <copy src="parent()" trait="visible"/> </visible>
+			<x>
+				<copy src="me()" trait="width"/> <div> -2 </div>
+				<add> <copy src="parent()" trait="width"/> <mul src="parent()" trait="_OffsetXAmmoText"/> </add>
+			</x>
+			<y>
+				<copy src="me()" trait="height"/> <mul> 0 </mul>
+				<add> <copy src="parent()" trait="height"/> <mul src="parent()" trait="_OffsetYAmmoText"/> </add>
+			</y>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+		</text>
+		
+		<text name="AmmoName">
+			<string> <copy src="parent()" trait="_AmmoName"/> </string>
+			<zoom> 100 </zoom>
+			<font> <copy src="parent()" trait="font"/> </font>
+			<justify> &left; </justify>
+			<depth> <copy src="parent()" trait="depth"/> </depth>
+			<visible> <copy src="parent()" trait="visible"/> </visible>
+			<x>
+				<copy src="me()" trait="width"/> <div> -2 </div>
+				<add> <copy src="parent()" trait="width"/> <mul src="parent()" trait="_OffsetXAmmoText"/> </add>
+			</x>
+			<y>
+				<copy src="sibling(AmmoCount)" trait="height"/> <mul> -1 </mul>
+				<add> <copy src="parent()" trait="height"/> <mul src="parent()" trait="_OffsetYAmmoText"/> </add>
+			</y>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+		</text>	
 	</rect>
 
 	<rect name="SliceBox3">
