@@ -32,7 +32,6 @@ namespace SortingIcons::Icons
 
 	void InjectIconTile(const CategoryPtr& category_, Tile* tile)
 	{
-		//	if (g_Items.find(entry->type) == g_Items.end()) return;
 		const auto& category = *category_;
 
 		if (category.filename.empty()) return;
@@ -43,9 +42,9 @@ namespace SortingIcons::Icons
 
 		const auto text = tile->children.Tail()->data;
 
-		if (!text || !std::string("ListItemText")._Equal(text->name.CStr())) return;
+		if (!text || std::string(text->name.CStr()) != "ListItemText") return;
 
-		Tile* icon = tile->GetChild(category.xmltemplate.c_str());
+		Tile* icon = tile->GetChild(category.xmltemplate);
 
 		if (!icon) {
 			if (!InjectTemplatesToMenu(menu, category.xmltemplate)) return;
@@ -57,11 +56,11 @@ namespace SortingIcons::Icons
 
 		if (!category.filename.empty()) icon->SetString(kTileValue_filename, category.filename.c_str(), false);
 		if (!category.texatlas.empty()) icon->SetString(kTileValue_texatlas, category.texatlas.c_str(), false);
-		if (!category.systemcolor)
-			icon->SetFloat(kTileValue_systemcolor, menu->GetFloat(kTileValue_systemcolor));
+		if (category.font.has_value()) icon->SetFloat(kTileValue_texatlas, category.font.value(), false);
+		if (category.systemcolor.has_value())
+			icon->SetFloat(kTileValue_systemcolor, category.systemcolor.value(), false);
 		else
-			icon->SetFloat(kTileValue_systemcolor, category.systemcolor, false);
-		//	icon->SetFloat(kTileValue_alpha, 255, propagate);
+			icon->SetFloat(kTileValue_systemcolor, menu->GetFloat(kTileValue_systemcolor));
 
 		const Float32 x = text->GetFloat(kTileValue_x);
 		Float32 width = 0;

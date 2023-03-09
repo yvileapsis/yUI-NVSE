@@ -100,13 +100,14 @@ namespace SortingIcons
 	class Category
 	{
 	public:
-		std::string		tag;
-		SInt32			priority = 0;
+		std::string				tag;
+		SInt32					priority = 0;
 
-		std::string		xmltemplate;
-		std::string		filename;
-		std::string		texatlas;
-		SInt32			systemcolor = 0;
+		std::string				xmltemplate;
+		std::string				filename;
+		std::string				texatlas;
+		std::optional<SInt32>	font;
+		std::optional<SInt32>	systemcolor;
 
 		Category() = default;
 	};

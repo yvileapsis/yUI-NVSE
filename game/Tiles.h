@@ -301,8 +301,8 @@ public:
 	__forceinline Float32		GetFloat(const UInt32 id) { return ThisCall<Float32>(0xA011B0, this, id); };
 	__forceinline Float32		GetFloat(const char* id) { return this->GetFloat(TraitNameToID(id)); };
 
-	__forceinline void			SetFloat(UInt32 id, float fltVal, bool bPropagate = true) { ThisCall(0xA012D0, this, id, fltVal, bPropagate); }
-	__forceinline void			SetFloat(const char* id, float fltVal, bool bPropagate = true) { SetFloat(TraitNameToID(id), fltVal, bPropagate); }
+	__forceinline void			SetFloat(UInt32 id, Float32 fltVal, bool bPropagate = true) { ThisCall(0xA012D0, this, id, fltVal, bPropagate); }
+	__forceinline void			SetFloat(const char* id, Float32 fltVal, bool bPropagate = true) { SetFloat(TraitNameToID(id), fltVal, bPropagate); }
 
 	__forceinline void			SetString(UInt32 id, const char* strVal, bool bPropagate = true) { ThisCall(0xA01350, this, id, strVal, bPropagate); }
 	__forceinline void			SetString(const char* id, const char* strVal, bool bPropagate = true) { SetString(TraitNameToID(id), strVal, bPropagate); }

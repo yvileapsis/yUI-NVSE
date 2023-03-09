@@ -202,6 +202,7 @@ namespace SortingIcons::Files
 		if (elem.contains("filename"))			category.filename = elem["filename"].get<std::string>();
 		if (elem.contains("texatlas"))			category.texatlas = elem["texatlas"].get<std::string>();
 		if (elem.contains("systemcolor"))		category.systemcolor = elem["systemcolor"].get<SInt32>();
+		if (elem.contains("font"))				category.font = elem["font"].get<SInt32>();
 		/*
 		if (elem.contains("category"))			category.category = elem["category"].get<std::string>();
 		if (elem.contains("routeToKeyring"))	category.category = elem["routeToKeyring"].get<std::string>();
