@@ -381,7 +381,7 @@ namespace UserInterface::LootMenu
 		{
 			if (!ref) return nullptr;
 
-            ref = ref->ResolveAshpile();
+			ref = ref->ResolveAshpile();
 
 			if (ref->IsDestroyed()) return nullptr;
 			if (ref->IsDeleted()) return nullptr;
