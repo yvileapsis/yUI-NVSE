@@ -397,7 +397,7 @@ bool GetCannibalPrompt(TESObjectREFR* ref)
 	activationPromptTList.RemoveAll();
 	activationPromptTList.Init();
 	ApplyPerkModifiers(0x1B, g_player, ref, &activationPromptTList, ref);
-	return activationPromptTList.Empty();
+	return !activationPromptTList.Empty();
 }
 
 

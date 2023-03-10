@@ -846,7 +846,11 @@ TESObjectREFR* TESObjectREFR::ResolveAshpile()
 	return this;
 }
 
-bool TESObjectREFR::IsLocked() { return this->GetLockData() ? this->GetLockData()->IsLocked() : false; }
+bool TESObjectREFR::IsLocked() const
+{
+	const auto data = GetLockData();
+	return data && data->IsLocked();
+}
 
 
 const _GetActorValueName GetActorValueName = reinterpret_cast<_GetActorValueName>(0x00066EAC0);	// See Cmd_GetActorValue_Eval

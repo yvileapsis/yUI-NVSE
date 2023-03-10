@@ -87,7 +87,6 @@ namespace UserInterface::LootMenu
 	std::vector<InventoryChanges*> items;
 
 	/* those are needed to know if ref should be updated */
-	TESObjectREFR*		ref					= nullptr;
 	TESObjectREFR*		container			= nullptr;
 
 	bool				owned				= false;
@@ -181,7 +180,9 @@ namespace UserInterface::LootMenu
 
 	bool ShouldAllowContainerInteractions()
 	{
-		return container && !((block || CheckContainer(container) == kCheck) && blockActivation);
+		if (MenuMode()) return false;
+		if (!container) return false;
+		return !((block || CheckContainer(container) == kCheck) && blockActivation);
 	}
 
 	namespace Items
@@ -351,63 +352,48 @@ namespace UserInterface::LootMenu
 		}
 	}
 
-	namespace Ref
+	namespace Container
 	{
-		void ChangeContainer(TESObjectREFR* newcontainer)
+		bool Change(TESObjectREFR* ref)
 		{
-			if (container != newcontainer)
+			auto update = false;
+
+			if (container != ref)
 			{
 				if (tookItem) { g_player->SendStealingAlarm(tookItem, true); tookItem = nullptr; }
 				if (openedContainer) { container->OpenCloseContainer(false, sounds & 0x1); openedContainer = nullptr; }
+
+				container = ref;
+
+				offset = 0;
+				index = 0;
+				blockActivation = true;
+
+				update = true;
 			}
 
-			offset = 0;
-			index = 0;
+			if (ref && owned != ref->IsCrimeOrEnemy()) { update = true; owned = !owned; }
 
-			blockActivation = true;
-
-			container = newcontainer;
+			return update;
 		}
 
-		bool				notcannibal			= false;
-		bool				dead				= false;
-		bool				open				= false;
-
-		bool NameNotEmpty(TESObjectREFR* ref)
+		TESObjectREFR* Filter(TESObjectREFR* ref)
 		{
-			return !std::string(ref->GetTheName()).empty();
-		}
+			if (!ref) return nullptr;
 
-		bool IsDead(TESObjectREFR* ref)
-		{
-			return ref->IsActor() ? (reinterpret_cast<Actor*>(ref)->lifeState == kLifeState_Dead || reinterpret_cast<Actor*>(ref)->lifeState == kLifeState_Dying) : true;
-		}
+            ref = ref->ResolveAshpile();
 
-		void Update(TESObjectREFR* newref)
-		{
-			bool update = false;
+			if (ref->IsDestroyed()) return nullptr;
+			if (ref->IsDeleted()) return nullptr;
+			if (ref->IsInteractionDisabled()) return nullptr;
+			if (!ref->baseForm->CanContainItems()) return nullptr;
+			if (ref->IsLocked()) return nullptr;
+			if (ref->IsActor() && reinterpret_cast<Actor*>(ref)->lifeState != kLifeState_Dead && reinterpret_cast<Actor*>(ref)->lifeState != kLifeState_Dying) return nullptr;
+			if (GetCannibalPrompt(ref)) return nullptr;
+			if (CheckContainer(ref) == kDisallow) return nullptr;
+			if (std::string(ref->GetTheName()).empty()) return nullptr;
 
-			if (ref != newref) update = true;
-			ref = newref;
-
-			if (ref)
-			{
-				ref = ref->ResolveAshpile();
-
-				if (owned != ref->IsCrimeOrEnemy())			{ update = true; owned = !owned; }
-				if (dead != IsDead(ref))					{ update = true; dead = !dead; }
-				if (open != !ref->IsLocked())				{ update = true; open = !open; }
-				if (notcannibal != GetCannibalPrompt(ref))	{ update = true; notcannibal = !notcannibal; }
-
-				if (!ref->baseForm->CanContainItems() || CheckContainer(ref) == kDisallow) ref = nullptr;
-			}
-
-			if (!update) return;
-
-			ref = ref && dead && open && notcannibal && NameNotEmpty(ref) ? ref : nullptr;
-
-			ChangeContainer(ref);
-			Box::Update();
+			return ref;
 		}
 	}
 
@@ -506,7 +492,8 @@ namespace UserInterface::LootMenu
 
 	void Update()
 	{
-		Ref::Update(MenuMode() ? nullptr : InterfaceManager::GetSingleton()->crosshairRef);
+		const auto ref = Container::Filter(InterfaceManager::GetSingleton()->crosshairRef);
+		if (Container::Change(ref)) Box::Update();
 		Keys::Update();
 		if (ShouldAllowContainerInteractions())
 		{
@@ -625,7 +612,7 @@ namespace UserInterface::LootMenu
 
 	bool OnPreActivate(TESObjectREFR* thisObj, Actor* ref, bool isActivationNotPrevented)
 	{
-		if (!container) Ref::Update(thisObj);
+		if (!container && Container::Change(Container::Filter(thisObj))) Box::Update();
 		if (!container || thisObj != container || ref != g_player || !isActivationNotPrevented) return true;
 		return Action(ActionToTake());
 	}

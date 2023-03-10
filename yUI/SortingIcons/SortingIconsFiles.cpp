@@ -91,13 +91,12 @@ namespace SortingIcons::Files
 		if (elem.contains("mod") && elem.contains("form"))
 		{
 			UInt32 repairList = 0;
-			if (elem.contains("formlist")) repairList = elem["formlist"].get<UInt8>();
-			if (elem.contains("repairList")) repairList = elem["repairList"].get<UInt8>();
+			if (elem.contains("formlist")) repairList |= elem["formlist"].get<UInt8>();
+			if (elem.contains("repairList")) repairList |= elem["repairList"].get<UInt8>();
 
 			for (const auto form : GetFormsFromElement(elem, "mod", "form"))
 			{
-				const auto vector = repairList ? FlattenListRepair(form) : FlattenListForm(form);
-				item.common.formIDs.insert_range(vector);
+				item.common.formIDs.insert_range(repairList ? FlattenListRepair(form) : FlattenListForm(form));
 			}
 
 			if (item.common.formIDs.empty())
@@ -124,26 +123,26 @@ namespace SortingIcons::Files
 
 		if (elem.contains("weaponType"))			item.weapon.type.insert_range(GetSetFromElement<UInt32>(elem["weaponType"]));
 
-		if (elem.contains("armorHead")) 			(elem["armorHead"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1;
-		if (elem.contains("armorHair")) 			(elem["armorHair"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 1;
-		if (elem.contains("armorUpperBody")) 		(elem["armorUpperBody"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 2;
-		if (elem.contains("armorLeftHand"))			(elem["armorLeftHand"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 3;
-		if (elem.contains("armorRightHand")) 		(elem["armorRightHand"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 4;
-		if (elem.contains("armorWeapon")) 			(elem["armorWeapon"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 5;
-		if (elem.contains("armorPipBoy")) 			(elem["armorPipBoy"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 6;
-		if (elem.contains("armorBackpack"))			(elem["armorBackpack"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 7;
-		if (elem.contains("armorNecklace"))			(elem["armorNecklace"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 8;
-		if (elem.contains("armorHeadband"))			(elem["armorHeadband"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 9;
-		if (elem.contains("armorHat")) 				(elem["armorHat"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 10;
-		if (elem.contains("armorEyeglasses"))		(elem["armorEyeglasses"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 11;
-		if (elem.contains("armorNosering"))			(elem["armorNosering"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 12;
-		if (elem.contains("armorEarrings"))			(elem["armorEarrings"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 13;
-		if (elem.contains("armorMask")) 			(elem["armorMask"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 14;
-		if (elem.contains("armorChoker")) 			(elem["armorChoker"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 15;
-		if (elem.contains("armorMouthObject"))		(elem["armorMouthObject"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 16;
-		if (elem.contains("armorBodyAddon1"))		(elem["armorBodyAddon1"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 17;
-		if (elem.contains("armorBodyAddon2"))		(elem["armorBodyAddon2"].get<SInt8>() == 1 ? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 18;
-		if (elem.contains("armorBodyAddon3"))		(elem["armorBodyAddon3"].get<SInt8>() == 1? item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 19;
+		if (elem.contains("armorHead")) 			(elem["armorHead"].get<SInt8>() == 1 ?			item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1;
+		if (elem.contains("armorHair")) 			(elem["armorHair"].get<SInt8>() == 1 ?			item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 1;
+		if (elem.contains("armorUpperBody")) 		(elem["armorUpperBody"].get<SInt8>() == 1 ?		item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 2;
+		if (elem.contains("armorLeftHand"))			(elem["armorLeftHand"].get<SInt8>() == 1 ?		item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 3;
+		if (elem.contains("armorRightHand")) 		(elem["armorRightHand"].get<SInt8>() == 1 ?		item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 4;
+		if (elem.contains("armorWeapon")) 			(elem["armorWeapon"].get<SInt8>() == 1 ?		item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 5;
+		if (elem.contains("armorPipBoy")) 			(elem["armorPipBoy"].get<SInt8>() == 1 ?		item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 6;
+		if (elem.contains("armorBackpack"))			(elem["armorBackpack"].get<SInt8>() == 1 ?		item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 7;
+		if (elem.contains("armorNecklace"))			(elem["armorNecklace"].get<SInt8>() == 1 ?		item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 8;
+		if (elem.contains("armorHeadband"))			(elem["armorHeadband"].get<SInt8>() == 1 ?		item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 9;
+		if (elem.contains("armorHat")) 				(elem["armorHat"].get<SInt8>() == 1 ?			item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 10;
+		if (elem.contains("armorEyeglasses"))		(elem["armorEyeglasses"].get<SInt8>() == 1 ?	item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 11;
+		if (elem.contains("armorNosering"))			(elem["armorNosering"].get<SInt8>() == 1 ?		item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 12;
+		if (elem.contains("armorEarrings"))			(elem["armorEarrings"].get<SInt8>() == 1 ?		item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 13;
+		if (elem.contains("armorMask")) 			(elem["armorMask"].get<SInt8>() == 1 ?			item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 14;
+		if (elem.contains("armorChoker")) 			(elem["armorChoker"].get<SInt8>() == 1 ?		item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 15;
+		if (elem.contains("armorMouthObject"))		(elem["armorMouthObject"].get<SInt8>() == 1 ?	item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 16;
+		if (elem.contains("armorBodyAddon1"))		(elem["armorBodyAddon1"].get<SInt8>() == 1 ?	item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 17;
+		if (elem.contains("armorBodyAddon2"))		(elem["armorBodyAddon2"].get<SInt8>() == 1 ?	item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 18;
+		if (elem.contains("armorBodyAddon3"))		(elem["armorBodyAddon3"].get<SInt8>() == 1 ?	item.armor.slotsMaskWL : item.armor.slotsMaskBL) += 1 << 19;
 
 		if (elem.contains("armorClass"))			item.armor.armorClass = elem["armorClass"].get<UInt16>();
 		if (elem.contains("armorPower"))			item.armor.powerArmor = elem["armorPower"].get<SInt8>();
@@ -233,9 +232,9 @@ namespace SortingIcons::Files
 			else for (const auto& type : elem["types"]) tab.types.emplace(type.get<UInt32>());
 		}
 
-		if (const auto categories = elem.contains("categories") ? &elem["categories"] : nullptr; categories)
+		if (const auto categories = elem.contains("categories") ? elem["categories"] : nullptr; categories)
 		{
-			if (!categories->is_array()) tab.categories.emplace(categories->get<std::string>());
+			if (!categories.is_array()) tab.categories.emplace(categories.get<std::string>());
 			else for (const auto& type : elem["categories"]) tab.categories.emplace(type.get<std::string>());
 		}
 
@@ -245,7 +244,7 @@ namespace SortingIcons::Files
 		if (elem.contains("inventory"))		tab.inventory	= elem["inventory"].get<UInt32>();
 		if (elem.contains("container"))		tab.container	= elem["container"].get<UInt32>();
 
-		if (elem.contains("tabPriority"))	tab.tabPriority = elem["tabPriority"].get<UInt32>();
+		if (elem.contains("tabPriority"))	tab.tabPriority = elem["tabPriority"].get<SInt32>();
 
 		if (elem.contains("tabNew"))		tab.tabNew		= elem["tabNew"].get<UInt32>();
 		if (elem.contains("tabMisc"))		tab.tabMisc		= elem["tabMisc"].get<UInt32>();
@@ -256,8 +255,7 @@ namespace SortingIcons::Files
 	void HandleXML(const std::filesystem::path& path)
 	{
 		const auto pathstring = path.generic_string();
-		const auto relativepath = pathstring.substr(pathstring.find_last_of("\\Data\\") - 3);
-		g_XMLPaths.emplace_back(std::filesystem::path(relativepath));
+		g_XMLPaths.emplace_back(pathstring.substr(pathstring.find_last_of("\\Data\\") - 3));
 	}
 
 	void HandleJSON(const std::filesystem::path& path)

@@ -2187,6 +2187,30 @@ public:
 	UInt8		jipFormFlags1;		// 005
 	UInt8		jipFormFlags2;		// 006
 	UInt8		jipFormFlags3;		// 007
+
+
+	enum JIPFormFlags
+	{
+		kJIPFormFlag1_FastTravelInformed = 1 << 0,
+		kJIPFormFlag1_CellChangeInformed = 1 << 1,
+		kJIPFormFlag1_MenuInputInformed = 1 << 2,
+		kJIPFormFlag1_ScriptInformed = kJIPFormFlag1_FastTravelInformed | kJIPFormFlag1_CellChangeInformed | kJIPFormFlag1_MenuInputInformed,
+		kJIPFormFlag1_ScriptOnWait = 1 << 3,
+
+		kJIPFormFlag2_MessageDisabled = 1 << 0,
+		kJIPFormFlag2_SetStageHandlers = kJIPFormFlag2_MessageDisabled,
+		kJIPFormFlag2_ProjectileImpact = kJIPFormFlag2_MessageDisabled,
+		kJIPFormFlag2_OnEquipHandlers = kJIPFormFlag2_MessageDisabled,
+		kJIPFormFlag2_NoPCActivation = 1 << 1,
+		kJIPFormFlag2_EventDisabled = 1 << 2,
+		kJIPFormFlag2_ActivateDisabled = 1 << 3,
+		kJIPFormFlag2_UniqueItem = 1 << 4,
+		kJIPFormFlag2_IsAshPile = 1 << 5,
+		kJIPFormFlag2_InsertNode = 1 << 6,
+		kJIPFormFlag2_AttachModel = 1 << 7,
+		kJIPFormFlag2_InsertObject = kJIPFormFlag2_InsertNode | kJIPFormFlag2_AttachModel,
+	};
+
 	UInt32		flags;				// 008
 	union
 	{
@@ -2215,9 +2239,10 @@ public:
 	const char*					RefToString();
 	TESLeveledList*				GetLvlList();
 	void						SetJIPFlag(UInt8 jipFlag, bool bSet);
-	bool						IsQuestItem2()	{ return flags & kFormFlags_QuestItem; };
-	bool						IsDisabled()	{ return flags & kFormFlags_IsPermanent; };
-	bool						IsDeleted()		{ return flags & kFormFlags_Deleted; };
+	bool						IsQuestItem2() const	{ return flags & kFormFlags_QuestItem; };
+	bool						IsDisabled() const	{ return flags & kFormFlags_IsPermanent; };
+	bool						IsDeleted() const { return flags & kFormFlags_Deleted; };
+	bool						IsInteractionDisabled() const { return jipFormFlags2 & kJIPFormFlag2_NoPCActivation; };
 	static void					DoAddForm(TESForm* newForm, bool bPersist = true, bool record = true);
 	TESForm*					CloneForm(bool bPersist = true) const;
 	bool						IsInventoryObject() { return CdeclCall<char>(0x00481F30, typeID); }

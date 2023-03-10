@@ -155,7 +155,7 @@ public:
 	NiNode* __fastcall		GetNode(const char* nodeName);
 	hkpRigidBody*			GetRigidBody(const char* nodeName);
 	bool					RunScriptSource(const char* sourceStr);
-	ExtraLockData*			GetLockData() { return ThisCall<ExtraLockData*>(0x569160, this); }
+	ExtraLockData*			GetLockData() const { return ThisCall<ExtraLockData*>(0x569160, (void*) this); }
 	void					SetScale(float scale);
 	bool					IsOwnedByActor(Actor* actor, bool includeFactionOwnership) { return ThisCall<bool>(0x5785E0, this, actor, includeFactionOwnership); };
 	TESObjectREFR*			ResolveOwnership() { return ThisCall<TESObjectREFR*>(0x567790, this); };
@@ -167,7 +167,7 @@ public:
 	NiPoint3				GetDimensions() const;
 	__forceinline Float32	GetScale() { return ThisCall<float>(0x567400, this); }
 	TESObjectREFR*			ResolveAshpile();
-	bool					IsLocked();
+	bool					IsLocked() const;
 
 	__forceinline bool		Activate(Actor* activator, UInt32 unk1, UInt32 unk2, UInt32 unk3) { return ThisCall<bool>(0x573170, this, activator, unk1, unk2, unk3); }
 
