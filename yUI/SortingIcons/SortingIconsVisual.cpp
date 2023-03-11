@@ -30,11 +30,13 @@ namespace SortingIcons::Icons
 		return true;
 	}
 
-	void InjectIconTile(const CategoryPtr& category_, Tile* tile)
+	void InjectIconTile(const CategoryPtr& category, Tile* tile)
 	{
-		const auto& category = *category_;
+		if (!category.IsValid()) return;
 
-		if (category.filename.empty()) return;
+		const auto [tag, priority, xmltemplate, filename, texatlas, font, systemcolor] = *category;
+
+		if (filename.empty()) return;
 
 		TileMenu* menu = tile->GetTileMenu();
 
@@ -44,21 +46,21 @@ namespace SortingIcons::Icons
 
 		if (!text || std::string(text->name.CStr()) != "ListItemText") return;
 
-		Tile* icon = tile->GetChild(category.xmltemplate);
+		Tile* icon = tile->GetChild(xmltemplate);
 
 		if (!icon) {
-			if (!InjectTemplatesToMenu(menu, category.xmltemplate)) return;
+			if (!InjectTemplatesToMenu(menu, xmltemplate)) return;
 			const auto last = tile->children.Head();
-			icon = tile->AddTileFromTemplate(category.xmltemplate.c_str());
+			icon = tile->AddTileFromTemplate(xmltemplate.c_str());
 			tile->children.ExchangeNodeData(tile->children.Head(), last);
 			if (!icon) return;
 		}
 
-		if (!category.filename.empty()) icon->SetString(kTileValue_filename, category.filename.c_str(), false);
-		if (!category.texatlas.empty()) icon->SetString(kTileValue_texatlas, category.texatlas.c_str(), false);
-		if (category.font.has_value()) icon->SetFloat(kTileValue_texatlas, category.font.value(), false);
-		if (category.systemcolor.has_value())
-			icon->SetFloat(kTileValue_systemcolor, category.systemcolor.value(), false);
+		if (!filename.empty()) icon->SetString(kTileValue_filename, filename.c_str(), false);
+		if (!texatlas.empty()) icon->SetString(kTileValue_texatlas, texatlas.c_str(), false);
+		if (font.has_value()) icon->SetFloat(kTileValue_texatlas, font.value(), false);
+		if (systemcolor.has_value())
+			icon->SetFloat(kTileValue_systemcolor, systemcolor.value(), false);
 		else
 			icon->SetFloat(kTileValue_systemcolor, menu->GetFloat(kTileValue_systemcolor));
 
@@ -80,12 +82,13 @@ namespace SortingIcons::Icons
 	void __fastcall SetTileStringInjectTile(Tile* tile, const InventoryChanges* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate)
 	{
 		tile->SetString(tilevalue, tileText, propagate);
-		if (entry && entry->form && TryGetTypeOfForm(entry->form)) InjectIconTile(Categories::ItemGetCategory(entry), tile);
+		if (entry && entry->form && TryGetTypeOfForm(entry->form)) InjectIconTile(CategoryPtr::Get(entry->form), tile);
 	}
 
 	void __fastcall SetStringValueTagImage(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate)
 	{
 		if (!tile) return;
+//		if (g_Categories.empty()) return;
 
 		if (Tile* icon = tile->GetChild("HK_Icon"); icon) {
 			icon->SetFloat(kTileValue_width, tile->GetFloat(kTileValue_width) - 16, propagate);
@@ -94,13 +97,14 @@ namespace SortingIcons::Icons
 			icon->SetFloat(kTileValue_y, 8, propagate);
 		}
 
-		const auto icon = Categories::ItemGetCategory(entry)->filename;
-		tile->SetString(tilevalue, icon.empty() ? src : icon.c_str(), propagate);
+		const auto category = CategoryPtr::Get(entry->form);
+		tile->SetString(tilevalue, category.IsValid() && !category->filename.empty() ? category->filename.c_str() : src, propagate);
 	}
 
 	void __fastcall SetStringValueTagRose(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate)
 	{
 		if (!tile) return;
+//		if (g_Categories.empty()) return;
 
 		if (compassRoseX == 0) compassRoseX = tile->GetFloat(kTileValue_x);
 		if (compassRoseY == 0) compassRoseY = tile->GetFloat(kTileValue_y);
@@ -110,20 +114,21 @@ namespace SortingIcons::Icons
 		tile->SetFloat(kTileValue_x, compassRoseX + 3, propagate);
 		tile->SetFloat(kTileValue_y, compassRoseY + 3, propagate);
 
-		const auto icon = Categories::ItemGetCategory(entry)->filename;
-		tile->SetString(tilevalue, icon.empty() ? src : icon.c_str(), propagate);
+		const auto category = CategoryPtr::Get(entry->form);
+		tile->SetString(tilevalue, category.IsValid() && !category->filename.empty() ? category->filename.c_str() : src, propagate);
 	}
 
 
 	void __fastcall PropagateIntValueTagPrompt(Tile* tile, void* dummyedx, UInt32 a2, signed int a3)
 	{
 		tile->SetFloat(a2, a3, true);
+		if (g_Categories.empty()) return;
 
 		const auto ref = HUDMainMenu::GetSingleton()->crosshairRef;
 		const auto item = !ref ? nullptr : ref->baseForm;
 		auto icon = tile->GetChild("ySIImage");
 		if (!icon) icon = tile->AddTileFromTemplate("ySIDefault");
-		if (!item || !item->IsInventoryObjectAlt())
+		if (!item || !item->IsInventoryObjectAlt() || !CategoryPtr::Get(item))
 		{
 			icon->SetFloat(kTileValue_visible, false, true);
 			return;
@@ -140,7 +145,7 @@ namespace SortingIcons::Icons
 		icon->SetFloat(kTileValue_brightness, tile->GetFloat(kTileValue_brightness));
 		icon->SetFloat(kTileValue_alpha, tile->GetFloat(kTileValue_alpha));
 
-		icon->SetString(kTileValue_filename, Categories::ItemGetCategory(item)->filename.c_str());
+		icon->SetString(kTileValue_filename, CategoryPtr::Get(item)->filename.c_str());
 	}
 }
 

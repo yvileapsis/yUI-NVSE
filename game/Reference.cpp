@@ -167,6 +167,12 @@ void TESObjectREFR::OpenCloseContainer(bool open, bool sounds)
 
 }
 
+const char* TESObjectREFR::GetJIPName()
+{
+	if (!(extraDataList.JIPExtraListFlags & BaseExtraList::kJIPExtraListFlag_AltRefName)) return "";
+	return GetBaseFormFullName();
+}
+
 TESForm* GetPermanentBaseForm(TESObjectREFR* thisObj)	// For LevelledForm, find real baseForm, not temporary one.
 {
 	if (thisObj)

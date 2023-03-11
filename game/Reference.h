@@ -176,6 +176,9 @@ public:
 	std::vector<InventoryChanges*> GetAllItems(UInt32 checkLinkedRec = 0);
 
 	void					OpenCloseContainer(bool open = false, bool sounds = true);
+
+	const char*				GetBaseFormFullName() { return ThisCall<const char*>(0x55D520, this); }
+	const char*				GetJIPName();
 };
 static_assert(sizeof(TESObjectREFR) == 0x68);
 

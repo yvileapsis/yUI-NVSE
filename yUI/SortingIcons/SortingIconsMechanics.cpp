@@ -59,7 +59,7 @@ namespace SortingIcons
 
 		if (dt && dt > armor->damageThreshold) return false;
 		if (dr && dr > armor->armorRating) return false;
-		//				if (armorChangesAV &&	armorChangesAV > armor->armorRating) continue;
+//		if (armorChangesAV &&	armorChangesAV > armor->armorRating) continue;
 
 
 		return true;
@@ -89,56 +89,39 @@ namespace SortingIcons
 		return true;
 	}
 
-}
+	bool CategoryPtr::IsValid() const { return get(); }
 
-namespace SortingIcons::Categories
-{
-	std::unordered_map<TESForm*, CategoryPtr> g_ItemToCategory;
+	std::unordered_map<std::string, CategoryPtr>	g_StringToCategory;
 
-	void ItemAssignCategory(TESForm* form)
+	CategoryPtr& CategoryPtr::Set(const std::string tag) const
 	{
-		for (const auto& iter : g_Items) if (iter->Satisfies(form))
-		{
-			g_ItemToCategory.emplace(form, g_StringToCategory[iter->tag]);
-			return;
-		}
-		g_ItemToCategory.emplace(form, categoryDefault);
+		return g_StringToCategory[tag] = *this;
 	}
 
-	bool ItemHasCategory(TESForm* form)
+	CategoryPtr& CategoryPtr::Get(const std::string tag)
 	{
-		if (!form) return false;
-		if (!g_ItemToCategory.contains(form)) return false;
-		return true;
+		return g_StringToCategory[tag];
 	}
 
-	bool ItemHasCategory(const InventoryChanges* entry)
+	CategoryPtr& CategoryPtr::Satisfies(TESForm* form)
 	{
-		if (!entry) return false;
-		return ItemHasCategory(entry->form->TryGetREFRParent());
+		for (const auto& iter : g_Items) 
+			if (iter->Satisfies(form)) return Get(iter->tag);
+		return categoryDefault;
 	}
 
-	CategoryPtr& ItemGetCategory(TESForm* form)
+	std::unordered_map<TESForm*, CategoryPtr>		g_ItemToCategory;
+
+	CategoryPtr& CategoryPtr::Set(TESForm* form) const
 	{
-		if (!ItemHasCategory(form)) ItemAssignCategory(form);
-		return g_ItemToCategory[form];
+		return g_ItemToCategory[form] = *this;
 	}
 
-	CategoryPtr& ItemGetCategory(const InventoryChanges* entry)
+	CategoryPtr& CategoryPtr::Get(TESForm* form)
 	{
-		return ItemGetCategory(entry->form->TryGetREFRParent());
+		return g_ItemToCategory.contains(form) ? g_ItemToCategory[form] : Satisfies(form).Set(form);
 	}
 
-	void ItemSetCategory(TESForm* form, const CategoryPtr& category)
-	{
-		g_ItemToCategory[form] = category;
-	}
-
-	void ItemSetCategory(const InventoryChanges* entry, const CategoryPtr& category)
-	{
-		ItemSetCategory(entry->form->TryGetREFRParent(), category);
-	}
-	
 }
 
 namespace SortingIcons::Keyrings
@@ -169,7 +152,7 @@ namespace SortingIcons::Keyrings
 		// todo: should hide regular
 		if (!entry->form->IsItemPlayable()) return true;
 		const auto type = entry->form->TryGetREFRParent()->typeID;
-		const auto category = Categories::ItemGetCategory(entry)->tag;
+		const auto category = CategoryPtr::Get(entry->form)->tag;
 		if (openTab->types.contains(type)) return false;
 		if (openTab->categories.contains(category)) return false;
 		return true;
@@ -178,13 +161,16 @@ namespace SortingIcons::Keyrings
 	bool __fastcall KeyringHideKeys(InventoryChanges* entry)
 	{
 		if (!entry || !entry->form) return false;
+
+		const auto category = CategoryPtr::Get(entry->form);
+		if (!category) return false;
+
 		const auto type = entry->form->TryGetREFRParent()->typeID;
-		const auto category = Categories::ItemGetCategory(entry)->tag;
 		bool shouldHide = false;
 		for (const auto& keyring : g_Keyrings)
 		{
 			if (!keyring->types.empty() && !keyring->types.contains(type)) continue;
-			if (!keyring->categories.empty() && !keyring->categories.contains(category)) continue;
+			if (!keyring->categories.empty() && !keyring->categories.contains(category->tag)) continue;
 
 			shouldHide = true;
 			if (keyring->keyring == 1) itemCountsForKeyrings[keyring] = 1;
@@ -769,8 +755,13 @@ namespace SortingIcons::Sorting
 
 			std::string tag1, tag2;
 
-			if (form1) tag1 = Categories::ItemGetCategory(form1)->tag;
-			if (form2) tag2 = Categories::ItemGetCategory(form2)->tag;
+			CategoryPtr category1, category2;
+
+			if (form1) category1 = CategoryPtr::Get(form1);
+			if (category1) tag1 = category1->tag;
+
+			if (form2) category2 = CategoryPtr::Get(form2);
+			if (category2) tag2 = category2->tag;
 
 			if (bCategories && !g_Keyrings.empty())
 			{

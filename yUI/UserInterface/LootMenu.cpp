@@ -222,11 +222,11 @@ namespace UserInterface::LootMenu
 
 				fst->SetFloat("_Equip", snd->GetEquipped());
 
-				const auto category = *SortingIcons::Categories::ItemGetCategory(snd);
-				if (!category.filename.empty())
+				const auto& category = SortingIcons::CategoryPtr::Get(snd->form);
+				if (category.IsValid() && !category->filename.empty())
 				{
 					fst->SetFloat("_Icon", true);
-					fst->SetString("_IconFilename", category.filename.c_str());
+					fst->SetString("_IconFilename", category->filename.c_str());
 				}
 				else fst->SetFloat("_Icon", false);
 
@@ -354,6 +354,9 @@ namespace UserInterface::LootMenu
 
 	namespace Container
 	{
+
+		auto menumode = false;
+
 		bool Change(TESObjectREFR* ref)
 		{
 			auto update = false;
@@ -373,6 +376,8 @@ namespace UserInterface::LootMenu
 			}
 
 			if (ref && owned != ref->IsCrimeOrEnemy()) { update = true; owned = !owned; }
+
+			if (menumode != MenuMode()) { update = true; menumode = !menumode; }
 
 			return update;
 		}

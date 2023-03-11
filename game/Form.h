@@ -2020,9 +2020,20 @@ public:
 	bool						MarkScriptEvent(UInt32 eventMask, TESForm* eventTarget);
 	__forceinline void			Copy(BaseExtraList* from) { ThisStdCall(0x411EC0, this, from); }
 
+	enum JIPExtraListFlags
+	{
+		kJIPExtraListFlag_Update3D = 1 << 0,
+		kJIPExtraListFlag_DisableCollision = 1 << 1,
+		kJIPExtraListFlag_AltRefName = 1 << 2,
+		kJIPExtraListFlag_RefrModelPath = 1 << 3,
+		kJIPExtraListFlag_RefNameOrModel = kJIPExtraListFlag_AltRefName | kJIPExtraListFlag_RefrModelPath,
+		kJIPExtraListFlag_NoZPosReset = 1 << 4,
+	};
+
 	BSExtraData*	m_data;						// 004
-	UInt8			m_presenceBitfield[0x15];	// 008 - if a bit is set, then the extralist should contain that extradata
-	UInt8			pad1D[3];					// 01D
+	UInt8			m_presenceBitfield[0x13];	// 008 - if a bit is set, then the extralist should contain that extradata
+	UInt8			JIPExtraListFlags;			// 1B	0x5F in TESObjectREFR
+	UInt16			JIPPerksInfo;
 };
 static_assert(sizeof(BaseExtraList) == 0x020);
 

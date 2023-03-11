@@ -108,8 +108,6 @@ namespace SortingIcons
 		std::string				texatlas;
 		std::optional<SInt32>	font;
 		std::optional<SInt32>	systemcolor;
-
-		Category() = default;
 	};
 
 	class Tab
@@ -138,16 +136,27 @@ namespace SortingIcons
 	};
 
 	typedef std::shared_ptr<Item> ItemPtr;
-	typedef std::shared_ptr<Category> CategoryPtr;
+	class CategoryPtr : public std::shared_ptr<Category>
+	{
+	public:
+		bool IsValid() const;
+
+		static CategoryPtr& Get(const std::string tag);
+		CategoryPtr& Set(const std::string tag) const;
+
+		static CategoryPtr& Satisfies(TESForm* form);
+		static CategoryPtr& Get(TESForm* form);
+		CategoryPtr& Set(TESForm* form) const;
+
+	};
 	typedef std::shared_ptr<Tab> TabPtr;
 
-	inline CategoryPtr categoryDefault;
+	inline CategoryPtr categoryDefault{};
 
 	inline std::vector<ItemPtr>		g_Items;
 	inline std::vector<CategoryPtr>	g_Categories;
 	inline std::vector<TabPtr>		g_Tabs;
 
-	inline std::unordered_map<std::string, CategoryPtr>	g_StringToCategory;
 	inline std::unordered_map<std::string, TabPtr>		g_StringToTabs;
 
 	inline std::vector<TabPtr>							g_Keyrings;
@@ -158,14 +167,6 @@ namespace SortingIcons
 namespace SortingIcons::Commands
 {
 	void Register();
-}
-
-namespace SortingIcons::Categories
-{
-	CategoryPtr& ItemGetCategory(TESForm* form);
-	CategoryPtr& ItemGetCategory(const InventoryChanges* form);
-	void ItemSetCategory(TESForm* form, const CategoryPtr& category);
-	void ItemSetCategory(const InventoryChanges* entry, const CategoryPtr& category);
 }
 
 namespace SortingIcons::Files

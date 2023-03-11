@@ -34,6 +34,11 @@ TESFullName* TESForm::GetFullName()
 
 const char* TESForm::GetTheName()
 {
+	if (GetIsReference())
+	{
+		const auto name = reinterpret_cast<TESObjectREFR*>(this)->GetJIPName();
+		if (name && name[0]) return name;
+	}
 	const auto fullName = GetFullName();
 	return fullName ? fullName->name.CStr() : "";
 }
