@@ -43,7 +43,7 @@ void Inits()
 	Fix::DroppedItems::Init();
 	Fix::TablineSelected::Init();
 	Fix::ReorderMCM::Init();
-	Fix::ProjectileEffects::Init();
+//	Fix::ProjectileEffects::Init();
 	Fix::TouchpadScrolling::Init();
 
 //	Patch::RestoreFO3Spread::Init();

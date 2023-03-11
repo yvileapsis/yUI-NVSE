@@ -72,6 +72,9 @@ namespace UserInterface::LootMenu
 
 	Float32		speed			= 0.05;
 
+	SInt32		scrollValue		= 120;
+
+
 	bool		sounds			= true;
 	bool		showEquip		= true;
 	bool		showIcon		= true;
@@ -404,16 +407,25 @@ namespace UserInterface::LootMenu
 
 	namespace Scroll
 	{
+
+		SInt32 scrollWheel = 0;
+
 		void Update()
 		{
 			bool update = false;
 
-			if (!IsKeyPressed(keyScrollDown)) {}
+			if (IsKeyPressed(keyScrollDown)) scrollWheel -= scrollValue;
+			if (IsKeyPressed(keyScrollUp)) scrollWheel += scrollValue;
+
+			const SInt32 result = scrollWheel / 120;
+			scrollWheel = scrollWheel % 120;
+
+			if (result > -1) {}
 			else if (index + 1 < tiles) { update = true; index++; }
 			else if (offset < items.size() - tiles) { update = true; offset++; }
 			else if (overScroll) { update = true; offset = 0; index = 0; }
 
-			if (!IsKeyPressed(keyScrollUp)) {}
+			if (result < 1) {}
 			else if (index > 0) { update = true; index--; }
 			else if (offset > 0) { update = true; offset--; }
 			else if (overScroll) { update = true; offset = items.size() - tiles; index = tiles - 1; }

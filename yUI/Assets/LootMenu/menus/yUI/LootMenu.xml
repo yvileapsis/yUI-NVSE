@@ -863,7 +863,7 @@
 	</image>
 
 	<rect name="Meter">
-		<visible> <copy src="parent()" trait="_Meter"/> </visible>
+		<visible> <copy src="parent()" trait="_Meter"/> <and src="parent()" trait="_ShowMeter"/> </visible>
 		
 		<_MeterValue> <copy src="parent()" trait="_MeterValue"/> </_MeterValue>
 		<_MeterArrow> <copy src="parent()" trait="_MeterArrow"/> </_MeterArrow>
