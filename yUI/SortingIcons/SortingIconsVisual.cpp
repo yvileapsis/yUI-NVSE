@@ -30,9 +30,9 @@ namespace SortingIcons::Icons
 		return true;
 	}
 
-	void InjectIconTile(const CategoryPtr& category, Tile* tile)
+	void InjectIconTile(const Category* category, Tile* tile)
 	{
-		if (!category.IsValid()) return;
+		if (!category->IsValid()) return;
 
 		const auto [tag, priority, xmltemplate, filename, texatlas, font, systemcolor] = *category;
 
@@ -82,7 +82,7 @@ namespace SortingIcons::Icons
 	void __fastcall InjectTileSetTileString(Tile* tile, const InventoryChanges* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate)
 	{
 		tile->SetString(tilevalue, tileText, propagate);
-		if (entry && entry->form && TryGetTypeOfForm(entry->form)) InjectIconTile(CategoryPtr::Get(entry->form), tile);
+		if (entry && entry->form && TryGetTypeOfForm(entry->form)) InjectIconTile(Category::Get(entry->form), tile);
 	}
 
 	void __fastcall TagImageSetStringValue(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate)
@@ -97,8 +97,8 @@ namespace SortingIcons::Icons
 			icon->SetFloat(kTileValue_y, 8, propagate);
 		}
 
-		const auto category = CategoryPtr::Get(entry->form);
-		tile->SetString(tilevalue, category.IsValid() && !category->filename.empty() ? category->filename.c_str() : src, propagate);
+		const auto category = Category::Get(entry->form);
+		tile->SetString(tilevalue, category->IsValid() && !category->filename.empty() ? category->filename.c_str() : src, propagate);
 	}
 
 	void __fastcall TagRoseSetStringValue(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate)
@@ -114,8 +114,8 @@ namespace SortingIcons::Icons
 		tile->SetFloat(kTileValue_x, compassRoseX + 3, propagate);
 		tile->SetFloat(kTileValue_y, compassRoseY + 3, propagate);
 
-		const auto category = CategoryPtr::Get(entry->form);
-		tile->SetString(tilevalue, category.IsValid() && !category->filename.empty() ? category->filename.c_str() : src, propagate);
+		const auto category = Category::Get(entry->form);
+		tile->SetString(tilevalue, category->IsValid() && !category->filename.empty() ? category->filename.c_str() : src, propagate);
 	}
 
 
@@ -125,11 +125,11 @@ namespace SortingIcons::Icons
 
 		const auto ref = HUDMainMenu::GetSingleton()->crosshairRef;
 		const auto item = !ref ? nullptr : ref->baseForm;
-		const auto category = CategoryPtr::Get(item);
+		const auto category = Category::Get(item);
 
 		auto icon = tile->GetChild("ySIImage");
 		if (!icon) icon = tile->AddTileFromTemplate("ySIDefault");
-		if (!item || !item->IsInventoryObjectAlt() || !category.IsValid())
+		if (!item || !item->IsInventoryObjectAlt() || !category->IsValid())
 		{
 			icon->SetFloat(kTileValue_visible, false, true);
 			return;

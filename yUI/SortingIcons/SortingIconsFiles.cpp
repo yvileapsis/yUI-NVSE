@@ -178,7 +178,7 @@ namespace SortingIcons::Files
 			}
 		}
 		Log(logLevel >= Log::kMessage) << log;
-		g_Items.emplace_back(std::make_shared<Item>(item));
+		g_Items.emplace_back(std::make_unique<Item>(item));
 	}
 
 	void HandleCategory(nlohmann::basic_json<> elem)
@@ -200,7 +200,7 @@ namespace SortingIcons::Files
 		if (elem.contains("font"))				category.font = elem["font"].get<SInt32>();
 
 		Log(logLevel >= Log::kMessage) << FormatString("Tag: '%6s', icon: '%s'", category.tag.c_str(), category.filename.c_str());
-		g_Categories.emplace_back(std::make_shared<Category>(category));
+		g_Categories.emplace_back(std::make_unique<Category>(category));
 	}
 
 	void HandleTab(nlohmann::basic_json<> elem)
@@ -231,7 +231,7 @@ namespace SortingIcons::Files
 		if (elem.contains("tabNew"))		tab.tabNew		= elem["tabNew"].get<UInt32>();
 		if (elem.contains("tabMisc"))		tab.tabMisc		= elem["tabMisc"].get<UInt32>();
 
-		g_Tabs.emplace_back(std::make_shared<Tab>(tab));
+		g_Tabs.emplace_back(std::make_unique<Tab>(tab));
 	}
 
 	void HandleXML(const std::filesystem::path& path)

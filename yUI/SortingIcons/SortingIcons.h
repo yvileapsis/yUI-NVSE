@@ -93,7 +93,7 @@ namespace SortingIcons
 		Armor			armor{};
 		Aid				aid{};
 
-		__forceinline bool Satisfies(TESForm* form) const;
+		bool Satisfies(TESForm* form) const;
 	};
 
 
@@ -108,6 +108,15 @@ namespace SortingIcons
 		std::string				texatlas;
 		std::optional<SInt32>	font;
 		std::optional<SInt32>	systemcolor;
+
+		bool IsValid() const;
+
+		static Category* Get(const std::string tag);
+		Category* Set(const std::string tag);
+
+		static Category* Satisfies(TESForm* form);
+		static Category* Get(TESForm* form);
+		Category* Set(TESForm* form);
 	};
 
 	class Tab
@@ -132,35 +141,19 @@ namespace SortingIcons
 		UInt32			tabNew				= 0;
 		UInt32			tabMisc				= 0;
 
-		Tab() = default;
+		bool Satisfies(TESForm* form) const;
 	};
 
-	typedef std::shared_ptr<Item> ItemPtr;
-	class CategoryPtr : public std::shared_ptr<Category>
-	{
-	public:
-		bool IsValid() const;
+	inline Category* categoryDefault = nullptr;
 
-		static CategoryPtr& Get(const std::string tag);
-		CategoryPtr& Set(const std::string tag) const;
+	inline std::vector<std::unique_ptr<Item>>		g_Items;
+	inline std::vector<std::unique_ptr<Category>>	g_Categories;
+	inline std::vector<std::unique_ptr<Tab>>		g_Tabs;
 
-		static CategoryPtr& Satisfies(TESForm* form);
-		static CategoryPtr& Get(TESForm* form);
-		CategoryPtr& Set(TESForm* form) const;
+	inline std::unordered_map<std::string, Tab*>		g_StringToTabs;
 
-	};
-	typedef std::shared_ptr<Tab> TabPtr;
-
-	inline CategoryPtr categoryDefault{};
-
-	inline std::vector<ItemPtr>		g_Items;
-	inline std::vector<CategoryPtr>	g_Categories;
-	inline std::vector<TabPtr>		g_Tabs;
-
-	inline std::unordered_map<std::string, TabPtr>		g_StringToTabs;
-
-	inline std::vector<TabPtr>							g_Keyrings;
-	inline std::vector<TabPtr>							g_Tabline;
+	inline std::vector<Tab*>							g_Keyrings;
+	inline std::vector<Tab*>							g_Tabline;
 	inline std::vector<std::filesystem::path>							g_XMLPaths;
 }
 
@@ -179,7 +172,7 @@ namespace SortingIcons::Icons
 {
 
 	void InjectTemplates();
-	void InjectIconTile(const CategoryPtr& category_, Tile* tile);
+	void InjectIconTile(const Category* category_, Tile* tile);
 }
 
 namespace SortingIcons::Patch

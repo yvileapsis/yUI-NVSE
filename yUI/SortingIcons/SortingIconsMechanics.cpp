@@ -14,7 +14,6 @@ namespace SortingIcons
 		if (!formIDs.empty() &&				!formIDs.contains(form->refID)) return false;
 		if (!formType.empty() &&			!formType.contains(form->typeID)) return false;
 
-
 		if (questItem.has_value() &&		questItem.value() != form->IsQuestItem2()) return false;
 		if (miscComponent.has_value() &&	miscComponent.value() != CraftingComponents::IsComponent(form)) return false;
 		if (miscProduct.has_value() &&		miscProduct.value() != CraftingComponents::IsProduct(form)) return false;
@@ -78,7 +77,7 @@ namespace SortingIcons
 		return true;
 	}
 
-	inline bool Item::Satisfies(TESForm* form) const
+	bool Item::Satisfies(TESForm* form) const
 	{
 		if (!common.Satisfies(form)) return false;
 
@@ -89,47 +88,61 @@ namespace SortingIcons
 		return true;
 	}
 
-	bool CategoryPtr::IsValid() const { return get(); }
+//	bool CategoryPtr::IsValid() const { return get(); }
 
-	std::unordered_map<std::string, CategoryPtr>	g_StringToCategory;
+	std::unordered_map<std::string, Category*>	g_StringToCategory;
 
-	CategoryPtr& CategoryPtr::Set(const std::string tag) const
+	Category* Category::Set(const std::string tag)
 	{
-		return g_StringToCategory[tag] = *this;
+		return g_StringToCategory[tag] = this;
 	}
 
-	CategoryPtr& CategoryPtr::Get(const std::string tag)
+	bool Category::IsValid() const
+	{
+		return categoryDefault;
+	}
+
+	Category* Category::Get(const std::string tag)
 	{
 		return g_StringToCategory[tag];
 	}
 
-	CategoryPtr& CategoryPtr::Satisfies(TESForm* form)
+	Category* Category::Satisfies(TESForm* form)
 	{
 		for (const auto& iter : g_Items) 
 			if (iter->Satisfies(form)) return Get(iter->tag);
 		return categoryDefault;
 	}
 
-	std::unordered_map<TESForm*, CategoryPtr>		g_ItemToCategory;
+	std::unordered_map<TESForm*, Category*> g_ItemToCategory;
 
-	CategoryPtr& CategoryPtr::Set(TESForm* form) const
+	Category* Category::Set(TESForm* form)
 	{
-		return g_ItemToCategory[form] = *this;
+		return g_ItemToCategory[form] = this;
 	}
 
-	CategoryPtr& CategoryPtr::Get(TESForm* form)
+	Category* Category::Get(TESForm* form)
 	{
-		return g_ItemToCategory.contains(form) ? g_ItemToCategory[form] : Satisfies(form).Set(form);
+		return g_ItemToCategory.contains(form) ? g_ItemToCategory[form] : Satisfies(form)->Set(form);
+	}
+
+	bool Tab::Satisfies(TESForm* form) const
+	{
+		if (!types.empty() && !types.contains(form->typeID)) return false;
+		if (const auto category = Category::Get(form); !categories.empty() && category->IsValid() && 
+			!categories.contains(category->tag)) return false;
+
+		return true;
 	}
 
 }
 
 namespace SortingIcons::Keyrings
 {
-	TabPtr openTab;
+	Tab* openTab;
 	std::string stringStewie;
 
-	std::unordered_map <TabPtr, UInt32> itemCountsForKeyrings;
+	std::unordered_map<Tab*, UInt32> itemCountsForKeyrings;
 
 	bool update = false;
 
@@ -152,50 +165,11 @@ namespace SortingIcons::Keyrings
 		return *(UInt32*)0x011D9EB8;
 	}
 
-	bool __fastcall KeyringHideKeys(InventoryChanges* entry);
-
-	UInt32 __fastcall IsKey(InventoryChanges* entry)
-	{
-		if (!entry->form) return true;
-		// todo: should hide regular
-		if (!entry->form->IsItemPlayable()) return true;
-		const auto type = entry->form->TryGetREFRParent()->typeID;
-		const auto category = CategoryPtr::Get(entry->form)->tag;
-		if (openTab->types.contains(type)) return false;
-		if (openTab->categories.contains(category)) return false;
-
-		return true;
-	}
-
-	bool __fastcall KeyringHideKeys(InventoryChanges* entry)
-	{
-		if (!entry || !entry->form) return false;
-
-		const auto category = CategoryPtr::Get(entry->form);
-		if (!category) return false;
-
-		const auto type = entry->form->TryGetREFRParent()->typeID;
-		bool shouldHide = false;
-		for (const auto& keyring : g_Keyrings)
-		{
-			if (!keyring->types.empty() && !keyring->types.contains(type)) continue;
-			if (!keyring->categories.empty() && !keyring->categories.contains(category->tag)) continue;
-
-			shouldHide = true;
-			if (keyring->keyring == 1) itemCountsForKeyrings[keyring] = 1;
-			else if (keyring->keyring == 2) itemCountsForKeyrings[keyring] += 1;
-			else if (keyring->keyring == 3) itemCountsForKeyrings[keyring] += entry->countDelta;
-		}
-	
-		return shouldHide;
-	}
-
 	UInt32 PostFilterUpdate()
 	{
-
-		if (!update) for (auto list = InventoryMenu::GetSingleton()->itemsList.list; const auto iter : list)
+		const auto inventoryMenu = InventoryMenu::GetSingleton();
+		if (!update) for (const auto list = inventoryMenu->itemsList.list; const auto iter : list)
 			if (iter->tile && iter->tile->GetValue(kTileValue_user16)) { iter->tile->Destroy(false); list.RemoveItem(iter); }
-
 
 		for (const auto& key : itemCountsForKeyrings | std::views::keys)
 		{
@@ -205,23 +179,26 @@ namespace SortingIcons::Keyrings
 			if (keyringname.find("&-") == 0) keyringname = GetStringFromGameSettingFromString(keyringname.substr(2, keyringname.length() - 3));
 			if (keys > 1) keyringname += " (" + std::to_string(keys) + ")";
 
-			const auto listItem = InventoryMenu::GetSingleton()->itemsList.InsertAlt(nullptr, keyringname.c_str());
+			const auto listItem = inventoryMenu->itemsList.InsertAlt(nullptr, keyringname.c_str());
 			const auto tile = listItem->tile;
 			tile->SetFloat(kTileValue_id, 30);
 			tile->SetString(kTileValue_user16, key->tag.c_str());
-			InventoryMenu::GetSingleton()->itemsList.SortAlt(listItem, reinterpret_cast<ListBox<InventoryChanges>::SortingFunction>(0x7824E0));
-			Icons::InjectIconTile(g_StringToCategory[key->tag], tile);
+			inventoryMenu->itemsList.SortAlt(listItem, reinterpret_cast<ListBox<InventoryChanges>::SortingFunction>(0x7824E0));
+			Icons::InjectIconTile(Category::Get(key->tag), tile);
 		}
 
 		itemCountsForKeyrings.clear();
 
 		update = false;
-		ThisCall(0x71A670, &InventoryMenu::GetSingleton()->itemsList);
-		return InventoryMenu::GetSingleton()->filter;
+		ThisCall(0x71A670, &inventoryMenu->itemsList);
+		return inventoryMenu->filter;
 	}
 
-	bool TypeFilter(UInt32 type, UInt32 filter)
+	bool VanillaTypeFilter(InventoryChanges* entry)
 	{
+		const auto type = entry->form->TryGetREFRParent()->typeID;
+		const auto filter = InventoryMenu::GetSingleton()->filter;
+
 		switch (type)
 		{
 		case kFormType_TESObjectWEAP:	return filter != 0;
@@ -235,37 +212,43 @@ namespace SortingIcons::Keyrings
 		}
 	}
 
+	bool KeyringHideKeys(InventoryChanges* entry)
+	{
+		const auto form = entry->form->TryGetREFRParent();
+
+		bool shouldHide = false;
+		for (const auto& keyring : g_Keyrings)
+		{
+			if (!keyring->Satisfies(form)) continue;
+
+			shouldHide = true;
+			if (keyring->keyring == 1) itemCountsForKeyrings[keyring] = 1;
+			else if (keyring->keyring == 2) itemCountsForKeyrings[keyring] += 1;
+			else if (keyring->keyring == 3) itemCountsForKeyrings[keyring] += entry->countDelta;
+		}
+
+		return shouldHide;
+	}
+
+
 	bool __fastcall KeyringFilter(InventoryChanges* entry, Tile* tile)
 	{
 		if (!entry || !entry->form) return true;
 
-		const auto form = entry->form;
+		const auto form = entry->form->TryGetREFRParent();
 
 		if (!form->IsItemPlayable()) return true;
 		if (form->refID == 0xF) return true;
 		if (form->IsQuestItem() && !PlayerCharacter::GetSingleton()->showQuestItems) return true;
 
-		const auto type = entry->form->TryGetREFRParent()->typeID;
-		const auto filter = InventoryMenu::GetSingleton()->filter;
-		if (TypeFilter(type, filter)) return true;
+		if (VanillaTypeFilter(entry)) return true;
 
-		if (openTab && openTab->keyring) return IsKey(entry);
-		else return KeyringHideKeys(entry);
-	}
-
-	bool __cdecl KeyringHideNonKeys(InventoryChanges* entry)
-	{
-		if (!entry || !entry->form) return true;
-/*		if (Categories::ItemGetCategory(entry)->category._Equal(openCategory)) {
+		return openTab && openTab->keyring ? !openTab->Satisfies(form) : KeyringHideKeys(entry);
+		/* TODO:
+			if (Categories::ItemGetCategory(entry)->category._Equal(openCategory)) {
 			if (stringStewie.empty() || stringStewie._Equal("_")) return false;
 			return !stristr(entry->form->GetTheName(), stringStewie.c_str());
 		}*/
-		return true;
-	}
-
-	bool __fastcall HasContainerChangesEntry(InventoryChanges* entry)
-	{
-		return !entry || !entry->form;
 	}
 
 	/*
@@ -279,8 +262,6 @@ namespace SortingIcons::Keyrings
 	*/
 
 	/*
-
-
 	std::unordered_map<UInt32, InventoryMenu::ScrollPos> scrollPosTab;
 	std::unordered_map<std::string, InventoryMenu::ScrollPos> scrollPosKeyring;
 
@@ -371,17 +352,6 @@ namespace SortingIcons::Keyrings::Hook
 			mov		esp, ebp
 			pop		ebp
 			ret
-		}
-	}
-
-	template<UInt32 retn> __declspec(naked) void KeyringAddCategories()
-	{
-		static const UInt32 retnAddr = retn;
-//		static const auto AddCategories = reinterpret_cast<UInt32>(Keyrings::EquipUpdate);
-		__asm
-		{
-//			call	AddCategories
-			jmp		retnAddr
 		}
 	}
 
@@ -505,11 +475,11 @@ namespace SortingIcons::Keyrings::Hook
 
 namespace SortingIcons::Tabs
 {
-	std::unordered_map<TESForm*, std::unordered_set<TabPtr>> g_ItemToTabs;
+//	std::unordered_map<TESForm*, std::unordered_set<TabPtr>> g_ItemToTabs;
 
 	void ItemAssignTabs(TESForm* form)
 	{
-		std::unordered_set<TabPtr> set;
+		std::unordered_set<Tab*> set;
 /*
 		for (const auto& iter : g_Tabs) {
 			const auto& entry = *iter;
@@ -538,7 +508,7 @@ namespace SortingIcons::Tabs
 	bool ItemHasTabs(TESForm* form)
 	{
 		if (!form) return false;
-		if (!g_ItemToTabs.contains(form)) return false;
+//		if (!g_ItemToTabs.contains(form)) return false;
 		return true;
 	}
 
@@ -644,7 +614,7 @@ namespace SortingIcons::Tabs
 		if (!Tabs::ItemHasTabs(entry)) Tabs::ItemAssignTabs(entry);
 		//	if (SI::g_Tabs[SI::g_Tabline[filter]].tabNew) return false;
 
-		if (Tabs::g_ItemToTabs[entry->form].contains(g_Tabline[filter])) return false;
+//		if (Tabs::g_ItemToTabs[entry->form].contains(g_Tabline[filter])) return false;
 
 		return true;
 	}
@@ -754,20 +724,16 @@ namespace SortingIcons::Sorting
 			const auto tile1 = unk1->tile;
 			const auto tile2 = unk2->tile;
 
-			TESForm* form1 = nullptr, * form2 = nullptr;
-
-			if (a1 && a1->form) form1 = a1->form->TryGetREFRParent();
-			if (a2 && a2->form) form2 = a2->form->TryGetREFRParent();
-
 			std::string tag1, tag2;
 
-			CategoryPtr category1, category2;
-
-			if (form1) category1 = CategoryPtr::Get(form1);
-			if (category1) tag1 = category1->tag;
-
-			if (form2) category2 = CategoryPtr::Get(form2);
-			if (category2) tag2 = category2->tag;
+			if (a1 && a1->form)
+				if (const auto form1 = a1->form->TryGetREFRParent())
+					if (const auto category1 = Category::Get(form1)) 
+						tag1 = category1->tag;
+			if (a2 && a2->form)
+				if (const auto form2 = a2->form->TryGetREFRParent())
+					if (const auto category2 = Category::Get(form2))
+						tag2 = category2->tag;
 
 			if (bCategories && !g_Keyrings.empty())
 			{
@@ -924,22 +890,6 @@ namespace SortingIcons::Patch
 		{
 
 		}
-	}
-
-
-
-	void AddKeyrings2(const bool bEnable)
-	{
-
-
-//		WriteRelJump(0x78083A, Hooks::KeyringHideNonKeys<0x78083F>);
-
-//		WriteRelCall(0x7800C6, Keyrings::KeyringShowCategories2);
-
-//		WriteRelCall(0x7807F5, Keyrings::KeyringShowCategories2);
-
-//		WriteRelJump(0x781E6D, Hooks::KeyringEnableEquipDrop<0x781E72>);
-
 	}
 
 	void AddTabs(const bool bEnable)

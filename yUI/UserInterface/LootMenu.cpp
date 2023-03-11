@@ -225,8 +225,8 @@ namespace UserInterface::LootMenu
 
 				fst->SetFloat("_Equip", snd->GetEquipped());
 
-				const auto& category = SortingIcons::CategoryPtr::Get(snd->form);
-				if (category.IsValid() && !category->filename.empty())
+				const auto& category = SortingIcons::Category::Get(snd->form);
+				if (category->IsValid() && !category->filename.empty())
 				{
 					fst->SetFloat("_Icon", true);
 					fst->SetString("_IconFilename", category->filename.c_str());
