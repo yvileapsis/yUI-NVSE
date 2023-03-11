@@ -19,9 +19,11 @@ namespace SortingIcons
 		logLevel = ini.GetOrCreate("Sorting and Icons", "iDebug", 3, "; debug output for Sorting and Icons, useful for developers");
 
 		bSort = ini.GetOrCreate("Sorting and Icons", "bSortInventory", 1, "; sort inventory according to tag names supplied in .json");
-		bIcons = ini.GetOrCreate("Sorting and Icons", "bAddInventoryIcons", 1, "; add ycons to inventory, container and barter menus");
-		bHotkeys = ini.GetOrCreate("Sorting and Icons", "bReplaceHotkeyIcons", 1, "; replace hotkey icons with ycons");
 		bCategories = ini.GetOrCreate("Sorting and Icons", "bEnableCategories", 1, "; enable keyring-like clickable categories (this destroys vanilla keyring, so you have to have .json files supplying a new keyring category, i.e. ySI.json)");
+
+		bIcons = ini.GetOrCreate("Sorting and Icons", "bAddIconsToInventory", 1, "; add ycons to inventory, container and barter menus");
+		bPrompt = ini.GetOrCreate("Sorting and Icons", "bAddIconsToPrompt", 1, "; add ycons to interaction prompt");
+		bHotkeys = ini.GetOrCreate("Sorting and Icons", "bReplaceHotkeyIcons", 1, "; replace hotkey icons with ycons");
 
 		ini.SaveFile(iniPath.c_str(), false);
 	}
@@ -78,7 +80,7 @@ namespace SortingIcons
 		Patch::AddIcons(enable && bIcons);
 		Patch::ReplaceHotkeyIcons(enable && bHotkeys);
 		Patch::AddKeyrings(enable && bCategories);
-		Patch::AddPromptIcon(true);
+		Patch::AddPromptIcon(enable && bPrompt);
 //		Patch::AddTabs(true);
 
 		deferredInit.emplace_back(CraftingComponents::Fill);

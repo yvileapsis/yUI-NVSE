@@ -146,6 +146,14 @@ namespace SortingIcons::Keyrings
 		return *(UInt32*)0x011D9EB8;
 	}
 
+	UInt32 __fastcall CloseKeyring(Tile* tile)
+	{
+		openTab = nullptr;
+		return *(UInt32*)0x011D9EB8;
+	}
+
+	bool __fastcall KeyringHideKeys(InventoryChanges* entry);
+
 	UInt32 __fastcall IsKey(InventoryChanges* entry)
 	{
 		if (!entry->form) return true;
@@ -155,6 +163,7 @@ namespace SortingIcons::Keyrings
 		const auto category = CategoryPtr::Get(entry->form)->tag;
 		if (openTab->types.contains(type)) return false;
 		if (openTab->categories.contains(category)) return false;
+
 		return true;
 	}
 
@@ -211,10 +220,8 @@ namespace SortingIcons::Keyrings
 		return InventoryMenu::GetSingleton()->filter;
 	}
 
-	bool __fastcall KeyringFilter(InventoryChanges* entry, Tile* tile)
+	bool TypeFilter(UInt32 type, UInt32 filter)
 	{
-		const auto type = entry->form->TryGetREFRParent()->typeID;
-		const auto filter = InventoryMenu::GetSingleton()->filter;
 		switch (type)
 		{
 		case kFormType_TESObjectWEAP:	return filter != 0;
@@ -226,6 +233,24 @@ namespace SortingIcons::Keyrings
 		case kFormType_TESAmmo:			return filter != 4;
 		default:						return filter != 3;
 		}
+	}
+
+	bool __fastcall KeyringFilter(InventoryChanges* entry, Tile* tile)
+	{
+		if (!entry || !entry->form) return true;
+
+		const auto form = entry->form;
+
+		if (!form->IsItemPlayable()) return true;
+		if (form->refID == 0xF) return true;
+		if (form->IsQuestItem() && !PlayerCharacter::GetSingleton()->showQuestItems) return true;
+
+		const auto type = entry->form->TryGetREFRParent()->typeID;
+		const auto filter = InventoryMenu::GetSingleton()->filter;
+		if (TypeFilter(type, filter)) return true;
+
+		if (openTab && openTab->keyring) return IsKey(entry);
+		else return KeyringHideKeys(entry);
 	}
 
 	bool __cdecl KeyringHideNonKeys(InventoryChanges* entry)
@@ -240,9 +265,9 @@ namespace SortingIcons::Keyrings
 
 	bool __fastcall HasContainerChangesEntry(InventoryChanges* entry)
 	{
-		if (entry && entry->form) return false;
-		return true;
+		return !entry || !entry->form;
 	}
+
 	/*
 	void __fastcall HideNonKeysGetTile(InventoryMenu* invmenu, Tile* tile)
 	{
@@ -334,48 +359,15 @@ namespace SortingIcons::Keyrings
 
 namespace SortingIcons::Keyrings::Hook
 {
-	
-	template<UInt32 retn1, UInt32 retn2> __declspec(naked) void KeyringHideKeys()
+	__declspec(naked) void KeyringHideKeysShowCategories()
 	{
-		static const UInt32 retnAddr1 = retn1;
-		static const UInt32 retnAddr2 = retn2;
-		static const auto ShouldHide = reinterpret_cast<UInt32>(Keyrings::KeyringHideKeys);
-		__asm
-		{
-			mov		ecx, [ebp + 0x8] // a1
-			call	ShouldHide
-			test	al, al
-			jz		shouldnot
-			jmp		retnAddr1
-		shouldnot :
-			jmp		retnAddr2
-		}
-	}
-
-	template<UInt32 retn> __declspec(naked) void KeyringHideKeysShowCategories()
-	{
-		static const UInt32 retnAddr = retn;
-		static const auto HasContainerEntry = reinterpret_cast<UInt32>(Keyrings::HasContainerChangesEntry);
 		static const auto Filter = reinterpret_cast<UInt32>(Keyrings::KeyringFilter);
 		__asm
 		{
 			mov		ecx, [ebp + 0x8] // a1
-			call	HasContainerEntry
-			test	al, al
-			jnz		hasnot
-
-			mov		ecx, [ebp + 0x8] // a1
 			mov		edx, [ebp + 0xC]
 			call	Filter
-			test	al, al
-			jnz		show
 
-			jmp		retnAddr
-
-		hasnot:
-			mov		eax, 0
-
-		show:
 			mov		esp, ebp
 			pop		ebp
 			ret
@@ -484,10 +476,24 @@ namespace SortingIcons::Keyrings::Hook
 		}
 	}
 
+
+	template <UInt32 retn> __declspec(naked) void CloseKeyring()
+	{
+		static const UInt32 retnAddr = retn;
+		static const auto ShouldHide = reinterpret_cast<UInt32>(Keyrings::CloseKeyring);
+		__asm
+		{
+			mov ecx, [ebp + 0xC]
+			call ShouldHide
+			mov ecx, eax
+			jmp retnAddr
+		}
+	}
+
 	template <UInt32 retn> __declspec(naked) void IsKey()
 	{
 		static const UInt32 retnAddr = retn;
-		static const auto ShouldHide = reinterpret_cast<UInt32>(Keyrings::IsKey);
+		static const auto ShouldHide = reinterpret_cast<UInt32>(Keyrings::KeyringFilter);
 		__asm
 		{
 			call ShouldHide
@@ -885,49 +891,38 @@ namespace SortingIcons::Patch
 	{
 		if (bEnable)
 		{
+			// Gives more information to ShouldHide
 			WriteRelJump(0x730C81, Keyrings::Hook::ContainerEntryListBoxFilterPre<0x730C8C>);
 			WriteRelJump(0x730C97, Keyrings::Hook::ContainerEntryListBoxFilterPost<0x730CA9>);
 
-			WriteRelJump(0x7826E4, Keyrings::Hook::KeyringHideKeys<0x7826EA, 0x7826F1>);
-
-
-
+			// Skips creating keyring before we count up the keys
 			WriteRelJump(0x7831C1, 0x783213);
+
+			// Removes keys, adds to keyring TODO:: unite this with new categories thing
+			WriteRelJump(0x782665, Keyrings::Hook::KeyringHideKeysShowCategories);
+
+			// Makes keyrings
+			WriteRelJump(0x7800C6, Keyrings::Hook::PostFilterUpdate<0x7800FA>);
+
+			// Opens keyring
 			WriteRelJump(0x7807F5, Keyrings::Hook::OpenKeyring<0x7807FA>);
+
+			// Items in keyring category TODO:: unite this with new categories thing
 			WriteRelJump(0x78281D, Keyrings::Hook::IsKey<0x78283D>);
 
+			// Closes keyring
+			WriteRelJump(0x7801F2, Keyrings::Hook::CloseKeyring<0x7801F8>);
+			WriteRelJump(0x78087D, Keyrings::Hook::CloseKeyring<0x780883>);
 
-
+			
+			// Patching keyring interactions so it doesn't die
 			WriteRelJump(0x780478, Keyrings::Hook::KeyringEnableEquipDrop<0x78048D>);
 			WriteRelJump(0x780934, Keyrings::Hook::KeyringEnableEquipDrop<0x78094A>);
 			WriteRelJump(0x782F2E, 0x782F47);
-
-			WriteRelJump(0x7800C6, Keyrings::Hook::PostFilterUpdate<0x7800FA>);
-
-
-
-			WriteRelJump(0x782665, Keyrings::Hook::KeyringHideKeysShowCategories<0x782679>);
-
 		}
 		else
 		{
-			UndoSafeWrite(0x730C81);
-			UndoSafeWrite(0x730C97);
 
-			UndoSafeWrite(0x7831C1);
-
-			UndoSafeWrite(0x7826E4);
-			UndoSafeWrite(0x78083A);
-
-			UndoSafeWrite(0x782665);
-
-			UndoSafeWrite(0x780478);
-			UndoSafeWrite(0x780934);
-			UndoSafeWrite(0x781E6D);
-
-			UndoSafeWrite(0x782F42);
-
-			UndoSafeWrite(0x7815A6);
 		}
 	}
 

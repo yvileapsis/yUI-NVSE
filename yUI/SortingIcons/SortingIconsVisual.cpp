@@ -79,13 +79,13 @@ namespace SortingIcons::Icons
 		text->SetFloat(kTileValue_wrapwidth, text->GetFloat(kTileValue_wrapwidth) - width, true);
 	}
 
-	void __fastcall SetTileStringInjectTile(Tile* tile, const InventoryChanges* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate)
+	void __fastcall InjectTileSetTileString(Tile* tile, const InventoryChanges* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate)
 	{
 		tile->SetString(tilevalue, tileText, propagate);
 		if (entry && entry->form && TryGetTypeOfForm(entry->form)) InjectIconTile(CategoryPtr::Get(entry->form), tile);
 	}
 
-	void __fastcall SetStringValueTagImage(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate)
+	void __fastcall TagImageSetStringValue(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate)
 	{
 		if (!tile) return;
 //		if (g_Categories.empty()) return;
@@ -101,7 +101,7 @@ namespace SortingIcons::Icons
 		tile->SetString(tilevalue, category.IsValid() && !category->filename.empty() ? category->filename.c_str() : src, propagate);
 	}
 
-	void __fastcall SetStringValueTagRose(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate)
+	void __fastcall TagRoseSetStringValue(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate)
 	{
 		if (!tile) return;
 //		if (g_Categories.empty()) return;
@@ -119,16 +119,17 @@ namespace SortingIcons::Icons
 	}
 
 
-	void __fastcall PropagateIntValueTagPrompt(Tile* tile, void* dummyedx, UInt32 a2, signed int a3)
+	void __fastcall TagPromptPropagateIntValue(Tile* tile, void* dummyedx, UInt32 a2, signed int a3)
 	{
 		tile->SetFloat(a2, a3, true);
-		if (g_Categories.empty()) return;
 
 		const auto ref = HUDMainMenu::GetSingleton()->crosshairRef;
 		const auto item = !ref ? nullptr : ref->baseForm;
+		const auto category = CategoryPtr::Get(item);
+
 		auto icon = tile->GetChild("ySIImage");
 		if (!icon) icon = tile->AddTileFromTemplate("ySIDefault");
-		if (!item || !item->IsInventoryObjectAlt() || !CategoryPtr::Get(item))
+		if (!item || !item->IsInventoryObjectAlt() || !category.IsValid())
 		{
 			icon->SetFloat(kTileValue_visible, false, true);
 			return;
@@ -136,8 +137,8 @@ namespace SortingIcons::Icons
 		const auto fontManager = FontManager::GetSingleton();
 		const auto string = tile->GetValue(kTileValue_string)->str;
 		const auto wrapwidth = tile->GetFloat(kTileValue_wrapwidth);
-		const auto font = tile->parent->GetFloat(kTileValue_font);
 		const auto stringDimensions = fontManager->GetStringDimensions(string, 7, wrapwidth);
+
 		icon->SetFloat(kTileValue_x, -stringDimensions->x / 2 - icon->GetFloat(kTileValue_width) - icon->GetFloat(kTileValue_user1));
 		icon->SetFloat(kTileValue_y, - icon->GetFloat(kTileValue_user2));
 		icon->SetFloat(kTileValue_visible, true, true);
@@ -145,14 +146,14 @@ namespace SortingIcons::Icons
 		icon->SetFloat(kTileValue_brightness, tile->GetFloat(kTileValue_brightness));
 		icon->SetFloat(kTileValue_alpha, tile->GetFloat(kTileValue_alpha));
 
-		icon->SetString(kTileValue_filename, CategoryPtr::Get(item)->filename.c_str());
+		icon->SetString(kTileValue_filename, category->filename.c_str());
 	}
 }
 
 namespace SortingIcons::Icons::Hook
 {
 	template <UInt32 retn> __declspec(naked) void TileSetStringValueIconInject() {
-		static const auto SetStringValue = reinterpret_cast<UInt32>(SetTileStringInjectTile);
+		static const auto SetStringValue = reinterpret_cast<UInt32>(InjectTileSetTileString);
 		static const UInt32 retnAddr = retn;
 		__asm
 		{
@@ -167,7 +168,7 @@ namespace SortingIcons::Icons::Hook
 	}
 
 	template<UInt32 retn> __declspec(naked) void TileSetStringValueIconHotkeyHUD() {
-		static const auto SetStringValue = reinterpret_cast<UInt32>(SetStringValueTagImage);
+		static const auto SetStringValue = reinterpret_cast<UInt32>(TagImageSetStringValue);
 		static const UInt32 retnAddr = retn;
 		__asm
 		{
@@ -178,7 +179,7 @@ namespace SortingIcons::Icons::Hook
 	}
 
 	template<UInt32 retn> __declspec(naked) void TileSetStringValueIconHotkeyPipBoy() {
-		static const auto SetStringValue = reinterpret_cast<UInt32>(SetStringValueTagRose);
+		static const auto SetStringValue = reinterpret_cast<UInt32>(TagRoseSetStringValue);
 		static const UInt32 retnAddr = retn;
 		static const UInt32 g_inventoryMenuSelection = 0x011D9EA8;
 		__asm
@@ -208,7 +209,7 @@ namespace SortingIcons::Patch
 	{
 		if (bEnable)
 		{
-			WriteRelCall(0x7786CF, Icons::PropagateIntValueTagPrompt);
+			WriteRelCall(0x7786CF, Icons::TagPromptPropagateIntValue);
 		}
 		else
 		{

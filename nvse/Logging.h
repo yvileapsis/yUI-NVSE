@@ -28,3 +28,5 @@ public:
 
 	static void Init(const std::filesystem::path& path, const std::string& modName);
 };
+
+void Dump(Tile* tile);

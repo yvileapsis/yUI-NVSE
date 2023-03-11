@@ -1,6 +1,5 @@
 #pragma once
 #include <Menus.h>
-#include <InventoryChanges.h>
 
 namespace SortingIcons
 {
@@ -12,6 +11,7 @@ namespace SortingIcons
 	inline int bIcons			= 1;
 	inline int bHotkeys			= 1;
 	inline int bCategories		= 1;
+	inline int bPrompt			= 1;
 	
 	class Item
 	{

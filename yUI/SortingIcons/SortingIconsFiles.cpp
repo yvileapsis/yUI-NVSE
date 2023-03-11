@@ -25,12 +25,8 @@ namespace SortingIcons::Files
 	template <typename T> std::vector<T> GetSetFromElement(const nlohmann::basic_json<>& elem)
 	{
 		std::vector<T> set{};
-		if (!elem.is_array()) {
-			if (const auto val = elem.get<T>()) set.push_back(val);
-		}
-		else for (const auto& i : elem) {
-			if (const auto val = i.get<T>()) set.push_back(val);
-		}
+		if (!elem.is_array()) set.push_back(elem.get<T>());
+		else for (const auto& i : elem) set.push_back(i.get<T>());
 		return set;
 	}
 
@@ -202,13 +198,7 @@ namespace SortingIcons::Files
 		if (elem.contains("texatlas"))			category.texatlas = elem["texatlas"].get<std::string>();
 		if (elem.contains("systemcolor"))		category.systemcolor = elem["systemcolor"].get<SInt32>();
 		if (elem.contains("font"))				category.font = elem["font"].get<SInt32>();
-		/*
-		if (elem.contains("category"))			category.category = elem["category"].get<std::string>();
-		if (elem.contains("routeToKeyring"))	category.category = elem["routeToKeyring"].get<std::string>();
-		if (elem.contains("name"))				category.name = UTF8toANSI(elem["name"].get<std::string>());
-		if (elem.contains("icon"))				category.icon = elem["icon"].get<std::string>();
-		if (elem.contains("count"))				category.count = elem["count"].get<UInt32>();
-		*/
+
 		Log(logLevel >= Log::kMessage) << FormatString("Tag: '%6s', icon: '%s'", category.tag.c_str(), category.filename.c_str());
 		g_Categories.emplace_back(std::make_shared<Category>(category));
 	}
@@ -222,21 +212,13 @@ namespace SortingIcons::Files
 		}
 
 		Tab tab{};
+
 		tab.tag = elem["tag"].get<std::string>();
 		if (elem.contains("priority"))		tab.priority = elem["priority"].get<SInt32>();
 		if (elem.contains("name"))			tab.name = UTF8toANSI(elem["name"].get<std::string>());
 
-		if (const auto types = elem.contains("types") ? &elem["types"] : nullptr; types)
-		{
-			if (!types->is_array()) tab.types.emplace(types->get<UInt32>());
-			else for (const auto& type : elem["types"]) tab.types.emplace(type.get<UInt32>());
-		}
-
-		if (const auto categories = elem.contains("categories") ? elem["categories"] : nullptr; categories)
-		{
-			if (!categories.is_array()) tab.categories.emplace(categories.get<std::string>());
-			else for (const auto& type : elem["categories"]) tab.categories.emplace(type.get<std::string>());
-		}
+		if (elem.contains("types"))			tab.types.insert_range(GetSetFromElement<UInt32>(elem["types"]));
+		if (elem.contains("categories"))	tab.categories.insert_range(GetSetFromElement<std::string>(elem["categories"]));
 
 		if (elem.contains("icon"))			tab.icon = elem["icon"].get<std::string>();
 

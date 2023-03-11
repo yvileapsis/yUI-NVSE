@@ -450,7 +450,9 @@
 ],
 
 "categories": [
+	/* This is a special default tag that gets assigned to every item not sorted through the system */
 	{ "priority": 200, "tag": "",		"template": "ySINoTag",	  "filename": "interface\\icons\\Misc_Unknown.dds" },
+	
 	{ "priority": 100, "tag": "(fba1)", "template": "ySIDefault", "filename": "interface\\icons\\WeapA_Pistol.dds" },
 	{ "priority": 100, "tag": "(fba2)", "template": "ySIDefault", "filename": "interface\\icons\\WeapA_Pistol_Revolver.dds" },
 	{ "priority": 100, "tag": "(fba3)", "template": "ySIDefault", "filename": "interface\\icons\\WeapA_Pistol_Silenced.dds" },
@@ -612,7 +614,7 @@
 "tabs": [
 
 	{ "priority": 100, "tag": "(jdc0)", "name": "&-sNotesToggle;",		"keyring": 3, "filename": "Interface\\Icons\\PipboyImages\\Items\\items_research_data.dds", "categories": "(jdc1)" },
-	{ "priority": 100, "tag": "(jdd0)", "name": "&-sKeyring;",  		"keyring": 3, "filename": "Interface\\Icons\\PipboyImages\\Items\\item_keyring.dds",		"categories": ["(jdd1)", "(aba1)"] },
+	{ "priority": 100, "tag": "(jdd0)", "name": "&-sKeyring;",  		"keyring": 3, "filename": "Interface\\Icons\\PipboyImages\\Items\\item_keyring.dds",		"categories": ["(jdd1)"] },
 	{ "priority": 100, "tag": "(jde0)", "name": "&-sCaravanDeckText;",	"keyring": 3, "filename": "Interface\\Icons\\PipboyImages\\Items\\item_caravan_deck.dds", 	"categories": "(jde1)" }, 
 	
 	{ "priority": 100, "tag": "(a1)",  "name": "&-sNew;",				"inventory": 1, 				"tabNew": 1 },
