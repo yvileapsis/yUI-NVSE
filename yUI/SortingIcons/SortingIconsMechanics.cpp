@@ -128,9 +128,18 @@ namespace SortingIcons
 
 	bool Tab::Satisfies(TESForm* form) const
 	{
-		if (!types.empty() && !types.contains(form->typeID)) return false;
-		if (const auto category = Category::Get(form); !categories.empty() && category->IsValid() && 
-			!categories.contains(category->tag)) return false;
+		if (!tabMisc)
+		{
+			if (!types.empty() && !types.contains(form->typeID)) return false;
+			if (const auto category = Category::Get(form); !categories.empty() && category->IsValid() &&
+				!categories.contains(category->tag)) return false;
+		}
+		else
+		{
+			if (!types.empty() && types.contains(form->typeID)) return false;
+			if (const auto category = Category::Get(form); !categories.empty() &&
+				category->IsValid() && categories.contains(category->tag)) return false;
+		}
 
 		return true;
 	}
