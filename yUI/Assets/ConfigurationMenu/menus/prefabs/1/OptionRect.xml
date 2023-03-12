@@ -1,0 +1,298 @@
+	<clicksound> UIMenuPrevNext </clicksound>
+	<depth> 13 </depth>
+	<height> <copy src="child(title)" trait="height"/> <add> <copy src="MCM_Options" trait="_padding"/> <mul> 2 </mul> </add> </height>
+	<target> <not src="MCM_Options" trait="_selected"/> <and> <copy src="me()" trait="_enable"/> <eq> 1 </eq> </and> </target>
+	<visible>
+		<copy src="me()" trait="y"/>
+		<add src="me()" trait="height"/>
+		<lt> <copy src="sibling(ArrowDown)" trait="y"/> </lt>
+		<and>
+			<copy src="me()" trait="_optionID"/>
+			<div src="parent()" trait="_columns"/>
+			<round> 1 </round>
+			<gt> <copy src="parent()" trait="_offset"/> </gt>
+		</and>
+		<and src="me()" trait="_enable"/>
+	</visible>
+	<width> <copy src="parent()" trait="_width"/> </width>
+	<x>
+		<copy src="me()" trait="_x1"/>
+		<add src="me()" trait="_x2"/>
+	</x>
+	<y>
+		<copy src="Options_Size" trait="y"/>
+		<add>
+			<copy src="parent()" trait="_spacing"/>
+			<add src="Options_Size" trait="height"/>
+			<add> <copy src="MCM_Options" trait="_padding"/> <mul> 2 </mul> </add> 
+			<mul>
+				<copy src="me()" trait="_optionID"/>
+				<div src="parent()" trait="_columns"/>
+				<round> 1 </round>
+				<sub> 1 </sub>
+				<sub src="parent()" trait="_offset"/>
+			</mul>
+		</add>
+	</y>
+
+	<_alpha>
+		<copy> 3 </copy>
+		<sub>
+			<copy> 2 </copy>
+			<onlyif>
+				<copy src="MCM_Options" trait="_selected"/>
+				<eq> 0 </eq>
+				<or>
+					<copy src="MCM_Options" trait="_selected"/>
+					<eq> <copy src="me()" trait="_OptionID"/> </eq>
+				</or>
+				<and>
+					<copy src="me()" trait="_enable"/>
+					<eq> 1 </eq>
+				</and>
+			</onlyif>
+		</sub>
+	</_alpha>
+	<_clicked> <sub src="MCM" trait="_UnClick"/> <add src="me()" trait="clicked"/> <max> 0 </max> <min> 1 </min> </_clicked>
+
+	<_blue>
+		<copy src="me()" trait="_RGB"/>
+		<add src="me()" trait="_RGBAlt2"/>
+		<sub> <copy src="me()" trait="_red"/> <mul> 1000000 </mul> </sub>
+		<sub> <copy src="me()" trait="_green"/> <mul> 1000 </mul> </sub>
+	</_blue>
+	<_green>
+		<copy src="me()" trait="_RGB"/>
+		<add src="me()" trait="_RGBAlt2"/>
+		<sub> <copy src="me()" trait="_red"/> <mul> 1000000 </mul> </sub>
+		<div> 1000 </div>
+		<floor> 0 </floor>
+	</_green>
+	<_red>
+		<copy src="me()" trait="_RGB"/>
+		<add src="me()" trait="_RGBAlt2"/>
+		<div> 1000000 </div>
+		<floor> 0 </floor>
+	</_red>
+
+	<_target>
+		<copy> 1 </copy>
+		<onlyif>
+			<copy src="me()" trait="mouseover"/>
+			<or>
+				<copy src="MCM" trait="_AltInput"/>
+				<and>
+					<copy src="MCM" trait="_TargetOption"/>
+					<eq src="me()" trait="_optionID"/>
+				</and>
+			</or>
+		</onlyif>
+	</_target>
+	<_x1>
+		<copy src="parent()" trait="_x1"/>
+		<onlyif>
+			<copy src="parent()" trait="_columns"/>
+			<eq> 1 </eq>
+			<or>
+				<copy src="me()" trait="_optionID"/>
+				<mod> 2 </mod>
+				<eq> 1 </eq>
+			</or>
+		</onlyif>
+	</_x1>
+	<_x2>
+		<copy src="parent()" trait="_x2"/>
+		<onlyifnot src="me()" trait="_x1"/>
+	</_x2>
+
+	<_RGBAlt2> <copy> <copy src="me()" trait="_RGBAlt"/> <sub src="me()" trait="_RGB"/> </copy> <onlyif> <copy src="me()" trait="_target"/> <and src="me()" trait="_type"/> </onlyif> </_RGBAlt2>
+
+	<_active> <copy src="me()" trait="_enable"/> <min> 1 </min> </_active>
+	<_optionIDX> <copy src="me()" trait="_optionID"/> <onlyif src="me()" trait="_target"/> </_optionIDX>
+	<_typeX> <copy src="me()" trait="_type"/> <onlyif src="me()" trait="_target"/> </_typeX>
+	<_valueX> <copy src="me()" trait="_value"/> <onlyif src="me()" trait="_target"/> </_valueX>
+
+	<_altFont> 0 </_altFont>
+	<_brightness> 255 </_brightness>
+	<_enable> 0 </_enable>
+	<_highlight> 1 </_highlight>
+	<_indent> </_indent>
+	<_prefix> </_prefix>
+	<_RGB> 255182066 </_RGB>
+	<_RGBAlt> 255255255 </_RGBAlt>
+	<_textOff> OFF </_textOff>
+	<_textOn> ON </_textOn>
+	<_suffix> </_suffix>
+	<_suffixText> </_suffixText>
+	<_title> </_title>
+	<_type> </_type>
+	<_value> </_value>
+	<_value1> </_value1>
+	<_value2> </_value2>
+	<_value3> </_value3>
+
+	<text name="title">
+		<alpha> <copy src="me()" trait="brightness"/> <div src="parent()" trait="_alpha"/> </alpha>
+		<brightness> <copy src="parent()" trait="_brightness"/> </brightness>
+		<depth> 12 </depth>
+		<font> <copy src="MCM_Font" trait="_Options"/> <onlyifnot src="parent()" trait="_altFont"/> <add src="parent()" trait="_altFont"/> </font>
+		<justify> &left; </justify>
+		<string> <copy src="parent()" trait="_title"/> </string>
+		<systemcolor> 0 </systemcolor>
+		<target> &false; </target>
+		<x> <copy src="parent()" trait="x"/> <add> <copy src="MCM_Options" trait="_padding"/> <mul src="parent()" trait="_indent"/> <mul> 4 </mul> </add> </x>
+		<y> <copy src="parent()" trait="y"/> </y>
+		<red> <copy src="parent()" trait="_red"/> </red>
+		<green> <copy src="parent()" trait="_green"/> </green>
+		<blue> <copy src="parent()" trait="_blue"/> </blue>
+	</text>
+
+	<image name="image">
+		<alpha> 255 </alpha>
+		<depth> 12 </depth>
+		<filename> Interface\Shared\empty.dds </filename>
+		<height> 0 </height>
+		<rotateangle> 0 </rotateangle>
+		<rotateaxisx> 0 </rotateaxisx>
+		<rotateaxisy> 0 </rotateaxisy>
+		<systemcolor> 0 </systemcolor>
+		<visible> &false; </visible>
+		<width> 0 </width>
+		<x> 0 </x>
+		<y> 0 </y>
+		<zoom> &scale; </zoom>
+	</image>
+
+	<rect name="value">
+		<depth> 12 </depth>
+		<font> <copy src="MCM_Font" trait="_Options"/> </font>
+		<height> <copy src="parent()" trait="height"/> </height>
+		<locus> &true; </locus>
+		<systemcolor> &nosystemcolor; </systemcolor>
+		<x> <copy src="parent()" trait="x"/> <add src="parent()" trait="width"/> <sub src="MCM_Options" trait="_padding"/> </x>
+		<y> <copy src="parent()" trait="y"/> </y>
+
+		<_alpha> <copy> 255 </copy> <div src="parent()" trait="_alpha"/> </_alpha>
+		<_brightness> <copy src="parent()" trait="_brightness"/> </_brightness>
+		<_xSuffix> <copy> 0 </copy> <sub src="child(suffix)" trait="width"/> <onlyif src="parent()" trait="_suffix"/> </_xSuffix>
+
+		<text name="text">
+			<alpha> <copy src="parent()" trait="_alpha"/> </alpha>
+			<blue> <copy src="grandparent()" trait="_blue"/> </blue>
+			<brightness> <copy src="parent()" trait="_brightness"/> </brightness>
+			<green> <copy src="grandparent()" trait="_green"/> </green>
+			<justify> &right; </justify>
+			<red> <copy src="grandparent()" trait="_red"/> </red>
+			<string> <copy src="grandparent()" trait="_value"/> </string>
+			<visible>
+				<copy src="grandparent()" trait="_type"/>
+				<gt> 0 </gt>
+				<and>
+					<copy src="grandparent()" trait="_type"/>
+					<lt> 4 </lt>
+				</and>
+				<or>
+					<copy src="grandparent()" trait="_type"/>
+					<eq> 7 </eq>
+				</or>
+				<or>
+					<copy src="grandparent()" trait="_type"/>
+					<eq> 8 </eq>
+				</or>
+			</visible>
+			<x> <copy src="parent()" trait="_xSuffix"/> </x>
+		</text>
+
+		<text name="prefix">
+			<alpha> <copy src="parent()" trait="_alpha"/> </alpha>
+			<blue> <copy src="grandparent()" trait="_blue"/> </blue>
+			<brightness> <copy src="parent()" trait="_brightness"/> </brightness>
+			<green> <copy src="grandparent()" trait="_green"/> </green>
+			<justify> &right; </justify>
+			<red> <copy src="grandparent()" trait="_red"/> </red>
+			<string> <copy src="grandparent()" trait="_prefix"/> </string>
+			<visible> <copy> 1 </copy> <onlyif src="grandparent()" trait="_prefix"/> </visible>
+			<x>
+				<copy src="parent()" trait="_xSuffix"/>
+				<sub src="MCM_Options" trait="_spacing"/>
+				<sub src="sibling(text)" trait="width"/>
+			</x>
+		</text>
+
+		<text name="suffix">
+			<alpha> <copy src="parent()" trait="_alpha"/> </alpha>
+			<blue> <copy src="grandparent()" trait="_blue"/> </blue>
+			<brightness> <copy src="parent()" trait="_brightness"/> </brightness>
+			<green> <copy src="grandparent()" trait="_green"/> </green>
+			<justify> &right; </justify>
+			<red> <copy src="grandparent()" trait="_red"/> </red>
+			<string> <copy src="grandparent()" trait="_suffixText"/> </string>
+			<visible> <copy src="grandparent()" trait="_suffix"/> </visible>
+		</text>
+
+		<rect name="toggle">
+			<alpha> <copy src="parent()" trait="_alpha"/> </alpha>
+			<brightness> <copy src="parent()" trait="_brightness"/> </brightness>
+			<locus> &true; </locus>
+			<visible> <copy src="grandparent()" trait="_type"/> <eq> 4 </eq> <or> <copy src="grandparent()" trait="_type"/> <eq> 6 </eq> </or> </visible>
+			<x> <copy src="parent()" trait="_xSuffix"/> </x>
+
+			<_blue> <copy src="grandparent()" trait="_blue"/> </_blue>
+			<_green> <copy src="grandparent()" trait="_green"/> </_green>
+			<_red> <copy src="grandparent()" trait="_red"/> </_red>
+			<_textOff> <copy src="grandparent()" trait="_textOff"/> </_textOff>
+			<_textOn> <copy src="grandparent()" trait="_textOn"/> </_textOn>
+			<_value> <copy src="grandparent()" trait="_value"/> </_value>
+
+			<text name="toggle_off">
+				<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+				<blue> <copy src="parent()" trait="_blue"/> </blue>
+				<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+				<green> <copy src="parent()" trait="_green"/> </green>
+				<justify> &right; </justify>
+				<red> <copy src="parent()" trait="_red"/> </red>
+				<string> <copy src="parent()" trait="_textOff"/> </string>
+				<visible> <not src="parent()" trait="_value"/> </visible>
+			</text>
+
+			<text name="toggle_on">
+				<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+				<blue> <copy src="parent()" trait="_blue"/> </blue>
+				<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+				<green> <copy src="parent()" trait="_green"/> </green>
+				<justify> &right; </justify>
+				<red> <copy src="parent()" trait="_red"/> </red>
+				<string> <copy src="parent()" trait="_textOn"/> </string>
+				<visible> <copy src="parent()" trait="_value"/> </visible>
+			</text>
+		</rect>
+
+		<image name="toggle_check">
+			<alpha> <copy src="parent()" trait="_alpha"/> </alpha>
+			<blue> <copy src="grandparent()" trait="_blue"/> </blue>
+			<brightness> <copy src="parent()" trait="_brightness"/> </brightness>
+			<filename> Interface\Shared\empty.dds </filename>
+			<green> <copy src="grandparent()" trait="_green"/> </green>
+			<height> 32 </height>
+			<red> <copy src="grandparent()" trait="_red"/> </red>
+			<visible> <copy src="grandparent()" trait="_type"/> <eq> 5 </eq> </visible>
+			<width> 32 </width>
+			<x> <copy src="parent()" trait="width"/> <sub> 30 </sub> <sub src="MCM_Options" trait="_padding"/> </x>
+			<y> -5 </y>
+			<zoom> &scale; </zoom>
+		</image>
+
+		<hotrect name="RGB">
+			<alpha> <copy src="parent()" trait="_alpha"/> </alpha>
+			<blue> <copy src="grandparent()" trait="_Value3"/> </blue>
+			<brightness> <copy src="parent()" trait="_brightness"/> </brightness>
+			<green> <copy src="grandparent()" trait="_Value2"/> </green>
+			<height> <copy src="parent()" trait="height"/> <sub src="MCM_Options" trait="_padding"/> </height>
+			<red> <copy src="grandparent()" trait="_Value1"/> </red>
+			<systemcolor> &nosystemcolor; </systemcolor>
+			<target> &false; </target>
+			<visible> <copy src="grandparent()" trait="_type"/> <eq> 9 </eq> </visible>
+			<width> 100 </width>
+			<x> <copy> 0 </copy> <sub src="me()" trait="width"/> </x>
+		</hotrect>
+	</rect>

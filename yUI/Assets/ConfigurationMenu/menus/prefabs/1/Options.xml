@@ -1,0 +1,715 @@
+	<rect name="MCM_Options">
+		<height> <copy src="parent()" trait="height"/> </height>
+		<width> <copy src="parent()" trait="width"/> <sub src="sibling(MCM_ModList)" trait="width"/> </width>
+		<visible> <copy src="parent()" trait="_Menu"/> </visible>
+		<x> <copy src="MCM" trait="x"/> <add src="MCM_ModList" trait="width"/> </x>
+		<y> <copy src="MCM" trait="y"/> <add src="MCM_Options" trait="_spacing"/> </y>
+
+		<_clicked>
+			<copy> 0 </copy>
+			<add src="child(Option1)" trait="_clicked"/>
+			<add src="child(Option2)" trait="_clicked"/>
+			<add src="child(Option3)" trait="_clicked"/>
+			<add src="child(Option4)" trait="_clicked"/>
+			<add src="child(Option5)" trait="_clicked"/>
+			<add src="child(Option6)" trait="_clicked"/>
+			<add src="child(Option7)" trait="_clicked"/>
+			<add src="child(Option8)" trait="_clicked"/>
+			<add src="child(Option9)" trait="_clicked"/>
+			<add src="child(Option10)" trait="_clicked"/>
+			<add src="child(Option11)" trait="_clicked"/>
+			<add src="child(Option12)" trait="_clicked"/>
+			<add src="child(Option13)" trait="_clicked"/>
+			<add src="child(Option14)" trait="_clicked"/>
+			<add src="child(Option15)" trait="_clicked"/>
+			<add src="child(Option16)" trait="_clicked"/>
+			<add src="child(Option17)" trait="_clicked"/>
+			<add src="child(Option18)" trait="_clicked"/>
+			<add src="child(Option19)" trait="_clicked"/>
+			<add src="child(Option20)" trait="_clicked"/>
+			<add src="child(Option21)" trait="_clicked"/>
+			<add src="child(Option22)" trait="_clicked"/>
+			<add src="child(Option23)" trait="_clicked"/>
+			<add src="child(Option24)" trait="_clicked"/>
+			<add src="child(Option25)" trait="_clicked"/>
+			<add src="child(Option26)" trait="_clicked"/>
+			<add src="child(Option27)" trait="_clicked"/>
+			<add src="child(Option28)" trait="_clicked"/>
+			<add src="child(Option29)" trait="_clicked"/>
+			<add src="child(Option30)" trait="_clicked"/>
+			<add src="child(Option31)" trait="_clicked"/>
+			<add src="child(Option32)" trait="_clicked"/>
+			<add src="child(Option33)" trait="_clicked"/>
+			<add src="child(Option34)" trait="_clicked"/>
+			<add src="child(Option35)" trait="_clicked"/>
+			<add src="child(Option36)" trait="_clicked"/>
+		</_clicked>
+		<_count>
+			<copy> 0 </copy>
+			<add src="child(Option1)" trait="_active"/>
+			<add src="child(Option2)" trait="_active"/>
+			<add src="child(Option3)" trait="_active"/>
+			<add src="child(Option4)" trait="_active"/>
+			<add src="child(Option5)" trait="_active"/>
+			<add src="child(Option6)" trait="_active"/>
+			<add src="child(Option7)" trait="_active"/>
+			<add src="child(Option8)" trait="_active"/>
+			<add src="child(Option9)" trait="_active"/>
+			<add src="child(Option10)" trait="_active"/>
+			<add src="child(Option11)" trait="_active"/>
+			<add src="child(Option12)" trait="_active"/>
+			<add src="child(Option13)" trait="_active"/>
+			<add src="child(Option14)" trait="_active"/>
+			<add src="child(Option15)" trait="_active"/>
+			<add src="child(Option16)" trait="_active"/>
+			<add src="child(Option17)" trait="_active"/>
+			<add src="child(Option18)" trait="_active"/>
+			<add src="child(Option19)" trait="_active"/>
+			<add src="child(Option20)" trait="_active"/>
+			<add src="child(Option21)" trait="_active"/>
+			<add src="child(Option22)" trait="_active"/>
+			<add src="child(Option23)" trait="_active"/>
+			<add src="child(Option24)" trait="_active"/>
+			<add src="child(Option25)" trait="_active"/>
+			<add src="child(Option26)" trait="_active"/>
+			<add src="child(Option27)" trait="_active"/>
+			<add src="child(Option28)" trait="_active"/>
+			<add src="child(Option29)" trait="_active"/>
+			<add src="child(Option30)" trait="_active"/>
+			<add src="child(Option31)" trait="_active"/>
+			<add src="child(Option32)" trait="_active"/>
+			<add src="child(Option33)" trait="_active"/>
+			<add src="child(Option34)" trait="_active"/>
+			<add src="child(Option35)" trait="_active"/>
+			<add src="child(Option36)" trait="_active"/>
+		</_count>
+		<_optionID>
+			<copy> 0 </copy>
+			<add src="child(Option1)" trait="_optionIDX"/>
+			<add src="child(Option2)" trait="_optionIDX"/>
+			<add src="child(Option3)" trait="_optionIDX"/>
+			<add src="child(Option4)" trait="_optionIDX"/>
+			<add src="child(Option5)" trait="_optionIDX"/>
+			<add src="child(Option6)" trait="_optionIDX"/>
+			<add src="child(Option7)" trait="_optionIDX"/>
+			<add src="child(Option8)" trait="_optionIDX"/>
+			<add src="child(Option9)" trait="_optionIDX"/>
+			<add src="child(Option10)" trait="_optionIDX"/>
+			<add src="child(Option11)" trait="_optionIDX"/>
+			<add src="child(Option12)" trait="_optionIDX"/>
+			<add src="child(Option13)" trait="_optionIDX"/>
+			<add src="child(Option14)" trait="_optionIDX"/>
+			<add src="child(Option15)" trait="_optionIDX"/>
+			<add src="child(Option16)" trait="_optionIDX"/>
+			<add src="child(Option17)" trait="_optionIDX"/>
+			<add src="child(Option18)" trait="_optionIDX"/>
+			<add src="child(Option19)" trait="_optionIDX"/>
+			<add src="child(Option20)" trait="_optionIDX"/>
+			<add src="child(Option21)" trait="_optionIDX"/>
+			<add src="child(Option22)" trait="_optionIDX"/>
+			<add src="child(Option23)" trait="_optionIDX"/>
+			<add src="child(Option24)" trait="_optionIDX"/>
+			<add src="child(Option25)" trait="_optionIDX"/>
+			<add src="child(Option26)" trait="_optionIDX"/>
+			<add src="child(Option27)" trait="_optionIDX"/>
+			<add src="child(Option28)" trait="_optionIDX"/>
+			<add src="child(Option29)" trait="_optionIDX"/>
+			<add src="child(Option30)" trait="_optionIDX"/>
+			<add src="child(Option31)" trait="_optionIDX"/>
+			<add src="child(Option32)" trait="_optionIDX"/>
+			<add src="child(Option33)" trait="_optionIDX"/>
+			<add src="child(Option34)" trait="_optionIDX"/>
+			<add src="child(Option35)" trait="_optionIDX"/>
+			<add src="child(Option36)" trait="_optionIDX"/>
+		</_optionID>
+		<_type>
+			<copy> 0 </copy>
+			<add src="child(Option1)" trait="_typeX"/>
+			<add src="child(Option2)" trait="_typeX"/>
+			<add src="child(Option3)" trait="_typeX"/>
+			<add src="child(Option4)" trait="_typeX"/>
+			<add src="child(Option5)" trait="_typeX"/>
+			<add src="child(Option6)" trait="_typeX"/>
+			<add src="child(Option7)" trait="_typeX"/>
+			<add src="child(Option8)" trait="_typeX"/>
+			<add src="child(Option9)" trait="_typeX"/>
+			<add src="child(Option10)" trait="_typeX"/>
+			<add src="child(Option11)" trait="_typeX"/>
+			<add src="child(Option12)" trait="_typeX"/>
+			<add src="child(Option13)" trait="_typeX"/>
+			<add src="child(Option14)" trait="_typeX"/>
+			<add src="child(Option15)" trait="_typeX"/>
+			<add src="child(Option16)" trait="_typeX"/>
+			<add src="child(Option17)" trait="_typeX"/>
+			<add src="child(Option18)" trait="_typeX"/>
+			<add src="child(Option19)" trait="_typeX"/>
+			<add src="child(Option20)" trait="_typeX"/>
+			<add src="child(Option21)" trait="_typeX"/>
+			<add src="child(Option22)" trait="_typeX"/>
+			<add src="child(Option23)" trait="_typeX"/>
+			<add src="child(Option24)" trait="_typeX"/>
+			<add src="child(Option25)" trait="_typeX"/>
+			<add src="child(Option26)" trait="_typeX"/>
+			<add src="child(Option27)" trait="_typeX"/>
+			<add src="child(Option28)" trait="_typeX"/>
+			<add src="child(Option29)" trait="_typeX"/>
+			<add src="child(Option30)" trait="_typeX"/>
+			<add src="child(Option31)" trait="_typeX"/>
+			<add src="child(Option32)" trait="_typeX"/>
+			<add src="child(Option33)" trait="_typeX"/>
+			<add src="child(Option34)" trait="_typeX"/>
+			<add src="child(Option35)" trait="_typeX"/>
+			<add src="child(Option36)" trait="_typeX"/>
+		</_type>
+		<_value>
+			<copy> 0 </copy>
+			<add src="child(Option1)" trait="_valueX"/>
+			<add src="child(Option2)" trait="_valueX"/>
+			<add src="child(Option3)" trait="_valueX"/>
+			<add src="child(Option4)" trait="_valueX"/>
+			<add src="child(Option5)" trait="_valueX"/>
+			<add src="child(Option6)" trait="_valueX"/>
+			<add src="child(Option7)" trait="_valueX"/>
+			<add src="child(Option8)" trait="_valueX"/>
+			<add src="child(Option9)" trait="_valueX"/>
+			<add src="child(Option10)" trait="_valueX"/>
+			<add src="child(Option11)" trait="_valueX"/>
+			<add src="child(Option12)" trait="_valueX"/>
+			<add src="child(Option13)" trait="_valueX"/>
+			<add src="child(Option14)" trait="_valueX"/>
+			<add src="child(Option15)" trait="_valueX"/>
+			<add src="child(Option16)" trait="_valueX"/>
+			<add src="child(Option17)" trait="_valueX"/>
+			<add src="child(Option18)" trait="_valueX"/>
+			<add src="child(Option19)" trait="_valueX"/>
+			<add src="child(Option20)" trait="_valueX"/>
+			<add src="child(Option21)" trait="_valueX"/>
+			<add src="child(Option22)" trait="_valueX"/>
+			<add src="child(Option23)" trait="_valueX"/>
+			<add src="child(Option24)" trait="_valueX"/>
+			<add src="child(Option25)" trait="_valueX"/>
+			<add src="child(Option26)" trait="_valueX"/>
+			<add src="child(Option27)" trait="_valueX"/>
+			<add src="child(Option28)" trait="_valueX"/>
+			<add src="child(Option29)" trait="_valueX"/>
+			<add src="child(Option30)" trait="_valueX"/>
+			<add src="child(Option31)" trait="_valueX"/>
+			<add src="child(Option32)" trait="_valueX"/>
+			<add src="child(Option33)" trait="_valueX"/>
+			<add src="child(Option34)" trait="_valueX"/>
+			<add src="child(Option35)" trait="_valueX"/>
+			<add src="child(Option36)" trait="_valueX"/>
+		</_value>
+		<_visible>
+			<copy> 0 </copy>
+			<add src="child(Option1)" trait="visible"/>
+			<add src="child(Option2)" trait="visible"/>
+			<add src="child(Option3)" trait="visible"/>
+			<add src="child(Option4)" trait="visible"/>
+			<add src="child(Option5)" trait="visible"/>
+			<add src="child(Option6)" trait="visible"/>
+			<add src="child(Option7)" trait="visible"/>
+			<add src="child(Option8)" trait="visible"/>
+			<add src="child(Option9)" trait="visible"/>
+			<add src="child(Option10)" trait="visible"/>
+			<add src="child(Option11)" trait="visible"/>
+			<add src="child(Option12)" trait="visible"/>
+			<add src="child(Option13)" trait="visible"/>
+			<add src="child(Option14)" trait="visible"/>
+			<add src="child(Option15)" trait="visible"/>
+			<add src="child(Option16)" trait="visible"/>
+			<add src="child(Option17)" trait="visible"/>
+			<add src="child(Option18)" trait="visible"/>
+			<add src="child(Option19)" trait="visible"/>
+			<add src="child(Option20)" trait="visible"/>
+			<add src="child(Option21)" trait="visible"/>
+			<add src="child(Option22)" trait="visible"/>
+			<add src="child(Option23)" trait="visible"/>
+			<add src="child(Option24)" trait="visible"/>
+			<add src="child(Option25)" trait="visible"/>
+			<add src="child(Option26)" trait="visible"/>
+			<add src="child(Option27)" trait="visible"/>
+			<add src="child(Option28)" trait="visible"/>
+			<add src="child(Option29)" trait="visible"/>
+			<add src="child(Option30)" trait="visible"/>
+			<add src="child(Option31)" trait="visible"/>
+			<add src="child(Option32)" trait="visible"/>
+			<add src="child(Option33)" trait="visible"/>
+			<add src="child(Option34)" trait="visible"/>
+			<add src="child(Option35)" trait="visible"/>
+			<add src="child(Option36)" trait="visible"/>
+		</_visible>
+
+		<_arrowDown> <copy src="child(ArrowDown)" trait="mouseover"/> </_arrowDown>
+		<_arrowUp> <copy src="child(ArrowUp)" trait="mouseover"/> </_arrowUp>
+		<_columns> 1 </_columns>
+		<_justify> 0 </_justify>
+		<_line_width> 1 </_line_width>
+		<_offset> 0 </_offset>
+		<_padding> 6 </_padding>
+		<_rows> 25 </_rows>
+		<_selected> 0 </_selected>
+		<_spacing> 4 </_spacing>
+		<_version> 1.5 </_version>
+		<_width>
+			<copy src="me()" trait="width"/>
+			<div src="me()" trait="_columns"/>
+			<sub>
+				<copy> 40 </copy>
+				<add>
+					<sub> 10 </sub>
+					<onlyif>
+						<copy src="me()" trait="_columns"/>
+						<eq> 2 </eq>
+					</onlyif>
+				</add>
+			</sub>
+		</_width>
+		<_x1> <copy src="me" trait="x"/> <add> 20 </add> </_x1>
+		<_x2>
+			<copy src="me" trait="x"/>
+			<add>
+				<copy src="me()" trait="width"/>
+				<div> 2 </div>
+			</add>
+			<add> 10 </add>
+		</_x2>
+
+
+		<hotrect name="Option1">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 1 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option2">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 2 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option3">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 3 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option4">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 4 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option5">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 5 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option6">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 6 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option7">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 7 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option8">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 8 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option9">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 9 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option10">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 10 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option11">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 11 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option12">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 12 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option13">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 13 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option14">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 14 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option15">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 15 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option16">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 16 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option17">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 17 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option18">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 18 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option19">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 19 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option20">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 20 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option21">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 21 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option22">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 22 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option23">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 23 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option24">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 24 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option25">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 25 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option26">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 26 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option27">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 27 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option28">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 28 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option29">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 29 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option30">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 30 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option31">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 31 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option32">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 32 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option33">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 33 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option34">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 34 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option35">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 35 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option36">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 36 </_optionID>
+		</hotrect><!--
+
+		<hotrect name="Option37">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 37 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option38">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 38 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option39">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 39 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option40">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 40 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option41">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 41 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option42">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 42 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option43">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 43 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option44">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 44 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option45">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 45 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option46">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 46 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option47">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 47 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option48">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 48 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option49">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 49 </_optionID>
+		</hotrect>
+
+		<hotrect name="Option50">
+			<include src="MCM\OptionRect.xml"/>
+			<_optionID> 50 </_optionID>
+		</hotrect>-->
+
+		<hotrect name="ArrowUp">
+			<clicksound> UIMenuPrevNext </clicksound>
+			<depth> 13 </depth>
+			<height> 30 </height>
+			<locus> &true; </locus>
+			<systemcolor> &mainmenu; </systemcolor>
+			<target> <not src="parent()" trait="_selected"/> </target>
+			<visible> <copy src="parent()" trait="_offset"/> </visible>
+			<width> <copy src="parent()" trait="width"/> <sub> 10 </sub> </width>
+			<x> <copy src="parent()" trait="x"/> <add> 5 </add> </x>
+			<y> <copy src="MCM_PressControl" trait="y"/> <sub> 5 </sub> </y>
+			<_alpha> <copy> 3 </copy> <sub> <copy> 2 </copy> <onlyifnot src="MCM_Options" trait="_selected"/> </sub> </_alpha>
+
+			<image name="highlight">
+				<alpha> <copy src="MCM_RGB" trait="_HighlightAlpha"/> </alpha>
+				<brightness> 255 </brightness>
+				<depth> 11 </depth>
+				<filename> <copy src="MCM_Images" trait="_fxglowspot01"/> </filename>
+				<height> <copy src="parent()" trait="height"/> <sub> 2 </sub> </height>
+				<visible> <copy src="parent()" trait="mouseover"/> </visible>
+				<width> <copy src="parent()" trait="width"/> <mul> 1.3 </mul> </width>
+				<x> <copy> 0 </copy> <sub> <copy src="me()" trait="width"/> <sub src="parent()" trait="width"/> <div> 2 </div> </sub> </x>
+				<zoom> &scale; </zoom>
+			</image>
+
+			<image name="ArrowUpImage1">
+				<alpha> <copy> 255 </copy> <div src="parent()" trait="_alpha"/> </alpha>
+				<brightness> 255 </brightness>
+				<depth> 11 </depth>
+				<filename> <copy src="MCM_Images" trait="_repair_arrow_down"/> </filename>
+				<height> 30 </height>
+				<justify> &center; </justify>
+				<rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </rotateaxisx>
+				<rotateaxisy> <copy src="me()" trait="height"/> <div> 2 </div> </rotateaxisy>
+				<rotateangle> 3.14159 </rotateangle>
+				<systemcolor> <copy> 5 </copy> <add> <copy> 5 </copy> <onlyif src="parent()" trait="mouseover"/> </add> </systemcolor>
+				<width> 30 </width>
+				<x> <copy src="parent()" trait="width"/> <mul> 0.2 </mul> <sub> <copy src="me()" trait="width"/> <mul> 0.5 </mul> </sub> </x>
+				<zoom> &scale; </zoom>
+			</image>
+
+			<image name="ArrowUpImage2">
+				<alpha> <copy> 255 </copy> <div src="parent()" trait="_alpha"/> </alpha>
+				<brightness> 255 </brightness>
+				<depth> 11 </depth>
+				<filename> <copy src="MCM_Images" trait="_repair_arrow_down"/> </filename>
+				<height> 30 </height>
+				<justify> &center; </justify>
+				<rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </rotateaxisx>
+				<rotateaxisy> <copy src="me()" trait="height"/> <div> 2 </div> </rotateaxisy>
+				<rotateangle> 3.14159 </rotateangle>
+				<systemcolor> <copy> 5 </copy> <add> <copy> 5 </copy> <onlyif src="parent()" trait="mouseover"/> </add> </systemcolor>
+				<width> 30 </width>
+				<x> <copy src="parent()" trait="width"/> <mul> 0.4 </mul> <sub> <copy src="me()" trait="width"/> <mul> 0.5 </mul> </sub> </x>
+				<zoom> &scale; </zoom>
+			</image>
+
+			<image name="ArrowUpImage3">
+				<alpha> <copy> 255 </copy> <div src="parent()" trait="_alpha"/> </alpha>
+				<brightness> 255 </brightness>
+				<depth> 11 </depth>
+				<filename> <copy src="MCM_Images" trait="_repair_arrow_down"/> </filename>
+				<height> 30 </height>
+				<justify> &center; </justify>
+				<rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </rotateaxisx>
+				<rotateaxisy> <copy src="me()" trait="height"/> <div> 2 </div> </rotateaxisy>
+				<rotateangle> 3.14159 </rotateangle>
+				<systemcolor> <copy> 5 </copy> <add> <copy> 5 </copy> <onlyif src="parent()" trait="mouseover"/> </add> </systemcolor>
+				<width> 30 </width>
+				<x> <copy src="parent()" trait="width"/> <mul> 0.6 </mul> <sub> <copy src="me()" trait="width"/> <mul> 0.5 </mul> </sub> </x>
+				<zoom> &scale; </zoom>
+			</image>
+
+			<image name="ArrowUpImage4">
+				<alpha> <copy> 255 </copy> <div src="parent()" trait="_alpha"/> </alpha>
+				<brightness> 255 </brightness>
+				<depth> 11 </depth>
+				<filename> <copy src="MCM_Images" trait="_repair_arrow_down"/> </filename>
+				<height> 30 </height>
+				<justify> &center; </justify>
+				<rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </rotateaxisx>
+				<rotateaxisy> <copy src="me()" trait="height"/> <div> 2 </div> </rotateaxisy>
+				<rotateangle> 3.14159 </rotateangle>
+				<systemcolor> <copy> 5 </copy> <add> <copy> 5 </copy> <onlyif src="parent()" trait="mouseover"/> </add> </systemcolor>
+				<width> 30 </width>
+				<x> <copy src="parent()" trait="width"/> <mul> 0.8 </mul> <sub> <copy src="me()" trait="width"/> <mul> 0.5 </mul> </sub> </x>
+				<zoom> &scale; </zoom>
+			</image>
+		</hotrect>
+
+		<hotrect name="ArrowDown">
+			<clicksound> UIMenuPrevNext </clicksound>
+			<depth> 13 </depth>
+			<height> 30 </height>
+			<locus> &true; </locus>
+			<systemcolor> &mainmenu; </systemcolor>
+			<target> <not src="parent()" trait="_selected"/> </target>
+			<visible> 0 </visible>
+			<width> <copy src="parent()" trait="width"/> <sub> 10 </sub> </width>
+			<x> <copy src="parent()" trait="x"/> <add> 5 </add> </x>
+			<y> <copy src="MCM" trait="y"/> <add src="MCM" trait="height"/> <sub> 5 </sub> <sub src="me()" trait="height"/> </y>
+			<_alpha> <copy> 3 </copy> <sub> <copy> 2 </copy> <onlyifnot src="MCM_Options" trait="_selected"/> </sub> </_alpha>
+
+			<image name="highlight">
+				<alpha> <copy src="MCM_RGB" trait="_HighlightAlpha"/> </alpha>
+				<brightness> 255 </brightness>
+				<depth> 11 </depth>
+				<filename> <copy src="MCM_Images" trait="_fxglowspot01"/> </filename>
+				<height> <copy src="parent()" trait="height"/> <sub> 2 </sub> </height>
+				<visible> <copy src="parent()" trait="mouseover"/> </visible>
+				<width> <copy src="parent()" trait="width"/> <mul> 1.3 </mul> </width>
+				<x> <copy> 0 </copy> <sub> <copy src="me()" trait="width"/> <sub src="parent()" trait="width"/> <div> 2 </div> </sub> </x>
+				<zoom> &scale; </zoom>
+			</image>
+
+			<image name="ArrowDownImage1">
+				<alpha> <copy> 255 </copy> <div src="parent()" trait="_alpha"/> </alpha>
+				<brightness> 255 </brightness>
+				<depth> 11 </depth>
+				<filename> <copy src="MCM_Images" trait="_repair_arrow_down"/> </filename>
+				<height> 30 </height>
+				<justify> &center; </justify>
+				<systemcolor> <copy> 5 </copy> <add> <copy> 5 </copy> <onlyif src="parent()" trait="mouseover"/> </add> </systemcolor>
+				<width> 30 </width>
+				<x> <copy src="parent()" trait="width"/> <mul> 0.2 </mul> <sub> <copy src="me()" trait="width"/> <mul> 0.5 </mul> </sub> </x>
+				<zoom> &scale; </zoom>
+			</image>
+
+			<image name="ArrowDownImage2">
+				<alpha> <copy> 255 </copy> <div src="parent()" trait="_alpha"/> </alpha>
+				<brightness> 255 </brightness>
+				<depth> 11 </depth>
+				<filename> <copy src="MCM_Images" trait="_repair_arrow_down"/> </filename>
+				<height> 30 </height>
+				<justify> &center; </justify>
+				<systemcolor> <copy> 5 </copy> <add> <copy> 5 </copy> <onlyif src="parent()" trait="mouseover"/> </add> </systemcolor>
+				<width> 30 </width>
+				<x> <copy src="parent()" trait="width"/> <mul> 0.4 </mul> <sub> <copy src="me()" trait="width"/> <mul> 0.5 </mul> </sub> </x>
+				<zoom> &scale; </zoom>
+			</image>
+
+			<image name="ArrowDownImage3">
+				<alpha> <copy> 255 </copy> <div src="parent()" trait="_alpha"/> </alpha>
+				<brightness> 255 </brightness>
+				<depth> 11 </depth>
+				<filename> <copy src="MCM_Images" trait="_repair_arrow_down"/> </filename>
+				<height> 30 </height>
+				<justify> &center; </justify>
+				<systemcolor> <copy> 5 </copy> <add> <copy> 5 </copy> <onlyif> <copy src="parent()" trait="mouseover"/> </onlyif> </add> </systemcolor>
+				<width> 30 </width>
+				<x> <copy src="parent()" trait="width"/> <mul> 0.6 </mul> <sub> <copy src="me()" trait="width"/> <mul> 0.5 </mul> </sub> </x>
+				<zoom> &scale; </zoom>
+			</image>
+
+			<image name="ArrowDownImage4">
+				<alpha> <copy> 255 </copy> <div src="parent()" trait="_alpha"/> </alpha>
+				<brightness> 255 </brightness>
+				<depth> 11 </depth>
+				<filename> <copy src="MCM_Images" trait="_repair_arrow_down"/> </filename>
+				<height> 30 </height>
+				<justify> &center; </justify>
+				<systemcolor> <copy> 5 </copy> <add> <copy> 5 </copy> <onlyif src="parent()" trait="mouseover"/> </add> </systemcolor>
+				<width> 30 </width>
+				<x> <copy src="parent()" trait="width"/> <mul> 0.8 </mul> <sub> <copy src="me()" trait="width"/> <mul> 0.5 </mul> </sub> </x>
+				<zoom> &scale; </zoom>
+			</image>
+		</hotrect>
+
+		<text name="Options_Size">
+			<alpha> 0 </alpha>
+			<font> <copy src="MCM_Font" trait="_Options"/> </font>
+			<string> Pp </string>
+			<y>
+				<copy src="MCM_PressControl" trait="y"/>
+				<add src="MCM_PressControl" trait="height"/>
+				<add src="parent()" trait="_spacing"/>
+			</y>
+		</text>
+
+		<hotrect name="Options_Scroll">
+			<depth> 12 </depth>
+			<height> <copy src="MCM" trait="height"/> </height>
+			<width> <copy src="parent()" trait="width"/> </width>
+			<x> <copy src="parent()" trait="x"/> </x>
+			<y> <copy src="parent()" trait="y"/> </y>
+		</hotrect>
+	</rect>

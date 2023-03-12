@@ -1,0 +1,55 @@
+
+Send
+	iActiveMod = GetUIFloat "StartMenu/MCM/_ActiveMod"
+	iActiveSubMenu = GetUIFloat "StartMenu/MCM/_ActiveSubMenu"
+	iActiveOption = GetUIFloat "StartMenu/MCM/_ActiveOption"
+	iMouseover = GetUIFloat "StartMenu/MCM/*:1/_optionID"
+
+   	iNewValue = GetUIFloat "StartMenu/MCM/_NewValue"
+	iShowList = GetUIFloat "StartMenu/MCM/_ShowList"
+	iShowScale = GetUIFloat "StartMenu/MCM/_ShowScale"
+	iActionScale = GetUIFloat "StartMenu/MCM/_DefaultScale"
+	iAction = GetUIFloat "StartMenu/MCM/_Default"
+	GetUIFloat "StartMenu/MCM/_Reset"
+	
+	fValue = GetUIFloat "StartMenu/MCM/_Value"
+	fValue1 = GetUIFloat "StartMenu/MCM/_Value1"
+	fValue2 = GetUIFloat "StartMenu/MCM/_Value2"
+	fValue3 = GetUIFloat "StartMenu/MCM/_Value3"
+
+Receive
+	SetUIFloat "StartMenu/MCM/MCM_Info/visible" 1
+	SetUIFloat ("StartMenu/MCM/*:5/SubMenu" + $iOptionSubmenu + "/_enable") 1
+	SetUIStringEx ("StartMenu/MCM/*:5/SubMenu" + $iOptionSubmenu + "/text/string") "Loot Menu"
+	SetUIStringEx ("StartMenu/MCM/*:8/SubTitle" + $iOptionSubmenu + "/string") "Just Loot Menu"
+	SetUIFloat "StartMenu/MCM/*:1/_columns" 2
+	SetMCMString 3 0 "_title" "Combination = Trigger"
+	SetMCMFloat 3 1 "_enable" 1
+	SetMCMFloat 3 2 "_enable" 1
+	SetMCMFloat 3 3 "_enable" 1
+	SetMCMFloat 3 4 "_enable" 1
+	SetMCMFloat 3 5 "_enable" 1
+	SetMCMFloat 3 6 "_enable" 1
+	SetMCMFloat 3 7 "_enable" 1
+	SetMCMString 3 1 "text/string" "Disabled"
+	SetMCMString 3 2 "text/string" "%k) Key" JLMKey1
+	SetMCMString 3 3 "text/string" "%k) Key + %k) Key" JLMKey1 JLMKeyAdditional
+	SetMCMString 3 4 "text/string" "%k) Key" JLMKey2
+	SetMCMString 3 5 "text/string" "%k) Key + %k) Key" JLMKey2 JLMKeyAdditional
+	SetMCMString 3 6 "text/string" "%k) Key" JLMKey3
+	SetMCMString 3 7 "text/string" "%k) Key + %k) Key" JLMKey3 JLMKeyAdditional
+
+	SetMCMFloat 1 iOptionOption "_enable" 1
+	SetMCMString 1 iOptionOption "_title" "Take Stack"
+	SetMCMFloat 1 iOptionOption "_type" 1
+	SetMCMString 1 iOptionOption "value/*:1/string" "%g)+%g)" JLMKey3 JLMButtonAdditional
+
+	SetMCMString 9 0 "string" "Determine what triggers stack take, one that takes full stack of an item."
+
+	SetUIFloat "StartMenu/MCM/_NewValue" iNewValue
+	SetUIFloat "StartMenu/MCM/_Default" iAction
+	SetUIFloat "StartMenu/MCM/_DefaultScale" iActionScale
+	SetUIFloat "StartMenu/MCM/_ShowScale" iShowScale
+	SetUIFloat "StartMenu/MCM/_ShowList" iShowList
+	SetUIFloat "StartMenu/MCM/_Reset" 0
+end

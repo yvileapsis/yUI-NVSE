@@ -1,0 +1,534 @@
+	<rect name="MCM_ModList">
+		<clipwindow> &true; </clipwindow>
+		<height> 675 </height>
+		<locus> &true; </locus>
+		<visible> <copy src="parent()" trait="_Menu"/> </visible>
+		<width> 150 </width>
+		<x> <copy src="parent()" trait="x"/> </x>
+		<y> <copy src="parent()" trait="y"/> </y>
+
+		<_index>
+			<copy> 0 </copy>
+			<add src="child(Mod1)" trait="_index"/>
+			<add src="child(Mod2)" trait="_index"/>
+			<add src="child(Mod3)" trait="_index"/>
+			<add src="child(Mod4)" trait="_index"/>
+			<add src="child(Mod5)" trait="_index"/>
+			<add src="child(Mod6)" trait="_index"/>
+			<add src="child(Mod7)" trait="_index"/>
+			<add src="child(Mod8)" trait="_index"/>
+			<add src="child(Mod9)" trait="_index"/>
+			<add src="child(Mod10)" trait="_index"/>
+			<add src="child(Mod11)" trait="_index"/>
+			<add src="child(Mod12)" trait="_index"/>
+			<add src="child(Mod13)" trait="_index"/>
+			<add src="child(Mod14)" trait="_index"/>
+			<add src="child(Mod15)" trait="_index"/>
+			<add src="child(Mod16)" trait="_index"/>
+			<add src="child(Mod17)" trait="_index"/>
+			<add src="child(Mod18)" trait="_index"/>
+			<add src="child(Mod19)" trait="_index"/>
+			<add src="child(Mod20)" trait="_index"/>
+			<add src="child(Mod21)" trait="_index"/>
+			<add src="child(Mod22)" trait="_index"/>
+			<add src="child(Mod23)" trait="_index"/>
+		</_index>
+		<_index2>
+			<copy> 0 </copy>
+			<add src="child(Mod1)" trait="_index2"/>
+			<add src="child(Mod2)" trait="_index2"/>
+			<add src="child(Mod3)" trait="_index2"/>
+			<add src="child(Mod4)" trait="_index2"/>
+			<add src="child(Mod5)" trait="_index2"/>
+			<add src="child(Mod6)" trait="_index2"/>
+			<add src="child(Mod7)" trait="_index2"/>
+			<add src="child(Mod8)" trait="_index2"/>
+			<add src="child(Mod9)" trait="_index2"/>
+			<add src="child(Mod10)" trait="_index2"/>
+			<add src="child(Mod11)" trait="_index2"/>
+			<add src="child(Mod12)" trait="_index2"/>
+			<add src="child(Mod13)" trait="_index2"/>
+			<add src="child(Mod14)" trait="_index2"/>
+			<add src="child(Mod15)" trait="_index2"/>
+			<add src="child(Mod16)" trait="_index2"/>
+			<add src="child(Mod17)" trait="_index2"/>
+			<add src="child(Mod18)" trait="_index2"/>
+			<add src="child(Mod19)" trait="_index2"/>
+			<add src="child(Mod20)" trait="_index2"/>
+			<add src="child(Mod21)" trait="_index2"/>
+			<add src="child(Mod22)" trait="_index2"/>
+			<add src="child(Mod23)" trait="_index2"/>
+		</_index2>
+		<_modID>
+			<copy> 0 </copy>
+			<add src="child(Mod1)" trait="_modID2"/>
+			<add src="child(Mod2)" trait="_modID2"/>
+			<add src="child(Mod3)" trait="_modID2"/>
+			<add src="child(Mod4)" trait="_modID2"/>
+			<add src="child(Mod5)" trait="_modID2"/>
+			<add src="child(Mod6)" trait="_modID2"/>
+			<add src="child(Mod7)" trait="_modID2"/>
+			<add src="child(Mod8)" trait="_modID2"/>
+			<add src="child(Mod9)" trait="_modID2"/>
+			<add src="child(Mod10)" trait="_modID2"/>
+			<add src="child(Mod11)" trait="_modID2"/>
+			<add src="child(Mod12)" trait="_modID2"/>
+			<add src="child(Mod13)" trait="_modID2"/>
+			<add src="child(Mod14)" trait="_modID2"/>
+			<add src="child(Mod15)" trait="_modID2"/>
+			<add src="child(Mod16)" trait="_modID2"/>
+			<add src="child(Mod17)" trait="_modID2"/>
+			<add src="child(Mod18)" trait="_modID2"/>
+			<add src="child(Mod19)" trait="_modID2"/>
+			<add src="child(Mod20)" trait="_modID2"/>
+			<add src="child(Mod21)" trait="_modID2"/>
+			<add src="child(Mod22)" trait="_modID2"/>
+			<add src="child(Mod23)" trait="_modID2"/>
+		</_modID>
+		<_mouseover>
+			<copy> 0 </copy>
+			<add src="child(Mod1)" trait="_mouseover"/>
+			<add src="child(Mod2)" trait="_mouseover"/>
+			<add src="child(Mod3)" trait="_mouseover"/>
+			<add src="child(Mod4)" trait="_mouseover"/>
+			<add src="child(Mod5)" trait="_mouseover"/>
+			<add src="child(Mod6)" trait="_mouseover"/>
+			<add src="child(Mod7)" trait="_mouseover"/>
+			<add src="child(Mod8)" trait="_mouseover"/>
+			<add src="child(Mod9)" trait="_mouseover"/>
+			<add src="child(Mod10)" trait="_mouseover"/>
+			<add src="child(Mod11)" trait="_mouseover"/>
+			<add src="child(Mod12)" trait="_mouseover"/>
+			<add src="child(Mod13)" trait="_mouseover"/>
+			<add src="child(Mod14)" trait="_mouseover"/>
+			<add src="child(Mod15)" trait="_mouseover"/>
+			<add src="child(Mod16)" trait="_mouseover"/>
+			<add src="child(Mod17)" trait="_mouseover"/>
+			<add src="child(Mod18)" trait="_mouseover"/>
+			<add src="child(Mod19)" trait="_mouseover"/>
+			<add src="child(Mod20)" trait="_mouseover"/>
+			<add src="child(Mod21)" trait="_mouseover"/>
+			<add src="child(Mod22)" trait="_mouseover"/>
+			<add src="child(Mod23)" trait="_mouseover"/>
+		</_mouseover>
+		<_mouseover2>
+			<copy> 0 </copy>
+			<add src="child(SubMenu1)" trait="_mouseover2"/>
+			<add src="child(SubMenu2)" trait="_mouseover2"/>
+			<add src="child(SubMenu3)" trait="_mouseover2"/>
+			<add src="child(SubMenu4)" trait="_mouseover2"/>
+			<add src="child(SubMenu5)" trait="_mouseover2"/>
+			<add src="child(SubMenu6)" trait="_mouseover2"/>
+			<add src="child(SubMenu7)" trait="_mouseover2"/>
+			<add src="child(SubMenu8)" trait="_mouseover2"/>
+			<add src="child(SubMenu9)" trait="_mouseover2"/>
+			<add src="child(SubMenu10)" trait="_mouseover2"/>
+		</_mouseover2>
+		<_subCount>
+			<copy> 0 </copy>
+			<add src="child(SubMenu1)" trait="_enable"/>
+			<add src="child(SubMenu2)" trait="_enable"/>
+			<add src="child(SubMenu3)" trait="_enable"/>
+			<add src="child(SubMenu4)" trait="_enable"/>
+			<add src="child(SubMenu5)" trait="_enable"/>
+			<add src="child(SubMenu6)" trait="_enable"/>
+			<add src="child(SubMenu7)" trait="_enable"/>
+			<add src="child(SubMenu8)" trait="_enable"/>
+			<add src="child(SubMenu9)" trait="_enable"/>
+			<add src="child(SubMenu10)" trait="_enable"/>
+		</_subCount>
+		<_subID>
+			<copy> 0 </copy>
+			<add src="child(SubMenu1)" trait="_subID2"/>
+			<add src="child(SubMenu2)" trait="_subID2"/>
+			<add src="child(SubMenu3)" trait="_subID2"/>
+			<add src="child(SubMenu4)" trait="_subID2"/>
+			<add src="child(SubMenu5)" trait="_subID2"/>
+			<add src="child(SubMenu6)" trait="_subID2"/>
+			<add src="child(SubMenu7)" trait="_subID2"/>
+			<add src="child(SubMenu8)" trait="_subID2"/>
+			<add src="child(SubMenu9)" trait="_subID2"/>
+			<add src="child(SubMenu10)" trait="_subID2"/>
+		</_subID>
+		<_subVisible>
+			<copy> 0 </copy>
+			<add src="child(SubMenu1)" trait="visible"/>
+			<add src="child(SubMenu2)" trait="visible"/>
+			<add src="child(SubMenu3)" trait="visible"/>
+			<add src="child(SubMenu4)" trait="visible"/>
+			<add src="child(SubMenu5)" trait="visible"/>
+			<add src="child(SubMenu6)" trait="visible"/>
+			<add src="child(SubMenu7)" trait="visible"/>
+			<add src="child(SubMenu8)" trait="visible"/>
+			<add src="child(SubMenu9)" trait="visible"/>
+			<add src="child(SubMenu10)" trait="visible"/>
+		</_subVisible>
+		<_visible>
+			<copy> 0 </copy>
+			<add src="child(Mod1)" trait="visible"/>
+			<add src="child(Mod2)" trait="visible"/>
+			<add src="child(Mod3)" trait="visible"/>
+			<add src="child(Mod4)" trait="visible"/>
+			<add src="child(Mod5)" trait="visible"/>
+			<add src="child(Mod6)" trait="visible"/>
+			<add src="child(Mod7)" trait="visible"/>
+			<add src="child(Mod8)" trait="visible"/>
+			<add src="child(Mod9)" trait="visible"/>
+			<add src="child(Mod10)" trait="visible"/>
+			<add src="child(Mod11)" trait="visible"/>
+			<add src="child(Mod12)" trait="visible"/>
+			<add src="child(Mod13)" trait="visible"/>
+			<add src="child(Mod14)" trait="visible"/>
+			<add src="child(Mod15)" trait="visible"/>
+			<add src="child(Mod16)" trait="visible"/>
+			<add src="child(Mod17)" trait="visible"/>
+			<add src="child(Mod18)" trait="visible"/>
+			<add src="child(Mod19)" trait="visible"/>
+			<add src="child(Mod20)" trait="visible"/>
+			<add src="child(Mod21)" trait="visible"/>
+			<add src="child(Mod22)" trait="visible"/>
+			<add src="child(Mod23)" trait="visible"/>
+		</_visible>
+		<_width>
+			<copy> 0 </copy>
+			<add src="child(Mod1)" trait="_width"/>
+			<add src="child(Mod2)" trait="_width"/>
+			<add src="child(Mod3)" trait="_width"/>
+			<add src="child(Mod4)" trait="_width"/>
+			<add src="child(Mod5)" trait="_width"/>
+			<add src="child(Mod6)" trait="_width"/>
+			<add src="child(Mod7)" trait="_width"/>
+			<add src="child(Mod8)" trait="_width"/>
+			<add src="child(Mod9)" trait="_width"/>
+			<add src="child(Mod10)" trait="_width"/>
+			<add src="child(Mod11)" trait="_width"/>
+			<add src="child(Mod12)" trait="_width"/>
+			<add src="child(Mod13)" trait="_width"/>
+			<add src="child(Mod14)" trait="_width"/>
+			<add src="child(Mod15)" trait="_width"/>
+			<add src="child(Mod16)" trait="_width"/>
+			<add src="child(Mod17)" trait="_width"/>
+			<add src="child(Mod18)" trait="_width"/>
+			<add src="child(Mod19)" trait="_width"/>
+			<add src="child(Mod20)" trait="_width"/>
+			<add src="child(Mod21)" trait="_width"/>
+			<add src="child(Mod22)" trait="_width"/>
+			<add src="child(Mod23)" trait="_width"/>
+		</_width>
+		<_widthcheck> 0 </_widthcheck>
+
+
+		<_click> 0 </_click>
+		<_count> 0 </_count>
+		<_offset> 0 </_offset>
+		<_selected> -1 </_selected>
+		<_spacing> 6 </_spacing>
+		<_version> 1.5 </_version>
+
+
+		<_highlightDepth> 11 </_highlightDepth>
+		<_highlightHeight> <copy src="MCM_ModList_Size" trait="height"/> <add src="me()" trait="_spacing"/> <sub> 1 </sub> </_hightlightHeight>
+		<_highlightWidth> <copy src="me()" trait="_listWidth"/> <add src="me()" trait="_spacing"/> <mul> 1.3 </mul> </_highlightWidth>
+		<_highlightX>
+			<copy src="me()" trait="_listX"/>
+			<sub>
+				<copy src="me()" trait="_spacing"/>
+				<div> 2 </div>
+			</sub>
+			<sub>
+				<copy src="me()" trait="_highlightWidth"/>
+				<sub src="me()" trait="_listWidth"/>
+				<div> 2 </div>
+			</sub>
+		</_highlightX>
+		<_listDepth> 12 </_listDepth>
+		<_listWidth> <copy src="me()" trait="width"/> <sub> <copy src="me()" trait="_spacing"/> <mul> 4 </mul> </sub> </_listWidth>
+		<_listX> <copy src="me()" trait="_spacing"/> <mul> 2 </mul> </_listX>
+		<_listY> <copy src="MCM_ModList_Size" trait="height"/> <div> 4 </div> <onlyifnot src="MCM" trait="_dUI"/> </_listY>
+
+		<hotrect name="Mod1">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 1 </_modID>
+		</hotrect>
+
+		<hotrect name="Mod2">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 2 </_modID>
+		</hotrect>
+
+		<hotrect name="Mod3">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 3 </_modID>
+		</hotrect>
+
+		<hotrect name="Mod4">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 4 </_modID>
+		</hotrect>
+
+		<hotrect name="Mod5">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 5 </_modID>
+		</hotrect>
+
+		<hotrect name="Mod6">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 6 </_modID>
+		</hotrect>
+
+		<hotrect name="Mod7">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 7 </_modID>
+		</hotrect>
+
+		<hotrect name="Mod8">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 8 </_modID>
+		</hotrect>
+
+		<hotrect name="Mod9">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 9 </_modID>
+		</hotrect>
+
+		<hotrect name="Mod10">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 10 </_modID>
+		</hotrect>
+
+		<hotrect name="Mod11">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 11 </_modID>
+		</hotrect>
+
+		<hotrect name="Mod12">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 12 </_modID>
+		</hotrect>
+
+		<hotrect name="Mod13">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 13 </_modID>
+		</hotrect>
+
+		<hotrect name="Mod14">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 14 </_modID>
+		</hotrect>
+
+		<hotrect name="Mod15">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 15 </_modID>
+		</hotrect>
+
+		<hotrect name="Mod16">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 16 </_modID>
+		</hotrect>
+
+		<hotrect name="Mod17">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 17 </_modID>
+		</hotrect>
+
+		<hotrect name="Mod18">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 18 </_modID>
+		</hotrect>
+
+		<hotrect name="Mod19">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 19 </_modID>
+		</hotrect>
+
+		<hotrect name="Mod20">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 20 </_modID>
+		</hotrect>
+
+		<hotrect name="Mod21">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 21 </_modID>
+		</hotrect>
+
+		<hotrect name="Mod22">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 22 </_modID>
+		</hotrect>
+
+		<hotrect name="Mod23">
+			<include src="MCM\ModListRect.xml"/>
+			<_modID> 23 </_modID>
+		</hotrect>
+
+		<hotrect name="SubMenu1">
+			<include src="MCM\ModListRect.xml"/>
+			<_subID> 1 </_subID>
+		</hotrect>
+
+		<hotrect name="SubMenu2">
+			<include src="MCM\ModListRect.xml"/>
+			<_subID> 2 </_subID>
+		</hotrect>
+
+		<hotrect name="SubMenu3">
+			<include src="MCM\ModListRect.xml"/>
+			<_subID> 3 </_subID>
+		</hotrect>
+
+		<hotrect name="SubMenu4">
+			<include src="MCM\ModListRect.xml"/>
+			<_subID> 4 </_subID>
+		</hotrect>
+
+		<hotrect name="SubMenu5">
+			<include src="MCM\ModListRect.xml"/>
+			<_subID> 5 </_subID>
+		</hotrect>
+
+		<hotrect name="SubMenu6">
+			<include src="MCM\ModListRect.xml"/>
+			<_subID> 6 </_subID>
+		</hotrect>
+
+		<hotrect name="SubMenu7">
+			<include src="MCM\ModListRect.xml"/>
+			<_subID> 7 </_subID>
+		</hotrect>
+
+		<hotrect name="SubMenu8">
+			<include src="MCM\ModListRect.xml"/>
+			<_subID> 8 </_subID>
+		</hotrect>
+
+		<hotrect name="SubMenu9">
+			<include src="MCM\ModListRect.xml"/>
+			<_subID> 9 </_subID>
+		</hotrect>
+
+		<hotrect name="SubMenu10">
+			<include src="MCM\ModListRect.xml"/>
+			<_subID> 10 </_subID>
+		</hotrect>
+
+		<hotrect name="ArrowUp">
+			<depth> 13 </depth>
+			<height> 20 </height>
+			<locus> &true; </locus>
+			<visible> <copy> 1 </copy> <onlyif src="parent()" trait="_offset"/> </visible>
+			<width> <copy src="parent()" trait="width"/> <add> 10 </add> </width>
+			<x> 5 </x>
+			<y> 5 </y>
+
+			<image name="highlight">
+				<alpha> <copy src="MCM_RGB" trait="_HighlightAlpha"/> </alpha>
+				<brightness> 255 </brightness>
+				<depth> 11 </depth>
+				<filename> <copy src="MCM_Images" trait="_fxglowspot01"/> </filename>
+				<height> <copy src="parent()" trait="height"/> <sub> 2 </sub> </height>
+				<systemcolor> &mainmenu; </systemcolor>
+				<visible> <copy> 1 </copy> <onlyif src="parent()" trait="mouseover"/> </visible>
+				<width> <copy src="parent()" trait="width"/> <mul> 1.3 </mul> </width>
+				<x> <copy> 0 </copy> <sub> <copy src="me()" trait="width"/> <sub src="parent()" trait="width"/> <div> 1.8 </div> </sub> </x>
+				<y> 5 </y>
+				<zoom> &scale; </zoom>
+			</image>
+
+			<image name="ArrowUpImage1">
+				<alpha> <copy> 255 </copy> <div src="parent()" trait="_alpha"/> </alpha>
+				<brightness> 255 </brightness>
+				<depth> 11 </depth>
+				<filename> <copy src="MCM_Images" trait="_repair_arrow_down"/> </filename>
+				<height> 30 </height>
+				<justify> &center; </justify>
+				<rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </rotateaxisx>
+				<rotateaxisy> <copy src="me()" trait="height"/> <div> 2 </div> </rotateaxisy>
+				<rotateangle> 3.14159 </rotateangle>
+				<systemcolor> <copy> 5 </copy> <add> <copy> 5 </copy> <onlyif src="parent()" trait="mouseover"/> </add> </systemcolor>
+				<width> 30 </width>
+				<x> <copy src="parent()" trait="width"/> <mul> 0.25 </mul> <sub> <copy src="me()" trait="width"/> <mul> 0.5 </mul> </sub> </x>
+				<y> -3 </y>
+				<zoom> &scale; </zoom>
+			</image>
+
+			<image name="ArrowUpImage2">
+				<alpha> <copy> 255 </copy> <div src="parent()" trait="_alpha"/> </alpha>
+				<brightness> 255 </brightness>
+				<depth> 11 </depth>
+				<filename> <copy src="MCM_Images" trait="_repair_arrow_down"/> </filename>
+				<height> 30 </height>
+				<justify> &center; </justify>
+				<rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </rotateaxisx>
+				<rotateaxisy> <copy src="me()" trait="height"/> <div> 2 </div> </rotateaxisy>
+				<rotateangle> 3.14159 </rotateangle>
+				<systemcolor> <copy> 5 </copy> <add> <copy> 5 </copy> <onlyif src="parent()" trait="mouseover"/> </add> </systemcolor>
+				<width> 30 </width>
+				<x> <copy src="parent()" trait="width"/> <mul> 0.75 </mul> <sub src="me()" trait="width"/> </x>
+				<y> -3 </y>
+				<zoom> &scale; </zoom>
+			</image>
+		</hotrect>
+
+		<hotrect name="ArrowDown">
+			<depth> 13 </depth>
+			<height> 20 </height>
+			<locus> &true; </locus>
+			<visible> <copy> 1 </copy> <onlyif> <copy src="parent()" trait="_visible"/> <add src="parent()" trait="_SubVisible"/> <add src="parent()" trait="_offset"/> <lt> <copy src="parent()" trait="_count"/> <add src="parent()" trait="_subCount"/> </lt> </onlyif> </visible>
+			<width> <copy src="parent()" trait="width"/> <add> 10 </add> </width>
+			<x> 5 </x>
+			<y> <copy src="parent()" trait="height"/> <sub> 28 </sub> </y>
+
+			<image name="highlight">
+				<alpha> <copy src="MCM_RGB" trait="_HighlightAlpha"/> </alpha>
+				<brightness> 255 </brightness>
+				<depth> 11 </depth>
+				<filename> <copy src="MCM_Images" trait="_fxglowspot01"/> </filename>
+				<height> <copy src="parent()" trait="height"/> <sub> 2 </sub> </height>
+				<systemcolor> &mainmenu; </systemcolor>
+				<visible> <copy> 1 </copy> <onlyif src="parent()" trait="mouseover"/> </visible>
+				<width> <copy src="parent()" trait="width"/> <mul> 1.3 </mul> </width>
+				<x> <copy> 0 </copy> <sub> <copy src="me()" trait="width"/> <sub src="parent()" trait="width"/> <div> 1.8 </div> </sub> </x>
+				<zoom> &scale; </zoom>
+			</image>
+
+			<image name="ArrowDownImage1">
+				<alpha> 255 </alpha>
+				<brightness> 255 </brightness>
+				<depth> 11 </depth>
+				<filename> <copy src="MCM_Images" trait="_repair_arrow_down"/> </filename>
+				<height> 30 </height>
+				<justify> &center; </justify>
+				<systemcolor> <copy> 5 </copy> <add> <copy> 5 </copy> <onlyif src="parent()" trait="mouseover"/> </add> </systemcolor>
+				<width> 30 </width>
+				<x> <copy src="parent()" trait="width"/> <mul> 0.25 </mul> <sub> <copy src="me()" trait="width"/> <mul> 0.5 </mul> </sub> </x>
+				<y> -3 </y>
+				<zoom> &scale; </zoom>
+			</image>
+
+			<image name="ArrowDownImage2">
+				<alpha> 255 </alpha>
+				<brightness> 255 </brightness>
+				<depth> 11 </depth>
+				<filename> <copy src="MCM_Images" trait="_repair_arrow_down"/> </filename>
+				<height> 30 </height>
+				<justify> &center; </justify>
+				<systemcolor> <copy> 5 </copy> <add> <copy> 5 </copy> <onlyif src="parent()" trait="mouseover"/> </add> </systemcolor>
+				<width> 30 </width>
+				<x> <copy src="parent()" trait="width"/> <mul> 0.75 </mul> <sub src="me()" trait="width"/> </x>
+				<y> -3 </y>
+				<zoom> &scale; </zoom>
+			</image>
+		</hotrect>
+
+		<hotrect name="ModList_Scroll">
+			<depth> 12 </depth>
+			<height> <copy src="parent()" trait="height"/> </height>
+			<width> <copy src="parent()" trait="width"/> </width>
+		</hotrect>
+
+		<text name="MCM_ModList_Size">
+			<alpha> 0 </alpha>
+			<font> <copy src="MCM_Font" trait="_ModList"/> </font>
+			<string> Pp </string>
+		</text>
+	</rect>

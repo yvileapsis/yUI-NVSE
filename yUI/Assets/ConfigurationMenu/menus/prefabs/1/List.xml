@@ -1,0 +1,176 @@
+	<rect name="MCM_List">
+		<height> <copy src="me()" trait="_height"/> <add> <copy src="child(List_Title)" trait="height"/> <mul> 1.5 </mul> </add> <add> <copy src="me()" trait="spacing"/> <mul> 2 </mul> </add> </height>
+		<visible> 0 </visible>
+		<width> 250 </width>
+		<x> <copy src="sibling(MCM_Options)" trait="x"/> <add> <copy src="sibling(MCM_Options)" trait="width"/> <div> 2 </div> </add> <sub> <copy src="me()" trait="width"/> <div> 2 </div> </sub> </x>
+		<y> <copy src="parent()" trait="y"/> <add> <copy src="parent()" trait="height"/> <div> 2 </div> </add> <sub> <copy src="me()" trait="height"/> <div> 2 </div> </sub> </y>
+
+		<_active>
+			<copy> 0 </copy>
+			<add src="child(Item1)" trait="_mouseover"/>
+			<add src="child(Item2)" trait="_mouseover"/>
+			<add src="child(Item3)" trait="_mouseover"/>
+			<add src="child(Item4)" trait="_mouseover"/>
+			<add src="child(Item5)" trait="_mouseover"/>
+			<add src="child(Item6)" trait="_mouseover"/>
+			<add src="child(Item7)" trait="_mouseover"/>
+			<add src="child(Item8)" trait="_mouseover"/>
+			<add src="child(Item9)" trait="_mouseover"/>
+			<add src="child(Item10)" trait="_mouseover"/>
+		</_active>
+		<_count> </_count>
+		<_height>
+			<copy> 0 </copy>
+			<add src="child(List_Title)" trait="height"/>
+			<add>
+				<copy src="MCM_ModList_Size" trait="height"/>
+				<add src="me()" trait="_spacing"/>
+				<mul src="me()" trait="_visible"/>
+			</add>
+			<add src="me()" trait="_spacing"/>
+		</_height>
+		<_line_width> 1 </_line_width>
+		<_offset> 0 </_offset>
+		<_selected> 0 </_selected>
+		<_spacing> 6 </_spacing>
+		<_title> </_title>
+		<_thickness> <copy src="globals()" trait="_line_thickness"/> </_thickness>
+		<_visible>
+			<copy> 0 </copy>
+			<add src="child(Item1)" trait="visible"/>
+			<add src="child(Item2)" trait="visible"/>
+			<add src="child(Item3)" trait="visible"/>
+			<add src="child(Item4)" trait="visible"/>
+			<add src="child(Item5)" trait="visible"/>
+			<add src="child(Item6)" trait="visible"/>
+			<add src="child(Item7)" trait="visible"/>
+			<add src="child(Item8)" trait="visible"/>
+			<add src="child(Item9)" trait="visible"/>
+			<add src="child(Item10)" trait="visible"/>
+		</_visible>
+		<_width> </_width>
+
+		<hotrect name="Item1">
+			<include src="MCM\ListRect.xml"/>
+			<_listID> 1 </_listID>
+		</hotrect>
+
+		<hotrect name="Item2">
+			<include src="MCM\ListRect.xml"/>
+			<_listID> 2 </_listID>
+		</hotrect>
+
+		<hotrect name="Item3">
+			<include src="MCM\ListRect.xml"/>
+			<_listID> 3 </_listID>
+		</hotrect>
+
+		<hotrect name="Item4">
+			<include src="MCM\ListRect.xml"/>
+			<_listID> 4 </_listID>
+		</hotrect>
+
+		<hotrect name="Item5">
+			<include src="MCM\ListRect.xml"/>
+			<_listID> 5 </_listID>
+		</hotrect>
+
+		<hotrect name="Item6">
+			<include src="MCM\ListRect.xml"/>
+			<_listID> 6 </_listID>
+		</hotrect>
+
+		<hotrect name="Item7">
+			<include src="MCM\ListRect.xml"/>
+			<_listID> 7 </_listID>
+		</hotrect>
+
+		<hotrect name="Item8">
+			<include src="MCM\ListRect.xml"/>
+			<_listID> 8 </_listID>
+		</hotrect>
+
+		<hotrect name="Item9">
+			<include src="MCM\ListRect.xml"/>
+			<_listID> 9 </_listID>
+		</hotrect>
+
+		<hotrect name="Item10">
+			<include src="MCM\ListRect.xml"/>
+			<_listID> 10 </_listID>
+		</hotrect>
+
+		<hotrect name="List_BG">
+			<alpha> 255 </alpha>
+			<blue> 0 </blue>
+			<depth> 15 </depth>
+			<green> 0 </green>
+			<height> <copy src="parent()" trait="height"/> <add> <copy src="globals()" trait="_line_thickness"/> <mul> 2 </mul> </add> </height>
+			<red> 0 </red>
+			<systemcolor> &nosystemcolor; </systemcolor>
+			<target> &false; </target>
+			<width> <copy src="parent()" trait="width"/> <add> <copy src="globals()" trait="_line_thickness"/> <mul> 2 </mul> </add> </width>
+			<x> <copy src="parent()" trait="x"/> <sub src="globals()" trait="_line_thickness"/> </x>
+			<y> <copy src="parent()" trait="y"/> <sub src="globals()" trait="_line_thickness"/> </y>
+		</hotrect>
+
+		<rect name="List_Bracket">
+			<rect name="Bracket_Top">
+				<width> <copy src="grandparent()" trait="width"/> </width>
+				<x> <copy src="grandparent()" trait="x"/> </x>
+				<y> <copy src="grandparent()" trait="y"/> </y>
+
+				<image name="Bracket_h">
+					<brightness> <copy src="globals()" trait="_text_brightness"/> </brightness>
+					<depth> 16 </depth>
+					<filename> <copy src="MCM_Images" trait="_solid"/> </filename>
+					<height> <copy src="globals()" trait="_line_thickness"/> </height>
+					<width> <copy src="parent()" trait="width"/> </width>
+					<x> <copy src="parent()" trait="x"/> </x>
+					<y> <copy src="parent()" trait="y"/> </y>
+				</image>
+
+				<image name="Bracket_v1">
+					<include src="vertical_fade_line.xml"/>
+					<depth> 16 </depth>
+					<height> 50 </height>
+					<x> <copy src="parent()" trait="x"/> </x>
+					<y> <copy src="parent()" trait="y"/> </y>
+				</image>
+
+				<image name="Bracket_v2">
+					<include src="vertical_fade_line.xml"/>
+					<depth> 16 </depth>
+					<height> 50 </height>
+					<x> <copy src="parent()" trait="x"/> <add src="parent()" trait="width"/> <sub src="me()" trait="width"/> </x>
+					<y> <copy src="parent()" trait="y"/> </y>
+				</image>
+			</rect>
+
+			<rect name="Bracket_Bottom">
+				<include src="bottom_bracket.xml"/>
+
+				<depth> 16 </depth>
+				<height> 50 </height>
+				<width> <copy src="grandparent()" trait="width"/> </width>
+				<x> <copy src="grandparent()" trait="x"/> </x>
+				<y>
+					<copy src="grandparent()" trait="y"/>
+					<add src="grandparent()" trait="height"/>
+					<sub src="globals()" trait="_line_thickness"/>
+				</y>
+			</rect>
+		</rect>
+
+		<text name="List_Title">
+			<alpha> 255 </alpha>
+			<brightness> 255 </brightness>
+			<depth> 16 </depth>
+			<font> <copy> 7 </copy> <sub> <copy> 1 </copy> <onlyifnot src="MCM" trait="_dUI"/> </sub> </font>
+			<justify> &left; </justify>
+			<string> <copy src="parent()" trait="_title"/> </string>
+			<x> <copy src="parent()" trait="x"/> <add> <copy src="parent()" trait="width"/> <div> 2 </div> </add> <sub> <copy src="me()" trait="width"/> <div> 2 </div> </sub> </x>
+			<y> <copy src="parent()" trait="y"/> <add> <copy src="me()" trait="height"/> <div> 3 </div> </add> </y>
+		</text>
+
+	</rect>

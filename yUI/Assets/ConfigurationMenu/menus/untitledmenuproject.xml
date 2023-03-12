@@ -1,0 +1,781 @@
+<menu name="UMPMenu">
+	<class> &UMPMenu; </class>
+	<menufade> 0.0 </menufade>
+	<stackingtype> &no_click_past; </stackingtype>
+
+	<!-- XBox 360 control bindings -->
+	<xbuttony><ref src="STW_ResetButton" trait="clicked"/></xbuttony>
+
+	<_PCButton_R>  STW_ResetButton </_PCButton_R>
+	<_PCButton_X>  STW_ContinueButton </_PCButton_X>
+	<_PCButton_E>  STW_BackButton </_PCButton_E>
+
+	<_IsCategoriesActive></_IsCategoriesActive>
+	<_FilterMode></_FilterMode>
+	<_IsSearchActive></_IsSearchActive>
+	<_separatorX>368</_separatorX>			<!-- ===== SEPARATES LEFT AND RIGHT SIDES OF THE MENU =====  -->
+	<_STwidth>1100</_STwidth>	<!--===== WIDTH OF THE MENU =====  -->
+	<_STheight> <copy src="screen()" trait="height"/><sub> 200 </sub></_STheight>	<!-- ===== HEIGHT OF THE MENU, BASED ON SCREEN HEIGHT MINUS VALUE =====  -->
+	<_subSpacing>8</_subSpacing>
+	<_CursorX></_CursorX>
+	<_CursorY></_CursorY>
+
+	<image name="STW_Background">
+		<filename> Interface\Shared\Background\solid_black.dds </filename> <!--VUI+ vanilla is too fuzzy -->
+		<zoom> &scale; </zoom>
+		<depth> 1 </depth>
+		<brightness> <copy src="globals" trait="_VUI+DarkBrightness" /> </brightness>
+		<alpha>180</alpha>
+		<x> <copy src="screen" trait="width"/> <sub src="me()" trait="width"/> <div> 2 </div> </x>
+		<y> <copy src="screen" trait="height"/> <sub src="me()" trait="height"/> <div> 2 </div> </y>
+		<width>1000</width>
+		<height> <copy src="screen" trait="height"/> <add> 350 </add> </height>
+	</image>
+
+	<hotrect name="ExitRect">	<!-- ===== ID 7 EXIT, STICKS TO THE RIGHT SIDE OF THE MENU =====  -->
+		<id> 7 </id>
+		<x>	<copy src="sibling(STW_Background)" trait="x"/><add src="sibling(STW_Background)" trait="width"/></x>
+		<y>0</y>
+		<width><copy src="screen()" trait="width"/><sub src="me()" trait="x"/></width>
+		<height> <copy src="screen()" trait="height"/></height>
+		<clicksound> UIMenuCancel </clicksound>
+	</hotrect>
+
+	<rect name="STW_MainRect">	<!-- ===== MAIN POSITIONING RECT ===== -->
+		<width> <copy src="io()" trait="_STwidth"/></width>
+		<height> <copy src="io()" trait="_STheight"/></height>
+		<x>		<copy src="screen()" trait="width"/>		<sub src="me()" trait="width"/>		<div> 2 </div>		</x>
+		<y>		<copy src="screen()" trait="height"/>		<sub src="me()" trait="height"/>		<div> 2 </div>		</y>
+		<locus> &true; </locus>
+		<depth> 2 </depth>
+
+		<text name="STW_Headline_Title">
+			<id> 0 </id>
+			<x><copy src="parent()" trait="width"/>		<sub src="me()" trait="width"/>		<div> 2 </div></x>
+			<y> -10 </y>
+			<font> 6 </font>
+		</text>
+
+		<image name="STW_Headline_h1">	<!-- ===== TOP LEFT HORIZONTAL BRACKET =====  -->
+			<include src="line.xml"/>
+			<_length><copy src="sibling(STW_Headline_Title)" trait="x"/>	<sub> 20 </sub> </_length>
+		</image>
+
+		<image name="STW_Headline_v1">	<!-- ===== TOP LEFT VERTICAL BRACKET =====  -->
+			<include src="vertical_fade_line.xml"/>
+			<height>160</height>
+		</image>
+
+		<image name="STW_Headline_h2">	<!-- ===== TOP RIGHT HORIZONTAL BRACKET =====  -->
+			<include src="line.xml"/>
+			<_length><copy src="parent()" trait="width"/><sub src="me()" trait="x"/></_length>
+			<x><copy src="sibling(STW_Headline_Title)" trait="x"/><add src="sibling(STW_Headline_Title)" trait="width"/><add> 20 </add></x>
+		</image>
+
+		<image name="STW_Headline_v2">	<!-- ===== TOP RIGHT VERTICAL BRACKET =====  -->
+			<include src="vertical_fade_line.xml"/>
+			<height>160</height>
+			<_x><copy src="sibling(STW_Headline_h2)" trait="x"/><add src="sibling(STW_Headline_h2)" trait="width"/><sub src="me()" trait="width"/></_x>
+		</image>
+
+		<rect name="STW_BottomBracket">	<!-- ===== BOTTOM HORIZONTAL BRACKET =====  -->
+			<include src="bottom_bracket.xml"/>
+			<visible> 1 </visible>
+			<y> <copy src="parent()" trait="height"/> </y>
+			<width> <copy src="parent()" trait="width"/> </width>
+			<height> 160 </height>
+		</rect>
+
+		<image name="SeparatorMidTop">	<!-- ===== TOP MIDDLE SEPARATOR =====  -->
+			<include src="vertical_fade_line.xml"/>
+			<x> <copy src="io()" trait="_separatorX"/><add>3</add></x>
+			<y> 0 </y>
+			<height>160</height>
+		</image>
+
+		<image name="SeparatorMidBottom">	<!-- ===== BOTTOM MIDDLE SEPARATOR =====  -->
+			<include src="vertical_fade_line.xml"/>
+			<_bottom_to_top>&true;</_bottom_to_top>
+			<x> <copy src="io()" trait="_separatorX"/><add>3</add></x>
+			<_y> <copy src="parent()" trait="height"/> </_y>
+			<height>160</height>
+		</image>
+
+		<hotrect name="ActiveOnlyParent">	<!-- ===== ACTIVE FILTER =====  -->
+			<visible><copy src="io()" trait="_IsCategoriesActive"/><eq>0</eq></visible>
+			<locus> &true; </locus>
+			<x> <copy src="io()" trait="_separatorX"/><sub src="me()" trait="width"/><sub> 1 </sub> </x>
+			<y> <copy src="sibling(SearchParent)" trait="y"/> </y>
+			<include src="box.xml"/>
+			<_line_thickness> 1 </_line_thickness>
+			<width>36</width>
+			<height> 36 </height>
+			<target> &true; </target>
+			<clicksound> UIMenuOK </clicksound>
+			<mouseoversound> UIPipboyScroll</mouseoversound>
+			<id> 18 </id>
+
+			<image name="CategoryIcon">
+				<_file_0> lStewieAl\all.dds </_file_0>
+				<_file_1> lStewieAl\on.dds </_file_1>
+				<_file_2> lStewieAl\off.dds </_file_2>
+				<filename> 
+					<copy src="io()" trait="_FilterMode" /> 
+					<copy src="me()" trait="_file_" /> 
+				</filename>
+				<height> <copy> 28 </copy>  </height>
+				<width> <copy> 28 </copy> </width>
+				<x><copy src="parent()" trait="width"/><sub src="me()" trait="width"/> <div> 2 </div></x>
+				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <div> 2 </div></y>
+				<zoom> &scale; </zoom>
+			</image>
+		</hotrect>
+
+		<hotrect name="SearchParent">	<!-- ===== SEARCH =====  -->
+			<visible><copy src="io()" trait="_IsCategoriesActive"/><eq>0</eq></visible>
+			<locus> &true; </locus>
+			<x> 7 </x>
+			<y> 64 </y>
+			<width><copy src="io()" trait="_separatorX"/><sub src="me()" trait="x"/><sub src="sibling(ActiveOnlyParent)" trait="width"/><sub> 5 </sub></width>
+			<height> 36 </height>
+
+			<rect name="SearchBox">
+				<include src="box.xml"/>
+				<_line_thickness> 1 </_line_thickness>
+				<width><copy src="parent()" trait="width"/></width>
+				<height> <copy src="parent()" trait="height"/> </height>
+			</rect>
+
+			<hotrect name="InputClipper">
+				<width><copy src="sibling(SearchIcon)" trait="x"/><sub> 4 </sub></width>
+				<target> &true; </target>
+				<clicksound> UIPipboyScroll </clicksound>
+				<id>6</id>
+				<height> <copy src="parent()" trait="height"/></height>
+				<clipwindow> &true; </clipwindow>
+				<x>6</x>
+				<text name="STW_SearchBar">
+					<clips> &true; </clips>
+					<string></string>
+					<id> 5 </id>
+					<y> 7 </y>
+					<x>
+						<copy> 10 </copy>
+						<sub>
+							<copy src="me()" trait="width"/><sub src="parent()" trait="width"/><add>14</add>
+							<onlyif>
+								<copy src="me()" trait="width"/><gt><copy src="parent()" trait="width"/><sub>12</sub></gt>
+								<and><copy src="io()" trait="_IsSearchActive" /> <eq>1</eq></and>
+							</onlyif>
+						</sub>
+					</x>
+					<font> 42 </font>
+					<systemcolor> &hudmain; </systemcolor>
+				</text>
+			</hotrect>
+
+			<image name="SearchIcon">
+				<_file_0> lStewieAl\search.dds </_file_0>
+				<_file_1> lStewieAl\searchStop.dds </_file_1>
+				<filename> 
+					<copy src="io()" trait="_IsSearchActive" /> 
+					<copy src="me()" trait="_file_" /> 
+				</filename>
+				<x><copy src="parent()" trait="width"/><sub src="me()" trait="width"/> <sub> 6 </sub></x>
+				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <div> 2 </div></y>
+				<height> 22 </height>
+				<width> 22 </width>
+				<zoom> &scale; </zoom>
+				<alpha>190</alpha>
+				<target> &true; </target>
+				<clicksound> UIPipboyScroll </clicksound>
+				<id>16</id>
+			</image>
+
+			<text name="SearchPlaceholder">
+				<y> 7 </y>
+				<x> 10 </x>
+				<font> 42 </font>
+				<alpha>75</alpha>
+				<string>Search</string>
+				<visible> <copy src="io()" trait="_IsSearchActive"/><eq>0</eq> </visible>
+			</text>
+
+		</hotrect>
+
+		<hotrect name="Categories"> <!-- ===== Categories =====  -->
+			<locus> &true; </locus>
+			<x> 0 </x>
+			<y> 0 </y>
+			<width><copy src="io()" trait="_separatorX"/></width>
+			<height> 56 </height>
+			<id> 15 </id>
+			<target> &true; </target>
+			<clicksound> UIMenuOK </clicksound>
+			<mouseoversound> UIPipboyScroll</mouseoversound>
+			<_highlight>
+				<copy>1</copy>
+				<onlyif>
+					<copy src="me()" trait="mouseover"/>
+					<or><copy src="io()" trait="_IsCategoriesActive"/></or>
+				</onlyif>
+			</_highlight>
+
+			<image name="CategoryIcon">
+				<filename>lStewieAl\category.dds</filename>
+				<x><copy> 0 </copy><sub><copy src="me()" trait="width"/> <div> 2 </div></sub><add> 23 </add></x>
+				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <div> 2 </div></y>
+				<height> <copy> 26 </copy> <add><copy src="parent()" trait="_highlight"/><mul>5</mul></add> </height>
+				<width> <copy> 26 </copy> <add><copy src="parent()" trait="_highlight"/><mul>5</mul></add> </width>
+				<zoom> &scale; </zoom>
+				<brightness><copy> 180 </copy> <add><copy src="parent()" trait="_highlight"/><mul>75</mul></add></brightness>
+				<rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </rotateaxisx>
+				<rotateaxisy> <copy src="me()" trait="height"/>   <div> 2 </div> </rotateaxisy>
+				<rotateangle>	 <copy>90</copy><mul><copy src="io()" trait="_IsCategoriesActive"/><eq>0</eq></mul> <mul> 3.141592654 </mul> <div> 180 </div> </rotateangle>
+			</image>
+
+			<text name="CategoryTitle">
+				<y><copy src="parent()" trait="height"/><sub src="me()" trait="height"/><add>17</add><div>2</div></y>
+				<x> 40 </x>
+				<zoom> 100 </zoom>
+				<string>Category</string>
+				<visible> 1 </visible>
+				<font> 6 </font>
+				<id> 17 </id>
+				<brightness><copy src="sibling(CategoryIcon)" trait="brightness"/></brightness>
+			</text>
+
+			<image name="SeparatorCategory">
+				<visible>1</visible>
+				<include src="line.xml"/>
+				<x> 2 </x>
+				<y>  <copy src="parent()" trait="height"/> </y>
+				<_length><copy src="io()" trait="_separatorX"/><sub src="me()" trait="x"/><add>3</add></_length>
+			</image>
+
+			<hotrect name="CategoriesList">
+				<include src="list_box_ST.xml"/>
+				<_scrollbar_pos> &right; </_scrollbar_pos>
+				<id> 13 </id>
+				<y><copy src="parent()" trait="height"/><add> 8 </add></y>
+				<x>8</x>
+				<width> <copy src="parent()" trait="width"/><sub src="me()" trait="x"/><add>12</add></width>
+				<height> <copy src="grandparent()" trait="height"/><sub src="parent()" trait="y"/><sub src="me()" trait="y"/><sub>8</sub></height>
+				<visible><copy src="io()" trait="_IsCategoriesActive"/></visible>
+			</hotrect>
+		</hotrect>
+
+		<hotrect name="TweaksList">
+			<include src="list_box_ST.xml"/>
+			<_scrollbar_pos> &right; </_scrollbar_pos>
+			<id> 2 </id>
+			<x> 7 </x>
+			<y> 110 </y>
+			<width><copy src="io()" trait="_separatorX"/><sub src="me()" trait="x"/><add>12</add></width>
+			<height> <copy src="parent()" trait="height"/><sub src="me()" trait="y"/><sub>8</sub></height>
+			<visible><copy src="io()" trait="_IsCategoriesActive"/><eq>0</eq></visible>
+		</hotrect>
+
+		<hotrect name="SubSettingsList">
+			<include src="list_box_ST.xml"/>
+			<_scrollbar_pos> &right; </_scrollbar_pos>
+			<id> 19 </id>
+			<x><copy src="io()" trait="_separatorX"/><add> 22 </add></x>
+			<y> 58 </y>
+			<width><copy src="parent()" trait="width"/><sub src="me()" trait="x"/></width>
+			<height> <copy src="parent()" trait="height"/><sub src="me()" trait="y"/>				<sub> 160 </sub></height>
+			<visible>1</visible>
+			<_line_alpha> 0 </_line_alpha>	<!-- optional override -->
+			<_fill_alpha> 0 </_fill_alpha>		<!-- optional override -->
+		</hotrect>
+
+		<rect name="STW_SelectionInfoRect">	<!-- ===== SELECTION INFO RECT ===== -->
+			<visible> <copy src="child(STW_SelectionText)" trait="width"/> <gt>35</gt> </visible>
+			<x><copy src="io()" trait="_separatorX"/><add> 12 </add></x>
+			<y>
+				<copy src="parent()" trait="height"/><sub> 152 </sub>
+				<sub>
+					<copy src="child(STW_SelectionText)" trait="height"/><sub> 121 </sub>
+					<onlyif>
+						<copy src="child(STW_SelectionText)" trait="height"/><gt>140</gt>
+					</onlyif>
+				</sub>
+			</y>
+			<include src="top_bracket.xml"/>				<!-- BRACKET ABOVE THE TEXT -->
+			<width>  <copy src="parent()" trait="width"/>  <sub src="me()" trait="x"/><sub> 9 </sub></width>
+			<height> 60 </height>
+			<locus> &true; </locus>
+
+			<text name="STW_SelectionText">			<!-- Selection text: displays info about selection -->
+				<id> 4 </id>
+				<y>15</y>
+				<x>15</x>
+				<brightness>300</brightness>
+				<font> 42 </font>
+				<wrapwidth> <copy src="parent()" trait="width"/> <sub> 25 </sub>  </wrapwidth>
+			</text>
+		</rect>	<!-- end STW_SelectionInfoRect -->
+	</rect> <!-- end STW_MainRect -->
+
+	<template name="TweakTemplate">	<!-- ===== TWEAK ITEM TEMPLATE ===== -->
+		<hotrect name="STW_Item">
+			<include src="list_box_template.xml"/>
+			<_TextAlpha> 255 </_TextAlpha>
+
+			<clicksound> UIMenuPrevNext </clicksound>
+			<mouseoversound>&nosound;</mouseoversound>
+
+			<_VerticalSpacing> 8 </_VerticalSpacing>
+			<_wrapper> <copy src="sibling(lb_highlight_box)" trait="width"/> </_wrapper>
+
+			<text name="ListItemText">
+				<brightness>
+					<copy> 220 </copy>
+						<add><copy> 80 </copy>
+						<onlyif>
+							<copy src="parent()" trait="mouseover"/>
+							<or><copy src="parent()" trait="_selected"/></or>
+						</onlyif>
+					</add>
+				</brightness>
+				<font> 42 </font>
+				<string> <copy src="parent()" trait="string"/> </string>
+				<wrapwidth> <copy src="parent()" trait="_wrapper"/><sub src="me()" trait="x"/><sub> 18 </sub></wrapwidth>
+				<x> 31 </x>
+				<y> 6 </y>
+				<alpha> <copy src="parent()" trait="_TextAlpha"/> </alpha>
+			</text>
+
+			<!-- Small square that denotes selection -->
+			<image name="STW_Template_ItemMarker">
+				<filename> Interface\Shared\Marker\square_filled.dds </filename>
+				<texatlas> Interface\InterfaceShared.tai </texatlas>
+				<width> 16 </width>
+				<height> 16 </height>
+				<x> 12 </x>
+				<y><copy src="sibling(ListItemText)" trait="height"/> <sub src="me()" trait="height"/> <div> 2 </div><add> 6 </add></y>
+				<visible> <copy src="parent()" trait="_selected"/> </visible>
+			</image>
+		</hotrect>
+	</template>
+
+	<template name="CategoryTemplate">
+		<hotrect name="STW_Item">
+			<include src="list_box_template.xml"/>
+
+			<_TextAlpha> 255 </_TextAlpha>
+			<mouseoversound> &nosound; </mouseoversound>
+			<clicksound> UIMenuPrevNext </clicksound>
+			<_VerticalSpacing> 8 </_VerticalSpacing>
+			<_wrapper> <copy src="sibling(lb_highlight_box)" trait="width"/> </_wrapper>
+
+			<text name="ListItemText">
+				<brightness>
+					<copy> 220 </copy>
+						<add><copy> 80 </copy>
+						<onlyif>
+							<copy src="parent()" trait="mouseover"/>
+							<or><copy src="parent()" trait="_selected"/></or>
+						</onlyif>
+					</add>
+				</brightness>
+				<font> 42 </font>
+				<string> <copy src="parent()" trait="string"/> </string>
+				<wrapwidth> <copy src="parent()" trait="_wrapper"/><sub src="me()" trait="x"/><sub> 10 </sub></wrapwidth>
+				<x> 31 </x>
+				<y> 6 </y>
+				<alpha> <copy src="parent()" trait="_TextAlpha"/> </alpha>
+			</text>
+
+			<!-- Small square that denotes selection -->
+			<image name="STW_Template_ItemMarker">
+				<filename> Interface\Shared\Marker\square_filled.dds </filename>
+				<texatlas> Interface\InterfaceShared.tai </texatlas>
+				<width> 16 </width>
+				<height> 16 </height>
+				<x> 12 </x>
+				<y> 12 </y>
+				<visible> <copy src="parent()" trait="_selected"/> </visible>
+			</image>
+		</hotrect>
+	</template>
+
+	<template name="SubSettingTemplate_Slider">
+		<hotrect name="STW_Item">
+			<include src="list_box_template.xml"/>
+
+			<_TextAlpha> 255 </_TextAlpha>
+			<mouseoversound> &nosound; </mouseoversound>
+			<clicksound> UIMenuPrevNext </clicksound>
+			<_wrapper> <copy src="sibling(lb_highlight_box)" trait="width"/> </_wrapper>
+			<_VerticalSpacing> <copy>42</copy> <add src="io()" trait="_subSpacing"/> </_VerticalSpacing>
+      
+			<_mouseover>
+				<copy>1</copy>
+				<onlyif>
+					<copy src="me()" trait="mouseover"/>
+					<or src="child(DecreaseArrow)" trait="mouseover"/>
+					<or src="child(IncreaseArrow)" trait="mouseover"/>
+					<or src="child(SliderBaseRect)" trait="mouseover"/>
+				</onlyif>
+			</_mouseover>
+
+			<text name="ListItemText">
+				<font> 42 </font>
+				<string> <copy src="parent()" trait="string"/> </string>
+				<brightness> <copy>300 </copy><add><copy src="parent()" trait="_mouseover"/> <mul>100</mul></add></brightness>
+				<wrapwidth> <copy src="parent()" trait="_wrapper"/><sub src="me()" trait="x"/><sub> 2 </sub></wrapwidth>
+				<x> 6 </x>
+				<y> 6 </y>
+				<alpha> <copy src="parent()" trait="_TextAlpha"/> </alpha>
+			</text>
+
+			<image name="DecreaseArrow">
+				<id> 100 </id>
+				<filename>lStewieAl\arrow_left.dds</filename>
+				<x> <copy src="sibling(ListItemText)" trait="x"/><sub> 5 </sub></x>
+				<width> 22 </width>
+				<height> 26 </height>
+				<y><copy src="sibling(ListItemText)" trait="y"/> <add src="sibling(ListItemText)" trait="height"/> </y>
+				<alpha> <copy>255 </copy><add><copy src="me()" trait="mouseover"/> <mul>100</mul></add></alpha>
+				<brightness> <copy>200 </copy><add><copy src="me()" trait="mouseover"/> <mul>100</mul></add></brightness>
+				<zoom> &scale; </zoom>
+				<target> <copy src="parent()" trait="target"/> </target>
+				<clips> &true; </clips>
+			</image>
+
+			<image name="IncreaseArrow">
+				<id> 101 </id>
+				<filename>lStewieAl\arrow_right.dds</filename>
+				<x> <copy src="sibling(SliderBaseRect)" trait="x"/> <add src="sibling(SliderBaseRect)" trait="width"/><add> 2 </add> </x>
+				<y> <copy src="sibling(DecreaseArrow)" trait="y"/></y>
+				<width> 22 </width>
+				<height> 26 </height>
+				<alpha> <copy>255 </copy><add><copy src="me()" trait="mouseover"/> <mul>100</mul></add></alpha>
+				<brightness> <copy>200 </copy><add><copy src="me()" trait="mouseover"/> <mul>100</mul></add></brightness>
+				<zoom> &scale; </zoom>
+				<target> &true; </target>
+				<clips> &true; </clips>
+			</image>
+
+			<hotrect name="SliderBaseRect">
+				<locus> &true; </locus>
+				<id>102</id>
+
+				<x> <copy src="sibling(DecreaseArrow)" trait="x"/> <add src="sibling(DecreaseArrow)" trait="width"/><add> 1 </add>  </x>
+				<y> <copy src="sibling(DecreaseArrow)" trait="height"/><sub src="me()" trait="height"/> <div> 2 </div><add src="sibling(DecreaseArrow)" trait="y"/></y>
+				<width> <copy src="parent()" trait="_wrapper"/><sub> 120 </sub><min> 302 </min></width>
+				<height> 12 </height>
+
+				<draggable> &true; </draggable>
+				<target> &true; </target>
+				<repeathorizontal> &true; </repeathorizontal>
+
+				<_Value>	<!-- ex _current     remapped value -->
+					<copy> 0 </copy>
+
+					<add>
+						<copy src="me()" trait="user1"/>		<!-- newValue == (v1current - v1min) / (v1max - v1min) * (user0 - _min) + _min -->
+						<mul><copy src="me()" trait="user0"/><sub src="me()" trait="_min"/></mul><add src="me()" trait="_min"/>
+						<onlyif src="me()" trait="dragx"/>
+					</add>
+
+					<add>
+						<copy src="me()" trait="user2"/>
+						<onlyifnot src="me()" trait="dragx"/>
+					</add>
+				</_Value>
+
+				<user0></user0>		<!-- ex _max     Max amount -->
+				<_min></_min>		<!-- Min amount -->
+
+				<user1>														<!-- Drag value: goes from 0 to 1 based on mouse drag -->
+					<copy src="me()" trait="dragx"/>
+					<sub src="me()" trait="x"/>
+					<div src="me()" trait="width"/>
+					<max> 0 </max>
+					<min> 1 </min>
+				</user1>
+
+				<user2></user2>		<!-- EX _setV      SET IN CODE -->
+
+				<_zero>	<!-- Remapped zero on 0-1 scale == (0 - _min) / (user0 - _min) * (1 - 0) + 0 -->
+					<copy> 0 </copy>
+					<sub src="me()" trait="_min"/>
+					<div>
+						<copy src="me()" trait="user0"/>
+						<sub src="me()" trait="_min"/>
+					</div>
+					<onlyif><copy src="me()" trait="_min"/><lt>0</lt></onlyif>
+				</_zero>
+
+				<_x>
+					<copy src="child(SliderBG)" trait="x"/>
+					<add src="me()" trait="width"/>
+					<mul>
+						<copy> 0 </copy>
+						<add>
+							<copy src="me()" trait="user1"/>
+							<onlyif src="me()" trait="dragx"/>
+						</add>
+						<add>	<!-- _zero == (user2 - _min) / (user0 - _min) * (1 - 0) + 0 -->
+							<copy src="me()" trait="user2"/>
+							<sub src="me()" trait="_min"/>
+							<div><copy src="me()" trait="user0"/><sub src="me()" trait="_min"/></div>
+							<onlyifnot src="me()" trait="dragx"/>
+						</add>
+					</mul>
+				</_x>
+
+				<image name="SliderBG">
+					<filename> interface\faders\white.dds </filename>
+					<height> <copy src="parent()" trait="height"/> </height>
+					<width> <copy src="parent()" trait="width"/> </width>
+					<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <div> 2 </div></y>
+					<depth> 1 </depth>
+					<systemcolor>0</systemcolor>
+					<alpha>20</alpha>
+					<clips> &true; </clips>
+					<target> <copy src="parent()" trait="target"/> </target>
+				</image>
+
+				<image name="DragMarker">
+					<filename>lStewieAl\marker.dds</filename>
+					<brightness> <copy>200 </copy><add><copy src="grandparent()" trait="_mouseover"/> <mul>55</mul></add></brightness>
+					<depth> 3 </depth>
+					<zoom> &scale; </zoom>
+					<width>14</width>
+					<height> 30 </height>
+					<y>-10</y>
+					<target> &true; </target>
+					<x> <copy src="parent()" trait="_x"/><sub>7</sub></x>
+					<alpha>255</alpha>
+					<clips> &true; </clips>
+				</image>
+
+				<image name="TiledSlider">
+					<filename>lStewieAl\vsc.dds</filename>
+					<tile>-1</tile>
+					<target> <copy src="parent()" trait="target"/> </target>
+					<brightness><copy src="sibling(DragMarker)" trait="brightness"/></brightness>
+					<depth> 2 </depth>
+					<clips> &true; </clips>
+					<alpha>255</alpha>
+					<height> <copy src="parent()" trait="height"/><mul> 2 </mul></height>
+					<_posMult> <copy src="parent()" trait="width"/><mul src="parent()" trait="_zero"/> </_posMult>
+					<y><copy src="parent()" trait="height"/>	<sub src="me()" trait="height"/> <div> 2 </div></y>
+
+					<rotateaxisy>	<copy src="me()" trait="height"/><div> 2 </div></rotateaxisy>
+					<rotateangle>
+						<copy> 0 </copy>
+						<add>
+							<copy> 3.141592654 </copy>
+							<onlyifnot> <copy src="parent()" trait="_Value"/>	<gt><copy src="parent()" trait="_zero"/></gt>		 </onlyifnot>
+						</add>
+					</rotateangle>
+
+					<width>
+						<copy> 0 </copy>
+						<add>
+							<copy src="parent()" trait="_x"/>
+							<sub src="me()" trait="_posMult"/>
+							<onlyif> <copy src="parent()" trait="_Value"/>	<gt><copy src="parent()" trait="_zero"/></gt>		 </onlyif>
+						</add>
+						<add>
+							<copy src="sibling(SliderBG)" trait="x"/>
+							<add src="me()" trait="_posMult"/>
+							<sub src="parent()" trait="_x"/>
+							<onlyifnot> <copy src="parent()" trait="_Value"/>	<gt><copy src="parent()" trait="_zero"/></gt>		 </onlyifnot>
+						</add>
+					</width>
+
+					<x><copy src="me()" trait="_posMult"/></x>
+				</image>
+			</hotrect>
+
+
+			<hotrect name="SliderText">
+				<id>105</id>
+				<clips> &true; </clips>
+				<locus> &true; </locus>
+				<clicksound> UIMenuPrevNext </clicksound>
+				<width><copy src="child(InputFieldText)" trait="width"/></width>
+				<height><copy src="child(InputFieldText)" trait="height"/></height>
+				<x><copy src="sibling(IncreaseArrow)" trait="x"/><add src="sibling(IncreaseArrow)" trait="width"/><add>4</add></x>
+				<y><copy src="sibling(SliderBaseRect)" trait="y"/> <add> <copy src="sibling(SliderBaseRect)" trait="height"/> <sub src="child(InputFieldText)" trait="height"/> <div> 2 </div>	</add>	<add>4</add>	</y>
+				<text name="InputFieldText">
+					<id>103</id>
+					<font> 42 </font>
+					<zoom> 110 </zoom>
+					<justify> &left; </justify>
+					<brightness> 300 </brightness>
+					<string> 0 </string>
+				</text>
+			</hotrect>
+
+		</hotrect>
+	</template>
+
+	<template name="SubSettingTemplate_Boolean">
+		<hotrect name="STW_Item">
+			<include src="list_box_template.xml"/>
+      
+			<_TextAlpha> 255 </_TextAlpha>
+			<mouseoversound> &nosound; </mouseoversound>
+			<clicksound> UIMenuPrevNext </clicksound>
+			<_VerticalSpacing> <copy>8</copy> <add src="io()" trait="_subSpacing"/> </_VerticalSpacing>
+			<_wrapper> <copy src="sibling(lb_highlight_box)" trait="width"/> </_wrapper>
+			<_selected>0</_selected>
+
+			<text name="ListItemText">
+				<visible>1</visible>
+				<brightness> <copy>300 </copy><add><copy src="parent()" trait="mouseover"/> <mul>100</mul></add></brightness>
+				<font> 42 </font>
+				<string> <copy src="parent()" trait="string"/> </string>
+				<wrapwidth> <copy src="parent()" trait="_wrapper"/><sub src="me()" trait="x"/><sub> 10 </sub></wrapwidth>
+				<x> 40 </x>
+				<y> 6 </y>
+				<alpha> <copy src="parent()" trait="_TextAlpha"/> </alpha>
+			</text>
+
+			<image name="MM_Template_ItemMarker">
+				<brightness> <copy>230 </copy><add><copy src="parent()" trait="mouseover"/> <mul>50</mul></add></brightness>
+				<_file_0> lStewieAl\checkboxNo.dds </_file_0>
+				<_file_1> lStewieAl\checkboxGo.dds </_file_1>
+				<filename> 
+					<copy src="parent()" trait="_selected" /> 
+					<copy src="me()" trait="_file_" /> 
+				</filename>
+				<zoom> &scale; </zoom>
+				<width> 28 </width>
+				<height> 28</height>
+				<x> 3 </x>
+				<y> 3 </y>
+			</image>
+		</hotrect>
+	</template>
+
+	<template name="SubSettingTemplate_Input">
+		<hotrect name="STW_Item">
+			<include src="list_box_template.xml"/>
+
+			<_TextAlpha> 255 </_TextAlpha>
+			<mouseoversound> &nosound; </mouseoversound>
+			<clicksound> UIMenuPrevNext </clicksound>
+			<_VerticalSpacing> <copy>54</copy> <add src="io()" trait="_subSpacing"/> </_VerticalSpacing>
+			<_wrapper> <copy src="sibling(lb_highlight_box)" trait="width"/> </_wrapper>
+
+			<_mouseover>
+				<copy>1</copy>
+				<onlyif>
+					<copy src="me()" trait="mouseover"/>
+				</onlyif>
+			</_mouseover>
+
+			<text name="ListItemText">
+				<brightness> <copy>300 </copy><add><copy src="parent()" trait="_mouseover"/> <mul>100</mul></add></brightness>
+				<font> 42 </font>
+				<string> <copy src="parent()" trait="string"/> </string>
+				<wrapwidth> <copy src="parent()" trait="_wrapper"/><sub src="me()" trait="x"/><sub> 10 </sub></wrapwidth>
+				<x> 6 </x>
+				<y> 6 </y>
+				<alpha> 255 </alpha>
+			</text>
+
+			<text name="InputFieldText">
+				<id>103</id>
+				<depth> 1 </depth>
+				<brightness><copy src="sibling(ListItemText)" trait="brightness"/></brightness>
+				<font> 42 </font>
+				<string> 0 </string>
+				<wrapwidth> <copy src="parent()" trait="_wrapper"/><sub src="me()" trait="x"/><sub> 10 </sub></wrapwidth>
+				<x> <copy src="sibling(ListItemText)" trait="x"/><add> 10 </add></x>
+				<y> <copy src="sibling(ListItemText)" trait="height"/><add src="sibling(ListItemText)" trait="y"/><add> 10 </add> </y>
+				<alpha> 255 </alpha>
+			</text>
+
+			<rect name="BoxBG">
+				<id>104</id>
+				<_BackgroundVisible>0</_BackgroundVisible>
+				<locus> 1 </locus>
+				<x> <copy src="sibling(InputFieldText)" trait="x"/><sub>9</sub></x>
+				<y> <copy src="sibling(InputFieldText)" trait="y"/><sub>6</sub></y>
+				<include src="box.xml"/>
+				<_line_thickness> 1 </_line_thickness>
+				<width><copy src="sibling(InputFieldText)" trait="width"/><add>20</add><max>180</max></width>
+				<height> <copy src="sibling(InputFieldText)" trait="height"/><add>6</add></height>
+
+				<image name="InputBG">
+					 <visible> <copy src="parent()" trait="_BackgroundVisible"/> </visible>
+					<alpha> 15 </alpha>
+					<depth> 0 </depth>
+					<filename> interface\faders\white.dds </filename>
+					<width><copy src="parent()" trait="width"/></width>
+					<height> <copy src="parent()" trait="height"/></height>
+				</image>
+			</rect>
+		</hotrect>
+	</template>
+
+	<template name="SubSettingTemplate_Dropdown">
+		<hotrect name="STW_Item">
+			<include src="list_box_template.xml"/>
+
+			<_TextAlpha> 255 </_TextAlpha>
+			<mouseoversound> &nosound; </mouseoversound>
+			<clicksound> UIMenuPrevNext </clicksound>
+			<_VerticalSpacing> <copy>54</copy> <add src="io()" trait="_subSpacing"/> </_VerticalSpacing>
+			<_wrapper> <copy src="sibling(lb_highlight_box)" trait="width"/> </_wrapper>
+
+			<text name="ListItemText">
+				<visible>1</visible>
+				<brightness> <copy>300 </copy><add><copy src="parent()" trait="mouseover"/> <mul>100</mul></add></brightness>
+				<font> 42 </font>
+				<string> <copy src="parent()" trait="string"/> </string>
+				<wrapwidth> <copy src="parent()" trait="_wrapper"/><sub src="me()" trait="x"/><sub> 10 </sub></wrapwidth>
+				<x> 6 </x>
+				<y> 6 </y>
+				<alpha> <copy src="parent()" trait="_TextAlpha"/> </alpha>
+			</text>
+
+			<image name="cyclerLeftArrow">
+				<id>100</id>
+				<filename>lStewieAl\arrow_left.dds</filename>
+				<x><copy src="sibling(ListItemText)" trait="x"/><sub>5</sub></x>
+				<width>18</width>
+				<height>22</height>
+				<y><copy src="sibling(ListItemText)" trait="y"/><add src="sibling(ListItemText)" trait="height"/><add>6</add></y>
+				<alpha><copy>255</copy><add><copy src="me()" trait="mouseover"/><mul>100</mul></add></alpha>
+				<brightness><copy>200</copy><add><copy src="me()" trait="mouseover"/><mul>100</mul></add></brightness>
+				<zoom>&scale;</zoom>
+				<target>&true;</target>
+			</image>
+
+			<image name="cyclerRightArrow">
+				<id>101</id>
+				<filename>lStewieAl\arrow_right.dds</filename>
+				<x><copy src="sibling(cyclerText)" trait="x"/><add src="sibling(cyclerText)" trait="width"/><add>2</add></x>
+				<y><copy src="sibling(cyclerLeftArrow)" trait="y"/></y>
+				<width>18</width>
+				<height>22</height>
+				<alpha><copy>255</copy><add><copy src="me()" trait="mouseover"/><mul>100</mul></add></alpha>
+				<brightness><copy>200</copy><add><copy src="me()" trait="mouseover"/><mul>100</mul></add></brightness>
+				<zoom>&scale;</zoom>
+				<target>&true;</target>
+			</image>
+
+			<text name="cyclerText">
+				<id>99</id>
+				<font>42</font>
+				<string></string>
+				<brightness> <copy>300 </copy><add><copy src="parent()" trait="mouseover"/> <mul>100</mul></add></brightness>
+				<x><copy src="sibling(cyclerLeftArrow)" trait="x"/><add src="sibling(cyclerLeftArrow)" trait="width"/><add>4</add></x>
+				<y><copy src="sibling(cyclerLeftArrow)" trait="y"/></y>
+
+				<wheelable>&true;</wheelable>
+				<mouseoversound>UIMenuFocus</mouseoversound>
+				<clicksound>UIMenuPrevNext</clicksound>
+			</text>
+		</hotrect>
+	</template>
+</menu>

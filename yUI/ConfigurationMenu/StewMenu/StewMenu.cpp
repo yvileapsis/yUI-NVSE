@@ -1592,6 +1592,8 @@ signed int __cdecl CompareTweaksAlphabetically(ListBoxItem<StewMenuItem>* a, Lis
 	return itemA->priority > itemB->priority ? -1 : 1;
 }
 
+static bool hasAddedNewTrait = false;
+
 void ShowTweaksMenu()
 {
 	Tile* prevMenu = GetMenuTile(MENU_ID);
@@ -1601,9 +1603,8 @@ void ShowTweaksMenu()
 	// setup the menu font (requires JIP LN NVSE)
 //	consoleItfc->RunScriptLine2("SetFontFile 42 \"textures\\fonts\\Monofonto_STn.fnt\"", nullptr, true);
 
-	float newDepth = StdCall<float>(0xA1DFB0);
+	const auto newDepth = StdCall<Float32>(0xA1DFB0);
 
-	static bool hasAddedNewTrait;
 	if (!hasAddedNewTrait)
 	{
 		hasAddedNewTrait = true;
@@ -1619,78 +1620,73 @@ void ShowTweaksMenu()
 
 	auto menu = (StewMenu*)tile->GetParentMenu();
 
-	if (menu && menu->GetID() == MENU_ID)
-	{
-		menu->RegisterTile(tile, 0);
-
-		if (menu->HasTiles())
-		{
-			g_stewMenu = menu;
-
-			float stackingType = tile->GetFloat(kTileValue_stackingtype);
-			if (stackingType == 6006.0 || stackingType == 102.0)
-			{
-				tile->SetFloat(kTileValue_depth, newDepth, 1);
-			}
-
-			char buf[0x20];
-			Setting* sSettings = (Setting*)0x11D1FE0;
-			snprintf(buf, sizeof(buf), "WAAAAAAAAAAAAAAA %s", sSettings->data.str);
-			menu->menuTitle->SetString(kTileValue_string, buf);
-
-			auto tweaksListBox = &menu->tweaksListBox;
-			tweaksListBox->parentTile = menu->tweaksListBackground;
-			tweaksListBox->templateName = "TweakTemplate";
-			tweaksListBox->scrollBar = tweaksListBox->parentTile->GetByTraitName("child(lb_scrollbar)");
-
-			InitTweaksListFromJSON();
-
-			tweaksListBox->ForEach(SetTweakSelectedBoxIfEnabled);
-			tweaksListBox->Sort(CompareTweaksAlphabetically);
-
-			auto categoriesListBox = &menu->categoriesListBox;
-			categoriesListBox->parentTile = menu->categoriesBackground;
-			categoriesListBox->templateName = "CategoryTemplate";
-			categoriesListBox->scrollBar = categoriesListBox->parentTile->GetByTraitName("child(lb_scrollbar)");
-
-			Tile* listTile = categoriesListBox->Insert(nullptr, "All"); 
-			if (listTile)
-			{
-				listTile->SetFloat(kTileValue_id, kStewMenu_CategoryItem);
-			}
-
-			for (auto iter : menu->allCategories)
-			{
-				char* categoryName = iter;
-				listTile = categoriesListBox->Insert(categoryName, categoryName);
-				if (listTile)
-				{
-					listTile->SetFloat(kTileValue_id, kStewMenu_CategoryItem);
-				}
-			}
-
-			auto subSettingsListBox = &menu->subSettingsListBox;
-			subSettingsListBox->parentTile = menu->subSettingsListBackground;
-			subSettingsListBox->templateName = "SubSettingTemplate_Slider";
-			subSettingsListBox->scrollBar = subSettingsListBox->parentTile->GetByTraitName("child(lb_scrollbar)");
-
-			menu->HideTitle(false);
-		}
-		else
-		{
-			menu->Close();
-			Log(true, Log::kConsole) << FormatString("MENUS: Stew Menu is missing some expected tiles...");
-		}
-	}
-	else if (menu)
-	{
-		Log(true, Log::kConsole) << FormatString("MENUS: Expected Stew Menu to have <class> %d </class> but it had class %d...", MENU_ID, menu->GetID());
-		menu->Destructor(true);
-	}
-	else
+	if (!menu)
 	{
 		Log(true, Log::kConsole) << FormatString("MENUS: Stew Menu Creation Failed...");
+		return;
 	}
+
+	if (menu->GetID() != MENU_ID)
+	{
+		Log(true, Log::kConsole) << FormatString(
+			"MENUS: Expected Stew Menu to have <class> %d </class> but it had class %d...", MENU_ID, menu->GetID());
+		menu->Destructor(true);
+		return;
+	}
+
+	menu->RegisterTile(tile, 0);
+
+	if (!menu->HasTiles())
+	{
+		menu->Close();
+		Log(true, Log::kConsole) << FormatString("MENUS: Stew Menu is missing some expected tiles...");
+		return;
+	}
+
+	g_stewMenu = menu;
+	float stackingType = tile->GetFloat(kTileValue_stackingtype);
+	if (stackingType == 6006.0 || stackingType == 102.0)
+	{
+		tile->SetFloat(kTileValue_depth, newDepth, 1);
+	}
+
+	Setting* sSettings = (Setting*)0x11D1FE0;
+	menu->menuTitle->SetString(kTileValue_string, FormatString("WAAAAAAAAAAAAAAA %s", sSettings->data.str).c_str());
+
+	auto tweaksListBox = &menu->tweaksListBox;
+	tweaksListBox->parentTile = menu->tweaksListBackground;
+	tweaksListBox->templateName = "TweakTemplate";
+	tweaksListBox->scrollBar = tweaksListBox->parentTile->GetByTraitName("child(lb_scrollbar)");
+
+	InitTweaksListFromJSON();
+
+	tweaksListBox->ForEach(SetTweakSelectedBoxIfEnabled);
+	tweaksListBox->Sort(CompareTweaksAlphabetically);
+
+	auto categoriesListBox = &menu->categoriesListBox;
+	categoriesListBox->parentTile = menu->categoriesBackground;
+	categoriesListBox->templateName = "CategoryTemplate";
+	categoriesListBox->scrollBar = categoriesListBox->parentTile->GetByTraitName("child(lb_scrollbar)");
+
+	Tile* listTile = categoriesListBox->Insert(nullptr, "All");
+	if (listTile) listTile->SetFloat(kTileValue_id, kStewMenu_CategoryItem);
+
+	for (const auto iter : menu->allCategories)
+	{
+		char* categoryName = iter;
+		listTile = categoriesListBox->Insert(categoryName, categoryName);
+		if (listTile)
+		{
+			listTile->SetFloat(kTileValue_id, kStewMenu_CategoryItem);
+		}
+	}
+
+	auto subSettingsListBox = &menu->subSettingsListBox;
+	subSettingsListBox->parentTile = menu->subSettingsListBackground;
+	subSettingsListBox->templateName = "SubSettingTemplate_Slider";
+	subSettingsListBox->scrollBar = subSettingsListBox->parentTile->GetByTraitName("child(lb_scrollbar)");
+
+	menu->HideTitle(false);
 }
 
 void StewMenu::AddCategory(char* category)

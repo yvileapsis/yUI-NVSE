@@ -1,0 +1,73 @@
+	<alpha> 0 </alpha>
+	<clicksound> UIMenuOK </clicksound>
+	<depth> 17 </depth>
+	<height> <copy src="MCM_ModList_Size" trait="height"/> </height>
+	<target> &true; </target>
+	<visible> <copy> &true; </copy> <onlyif src="me()" trait="_enable"/> </visible>
+	<width> <copy src="child(text)" trait="width"/> </width>
+	<x> <copy src="parent()" trait="x"/> <add> <copy src="parent()" trait="width"/> <div> 2 </div> </add> <sub> <copy src="me()" trait="width"/> <div> 2 </div> </sub> </x>
+	<y> <copy src="sibling(List_Title)" trait="y"/> <add> <copy src="sibling(List_Title)" trait="height"/> </add> <add> <copy src="MCM_ModList_Size" trait="height"/> <add src="parent()" trait="_spacing"/> <mul src="me()" trait="_listID"/></add> </y>
+	<_enable> 0 </_enable>
+	<_mouseover> <copy> 0 </copy> <add src="me()" trait="_listID"/> <onlyif src="me()" trait="_target"/> </_mouseover>
+	<_target>
+		<copy> 1 </copy>
+		<onlyif>
+			<copy src="me()" trait="mouseover"/>
+			<or>
+				<copy src="MCM" trait="_AltInput"/>
+				<and>
+					<copy src="MCM" trait="_TargetList"/>
+					<eq src="me()" trait="_listID"/>
+				</and>
+			</or>
+		</onlyif>
+	</_target>
+
+	<image name="highlight">
+		<alpha> 30 </alpha>
+		<brightness> 255 </brightness>
+		<depth> 16 </depth>
+		<filename> <copy src="MCM_Images" trait="_fxglowspot01"/> </filename>
+		<height>
+			<copy src="parent()" trait="height"/>
+			<add src="grandparent()" trait="_spacing"/>
+			<sub> 1 </sub>
+		</height>
+		<systemcolor> &mainmenu; </systemcolor>
+		<target> &false; </target>
+		<visible> <copy src="parent()" trait="_target"/> <onlyif src="MCM" trait="_HighlightGlow"/> </visible>
+		<width> <copy src="parent()" trait="width"/> <add src="grandparent()" trait="_spacing"/> <mul> 1.3 </mul> </width>
+		<x>
+			<copy src="parent()" trait="x"/>
+			<sub>
+				<copy src="grandparent()" trait="_spacing"/>
+				<div> 2 </div>
+			</sub>
+			<sub>
+				<copy src="me()" trait="width"/>
+				<sub src="parent()" trait="width"/>
+				<div> 2 </div>
+			</sub>
+		</x>
+		<y>
+			<copy src="parent()" trait="y"/>
+			<sub>
+				<copy src="grandparent()" trait="_spacing"/>
+				<div> 2 </div>
+			</sub>
+		</y>
+		<zoom> &scale; </zoom>
+	</image>
+
+	<text name="text">
+		<alpha> 255 </alpha>
+		<brightness> <copy src="me()" trait="alpha"/> </brightness>
+		<depth> 16 </depth>
+		<font> <copy> 3 </copy> <sub> <copy> 2 </copy> <onlyif src="MCM" trait="_dUI"/> </sub> </font>
+		<justify> &left; </justify>
+		<string>  </string>
+		<systemcolor> <copy> 5 </copy> <add> <copy> 5 </copy> <onlyif> <copy src="parent()" trait="_target"/> <or> <copy src="grandparent()" trait="_selected"/> <eq> <copy src="parent()" trait="_listID"/> </eq> </or> </onlyif> </add> </systemcolor>
+		<target> &false; </target>
+		<x> <copy src="parent()" trait="x"/> </x>
+		<y> <copy src="parent()" trait="y"/> <add> <copy src="me()" trait="height"/> <div> 4 </div> <onlyifnot src="MCM" trait="_dUI"/> </add></y>
+	</text>

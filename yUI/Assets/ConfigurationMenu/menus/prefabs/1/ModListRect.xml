@@ -1,0 +1,172 @@
+	<alpha> 0 </alpha>
+	<clicksound> UIMenuOK </clicksound>
+	<clips> &true; </clips>
+	<depth> 13 </depth>
+	<height> <copy src="MCM_ModList_Size" trait="height"/> </height>
+	<target> <copy src="MCM" trait="_TargetMain"/> </target>
+	<visible>
+		<copy> 1 </copy>
+		<onlyif>
+			<copy src="me()" trait="y"/>
+			<add src="me()" trait="height"/>
+			<lt> <copy src="sibling(ArrowDown)" trait="y"/> <add> 5 </add> </lt>
+			<and> <copy src="me()" trait="_enable"/> </and>
+		</onlyif>
+	</visible>
+	<width> <copy src="parent()" trait="_listWidth"/> </width>
+	<x> <copy src="parent()" trait="_listX"/> </x>
+	<y>
+		<copy src="sibling(ArrowUp)" trait="y"/>
+		<add>
+			<copy src="sibling(MCM_ModList_Size)" trait="height"/>
+			<add src="parent()" trait="_spacing"/>
+			<mul>
+				<copy src="me()" trait="_modID"/>
+				<add>
+					<copy src="parent()" trait="_subCount"/>
+					<onlyif>
+						<copy src="parent()" trait="_selected"/>
+						<gt> 0 </gt>
+						<and>
+							<copy src="parent()" trait="_selected"/>
+							<lt> <copy src="me()" trait="_modID"/> </lt>
+						</and>
+					</onlyif>
+				</add>
+				<add src="me()" trait="_subID"/>
+				<add>
+					<copy src="parent()" trait="_selected"/>
+					<onlyif src="me()" trait="_subID"/>
+				</add>
+			</mul>
+		</add>
+	</y>
+
+	<_altTarget>
+		<copy>
+			<copy src="MCM" trait="_TargetMenu"/>
+			<gt> 0 </gt>
+			<and>
+				<copy src="MCM" trait="_TargetMenu"/>
+				<eq src="me()" trait="_modID"/>
+			</and>
+		</copy>
+		<or>
+			<copy src="MCM" trait="_TargetSubMenu"/>
+			<gt> 0 </gt>
+			<and>
+				<copy src="MCM" trait="_TargetSubMenu"/>
+				<eq src="me()" trait="_subID"/>
+			</and>
+		</or>
+		<onlyif>
+			<copy src="MCM" trait="_TargetOption"/>
+			<eq> 0 </eq>
+			<and src="MCM" trait="_AltInput"/>
+		</onlyif>
+	</_altTarget>
+	<_clicked> <sub src="MCM" trait="_UnClick"/> <add src="me()" trait="clicked"/> <max> 0 </max> <min> 1 </min> </_clicked>
+	<_enable> 0 </_enable>
+	<_modIndex> 0 </_modIndex>
+	<_modIndex2> 0 </_modIndex2>
+	<_subID> 0 </_subID>
+	<_target> <copy> 1 </copy> <onlyif> <copy src="me()" trait="mouseover"/> <or src="me()" trait="_altTarget"/> </_target>
+
+	<_index> <copy src="me()" trait="_modIndex"/> <onlyif> <copy src="me()" trait="_clicked"/> <or src="me()" trait="_altTarget"/> </onlyif> </_index>
+	<_index2> <copy src="me()" trait="_modIndex2"/> <onlyif> <copy src="me()" trait="_clicked"/> <or src="me()" trait="_altTarget"/> </onlyif> </_index2>
+	<_modID2> <copy src="me()" trait="_modID"/> <onlyif> <copy src="me()" trait="_clicked"/> <or src="me()" trait="_altTarget"/> </onlyif> </_modID2>
+	<_mouseover> <copy src="me()" trait="_modID"/> <onlyif src="me()" trait="mouseover"/> </_mouseover>
+	<_mouseover2> <copy src="me()" trait="_subID"/> <onlyif src="me()" trait="mouseover"/> </_mouseover2>
+	<_subID2> <copy src="me()" trait="_subID"/> <onlyif> <copy src="me()" trait="_clicked"/> <or src="me()" trait="_altTarget"/> </onlyif> </_subID2>
+	<_width> <copy src="child(text)" trait="width"/> <onlyif> <copy src="parent()" trait="_widthcheck"/> <eq> <copy src="me()" trait="_modID"/> </eq> </onlyif> </_width>
+
+	<image name="highlight">
+		<alpha> <copy src="MCM_RGB" trait="_HighlightAlpha"/> <div> <copy> 3 </copy> <onlyifnot src="MCM" trait="_TargetMain"/> </div> </alpha>
+		<blue> <copy src="MCM_RGB" trait="_HighlightBlue"/> </blue>
+		<brightness> 255 </brightness>
+		<depth> <copy src="grandparent()" trait="_highlightDepth"/> </depth>
+		<filename> <copy src="MCM_Images" trait="_fxglowspot01"/> </filename>
+		<green> <copy src="MCM_RGB" trait="_HighlightGreen"/> </green>
+		<height> <copy src="grandparent()" trait="_highlightHeight"/> </height>
+		<red> <copy src="MCM_RGB" trait="_HighlightRed"/> </red>
+		<systemcolor> &nosystemcolor; </systemcolor>
+		<target> &false; </target>
+		<visible> <copy src="parent()" trait="_target"/> <onlyif src="MCM" trait="_HighlightGlow"/> </visible>
+		<width> <copy src="grandparent()" trait="_highlightWidth"/> </width>
+		<x> <copy src="grandparent()" trait="_highlightX"/> </x>
+		<y>
+			<copy src="parent()" trait="y"/>
+			<sub>
+				<copy src="MCM_ModList" trait="_spacing"/>
+				<div> 2 </div>
+			</sub>
+		</y>
+		<zoom> &scale; </zoom>
+	</image>
+
+	<text name="text">
+		<alpha> <copy> 255 </copy> <div> <copy> 3 </copy> <onlyifnot src="MCM" trait="_TargetMain"/> </div> </alpha>
+		<blue>
+			<copy src="MCM_RGB" trait="_ModListBlue"/>
+			<onlyifnot>
+				<copy src="parent()" trait="_target"/>
+				<or src="parent()" trait="_subID"/>
+			</onlyifnot>
+			<add>
+				<copy src="MCM_RGB" trait="_ModListBlueSub"/>
+				<onlyif>
+					<not src="parent()" trait="_target"/>
+					<and src="parent()" trait="_subID"/>
+				</onlyif>
+			</add>
+			<add>
+				<copy src="MCM_RGB" trait="_ModListBlueAlt"/>
+				<onlyif src="parent()" trait="_target"/>
+			</add>
+		</blue>
+		<brightness> 255 </brightness>
+		<depth> <copy src="grandparent()" trait="_listDepth"/> </depth>
+		<font> <copy src="MCM_Font" trait="_ModList"/> </font>
+		<green>
+			<copy src="MCM_RGB" trait="_ModListGreen"/>
+			<onlyifnot>
+				<copy src="parent()" trait="_target"/>
+				<or src="parent()" trait="_subID"/>
+			</onlyifnot>
+			<add>
+				<copy src="MCM_RGB" trait="_ModListGreenSub"/>
+				<onlyif>
+					<not src="parent()" trait="_target"/>
+					<and src="parent()" trait="_subID"/>
+				</onlyif>
+			</add>
+			<add>
+				<copy src="MCM_RGB" trait="_ModListGreenAlt"/>
+				<onlyif src="parent()" trait="_target"/>
+			</add>
+		</green>
+		<justify> &left; </justify>
+		<red>
+			<copy src="MCM_RGB" trait="_ModListRed"/>
+			<onlyifnot>
+				<copy src="parent()" trait="_target"/>
+				<or src="parent()" trait="_subID"/>
+			</onlyifnot>
+			<add>
+				<copy src="MCM_RGB" trait="_ModListRedSub"/>
+				<onlyif>
+					<not src="parent()" trait="_target"/>
+					<and src="parent()" trait="_subID"/>
+				</onlyif>
+			</add>
+			<add>
+				<copy src="MCM_RGB" trait="_ModListRedAlt"/>
+				<onlyif src="parent()" trait="_target"/>
+			</add>
+		</red>
+		<string>  </string>
+		<systemcolor> &nosystemcolor; </systemcolor>
+		<target> &false; </target>
+		<x> <copy src="parent()" trait="x"/> <add> <copy> 15 </copy> <onlyif src="parent()" trait="_subID"/> </add> </x>
+		<y> <copy src="parent()" trait="y"/> <add src="grandparent()" trait="_listY"/> </y>
+	</text>

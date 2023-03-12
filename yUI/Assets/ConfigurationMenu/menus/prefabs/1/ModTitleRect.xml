@@ -1,0 +1,38 @@
+	<blue> <copy src="MCM_RGB" trait="_ModTitleBlue"/> </blue>
+	<brightness> 255 </brightness>
+	<depth> 12 </depth>
+	<font> <copy src="MCM_Font" trait="_Title"/> </font>
+	<green> <copy src="MCM_RGB" trait="_ModTitleGreen"/> </green>
+	<justify> &left; </justify>
+	<red> <copy src="MCM_RGB" trait="_ModTitleRed"/> </red>
+	<string>  </string>
+	<systemcolor> &mainmenu; </systemcolor>
+	<visible>
+		<copy> 1 </copy>
+		<onlyif>
+			<copy src="MCM_ModList" trait="_selected"/>
+			<and>
+				<copy src="MCM_ModList" trait="_selected"/>
+				<eq> <copy src="me()" trait="_titleID"/> </eq>
+				<and> <not src="MCM" trait="_ActiveSubMenu"/> </and>
+			</and>
+		</onlyif>
+		<add>
+			<copy> 1 </copy>
+			<onlyif>
+				<copy src="MCM" trait="_ActiveSubMenu"/>
+				<and>
+					<copy src="MCM" trait="_ActiveSubMenu"/>
+					<eq src="me()" trait="_subTitleID"/>
+				</and>
+			</onlyif>
+		</add>
+	</visible>
+	<x>
+		<copy> 0 </copy>
+		<sub>
+			<copy src="me()" trait="width"/>
+			<div> 2 </div>
+		</sub>
+	</x>
+	<_width> <copy src="me()" trait="width"/> <onlyif src="me()" trait="visible"/> </_width>

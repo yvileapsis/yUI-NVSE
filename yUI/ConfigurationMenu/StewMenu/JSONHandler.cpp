@@ -4,16 +4,10 @@
 
 using json = nlohmann::json;
 
-
 void InitTweaksListFromJSON()
 {
-	ProcessJSONsForPath("Tweaks\\MenuConfig\\");
-}
-
-void ProcessJSONsForPath(const char* path)
-{
 	// handle settings from INIs in the "Tweaks\\MenuConfig\\" folder
-	const auto dir = GetCurPath() + "\\Data\\NVSE\\plugins\\" + path;
+	const auto dir = GetCurPath() + "\\Data\\menus\\";
 
 	for (auto& iter : std::filesystem::directory_iterator(dir))
 	{

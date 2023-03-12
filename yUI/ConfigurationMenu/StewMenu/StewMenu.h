@@ -302,7 +302,7 @@ inline void TweaksButtonCallback()
 
 
 	// return the StartMenu to the settings menu, to prevent a visual bug since we don't open a sub-menu
-	CdeclCall(0x7D0700); // MenuButton:Settings
+//	CdeclCall(0x7D0700); // MenuButton:Settings
 }
 
 // wraps a call that adds the settings menu to the start menu 
