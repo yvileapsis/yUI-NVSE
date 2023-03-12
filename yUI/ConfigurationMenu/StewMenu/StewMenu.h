@@ -310,7 +310,7 @@ inline void __fastcall addTweaksButton(BSSimpleArray<StartMenuOption*>* startMen
 {
 	startMenuOptions->Append(settingsMenuItem);
 
-	StartMenuOption* tweaksButton = StartMenuOption::Create("Tweaks", TweaksButtonCallback, StartMenuOption::kSettingsMenu);
+	StartMenuOption* tweaksButton = StartMenuOption::Create("WAHs", TweaksButtonCallback, StartMenuOption::kMainMenu + StartMenuOption::kPauseMenu);
 	startMenuOptions->Append(&tweaksButton);
 }
 

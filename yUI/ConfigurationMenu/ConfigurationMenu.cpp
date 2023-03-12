@@ -33,10 +33,10 @@ void __fastcall AddyCMToSettingsMenu(BSSimpleArray<StartMenuOption*>* settingsMe
 	//	(*menuDownloads)->callback = yCMCallback;
 	//	(*menuDownloads)->data = StartMenuOption::kMainMenu + StartMenuOption::kPauseMenu;
 
-	yCM1 = StartMenuOption::Create("Mods", yCMCallback, StartMenuOption::kMainMenu + StartMenuOption::kPauseMenu);
-	settingsMenuOptions->Append(&yCM1);
+//	yCM1 = StartMenuOption::Create("Mods", yCMCallback, StartMenuOption::kMainMenu + StartMenuOption::kPauseMenu);
+//	settingsMenuOptions->Append(&yCM1);
 
-	settingsMenuOptions->Append(menuDownloads);
+//	settingsMenuOptions->Append(menuDownloads);
 
 
 	//yCM = StartMenuOption::Create("Mods", yCMCallback, StartMenuOption::kMainMenu);

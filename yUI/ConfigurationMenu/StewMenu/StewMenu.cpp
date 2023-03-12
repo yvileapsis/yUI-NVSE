@@ -8,9 +8,9 @@
 #include "SimpleINILibrary.h"
 #include "Stootils.h"
 
-const char* MenuPath = "Data\\Menus\\stew_menu.xml";
-const char* TweaksINIPath = "Data\\NVSE\\Plugins\\nvse_stewie_tweaks.ini";
-const char* tweaksINIsPath = "Data\\NVSE\\Plugins\\Tweaks\\INIs\\";
+const char* MenuPath = "Data\\Menus\\untitledmenuproject.xml";
+//const char* TweaksINIPath = "Data\\NVSE\\Plugins\\nvse_stewie_tweaks.ini";
+//const char* tweaksINIsPath = "Data\\NVSE\\Plugins\\Tweaks\\INIs\\";
 
 StewMenu* g_stewMenu;
 StewMenu* StewMenu::GetSingleton() { return g_stewMenu; };
@@ -1213,7 +1213,7 @@ void CopyValuesFrom(CSimpleIni& to, CSimpleIni& from)
 void StewMenu::LoadINIs()
 {
 	char INIPath[MAX_PATH];
-
+	/*
 	auto errVal = ini.LoadFile(TweaksINIPath);
 	if (errVal == SI_Error::SI_FILE)
 	{
@@ -1221,6 +1221,7 @@ void StewMenu::LoadINIs()
 		return;
 	}
 
+	
 	if (g_bMultiINISupport)
 	{
 		CSimpleIni tempINI;
@@ -1239,7 +1240,7 @@ void StewMenu::LoadINIs()
 
 			tempINI.Reset();
 		}
-	}
+	}*/
 }
 
 void StewMenu::WriteTweakToINI(StewMenuItem* tweak)
@@ -1289,7 +1290,7 @@ bool IniContainsValue(const char* category, const char* name, const char* fileNa
 void WriteValueToINIs(const char* category, const char* name, const char* newValue)
 {
 	char INIPath[MAX_PATH];
-
+	/*
 	if (g_bMultiINISupport)
 	{
 		// loop over all the INIs in reverse order and pick the first one that has the key/name in the ini
@@ -1321,8 +1322,8 @@ void WriteValueToINIs(const char* category, const char* name, const char* newVal
 
 		iniPaths.DeleteAll();
 	}
-
-	WritePrivateProfileString(category, name, newValue, TweaksINIPath);
+	
+	WritePrivateProfileString(category, name, newValue, TweaksINIPath);*/
 }
 
 void StewMenu::Destructor(bool doFree) 
@@ -1528,8 +1529,8 @@ bool AtMainMenuOrStewMenuOpen()
 // TODO: FIGURE OUT WAAAAA
 void StewMenu::InitHooks()
 {
-	SafeWrite8(0x71F1EC + (MENU_ID - 1001), 30); // use switch case for MedicalQuestionaire
-	medicalQuestionaireCaseAddr = DetourVtable(0x71F154 + 4 * 30, UInt32(MedicalQuestionaireCreateHook));
+	SafeWrite8(0x71F1EC + (MENU_ID - 1001), 16); // use switch case for CreditsMenu
+	medicalQuestionaireCaseAddr = DetourVtable(0x71F154 + 4 * 16, UInt32(MedicalQuestionaireCreateHook));
 
 	// reload the menu when alt-tabbing
 	WriteRelCall(0x86A1AB, UInt32(OnAltTabReloadStewMenu));
@@ -1606,11 +1607,13 @@ void ShowTweaksMenu()
 	if (!hasAddedNewTrait)
 	{
 		hasAddedNewTrait = true;
-		CdeclCall(0x9FF8A0, "&StewMenu;", MENU_ID);
+		CdeclCall(0x9FF8A0, "&UMPMenu;", MENU_ID);
 	}
 
 	// allow hot-reloading the menu even if UIO is installed
 	UInt32 previousResolveXMLFile = DetourRelCall(0xA01B87, 0xA01E20);
+
+	StewMenu::Create();
 	Tile* tile = InterfaceManager::GetSingleton()->menuRoot->ReadXML(MenuPath);
 	WriteRelCall(0xA01B87, previousResolveXMLFile);
 
@@ -1632,7 +1635,7 @@ void ShowTweaksMenu()
 
 			char buf[0x20];
 			Setting* sSettings = (Setting*)0x11D1FE0;
-			snprintf(buf, sizeof(buf), "Tweaks %s", sSettings->data.str);
+			snprintf(buf, sizeof(buf), "WAAAAAAAAAAAAAAA %s", sSettings->data.str);
 			menu->menuTitle->SetString(kTileValue_string, buf);
 
 			auto tweaksListBox = &menu->tweaksListBox;
@@ -1717,5 +1720,5 @@ void patchAddTweaksButton()
 	{
 		StewMenu::InitHooks();
 	}
-	WriteRelCall(0x7CC96A, UInt32(addTweaksButton));
+	WriteRelCall(0x7CCA3E, UInt32(addTweaksButton));
 }
