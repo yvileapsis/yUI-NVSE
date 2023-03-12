@@ -1,6 +1,8 @@
 #include <Containers.h>
 #include <Utilities.h>
 
+#include "Stootils.h"
+
 String::String() : m_data(NULL), m_dataLen(0), m_bufLen(0) {}
 
 String::~String()
@@ -125,4 +127,92 @@ void String::Init(UInt32 bufSize)
 	m_data = (char*)GameHeapAlloc(m_bufLen + 1);
 	*m_data = 0;
 	m_dataLen = 0;
+}
+
+
+void String::AppendChar(char toAppend)
+{
+	if (m_bufLen == m_dataLen)
+	{
+		m_bufLen++;
+		char* newStr = (char*)GameHeapAlloc(m_bufLen + 1);
+		if (m_data)
+		{
+			memcpy(newStr, m_data, m_dataLen);
+			GameHeapFree(m_data);
+		}
+		m_data = newStr;
+	}
+	m_data[m_dataLen++] = toAppend;
+	m_data[m_dataLen] = 0;
+}
+
+void String::InsertChar(char toInsert, UInt32 index)
+{
+	if (index > m_dataLen) return;
+	if (m_bufLen == m_dataLen)
+	{
+		m_bufLen++;
+		char* newStr = (char*)GameHeapAlloc(m_bufLen + 1);
+		if (m_data)
+		{
+			memcpy(newStr, m_data, m_dataLen);
+			GameHeapFree(m_data);
+		}
+		m_data = newStr;
+	}
+	if (index < m_dataLen)
+		memcpy(m_data + index + 1, m_data + index, m_dataLen - index);
+	m_dataLen++;
+	m_data[index] = toInsert;
+	m_data[m_dataLen] = 0;
+}
+
+void String::EraseAt(UInt32 index)
+{
+	if (!m_data || (index >= m_dataLen)) return;
+	m_dataLen--;
+	if (m_dataLen)
+	{
+		UInt32 length = m_dataLen - index;
+		if (!length)
+			m_data[m_dataLen] = 0;
+		else
+			memmove(m_data + index, m_data + index + 1, length + 1);
+	}
+	else *m_data = 0;
+}
+
+void String::EraseAfter(UInt32 index)
+{
+	while (m_dataLen > index)
+	{
+		EraseAt(index);
+	}
+}
+
+int String::EraseWord(UInt32 index)
+{
+	int charsSinceSpace = GetCharsSinceSpace(m_data, index);
+	int newIndex = index - charsSinceSpace;
+	while (charsSinceSpace--)
+	{
+		EraseAt(--index);
+	}
+	return newIndex;
+}
+
+void String::EraseNextWord(UInt32 index)
+{
+	int charsTillSpace = GetCharsTillSpace(m_data, index) + 1;
+	while (charsTillSpace--)
+	{
+		EraseAt(index);
+	}
+}
+
+void String::RemoveLastChar()
+{
+	if (!m_data || !m_dataLen) return;
+	m_data[--m_dataLen] = '\0';
 }

@@ -87,7 +87,8 @@ public:
 };
 
 __forceinline void* GameHeapAlloc(UInt32 size) { return ThisStdCall<void*>(0xAA3E40, (void*)0x11F6238, size); }
-__forceinline void GameHeapFree(void* ptr) { ThisStdCall(0xAA4060, (void*)0x11F6238, ptr); }
+template <typename t> __forceinline t* GameHeapAlloc(UInt32 size) { return ThisStdCall<t*>(0xAA3E40, (void*)0x11F6238, size); }
+template <typename t> __forceinline void GameHeapFree(t* ptr) { ThisStdCall(0xAA4060, (t*)0x11F6238, ptr); }
 
 __forceinline void* FormHeapAlloc(UInt32 size) { return CdeclCall<void*>(0x00401000, size); }
 __forceinline void	FormHeapFree(void* ptr) { CdeclCall(0x00401030, ptr); }
@@ -509,3 +510,9 @@ bool IsConsoleOpen();
 __forceinline bool MenuMode() { return CdeclCall<bool>(0x702360); }
 
 int HexStringToInt(const std::string& str);
+struct ControlName
+{
+	UInt32		unk0;
+	const char* name;
+	UInt32		unkC;
+};

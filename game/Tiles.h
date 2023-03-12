@@ -326,6 +326,25 @@ public:
 	__forceinline Tile*			LookUpRectByName(const char* name);
 
 	Tile*						AddTileFromTemplate(const char* templateName, const char* altName = nullptr);
+
+	Tile* GetParentByID(UInt32 id)
+	{
+		CdeclCall(0xA044F0); // enter tile critical section
+
+		Tile* tile = this;
+		while (tile = tile->parent)
+		{
+			if (tile->GetFloat(kTileValue_id) == id)
+			{
+				break;
+			}
+		}
+
+		CdeclCall(0xA04500); // leave tile critical section
+		return tile;
+	}
+
+	Tile* GetByTraitName(const char* traitName) { return CdeclCall<Tile*>(0xA08B20, this, traitName); };
 };
 static_assert(sizeof(Tile) == 0x38);
 

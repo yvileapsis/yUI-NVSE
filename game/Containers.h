@@ -585,19 +585,18 @@ static_assert(sizeof(DList<void*>) == 0xC);
 enum KeyboardMenuInputCode;
 
 // 010
-template <class Item>
-class BSSimpleList
+template <class Item> class BSSimpleList
 {
 public:
-	BSSimpleList<Item>();
-	~BSSimpleList<Item>();
+	BSSimpleList<Item>() {};
+	~BSSimpleList<Item>() {};
 
 	virtual bool	SetSelectedTile(Tile* tile) { return false; };
-	virtual Tile* GetSelectedTile(void) { return nullptr; };
-	virtual Tile* HandleKeyboardInput(KeyboardMenuInputCode code) { return nullptr; };
+	virtual Tile*	GetSelectedTile(void) { return nullptr; };
+	virtual Tile*	HandleKeyboardInput(KeyboardMenuInputCode code) { return nullptr; };
 	virtual bool	IsMenuEqual(Menu* that) { return false; };
 	virtual void	ScrollToHighlight(void) {};
-	virtual Tile* GetTileByIndex(int index, char isNotTileListIndex) { return nullptr; };
+	virtual Tile*	GetTileByIndex(int index, char isNotTileListIndex) { return nullptr; };
 	virtual void	Destructor(bool doFree) {};
 	virtual void	FreeAllTiles(void) {};
 	virtual void	Sort(signed int(__cdecl*)(Item*, Item*)) {};

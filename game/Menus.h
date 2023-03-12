@@ -396,27 +396,25 @@ static_assert(sizeof(ListBox<void*>) == 0x30);
 class Menu
 {
 public:
-	Menu() { ThisCall(0xA1C4A0, this); };
-	~Menu() { ThisCall(0xA1C520, this); };
-	
-	virtual void	Destructor(bool freeMemory);
-	virtual void	SetTile(UInt32 tileID, Tile* value);
-	virtual void	HandleLeftClick(UInt32 tileID, Tile* activeTile);
-	virtual void	HandleClick(UInt32 tileID, Tile* clickedButton);	// buttonID = <id> trait defined in XML
-	virtual void	HandleMouseover(UInt32 tileID, Tile* tile);	//called on mouseover, activeTile is moused-over Tile
-	virtual void	HandleUnmouseover(UInt32 tileID, Tile* tile);
-	virtual void	PostDragTileChange(UInt32 tileID, Tile* newTile, Tile* activeTile);
-	virtual void	PreDragTileChange(UInt32 tileID, Tile* oldTile, Tile* activeTile);
-	virtual void	HandleActiveMenuClickHeld(UInt32 tileID, Tile* activeTile);
-	virtual void	OnClickHeld(UInt32 tileID, Tile* activeTile);
-	virtual void	HandleMousewheel(UInt32 tileID, Tile* tile);
-	virtual void	Update();
-	virtual bool	HandleKeyboardInput(UInt32 inputChar);	//for keyboard shortcuts, return true if handled
-	virtual UInt32	GetID();
-	virtual bool	HandleSpecialKeyInput(MenuSpecialKeyboardInputCode code, float keyState);
+	// TODO: figure out why it needs implementations
+	virtual void	Destructor(bool freeMemory) {};
+	virtual void	SetTile(UInt32 tileID, Tile* value) {};
+	virtual void	HandleLeftClick(UInt32 tileID, Tile* activeTile) {};
+	virtual void	HandleClick(UInt32 tileID, Tile* clickedButton) {};	// buttonID = <id> trait defined in XML
+	virtual void	HandleMouseover(UInt32 tileID, Tile* tile) {};	//called on mouseover, activeTile is moused-over Tile
+	virtual void	HandleUnmouseover(UInt32 tileID, Tile* tile) {};
+	virtual void	PostDragTileChange(UInt32 tileID, Tile* newTile, Tile* activeTile) {};
+	virtual void	PreDragTileChange(UInt32 tileID, Tile* oldTile, Tile* activeTile) {};
+	virtual void	HandleActiveMenuClickHeld(UInt32 tileID, Tile* activeTile) {};
+	virtual void	OnClickHeld(UInt32 tileID, Tile* activeTile) {};
+	virtual void	HandleMousewheel(UInt32 tileID, Tile* tile) {};
+	virtual void	Update() {};
+	virtual bool	HandleKeyboardInput(UInt32 inputChar) { return false; };	//for keyboard shortcuts, return true if handled
+	virtual UInt32	GetID() { return 0; };
+	virtual bool	HandleSpecialKeyInput(MenuSpecialKeyboardInputCode code, float keyState) { return false; };
 	virtual bool	HandleControllerInput(int a2, Tile* tile) { return false; };
-	virtual void    OnUpdateUserTrait(int tileVal);
-	virtual void	HandleControllerConnectOrDisconnect(bool isControllerConnected);
+	virtual void    OnUpdateUserTrait(int tileVal) {};
+	virtual void	HandleControllerConnectOrDisconnect(bool isControllerConnected) {};
 
 	// 14
 	struct TemplateInstance
@@ -435,21 +433,24 @@ public:
 		DList<TemplateInstance>	instances;		// 08
 	};
 	
-	TileMenu*			tile{};				// 04
+	TileMenu*			tile;				// 04
 	TList<TemplateData>	menuTemplates;		// 08
-	UInt32				unk10{};			// 10
-	UInt32				unk14{};			// 14	Same as id (20)
-	UInt32				unk18{};			// 18
-	UInt8				byte1C{};			// 1C
-	UInt8				byte1D{};			// 1D
-	UInt8				byte1E{};			// 1E
-	UInt8				byte1F{};			// 1F
-	UInt32				id{};				// 20
-	UInt32				visibilityState{};	// 24 :: Initialised to 4
+	UInt32				unk10;				// 10
+	UInt32				unk14;				// 14	Same as id (20)
+	UInt32				unk18;				// 18
+	UInt8				byte1C;				// 1C
+	UInt8				byte1D;				// 1D
+	UInt8				byte1E;				// 1E
+	UInt8				byte1F;				// 1F
+	UInt32				id;					// 20
+	UInt32				visibilityState;	// 24 :: Initialised to 4
 	// check 1 at 0xA0B174, 0x70D529, 0x70D592 :: set at 0x712224
 	// check 2 at 0x711FF1 :: set 2 at 0xA1D987 (when closes menu), 0xA1DA41
 	// check 4 at 0xA1D9EC (when closing menu) :: set at 0x7036A4, 0x71204D
 	// check 8 at 0x712194 :: set 8 at 0xA1DB8F (when opening menu), 0x720B39
+
+	Menu() { ThisCall(0xA1C4A0, this); };
+	~Menu() { ThisCall(0xA1C520, this); };
 
 	Menu*					HandleMenuInput(UInt32 tileID, Tile* clickedTile);
 	__forceinline Tile*		AddTileFromTemplate(Tile* destTile, const char* templateName, UInt32 arg3 = 0)	{ return ThisCall<Tile*>(0xA1DDB0, this, destTile, templateName, arg3); }

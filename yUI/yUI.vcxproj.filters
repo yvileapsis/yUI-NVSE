@@ -158,6 +158,21 @@
     <ClCompile Include="HookMCM.cpp">
       <Filter>features\ConfigurationMenu</Filter>
     </ClCompile>
+    <ClCompile Include="ConfigurationMenu\StewMenu\HotkeyField.cpp">
+      <Filter>features\ConfigurationMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigurationMenu\StewMenu\InputField.cpp">
+      <Filter>features\ConfigurationMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigurationMenu\StewMenu\JSONHandler.cpp">
+      <Filter>features\ConfigurationMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigurationMenu\StewMenu\StewMenu.cpp">
+      <Filter>features\ConfigurationMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="Stootils.cpp">
+      <Filter>features\ConfigurationMenu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h" />
@@ -270,6 +285,27 @@
     </ClInclude>
     <ClInclude Include="..\game\Object.h">
       <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigurationMenu\StewMenu\HotkeyField.h">
+      <Filter>features\ConfigurationMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigurationMenu\StewMenu\InputField.h">
+      <Filter>features\ConfigurationMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigurationMenu\StewMenu\JSONHandler.h">
+      <Filter>features\ConfigurationMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigurationMenu\StewMenu\StewMenu.h">
+      <Filter>features\ConfigurationMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigurationMenu\StewMenu\StewMenuItem.h">
+      <Filter>features\ConfigurationMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigurationMenu\StewMenu\StewMenuSubsettingItem.h">
+      <Filter>features\ConfigurationMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="Stootils.h">
+      <Filter>features\ConfigurationMenu</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

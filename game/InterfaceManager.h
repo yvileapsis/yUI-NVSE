@@ -204,7 +204,7 @@ public:
 	float					flt03C;				// 03C
 	float					cursorY;			// 040
 	float					mouseWheel;			// 044	-120.0 = down; 120.0 = up
-	float					flt048;				// 048
+	float					timeLeftClickHeld;	// 048 time in menus only
 	Tile*					draggedTile;		// 04C
 	int						unk050;				// 050
 	float					flt054;				// 054
@@ -305,6 +305,13 @@ public:
 
 	UInt32						GetTopVisibleMenuID();
 	Tile*						GetActiveTile();
+
+	char GetMessageBoxResult()
+	{
+		auto button = this->msgBoxButton;
+		this->msgBoxButton = -1;
+		return button;
+	};
 };
 static_assert(sizeof(InterfaceManager) == 0x580);
 static_assert(sizeof(InterfaceManager::Struct0178) == 0x64);

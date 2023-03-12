@@ -27,6 +27,9 @@ INIT_MODULE(Patch::MatchedCursor)
 INIT_MODULE(Patch::MultiplicativeShots)
 INIT_MODULE(Patch::TimeMult)
 
+
+extern void patchAddTweaksButton();
+
 void Inits()
 {
 	ConfigurationMenu::Init();
@@ -52,4 +55,6 @@ void Inits()
 	Patch::MatchedCursor::Init();
 //	Patch::MultiplicativeShots::Init();
 	Patch::TimeMult::Init();
+
+	patchAddTweaksButton();
 }

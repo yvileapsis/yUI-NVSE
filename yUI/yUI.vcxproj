@@ -136,6 +136,10 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClCompile Include="..\nvse\SafeWrite.cpp" />
     <ClCompile Include="..\nvse\Utilities.cpp" />
     <ClCompile Include="ConfigurationMenu\ConfigurationMenu.cpp" />
+    <ClCompile Include="ConfigurationMenu\StewMenu\HotkeyField.cpp" />
+    <ClCompile Include="ConfigurationMenu\StewMenu\InputField.cpp" />
+    <ClCompile Include="ConfigurationMenu\StewMenu\JSONHandler.cpp" />
+    <ClCompile Include="ConfigurationMenu\StewMenu\StewMenu.cpp" />
     <ClCompile Include="definitions.cpp" />
     <ClCompile Include="dllmain.c">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -163,6 +167,7 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClCompile Include="SortingIcons\SortingIconsVisual.cpp" />
     <ClCompile Include="SortingIcons\SortingIconsMain.cpp" />
     <ClCompile Include="SortingIcons\SortingIconsMechanics.cpp" />
+    <ClCompile Include="Stootils.cpp" />
     <ClCompile Include="UserInterface\DynamicCrosshair.cpp" />
     <ClCompile Include="UserInterface\HitIndicator.cpp" />
     <ClCompile Include="UserInterface\HitMarker.cpp" />
@@ -208,11 +213,18 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClInclude Include="..\nvse\dinput8.h" />
     <ClInclude Include="..\libraries\json.h" />
     <ClInclude Include="..\libraries\SimpleINILibrary.h" />
+    <ClInclude Include="ConfigurationMenu\StewMenu\HotkeyField.h" />
+    <ClInclude Include="ConfigurationMenu\StewMenu\InputField.h" />
+    <ClInclude Include="ConfigurationMenu\StewMenu\JSONHandler.h" />
+    <ClInclude Include="ConfigurationMenu\StewMenu\StewMenu.h" />
+    <ClInclude Include="ConfigurationMenu\StewMenu\StewMenuItem.h" />
+    <ClInclude Include="ConfigurationMenu\StewMenu\StewMenuSubsettingItem.h" />
     <ClInclude Include="functions.h" />
     <ClInclude Include="definitions.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="SortingIcons\SortingIcons.h" />
     <ClInclude Include="ConfigurationMenu\ConfigurationMenu.h" />
+    <ClInclude Include="Stootils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\game\GameRTTI.inc" />

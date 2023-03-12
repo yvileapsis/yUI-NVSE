@@ -100,3 +100,8 @@ __declspec(naked) UInt32 InterfaceManager::GetTopVisibleMenuID()
 		retn
 	}
 }
+
+Tile* InterfaceManager::GetActiveTile()
+{
+	return activeTile ? activeTile : activeTileAlt;
+}

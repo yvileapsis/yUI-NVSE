@@ -445,12 +445,6 @@ void Console_Print_Long(const std::string& str)
 
 #endif
 
-struct ControlName
-{
-	UInt32		unk0;
-	const char* name;
-	UInt32		unkC;
-};
 
 ControlName ** g_keyNames			= (ControlName **)0x011D52F0;
 ControlName ** g_mouseButtonNames	= (ControlName **)0x011D5240;
