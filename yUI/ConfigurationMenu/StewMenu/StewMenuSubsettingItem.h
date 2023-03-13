@@ -7,9 +7,9 @@ struct SubSettingData
 {
 	struct DropdownData
 	{
-		const char* displayName;
+		std::string displayName;
 		signed int value;
-		const char* description;
+		std::string description;
 	};
 
 	enum ElementType
@@ -65,7 +65,7 @@ struct SubSettingData
 	{
 		type = kSettingType_Boolean;
 		valueInt = 0;
-		valueStr = nullptr;
+		valueStr.clear();
 		minValue = 0;
 		maxValue = 0;
 	}
@@ -76,18 +76,7 @@ struct SubSettingData
 	{
 		if (type == kSettingType_Options)
 		{
-			for (auto iter : options)
-			{
-				auto option = iter;
-				GameHeapFree(option->displayName);
-				GameHeapFree(option->description);
-			}
 			options.DeleteAll();
-		}
-
-		if (valueStr)
-		{
-			GameHeapFree(valueStr);
 		}
 	}
 
@@ -107,7 +96,7 @@ struct SubSettingData
 		};
 		TList<DropdownData> options;
 	};
-	const char* valueStr;
+	std::string valueStr;
 
 	void SetType(ElementType _type) { this->type = _type; }
 	signed int GetElementType() { return this->type; };
@@ -119,8 +108,8 @@ struct SubSettingData
 	void AddOption(const char* displayString, signed int _value, const char* description)
 	{
 		auto option = (DropdownData*)GameHeapAlloc(sizeof(DropdownData));
-		option->displayName = GameHeapStrdup(displayString);
-		option->description = GameHeapStrdup(description);
+		option->displayName = (displayString);
+		option->description = (description);
 		option->value = _value;
 		this->options.Insert(option);
 	};
@@ -131,7 +120,7 @@ struct SubSettingData
 		{
 			do
 			{
-				if (iter->data->value == valueInt) { return iter->data->displayName; }
+				if (iter->data->value == valueInt) { return iter->data->displayName.c_str(); }
 			}
 			while (iter = iter->next);
 		}
@@ -144,7 +133,7 @@ struct SubSettingData
 		{
 			do
 			{
-				if (iter->data->value == valueInt) { return iter->data->description; }
+				if (iter->data->value == valueInt) { return iter->data->description.c_str(); }
 			} while (iter = iter->next);
 		}
 		return "";

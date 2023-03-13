@@ -1,0 +1,368 @@
+{
+"tags": [
+{
+	"id": "Quality-of-life",
+	"name": "Quality-of-life",
+	"description": "Minor improvements"
+},
+{
+	"id": "HUD",
+	"name": "HUD",
+	"description": "Having to do with heads up display"
+}
+],
+"mods": [
+{ 
+	"id": "JLM",
+	"name": "Just Loot Menu",
+	"version": "5.0",
+	"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+	"tags": ["Quality-of-life", "HUD"]
+}
+],
+"settings": [
+/* 
+iKey2 = 0
+iKey3 = 0
+iKeyAlt = 0
+iKeyScrollUp = 264
+iKeyScrollDown = 265
+iButton2 = 0
+iButton3 = 0
+iButtonAlt = 0
+*/
+{
+	"id": "JLMiAction1",
+	"name": "1st action control",
+	"description": "Determine control used as a trigger for the 1st action.",
+	"mod": ["JLM"],
+	"tags": ["Controls"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "control",
+	"keyboard": "JustMods.ini:Loot Menu:iKey1",
+	"controller": "JustMods.ini:Loot Menu:iButton1"
+},
+/*
+iMode1 = 1
+iMode1Alt = 2
+iMode = 4
+iMode2Alt = 3
+iMode3 = 0
+iMode3Alt = 0
+*/
+{
+	"id": "JLMiMode1",
+	"name": "1st action",
+	"description": "",
+	"mod": ["JLM"],
+	"tags": ["Controls", "Gameplay"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "choice",
+	"valueDefault": 1,
+	"values": [ { "value": 0, "name":"kNone" }, { "value":1, "name": "kTake" }, { "value":2, "name": "kEquip" }, { "value":3, "name": "kTakeAll" }, { "value":4, "name": "kOpen" } ],
+	"value": "JustMods.ini:Loot Menu:iMode1"
+},
+{
+	"id": "JLMiTakeSmartMin",
+	"name": "TakeSmartMin",
+	"description": "",
+	"mod": ["JLM"],
+	"tags": ["Gameplay"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "integer",
+	"valueDefault": 5,
+	"valueMin": 0,
+	"valueMax": 20,
+	"value": "JustMods.ini:Loot Menu:iTakeSmartMin"
+},
+{
+	"id": "JLMbTakeWeightless",
+	"name": "TakeWeightless",
+	"description": "",
+	"mod": ["JLM"],
+	"tags": ["Gameplay"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "choice",
+	"valueDefault": 1,
+	"values": [ { "value": 0, "name":"OFF" }, { "value":1, "name": "ON" } ],
+	"value": "JustMods.ini:Loot Menu:bTakeWeightless"
+},
+{
+	"id": "JLMbBlockBeforeActivate",
+	"name": "BlockBeforeActivate",
+	"description": "",
+	"mod": ["JLM"],
+	"tags": ["Gameplay"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "choice",
+	"valueDefault": 0,
+	"values": [ { "value": 0, "name":"OFF" }, { "value":1, "name": "ON" } ],
+	"value": "JustMods.ini:Loot Menu:bBlockBeforeActivate"
+},
+{
+	"id": "JLMbOverScroll",
+	"name": "OverScroll",
+	"description": "",
+	"mod": ["JLM"],
+	"tags": ["Gameplay"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "choice",
+	"valueDefault": 0,
+	"values": [ { "value": 0, "name":"OFF" }, { "value":1, "name": "ON" } ],
+	"value": "JustMods.ini:Loot Menu:bOverScroll"
+},
+{
+	"id": "JLMbHidePrompt",
+	"name": "HidePrompt",
+	"description": "",
+	"mod": ["JLM"],
+	"tags": ["Gameplay"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "choice",
+	"valueDefault": 1,
+	"values": [ { "value": 0, "name":"OFF" }, { "value":1, "name": "ON" } ],
+	"value": "JustMods.ini:Loot Menu:bHidePrompt"
+},
+{
+	"id": "JLMbHideName",
+	"name": "HideName",
+	"description": "",
+	"mod": ["JLM"],
+	"tags": ["Gameplay"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "choice",
+	"valueDefault": 0,
+	"values": [ { "value": 0, "name":"OFF" }, { "value":1, "name": "ON" } ],
+	"value": "JustMods.ini:Loot Menu:bHideName"
+},
+{
+	"id": "JLMiItemsMax",
+	"name": "iItemsMax",
+	"description": "",
+	"mod": ["JLM"],
+	"tags": ["Gameplay"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "integer",
+	"valueDefault": 5,
+	"valueMin": 0,
+	"valueMax": 20,
+	"value": "JustMods.ini:Loot Menu:iItemsMax"
+},
+{
+	"id": "JLMiJustify",
+	"name": "iJustify",
+	"description": "",
+	"mod": ["JLM"],
+	"tags": ["Gameplay"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "integer",
+	"valueDefault": 3,
+	"valueMin": 1,
+	"valueMax": 9,
+	"value": "JustMods.ini:Loot Menu:iJustify"
+},
+{
+	"id": "JLMfHeight",
+	"name": "fHeight",
+	"description": "",
+	"mod": ["JLM"],
+	"tags": ["Visuals"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "two floats",
+	"value1Default": 32.00,
+	"value1Delta": 0.5,
+	"value1Min": 0.00,
+	"value1Max": 960.00,
+	"value1": "JustMods.ini:Loot Menu:fHeightMin",
+	"value2Default": 640.00,
+	"value2Delta": 0.5,
+	"value2Min": 0.00,
+	"value2Max": 960.00,
+	"value2": "JustMods.ini:Loot Menu:fHeightMax"
+},
+{
+	"id": "JLMfWidth",
+	"name": "fWidth",
+	"description": "",
+	"mod": ["JLM"],
+	"tags": ["Visuals"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "two floats",
+	"value1Default": 400.00,
+	"value1Delta": 0.5,
+	"value1Min": 0.00,
+	"value1Max": 960.00,
+	"value1": "JustMods.ini:Loot Menu:fWidthMin",
+	"value2Default": 640.00,
+	"value2Delta": 0.5,
+	"value2Min": 0.00,
+	"value2Max": 960.00,
+	"value2": "JustMods.ini:Loot Menu:fWidthMax"
+},
+{
+	"id": "JLMfOffset",
+	"name": "fOffset",
+	"description": "",
+	"mod": ["JLM"],
+	"tags": ["Visuals"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "two floats",
+	"value1Default": 0.625000,
+	"value1Delta": 0.005,
+	"value1Min": 0.00,
+	"value1Max": 1.00,
+	"value1": "JustMods.ini:Loot Menu:fOffsetX",
+	"value2Default": 0.500000,
+	"value2Delta": 0.005,
+	"value2Min": 0.00,
+	"value2Max": 1.00,
+	"value2": "JustMods.ini:Loot Menu:fOffsetY"
+},
+{
+	"id": "JLMfIndent",
+	"name": "fIndent",
+	"description": "",
+	"mod": ["JLM"],
+	"tags": ["Visuals"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "three floats",
+	"value1Default": 8.000000,
+	"value1Delta": 0.5,
+	"value1Min": 0.00,
+	"value1Max": 960.00,
+	"value1": "JustMods.ini:Loot Menu:fIndentItem",
+	"value2Default": 10.000000,
+	"value2Delta": 0.5,
+	"value2Min": 0.00,
+	"value2Max": 960.00,
+	"value2": "JustMods.ini:Loot Menu:fIndentTextX",
+	"value3Default": 10.000000,
+	"value3Delta": 0.5,
+	"value3Min": 0.00,
+	"value3Max": 960.00,
+	"value3": "JustMods.ini:Loot Menu:fIndentTextY"
+},
+{
+	"id": "JLMiWeightVisible",
+	"name": "iWeightVisible",
+	"description": "",
+	"mod": ["JLM"],
+	"tags": ["Gameplay"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "choice",
+	"valueDefault": 1,
+	"values": [ { "value": 0, "name":"OFF" }, { "value": 1, "name": "ON" }, { "value": 2, "name": "ON!" } ],
+	"value": "JustMods.ini:Loot Menu:iWeightVisible"
+},
+{
+	"id": "JLMiWeightAltColor",
+	"name": "iWeightAltColor",
+	"description": "",
+	"mod": ["JLM"],
+	"tags": ["Gameplay"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "choice",
+	"valueDefault": 1,
+	"values": [ { "value": 0, "name":"OFF" }, { "value": 1, "name": "ON" }, { "value": 2, "name": "ON!" } ],
+	"value": "JustMods.ini:Loot Menu:iWeightAltColor"
+},
+{
+	"id": "JLMiFont",
+	"name": "iFont",
+	"description": "",
+	"mod": ["JLM"],
+	"tags": ["Gameplay"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "font",
+	"value1Default": 0,
+	"value1": "JustMods.ini:Loot Menu:iFont",
+	"value2Default": 0.00,
+	"value2": "JustMods.ini:Loot Menu:fFontY"
+},
+{
+	"id": "JLMiFontHead",
+	"name": "iFont",
+	"description": "",
+	"mod": ["JLM"],
+	"tags": ["Gameplay"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "font",
+	"value1Default": 0,
+	"value1": "JustMods.ini:Loot Menu:iFontHead",
+	"value2Default": 0.00,
+	"value2": "JustMods.ini:Loot Menu:fFontHeadY"
+},
+{
+	"id": "JLMbSounds",
+	"name": "bSounds",
+	"description": "",
+	"mod": ["JLM"],
+	"tags": ["Gameplay"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "choice",
+	"valueDefault": 1,
+	"values": [ { "value": 0, "name":"OFF" }, { "value": 1, "name": "ON" } ],
+	"value": "JustMods.ini:Loot Menu:bSounds"
+},
+{
+	"id": "JLMbShowEquip",
+	"name": "bShowEquip",
+	"description": "",
+	"mod": ["JLM"],
+	"tags": ["Gameplay"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "choice",
+	"valueDefault": 1,
+	"values": [ { "value": 0, "name":"OFF" }, { "value": 1, "name": "ON" } ],
+	"value": "JustMods.ini:Loot Menu:bShowEquip"
+},
+{
+	"id": "JLMbShowIcon",
+	"name": "bShowIcon",
+	"description": "",
+	"mod": ["JLM"],
+	"tags": ["Gameplay"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "choice",
+	"valueDefault": 1,
+	"values": [ { "value": 0, "name":"OFF" }, { "value": 1, "name": "ON" } ],
+	"value": "JustMods.ini:Loot Menu:bShowIcon"
+},
+{
+	"id": "JLMbShowMeter",
+	"name": "bShowMeter",
+	"description": "",
+	"mod": ["JLM"],
+	"tags": ["Gameplay"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "choice",
+	"valueDefault": 1,
+	"values": [ { "value": 0, "name":"OFF" }, { "value": 1, "name": "ON" } ],
+	"value": "JustMods.ini:Loot Menu:bShowMeter"
+},
+{
+	"id": "JLMbShowName",
+	"name": "bShowName",
+	"description": "",
+	"mod": ["JLM"],
+	"tags": ["Gameplay"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "choice",
+	"valueDefault": 1,
+	"values": [ { "value": 0, "name":"OFF" }, { "value":1, "name": "ON" } ],
+	"value": "JustMods.ini:Loot Menu:bShowName"
+},
+{
+	"id": "JLMbOnlyOpenLootMenuAfterFirstInteraction",
+	"name": "bOnlyOpenLootMenuAfterFirstInteraction",
+	"description": "I recommend considering enabling this option, as it's a little less performance intensive and as bug-free as regular container menu",
+	"mod": ["JLM"],
+	"tags": ["Gameplay"],
+	"condition": [ { "JLMEnable":1 } ],
+	"type": "choice",
+	"valueDefault": 0,
+	"values": [ { "value": 0, "name":"OFF" }, { "value":1, "name": "ON" } ],
+	"value": "JustMods.ini:Loot Menu:bOnlyOpenLootMenuAfterFirstInteraction"
+}
+]
+}

@@ -42,43 +42,45 @@
 	</hotrect>
 
 	<rect name="STW_MainRect">	<!-- ===== MAIN POSITIONING RECT ===== -->
+
 		<width> <copy src="io()" trait="_STwidth"/></width>
 		<height> <copy src="io()" trait="_STheight"/></height>
 		<x>		<copy src="screen()" trait="width"/>		<sub src="me()" trait="width"/>		<div> 2 </div>		</x>
 		<y>		<copy src="screen()" trait="height"/>		<sub src="me()" trait="height"/>		<div> 2 </div>		</y>
-		<locus> &true; </locus>
+		<locus> 0 </locus>
 		<depth> 2 </depth>
 
 		<text name="STW_Headline_Title">
 			<id> 0 </id>
-			<x><copy src="parent()" trait="width"/>		<sub src="me()" trait="width"/>		<div> 2 </div></x>
-			<y> -10 </y>
+			<x><copy src="screen()" trait="width"/>		<sub src="me()" trait="width"/>		<div> 2 </div></x>
+			<y> 20 </y>
 			<font> 6 </font>
 		</text>
 
-		<image name="STW_Headline_h1">	<!-- ===== TOP LEFT HORIZONTAL BRACKET =====  -->
+<!--
+		<image name="STW_Headline_h1">	 ===== TOP LEFT HORIZONTAL BRACKET =====  
 			<include src="line.xml"/>
 			<_length><copy src="sibling(STW_Headline_Title)" trait="x"/>	<sub> 20 </sub> </_length>
 		</image>
 
-		<image name="STW_Headline_v1">	<!-- ===== TOP LEFT VERTICAL BRACKET =====  -->
+		<image name="STW_Headline_v1">	 ===== TOP LEFT VERTICAL BRACKET =====  
 			<include src="vertical_fade_line.xml"/>
 			<height>160</height>
 		</image>
 
-		<image name="STW_Headline_h2">	<!-- ===== TOP RIGHT HORIZONTAL BRACKET =====  -->
+		<image name="STW_Headline_h2">	===== TOP RIGHT HORIZONTAL BRACKET =====  
 			<include src="line.xml"/>
 			<_length><copy src="parent()" trait="width"/><sub src="me()" trait="x"/></_length>
 			<x><copy src="sibling(STW_Headline_Title)" trait="x"/><add src="sibling(STW_Headline_Title)" trait="width"/><add> 20 </add></x>
 		</image>
 
-		<image name="STW_Headline_v2">	<!-- ===== TOP RIGHT VERTICAL BRACKET =====  -->
+		<image name="STW_Headline_v2">	 ===== TOP RIGHT VERTICAL BRACKET ===== 
 			<include src="vertical_fade_line.xml"/>
 			<height>160</height>
 			<_x><copy src="sibling(STW_Headline_h2)" trait="x"/><add src="sibling(STW_Headline_h2)" trait="width"/><sub src="me()" trait="width"/></_x>
 		</image>
 
-		<rect name="STW_BottomBracket">	<!-- ===== BOTTOM HORIZONTAL BRACKET =====  -->
+		<rect name="STW_BottomBracket">	 ===== BOTTOM HORIZONTAL BRACKET =====  
 			<include src="bottom_bracket.xml"/>
 			<visible> 1 </visible>
 			<y> <copy src="parent()" trait="height"/> </y>
@@ -86,25 +88,27 @@
 			<height> 160 </height>
 		</rect>
 
-		<image name="SeparatorMidTop">	<!-- ===== TOP MIDDLE SEPARATOR =====  -->
+		<image name="SeparatorMidTop">	 ===== TOP MIDDLE SEPARATOR =====  
 			<include src="vertical_fade_line.xml"/>
 			<x> <copy src="io()" trait="_separatorX"/><add>3</add></x>
 			<y> 0 </y>
 			<height>160</height>
 		</image>
 
-		<image name="SeparatorMidBottom">	<!-- ===== BOTTOM MIDDLE SEPARATOR =====  -->
+		<image name="SeparatorMidBottom">	 ===== BOTTOM MIDDLE SEPARATOR =====  
 			<include src="vertical_fade_line.xml"/>
 			<_bottom_to_top>&true;</_bottom_to_top>
 			<x> <copy src="io()" trait="_separatorX"/><add>3</add></x>
 			<_y> <copy src="parent()" trait="height"/> </_y>
 			<height>160</height>
 		</image>
-
+-->
 		<hotrect name="ActiveOnlyParent">	<!-- ===== ACTIVE FILTER =====  -->
 			<visible><copy src="io()" trait="_IsCategoriesActive"/><eq>0</eq></visible>
+			<visible> 0 </visible>
 			<locus> &true; </locus>
 			<x> <copy src="io()" trait="_separatorX"/><sub src="me()" trait="width"/><sub> 1 </sub> </x>
+			<x> -400 </x>
 			<y> <copy src="sibling(SearchParent)" trait="y"/> </y>
 			<include src="box.xml"/>
 			<_line_thickness> 1 </_line_thickness>
@@ -133,8 +137,10 @@
 
 		<hotrect name="SearchParent">	<!-- ===== SEARCH =====  -->
 			<visible><copy src="io()" trait="_IsCategoriesActive"/><eq>0</eq></visible>
+			<visible> 0 </visible>
 			<locus> &true; </locus>
 			<x> 7 </x>
+			<x> -400 </x>
 			<y> 64 </y>
 			<width><copy src="io()" trait="_separatorX"/><sub src="me()" trait="x"/><sub src="sibling(ActiveOnlyParent)" trait="width"/><sub> 5 </sub></width>
 			<height> 36 </height>
@@ -182,7 +188,7 @@
 					<copy src="me()" trait="_file_" /> 
 				</filename>
 				<x><copy src="parent()" trait="width"/><sub src="me()" trait="width"/> <sub> 6 </sub></x>
-				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <div> 2 </div></y>
+v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <div> 2 </div></y>
 				<height> 22 </height>
 				<width> 22 </width>
 				<zoom> &scale; </zoom>
@@ -206,6 +212,7 @@
 		<hotrect name="Categories"> <!-- ===== Categories =====  -->
 			<locus> &true; </locus>
 			<x> 0 </x>
+			<x> 0 </x>
 			<y> 0 </y>
 			<width><copy src="io()" trait="_separatorX"/></width>
 			<height> 56 </height>
@@ -220,6 +227,7 @@
 					<or><copy src="io()" trait="_IsCategoriesActive"/></or>
 				</onlyif>
 			</_highlight>
+			<visible> 0 </visible>
 
 			<image name="CategoryIcon">
 				<filename>lStewieAl\category.dds</filename>
@@ -266,23 +274,27 @@
 		</hotrect>
 
 		<hotrect name="TweaksList">
-			<include src="list_box_ST.xml"/>
-			<_scrollbar_pos> &right; </_scrollbar_pos>
+			<include src="list_box.xml"/>
+			<_scrollbar_pos> &left; </_scrollbar_pos>
 			<id> 2 </id>
-			<x> 7 </x>
-			<y> 110 </y>
-			<width><copy src="io()" trait="_separatorX"/><sub src="me()" trait="x"/><add>12</add></width>
+			<x> 0</x>
+			<y> 150 </y>
+<!--			<width><copy src="io()" trait="_separatorX"/><sub src="me()" trait="x"/><add>12</add></width>-->
+			<width> 400 </width>
 			<height> <copy src="parent()" trait="height"/><sub src="me()" trait="y"/><sub>8</sub></height>
 			<visible><copy src="io()" trait="_IsCategoriesActive"/><eq>0</eq></visible>
+			<_number_of_visible_items> 7 </_number_of_visible_items>
 		</hotrect>
 
 		<hotrect name="SubSettingsList">
-			<include src="list_box_ST.xml"/>
-			<_scrollbar_pos> &right; </_scrollbar_pos>
+			<include src="list_box.xml"/>
+			<_scrollbar_pos> &left; </_scrollbar_pos>
 			<id> 19 </id>
 			<x><copy src="io()" trait="_separatorX"/><add> 22 </add></x>
-			<y> 58 </y>
+			<x> 400 </x>
+			<y> 160 </y>
 			<width><copy src="parent()" trait="width"/><sub src="me()" trait="x"/></width>
+			<width> 1200 </width>
 			<height> <copy src="parent()" trait="height"/><sub src="me()" trait="y"/>				<sub> 160 </sub></height>
 			<visible>1</visible>
 			<_line_alpha> 0 </_line_alpha>	<!-- optional override -->
@@ -291,18 +303,12 @@
 
 		<rect name="STW_SelectionInfoRect">	<!-- ===== SELECTION INFO RECT ===== -->
 			<visible> <copy src="child(STW_SelectionText)" trait="width"/> <gt>35</gt> </visible>
-			<x><copy src="io()" trait="_separatorX"/><add> 12 </add></x>
+			<x>400</x>
 			<y>
-				<copy src="parent()" trait="height"/><sub> 152 </sub>
-				<sub>
-					<copy src="child(STW_SelectionText)" trait="height"/><sub> 121 </sub>
-					<onlyif>
-						<copy src="child(STW_SelectionText)" trait="height"/><gt>140</gt>
-					</onlyif>
-				</sub>
+				800
 			</y>
 			<include src="top_bracket.xml"/>				<!-- BRACKET ABOVE THE TEXT -->
-			<width>  <copy src="parent()" trait="width"/>  <sub src="me()" trait="x"/><sub> 9 </sub></width>
+			<width>  900 </width>
 			<height> 60 </height>
 			<locus> &true; </locus>
 
@@ -338,7 +344,7 @@
 						</onlyif>
 					</add>
 				</brightness>
-				<font> 42 </font>
+				<font> 7 </font>
 				<string> <copy src="parent()" trait="string"/> </string>
 				<wrapwidth> <copy src="parent()" trait="_wrapper"/><sub src="me()" trait="x"/><sub> 18 </sub></wrapwidth>
 				<x> 31 </x>
@@ -379,7 +385,7 @@
 						</onlyif>
 					</add>
 				</brightness>
-				<font> 42 </font>
+				<font> 8 </font>
 				<string> <copy src="parent()" trait="string"/> </string>
 				<wrapwidth> <copy src="parent()" trait="_wrapper"/><sub src="me()" trait="x"/><sub> 10 </sub></wrapwidth>
 				<x> 31 </x>
@@ -433,7 +439,7 @@
 			<image name="DecreaseArrow">
 				<id> 100 </id>
 				<filename>lStewieAl\arrow_left.dds</filename>
-				<x> <copy src="sibling(ListItemText)" trait="x"/><sub> 5 </sub></x>
+				<x> <copy src="sibling(ListItemText)" trait="x"/><sub> -100 </sub></x>
 				<width> 22 </width>
 				<height> 26 </height>
 				<y><copy src="sibling(ListItemText)" trait="y"/> <add src="sibling(ListItemText)" trait="height"/> </y>

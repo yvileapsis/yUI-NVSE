@@ -10,8 +10,6 @@ int GetCharsSinceSpace(char* text, UInt32 offset);
 int GetCharsTillSpace(char* text, UInt32 offset);
 
 std::string GetClipboardText();
-void* __fastcall MemCopy(void* dest, const void* src, UInt32 length);
-char* __fastcall StrLenCopy(char* dest, const char* src, UInt32 length);
 
 
 class DirectoryIterator
@@ -48,7 +46,6 @@ public:
 	void operator++() { if (!FindNextFile(handle, &fndData)) Close(); }
 };;
 
-char* GameHeapStrdup(const char* src);
 std::string ScancodeToString(UInt32 scancode);
 UInt32 __stdcall DetourVtable(UInt32 addr, UInt32 dst);
 UInt32 __stdcall DetourRelCall(UInt32 jumpSrc, UInt32 jumpTgt);

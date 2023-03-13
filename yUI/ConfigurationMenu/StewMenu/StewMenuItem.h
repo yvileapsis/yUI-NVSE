@@ -7,48 +7,43 @@ struct StewMenuItem
 {
 	StewMenuItem(const char* name, const char* description, signed int priority, const char* internalName, const char* internalCategory, const char* category)
 	{
-		this->name = GameHeapStrdup(name);
-		this->description = GameHeapStrdup(description);
-		this->internalName = GameHeapStrdup(internalName);
-		this->internalCategory = GameHeapStrdup(internalCategory);
-		this->category = GameHeapStrdup(category);
+		this->name = (name);
+		this->description = (description);
+		this->internalName = (internalName);
+		this->internalCategory = (internalCategory);
+		this->category = (category);
 		this->SetPriority(priority);
 		this->value = -1;
 		subsettings.Init(nullptr);
 	}
 
-	const char* name;
-	const char* description;
-	const char* internalName;
-	const char* internalCategory;
-	const char* category;
+	std::string name;
+	std::string description;
+	std::string internalName;
+	std::string internalCategory;
+	std::string category;
 	signed int priority;
 	signed int value;
 	SubsettingList subsettings;
 
 	void Free()
 	{
-		if (name) GameHeapFree(name);
-		if (description) GameHeapFree(description);
-		if (internalName) GameHeapFree(internalName);
-		if (internalCategory) GameHeapFree(internalCategory);
-		if (category) GameHeapFree(category);
 		subsettings.Destroy();
 	}
 
-	const char* GetName() { return name; };
-	const char* GetDescription() { return description; };
-	const char* GetInternalName() { return internalName; };
+	const char* GetName() { return name.c_str(); };
+	const char* GetDescription() { return description.c_str(); };
+	const char* GetInternalName() { return internalName.c_str(); };
 	const char* GetInternalCategory()
 	{
 		// if there's no internal category set, assume it's tweaks - done to avoid needlessly creating ~400 'Tweaks' strings since most tweak items will have that category
-		if (internalCategory) return internalCategory;
+		if (!internalCategory.empty()) return internalCategory.c_str();
 		return "Tweaks";
 	};
-	const char* GetCategory() { return category; };
+	const char* GetCategory() { return category.c_str(); };
 	signed int GetPriority() { return priority; };
 	void SetPriority(signed int _priority) { this->priority = _priority; };
-	bool IsBoolean() { return internalName && *internalName == 'b'; };
+	bool IsBoolean() { return !internalName.empty() && internalName[0] == 'b'; };
 	SubsettingList* GetSubsettings() { return &subsettings; };
 	void AddSubsetting(StewMenuSubsettingItem* item) { subsettings.Append(item); };
 

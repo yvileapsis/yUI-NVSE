@@ -9,13 +9,9 @@
 #include "Stootils.h"
 
 const char* MenuPath = "Data\\Menus\\untitledmenuproject.xml";
-//const char* TweaksINIPath = "Data\\NVSE\\Plugins\\nvse_stewie_tweaks.ini";
-//const char* tweaksINIsPath = "Data\\NVSE\\Plugins\\Tweaks\\INIs\\";
 
 StewMenu* g_stewMenu;
 StewMenu* StewMenu::GetSingleton() { return g_stewMenu; };
-
-void PlayGameSound(const char* soundPath);
 
 _declspec(naked) bool IsControllerConnected()
 {
@@ -30,9 +26,7 @@ _declspec(naked) bool IsControllerConnected()
 	}
 }
 
-int g_bMultiINISupport = true;
 int g_bTweaksMenuShowSettingPathOnSubsettings = true;
-//extern const NVSEConsoleInterface* consoleItfc;
 
 void StewMenu::SetTile(UInt32 tileID, Tile* tile)
 {
@@ -913,8 +907,8 @@ void StewMenu::SetActiveSubsettingValueFromInput()
 	{
 	case SubSettingData::kSettingDataType_String:
 	{
-		activeInputSubsetting->data.valueStr = GameHeapStrdup(subSettingInput.GetText());
-		ini.SetValue(category, name, activeInputSubsetting->data.valueStr);
+		activeInputSubsetting->data.valueStr = (subSettingInput.GetText());
+		ini.SetValue(category, name, activeInputSubsetting->data.valueStr.c_str());
 		break;
 	}
 	case SubSettingData::kSettingDataType_Integer:
@@ -965,9 +959,9 @@ void StewMenu::SetSubsettingValueFromINI(StewMenuSubsettingItem* setting)
 	}
 	case SubSettingData::kSettingDataType_String:
 	{
-		if (setting->data.valueStr)
+		if (setting->data.valueStr.c_str())
 		{
-			GameHeapFree(setting->data.valueStr);
+			GameHeapFree(setting->data.valueStr.c_str());
 		}
 		auto str = ini.GetValue(category, name, nullptr);
 		if (!str)
@@ -975,7 +969,7 @@ void StewMenu::SetSubsettingValueFromINI(StewMenuSubsettingItem* setting)
 			str = "";
 			isInvalidSetting = true;
 		}
-		setting->data.valueStr = GameHeapStrdup(str);
+		setting->data.valueStr = (str);
 		break;
 	}
 	}
@@ -1010,7 +1004,7 @@ void SetDisplayedValuesForSubsetting(Tile* tile, StewMenuSubsettingItem* setting
 	{
 		if (auto textField = tile->GetChildByID(kStewMenu_SubsettingInputFieldText))
 		{
-			textField->SetString(kTileValue_string, setting->data.valueStr);
+			textField->SetString(kTileValue_string, setting->data.valueStr.c_str());
 		}
 		break;
 	}
@@ -1268,7 +1262,7 @@ void StewMenu::WriteSubsettingToINI(StewMenuSubsettingItem* setting)
 	}
 	case SubSettingData::kSettingDataType_String:
 	{
-		str = setting->data.valueStr;
+		str = setting->data.valueStr.c_str();
 		break;
 	}
 	default:
@@ -1712,9 +1706,6 @@ void StewMenu::TouchSubsetting(StewMenuSubsettingItem* setting)
 
 void patchAddTweaksButton()
 {
-	if (true)
-	{
-		StewMenu::InitHooks();
-	}
-	WriteRelCall(0x7CCA3E, UInt32(addTweaksButton));
+	StewMenu::InitHooks();
+	WriteRelCall(0x7CCA3E, (addTweaksButton));
 }
