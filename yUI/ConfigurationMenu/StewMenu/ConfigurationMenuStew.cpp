@@ -158,7 +158,7 @@ void __cdecl ClearSelectedTrait(Tile* tile, char* categoryData)
 	}
 }
 
-void ConfigurationMenu::HandleLeftClickPress(UInt32 tileID, Tile* clickedTile)
+void ConfigurationMenu::HandleLeftClick(UInt32 tileID, Tile* clickedTile)
 {
 	if (clickedTile == categoriesListBox.scrollBar || clickedTile->parent == categoriesListBox.scrollBar)
 	{
@@ -190,7 +190,7 @@ bool ConfigurationMenu::ToggleTweakInINI(SM_Mod* tweak, Tile* tile = nullptr)
 	return false;
 }
 
-void ConfigurationMenu::HandleClick(SInt32 tileID, Tile* clickedTile) 
+void ConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile) 
 {
 	PlayGameSound("UIMenuFocus");
 	switch (tileID)

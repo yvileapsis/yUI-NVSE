@@ -212,8 +212,8 @@ public:
 
 	virtual void	Destructor(bool doFree);
 	virtual void	SetTile(UInt32 tileID, Tile* value);
-	virtual void	HandleLeftClickPress(UInt32 tileID, Tile* activeTile);
-	virtual void	HandleClick(SInt32 tileID, Tile* clickedTile);
+	virtual void	HandleLeftClick(UInt32 tileID, Tile* activeTile);
+	virtual void	HandleClick(UInt32 tileID, Tile* clickedButton);
 	virtual void	HandleMouseover(UInt32 tileID, Tile* activeTile);
 	virtual void	HandleUnmouseover(UInt32 tileID, Tile* tile);
 	virtual void	PostDragTileChange(UInt32 tileID, Tile* newTile, Tile* activeTile) {};
