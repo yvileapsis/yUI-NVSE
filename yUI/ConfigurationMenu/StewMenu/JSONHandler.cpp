@@ -116,7 +116,7 @@ void InitTweaksListFromJSON()
 	for (const auto& mod : ConfigurationMenu::GetSingleton()->g_Mods)
 	{
 		auto stewMenuItem = new SM_Mod(mod->name.c_str(), mod->description.c_str(), 0, mod->id.c_str(), "", "");
-		ConfigurationMenu::GetSingleton()->tweaksListBox.Insert(stewMenuItem, mod->name.c_str())->SetFloat(kTileValue_id, kStewMenu_TweakListItem);
+		ConfigurationMenu::GetSingleton()->tweaksListBox.Insert(stewMenuItem, mod->name.c_str())->SetFloat(kTileValue_id, kConfigurationMenu_ModListItem);
 	}
 
 	/*

@@ -192,6 +192,7 @@ bool ConfigurationMenu::ToggleTweakInINI(SM_Mod* tweak, Tile* tile = nullptr)
 
 void ConfigurationMenu::HandleClick(SInt32 tileID, Tile* clickedTile) 
 {
+	PlayGameSound("UIMenuFocus");
 	switch (tileID)
 	{
 	case kStewMenu_Exit:
@@ -200,14 +201,18 @@ void ConfigurationMenu::HandleClick(SInt32 tileID, Tile* clickedTile)
 		break;
 	}
 
-	case kStewMenu_TweakListItem:
+	case kConfigurationMenu_ModListItem:
 	{
-		auto tweak = tweaksListBox.GetItemForTile(clickedTile);
+		auto item = tweaksListBox.GetItemForTile(clickedTile);
+
+		this->SetActiveTweak(item);
+		PlayGameSound("UIMenuFocus");
+/*
 		if (!ToggleTweakInINI(tweak, clickedTile))
 		{
 			PlayGameSound("UIMenuCancel");
 			Log(true, Log::kConsole) << FormatString("ConfigurationMenu: Could not resolve setting: [%s] %s", tweak->GetInternalCategory(), tweak->GetInternalName());
-		}
+		}*/
 		break;
 	}
 
@@ -1066,7 +1071,7 @@ void ConfigurationMenu::SetActiveTweak(SM_Mod* tweak)
 	{
 		for (const auto& it : g_Settings)
 		{
-			if (!it->mods.contains(tweak->settingName)) continue;
+//			if (!it->mods.contains(tweak->settingName)) continue;
 
 			auto setting = new SM_Setting(it->name.c_str(), it->description.c_str(), it->id.c_str(), "");
 
@@ -1104,13 +1109,14 @@ void ConfigurationMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 {
 	switch (tileID)
 	{
-	case kStewMenu_TweakListItem:
+	case kConfigurationMenu_ModListItem:
 	{
-		PlayGameSound("UIMenuFocus");
 
 		auto item = tweaksListBox.GetItemForTile(activeTile);
 		this->SetTweakDescriptionTileString(item);
-		this->SetActiveTweak(item);
+//		this->SetActiveTweak(item);
+//		PlayGameSound("UIMenuFocus");
+
 		break;
 	}
 
@@ -1150,7 +1156,6 @@ void ConfigurationMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 
 	case kStewMenu_SubSettingsListBackground:
 	{
-		activeSubSettingsList = &subSettingsListBox;
 		break;
 	}
 	}

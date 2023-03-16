@@ -89,7 +89,7 @@ enum TileIDs
 	kStewMenu_SearchIcon = 6,
 	kStewMenu_Exit = 7,
 	kStewMenu_Back = 8,
-	kStewMenu_TweakListItem = 12,
+	kConfigurationMenu_ModListItem = 12,
 	kStewMenu_CategoriesBackground = 13,
 	kStewMenu_CategoryItem = 14,
 	kStewMenu_CategoriesButton = 15,
@@ -187,8 +187,6 @@ public:
 		touchedSubsettings.Init();
 		touchedTweaks.Init();
 
-		activeSubSettingsList = &subSettingsListBox;
-
 		filterMode = FilterMode::kFilterMode_ShowAll;
 		isDraggingCategoriesSlider = false;
 		activeInputSubsetting = nullptr;
@@ -259,7 +257,6 @@ public:
 	TweakListBox tweaksListBox;
 	CategoryListBox categoriesListBox;
 	SubSettingsListBox subSettingsListBox;
-	SubSettingsListBox* activeSubSettingsList;
 	InputField subSettingInput;
 	HotkeyField hotkeyInput;
 	SM_Setting* activeInputSubsetting;
@@ -339,7 +336,7 @@ inline void TweaksButtonCallback()
 
 
 	// return the StartMenu to the settings menu, to prevent a visual bug since we don't open a sub-menu
-//	CdeclCall(0x7D0700); // MenuButton:Settings
+	//CdeclCall(0x7D0700); // MenuButton:Settings
 }
 
 // wraps a call that adds the settings menu to the start menu 
