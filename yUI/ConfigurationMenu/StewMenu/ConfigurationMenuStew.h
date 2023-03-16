@@ -1,7 +1,8 @@
 #pragma once
 #include <set>
 
-#include "StewMenuItem.h"
+#include "SM_Mod.h"
+#include "SM_Setting.h"
 #include "InputField.h"
 #include "HotkeyField.h"
 #include <SimpleINILibrary.h>
@@ -19,17 +20,65 @@ static UInt32 _SetVTrait;
 static UInt32 _ValueTrait;
 static UInt32 _ValueStringTrait;
 static UInt32 _BackgroundVisibleTrait;
-extern const char* TweaksINIPath;
 extern const char* MenuPath;
 
 void ShowTweaksMenu();
 void InitTweaksListFromJSON();
-void SetDisplayedValuesForSubsetting(Tile* tile, StewMenuSubsettingItem* setting);
+void SetDisplayedValuesForSubsetting(Tile* tile, SM_Setting* setting);
 void SetListBoxesKeepSelectedWhenNonActive(bool isActive);
 void WriteValueToINIs(const char* category, const char* name, const char* value);
 
 // randomly selected from the unused menu codes between 1001 and 1084 inclusive (to be compatible with the menu visibility array)
 constexpr auto MENU_ID = 1042;
+
+class JS_Tag
+{
+public:
+	std::string id;
+	std::string name;
+	std::string description;
+};
+
+class JS_Mod
+{
+public:
+	std::string id;
+	std::string name;
+	std::string description;
+	std::unordered_set<std::string> tags;
+	std::string version;
+};
+
+class JS_Setting
+{
+public:
+	enum Type
+	{
+		kNone,
+		kChoice,
+		kInteger,
+		kFloat,
+	};
+
+	std::string id;
+	std::string name;
+	std::string description;
+	SInt32 priority = 0;
+	std::unordered_set<std::string> tags;
+	std::unordered_set<std::string> mods;
+	std::string condition;
+	Type type = kNone;
+
+};
+
+class JS_SettingChoice : public JS_Setting
+{
+	std::unordered_map<SInt32, std::string> values;
+	std::string path;
+	SInt32 defaultValue;
+};
+
+
 
 enum TileIDs
 {
@@ -67,20 +116,19 @@ enum FilterMode
 	kFilterMode_Count,
 };
 
-class StewMenu : public Menu
+class ConfigurationMenu : public Menu
 {
 private:
 	void Free();
-	void LoadINIs();
-	class TweakListBox : public ListBox<StewMenuItem>
+//	void LoadINIs();
+	class TweakListBox : public ListBox<SM_Mod>
 	{
 	public:
 		void Destroy()
 		{
-			for (auto iter : this->list)
+			for (const auto iter : list)
 			{
-				StewMenuItem* item = iter->object;
-				item->Free();
+				iter->object->~SM_Mod();
 			}
 
 			ListBox::Destroy();
@@ -90,12 +138,12 @@ private:
 	typedef ListBox<char> CategoryListBox;
 
 
-	class SubSettingsListBox : public ListBox<StewMenuSubsettingItem>
+	class SubSettingsListBox : public ListBox<SM_Setting>
 	{
 	public:
-		Tile* Insert(StewMenuSubsettingItem* item)
+		Tile* Insert(SM_Setting* item)
 		{
-			auto tile = ListBox::Insert(item, item->GetName(), nullptr, item->GetTemplate());
+			auto tile = ListBox::Insert(item, item->name.c_str(), nullptr, item->GetTemplate());
 			tile->SetFloat(kTileValue_id, kStewMenu_SubsettingItem);
 			if (item->IsSlider())
 			{
@@ -126,7 +174,7 @@ private:
 	};
 
 public:
-	StewMenu()
+	ConfigurationMenu()
 	{
 		memset(tiles, 0, sizeof(tiles));
 		tweaksListBox.Init();
@@ -141,23 +189,8 @@ public:
 
 		activeSubSettingsList = &subSettingsListBox;
 
-		_SelectedTrait = Tile::TraitNameToID("_selected");
-		_TextAlphaTrait = Tile::TraitNameToID("_TextAlpha");
-		_IsSearchActiveTrait = Tile::TraitNameToID("_IsSearchActive");
-		_IsCategoriesActiveTrait = Tile::TraitNameToID("_IsCategoriesActive");
-		_FilterModeTrait = Tile::TraitNameToID("_FilterMode");
-		_CursorXTrait = Tile::TraitNameToID("_CursorX");
-		_CursorYTrait = Tile::TraitNameToID("_CursorY");
-		_MinTrait = Tile::TraitNameToID("_min");
-		_MaxTrait = kTileValue_user0;
-		_SetVTrait = kTileValue_user2;
-		_ValueTrait = Tile::TraitNameToID("_Value");
-		_ValueStringTrait = Tile::TraitNameToID("_ValueString");
-		_BackgroundVisibleTrait = Tile::TraitNameToID("_BackgroundVisible");
-
 		filterMode = FilterMode::kFilterMode_ShowAll;
 		isDraggingCategoriesSlider = false;
-		selectedCategory = nullptr;
 		activeInputSubsetting = nullptr;
 		activeHotkeySubsetting = nullptr;
 
@@ -173,11 +206,11 @@ public:
 
 		ini.SetUnicode();
 
-		LoadINIs();
+//		LoadINIs();
 
 		SetListBoxesKeepSelectedWhenNonActive(true);
 	};
-	~StewMenu() {};
+	~ConfigurationMenu() {};
 
 	virtual void	Destructor(bool doFree);
 	virtual void	SetTile(UInt32 tileID, Tile* value);
@@ -219,31 +252,35 @@ public:
 		};
 	};
 
+	std::vector<std::unique_ptr<JS_Tag>>		g_Tags;
+	std::vector<std::unique_ptr<JS_Mod>>		g_Mods;
+	std::vector<std::unique_ptr<JS_Setting>>	g_Settings;
+
 	TweakListBox tweaksListBox;
 	CategoryListBox categoriesListBox;
 	SubSettingsListBox subSettingsListBox;
 	SubSettingsListBox* activeSubSettingsList;
 	InputField subSettingInput;
 	HotkeyField hotkeyInput;
-	StewMenuSubsettingItem* activeInputSubsetting;
-	StewMenuSubsettingItem* activeHotkeySubsetting;
-	StewMenuItem* activeTweak;
+	SM_Setting* activeInputSubsetting;
+	SM_Setting* activeHotkeySubsetting;
+	SM_Mod* activeTweak;
 	InputField searchBar;
 	CSimpleIniA ini;
 	FILETIME lastXMLWriteTime;
 	UInt8 filterMode;
-	TList<StewMenuSubsettingItem> touchedSubsettings;
-	TList<StewMenuItem> touchedTweaks;
+	TList<SM_Setting> touchedSubsettings;
+	TList<SM_Mod> touchedTweaks;
 
 	std::set<char*> allCategories;
-	const char* selectedCategory;
+	std::string selectedCategory;
 
 	// debounce to prevent the categories list closing after dragging the slider
 	bool isDraggingCategoriesSlider;
 
 	bool HasTiles();
 	static void InitHooks();
-	static StewMenu* Create();
+	static ConfigurationMenu* Create();
 	void Close();
 	void RefreshFilter();
 	void ReloadMenuXML();
@@ -259,25 +296,25 @@ public:
 	void CycleFilterMode();
 	void AddCategory(char* category);
 	bool HandleActiveSliderArrows(bool isRightArrow, float scale = 0.05F);
-	void SetActiveTweak(StewMenuItem* item);
-	void SetTweakDescriptionTileString(StewMenuItem* item);
-	void SetSubsettingDescriptionTileString(StewMenuSubsettingItem* setting);
-	bool ToggleTweakInINI(StewMenuItem* item, Tile* tile);
-	void SetSubsettingValueFromINI(StewMenuSubsettingItem* item);
+	void SetActiveTweak(SM_Mod* item);
+	void SetTweakDescriptionTileString(SM_Mod* item);
+	void SetSubsettingDescriptionTileString(SM_Setting* setting);
+	bool ToggleTweakInINI(SM_Mod* item, Tile* tile);
+	void SetSubsettingValueFromINI(SM_Setting* item);
 	bool IsSubsettingInputValid();
 	void SetActiveSubsettingValueFromInput();
 	void SetInHotkeyMode(bool isActive);
 	bool GetInHotkeyMode();
 	void SetCursorPosTraits();
 
-	void TouchTweak(StewMenuItem* tweak);	
-	void TouchSubsetting(StewMenuSubsettingItem* setting);
-	void WriteTweakToINI(StewMenuItem* tweak);
-	void WriteSubsettingToINI(StewMenuSubsettingItem* setting);
+	void TouchTweak(SM_Mod* tweak);	
+	void TouchSubsetting(SM_Setting* setting);
+	void WriteTweakToINI(SM_Mod* tweak);
+	void WriteSubsettingToINI(SM_Setting* setting);
 	void WriteAllChangesToINIs();
 	void RefreshActiveTweakSelectionSquare();
 
-	static StewMenu* GetSingleton();
+	static ConfigurationMenu* GetSingleton();
 
 	void* operator new(size_t size)
 	{
@@ -310,7 +347,7 @@ inline void __fastcall addTweaksButton(BSSimpleArray<StartMenuOption*>* startMen
 {
 	startMenuOptions->Append(settingsMenuItem);
 
-	StartMenuOption* tweaksButton = StartMenuOption::Create("WAHs", TweaksButtonCallback, StartMenuOption::kMainMenu + StartMenuOption::kPauseMenu);
+	StartMenuOption* tweaksButton = StartMenuOption::Create("Mods", TweaksButtonCallback, StartMenuOption::kMainMenu + StartMenuOption::kPauseMenu);
 	startMenuOptions->Append(&tweaksButton);
 }
 

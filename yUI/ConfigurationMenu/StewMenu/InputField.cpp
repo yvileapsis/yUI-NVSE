@@ -7,8 +7,7 @@
 void InputField::Init()
 {
 	this->tile = nullptr;
-	input.m_data = nullptr;
-	input.Init(0);
+	input.clear();
 	isActive = false;
 	isCaretShown = false;
 	caretIndex = 0;
@@ -16,47 +15,42 @@ void InputField::Init()
 	inputType = kInputType_String;
 }
 
-void InputField::Set(const char* str)
+void InputField::Set(std::string str)
 {
-	input.Set(str);
-	if (!str || !*str)
+	input = str;
+	if (str.empty())
 	{
 		tile->SetString(kTileValue_string, "");
 		caretIndex = 0;
 	}
 	else
 	{
-		auto len = strlen(str);
-		caretIndex = len;
+		caretIndex = str.length();
 	}
 }
 
-const char* InputField::GetText()
+std::string InputField::GetText()
 {
-	return input.CStr();
+	return input;
 }
 
 UInt16 InputField::GetLen()
 {
-	return input.m_dataLen;
+	return input.length();
 }
 
 void InputField::UpdateCaretDisplay()
 {
 	static const UInt32 _CaretIndex = Tile::TraitNameToID("_CaretIndex");
 
-	String inputString;
-	inputString.m_data = nullptr;
-	inputString.Init(0);
-	inputString.Set(GetText());
+	std::string inputString;
+	inputString = GetText();
 	if (isActive)
 	{
-		inputString.InsertChar(isCaretShown ? '|' : ' ', caretIndex);
+		inputString.insert(caretIndex, isCaretShown ? "|" : " ");
 		tile->SetFloat(_CaretIndex, caretIndex);
 	}
-	tile->SetString(kTileValue_string, inputString.CStr());
-
-	inputString.Set("");
+	tile->SetString(kTileValue_string, inputString.c_str());
 }
 
 void InputField::SetActive(bool active)
@@ -84,13 +78,13 @@ bool InputField::IsKeyValid(UInt32 key)
 	{
 		if (key == '-')
 		{
-			return caretIndex == 0 && *GetText() != '-';
+			return caretIndex == 0 && GetText()[0] != '-';
 		}
 
 		if (inputType == kInputType_Float)
 		{
 			// only allow one . character
-			if (key == '.') return strchr(GetText(), '.') == nullptr;
+			if (key == '.') return strchr(GetText().c_str(), '.') == nullptr;
 		}
 		return key >= '0' && key <= '9';
 	}
@@ -111,11 +105,11 @@ bool InputField::HandleSpecialInputKey(UInt32 key)
 		{
 			if (IsControlHeld())
 			{
-				caretIndex = input.EraseWord(caretIndex);
+//				caretIndex = (input.c_str()).EraseWord(caretIndex);
 			}
 			else
 			{
-				input.EraseAt(--caretIndex);
+				input.erase(--caretIndex);
 				caretIndex = max(0, caretIndex);
 			}
 		}
@@ -123,18 +117,18 @@ bool InputField::HandleSpecialInputKey(UInt32 key)
 		{
 			if (IsControlHeld())
 			{
-				input.EraseNextWord(caretIndex);
+//				input.EraseNextWord(caretIndex);
 			}
 			else
 			{
-				input.EraseAt(caretIndex);
-				caretIndex = min(input.m_dataLen, caretIndex);
+				input.erase(caretIndex);
+				caretIndex = min(input.length(), caretIndex);
 			}
 		}
 
-		if (input.m_dataLen)
+		if (input.length())
 		{
-			tile->SetString(kTileValue_string, this->GetText());
+			tile->SetString(kTileValue_string, this->GetText().c_str());
 		}
 		else
 		{
@@ -147,7 +141,7 @@ bool InputField::HandleSpecialInputKey(UInt32 key)
 	{
 		if (IsControlHeld())
 		{
-			caretIndex -= GetCharsSinceSpace(input.m_data, caretIndex);
+			caretIndex -= GetCharsSinceSpace(input.c_str(), caretIndex);
 		}
 		else
 		{
@@ -160,13 +154,13 @@ bool InputField::HandleSpecialInputKey(UInt32 key)
 	{
 		if (IsControlHeld())
 		{
-			caretIndex += GetCharsTillSpace(input.m_data, caretIndex) + 1;
+			caretIndex += GetCharsTillSpace(input.c_str(), caretIndex) + 1;
 		}
 		else
 		{
 			++caretIndex;
 		}
-		caretIndex = min(input.m_dataLen, caretIndex);
+		caretIndex = min(input.length(), caretIndex);
 		return true;
 	}
 	case kInputCode_Enter:
@@ -181,7 +175,7 @@ bool InputField::HandleSpecialInputKey(UInt32 key)
 	}
 	case kInputCode_End:
 	{
-		caretIndex = input.m_dataLen;
+		caretIndex = input.length();
 		return true;
 	}
 	}
@@ -198,10 +192,9 @@ void InputField::HandleKeyboardShortcuts(UInt32 key)
 		auto len = min(200, clipboardText.length()); // cap paste to 200 characters
 		for (int i = 0; i < len; ++i)
 		{
-			char c = clipboardText[i];
-			if (IsKeyValid(c))
+			if (char c = clipboardText[i]; IsKeyValid(c))
 			{
-				input.InsertChar(c, caretIndex++);
+				input.insert(caretIndex++, 1, c);
 			}
 		}
 	}
@@ -220,10 +213,10 @@ bool InputField::HandleKey(UInt32 key)
 		}
 		else
 		{
-			input.InsertChar(key, caretIndex++);
+			input.insert(caretIndex++, 1, key);
 		}
 
-		tile->SetString(kTileValue_string, this->GetText());
+		tile->SetString(kTileValue_string, this->GetText().c_str());
 		return true;
 	}
 
@@ -246,5 +239,4 @@ void InputField::Update()
 
 void InputField::Free()
 {
-	input.Set(nullptr);
 }

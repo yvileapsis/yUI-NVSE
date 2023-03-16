@@ -167,7 +167,7 @@
     <ClCompile Include="ConfigurationMenu\StewMenu\JSONHandler.cpp">
       <Filter>features\ConfigurationMenu</Filter>
     </ClCompile>
-    <ClCompile Include="ConfigurationMenu\StewMenu\StewMenu.cpp">
+    <ClCompile Include="ConfigurationMenu\StewMenu\ConfigurationMenuStew.cpp">
       <Filter>features\ConfigurationMenu</Filter>
     </ClCompile>
     <ClCompile Include="Stootils.cpp">
@@ -295,13 +295,13 @@
     <ClInclude Include="ConfigurationMenu\StewMenu\JSONHandler.h">
       <Filter>features\ConfigurationMenu</Filter>
     </ClInclude>
-    <ClInclude Include="ConfigurationMenu\StewMenu\StewMenu.h">
+    <ClInclude Include="ConfigurationMenu\StewMenu\ConfigurationMenuStew.h">
       <Filter>features\ConfigurationMenu</Filter>
     </ClInclude>
-    <ClInclude Include="ConfigurationMenu\StewMenu\StewMenuItem.h">
+    <ClInclude Include="ConfigurationMenu\StewMenu\SM_Mod.h">
       <Filter>features\ConfigurationMenu</Filter>
     </ClInclude>
-    <ClInclude Include="ConfigurationMenu\StewMenu\StewMenuSubsettingItem.h">
+    <ClInclude Include="ConfigurationMenu\StewMenu\SM_Setting.h">
       <Filter>features\ConfigurationMenu</Filter>
     </ClInclude>
     <ClInclude Include="Stootils.h">

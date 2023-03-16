@@ -12,7 +12,7 @@ struct InputField
 	};
 
 	Tile* tile;
-	String input;
+	std::string input;
 	bool isActive;
 	bool isCaretShown;
 	SInt16 caretIndex;
@@ -20,9 +20,9 @@ struct InputField
 	UInt8 inputType;
 
 	void Init();
-	void Set(const char* str);
+	void Set(std::string str);
 
-	const char* GetText();
+	std::string GetText();
 	UInt16 GetLen();
 	void UpdateCaretDisplay();
 	void SetActive(bool active);

@@ -1,6 +1,5 @@
 #pragma once
 #include "Containers.h"
-#include "Stootils.h"
 #include "Utilities.h"
 
 struct SubSettingData
@@ -180,48 +179,30 @@ struct SubSettingData
 	}
 };
 
-struct StewMenuSubsettingItem
+struct SM_Setting
 {
-	String name;
-	String internalName;
-	String internalCategory;
-	String description;
+	std::string name;
+	std::string id;
+	std::string description;
+
 	SubSettingData data;
 
-	StewMenuSubsettingItem(const char* name, const char* description, const char* internalName, const char* internalCategory)
+	std::string settingPath;
+	std::string settingCategory;
+	std::string settingName;
+
+
+	SM_Setting(std::string name, std::string description, std::string id, std::string internalCategory)
+		: name(name), id(id), settingCategory(internalCategory), description(description)
 	{
-		this->name.m_data = nullptr;
-		this->name.Init(0);
-		this->description.m_data = nullptr;
-		this->description.Init(0);
-		this->internalName.m_data = nullptr;
-		this->internalName.Init(0);
-		this->internalCategory.m_data = nullptr;
-		this->internalCategory.Init(0);
-		this->SetName(name);
-		this->SetDescription(description);
-		this->SetInternalName(internalName);
-		this->SetInternalCategory(internalCategory);
 		data.Init();
 	}
 
 	void Free()
 	{
 		data.Free();
-		name.Set(nullptr);
-		internalName.Set(nullptr);
-		internalCategory.Set(nullptr);
-		description.Set(nullptr);
 	}
 
-	const char* GetName() { return name.CStr(); };
-	void SetName(const char* _name) { this->name.Set(_name); };
-	const char* GetDescription() { return description.CStr(); };
-	void SetDescription(const char* _description) { this->description.Set(_description); };
-	const char* GetInternalName() { return internalName.CStr(); };
-	void SetInternalName(const char* _name) { this->internalName.Set(_name); };
-	const char* GetInternalCategory() { return internalCategory.CStr(); };
-	void SetInternalCategory(const char* category) { this->internalCategory.Set(category); };
 	const char* GetTemplate() { return SubSettingData::SettingTypeToTemplate(this->data.type); };
 	signed int GetElementType() { return this->data.GetElementType(); };
 	signed int GetDataType()
@@ -238,7 +219,7 @@ struct StewMenuSubsettingItem
 
 		if (elementType == SubSettingData::kSettingType_Slider || elementType == SubSettingData::kSettingType_NumberInput)
 		{
-			if (GetInternalName()[0] == 'f')
+			if (id[0] == 'f')
 			{
 				return SubSettingData::kSettingDataType_Float;
 			}
@@ -258,7 +239,7 @@ struct StewMenuSubsettingItem
 	}
 };
 
-struct SubsettingList : TList<StewMenuSubsettingItem>
+struct SubsettingList : TList<SM_Setting>
 {
 	void Destroy()
 	{
