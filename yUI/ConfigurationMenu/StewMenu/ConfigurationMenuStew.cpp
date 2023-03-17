@@ -192,7 +192,6 @@ bool ConfigurationMenu::ToggleTweakInINI(SM_Mod* tweak, Tile* tile = nullptr)
 
 void ConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile) 
 {
-	PlayGameSound("UIMenuFocus");
 	switch (tileID)
 	{
 	case kStewMenu_Exit:
@@ -206,7 +205,7 @@ void ConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 		auto item = tweaksListBox.GetItemForTile(clickedTile);
 
 		this->SetActiveTweak(item);
-		PlayGameSound("UIMenuFocus");
+//		PlayGameSound("UIMenuFocus");
 /*
 		if (!ToggleTweakInINI(tweak, clickedTile))
 		{
@@ -1071,7 +1070,7 @@ void ConfigurationMenu::SetActiveTweak(SM_Mod* tweak)
 	{
 		for (const auto& it : g_Settings)
 		{
-//			if (!it->mods.contains(tweak->settingName)) continue;
+			if (!it->mods.contains(tweak->settingName)) continue;
 
 			auto setting = new SM_Setting(it->name.c_str(), it->description.c_str(), it->id.c_str(), "");
 
@@ -1085,7 +1084,7 @@ void ConfigurationMenu::SetActiveTweak(SM_Mod* tweak)
 
 void ConfigurationMenu::SetTweakDescriptionTileString(SM_Mod* tweak)
 {
-	this->selectionText->SetString(kTileValue_string, FormatString("%s\n- %s", tweak->description.c_str(), tweak->GetInternalName()).c_str());
+	this->selectionText->SetString(kTileValue_string, FormatString("%s\n- %s", tweak->description.c_str(), tweak->settingName).c_str());
 }
 
 void ConfigurationMenu::SetSubsettingDescriptionTileString(SM_Setting* setting)

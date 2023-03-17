@@ -23,7 +23,7 @@ void HandleTag(nlohmann::basic_json<> elem)
 	JS_Tag tag{};
 
 	if (elem.contains("id"))			tag.id = elem["id"].get<std::string>();
-	if (elem.contains("name"))			tag.name = elem["id"].get<std::string>();
+	if (elem.contains("name"))			tag.name = elem["name"].get<std::string>();
 	if (elem.contains("description"))	tag.description = elem["description"].get<std::string>();
 
 	ConfigurationMenu::GetSingleton()->g_Tags.push_back(std::make_unique<JS_Tag>(tag));
@@ -40,7 +40,7 @@ void HandleMod(nlohmann::basic_json<> elem)
 	JS_Mod mod{};
 
 	if (elem.contains("id"))			mod.id = elem["id"].get<std::string>();
-	if (elem.contains("name"))			mod.name = elem["id"].get<std::string>();
+	if (elem.contains("name"))			mod.name = elem["name"].get<std::string>();
 	if (elem.contains("description"))	mod.description = elem["description"].get<std::string>();
 
 	if (elem.contains("version"))		mod.version = elem["version"].get<std::string>();
@@ -61,7 +61,7 @@ void HandleSetting(nlohmann::basic_json<> elem)
 	JS_Setting setting{};
 
 	if (elem.contains("id"))			setting.id = elem["id"].get<std::string>();
-	if (elem.contains("name"))			setting.name = elem["id"].get<std::string>();
+	if (elem.contains("name"))			setting.name = elem["name"].get<std::string>();
 	if (elem.contains("description"))	setting.description = elem["description"].get<std::string>();
 
 	if (elem.contains("tags"))			setting.tags.insert_range(GetSetFromElement<std::string>(elem["tags"]));
@@ -115,7 +115,7 @@ void InitTweaksListFromJSON()
 
 	for (const auto& mod : ConfigurationMenu::GetSingleton()->g_Mods)
 	{
-		auto stewMenuItem = new SM_Mod(mod->name.c_str(), mod->description.c_str(), 0, mod->id.c_str(), "", "");
+		auto stewMenuItem = new SM_Mod(mod->name, mod->description, 0, mod->id, "", "");
 		ConfigurationMenu::GetSingleton()->tweaksListBox.Insert(stewMenuItem, mod->name.c_str())->SetFloat(kTileValue_id, kConfigurationMenu_ModListItem);
 	}
 

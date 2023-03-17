@@ -195,13 +195,6 @@ public:
 		lastXMLWriteTime.dwLowDateTime = 0;
 		lastXMLWriteTime.dwHighDateTime = 0;
 
-		HANDLE tweaksXMLHandle = CreateFile(MenuPath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-		if (tweaksXMLHandle != INVALID_HANDLE_VALUE)
-		{
-			GetFileTime(tweaksXMLHandle, nullptr, nullptr, &lastXMLWriteTime);
-			CloseHandle(tweaksXMLHandle);
-		}
-
 		ini.SetUnicode();
 
 //		LoadINIs();
@@ -326,15 +319,7 @@ public:
 
 inline void TweaksButtonCallback()
 {
-	if (true)
-	{
-		if (true)
-		{
-			ShowTweaksMenu();
-		}
-	}
-
-
+	ShowTweaksMenu();
 	// return the StartMenu to the settings menu, to prevent a visual bug since we don't open a sub-menu
 	//CdeclCall(0x7D0700); // MenuButton:Settings
 }
