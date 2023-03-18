@@ -257,6 +257,23 @@ public:
 
 	Item* GetSelected() { return GetItemForTile(selected); }
 
+	bool SetSelected(Tile* tile)
+	{
+		if (!parentTile) return false;
+
+		if (tile)
+		{
+			if (!GetItemForTile(tile)) return false;
+			if (!tile->GetFloat("_enabled")) return false;
+		}
+
+		selected = tile;
+
+		ThisCall(0x71A740, this);
+
+		return true;
+	}
+
 	void SaveScrollPosition() { ThisCall(0x7312E0, this); }
 	int GetNumVisibleItems() { return ThisCall<int>(0x71AE60, this); }
 	void RestorePosition(bool playSound = false) { ThisCall(0x731360, this, playSound); }

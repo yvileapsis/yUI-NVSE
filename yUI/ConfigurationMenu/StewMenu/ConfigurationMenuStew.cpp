@@ -105,7 +105,7 @@ void ConfigurationMenu::HandleActiveMenuClickHeld(UInt32 tileID, Tile* activeTil
 {
 	if (tileID == kStewMenu_SliderDraggableRect)
 	{
-		auto setting = this->subSettingsListBox.GetItemForTile(activeTile->parent);
+		auto setting = this->settingsListBox.GetItemForTile(activeTile->parent);
 		if (setting->IsSlider())
 		{
 			auto newValue = activeTile->GetFloat(_ValueTrait);
@@ -202,10 +202,10 @@ void ConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 
 	case kConfigurationMenu_ModListItem:
 	{
-		auto item = tweaksListBox.GetItemForTile(clickedTile);
+		auto item = modsListBox.GetItemForTile(clickedTile);
 
 		this->SetActiveTweak(item);
-//		PlayGameSound("UIMenuFocus");
+		PlayGameSound("UIMenuOK");
 /*
 		if (!ToggleTweakInINI(tweak, clickedTile))
 		{
@@ -273,7 +273,7 @@ void ConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 		// remove the caret from the original tile if one exists
 		this->SetInSubsettingInputMode(false);
 
-		auto setting = subSettingsListBox.GetItemForTile(clickedTile);
+		auto setting = settingsListBox.GetItemForTile(clickedTile);
 		if (setting->IsInputField())
 		{
 			auto inputFieldTextTile = clickedTile->GetChildByID(kStewMenu_SubsettingInputFieldText);
@@ -337,7 +337,7 @@ void ConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 		{
 			auto inputFieldTextTile = clickedTile->GetChildByID(kStewMenu_SubsettingInputFieldText);
 			subSettingInput.tile = inputFieldTextTile;
-			auto setting = subSettingsListBox.GetItemForTile(tile);
+			auto setting = settingsListBox.GetItemForTile(tile);
 			if (setting->IsSlider())
 			{
 				auto strVal = inputFieldTextTile->GetValue(kTileValue_string);
@@ -594,12 +594,12 @@ bool __cdecl TweakFilter(SM_Mod* item)
 
 void ConfigurationMenu::RefreshFilter()
 {
-	tweaksListBox.Filter(TweakFilter);
+	modsListBox.Filter(TweakFilter);
 
-	auto textColor = tweaksListBox.GetNumVisibleItems() ? 1 : 2;
+	auto textColor = modsListBox.GetNumVisibleItems() ? 1 : 2;
 	searchBar.tile->SetFloat(kTileValue_systemcolor, textColor);
 
-	if (auto selectedTile = tweaksListBox.GetTileFromItem(&activeTweak))
+	if (auto selectedTile = modsListBox.GetTileFromItem(&activeTweak))
 	{
 		// if the selected tweak is filtered out
 		if (selectedTile->GetFloat(kTileValue_listindex) < 0)
@@ -747,9 +747,9 @@ UInt32 ConfigurationMenu::GetID(void)
 
 bool ConfigurationMenu::HandleActiveSliderArrows(bool isRightArrow, float scale)
 {
-	if (auto tile = this->subSettingsListBox.selected)
+	if (auto tile = this->settingsListBox.selected)
 	{
-		auto setting = this->subSettingsListBox.GetItemForTile(tile);
+		auto setting = this->settingsListBox.GetItemForTile(tile);
 		if (setting->IsSlider())
 		{
 			if (auto sliderRect = tile->GetChildByID(kStewMenu_SliderDraggableRect))
@@ -827,35 +827,35 @@ bool ConfigurationMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode code,
 	}
 	case kMenu_ShiftLeft:
 	{
-		if (tweaksListBox.GetSelectedTile() && categoriesListBox.GetNumVisibleItems())
+		if (modsListBox.GetSelectedTile() && categoriesListBox.GetNumVisibleItems())
 		{
 			this->SetCategoriesListActive(true);
-			tweaksListBox.SaveScrollPosition();
+			modsListBox.SaveScrollPosition();
 			this->HandleMouseover(kStewMenu_CategoriesBackground, nullptr);
 			categoriesListBox.RestorePosition();
 		}
-		else if (subSettingsListBox.GetSelectedTile() && tweaksListBox.GetNumVisibleItems())
+		else if (settingsListBox.GetSelectedTile() && modsListBox.GetNumVisibleItems())
 		{
-			subSettingsListBox.SaveScrollPosition();
+			settingsListBox.SaveScrollPosition();
 			this->HandleMouseover(kStewMenu_TweaksListBackground, nullptr);
-			tweaksListBox.RestorePosition();
+			modsListBox.RestorePosition();
 		}
 		return true;
 	}
 	case kMenu_ShiftRight:
 	{
-		if (categoriesListBox.GetSelectedTile() && tweaksListBox.GetNumVisibleItems())
+		if (categoriesListBox.GetSelectedTile() && modsListBox.GetNumVisibleItems())
 		{
 			this->SetCategoriesListActive(false);
 			categoriesListBox.SaveScrollPosition();
 			this->HandleMouseover(kStewMenu_TweaksListBackground, nullptr);
-			tweaksListBox.RestorePosition();
+			modsListBox.RestorePosition();
 		}
-		else if (tweaksListBox.GetSelectedTile() && subSettingsListBox.GetNumVisibleItems())
+		else if (modsListBox.GetSelectedTile() && settingsListBox.GetNumVisibleItems())
 		{
-			tweaksListBox.SaveScrollPosition();
+			modsListBox.SaveScrollPosition();
 			this->HandleMouseover(kStewMenu_SubSettingsListBackground, nullptr);
-			subSettingsListBox.RestorePosition();
+			settingsListBox.RestorePosition();
 		}
 		return true;
 	}
@@ -1063,7 +1063,7 @@ void ConfigurationMenu::SetActiveTweak(SM_Mod* tweak)
 	subSettingInput.tile = nullptr;
 	hotkeyInput.tile = nullptr;
 
-	subSettingsListBox.FreeAllTiles();
+	settingsListBox.FreeAllTiles();
 	activeTweak = tweak;
 
 	if (tweak)
@@ -1075,7 +1075,7 @@ void ConfigurationMenu::SetActiveTweak(SM_Mod* tweak)
 			auto setting = new SM_Setting(it->name.c_str(), it->description.c_str(), it->id.c_str(), "");
 
 			this->SetSubsettingValueFromINI(setting);
-			const auto tile = subSettingsListBox.Insert(setting);
+			const auto tile = settingsListBox.Insert(setting);
 
 			SetDisplayedValuesForSubsetting(tile, setting);
 		}
@@ -1111,7 +1111,9 @@ void ConfigurationMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 	case kConfigurationMenu_ModListItem:
 	{
 
-		auto item = tweaksListBox.GetItemForTile(activeTile);
+		modsListBox.GetItemForTile(activeTile);
+
+		auto item = modsListBox.GetItemForTile(activeTile);
 		this->SetTweakDescriptionTileString(item);
 //		this->SetActiveTweak(item);
 //		PlayGameSound("UIMenuFocus");
@@ -1123,14 +1125,14 @@ void ConfigurationMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 	case kStewMenu_SliderLeftArrow:
 	case kStewMenu_SliderRightArrow:
 	{
-		auto item = subSettingsListBox.GetItemForTile(activeTile->parent);
+		auto item = settingsListBox.GetItemForTile(activeTile->parent);
 		this->SetSubsettingDescriptionTileString(item);
 		break;
 	}
 
 	case kStewMenu_SubsettingItem:
 	{
-		auto item = subSettingsListBox.GetItemForTile(activeTile);
+		auto item = settingsListBox.GetItemForTile(activeTile);
 		this->SetSubsettingDescriptionTileString(item);
 		break;
 	}
@@ -1143,13 +1145,11 @@ void ConfigurationMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 
 	case kStewMenu_TweaksListBackground:
 	{
-		categoriesListBox.SetSelectedTile(nullptr);
 		break;
 	}
 
 	case kStewMenu_CategoriesBackground:
 	{
-		tweaksListBox.SetSelectedTile(nullptr);
 		break;
 	}
 
@@ -1162,16 +1162,18 @@ void ConfigurationMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 
 void ConfigurationMenu::HandleUnmouseover(UInt32 tileID, Tile* tile)
 {
-	this->selectionText->SetString(kTileValue_string, "");
+	modsListBox.SetSelected(nullptr);
+	settingsListBox.SetSelected(nullptr);
+	selectionText->SetString(kTileValue_string, "");
 }
 
 void ConfigurationMenu::Free() 
 {
 	SetListBoxesKeepSelectedWhenNonActive(false);
 
-	tweaksListBox.Destroy();
+	modsListBox.Destroy();
 	categoriesListBox.Destroy();
-	subSettingsListBox.Destroy();
+	settingsListBox.Destroy();
 	searchBar.Free();
 	subSettingInput.Free();
 	hotkeyInput.Free();
@@ -1465,7 +1467,7 @@ void ConfigurationMenu::Update()
 			int deadzoneRS = *(UInt32*)0x9455F5;
 			if (abs(rightStickX) > deadzoneRS)
 			{
-				if (auto activeSubsetting = subSettingsListBox.GetSelected())
+				if (auto activeSubsetting = settingsListBox.GetSelected())
 				{
 					if (activeSubsetting->IsSlider())
 					{
@@ -1523,7 +1525,7 @@ void ConfigurationMenu::InitHooks()
 	medicalQuestionaireCaseAddr = DetourVtable(0x71F154 + 4 * 16, UInt32(MedicalQuestionaireCreateHook));
 
 	// reload the menu when alt-tabbing
-	WriteRelCall(0x86A1AB, UInt32(OnAltTabReloadStewMenu));
+//	WriteRelCall(0x86A1AB, UInt32(OnAltTabReloadStewMenu));
 
 	// prevent Escape closing the whole start menu if ConfigurationMenu is open
 	WriteRelCall(0x70E686, UInt32(AtMainMenuOrStewMenuOpen));
@@ -1562,7 +1564,7 @@ void ConfigurationMenu::RefreshActiveTweakSelectionSquare()
 {
 	if (activeTweak)
 	{
-		if (auto tile = tweaksListBox.GetTileFromItem(&activeTweak))
+		if (auto tile = modsListBox.GetTileFromItem(&activeTweak))
 		{
 			SetTweakSelectedBoxIfEnabled(tile, activeTweak);
 		}
@@ -1586,7 +1588,7 @@ static bool hasAddedNewTrait = false;
 
 void ShowTweaksMenu()
 {
-	Tile* prevMenu = GetMenuTile(MENU_ID);
+	Tile* prevMenu = Menu::GetTileMenu(MENU_ID);
 	if (prevMenu) prevMenu->Destroy(true);
 
 	// TODO: Font setup, also LOL stewie running fucking console lmao
@@ -1643,7 +1645,7 @@ void ShowTweaksMenu()
 	Setting* sSettings = (Setting*)0x11D1FE0;
 	menu->menuTitle->SetString(kTileValue_string, FormatString("WAAAAAAAAAAAAAAA %s", sSettings->data.str).c_str());
 
-	auto tweaksListBox = &menu->tweaksListBox;
+	auto tweaksListBox = &menu->modsListBox;
 	tweaksListBox->parentTile = menu->tweaksListBackground;
 	tweaksListBox->templateName = "TweakTemplate";
 	tweaksListBox->scrollBar = tweaksListBox->parentTile->GetByTraitName("child(lb_scrollbar)");
@@ -1671,7 +1673,7 @@ void ShowTweaksMenu()
 		}
 	}
 
-	auto subSettingsListBox = &menu->subSettingsListBox;
+	auto subSettingsListBox = &menu->settingsListBox;
 	subSettingsListBox->parentTile = menu->subSettingsListBackground;
 	subSettingsListBox->templateName = "SubSettingTemplate_Slider";
 	subSettingsListBox->scrollBar = subSettingsListBox->parentTile->GetByTraitName("child(lb_scrollbar)");

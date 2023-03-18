@@ -80,8 +80,6 @@ int GetCharsTillSpace(const char* text, UInt32 offset)
 	return numChars;
 }
 
-
-
 std::string GetClipboardText()
 {
 	// Try opening the clipboard
@@ -160,17 +158,4 @@ std::string ScancodeToString(UInt32 scancode)
 	return result;
 }
 
-[[nodiscard]] __declspec(noinline) UInt32 __stdcall DetourVtable(UInt32 addr, UInt32 dst)
-{
-	UInt32 originalFunction = *(UInt32*)addr;
-	SafeWrite32(addr, dst);
-	return originalFunction;
-}
-
-[[nodiscard]] __declspec(noinline) UInt32 __stdcall DetourRelCall(UInt32 jumpSrc, UInt32 jumpTgt)
-{
-	UInt32 originalFunction = *(UInt32*)(jumpSrc + 1) + jumpSrc + 5;
-	WriteRelCall(jumpSrc, jumpTgt);
-	return originalFunction;
-}
 

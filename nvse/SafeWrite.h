@@ -45,3 +45,6 @@ void WriteRelJnz(UInt32 jumpSrc, UInt32 jumpTgt);
 void WriteRelJle(UInt32 jumpSrc, UInt32 jumpTgt);
 
 void PatchMemoryNop(ULONG_PTR Address, SIZE_T Size);
+
+UInt32 __stdcall DetourVtable(UInt32 addr, UInt32 dst);
+UInt32 __stdcall DetourRelCall(UInt32 jumpSrc, UInt32 jumpTgt);

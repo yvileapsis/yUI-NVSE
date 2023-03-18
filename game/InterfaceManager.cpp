@@ -52,7 +52,8 @@ std::string FontManager::StringShorten(const std::string& str, const UInt32 font
 		if (accumulator + dotWidth < max) length++;
 		if (accumulator >= max) return str.substr(0, length) + "...";
 		const auto charDims = charDimensions[iterChar];
-		accumulator += charDims.width + charDims.widthMod + charDims.flt2C;
+		// < 100 is a sanity check because cyrillic fonts for whatever reason have this value ruined
+		accumulator += charDims.width + charDims.flt2C + charDims.widthMod < 100 ? charDims.widthMod : 0;
 	}
 	return str;
 }

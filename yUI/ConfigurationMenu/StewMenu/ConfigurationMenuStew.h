@@ -121,7 +121,7 @@ class ConfigurationMenu : public Menu
 private:
 	void Free();
 //	void LoadINIs();
-	class TweakListBox : public ListBox<SM_Mod>
+	class ModsListBox : public ListBox<SM_Mod>
 	{
 	public:
 		void Destroy()
@@ -138,7 +138,7 @@ private:
 	typedef ListBox<char> CategoryListBox;
 
 
-	class SubSettingsListBox : public ListBox<SM_Setting>
+	class SettingsListBox : public ListBox<SM_Setting>
 	{
 	public:
 		Tile* Insert(SM_Setting* item)
@@ -177,13 +177,13 @@ public:
 	ConfigurationMenu()
 	{
 		memset(tiles, 0, sizeof(tiles));
-		tweaksListBox.Init();
-		tweaksListBox.flags &= ~TweakListBox::kFlag_RecalculateHeightsOnInsert;
+		modsListBox.Init();
+		modsListBox.flags &= ~ModsListBox::kFlag_RecalculateHeightsOnInsert;
 		categoriesListBox.Init();
 		searchBar.Init();
 		subSettingInput.Init();
 		hotkeyInput.Init();
-		subSettingsListBox.Init();
+		settingsListBox.Init();
 		touchedSubsettings.Init();
 		touchedTweaks.Init();
 
@@ -247,9 +247,9 @@ public:
 	std::vector<std::unique_ptr<JS_Mod>>		g_Mods;
 	std::vector<std::unique_ptr<JS_Setting>>	g_Settings;
 
-	TweakListBox tweaksListBox;
+	ModsListBox modsListBox;
 	CategoryListBox categoriesListBox;
-	SubSettingsListBox subSettingsListBox;
+	SettingsListBox settingsListBox;
 	InputField subSettingInput;
 	HotkeyField hotkeyInput;
 	SM_Setting* activeInputSubsetting;

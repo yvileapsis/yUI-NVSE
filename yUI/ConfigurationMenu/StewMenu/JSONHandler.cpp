@@ -116,7 +116,7 @@ void InitTweaksListFromJSON()
 	for (const auto& mod : ConfigurationMenu::GetSingleton()->g_Mods)
 	{
 		auto stewMenuItem = new SM_Mod(mod->name, mod->description, 0, mod->id, "", "");
-		ConfigurationMenu::GetSingleton()->tweaksListBox.Insert(stewMenuItem, mod->name.c_str())->SetFloat(kTileValue_id, kConfigurationMenu_ModListItem);
+		ConfigurationMenu::GetSingleton()->modsListBox.Insert(stewMenuItem, mod->name.c_str())->SetFloat(kTileValue_id, kConfigurationMenu_ModListItem);
 	}
 
 	/*
@@ -124,7 +124,7 @@ void InitTweaksListFromJSON()
 	{
 		auto subSetting = new SM_Setting(setting->name.c_str(), setting->description.c_str(), setting->id.c_str(), "");
 
-		ConfigurationMenu::GetSingleton()->subSettingsListBox.Insert(subSetting);
+		ConfigurationMenu::GetSingleton()->settingsListBox.Insert(subSetting);
 	}
 
 	
@@ -132,7 +132,7 @@ void InitTweaksListFromJSON()
 	{
 		auto subSetting = new SM_Setting(setting->name.c_str(), setting->description.c_str(), setting->id.c_str(), "");
 
-		for (const auto& mod : ConfigurationMenu::GetSingleton()->tweaksListBox.list)
+		for (const auto& mod : ConfigurationMenu::GetSingleton()->modsListBox.list)
 		{
 			mod->object->AddSubsetting(subSetting);
 		}

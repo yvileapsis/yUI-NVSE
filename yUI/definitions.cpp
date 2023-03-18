@@ -60,5 +60,5 @@ void Inits()
 	Patch::TimeMult::Init();
 	Patch::CharGenMenuSRemoval::Init();
 
-//	patchAddTweaksButton();
+	patchAddTweaksButton();
 }
