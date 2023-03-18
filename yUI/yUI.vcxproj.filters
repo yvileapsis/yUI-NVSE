@@ -173,6 +173,12 @@
     <ClCompile Include="Stootils.cpp">
       <Filter>features\ConfigurationMenu</Filter>
     </ClCompile>
+    <ClCompile Include="FixSleepWaitMenuString.cpp">
+      <Filter>features</Filter>
+    </ClCompile>
+    <ClCompile Include="PatchCharGenMenuSRemoval.cpp">
+      <Filter>features</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h" />

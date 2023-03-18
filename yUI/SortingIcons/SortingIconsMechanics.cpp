@@ -88,8 +88,6 @@ namespace SortingIcons
 		return true;
 	}
 
-//	bool CategoryPtr::IsValid() const { return get(); }
-
 	std::unordered_map<std::string, Category*>	g_StringToCategory;
 
 	Category* Category::Set(const std::string tag)

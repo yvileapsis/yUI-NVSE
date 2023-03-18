@@ -19,6 +19,7 @@ INIT_MODULE(Fix::TablineSelected)
 INIT_MODULE(Fix::ReorderMCM)
 INIT_MODULE(Fix::ProjectileEffects)
 INIT_MODULE(Fix::TouchpadScrolling)
+INIT_MODULE(Fix::SleepWaitMenuString)
 
 INIT_MODULE(Patch::RestoreFO3Spread)
 INIT_MODULE(Patch::ArmedUnarmed)
@@ -26,13 +27,14 @@ INIT_MODULE(Patch::ExplosionForce)
 INIT_MODULE(Patch::MatchedCursor)
 INIT_MODULE(Patch::MultiplicativeShots)
 INIT_MODULE(Patch::TimeMult)
+INIT_MODULE(Patch::CharGenMenuSRemoval)
 
 
 extern void patchAddTweaksButton();
 
 void Inits()
 {
-	ConfigurationMenu::Init();
+//	ConfigurationMenu::Init();
 	SortingIcons::Init();
 
 	UserInterface::EventLayer::Init();
@@ -41,20 +43,22 @@ void Inits()
 	UserInterface::HitIndicator::Init();
 	UserInterface::VisualObjectives::Init();
 	UserInterface::LootMenu::Init();
-	UserInterface::WeaponHweel::Init();
+//	UserInterface::WeaponHweel::Init();
 
 	Fix::DroppedItems::Init();
 	Fix::TablineSelected::Init();
-	Fix::ReorderMCM::Init();
+//	Fix::ReorderMCM::Init();
 //	Fix::ProjectileEffects::Init();
 	Fix::TouchpadScrolling::Init();
+	Fix::SleepWaitMenuString::Init();
 
 //	Patch::RestoreFO3Spread::Init();
 //	Patch::ArmedUnarmed::Init();
-//	Patch::ExplosionForce::Init();
+	Patch::ExplosionForce::Init();
 	Patch::MatchedCursor::Init();
 //	Patch::MultiplicativeShots::Init();
 	Patch::TimeMult::Init();
+	Patch::CharGenMenuSRemoval::Init();
 
-	patchAddTweaksButton();
+//	patchAddTweaksButton();
 }

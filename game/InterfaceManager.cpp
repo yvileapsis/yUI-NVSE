@@ -21,21 +21,41 @@ FontInfo* FontInfo::Load(const char* path, UInt32 ID)
 
 bool FontInfo::GetName(char* out)
 {
-	UInt32 len = strlen(path);
+	UInt32 len = strlen(filePath);
 	len -= 4;					// '.fnt'
 	UInt32 start = len;
-	while (path[start - 1] != '\\') {
+	while (filePath[start - 1] != '\\') {
 		start--;
 	}
 
 	len -= start;
 
-	memcpy(out, path + start, len);
+	memcpy(out, filePath + start, len);
 	out[len] = 0;
 
 	return true;
 }
 
+std::string FontManager::StringShorten(const std::string& str, const UInt32 font, const Float32 max) const
+{
+	if (str.empty() || font < 1) return "";
+
+	const auto charDimensions = fontInfos[font - 1]->fontData->charDimensions;
+
+	const auto dotDims = charDimensions['.'];
+	const auto dotWidth = (dotDims.width + dotDims.widthMod + dotDims.flt2C) * 3.0;
+	Float64 accumulator = 0;
+	UInt32 length = 0;
+
+	for (const auto iterChar : str)
+	{
+		if (accumulator + dotWidth < max) length++;
+		if (accumulator >= max) return str.substr(0, length) + "...";
+		const auto charDims = charDimensions[iterChar];
+		accumulator += charDims.width + charDims.widthMod + charDims.flt2C;
+	}
+	return str;
+}
 
 void InterfaceManager::VATSHighlightData::AddRef(TESObjectREFR* ref)
 {

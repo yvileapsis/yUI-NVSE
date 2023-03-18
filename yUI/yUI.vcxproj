@@ -149,6 +149,7 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     </ClCompile>
     <ClCompile Include="events.cpp" />
     <ClCompile Include="FixReorderMCM.cpp" />
+    <ClCompile Include="FixSleepWaitMenuString.cpp" />
     <ClCompile Include="HookMCM.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="functions.cpp" />
@@ -162,6 +163,7 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClCompile Include="MiscFeatures\PatchMatchedCursor.cpp" />
     <ClCompile Include="MiscFeatures\PatchMultiplicativeShots.cpp" />
     <ClCompile Include="MiscFeatures\PatchTimeMult.cpp" />
+    <ClCompile Include="PatchCharGenMenuSRemoval.cpp" />
     <ClCompile Include="SortingIcons\SortingIconsCommands.cpp" />
     <ClCompile Include="SortingIcons\SortingIconsFiles.cpp" />
     <ClCompile Include="SortingIcons\SortingIconsVisual.cpp" />

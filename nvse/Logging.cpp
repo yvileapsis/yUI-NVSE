@@ -202,7 +202,7 @@ void DumpFontNames(void)
 	FontInfo** fonts = FontManager::GetSingleton()->fontInfos;
 
 	for (UInt32 i = 0; i < FontArraySize; i++)
-		file.Message(FormatString("Font %d is named %s", i + 1, fonts[i]->path));
+		file.Message(FormatString("Font %d is named %s", i + 1, fonts[i]->filePath));
 }
 
 

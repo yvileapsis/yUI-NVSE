@@ -200,6 +200,8 @@ namespace UserInterface::LootMenu
 			Float64 x = 0;
 
 			tiles = 0;
+			const auto fontManager = FontManager::GetSingleton();
+			const auto font = tileMain->GetFloat("_Font");
 
 			for (const auto fst : tileMain->GetChild("JLMContainer")->children)
 			{
@@ -225,7 +227,7 @@ namespace UserInterface::LootMenu
 
 				fst->SetFloat("_Equip", snd->GetEquipped());
 
-				const auto& category = SortingIcons::Category::Get(snd->form);
+				const auto& category = SortingIcons::Category::Get(snd->form->TryGetREFRParent());
 				if (category->IsValid() && !category->filename.empty())
 				{
 					fst->SetFloat("_Icon", true);
@@ -241,8 +243,6 @@ namespace UserInterface::LootMenu
 				}
 				else fst->SetFloat("_Meter", 0);
 
-				const auto fontManager = FontManager::GetSingleton();
-				const auto font = tileMain->GetFloat("_Font");
 				const auto wrapWidth = fst->GetChild("ButtonText")->GetFloat(kTileValue_wrapwidth);
 
 				const auto stringDimensions = fontManager->GetStringDimensions(string.c_str(), font, wrapWidth);
@@ -283,7 +283,10 @@ namespace UserInterface::LootMenu
 		void Show()
 		{
 			owned = container->IsCrimeOrEnemy();
-			tileMain->SetString("_Title", container->GetTheName());
+
+			tileMain->SetString("_Title", FontManager::GetSingleton()->StringShorten(
+				                    container->GetTheName(), tileMain->GetFloat("_FontHead"),
+				                    tileMain->GetFloat("_Width") - indentItem * 3 - 50).c_str());
 			tileMain->SetFloat("_SystemColor", 1 + owned);
 
 			Items::Update();
@@ -397,6 +400,7 @@ namespace UserInterface::LootMenu
 			if (!ref->baseForm->CanContainItems()) return nullptr;
 			if (ref->IsLocked()) return nullptr;
 			if (ref->IsActor() && reinterpret_cast<Actor*>(ref)->lifeState != kLifeState_Dead && reinterpret_cast<Actor*>(ref)->lifeState != kLifeState_Dying) return nullptr;
+			if (g_player->grabbedRef) return nullptr;
 			if (GetCannibalPrompt(ref)) return nullptr;
 			if (CheckContainer(ref) == kDisallow) return nullptr;
 			if (std::string(ref->GetTheName()).empty()) return nullptr;

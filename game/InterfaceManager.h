@@ -12,9 +12,6 @@ enum eEmotion {
 
 class ButtonIcon;
 
-typedef FontManager* (*_FontManager_GetSingleton)(void);
-const _FontManager_GetSingleton FontManager_GetSingleton = reinterpret_cast<_FontManager_GetSingleton>(0x011F33F8);
-
 typedef void (*_ShowMessageBox_Callback)(void);
 extern const _ShowMessageBox_Callback ShowMessageBox_Callback;
 
@@ -404,12 +401,42 @@ struct FontInfo {
 		UInt16	wrd006;	// 006	Init'd to 0x0FFFF
 	};	// 0008
 
-	struct FontData {
-		float	flt000;				// 000
-		UInt32	fontTextureCount;	// 004
-		UInt32	unk008;
-		char	unk00C[8][0x024];	// array of 8 Font Texture Name (expected in Textures\Fonts\*.tex)
+
+	// 3928
+	struct FontData
+	{
+		struct TexFileName
+		{
+			UInt32			unk00;
+			char			fileName[0x20];
+		};
+
+		struct CharDimensions
+		{
+			float			flt00;		// 0
+			float			flt04;		// 4
+			float			flt08;		// 8
+			float			flt0C;		// C
+			float			flt10;		// 10
+			float			flt14;		// 14
+			float			flt18;		// 18
+			float			flt1C;		// 1C
+			float			flt20;		// 20
+			float			width;		// 24
+			float			height;		// 28
+			float			flt2C;		// 2C
+			float			widthMod;	// 30
+			float			flt34;		// 34
+		//	totalWidth = width + widthMod
+		};
+		static_assert(sizeof(CharDimensions) == 0x38);
+
+		float			lineHeight;				// 0000
+		UInt32			numTextures;			// 0004
+		TexFileName		textures[8];			// 0008
+		CharDimensions	charDimensions[256];	// 0128
 	};
+	static_assert(sizeof(FontData) == 0x3928);
 
 	struct TextReplaced {
 		String	str000;	// 000	Init'd to ""
@@ -422,15 +449,15 @@ struct FontInfo {
 		UInt8	fill[3];
 	};	// 020
 
-	UInt16						unk000;			// 000	Init'd to 0, loaded successfully in OBSE (word bool ?)
-	UInt16						pad002;			// 002
-	char* path;			// 004	Init'd to arg2, passed to OpenBSFile
+	UInt8						isLoaded;		// 000	Init'd to 0, loaded successfully in OBSE (word bool ?)
+	UInt8						pad01[3];		// 001
+	char*						filePath;		// 004	Init'd to arg2, passed to OpenBSFile
 	UInt32						id;				// 008	1 based, up to 8 apparently
-	NiObject* unk00C[8];	// 00C	in OBSE: NiTexturingProperty			* textureProperty
+	NiObject*					unk00C[8];		// 00C	in OBSE: NiTexturingProperty			* textureProperty
 	float						unk02C;			// 02C	Those two values seem to be computed by looping through the characters in the font (max height/weight ?)
 	float						unk030;			// 030
 	UInt32						unk034;			// 038	in OBSE: NiD3DShaderConstantMapEntry	* unk34;
-	FontData* fontData;		// 038	Init'd to 0, might be the font content, at Unk004 we have the count of font texture
+	FontData*					fontData;		// 038	Init'd to 0, might be the font content, at Unk004 we have the count of font texture
 	Data03C						dat03C;			// 03C
 	BSSimpleArray<ButtonIcon>	unk044;			// 044
 
@@ -448,10 +475,10 @@ public:
 	// 3C
 
 
-	FontInfo* fontInfos[8];		// 00
+	FontInfo*			fontInfos[8];		// 00
 	UInt8				byte20;				// 20
 	UInt8				pad21[3];			// 21
-	FontInfo* extraFonts[80];	// 24
+	FontInfo*			extraFonts[80];		// 24
 
 	NiPoint3* GetStringDimensions(NiPoint3* outDims, const char* srcString, UInt32 fontID, Float32 wrapwidth = 0x7F7FFFFF, UInt32 startIdx = 0) { return ThisCall<NiPoint3*>(0xA1B020, this, outDims, srcString, fontID, wrapwidth, startIdx); };
 	NiPoint3* GetStringDimensions(const char* srcString, UInt32 fontID, Float32 wrapwidth = 0x7F7FFFFF, UInt32 startIdx = 0)
@@ -459,6 +486,8 @@ public:
 		NiPoint3 out;
 		return GetStringDimensions(&out, srcString, fontID, wrapwidth, startIdx);
 	}
+
+	std::string StringShorten(const std::string& str, const UInt32 font, const Float32 max) const;
 
 	static FontManager* GetSingleton() { return *reinterpret_cast<FontManager**>(0x11F33F8); };
 };
@@ -527,7 +556,7 @@ public:
 		float           offsetX;    // 00
 		float           offsetY;    // 04
 		UInt32          alignment;  // 08
-		NiNode* node;       // 0C
+		NiNode*			node;       // 0C
 		String          text;       // 10
 		float           flt18;      // 18    Always -1.0
 		NiColorAlpha    color;      // 1C
