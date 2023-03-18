@@ -139,7 +139,7 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClCompile Include="ConfigurationMenu\StewMenu\HotkeyField.cpp" />
     <ClCompile Include="ConfigurationMenu\StewMenu\InputField.cpp" />
     <ClCompile Include="ConfigurationMenu\StewMenu\JSONHandler.cpp" />
-    <ClCompile Include="ConfigurationMenu\StewMenu\StewMenu.cpp" />
+    <ClCompile Include="ConfigurationMenu\StewMenu\ConfigurationMenuStew.cpp" />
     <ClCompile Include="definitions.cpp" />
     <ClCompile Include="dllmain.c">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -218,9 +218,9 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClInclude Include="ConfigurationMenu\StewMenu\HotkeyField.h" />
     <ClInclude Include="ConfigurationMenu\StewMenu\InputField.h" />
     <ClInclude Include="ConfigurationMenu\StewMenu\JSONHandler.h" />
-    <ClInclude Include="ConfigurationMenu\StewMenu\StewMenu.h" />
-    <ClInclude Include="ConfigurationMenu\StewMenu\StewMenuItem.h" />
-    <ClInclude Include="ConfigurationMenu\StewMenu\StewMenuSubsettingItem.h" />
+    <ClInclude Include="ConfigurationMenu\StewMenu\ConfigurationMenuStew.h" />
+    <ClInclude Include="ConfigurationMenu\StewMenu\SM_Mod.h" />
+    <ClInclude Include="ConfigurationMenu\StewMenu\SM_Setting.h" />
     <ClInclude Include="functions.h" />
     <ClInclude Include="definitions.h" />
     <ClInclude Include="main.h" />

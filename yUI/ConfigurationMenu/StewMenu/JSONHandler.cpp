@@ -1,57 +1,16 @@
 #include "JSONHandler.h"
-#include "StewMenu.h"
+#include "ConfigurationMenuStew.h"
 #include "json.h"
 
-class Tag
+
+
+template <typename T> std::vector<T> GetSetFromElement(const nlohmann::basic_json<>& elem)
 {
-public:
-	std::string id;
-	std::string name;
-	std::string description;
-};
-
-class Mod
-{
-public:
-	std::string id;
-	std::string name;
-	std::string description;
-	std::unordered_set<std::string> tags;
-	std::string version;
-};
-
-class Setting
-{
-public:
-	enum Type
-	{
-		kNone,
-		kChoice,
-		kInteger,
-		kFloat,
-	};
-
-	std::string id;
-	std::string name;
-	std::string description;
-	std::unordered_set<std::string> tags;
-	std::unordered_set<std::string> mods;
-	std::string condition;
-	Type type = kNone;
-
-};
-
-class SettingChoice : public Setting
-{
-	std::unordered_map<SInt32, std::string> values;
-	std::string path;
-	SInt32 defaultValue;
-};
-
-
-inline std::vector<std::unique_ptr<Tag>>		g_Tags;
-inline std::vector<std::unique_ptr<Mod>>		g_Mods;
-inline std::vector<std::unique_ptr<Setting>>	g_Settings;
+	std::vector<T> set{};
+	if (!elem.is_array()) set.push_back(elem.get<T>());
+	else for (const auto& i : elem) set.push_back(i.get<T>());
+	return set;
+}
 
 void HandleTag(nlohmann::basic_json<> elem)
 {
@@ -61,13 +20,13 @@ void HandleTag(nlohmann::basic_json<> elem)
 		return;
 	}
 
-	Tag tag{};
+	JS_Tag tag{};
 
 	if (elem.contains("id"))			tag.id = elem["id"].get<std::string>();
-	if (elem.contains("name"))			tag.name = elem["id"].get<std::string>();
+	if (elem.contains("name"))			tag.name = elem["name"].get<std::string>();
 	if (elem.contains("description"))	tag.description = elem["description"].get<std::string>();
 
-	g_Tags.push_back(std::make_unique<Tag>(tag));
+	ConfigurationMenu::GetSingleton()->g_Tags.push_back(std::make_unique<JS_Tag>(tag));
 }
 
 void HandleMod(nlohmann::basic_json<> elem)
@@ -78,15 +37,17 @@ void HandleMod(nlohmann::basic_json<> elem)
 		return;
 	}
 
-	Mod mod{};
+	JS_Mod mod{};
 
 	if (elem.contains("id"))			mod.id = elem["id"].get<std::string>();
-	if (elem.contains("name"))			mod.name = elem["id"].get<std::string>();
+	if (elem.contains("name"))			mod.name = elem["name"].get<std::string>();
 	if (elem.contains("description"))	mod.description = elem["description"].get<std::string>();
 
 	if (elem.contains("version"))		mod.version = elem["version"].get<std::string>();
 
-	g_Mods.push_back(std::make_unique<Mod>(mod));
+	if (elem.contains("tags"))			mod.tags.insert_range(GetSetFromElement<std::string>(elem["tags"]));
+
+	ConfigurationMenu::GetSingleton()->g_Mods.push_back(std::make_unique<JS_Mod>(mod));
 }
 
 void HandleSetting(nlohmann::basic_json<> elem)
@@ -97,13 +58,16 @@ void HandleSetting(nlohmann::basic_json<> elem)
 		return;
 	}
 
-	Setting setting{};
+	JS_Setting setting{};
 
 	if (elem.contains("id"))			setting.id = elem["id"].get<std::string>();
-	if (elem.contains("name"))			setting.name = elem["id"].get<std::string>();
+	if (elem.contains("name"))			setting.name = elem["name"].get<std::string>();
 	if (elem.contains("description"))	setting.description = elem["description"].get<std::string>();
 
-	g_Settings.push_back(std::make_unique<Setting>(setting));
+	if (elem.contains("tags"))			setting.tags.insert_range(GetSetFromElement<std::string>(elem["tags"]));
+	if (elem.contains("mods"))			setting.mods.insert_range(GetSetFromElement<std::string>(elem["mods"]));
+
+	ConfigurationMenu::GetSingleton()->g_Settings.push_back(std::make_unique<JS_Setting>(setting));
 }
 
 void HandleJSON(const std::filesystem::path& path)
@@ -149,22 +113,31 @@ void InitTweaksListFromJSON()
 		if (iter.path().extension().string() == ".json") HandleJSON(iter.path());
 	}
 
-	for (const auto& mod : g_Mods)
+	for (const auto& mod : ConfigurationMenu::GetSingleton()->g_Mods)
 	{
-		auto stewMenuItem = new StewMenuItem(mod->name.c_str(), mod->description.c_str(), 0, mod->id.c_str(), "", "");
-		StewMenu::GetSingleton()->tweaksListBox.Insert(stewMenuItem, mod->name.c_str())->SetFloat(kTileValue_id, kStewMenu_TweakListItem);
+		auto stewMenuItem = new SM_Mod(mod->name, mod->description, 0, mod->id, "", "");
+		ConfigurationMenu::GetSingleton()->tweaksListBox.Insert(stewMenuItem, mod->name.c_str())->SetFloat(kTileValue_id, kConfigurationMenu_ModListItem);
 	}
 
+	/*
+	for (const auto& setting : ConfigurationMenu::GetSingleton()->g_Settings)
+	{
+		auto subSetting = new SM_Setting(setting->name.c_str(), setting->description.c_str(), setting->id.c_str(), "");
+
+		ConfigurationMenu::GetSingleton()->subSettingsListBox.Insert(subSetting);
+	}
+
+	
 	for (const auto& setting : g_Settings)
 	{
-		auto subSetting = new StewMenuSubsettingItem(setting->name.c_str(), setting->description.c_str(), setting->id.c_str(), "");
+		auto subSetting = new SM_Setting(setting->name.c_str(), setting->description.c_str(), setting->id.c_str(), "");
 
-		for (const auto& mod : StewMenu::GetSingleton()->tweaksListBox.list)
+		for (const auto& mod : ConfigurationMenu::GetSingleton()->tweaksListBox.list)
 		{
 			mod->object->AddSubsetting(subSetting);
 		}
 	}
-
+	*/
 	/*
 	 * 
 	auto category = elem.contains("category") ? elem["category"].get<std::string>() : "Other";
@@ -179,11 +152,11 @@ void InitTweaksListFromJSON()
 	}
 
 	auto name = e.contains("name") ? e["name"].get<std::string>() : "";
-	internalName = e.contains("internalName") ? e["internalName"].get<std::string>() : "";
+	id = e.contains("id") ? e["id"].get<std::string>() : "";
 	description = e.contains("description") ? e["description"].get<std::string>() : "";
-	auto internalCategory = e.contains("internalCategory") ? e["internalCategory"].get<std::string>() : "";
+	auto id = e.contains("id") ? e["id"].get<std::string>() : "";
 
-	auto subSetting = new StewMenuSubsettingItem(name.c_str(), description.c_str(), internalName.c_str(), internalCategory.c_str());
+	auto subSetting = new SM_Setting(name.c_str(), description.c_str(), id.c_str(), id.c_str());
 
 	subSetting->data.SetType(type);
 

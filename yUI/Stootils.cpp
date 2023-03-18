@@ -57,9 +57,9 @@ _declspec(naked) bool IsControlHeld()
 }
 
 
-int GetCharsSinceSpace(char* text, UInt32 offset)
+int GetCharsSinceSpace(const char* text, UInt32 offset)
 {
-	char* barPos = text + offset;
+	const char* barPos = text + offset;
 	int numChars = 0;
 
 	while (barPos != text && !isalnum(*--barPos)) numChars++;
@@ -68,9 +68,9 @@ int GetCharsSinceSpace(char* text, UInt32 offset)
 	return numChars;
 }
 
-int GetCharsTillSpace(char* text, UInt32 offset)
+int GetCharsTillSpace(const char* text, UInt32 offset)
 {
-	char* barPos = text + offset;
+	const char* barPos = text + offset;
 
 	int numChars = 0;
 

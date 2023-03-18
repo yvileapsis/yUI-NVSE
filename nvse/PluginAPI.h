@@ -953,7 +953,7 @@ struct NVSELoggingInterface
 	// The path is relative to base game folder.
 	// If empty string (logPath[0] == 0), use the base game folder.
 	// xNVSE ensures this isn't passed as nullptr.
-	const wchar_t* logPath;
+	const char* (__fastcall* GetPluginLogPath)();
 };
 #endif
 

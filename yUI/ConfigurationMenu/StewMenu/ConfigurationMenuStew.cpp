@@ -1,4 +1,4 @@
-#include "StewMenu.h"
+#include "ConfigurationMenuStew.h"
 #include "JSONHandler.h"
 #include <sstream>
 
@@ -10,8 +10,8 @@
 
 const char* MenuPath = "Data\\Menus\\untitledmenuproject.xml";
 
-StewMenu* g_stewMenu;
-StewMenu* StewMenu::GetSingleton() { return g_stewMenu; };
+ConfigurationMenu* g_stewMenu;
+ConfigurationMenu* ConfigurationMenu::GetSingleton() { return g_stewMenu; };
 
 _declspec(naked) bool IsControllerConnected()
 {
@@ -28,7 +28,7 @@ _declspec(naked) bool IsControllerConnected()
 
 int g_bTweaksMenuShowSettingPathOnSubsettings = true;
 
-void StewMenu::SetTile(UInt32 tileID, Tile* tile)
+void ConfigurationMenu::SetTile(UInt32 tileID, Tile* tile)
 {
 	switch (tileID)
 	{
@@ -71,23 +71,23 @@ void StewMenu::SetTile(UInt32 tileID, Tile* tile)
 	}
 }
 
-void StewMenu::HandleMousewheel(UInt32 tileID, Tile* tile)
+void ConfigurationMenu::HandleMousewheel(UInt32 tileID, Tile* tile)
 {
 
 }
 
-void SetSliderDisplayedValues(Tile* sliderRect, StewMenuSubsettingItem* setting)
+void SetSliderDisplayedValues(Tile* sliderRect, SM_Setting* setting)
 {
 	char buf[0x40];
 	if (setting->GetDataType() == SubSettingData::kSettingDataType_Integer)
 	{
 		sliderRect->SetFloat(_SetVTrait, setting->data.valueInt);
-		snprintf(buf, sizeof(buf), "%d", setting->data.valueInt);
+		snprintf(buf, sizeof buf, "%d", setting->data.valueInt);
 	}
 	else
 	{
 		sliderRect->SetFloat(_SetVTrait, setting->data.valueFloat);
-		snprintf(buf, sizeof(buf), "%.4f", setting->data.valueFloat);
+		snprintf(buf, sizeof buf, "%.4f", setting->data.valueFloat);
 	}
 
 	if (auto sliderTextRect = sliderRect->parent->GetChildByID(kStewMenu_SliderText))
@@ -101,7 +101,7 @@ void SetSliderDisplayedValues(Tile* sliderRect, StewMenuSubsettingItem* setting)
 	sliderRect->SetFloat(kTileValue_dragx, 0);
 }
 
-void StewMenu::HandleActiveMenuClickHeld(UInt32 tileID, Tile* activeTile)
+void ConfigurationMenu::HandleActiveMenuClickHeld(UInt32 tileID, Tile* activeTile)
 {
 	if (tileID == kStewMenu_SliderDraggableRect)
 	{
@@ -110,18 +110,18 @@ void StewMenu::HandleActiveMenuClickHeld(UInt32 tileID, Tile* activeTile)
 		{
 			auto newValue = activeTile->GetFloat(_ValueTrait);
 
-			auto category = setting->GetInternalCategory();
-			auto name = setting->GetInternalName();
+			auto category = setting->settingCategory;
+			auto name = setting->id;
 
 			if (setting->GetDataType() == SubSettingData::kSettingDataType_Float)
 			{
 				setting->data.valueFloat = newValue;
-				ini.SetDoubleValue(category, name, newValue);
+				ini.SetDoubleValue(category.c_str(), name.c_str(), newValue);
 			}
 			else
 			{
 				setting->data.valueInt = newValue;
-				ini.SetLongValue(category, name, newValue);
+				ini.SetLongValue(category.c_str(), name.c_str(), newValue);
 			}
 
 			SetSliderDisplayedValues(activeTile, setting);
@@ -140,12 +140,12 @@ void StewMenu::HandleActiveMenuClickHeld(UInt32 tileID, Tile* activeTile)
 	}
 }
 
-void StewMenu::SetCategoriesListActive(bool isVisible)
+void ConfigurationMenu::SetCategoriesListActive(bool isVisible)
 {
 	this->tile->SetFloat(_IsCategoriesActiveTrait, isVisible);
 }
 
-bool StewMenu::GetCategoriesListActive()
+bool ConfigurationMenu::GetCategoriesListActive()
 {
 	return this->tile->GetFloat(_IsCategoriesActiveTrait);
 }
@@ -158,7 +158,7 @@ void __cdecl ClearSelectedTrait(Tile* tile, char* categoryData)
 	}
 }
 
-void StewMenu::HandleLeftClickPress(UInt32 tileID, Tile* clickedTile)
+void ConfigurationMenu::HandleLeftClick(UInt32 tileID, Tile* clickedTile)
 {
 	if (clickedTile == categoriesListBox.scrollBar || clickedTile->parent == categoriesListBox.scrollBar)
 	{
@@ -166,7 +166,7 @@ void StewMenu::HandleLeftClickPress(UInt32 tileID, Tile* clickedTile)
 	}
 }
 
-bool StewMenu::ToggleTweakInINI(StewMenuItem* tweak, Tile* tile = nullptr)
+bool ConfigurationMenu::ToggleTweakInINI(SM_Mod* tweak, Tile* tile = nullptr)
 {
 	auto currentVal = tweak->value;
 	if (currentVal != -1)
@@ -190,7 +190,7 @@ bool StewMenu::ToggleTweakInINI(StewMenuItem* tweak, Tile* tile = nullptr)
 	return false;
 }
 
-void StewMenu::HandleClick(SInt32 tileID, Tile* clickedTile) 
+void ConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile) 
 {
 	switch (tileID)
 	{
@@ -200,14 +200,18 @@ void StewMenu::HandleClick(SInt32 tileID, Tile* clickedTile)
 		break;
 	}
 
-	case kStewMenu_TweakListItem:
+	case kConfigurationMenu_ModListItem:
 	{
-		auto tweak = tweaksListBox.GetItemForTile(clickedTile);
+		auto item = tweaksListBox.GetItemForTile(clickedTile);
+
+		this->SetActiveTweak(item);
+//		PlayGameSound("UIMenuFocus");
+/*
 		if (!ToggleTweakInINI(tweak, clickedTile))
 		{
 			PlayGameSound("UIMenuCancel");
-			Log(true, Log::kConsole) << FormatString("StewMenu: Could not resolve setting: [%s] %s", tweak->GetInternalCategory(), tweak->GetInternalName());
-		}
+			Log(true, Log::kConsole) << FormatString("ConfigurationMenu: Could not resolve setting: [%s] %s", tweak->GetInternalCategory(), tweak->GetInternalName());
+		}*/
 		break;
 	}
 
@@ -287,7 +291,7 @@ void StewMenu::HandleClick(SInt32 tileID, Tile* clickedTile)
 			}
 			else
 			{
-				Log(true, Log::kConsole) << FormatString("StewMenu: Failed to find input text tile (ID: %d)", kStewMenu_SubsettingInputFieldText);
+				Log(true, Log::kConsole) << FormatString("ConfigurationMenu: Failed to find input text tile (ID: %d)", kStewMenu_SubsettingInputFieldText);
 			}
 		}
 		else if (setting->IsCheckboxField())
@@ -295,7 +299,7 @@ void StewMenu::HandleClick(SInt32 tileID, Tile* clickedTile)
 			bool newSettingValue = setting->data.valueInt == 0;
 			setting->data.valueInt = newSettingValue;
 			clickedTile->SetFloat(_SelectedTrait, newSettingValue);
-			ini.SetLongValue(setting->GetInternalCategory(), setting->GetInternalName(), newSettingValue);
+			ini.SetLongValue(setting->settingCategory.c_str(), setting->id.c_str(), newSettingValue);
 
 			this->TouchSubsetting(setting);
 		}
@@ -351,11 +355,11 @@ void StewMenu::HandleClick(SInt32 tileID, Tile* clickedTile)
 	}
 }
 
-void StewMenu::SetInSearchMode(bool isSearchMode)
+void ConfigurationMenu::SetInSearchMode(bool isSearchMode)
 {
 	searchBar.SetActive(isSearchMode);
 
-	bool isSuspendedSearch = !isSearchMode && *searchBar.GetText();
+	bool isSuspendedSearch = !isSearchMode && !searchBar.GetText().empty();
 	this->tile->SetFloat(_IsSearchActiveTrait, isSuspendedSearch ? 2 : isSearchMode);
 
 	if (isSearchMode)
@@ -364,21 +368,21 @@ void StewMenu::SetInSearchMode(bool isSearchMode)
 	}
 }
 
-bool StewMenu::GetInSearchMode()
+bool ConfigurationMenu::GetInSearchMode()
 {
 	return searchBar.isActive;
 }
 
-bool StewMenu::IsSearchSuspended()
+bool ConfigurationMenu::IsSearchSuspended()
 {
-	return !searchBar.isActive && *searchBar.GetText();
+	return !searchBar.isActive && !searchBar.GetText().empty();
 }
 
 // disable the warnings for 'discarding return value of function with 'nodiscard' attribute' 
 // since we only need the parse length of the stol and stof calls
 #pragma warning( push )
 #pragma warning( disable: 4834 )
-bool StewMenu::IsSubsettingInputValid()
+bool ConfigurationMenu::IsSubsettingInputValid()
 {
 	auto dataType = activeInputSubsetting->GetDataType();
 	switch (dataType)
@@ -429,7 +433,7 @@ bool StewMenu::IsSubsettingInputValid()
 }
 #pragma warning( pop )
 
-void StewMenu::SetInSubsettingInputMode(bool isActive)
+void ConfigurationMenu::SetInSubsettingInputMode(bool isActive)
 {
 	auto tile = subSettingInput.tile;
 	if (tile)
@@ -505,12 +509,12 @@ void StewMenu::SetInSubsettingInputMode(bool isActive)
 	subSettingInput.SetActive(isActive);
 }
 
-bool StewMenu::GetInSubsettingInputMode()
+bool ConfigurationMenu::GetInSubsettingInputMode()
 {
 	return subSettingInput.isActive;
 }
 
-void StewMenu::SetInHotkeyMode(bool isActive)
+void ConfigurationMenu::SetInHotkeyMode(bool isActive)
 {
 	auto tile = hotkeyInput.tile;
 	if (tile)
@@ -548,14 +552,14 @@ void StewMenu::SetInHotkeyMode(bool isActive)
 	hotkeyInput.SetActive(isActive);
 }
 
-bool StewMenu::GetInHotkeyMode()
+bool ConfigurationMenu::GetInHotkeyMode()
 {
 	return hotkeyInput.isActive;
 }
 
-bool __cdecl FilterTweaksOnActiveTrait(StewMenuItem* item)
+bool __cdecl FilterTweaksOnActiveTrait(SM_Mod* item)
 {
-	auto filterMode = StewMenu::GetSingleton()->filterMode;
+	auto filterMode = ConfigurationMenu::GetSingleton()->filterMode;
 	if (filterMode == FilterMode::kFilterMode_ShowAll) return false;
 
 	if (item->value == 0)
@@ -566,28 +570,29 @@ bool __cdecl FilterTweaksOnActiveTrait(StewMenuItem* item)
 	return filterMode == kFilterMode_ShowInActive;
 }
 
-bool __cdecl FilterOnSelectedCategory(StewMenuItem* item)
+bool __cdecl FilterOnSelectedCategory(SM_Mod* item)
 {
-	const char* selectedCategory = StewMenu::GetSingleton()->selectedCategory;
-	return selectedCategory && strcmp(item->GetCategory(), selectedCategory);
+	const auto selectedCategory = ConfigurationMenu::GetSingleton()->selectedCategory;
+	return !selectedCategory.empty() && item->category != selectedCategory;
 }
 
-bool __cdecl HideItemsNotMatchingFilterString(StewMenuItem* item)
+bool __cdecl HideItemsNotMatchingFilterString(SM_Mod* item)
 {
-	auto searchStr = StewMenu::GetSingleton()->searchBar.GetText();
-	if (stristr(item->GetName(), searchStr)) return false;
-	if (stristr(item->GetInternalName(), searchStr)) return false;
-	return !stristr(item->GetDescription(), searchStr);
+	const auto searchStr = ConfigurationMenu::GetSingleton()->searchBar.GetText();
+	if (item->name.find(searchStr) != std::string::npos) return false;
+	if (item->settingName.find(searchStr) != std::string::npos) return false;
+	if (item->description.find(searchStr) != std::string::npos) return false;
+	return true;
 }
 
-bool __cdecl TweakFilter(StewMenuItem* item)
+bool __cdecl TweakFilter(SM_Mod* item)
 {
 	if (FilterTweaksOnActiveTrait(item)) return true;
 	if (HideItemsNotMatchingFilterString(item)) return true;
 	return FilterOnSelectedCategory(item);
 }
 
-void StewMenu::RefreshFilter()
+void ConfigurationMenu::RefreshFilter()
 {
 	tweaksListBox.Filter(TweakFilter);
 
@@ -604,7 +609,7 @@ void StewMenu::RefreshFilter()
 	}
 }
 
-void StewMenu::CycleFilterMode()
+void ConfigurationMenu::CycleFilterMode()
 {
 	++filterMode;
 	if (filterMode >= kFilterMode_Count) filterMode = kFilterMode_ShowAll;
@@ -624,14 +629,14 @@ void __fastcall ReloadTweaksMenuInOneFrameHook(void* startMenu)
 }
 
 // reloads the entire menu by closing it, and writing a hook in StartMenu::Update which waits a couple frames and then reopens the menu
-void StewMenu::ReloadMenuXML()
+void ConfigurationMenu::ReloadMenuXML()
 {
 	this->Close();
 	WriteRelCall(0x7CFA8C, UInt32(ReloadTweaksMenuInOneFrameHook));
 	reloadTweaksMenuFrameDelay = 2;
 }
 
-bool StewMenu::XMLHasChanges()
+bool ConfigurationMenu::XMLHasChanges()
 {
 	if (lastXMLWriteTime.dwLowDateTime == 0 && lastXMLWriteTime.dwHighDateTime == 0)
 	{
@@ -645,7 +650,7 @@ bool StewMenu::XMLHasChanges()
 		if (GetFileTime(tweaksXMLHandle, nullptr, nullptr, &lastWriteTime))
 		{
 			CloseHandle(tweaksXMLHandle);
-			return (lastXMLWriteTime.dwLowDateTime != lastWriteTime.dwLowDateTime || lastXMLWriteTime.dwHighDateTime != lastWriteTime.dwHighDateTime);
+			return lastXMLWriteTime.dwLowDateTime != lastWriteTime.dwLowDateTime || lastXMLWriteTime.dwHighDateTime != lastWriteTime.dwHighDateTime;
 		}
 
 		CloseHandle(tweaksXMLHandle);
@@ -653,14 +658,14 @@ bool StewMenu::XMLHasChanges()
 	return true;
 }
 
-void StewMenu::ClearAndCloseSearch()
+void ConfigurationMenu::ClearAndCloseSearch()
 {
 	searchBar.Set("");
 	this->SetInSearchMode(false);
 	this->RefreshFilter();
 }
 
-bool StewMenu::HandleKeyboardInput(UInt32 key) 
+bool ConfigurationMenu::HandleKeyboardInput(UInt32 key) 
 {
 	if (IsControlHeld())
 	{
@@ -714,14 +719,14 @@ bool StewMenu::HandleKeyboardInput(UInt32 key)
 	}
 	else if (this->GetInHotkeyMode())
 	{
-		// ignore all keyboard input while in hotkey mode, hotkeys are checked in StewMenu::Update to allow checking function keys etc.
+		// ignore all keyboard input while in hotkey mode, hotkeys are checked in ConfigurationMenu::Update to allow checking function keys etc.
 		return true;
 	}
 	else if ((key | 0x20) == 'r')
 	{
 		if (IsShiftHeld())
 		{
-			this->WriteAllChangesToINIs();
+//			this->WriteAllChangesToINIs();
 
 //			ReloadINIs();
 		}
@@ -735,12 +740,12 @@ bool StewMenu::HandleKeyboardInput(UInt32 key)
 	return false;
 }
 
-UInt32 StewMenu::GetID(void)
+UInt32 ConfigurationMenu::GetID(void)
 {
 	return UInt32(MENU_ID);
 }
 
-bool StewMenu::HandleActiveSliderArrows(bool isRightArrow, float scale)
+bool ConfigurationMenu::HandleActiveSliderArrows(bool isRightArrow, float scale)
 {
 	if (auto tile = this->subSettingsListBox.selected)
 	{
@@ -757,19 +762,19 @@ bool StewMenu::HandleActiveSliderArrows(bool isRightArrow, float scale)
 				if (!isRightArrow) addend = -addend;
 				auto newValue = max(minValue, min(maxValue, currentSettingValue + addend));
 
-				auto category = setting->GetInternalCategory();
-				auto name = setting->GetInternalName();
+				auto category = setting->settingCategory;
+				auto name = setting->id;
 
 				if (setting->GetDataType() == SubSettingData::kSettingDataType_Float)
 				{
 					setting->data.valueFloat = newValue;
-					ini.SetDoubleValue(category, name, newValue);
+					ini.SetDoubleValue(category.c_str(), name.c_str(), newValue);
 				}
 				else
 				{
 					if (isRightArrow) newValue = ceil(newValue);
 					setting->data.valueInt = newValue;
-					ini.SetLongValue(category, name, newValue);
+					ini.SetLongValue(category.c_str(), name.c_str(), newValue);
 				}
 
 				SetSliderDisplayedValues(sliderRect, setting);
@@ -786,7 +791,7 @@ bool StewMenu::HandleActiveSliderArrows(bool isRightArrow, float scale)
 			SetDisplayedValuesForSubsetting(tile, setting);
 			this->SetSubsettingDescriptionTileString(setting);
 
-			ini.SetLongValue(setting->GetInternalCategory(), setting->GetInternalName(), setting->data.valueInt);
+			ini.SetLongValue(setting->settingCategory.c_str(), setting->id.c_str(), setting->data.valueInt);
 			this->TouchSubsetting(setting);
 
 			return true;
@@ -796,7 +801,7 @@ bool StewMenu::HandleActiveSliderArrows(bool isRightArrow, float scale)
 	return false;
 }
 
-bool StewMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode code, float keyState)
+bool ConfigurationMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode code, float keyState)
 {
 	switch (code)
 	{
@@ -880,7 +885,7 @@ bool StewMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode code, float ke
 	return false;
 }
 
-bool StewMenu::HandleControllerInput(int code, Tile* tile)
+bool ConfigurationMenu::HandleControllerInput(int code, Tile* tile)
 {
 	this->SetInSearchMode(false);
 	if (this->GetInSubsettingInputMode() && code != OSInputGlobals::kXboxCtrl_BUTTON_A)
@@ -897,48 +902,48 @@ bool StewMenu::HandleControllerInput(int code, Tile* tile)
 	return false;
 }
 
-void StewMenu::SetActiveSubsettingValueFromInput()
+void ConfigurationMenu::SetActiveSubsettingValueFromInput()
 {
-	auto category = activeInputSubsetting->GetInternalCategory();
-	auto name = activeInputSubsetting->GetInternalName();
+	auto category = activeInputSubsetting->settingCategory;
+	auto name = activeInputSubsetting->id;
 
 	auto dataType = activeInputSubsetting->GetDataType();
 	switch (dataType)
 	{
 	case SubSettingData::kSettingDataType_String:
 	{
-		activeInputSubsetting->data.valueStr = (subSettingInput.GetText());
-		ini.SetValue(category, name, activeInputSubsetting->data.valueStr.c_str());
+		activeInputSubsetting->data.valueStr = subSettingInput.GetText();
+		ini.SetValue(category.c_str(), name.c_str(), activeInputSubsetting->data.valueStr.c_str());
 		break;
 	}
 	case SubSettingData::kSettingDataType_Integer:
 	{
 		activeInputSubsetting->data.valueInt = std::stol(subSettingInput.GetText());
-		ini.SetLongValue(category, name, activeInputSubsetting->data.valueInt);
+		ini.SetLongValue(category.c_str(), name.c_str(), activeInputSubsetting->data.valueInt);
 		break;
 	}
 	case SubSettingData::kSettingDataType_Float:
 	{
 		activeInputSubsetting->data.valueFloat = std::stof(subSettingInput.GetText());
-		ini.SetDoubleValue(category, name, activeInputSubsetting->data.valueFloat);
+		ini.SetDoubleValue(category.c_str(), name.c_str(), activeInputSubsetting->data.valueFloat);
 		break;
 	}
 	}
 }
 
-void StewMenu::SetSubsettingValueFromINI(StewMenuSubsettingItem* setting)
+void ConfigurationMenu::SetSubsettingValueFromINI(SM_Setting* setting)
 {
-	auto category = setting->GetInternalCategory();
-	auto name = setting->GetInternalName();
+	auto category = setting->settingCategory;
+	auto name = setting->id;
 	bool isInvalidSetting = false;
 	switch (setting->GetDataType())
 	{
 	case SubSettingData::kSettingDataType_Integer:
 	{
-		setting->data.valueInt = ini.GetLongValue(category, name, -14356);
+		setting->data.valueInt = ini.GetLongValue(category.c_str(), name.c_str(), -14356);
 		if (setting->data.valueInt == -14356)
 		{
-			setting->data.valueInt = ini.GetDoubleValue(category, name, -14356);
+			setting->data.valueInt = ini.GetDoubleValue(category.c_str(), name.c_str(), -14356);
 			if (setting->data.valueInt == -14356)
 			{
 				setting->data.valueInt = 0;
@@ -949,7 +954,7 @@ void StewMenu::SetSubsettingValueFromINI(StewMenuSubsettingItem* setting)
 	}
 	case SubSettingData::kSettingDataType_Float:
 	{
-		setting->data.valueFloat = ini.GetDoubleValue(category, name, -14356);
+		setting->data.valueFloat = ini.GetDoubleValue(category.c_str(), name.c_str(), -14356);
 		if (setting->data.valueFloat == -14356)
 		{
 			setting->data.valueFloat = 0;
@@ -963,24 +968,24 @@ void StewMenu::SetSubsettingValueFromINI(StewMenuSubsettingItem* setting)
 		{
 			GameHeapFree(setting->data.valueStr.c_str());
 		}
-		auto str = ini.GetValue(category, name, nullptr);
+		auto str = ini.GetValue(category.c_str(), name.c_str(), nullptr);
 		if (!str)
 		{
 			str = "";
 			isInvalidSetting = true;
 		}
-		setting->data.valueStr = (str);
+		setting->data.valueStr = str;
 		break;
 	}
 	}
 
 	if (isInvalidSetting)
 	{
-		Log(true, Log::kConsole) << FormatString("StewMenu: Failed to resolve subsetting: [%s] %s", setting->GetInternalCategory(), setting->GetInternalName());
+		Log(true, Log::kConsole) << FormatString("ConfigurationMenu: Failed to resolve subsetting: [%s] %s", setting->settingCategory.c_str(), setting->id.c_str());
 	}
 }
 
-void SetDisplayedValuesForSubsetting(Tile* tile, StewMenuSubsettingItem* setting)
+void SetDisplayedValuesForSubsetting(Tile* tile, SM_Setting* setting)
 {
 	char buf[0x40];
 
@@ -1014,11 +1019,11 @@ void SetDisplayedValuesForSubsetting(Tile* tile, StewMenuSubsettingItem* setting
 		{
 			if (dataType == SubSettingData::kSettingDataType_Integer)
 			{
-				snprintf(buf, sizeof(buf), "%d", setting->data.valueInt);
+				snprintf(buf, sizeof buf, "%d", setting->data.valueInt);
 			}
 			else
 			{
-				snprintf(buf, sizeof(buf), "%.4f", setting->data.valueFloat);
+				snprintf(buf, sizeof buf, "%.4f", setting->data.valueFloat);
 			}
 			textField->SetString(kTileValue_string, buf, 1);
 		}
@@ -1051,7 +1056,7 @@ void SetListBoxesKeepSelectedWhenNonActive(bool isActive)
 	SafeWrite8(0x7262C3, isActive ? 0x52 : 0x2A); // adjust jump target to skip setting _highlight_y = -1 and _selected_height = 0 if a listbox has no selected entry
 }
 
-void StewMenu::SetActiveTweak(StewMenuItem* tweak)
+void ConfigurationMenu::SetActiveTweak(SM_Mod* tweak)
 {
 	this->SetInSubsettingInputMode(false);
 	this->SetInHotkeyMode(false);
@@ -1063,58 +1068,54 @@ void StewMenu::SetActiveTweak(StewMenuItem* tweak)
 
 	if (tweak)
 	{
-		auto subs = &tweak->subsettings;
-		for (auto iter : *subs)
+		for (const auto& it : g_Settings)
 		{
-			auto setting = iter;
+			if (!it->mods.contains(tweak->settingName)) continue;
+
+			auto setting = new SM_Setting(it->name.c_str(), it->description.c_str(), it->id.c_str(), "");
+
 			this->SetSubsettingValueFromINI(setting);
-			auto tile = subSettingsListBox.Insert(setting);
+			const auto tile = subSettingsListBox.Insert(setting);
 
 			SetDisplayedValuesForSubsetting(tile, setting);
 		}
 	}
 }
 
-void StewMenu::SetTweakDescriptionTileString(StewMenuItem* tweak)
+void ConfigurationMenu::SetTweakDescriptionTileString(SM_Mod* tweak)
 {
-	char buf[0x800];
-	auto description = tweak->GetDescription();
-	snprintf(buf, sizeof(buf), "%s\n- %s", description, tweak->GetInternalName());
-	this->selectionText->SetString(kTileValue_string, buf);
+	this->selectionText->SetString(kTileValue_string, FormatString("%s\n- %s", tweak->description.c_str(), tweak->settingName).c_str());
 }
 
-void StewMenu::SetSubsettingDescriptionTileString(StewMenuSubsettingItem* setting)
+void ConfigurationMenu::SetSubsettingDescriptionTileString(SM_Setting* setting)
 {
-	char buf[0x800];
-	const char* description = setting->GetDescription();
+	auto description = setting->description;
 	if (setting->IsDropdown())
 	{
 		
-		snprintf(buf, sizeof(buf), *description ? "%s\r\n%s" : "%s%s", description, setting->data.GetDropdownDescription());
-		description = buf;
+		description = FormatString(!description.empty() ? "%s\r\n%s" : "%s%s", description, setting->data.GetDropdownDescription());
 	}
 
 	if (g_bTweaksMenuShowSettingPathOnSubsettings)
 	{
-		snprintf(buf, sizeof(buf), *description ? "%s\n[%s]\n%s" : "%s[%s]\n%s", description, setting->GetInternalCategory(), setting->GetInternalName());
-		description = buf;
+		description = FormatString(!description.empty() ? "%s\n[%s]\n%s" : "%s[%s]\n%s", description, setting->settingCategory.c_str(), setting->id.c_str());
 	}
 
-	this->selectionText->SetString(kTileValue_string, description);
+	this->selectionText->SetString(kTileValue_string, description.c_str());
 }
 
-void PlayGameSound(const char* soundPath);
-void StewMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
+void ConfigurationMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 {
 	switch (tileID)
 	{
-	case kStewMenu_TweakListItem:
+	case kConfigurationMenu_ModListItem:
 	{
-		PlayGameSound("UIMenuFocus");
 
 		auto item = tweaksListBox.GetItemForTile(activeTile);
 		this->SetTweakDescriptionTileString(item);
-		this->SetActiveTweak(item);
+//		this->SetActiveTweak(item);
+//		PlayGameSound("UIMenuFocus");
+
 		break;
 	}
 
@@ -1154,18 +1155,17 @@ void StewMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 
 	case kStewMenu_SubSettingsListBackground:
 	{
-		activeSubSettingsList = &subSettingsListBox;
 		break;
 	}
 	}
 }
 
-void StewMenu::HandleUnmouseover(UInt32 tileID, Tile* tile)
+void ConfigurationMenu::HandleUnmouseover(UInt32 tileID, Tile* tile)
 {
 	this->selectionText->SetString(kTileValue_string, "");
 }
 
-void StewMenu::Free() 
+void ConfigurationMenu::Free() 
 {
 	SetListBoxesKeepSelectedWhenNonActive(false);
 
@@ -1204,14 +1204,14 @@ void CopyValuesFrom(CSimpleIni& to, CSimpleIni& from)
 	}
 }
 
-void StewMenu::LoadINIs()
+/*
+void ConfigurationMenu::LoadINIs()
 {
 	char INIPath[MAX_PATH];
-	/*
 	auto errVal = ini.LoadFile(TweaksINIPath);
 	if (errVal == SI_Error::SI_FILE)
 	{
-		Log(true, Log::kConsole) << FormatString("StewMenu:: Failed to read INI");
+		Log(true, Log::kConsole) << FormatString("ConfigurationMenu:: Failed to read INI");
 		return;
 	}
 
@@ -1234,35 +1234,33 @@ void StewMenu::LoadINIs()
 
 			tempINI.Reset();
 		}
-	}*/
+	}
 }
 
-void StewMenu::WriteTweakToINI(StewMenuItem* tweak)
+void ConfigurationMenu::WriteTweakToINI(SM_Mod* tweak)
 {
 	char buf[0x40];
-	snprintf(buf, sizeof(buf), "%d", tweak->value);
+	snprintf(buf, sizeof buf, "%d", tweak->value);
 	WriteValueToINIs(tweak->GetInternalCategory(), tweak->GetInternalName(), buf);
 }
 
-void StewMenu::WriteSubsettingToINI(StewMenuSubsettingItem* setting)
+void ConfigurationMenu::WriteSubsettingToINI(SM_Setting* setting)
 {
-	char buf[0x40];
-	const char* str = buf;
-	switch (setting->GetDataType())
-	{
+	std::string str;
+	switch (setting->GetDataType()) {
 	case SubSettingData::kSettingDataType_Float:
 	{
-		snprintf(buf, sizeof(buf), "%.6f", setting->data.valueFloat);
+		str = FormatString("%.6f", setting->data.valueFloat);
 		break;
 	}
 	case SubSettingData::kSettingDataType_Integer:
 	{
-		snprintf(buf, sizeof(buf), "%d", setting->data.valueInt);
+		str = FormatString("%d", setting->data.valueInt);
 		break;
 	}
 	case SubSettingData::kSettingDataType_String:
 	{
-		str = setting->data.valueStr.c_str();
+		str = setting->data.valueStr;
 		break;
 	}
 	default:
@@ -1271,20 +1269,22 @@ void StewMenu::WriteSubsettingToINI(StewMenuSubsettingItem* setting)
 	}
 	}
 
-	WriteValueToINIs(setting->GetInternalCategory(), setting->GetInternalName(), str);
+	WriteValueToINIs(setting->GetInternalCategory(), setting->GetInternalName(), str.c_str());
 }
+*/
+
+/*
 
 bool IniContainsValue(const char* category, const char* name, const char* fileName)
 {
 	char buf[4];
-	UInt8 numCharactersRead = GetPrivateProfileString(category, name, "", buf, sizeof(buf), fileName);
+	UInt8 numCharactersRead = GetPrivateProfileString(category, name, "", buf, sizeof buf, fileName);
 	return numCharactersRead != 0;
 }
 
 void WriteValueToINIs(const char* category, const char* name, const char* newValue)
 {
 	char INIPath[MAX_PATH];
-	/*
 	if (g_bMultiINISupport)
 	{
 		// loop over all the INIs in reverse order and pick the first one that has the key/name in the ini
@@ -1317,17 +1317,13 @@ void WriteValueToINIs(const char* category, const char* name, const char* newVal
 		iniPaths.DeleteAll();
 	}
 	
-	WritePrivateProfileString(category, name, newValue, TweaksINIPath);*/
-}
+	WritePrivateProfileString(category, name, newValue, TweaksINIPath);
+}*/
 
-void StewMenu::Destructor(bool doFree) 
+void ConfigurationMenu::Destructor(bool doFree) 
 {
 	this->Free();
-	if (doFree)
-	{
-		GameHeapFree(this);
-	}
-
+	if (doFree) GameHeapFree(this);
 	g_stewMenu = nullptr;
 }
 
@@ -1339,24 +1335,24 @@ void RestartGameWarningCallback()
 	if (InterfaceManager::GetSingleton()->GetMessageBoxResult() == kDontShowThisAgain)
 	{
 		g_bShownTweaksMenuReloadWarning = 1;
-		WriteValueToINIs("INI", "bShownTweaksMenuReloadWarning", " 1");
+//		WriteValueToINIs("INI", "bShownTweaksMenuReloadWarning", " 1");
 	}
 }
 
-void StewMenu::WriteAllChangesToINIs()
+void ConfigurationMenu::WriteAllChangesToINIs()
 {
 	for (auto iter : touchedTweaks)
 	{
-		this->WriteTweakToINI(iter);
+//		this->WriteTweakToINI(iter);
 	}
 
 	for (auto iter : touchedSubsettings)
 	{
-		this->WriteSubsettingToINI(iter);
+//		this->WriteSubsettingToINI(iter);
 	}
 }
 
-void StewMenu::Close()
+void ConfigurationMenu::Close()
 {
 	if (!g_bShownTweaksMenuReloadWarning)
 	{
@@ -1371,12 +1367,12 @@ void StewMenu::Close()
 	Menu::Close();
 }
 
-void StewMenu::HandleControllerConnectOrDisconnect(bool isControllerConnected)
+void ConfigurationMenu::HandleControllerConnectOrDisconnect(bool isControllerConnected)
 {
 
 }
 
-void StewMenu::SetCursorPosTraits()
+void ConfigurationMenu::SetCursorPosTraits()
 {
 	auto im = InterfaceManager::GetSingleton();
 
@@ -1394,7 +1390,7 @@ void StewMenu::SetCursorPosTraits()
 	}
 }
 
-void StewMenu::Update() 
+void ConfigurationMenu::Update() 
 {
 	searchBar.Update();
 	subSettingInput.Update();
@@ -1454,7 +1450,7 @@ void StewMenu::Update()
 				}
 
 				activeHotkeySubsetting->data.valueInt = pressedKey;
-				ini.SetLongValue(activeHotkeySubsetting->GetInternalCategory(), activeHotkeySubsetting->GetInternalName(), pressedKey);
+				ini.SetLongValue(activeHotkeySubsetting->settingCategory.c_str(), activeHotkeySubsetting->id.c_str(), pressedKey);
 				this->RefreshActiveTweakSelectionSquare();
 			}
 			this->SetInHotkeyMode(false);
@@ -1484,9 +1480,9 @@ void StewMenu::Update()
 	SetCursorPosTraits();
 }
 
-StewMenu* StewMenu::Create()
+ConfigurationMenu* ConfigurationMenu::Create()
 {
-	return new StewMenu();
+	return new ConfigurationMenu();
 }
 
 UInt32 medicalQuestionaireCaseAddr;
@@ -1501,14 +1497,14 @@ __declspec(naked) void MedicalQuestionaireCreateHook()
 
 	createStewMenu:
 		push 0x71F142
-		jmp StewMenu::Create
+		jmp ConfigurationMenu::Create
 	}
 }
 
 void __fastcall OnAltTabReloadStewMenu(OSGlobals* osGlobals, void* edx, int isActive)
 {
 	ThisCall(0x871C90, osGlobals, isActive);
-	StewMenu* menu = StewMenu::GetSingleton();
+	ConfigurationMenu* menu = ConfigurationMenu::GetSingleton();
 	if (menu && menu->XMLHasChanges())
 	{
 		menu->ReloadMenuXML();
@@ -1517,11 +1513,11 @@ void __fastcall OnAltTabReloadStewMenu(OSGlobals* osGlobals, void* edx, int isAc
 
 bool AtMainMenuOrStewMenuOpen()
 {
-	return CdeclCall<bool>(0x70EDF0) || StewMenu::GetSingleton();
+	return CdeclCall<bool>(0x70EDF0) || ConfigurationMenu::GetSingleton();
 }
 
 // TODO: FIGURE OUT WAAAAA
-void StewMenu::InitHooks()
+void ConfigurationMenu::InitHooks()
 {
 	SafeWrite8(0x71F1EC + (MENU_ID - 1001), 16); // use switch case for CreditsMenu
 	medicalQuestionaireCaseAddr = DetourVtable(0x71F154 + 4 * 16, UInt32(MedicalQuestionaireCreateHook));
@@ -1529,11 +1525,11 @@ void StewMenu::InitHooks()
 	// reload the menu when alt-tabbing
 	WriteRelCall(0x86A1AB, UInt32(OnAltTabReloadStewMenu));
 
-	// prevent Escape closing the whole start menu if StewMenu is open
+	// prevent Escape closing the whole start menu if ConfigurationMenu is open
 	WriteRelCall(0x70E686, UInt32(AtMainMenuOrStewMenuOpen));
 }
 
-bool StewMenu::HasTiles()
+bool ConfigurationMenu::HasTiles()
 {
 	for (Tile* tile : this->tiles)
 	{
@@ -1545,9 +1541,9 @@ bool StewMenu::HasTiles()
 	return true;
 }
 
-void __cdecl SetTweakSelectedBoxIfEnabled(Tile* tile, StewMenuItem* tweak)
+void __cdecl SetTweakSelectedBoxIfEnabled(Tile* tile, SM_Mod* tweak)
 {
-	auto ini = &StewMenu::GetSingleton()->ini;
+	auto ini = &ConfigurationMenu::GetSingleton()->ini;
 	auto isEnabled = ini->GetLongValue(tweak->GetInternalCategory(), tweak->GetInternalName(), -10063);
 	tweak->value = isEnabled;
 	if (isEnabled != -10063)
@@ -1562,7 +1558,7 @@ void __cdecl SetTweakSelectedBoxIfEnabled(Tile* tile, StewMenuItem* tweak)
 	}
 }
 
-void StewMenu::RefreshActiveTweakSelectionSquare()
+void ConfigurationMenu::RefreshActiveTweakSelectionSquare()
 {
 	if (activeTweak)
 	{
@@ -1573,14 +1569,14 @@ void StewMenu::RefreshActiveTweakSelectionSquare()
 	}
 }
 
-signed int __cdecl CompareTweaksAlphabetically(ListBoxItem<StewMenuItem>* a, ListBoxItem<StewMenuItem>* b)
+signed int __cdecl CompareTweaksAlphabetically(ListBoxItem<SM_Mod>* a, ListBoxItem<SM_Mod>* b)
 {
 	auto itemA = a->object;
 	auto itemB = b->object;
 
 	if (itemA->priority == itemB->priority)
 	{
-		return stricmp(itemA->GetName(), itemB->GetName());
+		return (itemA->name <=> itemB->name)._Value;
 	}
 
 	return itemA->priority > itemB->priority ? -1 : 1;
@@ -1608,11 +1604,11 @@ void ShowTweaksMenu()
 	// allow hot-reloading the menu even if UIO is installed
 	UInt32 previousResolveXMLFile = DetourRelCall(0xA01B87, 0xA01E20);
 
-	StewMenu::Create();
+	ConfigurationMenu::Create();
 	Tile* tile = InterfaceManager::GetSingleton()->menuRoot->ReadXML(MenuPath);
 	WriteRelCall(0xA01B87, previousResolveXMLFile);
 
-	auto menu = (StewMenu*)tile->GetParentMenu();
+	auto menu = (ConfigurationMenu*)tile->GetParentMenu();
 
 	if (!menu)
 	{
@@ -1680,15 +1676,17 @@ void ShowTweaksMenu()
 	subSettingsListBox->templateName = "SubSettingTemplate_Slider";
 	subSettingsListBox->scrollBar = subSettingsListBox->parentTile->GetByTraitName("child(lb_scrollbar)");
 
+	ConfigurationMenu::GetSingleton()->SetActiveTweak(tweaksListBox->list.first.data->object);
+
 	menu->HideTitle(false);
 }
 
-void StewMenu::AddCategory(char* category)
+void ConfigurationMenu::AddCategory(char* category)
 {
 	allCategories.insert(category);
 }
 
-void StewMenu::TouchTweak(StewMenuItem* tweak)
+void ConfigurationMenu::TouchTweak(SM_Mod* tweak)
 {
 	if (!this->touchedTweaks.contains(tweak))
 	{
@@ -1696,7 +1694,7 @@ void StewMenu::TouchTweak(StewMenuItem* tweak)
 	}
 }
 
-void StewMenu::TouchSubsetting(StewMenuSubsettingItem* setting)
+void ConfigurationMenu::TouchSubsetting(SM_Setting* setting)
 {
 	if (!this->touchedSubsettings.contains(setting))
 	{
@@ -1706,6 +1704,21 @@ void StewMenu::TouchSubsetting(StewMenuSubsettingItem* setting)
 
 void patchAddTweaksButton()
 {
-	StewMenu::InitHooks();
-	WriteRelCall(0x7CCA3E, (addTweaksButton));
+
+	_SelectedTrait = Tile::TraitNameToID("_selected");
+	_TextAlphaTrait = Tile::TraitNameToID("_TextAlpha");
+	_IsSearchActiveTrait = Tile::TraitNameToID("_IsSearchActive");
+	_IsCategoriesActiveTrait = Tile::TraitNameToID("_IsCategoriesActive");
+	_FilterModeTrait = Tile::TraitNameToID("_FilterMode");
+	_CursorXTrait = Tile::TraitNameToID("_CursorX");
+	_CursorYTrait = Tile::TraitNameToID("_CursorY");
+	_MinTrait = Tile::TraitNameToID("_min");
+	_MaxTrait = kTileValue_user0;
+	_SetVTrait = kTileValue_user2;
+	_ValueTrait = Tile::TraitNameToID("_Value");
+	_ValueStringTrait = Tile::TraitNameToID("_ValueString");
+	_BackgroundVisibleTrait = Tile::TraitNameToID("_BackgroundVisible");
+
+	ConfigurationMenu::InitHooks();
+	WriteRelCall(0x7CCA3E, addTweaksButton);
 }
