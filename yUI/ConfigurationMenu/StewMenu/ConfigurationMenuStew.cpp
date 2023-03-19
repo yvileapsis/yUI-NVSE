@@ -530,7 +530,7 @@ void ModConfigurationMenu::SetInHotkeyMode(bool isActive)
 	{
 		if (isActive)
 		{
-			hotkeyInput.value = activeHotkeySubsetting->data.valueInt;
+//			hotkeyInput.value = activeHotkeySubsetting->data.valueInt;
 			if (tile)
 			{
 				tile->SetString(kTileValue_string, "...");
@@ -538,7 +538,7 @@ void ModConfigurationMenu::SetInHotkeyMode(bool isActive)
 		}
 		else
 		{
-			activeHotkeySubsetting->data.valueInt = hotkeyInput.value;
+//			activeHotkeySubsetting->data.valueInt = hotkeyInput.value;
 			if (tile->parent)
 			{
 				activeHotkeySubsetting->SetDisplayedValue(tile->parent);
@@ -745,60 +745,30 @@ UInt32 ModConfigurationMenu::GetID(void)
 
 bool ModConfigurationMenu::HandleActiveSliderArrows(bool isRightArrow, float scale)
 {
-	if (auto tile = this->settingsListBox.selected)
+	if (const auto tile = this->settingsListBox.selected; !tile) return false;
+
+	auto setting = this->settingsListBox.GetItemForTile(tile->parent);
+
+	SM_Value newValue;
+
+	if (setting->type == SM_Setting::kSettingType_Choice)
 	{
-		auto setting = this->settingsListBox.GetItemForTile(tile);
+		if (setting->values.empty()) return false;
 
-		/*
-		if (setting->IsSlider())
+		const auto value = setting->ReadINI();
+		if (auto iter = setting->values.find(value); iter != setting->values.end())
 		{
-			if (auto sliderRect = tile->GetChildByID(kStewMenu_SliderDraggableRect))
-			{
-				auto minValue = sliderRect->GetFloat(_MinTrait);
-				auto maxValue = sliderRect->GetFloat(_MaxTrait);
-
-				auto currentSettingValue = sliderRect->GetFloat(_ValueTrait);
-				auto addend = (maxValue - minValue) * scale;
-				if (!isRightArrow) addend = -addend;
-				auto newValue = max(minValue, min(maxValue, currentSettingValue + addend));
-
-				auto category = setting->settingCategory;
-				auto name = setting->id;
-
-				if (setting->GetDataType() == SubSettingData::kSettingDataType_Float)
-				{
-					setting->data.valueFloat = newValue;
-					ini.SetDoubleValue(category.c_str(), name.c_str(), newValue);
-				}
-				else
-				{
-					if (isRightArrow) newValue = ceil(newValue);
-					setting->data.valueInt = newValue;
-					ini.SetLongValue(category.c_str(), name.c_str(), newValue);
-				}
-
-				SetSliderDisplayedValues(sliderRect, setting);
-
-				this->TouchSubsetting(setting);
-
-				return true;
-			}
+			++iter;
+			if (iter != setting->values.end()) newValue = iter->first;
+			else newValue = setting->values.begin()->first;
 		}
-		else if (setting->IsDropdown())
+		else
 		{
-			setting->data.DropdownSelectNext(isRightArrow);
-
-			SetDisplayedValuesForSubsetting(tile, setting);
-			this->SetSubsettingDescriptionTileString(setting);
-
-			ini.SetLongValue(setting->settingCategory.c_str(), setting->id.c_str(), setting->data.valueInt);
-			this->TouchSubsetting(setting);
-
-			return true;
-		}*/
+			newValue = setting->values.begin()->first;
+		}
 	}
-
-	return false;
+	setting->WriteINI(newValue);
+	setting->SetDisplayedValue(tile);
 }
 
 bool ModConfigurationMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode code, float keyState)
@@ -932,60 +902,6 @@ void ModConfigurationMenu::SetActiveSubsettingValueFromInput()
 	}*/
 }
 
-void ModConfigurationMenu::SetSubsettingValueFromINI(SM_Setting* setting)
-{
-//	auto category = setting->settingCategory;
-	auto name = setting->id;
-	bool isInvalidSetting = false;
-	/*
-	switch (setting->type)
-	{
-	case SubSettingData::kSettingDataType_Integer:
-	{
-		setting->data.valueInt = ini.GetLongValue(category.c_str(), name.c_str(), -14356);
-		if (setting->data.valueInt == -14356)
-		{
-			setting->data.valueInt = ini.GetDoubleValue(category.c_str(), name.c_str(), -14356);
-			if (setting->data.valueInt == -14356)
-			{
-				setting->data.valueInt = 0;
-				isInvalidSetting = true;
-			}
-		}
-		break;
-	}
-	case SubSettingData::kSettingDataType_Float:
-	{
-		setting->data.valueFloat = ini.GetDoubleValue(category.c_str(), name.c_str(), -14356);
-		if (setting->data.valueFloat == -14356)
-		{
-			setting->data.valueFloat = 0;
-			isInvalidSetting = true;
-		}
-		break;
-	}
-	case SubSettingData::kSettingDataType_String:
-	{
-		if (setting->data.valueStr.c_str())
-		{
-			GameHeapFree(setting->data.valueStr.c_str());
-		}
-		auto str = ini.GetValue(category.c_str(), name.c_str(), nullptr);
-		if (!str)
-		{
-			str = "";
-			isInvalidSetting = true;
-		}
-		setting->data.valueStr = str;
-		break;
-	}
-	}
-
-	if (isInvalidSetting)
-	{
-		Log(true, Log::kConsole) << FormatString("ModConfigurationMenu: Failed to resolve subsetting: [%s] %s", setting->settingCategory.c_str(), setting->id.c_str());
-	}*/
-}
 /*
 void SetDisplayedValuesForSubsetting(Tile* tile, SM_Setting* setting)
 {
@@ -1056,11 +972,17 @@ void SM_Setting::SetDisplayedValue(Tile* tile)
 {
 	if (type == kSettingType_Choice)
 	{
-		const auto value = ReadINI(setting);
-		if (std::holds_alternative<SInt32>(value))
+		const auto value = ReadINI();
+		std::string valueString;
+		if (values.contains(value)) valueString = values[value].first;
+		else
 		{
-			tile->SetString(kTileValue_user0, values[std::get<SInt32>(value)].first.c_str());
+			// Value is not in the supplied set, display it anyway
+			if (std::holds_alternative<std::string>(value)) valueString = std::get<std::string>(value);
+			else if (std::holds_alternative<Float64>(value)) valueString = std::to_string(std::get<Float64>(value));
+			else if (std::holds_alternative<SInt32>(value)) valueString = std::to_string(std::get<SInt32>(value));
 		}
+		tile->SetString(kTileValue_user0, valueString.c_str());
 	}
 }
 
@@ -1080,7 +1002,6 @@ void ModConfigurationMenu::SetActiveTweak(SM_Mod* tweak)
 		{
 			if (!it->mods.contains(tweak->id)) continue;
 
-//			this->SetSubsettingValueFromINI(it);
 			const auto tile = settingsListBox.Insert(it.get());
 			it->SetDisplayedValue(tile);
 		}
@@ -1459,7 +1380,7 @@ void ModConfigurationMenu::Update()
 					PlayGameSound("UIPopUpMessageGeneral");
 				}
 
-				activeHotkeySubsetting->data.valueInt = pressedKey;
+//				activeHotkeySubsetting->data.valueInt = pressedKey;
 //				ini.SetLongValue(activeHotkeySubsetting->settingCategory.c_str(), activeHotkeySubsetting->id.c_str(), pressedKey);
 				this->RefreshActiveTweakSelectionSquare();
 			}

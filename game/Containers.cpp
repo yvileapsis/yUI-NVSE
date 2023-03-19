@@ -1,8 +1,6 @@
 #include <Containers.h>
 #include <Utilities.h>
 
-#include "Stootils.h"
-
 String::String() : m_data(NULL), m_dataLen(0), m_bufLen(0) {}
 
 String::~String()

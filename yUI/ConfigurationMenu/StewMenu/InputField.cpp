@@ -2,7 +2,6 @@
 
 #include "functions.h"
 #include "Menus.h"
-#include "Stootils.h"
 #include "Tiles.h"
 
 void InputField::Init()

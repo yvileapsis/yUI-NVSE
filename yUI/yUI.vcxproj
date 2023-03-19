@@ -135,6 +135,7 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClCompile Include="..\nvse\printf.cpp" />
     <ClCompile Include="..\nvse\SafeWrite.cpp" />
     <ClCompile Include="..\nvse\Utilities.cpp" />
+    <ClCompile Include="ConfigurationMenuINI.cpp" />
     <ClCompile Include="ConfigurationMenu\ConfigurationMenu.cpp" />
     <ClCompile Include="ConfigurationMenu\StewMenu\HotkeyField.cpp" />
     <ClCompile Include="ConfigurationMenu\StewMenu\InputField.cpp" />
@@ -169,7 +170,6 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClCompile Include="SortingIcons\SortingIconsVisual.cpp" />
     <ClCompile Include="SortingIcons\SortingIconsMain.cpp" />
     <ClCompile Include="SortingIcons\SortingIconsMechanics.cpp" />
-    <ClCompile Include="Stootils.cpp" />
     <ClCompile Include="UserInterface\DynamicCrosshair.cpp" />
     <ClCompile Include="UserInterface\HitIndicator.cpp" />
     <ClCompile Include="UserInterface\HitMarker.cpp" />
@@ -223,7 +223,6 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClInclude Include="main.h" />
     <ClInclude Include="SortingIcons\SortingIcons.h" />
     <ClInclude Include="ConfigurationMenu\ConfigurationMenu.h" />
-    <ClInclude Include="Stootils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\game\GameRTTI.inc" />

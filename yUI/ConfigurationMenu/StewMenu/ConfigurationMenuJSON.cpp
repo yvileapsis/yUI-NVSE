@@ -73,6 +73,14 @@ SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem)
 		if (elem.contains("category"))	setting.category = elem["category"].get<std::string>();
 		if (elem.contains("value"))		setting.value = elem["value"].get<std::string>();
 	}
+
+	if (elem.contains("valueDefault"))
+	{
+		const auto& elemDefault = elem["valueDefault"];
+		if (elemDefault.is_number_integer() || elemDefault.is_number_unsigned()) valueDefault = elemDefault.get<SInt32>();
+		else if (elemDefault.is_string()) valueDefault = elemDefault.get<std::string>();
+		else if (elemDefault.is_number_float()) valueDefault = elemDefault.get<Float64>();
+	}
 }
 
 void ModConfigurationMenu::ReadJSON(const std::filesystem::path& path)

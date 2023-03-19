@@ -512,3 +512,26 @@ __forceinline bool MenuMode() { return CdeclCall<bool>(0x702360); }
 int HexStringToInt(const std::string& str);
 
 std::string GetClipboardText();
+
+inline int GetCharsSinceSpace(const char* text, UInt32 offset)
+{
+	const char* barPos = text + offset;
+	int numChars = 0;
+
+	while (barPos != text && !isalnum(*--barPos)) numChars++;
+	while (barPos >= text && isalnum(*barPos--)) numChars++;
+
+	return numChars;
+}
+
+inline int GetCharsTillSpace(const char* text, UInt32 offset)
+{
+	const char* barPos = text + offset;
+
+	int numChars = 0;
+
+	while (isalnum(*++barPos)) numChars++;
+	while (*barPos && !isalnum(*barPos++)) numChars++;
+
+	return numChars;
+}

@@ -9,6 +9,8 @@
 #include <utility>
 #include <variant>
 
+typedef std::variant<SInt32, Float64, std::string> SM_Value;
+
 class SM_Tag
 {
 public:
@@ -46,134 +48,6 @@ public:
 	bool IsBoolean() { return !settingName.empty() && settingName[0] == 'b'; };
 };
 
-struct SubSettingData
-{
-	struct DropdownData
-	{
-		std::string displayName;
-		signed int value;
-		std::string description;
-	};
-
-	static const char* SettingTypeToTemplate(signed int type)
-	{
-/*		switch (type)
-		{
-		case kSettingType_Choice:
-			return "SettingTemplateChoice";
-		case kSettingType_Slider:
-			return "SubSettingTemplate_Slider";
-		case kSettingType_StringInput:
-		case kSettingType_NumberInput:
-		case kSettingType_Hotkey:
-			return "SubSettingTemplate_Input";
-		case kSettingType_Options:
-			return "SubSettingTemplate_Dropdown";
-		}
-*/
-		Log(true, Log::kBoth) << "ERROR TEMPLATE";
-		return "SettingTemplateChoice";
-		return nullptr;
-	}
-
-	void Init()
-	{
-//		type = kSettingType_None;
-		valueInt = 0;
-		valueStr.clear();
-		minValue = 0;
-		maxValue = 0;
-	}
-
-	SubSettingData() {};
-
-//	ElementType type;
-	union
-	{
-		float valueFloat;
-		int valueInt;
-		void* value;
-	};
-	union
-	{
-		struct
-		{
-			float minValue;
-			float maxValue;
-		};
-		TList<DropdownData> options;
-	};
-	std::string valueStr;
-
-
-	void AddOption(const char* displayString, signed int _value, const char* description)
-	{
-		auto option = (DropdownData*)GameHeapAlloc(sizeof(DropdownData));
-		option->displayName = (displayString);
-		option->description = (description);
-		option->value = _value;
-		this->options.Insert(option);
-	};
-	const char* GetDropdownValue()
-	{
-		auto iter = options.Head();
-		if (iter)
-		{
-			do
-			{
-				if (iter->data->value == valueInt) { return iter->data->displayName.c_str(); }
-			} while (iter = iter->next);
-		}
-		return "";
-	}
-	const char* GetDropdownDescription()
-	{
-		auto iter = options.Head();
-		if (iter)
-		{
-			do
-			{
-				if (iter->data->value == valueInt) { return iter->data->description.c_str(); }
-			} while (iter = iter->next);
-		}
-		return "";
-	}
-
-	void DropdownSelectNext(bool isNext)
-	{
-		auto iter = options.Head();
-		auto prev = options.GetLastNode();
-		if (iter)
-		{
-			do
-			{
-				if (iter->data->value == valueInt)
-				{
-					// found currently selected element
-					if (isNext)
-					{
-						if (!(iter = iter->next))
-						{
-							iter = options.Head();
-						}
-					}
-					else
-					{
-						iter = prev;
-					}
-					this->valueInt = iter->data->value;
-					return;
-				}
-
-				prev = iter;
-			} while (iter = iter->next);
-
-			// the current value wasn't one of the available options... reset it to the first option
-			this->valueInt = options.Head()->data->value;
-		}
-	}
-};
-
 struct SM_Setting
 {
 	enum ElementType
@@ -198,8 +72,6 @@ struct SM_Setting
 	std::string id;
 	std::string description;
 
-	SubSettingData data;
-
 	ElementType type;
 
 	INISetting setting;
@@ -209,70 +81,35 @@ struct SM_Setting
 	std::unordered_set<std::string> tags;
 	std::unordered_set<std::string> mods;
 
-	std::unordered_map<SInt32, std::pair<std::string, std::string>> values;
+	SM_Value valueDefault;
+
+	typedef std::unordered_map<SM_Value, std::pair<std::string, std::string>> SM_ValueOptions;
+
+	SM_ValueOptions values;
 
 	void SetDisplayedValue(Tile* tile);
-	const char* GetTemplate() { return SubSettingData::SettingTypeToTemplate(0); };
+
+	SM_Value ReadINI();
+	void WriteINI(SM_Value value);
+
+	const char* GetTemplate() {
+		switch (type)
+		{
+		case kSettingType_Choice:
+			return "SettingTemplateChoice";
+//		case kSettingType_Slider:
+//			return "SubSettingTemplate_Slider";
+//		case kSettingType_StringInput:
+//		case kSettingType_NumberInput:
+//		case kSettingType_Hotkey:
+//			return "SubSettingTemplate_Input";
+//		case kSettingType_Options:
+//			return "SubSettingTemplate_Dropdown";
+		}
+		return nullptr;
+	};
 
 };
-
-typedef std::variant<SInt32, Float64, std::string> SM_Value;
-
-inline std::unordered_map<std::filesystem::path, SM_Value> ini_map;
-
-inline void ProcessINI(const std::filesystem::path iniPath)
-{
-	CSimpleIniA ini;
-	ini.SetUnicode();
-	if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
-
-	CSimpleIniA::TNamesDepend sections;
-	ini.GetAllSections(sections);
-
-	for (const auto& section : sections)
-	{
-		CSimpleIniA::TNamesDepend keys;
-		ini.GetAllKeys(section.pItem, keys);
-		for (const auto& key : keys)
-		{
-			std::filesystem::path fullPath = iniPath;
-			fullPath += section.pItem;
-			fullPath += key.pItem;
-
-			SM_Value value;
-
-			if (key.pItem[0] == 'b' || key.pItem[0] == 'i') value.emplace<SInt32>(ini.GetLongValue(section.pItem, key.pItem));
-			else if (key.pItem[0] == 'f') value.emplace<Float64>(ini.GetDoubleValue(section.pItem, key.pItem));
-			else if (key.pItem[0] == 's') value.emplace<std::string>(ini.GetValue(section.pItem, key.pItem));
-
-			ini_map.emplace(fullPath, value);
-		}
-	}
-
-	ini.SaveFile(iniPath.c_str(), false);
-}
-
-inline SM_Value ReadINI(const SM_Setting::INISetting& setting)
-{
-
-	std::filesystem::path iniPath = GetCurPath();
-	iniPath += setting.path;
-
-	std::filesystem::path fullPath = iniPath;
-	fullPath += setting.category;
-	fullPath += setting.value;
-
-	if (ini_map.contains(fullPath)) return ini_map[fullPath];
-
-	ProcessINI(iniPath);
-
-	if (ini_map.contains(fullPath)) return ini_map[fullPath];
-
-	// TODO: return default
-	return 0;
-}
-
-
 struct SubsettingList : TList<SM_Setting>
 {
 	void Destroy()
@@ -479,7 +316,6 @@ public:
 	void SetTweakDescriptionTileString(SM_Mod* item);
 	void SetSubsettingDescriptionTileString(SM_Setting* setting);
 	bool ToggleTweakInINI(SM_Mod* item, Tile* tile);
-	void SetSubsettingValueFromINI(SM_Setting* item);
 	bool IsSubsettingInputValid();
 	void SetActiveSubsettingValueFromInput();
 	void SetInHotkeyMode(bool isActive);

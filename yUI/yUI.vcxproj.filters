@@ -170,14 +170,14 @@
     <ClCompile Include="ConfigurationMenu\StewMenu\ConfigurationMenuStew.cpp">
       <Filter>features\ConfigurationMenu</Filter>
     </ClCompile>
-    <ClCompile Include="Stootils.cpp">
-      <Filter>features\ConfigurationMenu</Filter>
-    </ClCompile>
     <ClCompile Include="FixSleepWaitMenuString.cpp">
       <Filter>features</Filter>
     </ClCompile>
     <ClCompile Include="PatchCharGenMenuSRemoval.cpp">
       <Filter>features</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigurationMenuINI.cpp">
+      <Filter>features\ConfigurationMenu</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -299,9 +299,6 @@
       <Filter>features\ConfigurationMenu</Filter>
     </ClInclude>
     <ClInclude Include="ConfigurationMenu\StewMenu\ConfigurationMenuStew.h">
-      <Filter>features\ConfigurationMenu</Filter>
-    </ClInclude>
-    <ClInclude Include="Stootils.h">
       <Filter>features\ConfigurationMenu</Filter>
     </ClInclude>
   </ItemGroup>
