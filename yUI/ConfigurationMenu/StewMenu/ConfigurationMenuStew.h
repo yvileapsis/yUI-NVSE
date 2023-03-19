@@ -7,6 +7,7 @@
 
 #include <set>
 #include <utility>
+#include <variant>
 
 class SM_Tag
 {
@@ -43,16 +44,7 @@ public:
 		return "Tweaks";
 	};
 	bool IsBoolean() { return !settingName.empty() && settingName[0] == 'b'; };
-
-	void* operator new(size_t size)
-	{
-		return FormHeapAlloc(size);
-	}
-
-	~SM_Mod() = default;
 };
-
-class JS_Setting;
 
 struct SubSettingData
 {
@@ -113,12 +105,7 @@ struct SubSettingData
 	};
 	std::string valueStr;
 
-//	void SetType(ElementType _type) { this->type = _type; }
-	/*	bool IsInputField() { return type == kSettingType_NumberInput || type == kSettingType_StringInput; };
-		bool IsHotkeyField() { return type == kSettingType_Hotkey; };
-		bool IsCheckboxField() { return type == kSettingType_Boolean; };
-		bool IsSlider() { return type == kSettingType_Slider; };
-		bool IsDropdown() { return type == kSettingType_Options; };*/
+
 	void AddOption(const char* displayString, signed int _value, const char* description)
 	{
 		auto option = (DropdownData*)GameHeapAlloc(sizeof(DropdownData));
@@ -185,11 +172,6 @@ struct SubSettingData
 			this->valueInt = options.Head()->data->value;
 		}
 	}
-
-	void* operator new(size_t size)
-	{
-		return FormHeapAlloc(size);
-	}
 };
 
 struct SM_Setting
@@ -198,15 +180,19 @@ struct SM_Setting
 	{
 		kSettingType_None,
 		kSettingType_Control,
-		kSettingType_ChoiceInteger,
-		kSettingType_ChoiceFloat,
-		kSettingType_ChoiceString,
+		kSettingType_Choice,
 		kSettingType_SliderInteger,
 		kSettingType_SliderFloat,
 		kSettingType_InputString,
 		kSettingType_InputFloat,
 	};
 
+	struct INISetting
+	{
+		std::filesystem::path	path;
+		std::string				category;
+		std::string				value;
+	};
 
 	std::string name;
 	std::string id;
@@ -216,37 +202,76 @@ struct SM_Setting
 
 	ElementType type;
 
-	std::filesystem::path	settingPath;
-	std::string				settingCategory;
-	std::string				settingName;
+	INISetting setting;
 
 	SInt32 priority = 0;
 
 	std::unordered_set<std::string> tags;
 	std::unordered_set<std::string> mods;
 
-	std::unordered_map<SInt32, std::tuple<std::string, std::string>> values;
+	std::unordered_map<SInt32, std::pair<std::string, std::string>> values;
 
-	SM_Setting() = default;
-
-	SM_Setting(std::string name, std::string description, std::string id, std::string internalCategory)
-		: name(std::move(name)), id(std::move(id)), description(std::move(description)), settingCategory(
-			std::move(internalCategory))
-	{
-		data.Init();
-	}
-
-	void Free()
-	{
-	}
-
+	void SetDisplayedValue(Tile* tile);
 	const char* GetTemplate() { return SubSettingData::SettingTypeToTemplate(0); };
 
-	void* operator new(size_t size)
-	{
-		return FormHeapAlloc(size);
-	}
 };
+
+typedef std::variant<SInt32, Float64, std::string> SM_Value;
+
+inline std::unordered_map<std::filesystem::path, SM_Value> ini_map;
+
+inline void ProcessINI(const std::filesystem::path iniPath)
+{
+	CSimpleIniA ini;
+	ini.SetUnicode();
+	if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
+
+	CSimpleIniA::TNamesDepend sections;
+	ini.GetAllSections(sections);
+
+	for (const auto& section : sections)
+	{
+		CSimpleIniA::TNamesDepend keys;
+		ini.GetAllKeys(section.pItem, keys);
+		for (const auto& key : keys)
+		{
+			std::filesystem::path fullPath = iniPath;
+			fullPath += section.pItem;
+			fullPath += key.pItem;
+
+			SM_Value value;
+
+			if (key.pItem[0] == 'b' || key.pItem[0] == 'i') value.emplace<SInt32>(ini.GetLongValue(section.pItem, key.pItem));
+			else if (key.pItem[0] == 'f') value.emplace<Float64>(ini.GetDoubleValue(section.pItem, key.pItem));
+			else if (key.pItem[0] == 's') value.emplace<std::string>(ini.GetValue(section.pItem, key.pItem));
+
+			ini_map.emplace(fullPath, value);
+		}
+	}
+
+	ini.SaveFile(iniPath.c_str(), false);
+}
+
+inline SM_Value ReadINI(const SM_Setting::INISetting& setting)
+{
+
+	std::filesystem::path iniPath = GetCurPath();
+	iniPath += setting.path;
+
+	std::filesystem::path fullPath = iniPath;
+	fullPath += setting.category;
+	fullPath += setting.value;
+
+	if (ini_map.contains(fullPath)) return ini_map[fullPath];
+
+	ProcessINI(iniPath);
+
+	if (ini_map.contains(fullPath)) return ini_map[fullPath];
+
+	// TODO: return default
+	return 0;
+}
+
 
 struct SubsettingList : TList<SM_Setting>
 {
@@ -254,8 +279,8 @@ struct SubsettingList : TList<SM_Setting>
 	{
 		for (auto iter : *this)
 		{
-			auto item = iter;
-			item->Free();
+//			auto item = iter;
+//			iter->destroy;
 		}
 		this->DeleteAll();
 	}
@@ -264,8 +289,6 @@ struct SubsettingList : TList<SM_Setting>
 extern const char* MenuPath;
 
 void ShowTweaksMenu();
-void SetDisplayedValuesForSubsetting(Tile* tile, SM_Setting* setting);
-void SetListBoxesKeepSelectedWhenNonActive(bool isActive);
 void WriteValueToINIs(const char* category, const char* name, const char* value);
 
 // randomly selected from the unused menu codes between 1001 and 1084 inclusive (to be compatible with the menu visibility array)
@@ -280,7 +303,7 @@ enum TileIDs
 	kStewMenu_SearchIcon = 6,
 	kStewMenu_Exit = 7,
 	kStewMenu_Back = 8,
-	kConfigurationMenu_ModListItem = 12,
+	kModConfigurationMenu_ModListItem = 12,
 	kStewMenu_CategoriesBackground = 13,
 	kStewMenu_CategoryItem = 14,
 	kStewMenu_CategoriesButton = 15,
@@ -290,7 +313,7 @@ enum TileIDs
 	kStewMenu_SubSettingsListBackground = 19,
 	kStewMenu_SubsettingItem = 20,
 
-	kStewMenu_CycleText = 99,
+	kModConfigurationMenu_ChoiceText = 99,
 	kStewMenu_SliderLeftArrow = 100,
 	kStewMenu_SliderRightArrow = 101,
 	kStewMenu_SliderDraggableRect = 102,
@@ -367,8 +390,6 @@ public:
 		ini.SetUnicode();
 
 //		LoadINIs();
-
-		SetListBoxesKeepSelectedWhenNonActive(true);
 	};
 	~ModConfigurationMenu() {};
 

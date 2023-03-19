@@ -1253,9 +1253,9 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 			<zoom> &scale; </zoom>
 		</image>
 
-		<hotrect name="lb_toggle_value">
-			<id> &generic; </id>
+		<text name="lb_toggle_value">
 			<include src="text_box.xml"/>
+			<id> 99 </id>
 			<mouseoversound> UIMenuFocus </mouseoversound>
 			<clicksound> UIMenuPrevNext </clicksound>
 			<depth> 3 </depth>
@@ -1274,7 +1274,7 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 			<_horbuf> 20 </_horbuf>
 			<_verbuf> 10 </_verbuf>
 			<_line_alpha> <copy src="sibling(ListItemText)" trait="alpha"/> </_line_alpha>
-		</hotrect>
+		</text>
 
 		<image name="lb_toggle_right">
 			<id> 101 </id>

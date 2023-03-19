@@ -164,7 +164,7 @@
     <ClCompile Include="ConfigurationMenu\StewMenu\InputField.cpp">
       <Filter>features\ConfigurationMenu</Filter>
     </ClCompile>
-    <ClCompile Include="ConfigurationMenu\StewMenu\JSONHandler.cpp">
+    <ClCompile Include="ConfigurationMenu\StewMenu\ConfigurationMenuJSON.cpp">
       <Filter>features\ConfigurationMenu</Filter>
     </ClCompile>
     <ClCompile Include="ConfigurationMenu\StewMenu\ConfigurationMenuStew.cpp">

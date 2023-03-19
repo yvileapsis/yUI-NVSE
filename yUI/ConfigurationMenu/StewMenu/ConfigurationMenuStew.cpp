@@ -1,5 +1,4 @@
 #include "ConfigurationMenuStew.h"
-#include "JSONHandler.h"
 #include <sstream>
 
 #include "dinput8.h"
@@ -195,7 +194,7 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 		break;
 	}
 
-	case kConfigurationMenu_ModListItem:
+	case kModConfigurationMenu_ModListItem:
 	{
 		auto item = modsListBox.GetItemForTile(clickedTile);
 
@@ -316,7 +315,7 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 		break;
 	}
 
-	case kStewMenu_CycleText:
+	case kModConfigurationMenu_ChoiceText:
 	case kStewMenu_SliderLeftArrow:
 	case kStewMenu_SliderRightArrow:
 	{
@@ -487,7 +486,7 @@ void ModConfigurationMenu::SetInSubsettingInputMode(bool isActive)
 				if (tile->parent)
 				{
 					// set the input string back to the current value of the setting
-					SetDisplayedValuesForSubsetting(tile->parent, activeInputSubsetting);
+					activeInputSubsetting->SetDisplayedValue(tile->parent);
 
 					// ensure the input field has the same value so UpdateCaretDisplay doesn't reset the string
 					auto strVal = tile->GetValue(kTileValue_string);
@@ -542,7 +541,7 @@ void ModConfigurationMenu::SetInHotkeyMode(bool isActive)
 			activeHotkeySubsetting->data.valueInt = hotkeyInput.value;
 			if (tile->parent)
 			{
-				SetDisplayedValuesForSubsetting(tile->parent, activeHotkeySubsetting);
+				activeHotkeySubsetting->SetDisplayedValue(tile->parent);
 			}
 			activeHotkeySubsetting = nullptr;
 		}
@@ -935,7 +934,7 @@ void ModConfigurationMenu::SetActiveSubsettingValueFromInput()
 
 void ModConfigurationMenu::SetSubsettingValueFromINI(SM_Setting* setting)
 {
-	auto category = setting->settingCategory;
+//	auto category = setting->settingCategory;
 	auto name = setting->id;
 	bool isInvalidSetting = false;
 	/*
@@ -987,11 +986,11 @@ void ModConfigurationMenu::SetSubsettingValueFromINI(SM_Setting* setting)
 		Log(true, Log::kConsole) << FormatString("ModConfigurationMenu: Failed to resolve subsetting: [%s] %s", setting->settingCategory.c_str(), setting->id.c_str());
 	}*/
 }
-
+/*
 void SetDisplayedValuesForSubsetting(Tile* tile, SM_Setting* setting)
 {
 	char buf[0x40];
-	/*
+
 	auto dataType = setting->GetDataType();
 	switch (setting->GetElementType())
 	{
@@ -1034,7 +1033,7 @@ void SetDisplayedValuesForSubsetting(Tile* tile, SM_Setting* setting)
 	}
 	case SubSettingData::kSettingType_Options:
 	{
-		if (auto textField = tile->GetChildByID(kStewMenu_CycleText))
+		if (auto textField = tile->GetChildByID(kModConfigurationMenu_ChoiceText))
 		{
 			textField->SetString(kTileValue_string, setting->data.GetDropdownValue());
 		}
@@ -1049,14 +1048,20 @@ void SetDisplayedValuesForSubsetting(Tile* tile, SM_Setting* setting)
 		}
 		break;
 	}
-	}*/
+	}
 }
+*/
 
-void SetListBoxesKeepSelectedWhenNonActive(bool isActive)
+void SM_Setting::SetDisplayedValue(Tile* tile)
 {
-	// make listboxes keep their highlighted item even when not hovered over
-	// patches ListBox::SetSelectedItemBox temporarily (must be restored when menu is closed!)
-	SafeWrite8(0x7262C3, isActive ? 0x52 : 0x2A); // adjust jump target to skip setting _highlight_y = -1 and _selected_height = 0 if a listbox has no selected entry
+	if (type == kSettingType_Choice)
+	{
+		const auto value = ReadINI(setting);
+		if (std::holds_alternative<SInt32>(value))
+		{
+			tile->SetString(kTileValue_user0, values[std::get<SInt32>(value)].first.c_str());
+		}
+	}
 }
 
 void ModConfigurationMenu::SetActiveTweak(SM_Mod* tweak)
@@ -1077,8 +1082,7 @@ void ModConfigurationMenu::SetActiveTweak(SM_Mod* tweak)
 
 //			this->SetSubsettingValueFromINI(it);
 			const auto tile = settingsListBox.Insert(it.get());
-
-//			SetDisplayedValuesForSubsetting(tile, setting);
+			it->SetDisplayedValue(tile);
 		}
 	}
 }
@@ -1090,7 +1094,7 @@ void ModConfigurationMenu::SetTweakDescriptionTileString(SM_Mod* tweak)
 
 void ModConfigurationMenu::SetSubsettingDescriptionTileString(SM_Setting* setting)
 {
-	auto description = setting->description;
+//	auto description = setting->description;
 	/*if (setting->IsDropdown())
 	{
 		
@@ -1099,17 +1103,17 @@ void ModConfigurationMenu::SetSubsettingDescriptionTileString(SM_Setting* settin
 
 	if (g_bTweaksMenuShowSettingPathOnSubsettings)
 	{
-		description = FormatString(!description.empty() ? "%s\n[%s]\n%s" : "%s[%s]\n%s", description, setting->settingCategory.c_str(), setting->id.c_str());
+//		description = FormatString(!description.empty() ? "%s\n[%s]\n%s" : "%s[%s]\n%s", description, setting->settingCategory.c_str(), setting->id.c_str());
 	}
 
-	this->selectionText->SetString(kTileValue_string, description.c_str());
+//	this->selectionText->SetString(kTileValue_string, description.c_str());
 }
 
 void ModConfigurationMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 {
 	switch (tileID)
 	{
-	case kConfigurationMenu_ModListItem:
+	case kModConfigurationMenu_ModListItem:
 	{
 
 		modsListBox.GetItemForTile(activeTile);
@@ -1158,19 +1162,22 @@ void ModConfigurationMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 	{
 		break;
 	}
+	case kModConfigurationMenu_ChoiceText:
+	{
+		break;
+	}
 	}
 }
 
 void ModConfigurationMenu::HandleUnmouseover(UInt32 tileID, Tile* tile)
 {
-	modsListBox.SetSelected(nullptr);
-	settingsListBox.SetSelected(nullptr);
+//	modsListBox.SetSelected(nullptr);
+//	settingsListBox.SetSelected(nullptr);
 	selectionText->SetString(kTileValue_string, "");
 }
 
 void ModConfigurationMenu::Free() 
 {
-	SetListBoxesKeepSelectedWhenNonActive(false);
 
 	modsListBox.Destroy();
 	categoriesListBox.Destroy();
@@ -1453,7 +1460,7 @@ void ModConfigurationMenu::Update()
 				}
 
 				activeHotkeySubsetting->data.valueInt = pressedKey;
-				ini.SetLongValue(activeHotkeySubsetting->settingCategory.c_str(), activeHotkeySubsetting->id.c_str(), pressedKey);
+//				ini.SetLongValue(activeHotkeySubsetting->settingCategory.c_str(), activeHotkeySubsetting->id.c_str(), pressedKey);
 				this->RefreshActiveTweakSelectionSquare();
 			}
 			this->SetInHotkeyMode(false);
@@ -1628,7 +1635,8 @@ void ShowTweaksMenu()
 
 	for (const auto& mod : menu->g_Mods)
 	{
-		menu->modsListBox.Insert(mod.get(), mod->name.c_str())->SetFloat(kTileValue_id, kConfigurationMenu_ModListItem);
+		const auto tile = menu->modsListBox.Insert(mod.get(), mod->name.c_str());
+		tile->SetFloat(kTileValue_id, kModConfigurationMenu_ModListItem);
 	}
 
 	tweaksListBox->ForEach(SetTweakSelectedBoxIfEnabled);

@@ -1,23 +1,9 @@
 #include "ConfigurationMenuStew.h"
 #include "json.h"
 
-class TagJSON : public SM_Tag
-{
-public:
-	TagJSON(const nlohmann::basic_json<>& elem);
-};
-
-class ModJSON : public SM_Mod
-{
-public:
-	ModJSON(const nlohmann::basic_json<>& elem);
-};
-
-class SettingJSON : public SM_Setting
-{
-public:
-	SettingJSON(const nlohmann::basic_json<>& elem);
-};
+class TagJSON : public SM_Tag { public: TagJSON(const nlohmann::basic_json<>& elem); };
+class ModJSON : public SM_Mod { public: ModJSON(const nlohmann::basic_json<>& elem); };
+class SettingJSON : public SM_Setting { public: SettingJSON(const nlohmann::basic_json<>& elem); };
 
 template <typename T> std::vector<T> GetSetFromElement(const nlohmann::basic_json<>& elem)
 {
@@ -45,7 +31,7 @@ ModJSON::ModJSON(const nlohmann::basic_json<>& elem)
 	if (elem.contains("tags"))			tags.insert_range(GetSetFromElement<std::string>(elem["tags"]));
 }
 
-SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem) : SM_Setting()
+SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem)
 {
 	if (elem.contains("id"))			id = elem["id"].get<std::string>();
 	if (elem.contains("name"))			name = elem["name"].get<std::string>();
@@ -58,13 +44,13 @@ SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem) : SM_Setting()
 	else
 	{
 		const auto typeString = elem["type"].get<std::string>();
-		if (typeString == "choice")			type = kSettingType_ChoiceInteger;
+		if (typeString == "choice")			type = kSettingType_Choice;
 		else if (typeString == "control")	type = kSettingType_Control;
 		else if (typeString == "integer")	type = kSettingType_SliderInteger;
 		else if (typeString == "float")		type = kSettingType_SliderFloat;
 	}
 
-	if (type == kSettingType_ChoiceInteger)
+	if (type == kSettingType_Choice)
 	{
 		SInt32 valueLess = 0;
 		if (!elem.contains("values")) Log(true) << "WAAAAAAAAA, broke";
@@ -80,8 +66,12 @@ SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem) : SM_Setting()
 			else name = std::to_string(value);
 			if (i.contains("description")) description = i["description"].get<std::string>();
 
-			values.emplace(value, std::make_tuple(name, description));
+			values.emplace(value, std::make_pair(name, description));
 		}
+
+		if (elem.contains("path"))		setting.path = elem["path"].get<std::string>();
+		if (elem.contains("category"))	setting.category = elem["category"].get<std::string>();
+		if (elem.contains("value"))		setting.value = elem["value"].get<std::string>();
 	}
 }
 
