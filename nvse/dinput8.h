@@ -148,3 +148,12 @@ private:
 };
 
 extern FramerateTracker	g_framerateTracker;
+
+struct ControlName
+{
+	UInt32		unk0;
+	const char* name;
+	UInt32		unkC;
+};
+
+std::string ScancodeToString(UInt32 scancode);

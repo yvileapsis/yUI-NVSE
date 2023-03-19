@@ -5,6 +5,9 @@
 #include "GameData.h"
 #include "Script.h"
 
+#include <cstdlib>
+#include <utility>
+
 ScopedLock::ScopedLock(CriticalSection& critSection) : m_critSection(critSection)
 {
 	m_critSection.Enter();
@@ -444,35 +447,6 @@ void Console_Print_Long(const std::string& str)
 }
 
 #endif
-
-
-ControlName ** g_keyNames			= (ControlName **)0x011D52F0;
-ControlName ** g_mouseButtonNames	= (ControlName **)0x011D5240;
-ControlName ** g_joystickNames		= (ControlName **)0x011D51B0;
-
-std::string GetDXDescription(UInt32 keycode)
-{
-	const char * keyName = "<no key>";
-
-	if(keycode <= 220)
-	{
-		if(g_keyNames[keycode])
-			keyName = g_keyNames[keycode]->name;
-	}
-	else if(255 <= keycode && keycode <= 263)
-	{
-		if(keycode == 255)
-			keycode = 256;
-		if(g_mouseButtonNames[keycode - 256])
-			keyName = g_mouseButtonNames[keycode - 256]->name;
-	}
-	else if (keycode == 264)
-		keyName = "WheelUp";
-	else if (keycode == 265)
-		keyName = "WheelDown";
-
-	return keyName;
-}
 
 bool ci_equal(char ch1, char ch2)
 {
@@ -1194,8 +1168,41 @@ char* stristr(const char* str1, const char* str2)
 	return *p2 == 0 ? (char*)r : nullptr;
 }
 
-#include <cstdlib>
-#include <utility>
+std::string GetClipboardText()
+{
+	// Try opening the clipboard
+	if (!OpenClipboard(nullptr))
+	{
+		return "";
+	}
+
+	// Get handle of clipboard object for ANSI text
+	HANDLE hData = GetClipboardData(CF_TEXT);
+	if (hData == nullptr)
+	{
+		CloseClipboard();
+		return "";
+	}
+
+	// Lock the handle to get the actual text pointer
+	char* pszText = static_cast<char*>(GlobalLock(hData));
+	if (pszText == nullptr)
+	{
+		CloseClipboard();
+		return "";
+	}
+
+	// Save text in a string class instance
+	std::string text(pszText);
+
+	// Release the lock
+	GlobalUnlock(hData);
+
+	// Release the clipboard
+	CloseClipboard();
+
+	return text;
+}
 
 std::string UTF8toANSI(const std::string& str)
 {	

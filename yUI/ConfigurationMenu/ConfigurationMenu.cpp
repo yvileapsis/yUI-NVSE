@@ -1,85 +1,79 @@
+#include "main.h"
 #include "ConfigurationMenu.h"
 
-#include "main.h"
 #include "SafeWrite.h"
-
-struct MenuItem
-{
-	const char* name;
-};
-
-class ConfigurationMenu1 : public Menu
-{
-	ListBox<MenuItem> listbox;
-};
-
-
-StartMenuOption* yCM1;
-
-void __cdecl yCMCallback()
-{
-	Log(true, Log::kConsole) << "Test";
-//	MenuButton_DownloadsClick();
-	//	ThisCall(0x7D74F0, (void *)( 0x11DAAC0 + 0x0B4), 0);
-	//	static StartMenu* g_StartMenu = StartMenu::GetSingleton();
-	//	((Tile*)(&(g_StartMenu->settingsSubMenu) + 0xC))->SetFloat(TraitNameToID("_enabled"), 1);
-	//	g_StartMenu->GetChild("yCM")->GetChild("yCM")->SetFloat(kTileValue_visible, 0, 0);
-}
-
-void __fastcall AddyCMToSettingsMenu(BSSimpleArray<StartMenuOption*>* settingsMenuOptions, void* edx, StartMenuOption** menuDownloads)
-{
-	//		(*HUDColorSetting)->onSelection = HUDColorSettingCallback;
-	//	(*menuDownloads)->displayString = "Mods";
-	//	(*menuDownloads)->callback = yCMCallback;
-	//	(*menuDownloads)->data = StartMenuOption::kMainMenu + StartMenuOption::kPauseMenu;
-
-//	yCM1 = StartMenuOption::Create("Mods", yCMCallback, StartMenuOption::kMainMenu + StartMenuOption::kPauseMenu);
-//	settingsMenuOptions->Append(&yCM1);
-
-//	settingsMenuOptions->Append(menuDownloads);
-
-
-	//yCM = StartMenuOption::Create("Mods", yCMCallback, StartMenuOption::kMainMenu);
-
-}
+#include "StewMenu/ConfigurationMenuStew.h"
 
 namespace ConfigurationMenu
 {
-	void DeferredInit()
-	{
-		const auto tile = StartMenu::GetSingleton()->tile->InjectUIXML(R"(Data\menus\yCM.xml)");
 
+	UInt32 medicalQuestionaireCaseAddr;
+	__declspec(naked) void MedicalQuestionaireCreateHook()
+	{
+		_asm
+		{
+			mov ecx, [ebp + 8]
+			cmp ecx, MENU_ID
+			je createStewMenu
+			jmp[medicalQuestionaireCaseAddr]
+
+		createStewMenu:
+			push 0x71F142
+			jmp ModConfigurationMenu::Create
+		}
+	}
+
+	inline void TweaksButtonCallback()
+	{
+		ShowTweaksMenu();
+		// return the StartMenu to the settings menu, to prevent a visual bug since we don't open a sub-menu
+		//CdeclCall(0x7D0700); // MenuButton:Settings
+	}
+
+	// wraps a call that adds the settings menu to the start menu 
+	inline void __fastcall addTweaksButton(BSSimpleArray<StartMenuOption*>* startMenuOptions, void* edx, StartMenuOption** settingsMenuItem)
+	{
+		startMenuOptions->Append(settingsMenuItem);
+
+		StartMenuOption* tweaksButton = StartMenuOption::Create("Mods", TweaksButtonCallback, StartMenuOption::kMainMenu + StartMenuOption::kPauseMenu);
+		startMenuOptions->Append(&tweaksButton);
+	}
+
+
+	bool AtMainMenuOrStewMenuOpen()
+	{
+		return CdeclCall<bool>(0x70EDF0) || ModConfigurationMenu::GetSingleton();
 	}
 
 	void Init()
 	{
+		/*
+_SelectedTrait = Tile::TraitNameToID("_selected");
+_TextAlphaTrait = Tile::TraitNameToID("_TextAlpha");
+_IsSearchActiveTrait = Tile::TraitNameToID("_IsSearchActive");
+_IsCategoriesActiveTrait = Tile::TraitNameToID("_IsCategoriesActive");
+_FilterModeTrait = Tile::TraitNameToID("_FilterMode");
+_CursorXTrait = Tile::TraitNameToID("_CursorX");
+_CursorYTrait = Tile::TraitNameToID("_CursorY");
+_MinTrait = Tile::TraitNameToID("_min");
+_MaxTrait = kTileValue_user0;
+_SetVTrait = kTileValue_user2;
+_ValueTrait = Tile::TraitNameToID("_Value");
+_ValueStringTrait = Tile::TraitNameToID("_ValueString");
+_BackgroundVisibleTrait = Tile::TraitNameToID("_BackgroundVisible");
+*/
 
-		WriteRelCall(0x7CC9D4, UInt32(AddyCMToSettingsMenu));
-		WriteRelJump(0x7CCA43, 0x7CCAAD);
+		SafeWrite8(0x71F1EC + (MENU_ID - 1001), 16); // use switch case for CreditsMenu
+		medicalQuestionaireCaseAddr = DetourVtable(0x71F154 + 4 * 16, UInt32(MedicalQuestionaireCreateHook));
 
-		deferredInit.emplace_back(DeferredInit);
+		// reload the menu when alt-tabbing
+	//	WriteRelCall(0x86A1AB, UInt32(OnAltTabReloadStewMenu));
 
-	//	SafeWriteBuf(0x7CBF77
+		// prevent Escape closing the whole start menu if ModConfigurationMenu is open
+		WriteRelCall(0x70E686, UInt32(AtMainMenuOrStewMenuOpen));
 
-	//	SafeWriteBuf(0x7CBF8C, "\x66\x0F\x1F\x44\x00\x00", 6);//
-	//	SafeWriteBuf(0x7CB674, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CB686, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CB698, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CB6AA, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CB6BC, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CB6CE, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CB6E0, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CBE50, "\x81\x7A\x08\x50\x05\x7D\x00", 7);
-
-	/*	SafeWriteBuf(0x7CC044, "\x0F\x1F\x44\x00\x00", 5);
-		SafeWriteBuf(0x7CC392, "\x0F\x1F\x44\x00\x00", 5);
-		SafeWriteBuf(0x7CC23E, "\x0F\x1F\x44\x00\x00", 5);
-		SafeWriteBuf(0x7CC0C3, "\x0F\x1F\x44\x00\x00", 5);
-		SafeWriteBuf(0x7CC044, "\x0F\x1F\x44\x00\x00", 5);
-		SafeWriteBuf(0x7CC416, "\x0F\x1F\x44\x00\x00", 5);
-		SafeWriteBuf(0x7CC582, "\x0F\x1F\x44\x00\x00", 5);*/
-	//	SafeWriteBuf(0x7CBF59, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CC01F, "\x0F\x1F\x44\x00\x00", 5);
-
+		WriteRelCall(0x7CCA3E, addTweaksButton);
+		
+//		deferredInit.emplace_back(DeferredInit);
 	}
 }

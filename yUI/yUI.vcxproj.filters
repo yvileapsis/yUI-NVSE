@@ -298,16 +298,7 @@
     <ClInclude Include="ConfigurationMenu\StewMenu\InputField.h">
       <Filter>features\ConfigurationMenu</Filter>
     </ClInclude>
-    <ClInclude Include="ConfigurationMenu\StewMenu\JSONHandler.h">
-      <Filter>features\ConfigurationMenu</Filter>
-    </ClInclude>
     <ClInclude Include="ConfigurationMenu\StewMenu\ConfigurationMenuStew.h">
-      <Filter>features\ConfigurationMenu</Filter>
-    </ClInclude>
-    <ClInclude Include="ConfigurationMenu\StewMenu\SM_Mod.h">
-      <Filter>features\ConfigurationMenu</Filter>
-    </ClInclude>
-    <ClInclude Include="ConfigurationMenu\StewMenu\SM_Setting.h">
       <Filter>features\ConfigurationMenu</Filter>
     </ClInclude>
     <ClInclude Include="Stootils.h">

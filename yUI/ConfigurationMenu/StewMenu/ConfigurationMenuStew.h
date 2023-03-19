@@ -1,84 +1,275 @@
 #pragma once
-#include <set>
-
-#include "SM_Mod.h"
-#include "SM_Setting.h"
+#include "Containers.h"
+#include "Utilities.h"
 #include "InputField.h"
 #include "HotkeyField.h"
 #include <SimpleINILibrary.h>
 
-static UInt32 _SelectedTrait;
-static UInt32 _TextAlphaTrait;
-static UInt32 _IsSearchActiveTrait;
-static UInt32 _IsCategoriesActiveTrait;
-static UInt32 _FilterModeTrait;
-static UInt32 _CursorXTrait;
-static UInt32 _CursorYTrait;
-static UInt32 _MaxTrait;
-static UInt32 _MinTrait;
-static UInt32 _SetVTrait;
-static UInt32 _ValueTrait;
-static UInt32 _ValueStringTrait;
-static UInt32 _BackgroundVisibleTrait;
+#include <set>
+#include <utility>
+
+class SM_Tag
+{
+public:
+	std::string id;
+	std::string name;
+	std::string description;
+};
+
+class SM_Mod
+{
+public:
+	std::string id;
+	std::string version;
+
+	std::unordered_set<std::string> tags;
+
+	std::string name;
+	std::string category;
+	std::string description;
+
+	std::string settingPath;
+	std::string settingCategory;
+	std::string settingName;
+
+	signed int priority;
+	signed int value;
+
+	const char* GetInternalName() { return settingName.c_str(); };
+	const char* GetInternalCategory()
+	{
+		// if there's no internal category set, assume it's tweaks - done to avoid needlessly creating ~400 'Tweaks' strings since most tweak items will have that category
+		if (!settingCategory.empty()) return settingCategory.c_str();
+		return "Tweaks";
+	};
+	bool IsBoolean() { return !settingName.empty() && settingName[0] == 'b'; };
+
+	void* operator new(size_t size)
+	{
+		return FormHeapAlloc(size);
+	}
+
+	~SM_Mod() = default;
+};
+
+class JS_Setting;
+
+struct SubSettingData
+{
+	struct DropdownData
+	{
+		std::string displayName;
+		signed int value;
+		std::string description;
+	};
+
+	static const char* SettingTypeToTemplate(signed int type)
+	{
+/*		switch (type)
+		{
+		case kSettingType_Choice:
+			return "SettingTemplateChoice";
+		case kSettingType_Slider:
+			return "SubSettingTemplate_Slider";
+		case kSettingType_StringInput:
+		case kSettingType_NumberInput:
+		case kSettingType_Hotkey:
+			return "SubSettingTemplate_Input";
+		case kSettingType_Options:
+			return "SubSettingTemplate_Dropdown";
+		}
+*/
+		Log(true, Log::kBoth) << "ERROR TEMPLATE";
+		return "SettingTemplateChoice";
+		return nullptr;
+	}
+
+	void Init()
+	{
+//		type = kSettingType_None;
+		valueInt = 0;
+		valueStr.clear();
+		minValue = 0;
+		maxValue = 0;
+	}
+
+	SubSettingData() {};
+
+//	ElementType type;
+	union
+	{
+		float valueFloat;
+		int valueInt;
+		void* value;
+	};
+	union
+	{
+		struct
+		{
+			float minValue;
+			float maxValue;
+		};
+		TList<DropdownData> options;
+	};
+	std::string valueStr;
+
+//	void SetType(ElementType _type) { this->type = _type; }
+	/*	bool IsInputField() { return type == kSettingType_NumberInput || type == kSettingType_StringInput; };
+		bool IsHotkeyField() { return type == kSettingType_Hotkey; };
+		bool IsCheckboxField() { return type == kSettingType_Boolean; };
+		bool IsSlider() { return type == kSettingType_Slider; };
+		bool IsDropdown() { return type == kSettingType_Options; };*/
+	void AddOption(const char* displayString, signed int _value, const char* description)
+	{
+		auto option = (DropdownData*)GameHeapAlloc(sizeof(DropdownData));
+		option->displayName = (displayString);
+		option->description = (description);
+		option->value = _value;
+		this->options.Insert(option);
+	};
+	const char* GetDropdownValue()
+	{
+		auto iter = options.Head();
+		if (iter)
+		{
+			do
+			{
+				if (iter->data->value == valueInt) { return iter->data->displayName.c_str(); }
+			} while (iter = iter->next);
+		}
+		return "";
+	}
+	const char* GetDropdownDescription()
+	{
+		auto iter = options.Head();
+		if (iter)
+		{
+			do
+			{
+				if (iter->data->value == valueInt) { return iter->data->description.c_str(); }
+			} while (iter = iter->next);
+		}
+		return "";
+	}
+
+	void DropdownSelectNext(bool isNext)
+	{
+		auto iter = options.Head();
+		auto prev = options.GetLastNode();
+		if (iter)
+		{
+			do
+			{
+				if (iter->data->value == valueInt)
+				{
+					// found currently selected element
+					if (isNext)
+					{
+						if (!(iter = iter->next))
+						{
+							iter = options.Head();
+						}
+					}
+					else
+					{
+						iter = prev;
+					}
+					this->valueInt = iter->data->value;
+					return;
+				}
+
+				prev = iter;
+			} while (iter = iter->next);
+
+			// the current value wasn't one of the available options... reset it to the first option
+			this->valueInt = options.Head()->data->value;
+		}
+	}
+
+	void* operator new(size_t size)
+	{
+		return FormHeapAlloc(size);
+	}
+};
+
+struct SM_Setting
+{
+	enum ElementType
+	{
+		kSettingType_None,
+		kSettingType_Control,
+		kSettingType_ChoiceInteger,
+		kSettingType_ChoiceFloat,
+		kSettingType_ChoiceString,
+		kSettingType_SliderInteger,
+		kSettingType_SliderFloat,
+		kSettingType_InputString,
+		kSettingType_InputFloat,
+	};
+
+
+	std::string name;
+	std::string id;
+	std::string description;
+
+	SubSettingData data;
+
+	ElementType type;
+
+	std::filesystem::path	settingPath;
+	std::string				settingCategory;
+	std::string				settingName;
+
+	SInt32 priority = 0;
+
+	std::unordered_set<std::string> tags;
+	std::unordered_set<std::string> mods;
+
+	std::unordered_map<SInt32, std::tuple<std::string, std::string>> values;
+
+	SM_Setting() = default;
+
+	SM_Setting(std::string name, std::string description, std::string id, std::string internalCategory)
+		: name(std::move(name)), id(std::move(id)), description(std::move(description)), settingCategory(
+			std::move(internalCategory))
+	{
+		data.Init();
+	}
+
+	void Free()
+	{
+	}
+
+	const char* GetTemplate() { return SubSettingData::SettingTypeToTemplate(0); };
+
+	void* operator new(size_t size)
+	{
+		return FormHeapAlloc(size);
+	}
+};
+
+struct SubsettingList : TList<SM_Setting>
+{
+	void Destroy()
+	{
+		for (auto iter : *this)
+		{
+			auto item = iter;
+			item->Free();
+		}
+		this->DeleteAll();
+	}
+};
+
 extern const char* MenuPath;
 
 void ShowTweaksMenu();
-void InitTweaksListFromJSON();
 void SetDisplayedValuesForSubsetting(Tile* tile, SM_Setting* setting);
 void SetListBoxesKeepSelectedWhenNonActive(bool isActive);
 void WriteValueToINIs(const char* category, const char* name, const char* value);
 
 // randomly selected from the unused menu codes between 1001 and 1084 inclusive (to be compatible with the menu visibility array)
 constexpr auto MENU_ID = 1042;
-
-class JS_Tag
-{
-public:
-	std::string id;
-	std::string name;
-	std::string description;
-};
-
-class JS_Mod
-{
-public:
-	std::string id;
-	std::string name;
-	std::string description;
-	std::unordered_set<std::string> tags;
-	std::string version;
-};
-
-class JS_Setting
-{
-public:
-	enum Type
-	{
-		kNone,
-		kChoice,
-		kInteger,
-		kFloat,
-	};
-
-	std::string id;
-	std::string name;
-	std::string description;
-	SInt32 priority = 0;
-	std::unordered_set<std::string> tags;
-	std::unordered_set<std::string> mods;
-	std::string condition;
-	Type type = kNone;
-
-};
-
-class JS_SettingChoice : public JS_Setting
-{
-	std::unordered_map<SInt32, std::string> values;
-	std::string path;
-	SInt32 defaultValue;
-};
-
-
 
 enum TileIDs
 {
@@ -116,7 +307,7 @@ enum FilterMode
 	kFilterMode_Count,
 };
 
-class ConfigurationMenu : public Menu
+class ModConfigurationMenu : public Menu
 {
 private:
 	void Free();
@@ -143,38 +334,16 @@ private:
 	public:
 		Tile* Insert(SM_Setting* item)
 		{
-			auto tile = ListBox::Insert(item, item->name.c_str(), nullptr, item->GetTemplate());
+			const auto tile = ListBox::Insert(item, item->name.c_str(), nullptr, item->GetTemplate());
+
 			tile->SetFloat(kTileValue_id, kStewMenu_SubsettingItem);
-			if (item->IsSlider())
-			{
-				if (auto sliderRect = tile->GetChildByID(kStewMenu_SliderDraggableRect))
-				{
-					if (item->GetDataType() == SubSettingData::kSettingDataType_Float)
-					{
-						auto currentVal = item->data.valueFloat;
-						sliderRect->SetFloat(_MinTrait, min(currentVal, item->data.minValue));
-						sliderRect->SetFloat(_MaxTrait, max(currentVal, item->data.maxValue));
-					}
-					else
-					{
-						auto currentVal = item->data.valueInt;
-						sliderRect->SetFloat(_MinTrait, min(currentVal, item->data.minValue));
-						sliderRect->SetFloat(_MaxTrait, max(currentVal, item->data.maxValue));
-					}
-				}
-			}
-			else
-			{
-				tile->SetFloat(_MinTrait, item->data.minValue);
-				tile->SetFloat(_MaxTrait, item->data.maxValue);
-			}
 
 			return tile;
 		}
 	};
 
 public:
-	ConfigurationMenu()
+	ModConfigurationMenu()
 	{
 		memset(tiles, 0, sizeof(tiles));
 		modsListBox.Init();
@@ -201,7 +370,7 @@ public:
 
 		SetListBoxesKeepSelectedWhenNonActive(true);
 	};
-	~ConfigurationMenu() {};
+	~ModConfigurationMenu() {};
 
 	virtual void	Destructor(bool doFree);
 	virtual void	SetTile(UInt32 tileID, Tile* value);
@@ -243,9 +412,9 @@ public:
 		};
 	};
 
-	std::vector<std::unique_ptr<JS_Tag>>		g_Tags;
-	std::vector<std::unique_ptr<JS_Mod>>		g_Mods;
-	std::vector<std::unique_ptr<JS_Setting>>	g_Settings;
+	std::vector<std::unique_ptr<SM_Tag>>		g_Tags;
+	std::vector<std::unique_ptr<SM_Mod>>		g_Mods;
+	std::vector<std::unique_ptr<SM_Setting>>	g_Settings;
 
 	ModsListBox modsListBox;
 	CategoryListBox categoriesListBox;
@@ -269,8 +438,7 @@ public:
 	bool isDraggingCategoriesSlider;
 
 	bool HasTiles();
-	static void InitHooks();
-	static ConfigurationMenu* Create();
+	static ModConfigurationMenu* Create() { return new ModConfigurationMenu(); };
 	void Close();
 	void RefreshFilter();
 	void ReloadMenuXML();
@@ -304,7 +472,10 @@ public:
 	void WriteAllChangesToINIs();
 	void RefreshActiveTweakSelectionSquare();
 
-	static ConfigurationMenu* GetSingleton();
+	void ReadJSON(const std::filesystem::path& path);
+	void ReadJSONForPath(const std::filesystem::path& path);
+
+	static ModConfigurationMenu* GetSingleton();
 
 	void* operator new(size_t size)
 	{
@@ -316,20 +487,3 @@ public:
 		FormHeapFree(ptr);
 	}
 };
-
-inline void TweaksButtonCallback()
-{
-	ShowTweaksMenu();
-	// return the StartMenu to the settings menu, to prevent a visual bug since we don't open a sub-menu
-	//CdeclCall(0x7D0700); // MenuButton:Settings
-}
-
-// wraps a call that adds the settings menu to the start menu 
-inline void __fastcall addTweaksButton(BSSimpleArray<StartMenuOption*>* startMenuOptions, void* edx, StartMenuOption** settingsMenuItem)
-{
-	startMenuOptions->Append(settingsMenuItem);
-
-	StartMenuOption* tweaksButton = StartMenuOption::Create("Mods", TweaksButtonCallback, StartMenuOption::kMainMenu + StartMenuOption::kPauseMenu);
-	startMenuOptions->Append(&tweaksButton);
-}
-

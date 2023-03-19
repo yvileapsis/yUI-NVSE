@@ -29,12 +29,9 @@ INIT_MODULE(Patch::MultiplicativeShots)
 INIT_MODULE(Patch::TimeMult)
 INIT_MODULE(Patch::CharGenMenuSRemoval)
 
-
-extern void patchAddTweaksButton();
-
 void Inits()
 {
-//	ConfigurationMenu::Init();
+	ConfigurationMenu::Init();
 	SortingIcons::Init();
 
 	UserInterface::EventLayer::Init();
@@ -59,6 +56,4 @@ void Inits()
 //	Patch::MultiplicativeShots::Init();
 	Patch::TimeMult::Init();
 	Patch::CharGenMenuSRemoval::Init();
-
-	patchAddTweaksButton();
 }

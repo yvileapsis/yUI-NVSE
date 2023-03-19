@@ -510,9 +510,5 @@ bool IsConsoleOpen();
 __forceinline bool MenuMode() { return CdeclCall<bool>(0x702360); }
 
 int HexStringToInt(const std::string& str);
-struct ControlName
-{
-	UInt32		unk0;
-	const char* name;
-	UInt32		unkC;
-};
+
+std::string GetClipboardText();

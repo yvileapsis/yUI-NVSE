@@ -1,11 +1,11 @@
 #include "dinput8.h"
-
-#include <cassert>
-
 #include "SafeWrite.h"
-#include <queue>
 
 #include "Utilities.h"
+
+#include <queue>
+#include <cassert>
+
 
 static const GUID GUID_SysMouse		= { 0x6F1D2B60, 0xD5A0, 0x11CF, { 0xBF,0xC7,0x44,0x45,0x53,0x54,0x00,0x00} };
 static const GUID GUID_SysKeyboard	= { 0x6F1D2B61, 0xD5A0, 0x11CF, { 0xBF,0xC7,0x44,0x45,0x53,0x54,0x00,0x00} };
@@ -534,4 +534,70 @@ void FramerateTracker::Update(void)
 		// report 0 frametime until primed
 		m_averageFrameTime = 0;
 	}
+}
+
+ControlName** g_keyNames = (ControlName**)0x011D52F0;
+ControlName** g_mouseButtonNames = (ControlName**)0x011D5240;
+ControlName** g_joystickNames = (ControlName**)0x011D51B0;
+
+std::string GetDXDescription(UInt32 keycode)
+{
+	const char* keyName = "<no key>";
+
+	if (keycode <= 220)
+	{
+		if (g_keyNames[keycode])
+			keyName = g_keyNames[keycode]->name;
+	}
+	else if (255 <= keycode && keycode <= 263)
+	{
+		if (keycode == 255)
+			keycode = 256;
+		if (g_mouseButtonNames[keycode - 256])
+			keyName = g_mouseButtonNames[keycode - 256]->name;
+	}
+	else if (keycode == 264)
+		keyName = "WheelUp";
+	else if (keycode == 265)
+		keyName = "WheelDown";
+
+	return keyName;
+}
+
+std::string ScancodeToString(UInt32 scancode)
+{
+	std::string result;
+
+	const char* keyName = nullptr;
+	if (scancode <= 220)
+	{
+		if (g_keyNames[scancode])
+			keyName = g_keyNames[scancode]->name;
+	}
+	else if (255 <= scancode && scancode <= 263)
+	{
+		if (scancode == 255)
+			scancode = 256;
+		if (g_mouseButtonNames[scancode - 256])
+			keyName = g_mouseButtonNames[scancode - 256]->name;
+	}
+	else if (scancode == 264)		//OB doesn't provide names for wheel up/down
+		keyName = "WheelUp";
+	else if (scancode == 265)
+		keyName = "WheelDown";
+	else if (scancode == 221)
+		keyName = "Select";
+
+	if (!keyName)
+	{
+		char buf[0x40];
+		snprintf(buf, sizeof(buf), scancode ? "Unknown Key: %d" : "--", scancode);
+		result = buf;
+	}
+	else
+	{
+		result = keyName;
+	}
+
+	return result;
 }

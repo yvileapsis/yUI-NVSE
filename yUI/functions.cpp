@@ -293,6 +293,57 @@ void DisableKey(UInt32 key, bool disable, UInt32 mask)
 	g_DIHook->SetKeyDisableState(key, disable, mask);
 }
 
+__declspec(naked) bool IsShiftHeld()
+{
+	_asm
+	{
+		mov ecx, g_DIHook
+		cmp byte ptr[ecx + 0x12A], 0    // check left shift (DirectX scancode * 7 + 4)
+		jne done
+		cmp byte ptr[ecx + 0x17E], 0    // check right shift (DirectX scancode * 7 + 4)
+
+		done:
+		setne al
+			ret
+	}
+}
+
+_declspec(naked) bool IsAltHeld()
+{
+	_asm
+	{
+		mov edx, g_DIHook
+		cmp byte ptr[edx + 0x18C], 0    // check left alt (DirectX scancode * 7 + 4)
+		setne al
+		ret
+	}
+}
+
+_declspec(naked) bool IsTabHeld()
+{
+	_asm
+	{
+		mov edx, g_DIHook
+		cmp byte ptr[edx + 0x6D], 0    // check tab (DirectX scancode * 7 + 4)
+		setne al
+		ret
+	}
+}
+
+_declspec(naked) bool IsControlHeld()
+{
+	_asm
+	{
+		mov edx, g_DIHook
+		cmp	byte ptr[edx + 0xCF], 0
+		jne	done
+		cmp	byte ptr[edx + 0x44F], 0
+		done:
+		setne al
+			ret
+	}
+}
+
 Script* LNIsButtonPressed;
 bool IsButtonPressed(UInt32 button)
 {
