@@ -235,7 +235,7 @@ namespace UserInterface::LootMenu
 				}
 				else fst->SetFloat("_Icon", false);
 
-				if (const auto condition = snd->GetHealthPercentAlt(true); condition != -1)
+				if (const auto condition = snd->GetHealthPercentAlt(true, false); condition != -1)
 				{
 					fst->SetFloat("_Meter", 1);
 					fst->SetFloat("_MeterValue", condition);

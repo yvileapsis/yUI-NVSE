@@ -38,7 +38,7 @@ struct InventoryChanges
 
 	UInt8						GetWeaponMod();
 	__forceinline Float64		GetHealthPercent(char a1 = 0) { return ThisCall<Float64>(0x4BCDB0, this, a1); };
-	Float64						GetHealthPercentAlt(bool axonisFix = false);
+	Float64						GetHealthPercentAlt(bool axonisFix = false, bool checkDestruction = true);
 	bool						GetEquipped();
 	ExtraDataList*				GetExtraData() const;
 	UInt32						GetClipSize();

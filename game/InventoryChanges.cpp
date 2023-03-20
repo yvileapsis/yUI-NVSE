@@ -118,7 +118,7 @@ UInt8 InventoryChanges::GetWeaponMod()
 	return xModFlags ? xModFlags->flags : 0;
 }
 
-Float64 InventoryChanges::GetHealthPercentAlt(bool axonisFix)
+Float64 InventoryChanges::GetHealthPercentAlt(bool axonisFix, bool checkDestruction)
 {
 	Float64 healthPer = -1;
 
@@ -132,7 +132,7 @@ Float64 InventoryChanges::GetHealthPercentAlt(bool axonisFix)
 			: 0))
 			: 1;
 	}
-	else
+	else if (checkDestruction)
 	{
 		const auto destructible = DYNAMIC_CAST(form->TryGetREFRParent(), TESForm, BGSDestructibleObjectForm);
 		if (destructible && destructible->data)
