@@ -1170,8 +1170,6 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 		<clicksound> &nosound; </clicksound>
 		<xdefault> 1 </xdefault>
 		<user0></user0> <!-- value string -->
-		<user1> 0 </user1> <!-- jump value (LB/RB) -->
-		<user2></user2> <!-- arrow display (0=left 1=both 2=right) -->
 		<user4> 0 </user4> <!-- arrow spacing -->
 		<brightness> <copy src="io" trait="brightness"/> </brightness>
 		<_VerticalSpacing> 10 </_VerticalSpacing>
@@ -1230,11 +1228,6 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 				<add src="me" trait="mouseover"/>
 				<add src="sibling(lb_toggle_right)" trait="mouseover"/>
 				<add src="sibling(lb_toggle_value)" trait="mouseover"/>
-				<eq> 1 </eq>
-				<and>
-					<copy src="parent" trait="user2"/>
-					<lt> 2 </lt>
-				</and>
 			</visible>
 			<x>
 				<copy src="sibling(lb_toggle_value)" trait="_x"/>
@@ -1253,7 +1246,7 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 			<zoom> &scale; </zoom>
 		</image>
 
-		<text name="lb_toggle_value">
+		<hotrect name="lb_toggle_value">
 			<include src="text_box.xml"/>
 			<id> 99 </id>
 			<mouseoversound> UIMenuFocus </mouseoversound>
@@ -1274,7 +1267,7 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 			<_horbuf> 20 </_horbuf>
 			<_verbuf> 10 </_verbuf>
 			<_line_alpha> <copy src="sibling(ListItemText)" trait="alpha"/> </_line_alpha>
-		</text>
+		</hotrect>
 
 		<image name="lb_toggle_right">
 			<id> 101 </id>
@@ -1289,11 +1282,6 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 				<add src="me" trait="mouseover"/>
 				<add src="sibling(lb_toggle_left)" trait="mouseover"/>
 				<add src="sibling(lb_toggle_value)" trait="mouseover"/>
-				<eq> 1 </eq>
-				<and>
-					<copy src="parent" trait="user2"/>
-					<gt> 0 </gt>
-				</and>
 			</visible>
 			<x>
 				<copy src="sibling(lb_toggle_value)" trait="_x"/>
