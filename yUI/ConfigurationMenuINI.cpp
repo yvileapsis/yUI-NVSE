@@ -1,10 +1,9 @@
 #pragma once
-#include "json.h"
 #include "ConfigurationMenu/StewMenu/ConfigurationMenuStew.h"
 
-inline std::unordered_map<std::filesystem::path, SM_Value> ini_map;
+inline std::map<std::tuple<std::filesystem::path, std::string, std::string>, SM_Value> ini_map;
 
-inline void ReadINIInternal(const std::filesystem::path& iniPath)
+inline void ReadINIInternal(const std::filesystem::path& iniPath, const std::filesystem::path& iniPath2)
 {
 	CSimpleIniA ini;
 	ini.SetUnicode();
@@ -19,17 +18,13 @@ inline void ReadINIInternal(const std::filesystem::path& iniPath)
 		ini.GetAllKeys(section.pItem, keys);
 		for (const auto& key : keys)
 		{
-			std::filesystem::path fullPath = iniPath;
-			fullPath += section.pItem;
-			fullPath += key.pItem;
-
 			SM_Value value;
 
 			if (key.pItem[0] == 'b' || key.pItem[0] == 'i') value.emplace<SInt32>(ini.GetLongValue(section.pItem, key.pItem));
 			else if (key.pItem[0] == 'f') value.emplace<Float64>(ini.GetDoubleValue(section.pItem, key.pItem));
 			else if (key.pItem[0] == 's') value.emplace<std::string>(ini.GetValue(section.pItem, key.pItem));
 
-			ini_map.emplace(fullPath, value);
+			ini_map.emplace(std::make_tuple(iniPath2, section.pItem, key.pItem), value);
 		}
 	}
 
@@ -41,15 +36,13 @@ SM_Value SM_Setting::ReadINI()
 	std::filesystem::path iniPath = GetCurPath();
 	iniPath += setting.path;
 
-	std::filesystem::path fullPath = iniPath;
-	fullPath += setting.category;
-	fullPath += setting.value;
+	const auto settingTuple = std::make_tuple(setting.path, setting.category, setting.value);
 
-	if (ini_map.contains(fullPath)) return ini_map[fullPath];
+	if (ini_map.contains(settingTuple)) return ini_map[settingTuple];
 
-	ReadINIInternal(iniPath);
+	ReadINIInternal(iniPath, setting.path);
 
-	if (ini_map.contains(fullPath)) return ini_map[fullPath];
+	if (ini_map.contains(settingTuple)) return ini_map[settingTuple];
 
 	return valueDefault;
 }
@@ -75,11 +68,9 @@ void SM_Setting::WriteINI(SM_Value value)
 	std::filesystem::path iniPath = GetCurPath();
 	iniPath += setting.path;
 
-	std::filesystem::path fullPath = iniPath;
-	fullPath += setting.category;
-	fullPath += setting.value;
+	const auto settingTuple = std::make_tuple(setting.path, setting.category, setting.value);
 
-	ini_map[fullPath] = value;
+	ini_map[settingTuple] = value;
 
 	WriteINIInternal(iniPath, *this, value);
 }

@@ -66,6 +66,7 @@ struct SM_Setting
 		std::filesystem::path	path;
 		std::string				category;
 		std::string				value;
+
 	};
 
 	std::string name;
@@ -83,14 +84,17 @@ struct SM_Setting
 
 	SM_Value valueDefault;
 
-	typedef std::unordered_map<SM_Value, std::pair<std::string, std::string>> SM_ValueOptions;
+	typedef std::map<SM_Value, std::pair<std::string, std::string>> SM_ValueOptions;
 
 	SM_ValueOptions values;
 
-	void SetDisplayedValue(Tile* tile);
+	void SetDisplayedValue(Tile* tile, SM_Value value);
 
 	SM_Value ReadINI();
 	void WriteINI(SM_Value value);
+
+	SM_Value GetValuePrev(SM_Value value);
+	SM_Value GetValueNext(SM_Value value);
 
 	const char* GetTemplate() {
 		switch (type)
@@ -311,7 +315,7 @@ public:
 	void ClearAndCloseSearch();
 	void CycleFilterMode();
 	void AddCategory(char* category);
-	bool HandleActiveSliderArrows(bool isRightArrow, float scale = 0.05F);
+	bool HandleActiveSliderArrows(Tile* tile, bool isRightArrow, float scale = 0.05F);
 	void SetActiveTweak(SM_Mod* item);
 	void SetTweakDescriptionTileString(SM_Mod* item);
 	void SetSubsettingDescriptionTileString(SM_Setting* setting);

@@ -137,7 +137,7 @@ void ModConfigurationMenu::HandleActiveMenuClickHeld(UInt32 tileID, Tile* active
 		auto timeClickHeld = InterfaceManager::GetSingleton()->timeLeftClickHeld;
 		if (timeClickHeld > 0.3)
 		{
-			this->HandleActiveSliderArrows(tileID != kStewMenu_SliderLeftArrow);
+//			this->HandleActiveSliderArrows(tileID != kStewMenu_SliderLeftArrow);
 		}
 	}
 }
@@ -319,7 +319,7 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 	case kStewMenu_SliderLeftArrow:
 	case kStewMenu_SliderRightArrow:
 	{
-		this->HandleActiveSliderArrows(tileID != kStewMenu_SliderLeftArrow);
+		this->HandleActiveSliderArrows(clickedTile->parent, tileID != kStewMenu_SliderLeftArrow);
 		break;
 	}
 	case kStewMenu_SliderText:
@@ -486,7 +486,7 @@ void ModConfigurationMenu::SetInSubsettingInputMode(bool isActive)
 				if (tile->parent)
 				{
 					// set the input string back to the current value of the setting
-					activeInputSubsetting->SetDisplayedValue(tile->parent);
+					//activeInputSubsetting->SetDisplayedValue(tile->parent);
 
 					// ensure the input field has the same value so UpdateCaretDisplay doesn't reset the string
 					auto strVal = tile->GetValue(kTileValue_string);
@@ -514,7 +514,7 @@ bool ModConfigurationMenu::GetInSubsettingInputMode()
 
 void ModConfigurationMenu::SetInHotkeyMode(bool isActive)
 {
-	auto tile = hotkeyInput.tile;
+/*	auto tile = hotkeyInput.tile;
 	if (tile)
 	{
 		if (tile->parent)
@@ -547,7 +547,7 @@ void ModConfigurationMenu::SetInHotkeyMode(bool isActive)
 		}
 	}
 
-	hotkeyInput.SetActive(isActive);
+	hotkeyInput.SetActive(isActive);*/
 }
 
 bool ModConfigurationMenu::GetInHotkeyMode()
@@ -743,32 +743,18 @@ UInt32 ModConfigurationMenu::GetID(void)
 	return UInt32(MENU_ID);
 }
 
-bool ModConfigurationMenu::HandleActiveSliderArrows(bool isRightArrow, float scale)
+bool ModConfigurationMenu::HandleActiveSliderArrows(Tile* tile,  bool isRightArrow, float scale)
 {
-	if (const auto tile = this->settingsListBox.selected; !tile) return false;
+	if (!tile) return false;
 
-	auto setting = this->settingsListBox.GetItemForTile(tile->parent);
+	const auto setting = this->settingsListBox.GetItemForTile(tile);
 
-	SM_Value newValue;
+	if (!setting) return false;
 
-	if (setting->type == SM_Setting::kSettingType_Choice)
-	{
-		if (setting->values.empty()) return false;
-
-		const auto value = setting->ReadINI();
-		if (auto iter = setting->values.find(value); iter != setting->values.end())
-		{
-			++iter;
-			if (iter != setting->values.end()) newValue = iter->first;
-			else newValue = setting->values.begin()->first;
-		}
-		else
-		{
-			newValue = setting->values.begin()->first;
-		}
-	}
+	const auto value = setting->ReadINI();
+	const SM_Value newValue = isRightArrow ? setting->GetValueNext(value) : setting->GetValuePrev(value);
 	setting->WriteINI(newValue);
-	setting->SetDisplayedValue(tile);
+	setting->SetDisplayedValue(tile, newValue);
 }
 
 bool ModConfigurationMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode code, float keyState)
@@ -832,7 +818,7 @@ bool ModConfigurationMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode co
 	case kMenu_LeftArrow:
 	case kMenu_RightArrow:
 	{
-		if (this->HandleActiveSliderArrows(code == kMenu_RightArrow))
+//		if (this->HandleActiveSliderArrows( code == kMenu_RightArrow))
 		{
 			return true;
 		}
@@ -849,7 +835,7 @@ bool ModConfigurationMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode co
 			isRightArrow = !isRightArrow;
 		}
 
-		return this->HandleActiveSliderArrows(isRightArrow, 0.2);
+//		return this->HandleActiveSliderArrows(isRightArrow, 0.2);
 	}
 	}
 	return false;
@@ -968,11 +954,10 @@ void SetDisplayedValuesForSubsetting(Tile* tile, SM_Setting* setting)
 }
 */
 
-void SM_Setting::SetDisplayedValue(Tile* tile)
+void SM_Setting::SetDisplayedValue(Tile* tile, const SM_Value value)
 {
 	if (type == kSettingType_Choice)
 	{
-		const auto value = ReadINI();
 		std::string valueString;
 		if (values.contains(value)) valueString = values[value].first;
 		else
@@ -985,6 +970,37 @@ void SM_Setting::SetDisplayedValue(Tile* tile)
 		tile->SetString(kTileValue_user0, valueString.c_str());
 	}
 }
+
+SM_Value SM_Setting::GetValuePrev(SM_Value value)
+{
+	SM_Value newValue;
+
+	if (type == kSettingType_Choice)
+	{
+		if (values.empty()) return value;
+		if (auto iter = values.find(value); iter == values.end() || --iter == values.end())
+			newValue = values.rbegin()->first;
+		else newValue = iter->first;
+	}
+
+	return newValue;
+}
+
+SM_Value SM_Setting::GetValueNext(SM_Value value)
+{
+	SM_Value newValue;
+
+	if (type == kSettingType_Choice)
+	{
+		if (values.empty()) return value;
+		if (auto iter = values.find(value); iter == values.end() || ++iter == values.end())
+			newValue = values.begin()->first;
+		else newValue = iter->first;
+	}
+
+	return newValue;
+}
+
 
 void ModConfigurationMenu::SetActiveTweak(SM_Mod* tweak)
 {
@@ -1003,7 +1019,8 @@ void ModConfigurationMenu::SetActiveTweak(SM_Mod* tweak)
 			if (!it->mods.contains(tweak->id)) continue;
 
 			const auto tile = settingsListBox.Insert(it.get());
-			it->SetDisplayedValue(tile);
+			const auto value = it->ReadINI();
+			it->SetDisplayedValue(tile, value);
 		}
 	}
 }
@@ -1085,6 +1102,7 @@ void ModConfigurationMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 	}
 	case kModConfigurationMenu_ChoiceText:
 	{
+		settingsListBox.SetSelected(activeTile->parent);
 		break;
 	}
 	}
