@@ -185,7 +185,7 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 		clickedTile->parent->SetFloat("_selected", 1);
 		clickedTile->SetFloat("_selected", 1);
 
-		SetActiveTweak(item);
+		SetActiveMod(item);
 
 		break;
 	}
@@ -210,7 +210,6 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 			// when clicking <All>
 			this->currentCategory->SetString(kTileValue_string, clickedTile->GetValue(kTileValue_string)->str);
 		}
-		this->selectedCategory = categoryStr;
 
 		categoriesListBox.SaveScrollPosition();
 		this->SetCategoriesListActive(false);
@@ -247,6 +246,11 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 		this->SetInSubsettingInputMode(false);
 
 		auto setting = settingsListBox.GetItemForTile(clickedTile);
+
+		if (setting->type = setting->kSettingType_Subsetting)
+		{
+			DisplaySettings(setting ? setting->id : "");
+		}
 
 			/*
 		if (setting->IsInputField())
@@ -549,8 +553,9 @@ bool __cdecl FilterTweaksOnActiveTrait(SM_Mod* item)
 
 bool __cdecl FilterOnSelectedCategory(SM_Mod* item)
 {
-	const auto selectedCategory = ModConfigurationMenu::GetSingleton()->selectedCategory;
-	return !selectedCategory.empty() && item->category != selectedCategory;
+//	const auto selectedCategory = ModConfigurationMenu::GetSingleton()->selectedCategory;
+//	return !selectedCategory.empty() && item->category != selectedCategory;
+	return false;
 }
 
 bool __cdecl HideItemsNotMatchingFilterString(SM_Mod* item)
@@ -581,7 +586,7 @@ void ModConfigurationMenu::RefreshFilter()
 		// if the selected tweak is filtered out
 		if (selectedTile->GetFloat(kTileValue_listindex) < 0)
 		{
-			this->SetActiveTweak(nullptr);
+			this->SetActiveMod(nullptr);
 		}
 	}
 }
@@ -876,7 +881,7 @@ void SM_Setting::SetDisplayedValue(Tile* tile, const SM_Value& value)
 	}
 	else if (type == kSettingType_Slider)
 	{
-		tile->SetFloat(kTileValue_user0, 20 * std::get<SInt32>(value) / std::get<SInt32>(std::get<1>(slider)));
+		tile->SetFloat(kTileValue_user0, 20 * GetFloatFromValue(value) / GetFloatFromValue(std::get<1>(slider)));
 		tile->SetFloat(kTileValue_user3, 20);
 	}
 }
@@ -930,49 +935,37 @@ const char* SM_Setting::GetTemplate() const
 		return "SettingChoiceTemplate";
 	case kSettingType_Slider:
 		return "SettingSliderTemplate";
+	case kSettingType_Subsetting:
+		return "SettingSubsettingTemplate";
 	default:
 		return "SettingNoneTemplate";
 	}
 };
 
-void ModConfigurationMenu::SetActiveTweak(SM_Mod* mod)
+void ModConfigurationMenu::DisplaySettings(std::string tab)
+{
+	settingsListBox.FreeAllTiles();
+
+	for (const auto& it : g_Settings)
+	{
+		if (!it->mods.contains(tab)) continue;
+
+		const auto tile = settingsListBox.Insert(it.get());
+		const auto value = it->ReadINI();
+		it->SetDisplayedValue(tile, value);
+	}
+}
+
+void ModConfigurationMenu::SetActiveMod(SM_Mod* mod)
 {
 	this->SetInSubsettingInputMode(false);
 	this->SetInHotkeyMode(false);
 	subSettingInput.tile = nullptr;
 	hotkeyInput.tile = nullptr;
 
-	settingsListBox.FreeAllTiles();
 	activeTweak = mod;
 
-	if (mod)
-	{
-		for (const auto& it : g_Settings)
-		{
-			if (!it->mods.contains(mod->id)) continue;
-
-			const auto tile = settingsListBox.Insert(it.get());
-			const auto value = it->ReadINI();
-			it->SetDisplayedValue(tile, value);
-		}
-	}
-}
-
-void ModConfigurationMenu::SetSubsettingDescriptionTileString(SM_Setting* setting)
-{
-//	auto description = setting->description;
-	/*if (setting->IsDropdown())
-	{
-		
-		description = FormatString(!description.empty() ? "%s\r\n%s" : "%s%s", description, setting->data.GetDropdownDescription());
-	}*/
-
-	if (g_bTweaksMenuShowSettingPathOnSubsettings)
-	{
-//		description = FormatString(!description.empty() ? "%s\n[%s]\n%s" : "%s[%s]\n%s", description, setting->settingCategory.c_str(), setting->id.c_str());
-	}
-
-//	this->selectionText->SetString(kTileValue_string, description.c_str());
+	DisplaySettings(mod ? mod->id : "");
 }
 
 void ModConfigurationMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
@@ -989,7 +982,7 @@ void ModConfigurationMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 		selectionText->SetString(kTileValue_string, FormatString("%s\n- %s", mod->description.c_str(), mod->settingName.c_str()).c_str());
 
 			//		this->SetTweakDescriptionTileString(item);
-//		this->SetActiveTweak(item);
+//		this->SetActiveMod(item);
 //		PlayGameSound("UIMenuFocus");
 
 		break;
@@ -1000,14 +993,12 @@ void ModConfigurationMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 	case kModConfigurationMenu_SliderRightArrow:
 	{
 		auto item = settingsListBox.GetItemForTile(activeTile->parent);
-		this->SetSubsettingDescriptionTileString(item);
 		break;
 	}
 
 	case kModConfigurationMenu_SettingListItem:
 	{
 		auto item = settingsListBox.GetItemForTile(activeTile);
-		this->SetSubsettingDescriptionTileString(item);
 		break;
 	}
 
@@ -1055,9 +1046,7 @@ void ModConfigurationMenu::Free()
 	searchBar.Free();
 	subSettingInput.Free();
 	hotkeyInput.Free();
-	ini.Reset();
 
-	allCategories.clear();
 	touchedSubsettings.RemoveAll();
 	touchedTweaks.RemoveAll();
 
@@ -1065,24 +1054,6 @@ void ModConfigurationMenu::Free()
 
 	OSInputGlobals::GetSingleton()->SetDebounceMenuMode(false);
 };
-
-void CopyValuesFrom(CSimpleIni& to, CSimpleIni& from)
-{
-	std::list<CSimpleIni::Entry> categoryList;
-	std::list<CSimpleIni::Entry> keyList;
-	from.GetAllSections(categoryList);
-	for (auto categoryEntry : categoryList)
-	{
-		const char* category = categoryEntry.pItem;
-		from.GetAllKeys(category, keyList);
-		for (auto keyEntry : keyList)
-		{
-			const char* key = keyEntry.pItem;
-			auto value = from.GetValue(category, key);
-			to.SetValue(category, key, value, nullptr, true);
-		}
-	}
-}
 
 /*
 void ModConfigurationMenu::LoadINIs()
@@ -1137,19 +1108,6 @@ void RestartGameWarningCallback()
 	}
 }
 
-void ModConfigurationMenu::WriteAllChangesToINIs()
-{
-	for (auto iter : touchedTweaks)
-	{
-//		this->WriteTweakToINI(iter);
-	}
-
-	for (auto iter : touchedSubsettings)
-	{
-//		this->WriteSubsettingToINI(iter);
-	}
-}
-
 void ModConfigurationMenu::Close()
 {
 	if (!g_bShownTweaksMenuReloadWarning)
@@ -1160,8 +1118,6 @@ void ModConfigurationMenu::Close()
 		}
 	}
 
-	this->WriteAllChangesToINIs();
-
 	Menu::Close();
 }
 
@@ -1170,7 +1126,7 @@ void ModConfigurationMenu::HandleControllerConnectOrDisconnect(bool isController
 
 }
 
-void ModConfigurationMenu::SetCursorPosTraits()
+void ModConfigurationMenu::SetCursorPosTraits() const
 {
 	auto im = InterfaceManager::GetSingleton();
 
@@ -1404,38 +1360,7 @@ void ShowTweaksMenu()
 	Tile* listTile = categoriesListBox->Insert(nullptr, "All");
 	if (listTile) listTile->SetFloat(kTileValue_id, kModConfigurationMenu_CategoryItem);
 
-	for (const auto iter : menu->allCategories)
-	{
-		char* categoryName = iter;
-		listTile = categoriesListBox->Insert(categoryName, categoryName);
-		if (listTile)
-		{
-			listTile->SetFloat(kTileValue_id, kModConfigurationMenu_CategoryItem);
-		}
-	}
-
-//	ModConfigurationMenu::GetSingleton()->SetActiveTweak(modsListBox->list.first.data->object);
+//	ModConfigurationMenu::GetSingleton()->SetActiveMod(modsListBox->list.first.data->object);
 
 	menu->HideTitle(false);
-}
-
-void ModConfigurationMenu::AddCategory(char* category)
-{
-	allCategories.insert(category);
-}
-
-void ModConfigurationMenu::TouchTweak(SM_Mod* tweak)
-{
-	if (!this->touchedTweaks.contains(tweak))
-	{
-		touchedTweaks.Insert(tweak);
-	}
-}
-
-void ModConfigurationMenu::TouchSubsetting(SM_Setting* setting)
-{
-	if (!this->touchedSubsettings.contains(setting))
-	{
-		touchedSubsettings.Insert(setting);
-	}
 }

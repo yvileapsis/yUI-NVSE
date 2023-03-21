@@ -295,23 +295,45 @@ iMode3Alt = 0
 	"value": "JustMods.ini:Loot Menu:iJustify"
 },
 {
-	"id": "JLMfHeight",
-	"name": "fHeight",
+	"id": "JLMfHeightMin",
+	"name": "Height Min",
+	"mods": "JLMVisuals",
+	"tags": "Visuals",
+	"type": "slider",
+
+	"valueDefault": 32.00,
+	"valueDelta": 0.5,
+	"valueMin": 0.00,
+	"valueMax": 960.00,
+	
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "fHeightMin"
+},
+{
+	"id": "JLMfHeightMax",
+	"name": "Height Max",
+	"mods": "JLMVisuals",
+	"tags": "Visuals",
+	"type": "slider",
+
+	"valueDefault": 400.00,
+	"valueDelta": 0.5,
+	"valueMin": 0.00,
+	"valueMax": 960.00,
+	
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "fHeightMax"
+},
+{
+	"id": "JLMVisuals",
+	"name": "Visuals",
 	"description": "",
 	"mods": ["JLM"],
 	"tags": ["Visuals"],
 	"condition": [ { "JLMbEnable":1 } ],
-	"type": "two floats",
-	"value1Default": 32.00,
-	"value1Delta": 0.5,
-	"value1Min": 0.00,
-	"value1Max": 960.00,
-	"value1": "JustMods.ini:Loot Menu:fHeightMin",
-	"value2Default": 640.00,
-	"value2Delta": 0.5,
-	"value2Min": 0.00,
-	"value2Max": 960.00,
-	"value2": "JustMods.ini:Loot Menu:fHeightMax"
+	"type": "subsetting"
 },
 {
 	"id": "JLMfWidth",

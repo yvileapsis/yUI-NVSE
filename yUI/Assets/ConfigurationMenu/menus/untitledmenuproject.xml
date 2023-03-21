@@ -1324,4 +1324,80 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 			<zoom> &scale; </zoom>
 		</image>
 	</hotrect> </template>
+
+		<template name="SettingSubsettingTemplate"> <hotrect name="SettingItem">
+		<include src="list_box_template.xml"/>
+		<mouseoversound> &nosound; </mouseoversound>
+		<clicksound> &nosound; </clicksound>
+		<xdefault> 1 </xdefault>
+		<user0></user0> <!-- value string -->
+		<user4> 0 </user4> <!-- arrow spacing -->
+		<brightness> <copy src="io" trait="brightness"/> </brightness>
+		<_VerticalSpacing> 10 </_VerticalSpacing>
+
+		<text name="ListItemText">
+			<font> <copy src="io" trait="font" /> </font>
+			<string> <copy src="parent" trait="string"/> </string>
+
+			<brightness>
+				<copy> 255 </copy>
+				<add>
+					<copy src="globals" trait="_VUI+Highlighting" /> <div> 2 </div>
+					<onlyif>
+						<copy src="parent" trait="mouseover" />
+						<and src="globals" trait="_Has360Controller" />
+						<or src="sibling(lb_toggle_value)" trait="mouseover" />
+						<or src="sibling(lb_toggle_left)" trait="mouseover" />
+						<or src="sibling(lb_toggle_right)" trait="mouseover" />
+					</onlyif>
+				</add>
+			</brightness>
+			
+			<alpha>
+				<copy src="grandparent" trait="_alpha"/>
+				<min>
+					<copy> 255 </copy>
+					<sub>
+						<copy> 128 </copy>
+						<onlyifnot src="parent" trait="_enabled"/>
+					</sub>
+				</min>
+			</alpha>
+
+			<x> 10 </x>
+			<y>
+				<copy src="parent" trait="height" />
+				<sub src="me" trait="height" />
+				<div> 2 </div>
+				<add>
+					<copy src="me" trait="font" />
+					<copy src="globals" trait="_VUI+FontY_"/>
+				</add>
+			</y>
+		</text>
+
+		<image name="lb_toggle_right">
+			<id> 101 </id>
+			<alpha> <copy src="sibling(ListItemText)" trait="alpha"/> </alpha>
+			<filename> Interface\Main\main_arrow_right.dds </filename>
+			<mouseoversound> UIMenuFocus </mouseoversound>
+			<clicksound> UIMenuPrevNext </clicksound>
+			<target> 1 </target>
+			<depth> 5 </depth>
+			<visible> 1 </visible>
+			<x>
+        <copy src="io" trait="_center_x"/>
+				<add src="parent" trait="user4"/>
+			</x>
+			<y>
+        <copy src="parent" trait="height"/>
+        <sub src="me" trait="height"/>
+        <div> 2 </div>
+        <add> 0.5 </add>
+      </y>
+      <width> 13 </width>
+      <height> 23 </height>
+			<zoom> &scale; </zoom>
+		</image>
+	</hotrect> </template>
 </menu>

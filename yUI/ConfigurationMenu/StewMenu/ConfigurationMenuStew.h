@@ -86,7 +86,7 @@ struct SM_Setting
 		kSettingType_Control,
 		kSettingType_Choice,
 		kSettingType_Slider,
-		kSettingType_InputString,
+		kSettingType_Subsetting,
 		kSettingType_InputFloat,
 	};
 
@@ -252,9 +252,6 @@ public:
 		lastXMLWriteTime.dwLowDateTime = 0;
 		lastXMLWriteTime.dwHighDateTime = 0;
 
-		ini.SetUnicode();
-
-//		LoadINIs();
 	};
 	~ModConfigurationMenu() {};
 
@@ -303,22 +300,27 @@ public:
 	std::vector<std::unique_ptr<SM_Setting>>	g_Settings;
 
 	ModsListBox modsListBox;
-	CategoryListBox categoriesListBox;
 	SettingsListBox settingsListBox;
+	CategoryListBox categoriesListBox;
+
 	InputField subSettingInput;
+
 	HotkeyField hotkeyInput;
+
 	SM_Setting* activeInputSubsetting;
 	SM_Setting* activeHotkeySubsetting;
+
+	std::string activeTab;
+	std::string activeTag;
+
 	SM_Mod* activeTweak;
+
 	InputField searchBar;
-	CSimpleIniA ini;
 	FILETIME lastXMLWriteTime;
 	UInt8 filterMode;
 	TList<SM_Setting> touchedSubsettings;
 	TList<SM_Mod> touchedTweaks;
 
-	std::set<char*> allCategories;
-	std::string selectedCategory;
 
 	// debounce to prevent the categories list closing after dragging the slider
 	bool isDraggingCategoriesSlider;
@@ -340,17 +342,13 @@ public:
 	void CycleFilterMode();
 	void AddCategory(char* category);
 	bool HandleActiveSliderArrows(Tile* tile, bool isRightArrow, float scale = 0.05F);
-	void SetActiveTweak(SM_Mod* mod);
-	void SetSubsettingDescriptionTileString(SM_Setting* setting);
+	void DisplaySettings(std::string tab);
+	void SetActiveMod(SM_Mod* mod);
 	bool IsSubsettingInputValid();
 	void SetActiveSubsettingValueFromInput();
 	void SetInHotkeyMode(bool isActive);
 	bool GetInHotkeyMode();
-	void SetCursorPosTraits();
-
-	void TouchTweak(SM_Mod* tweak);	
-	void TouchSubsetting(SM_Setting* setting);
-	void WriteAllChangesToINIs();
+	void SetCursorPosTraits() const;
 
 	void ReadJSON(const std::filesystem::path& path);
 	void ReadJSONForPath(const std::filesystem::path& path);

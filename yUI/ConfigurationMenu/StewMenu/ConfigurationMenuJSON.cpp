@@ -51,10 +51,11 @@ SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem)
 	else
 	{
 		const auto typeString = elem["type"].get<std::string>();
-		if (typeString == "choice")			type = kSettingType_Choice;
-		else if (typeString == "control")	type = kSettingType_Control;
-		else if (typeString == "slider")	type = kSettingType_Slider;
-		else								type = kSettingType_None;
+		if (typeString == "choice")				type = kSettingType_Choice;
+		else if (typeString == "control")		type = kSettingType_Control;
+		else if (typeString == "slider")		type = kSettingType_Slider;
+		else if (typeString == "subsetting")	type = kSettingType_Subsetting;
+		else									type = kSettingType_None;
 	}
 
 	if (type == kSettingType_Choice)
