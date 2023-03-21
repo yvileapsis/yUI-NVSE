@@ -138,18 +138,19 @@ iButton3 = 0
 iButtonAlt = 0
 */
 {
-	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
-	"category": "General",
-	"value": "bLootMenu",
-
 	"id": "JLMbEnable",
 	"name": "Enable Just Loot Menu",
 	"description": "EEEEEEEEEEEEEEEEEEEEEEE",
 	"mods": ["JLM"],
 	"tags": ["Gameplay"],
 	"condition": [ { "JLMbEnable":1 } ],
-	"type": "choice",
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "General",
+	"value": "bLootMenu",
+
 	"valueDefault": 1,
+	"type": "choice",
 	"values": [ { "value": 0, "name":"OFF", "description": "LOOT MENU IS ON!" }, { "value": 1, "name": "ON", "description": "LOOT MENU IS OFF!" } ]
 },
 {
@@ -184,20 +185,28 @@ iMode3Alt = 0
 	"condition": [ { "JLMbEnable":1 } ],
 	"type": "choice",
 	"valueDefault": 1,
-	"values": [ { "value": 0, "name":"kNone" }, { "value":1, "name": "kTake" }, { "value":2, "name": "kEquip" }, { "value":3, "name": "kTakeAll" }, { "value":4, "name": "kOpen" } ]
+	"values": [ { "value": 0, "name":"None" }, { "value":1, "name": "Take" }, { "value":2, "name": "Equip" }, { "value":3, "name": "TakeAll" }, { "value":4, "name": "Open" } ]
 },
 {
 	"id": "JLMiTakeSmartMin",
-	"name": "TakeSmartMin",
-	"description": "",
+	"name": "Take Smart Min",
+	"description": "The amount of items wah wah wah whatever.",
+
 	"mods": ["JLM"],
 	"tags": ["Gameplay"],
-	"condition": [ { "JLMbEnable":1 } ],
-	"type": "integer",
+
 	"valueDefault": 5,
+	"type": "slider",
+
 	"valueMin": 0,
 	"valueMax": 20,
-	"value": "JustMods.ini:Loot Menu:iTakeSmartMin"
+	"valueDelta": 1,
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "iTakeSmartMin",
+
+	"condition": [ { "JLMbEnable":1 } ]
 },
 {
 	"id": "JLMbTakeWeightless",

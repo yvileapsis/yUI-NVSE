@@ -13,6 +13,13 @@ template <typename T> std::vector<T> GetSetFromElement(const nlohmann::basic_jso
 	return set;
 }
 
+SM_Value GetValueFromElement(const nlohmann::basic_json<>& elem)
+{
+	if (elem.is_number_integer() || elem.is_number_unsigned()) return elem.get<SInt32>();
+	if (elem.is_string()) return elem.get<std::string>();
+	if (elem.is_number_float()) return elem.get<Float64>();
+}
+
 TagJSON::TagJSON(const nlohmann::basic_json<>& elem)
 {
 	if (elem.contains("id"))			id = elem["id"].get<std::string>();
@@ -46,8 +53,8 @@ SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem)
 		const auto typeString = elem["type"].get<std::string>();
 		if (typeString == "choice")			type = kSettingType_Choice;
 		else if (typeString == "control")	type = kSettingType_Control;
-		else if (typeString == "integer")	type = kSettingType_SliderInteger;
-		else if (typeString == "float")		type = kSettingType_SliderFloat;
+		else if (typeString == "slider")	type = kSettingType_Slider;
+		else								type = kSettingType_None;
 	}
 
 	if (type == kSettingType_Choice)
@@ -56,31 +63,38 @@ SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem)
 		if (!elem.contains("values")) Log(true) << "WAAAAAAAAA, broke";
 		else for (const auto& i : elem["values"])
 		{
-			SInt32 value;
+			SM_Value value;
 			std::string name;
 			std::string description;
 
-			if (i.contains("value")) value = i["value"].get<SInt32>();
+			if (i.contains("value")) value = GetValueFromElement(i["value"]);
 			else value = valueLess++;
 			if (i.contains("name")) name = i["name"].get<std::string>();
-			else name = std::to_string(value);
+			else name = GetStringFromValue(value);
 			if (i.contains("description")) description = i["description"].get<std::string>();
 
-			values.emplace(value, std::make_pair(name, description));
+			choice.emplace(value, std::make_pair(name, description));
 		}
-
-		if (elem.contains("path"))		setting.path = elem["path"].get<std::string>();
-		if (elem.contains("category"))	setting.category = elem["category"].get<std::string>();
-		if (elem.contains("value"))		setting.value = elem["value"].get<std::string>();
 	}
-
-	if (elem.contains("valueDefault"))
+	else if (type == kSettingType_Slider)
 	{
-		const auto& elemDefault = elem["valueDefault"];
-		if (elemDefault.is_number_integer() || elemDefault.is_number_unsigned()) valueDefault = elemDefault.get<SInt32>();
-		else if (elemDefault.is_string()) valueDefault = elemDefault.get<std::string>();
-		else if (elemDefault.is_number_float()) valueDefault = elemDefault.get<Float64>();
+		SM_Value valueMin, valueMax, valueDelta;
+
+		if (elem.contains("valueMin")) valueMin = GetValueFromElement(elem["valueMin"]);
+		else valueMin = MININT32;
+		if (elem.contains("valueMax")) valueMax = GetValueFromElement(elem["valueMax"]);
+		else valueMax = MAXINT32;
+		if (elem.contains("valueDelta")) valueDelta = GetValueFromElement(elem["valueDelta"]);
+		else valueMin = 1;
+
+		slider = std::make_tuple(valueMin, valueMax, valueDelta);
 	}
+
+	if (elem.contains("path"))		setting.path = elem["path"].get<std::string>();
+	if (elem.contains("category"))	setting.category = elem["category"].get<std::string>();
+	if (elem.contains("value"))		setting.value = elem["value"].get<std::string>();
+
+	if (elem.contains("valueDefault")) valueDefault = GetValueFromElement(elem["valueDefault"]);
 }
 
 void ModConfigurationMenu::ReadJSON(const std::filesystem::path& path)

@@ -11,6 +11,36 @@
 
 typedef std::variant<SInt32, Float64, std::string> SM_Value;
 
+inline std::string GetStringFromValue(const SM_Value& value)
+{
+	if (std::holds_alternative<std::string>(value)) return std::get<std::string>(value);
+	if (std::holds_alternative<Float64>(value)) return std::to_string(std::get<Float64>(value));
+	if (std::holds_alternative<SInt32>(value)) return std::to_string(std::get<SInt32>(value));
+	return "";
+}
+
+inline Float64 GetFloatFromValue(const SM_Value& value)
+{
+	if (std::holds_alternative<Float64>(value)) return std::get<Float64>(value);
+	if (std::holds_alternative<SInt32>(value)) return std::get<SInt32>(value);
+	return 0;
+}
+
+inline SM_Value operator+(const SM_Value& left, const SM_Value& right)
+{
+	if (std::holds_alternative<SInt32>(left) && std::holds_alternative<SInt32>(right)) 
+		return std::get<SInt32>(left) + std::get<SInt32>(right);
+	return GetFloatFromValue(left) + GetFloatFromValue(right);
+}
+
+inline SM_Value operator-(const SM_Value& left, const SM_Value& right)
+{
+	if (std::holds_alternative<SInt32>(left) && std::holds_alternative<SInt32>(right))
+		return std::get<SInt32>(left) - std::get<SInt32>(right);
+	return GetFloatFromValue(left) - GetFloatFromValue(right);
+}
+
+
 class SM_Tag
 {
 public:
@@ -55,8 +85,7 @@ struct SM_Setting
 		kSettingType_None,
 		kSettingType_Control,
 		kSettingType_Choice,
-		kSettingType_SliderInteger,
-		kSettingType_SliderFloat,
+		kSettingType_Slider,
 		kSettingType_InputString,
 		kSettingType_InputFloat,
 	};
@@ -84,11 +113,13 @@ struct SM_Setting
 
 	SM_Value valueDefault;
 
-	typedef std::map<SM_Value, std::pair<std::string, std::string>> SM_ValueOptions;
+	typedef std::map<SM_Value, std::pair<std::string, std::string>> SM_ValueChoice;
+	typedef std::tuple<SM_Value, SM_Value, SM_Value> SM_ValueSlider;
 
-	SM_ValueOptions values;
+	SM_ValueChoice choice;
+	SM_ValueSlider slider;
 
-	void SetDisplayedValue(Tile* tile, SM_Value value);
+	void SetDisplayedValue(Tile* tile, const SM_Value& value);
 
 	SM_Value ReadINI();
 	void WriteINI(SM_Value value);
@@ -96,22 +127,7 @@ struct SM_Setting
 	SM_Value GetValuePrev(SM_Value value);
 	SM_Value GetValueNext(SM_Value value);
 
-	const char* GetTemplate() {
-		switch (type)
-		{
-		case kSettingType_Choice:
-			return "SettingTemplateChoice";
-//		case kSettingType_Slider:
-//			return "SubSettingTemplate_Slider";
-//		case kSettingType_StringInput:
-//		case kSettingType_NumberInput:
-//		case kSettingType_Hotkey:
-//			return "SubSettingTemplate_Input";
-//		case kSettingType_Options:
-//			return "SubSettingTemplate_Dropdown";
-		}
-		return nullptr;
-	};
+	const char* GetTemplate() const;
 
 };
 struct SubsettingList : TList<SM_Setting>
@@ -137,30 +153,38 @@ constexpr auto MENU_ID = 1042;
 
 enum TileIDs
 {
-	kStewMenu_Title = 0,
-	kStewMenu_TweaksListBackground = 2,
-	kStewMenu_SelectionText = 4,
-	kStewMenu_SearchBar = 5,
-	kStewMenu_SearchIcon = 6,
-	kStewMenu_Exit = 7,
-	kStewMenu_Back = 8,
+	kModConfigurationMenu_Title = 0,
+	kModConfigurationMenu_ModList = 2,
+
+	kModConfigurationMenu_SelectionText = 4,
+
+	kModConfigurationMenu_SearchBar = 5,
+	kModConfigurationMenu_SearchIcon = 6,
+
+	kModConfigurationMenu_Exit = 7,
+	kModConfigurationMenu_Back = 8,
+
 	kModConfigurationMenu_ModListItem = 12,
-	kStewMenu_CategoriesBackground = 13,
-	kStewMenu_CategoryItem = 14,
-	kStewMenu_CategoriesButton = 15,
-	kStewMenu_CancelSearch = 16,
-	kStewMenu_ActiveCategory = 17,
-	kStewMenu_ToggleShowActive = 18,
-	kStewMenu_SubSettingsListBackground = 19,
-	kStewMenu_SubsettingItem = 20,
+
+	kModConfigurationMenu_CategoriesBackground = 13,
+	kModConfigurationMenu_CategoryItem = 14,
+	kModConfigurationMenu_CategoriesButton = 15,
+
+	kModConfigurationMenu_CancelSearch = 16,
+
+	kModConfigurationMenu_ActiveCategory = 17,
+	kModConfigurationMenu_ToggleShowActive = 18,
+
+	kModConfigurationMenu_SettingList = 19,
+	kModConfigurationMenu_SettingListItem = 20,
 
 	kModConfigurationMenu_ChoiceText = 99,
-	kStewMenu_SliderLeftArrow = 100,
-	kStewMenu_SliderRightArrow = 101,
-	kStewMenu_SliderDraggableRect = 102,
-	kStewMenu_SubsettingInputFieldText = 103,
-	kStewMenu_SubsettingInputFieldText_BoxBG = 104,
-	kStewMenu_SliderText = 105,
+	kModConfigurationMenu_SliderLeftArrow = 100,
+	kModConfigurationMenu_SliderRightArrow = 101,
+	kModConfigurationMenu_SliderDraggableRect = 102,
+	kModConfigurationMenu_SubsettingInputFieldText = 103,
+	kModConfigurationMenu_SubsettingInputFieldText_BoxBG = 104,
+	kModConfigurationMenu_SliderText = 105,
 };
 
 enum FilterMode
@@ -200,7 +224,7 @@ private:
 		{
 			const auto tile = ListBox::Insert(item, item->name.c_str(), nullptr, item->GetTemplate());
 
-			tile->SetFloat(kTileValue_id, kStewMenu_SubsettingItem);
+			tile->SetFloat(kTileValue_id, kModConfigurationMenu_SettingListItem);
 
 			return tile;
 		}
@@ -316,10 +340,8 @@ public:
 	void CycleFilterMode();
 	void AddCategory(char* category);
 	bool HandleActiveSliderArrows(Tile* tile, bool isRightArrow, float scale = 0.05F);
-	void SetActiveTweak(SM_Mod* item);
-	void SetTweakDescriptionTileString(SM_Mod* item);
+	void SetActiveTweak(SM_Mod* mod);
 	void SetSubsettingDescriptionTileString(SM_Setting* setting);
-	bool ToggleTweakInINI(SM_Mod* item, Tile* tile);
 	bool IsSubsettingInputValid();
 	void SetActiveSubsettingValueFromInput();
 	void SetInHotkeyMode(bool isActive);
@@ -328,10 +350,7 @@ public:
 
 	void TouchTweak(SM_Mod* tweak);	
 	void TouchSubsetting(SM_Setting* setting);
-	void WriteTweakToINI(SM_Mod* tweak);
-	void WriteSubsettingToINI(SM_Setting* setting);
 	void WriteAllChangesToINIs();
-	void RefreshActiveTweakSelectionSquare();
 
 	void ReadJSON(const std::filesystem::path& path);
 	void ReadJSONForPath(const std::filesystem::path& path);
