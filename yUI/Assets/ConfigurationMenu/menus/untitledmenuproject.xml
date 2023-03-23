@@ -34,6 +34,183 @@
 	<user5> <copy src="globals" trait="_Has360Controller" /> </user5> <!-- support controller hot (un)plugging -->
 
 
+  <hotrect name="main_device_button">
+    <id> 15 </id>
+    <include src="text_box.xml"/>
+    <depth> 3 </depth>
+    <user0> 1 </user0>
+    <visible>
+      <copy src="me" trait="_line_alpha"/>
+      <gt> 0 </gt>
+      <and src="me" trait="user0"/>
+    </visible>
+    <target>
+      <copy src="sibling(saveload_container)" trait="_enabled"/>
+      <onlyif src="globals" trait="_Has360Controller" />
+      <add>
+        <copy src="sibling(options_container)" trait="_enabled"/>
+        <onlyifnot src="io" trait="user5"/>
+      </add>
+    </target>
+    <string> &-sDevice; </string>
+    <justify> &right; </justify>
+    <clicksound> UIMenuOK </clicksound>
+    <alpha>
+      <copy> 40 </copy>
+      <onlyif src="me" trait="_box_visible"/>
+    </alpha>
+    <_x>
+      <copy src="sibling(main_defaults_button)" trait="_x"/>
+    </_x>
+    <_y>
+      <copy src="sibling(main_defaults_button)" trait="_y"/>
+      <sub>47</sub>
+    </_y>
+    <_glow> 1 </_glow>
+    <brightness>
+      <copy src="me" trait="_line_alpha"/>
+    </brightness>
+    <_horbuf>
+      <copy src="sibling(main_defaults_button)" trait="_horbuf"/>
+    </_horbuf>
+    <_verbuf>
+      <copy src="sibling(main_defaults_button)" trait="_verbuf"/>
+    </_verbuf>
+    <_fixedwidth>
+      <copy src="sibling(main_defaults_button)" trait="_fixedwidth"/>
+    </_fixedwidth>
+    <_xbox_button> &xbuttonx; </_xbox_button>
+    <user0> 1 </user0>
+    <!-- additional visibility check -->
+    <_line_alpha>
+      <copy src="sibling(options_container)" trait="_alpha"/>
+      <max src="sibling(saveload_container)" trait="_alpha"/>
+      <min>
+        <copy> 128 </copy>
+        <add>
+          <copy> 127 </copy>
+          <onlyif src="me" trait="target"/>
+        </add>
+      </min>
+    </_line_alpha>
+  </hotrect>
+
+  <hotrect name="main_defaults_button">
+    <!-- Used for defaults button with options or delete button with save/load -->
+    <id> 4 </id>
+    <include src="text_box.xml"/>
+    <depth> 3 </depth>
+    <user0> 1 </user0>
+    <visible>
+      <copy src="me" trait="_line_alpha"/>
+      <gt> 0 </gt>
+      <and src="me" trait="user0"/>
+    </visible>
+    <target>
+      <copy src="sibling(options_container)" trait="_enabled"/>
+      <or>
+        <copy src="io" trait="user5"/>
+        <and src="sibling(saveload_container)" trait="_enabled"/>
+        <and src="me" trait="_target"/>
+      </or>
+    </target>
+    <_target> 0 </_target>
+    <!-- Set in code:  true when a save game is currently highlighted -->
+    <justify> &right; </justify>
+    <clicksound> UIMenuOK </clicksound>
+    <alpha>
+      <copy> 40 </copy>
+      <onlyif src="me" trait="_box_visible"/>
+    </alpha>
+    <_x>
+     500
+    </_x>
+    <_y>
+500    </_y>
+    <_glow> 1 </_glow>
+    <_xbox_button> &xbuttony; </_xbox_button>
+    <_fixedwidth> 150 </_fixedwidth>
+    <brightness>
+      <copy src="me" trait="_line_alpha"/>
+    </brightness>
+    <_horbuf> 30 </_horbuf>
+    <_verbuf> 10 </_verbuf>
+    <user0> 1 </user0>
+    <!-- additional visibility check -->
+    <_line_alpha>
+      <copy src="sibling(options_container)" trait="_alpha"/>
+      <max>
+        <copy src="sibling(saveload_container)" trait="_alpha"/>
+        <onlyif>
+          <copy src="io" trait="user5"/>
+        </onlyif>
+      </max>
+      <min>
+        <copy> 128 </copy>
+        <add>
+          <copy> 127 </copy>
+          <onlyif src="me" trait="target"/>
+        </add>
+      </min>
+    </_line_alpha>
+  </hotrect>
+
+  <hotrect name="main_back_button">
+    <id> 5 </id>
+    <include src="text_box.xml"/>
+    <depth> 3 </depth>
+    <visible>
+      <copy src="me" trait="_line_alpha"/>
+      <gt> 0 </gt>
+    </visible>
+    <string> &-sBack; </string>
+    <justify> &right; </justify>
+    <clicksound> UIMenuCancel </clicksound>
+    <alpha>
+      <copy> 40 </copy>
+      <onlyif src="me" trait="_box_visible"/>
+    </alpha>
+    <_glow> 1 </_glow>
+    <_alpha> 0 </_alpha>
+    <!-- Fade value. Set in code by fade control -->
+    <_x>
+      <copy src="sibling(main_defaults_button)" trait="_x"/>
+    </_x>
+    <_y>
+      <copy src="sibling(main_defaults_button)" trait="_y"/>
+      <sub src="me" trait="height"/>
+      <sub src="screen" trait="cropy"/>
+      <sub src="screen" trait="cropy"/>
+    </_y>
+    <_line_alpha>
+      <copy src="me" trait="_alpha"/>
+      <min>
+        <copy> 255 </copy>
+        <sub>
+          <copy> 127 </copy>
+          <onlyifnot src="me" trait="target"/>
+        </sub>
+      </min>
+    </_line_alpha>
+    <brightness>
+      <copy src="me" trait="_line_alpha"/>
+    </brightness>
+    <_xbox_button> &xbuttonb; </_xbox_button>
+    <_fixedwidth>
+      <copy src="sibling(main_defaults_button)" trait="_fixedwidth"/>
+    </_fixedwidth>
+    <_horbuf>
+      <copy src="sibling(main_defaults_button)" trait="_horbuf"/>
+    </_horbuf>
+    <_verbuf>
+      <copy src="sibling(main_defaults_button)" trait="_verbuf"/>
+    </_verbuf>
+    <visible> 1 </visible>
+    <alpha> 255 </alpha>
+    <brightness> 255 </brightness>
+  </hotrect>
+
+
 	<image name="STW_Background">
 		<filename> Interface\Shared\Background\solid_black.dds </filename> <!--VUI+ vanilla is too fuzzy -->
 		<zoom> &scale; </zoom>
