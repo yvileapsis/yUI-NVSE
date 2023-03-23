@@ -130,16 +130,20 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClCompile Include="..\game\Types.cpp" />
     <ClCompile Include="..\game\Menus.cpp" />
     <ClCompile Include="..\game\Sound.cpp" />
+    <ClCompile Include="..\game\GameProcess.cpp" />
+    <ClCompile Include="..\game\NiNodes.cpp" />
+    <ClCompile Include="..\game\Object.cpp" />
     <ClCompile Include="..\nvse\dinput8.cpp" />
     <ClCompile Include="..\nvse\Logging.cpp" />
     <ClCompile Include="..\nvse\printf.cpp" />
     <ClCompile Include="..\nvse\SafeWrite.cpp" />
     <ClCompile Include="..\nvse\Utilities.cpp" />
-    <ClCompile Include="ConfigurationMenuINI.cpp" />
+    <ClCompile Include="ConfigurationMenu\ConfigurationMenuINI.cpp" />
     <ClCompile Include="ConfigurationMenu\ConfigurationMenu.cpp" />
-    <ClCompile Include="ConfigurationMenu\StewMenu\InputField.cpp" />
-    <ClCompile Include="ConfigurationMenu\StewMenu\ConfigurationMenuJSON.cpp" />
-    <ClCompile Include="ConfigurationMenu\StewMenu\ConfigurationMenuStew.cpp" />
+    <ClCompile Include="ConfigurationMenu\InputField.cpp" />
+    <ClCompile Include="ConfigurationMenu\ConfigurationMenuJSON.cpp" />
+    <ClCompile Include="ConfigurationMenu\ConfigurationMenuStew.cpp" />
+    <ClCompile Include="ConfigurationMenu\HookMCM.cpp" />
     <ClCompile Include="definitions.cpp" />
     <ClCompile Include="dllmain.c">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -147,37 +151,33 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="events.cpp" />
-    <ClCompile Include="FixReorderMCM.cpp" />
-    <ClCompile Include="FixSleepWaitMenuString.cpp" />
-    <ClCompile Include="HookMCM.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="MiscFeatures\FixDroppedItems.cpp" />
     <ClCompile Include="MiscFeatures\FixProjectileEffects.cpp" />
     <ClCompile Include="MiscFeatures\FixTablineSelected.cpp" />
     <ClCompile Include="MiscFeatures\FixTouchpadScrolling.cpp" />
+    <ClCompile Include="MiscFeatures\FixReorderMCM.cpp" />
+    <ClCompile Include="MiscFeatures\FixSleepWaitMenuString.cpp" />
     <ClCompile Include="MiscFeatures\PatchAlterSpread.cpp" />
     <ClCompile Include="MiscFeatures\PatchArmedUnarmed.cpp" />
     <ClCompile Include="MiscFeatures\PatchExplosionForce.cpp" />
     <ClCompile Include="MiscFeatures\PatchMatchedCursor.cpp" />
     <ClCompile Include="MiscFeatures\PatchMultiplicativeShots.cpp" />
     <ClCompile Include="MiscFeatures\PatchTimeMult.cpp" />
-    <ClCompile Include="PatchCharGenMenuSRemoval.cpp" />
+    <ClCompile Include="MiscFeatures\PatchCharGenMenuSRemoval.cpp" />
     <ClCompile Include="SortingIcons\SortingIconsCommands.cpp" />
     <ClCompile Include="SortingIcons\SortingIconsFiles.cpp" />
     <ClCompile Include="SortingIcons\SortingIconsVisual.cpp" />
     <ClCompile Include="SortingIcons\SortingIconsMain.cpp" />
     <ClCompile Include="SortingIcons\SortingIconsMechanics.cpp" />
+    <ClCompile Include="UserInterface\events.cpp" />
     <ClCompile Include="UserInterface\DynamicCrosshair.cpp" />
     <ClCompile Include="UserInterface\HitIndicator.cpp" />
     <ClCompile Include="UserInterface\HitMarker.cpp" />
     <ClCompile Include="UserInterface\LootMenu.cpp" />
     <ClCompile Include="UserInterface\VisualObjectives.cpp" />
     <ClCompile Include="UserInterface\WeaponHweel.cpp" />
-    <ClCompile Include="..\game\GameProcess.cpp" />
-    <ClCompile Include="..\game\NiNodes.cpp" />
-    <ClCompile Include="..\game\Object.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\game\ConsoleManager.h" />
@@ -214,13 +214,13 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClInclude Include="..\nvse\dinput8.h" />
     <ClInclude Include="..\libraries\json.h" />
     <ClInclude Include="..\libraries\SimpleINILibrary.h" />
-    <ClInclude Include="ConfigurationMenu\StewMenu\InputField.h" />
-    <ClInclude Include="ConfigurationMenu\StewMenu\ConfigurationMenuStew.h" />
     <ClInclude Include="functions.h" />
     <ClInclude Include="definitions.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="SortingIcons\SortingIcons.h" />
     <ClInclude Include="ConfigurationMenu\ConfigurationMenu.h" />
+    <ClInclude Include="ConfigurationMenu\InputField.h" />
+    <ClInclude Include="ConfigurationMenu\ConfigurationMenuStew.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\game\GameRTTI.inc" />

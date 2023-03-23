@@ -4,6 +4,7 @@
     <ClCompile Include="dllmain.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="functions.cpp" />
+    <ClCompile Include="definitions.cpp" />
     <ClCompile Include="..\nvse\printf.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
@@ -16,7 +17,25 @@
     <ClCompile Include="..\nvse\dinput8.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
+    <ClCompile Include="..\nvse\Logging.cpp">
+      <Filter>nvse</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigurationMenu\HookMCM.cpp">
+      <Filter>features\ConfigurationMenu</Filter>
+    </ClCompile>
     <ClCompile Include="ConfigurationMenu\ConfigurationMenu.cpp">
+      <Filter>features\ConfigurationMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigurationMenu\InputField.cpp">
+      <Filter>features\ConfigurationMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigurationMenu\ConfigurationMenuJSON.cpp">
+      <Filter>features\ConfigurationMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigurationMenu\ConfigurationMenuStew.cpp">
+      <Filter>features\ConfigurationMenu</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigurationMenu\ConfigurationMenuINI.cpp">
       <Filter>features\ConfigurationMenu</Filter>
     </ClCompile>
     <ClCompile Include="SortingIcons\SortingIconsMain.cpp">
@@ -94,11 +113,31 @@
     <ClCompile Include="..\game\InterfaceManager.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="definitions.cpp" />
-    <ClCompile Include="MiscFeatures\PatchTimeMult.cpp">
-      <Filter>features</Filter>
+    <ClCompile Include="..\game\Containers.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+        <ClCompile Include="..\game\NiNodes.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\GameProcess.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\Object.cpp">
+      <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="MiscFeatures\FixProjectileEffects.cpp">
+      <Filter>features</Filter>
+    </ClCompile>
+    <ClCompile Include="MiscFeatures\FixSleepWaitMenuString.cpp">
+      <Filter>features</Filter>
+    </ClCompile>
+    <ClCompile Include="MiscFeatures\FixReorderMCM.cpp">
+      <Filter>features</Filter>
+    </ClCompile>
+    <ClCompile Include="MiscFeatures\FixTouchpadScrolling.cpp">
+      <Filter>features</Filter>
+    </ClCompile>
+    <ClCompile Include="MiscFeatures\PatchTimeMult.cpp">
       <Filter>features</Filter>
     </ClCompile>
     <ClCompile Include="MiscFeatures\PatchAlterSpread.cpp">
@@ -113,8 +152,8 @@
     <ClCompile Include="MiscFeatures\PatchMultiplicativeShots.cpp">
       <Filter>features</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\Containers.cpp">
-      <Filter>game</Filter>
+    <ClCompile Include="MiscFeatures\PatchCharGenMenuSRemoval.cpp">
+      <Filter>features</Filter>
     </ClCompile>
     <ClCompile Include="UserInterface\DynamicCrosshair.cpp">
       <Filter>features\UserInterface</Filter>
@@ -128,62 +167,20 @@
     <ClCompile Include="UserInterface\VisualObjectives.cpp">
       <Filter>features\UserInterface</Filter>
     </ClCompile>
-    <ClCompile Include="events.cpp">
-      <Filter>features\UserInterface</Filter>
-    </ClCompile>
     <ClCompile Include="UserInterface\HitIndicator.cpp">
       <Filter>features\UserInterface</Filter>
-    </ClCompile>
-    <ClCompile Include="MiscFeatures\FixTouchpadScrolling.cpp">
-      <Filter>features</Filter>
-    </ClCompile>
-    <ClCompile Include="..\nvse\Logging.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
-    <ClCompile Include="..\game\NiNodes.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\game\GameProcess.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\game\Object.cpp">
-      <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="UserInterface\WeaponHweel.cpp">
       <Filter>features\UserInterface</Filter>
     </ClCompile>
-    <ClCompile Include="FixReorderMCM.cpp">
-      <Filter>features</Filter>
-    </ClCompile>
-    <ClCompile Include="HookMCM.cpp">
-      <Filter>features\ConfigurationMenu</Filter>
-    </ClCompile>
-    <ClCompile Include="ConfigurationMenu\StewMenu\InputField.cpp">
-      <Filter>features\ConfigurationMenu</Filter>
-    </ClCompile>
-    <ClCompile Include="ConfigurationMenu\StewMenu\ConfigurationMenuJSON.cpp">
-      <Filter>features\ConfigurationMenu</Filter>
-    </ClCompile>
-    <ClCompile Include="ConfigurationMenu\StewMenu\ConfigurationMenuStew.cpp">
-      <Filter>features\ConfigurationMenu</Filter>
-    </ClCompile>
-    <ClCompile Include="FixSleepWaitMenuString.cpp">
-      <Filter>features</Filter>
-    </ClCompile>
-    <ClCompile Include="PatchCharGenMenuSRemoval.cpp">
-      <Filter>features</Filter>
-    </ClCompile>
-    <ClCompile Include="ConfigurationMenuINI.cpp">
-      <Filter>features\ConfigurationMenu</Filter>
+    <ClCompile Include="events.cpp">
+      <Filter>features\UserInterface</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h" />
     <ClInclude Include="definitions.h" />
     <ClInclude Include="main.h" />
-    <ClInclude Include="..\nvse\Utilities.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
     <ClInclude Include="..\libraries\SimpleINILibrary.h">
       <Filter>libraries</Filter>
     </ClInclude>
@@ -202,7 +199,22 @@
     <ClInclude Include="..\nvse\dinput8.h">
       <Filter>nvse</Filter>
     </ClInclude>
+    <ClInclude Include="..\nvse\Utilities.h">
+      <Filter>nvse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nvse\printf.h">
+      <Filter>nvse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nvse\Logging.h">
+      <Filter>nvse</Filter>
+    </ClInclude>
     <ClInclude Include="ConfigurationMenu\ConfigurationMenu.h">
+      <Filter>features\ConfigurationMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigurationMenu\InputField.h">
+      <Filter>features\ConfigurationMenu</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigurationMenu\ConfigurationMenuStew.h">
       <Filter>features\ConfigurationMenu</Filter>
     </ClInclude>
     <ClInclude Include="SortingIcons\SortingIcons.h">
@@ -280,20 +292,8 @@
     <ClInclude Include="..\game\Containers.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="..\nvse\printf.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\Logging.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
     <ClInclude Include="..\game\Object.h">
       <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="ConfigurationMenu\StewMenu\InputField.h">
-      <Filter>features\ConfigurationMenu</Filter>
-    </ClInclude>
-    <ClInclude Include="ConfigurationMenu\StewMenu\ConfigurationMenuStew.h">
-      <Filter>features\ConfigurationMenu</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -318,11 +318,11 @@
     <Filter Include="features\ConfigurationMenu">
       <UniqueIdentifier>{656ac85f-09be-4ed7-ae30-677b09f38f26}</UniqueIdentifier>
     </Filter>
-    <Filter Include="game">
-      <UniqueIdentifier>{a015f998-0a48-4aa3-a1b7-bb3274a03bde}</UniqueIdentifier>
-    </Filter>
     <Filter Include="features\UserInterface">
       <UniqueIdentifier>{c2809161-6d98-4828-951b-1677e5f45c6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="game">
+      <UniqueIdentifier>{a015f998-0a48-4aa3-a1b7-bb3274a03bde}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
