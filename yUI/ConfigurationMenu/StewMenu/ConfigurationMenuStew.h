@@ -1,15 +1,19 @@
 #pragma once
+#include <map>
+
 #include "Containers.h"
 #include "Utilities.h"
 #include "InputField.h"
-#include "HotkeyField.h"
-#include <SimpleINILibrary.h>
 
 #include <set>
 #include <utility>
 #include <variant>
 
+#include "Menus.h"
+
 typedef std::variant<SInt32, Float64, std::string> SM_Value;
+
+inline std::map<SM_Value, std::string> fontMap;
 
 inline std::string GetStringFromValue(const SM_Value& value)
 {
@@ -66,16 +70,6 @@ public:
 	std::string settingName;
 
 	signed int priority;
-	signed int value;
-
-	const char* GetInternalName() { return settingName.c_str(); };
-	const char* GetInternalCategory()
-	{
-		// if there's no internal category set, assume it's tweaks - done to avoid needlessly creating ~400 'Tweaks' strings since most tweak items will have that category
-		if (!settingCategory.empty()) return settingCategory.c_str();
-		return "Tweaks";
-	};
-	bool IsBoolean() { return !settingName.empty() && settingName[0] == 'b'; };
 };
 
 struct SM_Setting
@@ -86,17 +80,12 @@ struct SM_Setting
 		kSettingType_Control,
 		kSettingType_Choice,
 		kSettingType_Slider,
+		kSettingType_Font,
 		kSettingType_Subsetting,
-		kSettingType_InputFloat,
+		kSettingType_Input,
 	};
 
-	struct INISetting
-	{
-		std::filesystem::path	path;
-		std::string				category;
-		std::string				value;
-
-	};
+	typedef std::tuple<std::filesystem::path, std::string, std::string> INISetting;
 
 	std::string name;
 	std::string id;
@@ -104,25 +93,28 @@ struct SM_Setting
 
 	ElementType type;
 
-	INISetting setting;
-
 	SInt32 priority = 0;
 
 	std::unordered_set<std::string> tags;
 	std::unordered_set<std::string> mods;
 
+	INISetting setting;
 	SM_Value valueDefault;
 
 	typedef std::map<SM_Value, std::pair<std::string, std::string>> SM_ValueChoice;
 	typedef std::tuple<SM_Value, SM_Value, SM_Value> SM_ValueSlider;
+	typedef std::pair<INISetting, SM_Value> SM_ValueControl;
 
 	SM_ValueChoice choice;
 	SM_ValueSlider slider;
+	SM_ValueControl control[2];
 
 	void SetDisplayedValue(Tile* tile, const SM_Value& value);
 
 	SM_Value ReadINI();
-	void WriteINI(SM_Value value);
+	static SM_Value ReadINI(const SM_ValueControl& control);
+	void WriteINI(const SM_Value& value);
+	static void WriteINI(const SM_ValueControl& control, const SM_Value& value);
 
 	SM_Value GetValuePrev(SM_Value value);
 	SM_Value GetValueNext(SM_Value value);
@@ -178,6 +170,9 @@ enum TileIDs
 	kModConfigurationMenu_SettingList = 19,
 	kModConfigurationMenu_SettingListItem = 20,
 
+
+	kModConfigurationMenu_DeviceButton = 30,
+
 	kModConfigurationMenu_ChoiceText = 99,
 	kModConfigurationMenu_SliderLeftArrow = 100,
 	kModConfigurationMenu_SliderRightArrow = 101,
@@ -195,27 +190,27 @@ enum FilterMode
 	kFilterMode_Count,
 };
 
+struct HotkeyField
+{
+	Tile* tile;
+	int value;
+	bool isActive;
+	bool frameDebounce;	// ignore inputs for the frame it's set active to allow clicking on the input with Spacebar/Enter etc.
+
+	void Init();
+	int GetPressedKey();
+	void SetActive(bool active);
+	int Update();
+	void Free();
+};
+
 class ModConfigurationMenu : public Menu
 {
 private:
 	void Free();
-//	void LoadINIs();
-	class ModsListBox : public ListBox<SM_Mod>
-	{
-	public:
-		void Destroy()
-		{
-			for (const auto iter : list)
-			{
-				iter->object->~SM_Mod();
-			}
 
-			ListBox::Destroy();
-		}
-	};
-
+	typedef ListBox<SM_Mod> ModsListBox;
 	typedef ListBox<char> CategoryListBox;
-
 
 	class SettingsListBox : public ListBox<SM_Setting>
 	{
@@ -325,6 +320,8 @@ public:
 	// debounce to prevent the categories list closing after dragging the slider
 	bool isDraggingCategoriesSlider;
 
+	OSInputGlobals::ControlType controlDevice = OSInputGlobals::kControlType_Keyboard;
+
 	bool HasTiles();
 	static ModConfigurationMenu* Create() { return new ModConfigurationMenu(); };
 	void Close();
@@ -340,7 +337,6 @@ public:
 	bool GetCategoriesListActive();
 	void ClearAndCloseSearch();
 	void CycleFilterMode();
-	void AddCategory(char* category);
 	bool HandleActiveSliderArrows(Tile* tile, bool isRightArrow, float scale = 0.05F);
 	void DisplaySettings(std::string tab);
 	void SetActiveMod(SM_Mod* mod);

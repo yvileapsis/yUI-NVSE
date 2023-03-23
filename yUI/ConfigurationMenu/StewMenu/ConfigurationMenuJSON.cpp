@@ -55,8 +55,18 @@ SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem)
 		else if (typeString == "control")		type = kSettingType_Control;
 		else if (typeString == "slider")		type = kSettingType_Slider;
 		else if (typeString == "subsetting")	type = kSettingType_Subsetting;
+		else if (typeString == "font")			type = kSettingType_Font;
 		else									type = kSettingType_None;
 	}
+
+	std::filesystem::path path;
+	std::string category, value;
+	if (elem.contains("path"))		path = elem["path"].get<std::string>();
+	if (elem.contains("category"))	category = elem["category"].get<std::string>();
+	if (elem.contains("value"))		value = elem["value"].get<std::string>();
+	setting = std::make_tuple(path, category, value);
+
+	if (elem.contains("valueDefault")) valueDefault = GetValueFromElement(elem["valueDefault"]);
 
 	if (type == kSettingType_Choice)
 	{
@@ -90,12 +100,30 @@ SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem)
 
 		slider = std::make_tuple(valueMin, valueMax, valueDelta);
 	}
+	else if (type == kSettingType_Control)
+	{
+		std::filesystem::path mousePath;
+		std::string mouseCategory, mouseValue;
+		if (elem.contains("mousePath"))			mousePath = elem["mousePath"].get<std::string>();
+		if (elem.contains("mouseCategory"))		mouseCategory = elem["mouseCategory"].get<std::string>();
+		if (elem.contains("mouseValue"))		mouseValue = elem["mouseValue"].get<std::string>();
 
-	if (elem.contains("path"))		setting.path = elem["path"].get<std::string>();
-	if (elem.contains("category"))	setting.category = elem["category"].get<std::string>();
-	if (elem.contains("value"))		setting.value = elem["value"].get<std::string>();
+		SM_Value mouseValueDefault;
+		if (elem.contains("mouseValueDefault")) mouseValueDefault = GetValueFromElement(elem["mouseValueDefault"]);
 
-	if (elem.contains("valueDefault")) valueDefault = GetValueFromElement(elem["valueDefault"]);
+		control[0] = std::make_pair(std::make_tuple(mousePath, mouseCategory, mouseValue), mouseValueDefault);
+
+		std::filesystem::path controllerPath;
+		std::string controllerCategory, controllerValue;
+		if (elem.contains("controllerPath"))		controllerPath = elem["controllerPath"].get<std::string>();
+		if (elem.contains("controllerCategory"))	controllerCategory = elem["controllerCategory"].get<std::string>();
+		if (elem.contains("controllerValue"))		controllerValue = elem["controllerValue"].get<std::string>();
+
+		SM_Value controllerValueDefault;
+		if (elem.contains("controllerValueDefault")) controllerValueDefault = GetValueFromElement(elem["controllerValueDefault"]);
+
+		control[1] = std::make_pair(std::make_tuple(controllerPath, controllerCategory, controllerValue), controllerValueDefault);
+	}
 }
 
 void ModConfigurationMenu::ReadJSON(const std::filesystem::path& path)

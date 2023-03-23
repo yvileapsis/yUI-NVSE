@@ -158,9 +158,6 @@
     <ClCompile Include="HookMCM.cpp">
       <Filter>features\ConfigurationMenu</Filter>
     </ClCompile>
-    <ClCompile Include="ConfigurationMenu\StewMenu\HotkeyField.cpp">
-      <Filter>features\ConfigurationMenu</Filter>
-    </ClCompile>
     <ClCompile Include="ConfigurationMenu\StewMenu\InputField.cpp">
       <Filter>features\ConfigurationMenu</Filter>
     </ClCompile>
@@ -291,9 +288,6 @@
     </ClInclude>
     <ClInclude Include="..\game\Object.h">
       <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="ConfigurationMenu\StewMenu\HotkeyField.h">
-      <Filter>features\ConfigurationMenu</Filter>
     </ClInclude>
     <ClInclude Include="ConfigurationMenu\StewMenu\InputField.h">
       <Filter>features\ConfigurationMenu</Filter>

@@ -6,9 +6,8 @@
 #include "GameSettings.h"
 #include "InterfaceManager.h"
 #include "SafeWrite.h"
-#include "SimpleINILibrary.h"
 
-const char* MenuPath = "Data\\Menus\\untitledmenuproject.xml";
+const char* MenuPath = R"(Data\Menus\untitledmenuproject.xml)";
 
 ModConfigurationMenu* g_stewMenu;
 
@@ -169,23 +168,32 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 {
 	switch (tileID)
 	{
+	case kModConfigurationMenu_DeviceButton:
+	{
+		if (controlDevice == OSInputGlobals::kControlType_Keyboard) controlDevice = OSInputGlobals::kControlType_Mouse;
+		else if (controlDevice == OSInputGlobals::kControlType_Mouse) controlDevice = OSInputGlobals::kControlType_Joystick;
+		else if (controlDevice == OSInputGlobals::kControlType_Joystick) controlDevice = OSInputGlobals::kControlType_Keyboard;
+		tile->SetFloat("_controlDevice", controlDevice);
+		break;
+	}
 	case kModConfigurationMenu_Exit:
 	{
-		this->Close();
+		Close();
+//		StartMenu::GetSingleton()->HandleClick(1, nullptr);
 		break;
 	}
 
 	case kModConfigurationMenu_ModListItem:
 	{
 
-		auto item = modsListBox.GetItemForTile(clickedTile);
+		auto mod = modsListBox.GetItemForTile(clickedTile);
 
 		modsListBox.ForEach(SetTweakNotSelected);
 
 		clickedTile->parent->SetFloat("_selected", 1);
 		clickedTile->SetFloat("_selected", 1);
 
-		SetActiveMod(item);
+		SetActiveMod(mod);
 
 		break;
 	}
@@ -247,7 +255,7 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 
 		auto setting = settingsListBox.GetItemForTile(clickedTile);
 
-		if (setting->type = setting->kSettingType_Subsetting)
+		if (setting->type == setting->kSettingType_Subsetting)
 		{
 			DisplaySettings(setting ? setting->id : "");
 		}
@@ -543,7 +551,7 @@ bool __cdecl FilterTweaksOnActiveTrait(SM_Mod* item)
 	auto filterMode = ModConfigurationMenu::GetSingleton()->filterMode;
 	if (filterMode == FilterMode::kFilterMode_ShowAll) return false;
 
-	if (item->value == 0)
+//	if (item->value == 0)
 	{
 		return filterMode == kFilterMode_ShowActive;
 	}
@@ -739,6 +747,8 @@ bool ModConfigurationMenu::HandleActiveSliderArrows(Tile* tile,  bool isRightArr
 	const SM_Value newValue = isRightArrow ? setting->GetValueNext(value) : setting->GetValuePrev(value);
 	setting->WriteINI(newValue);
 	setting->SetDisplayedValue(tile, newValue);
+
+	return true;
 }
 
 bool ModConfigurationMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode code, float keyState)
@@ -884,6 +894,35 @@ void SM_Setting::SetDisplayedValue(Tile* tile, const SM_Value& value)
 		tile->SetFloat(kTileValue_user0, 20 * GetFloatFromValue(value) / GetFloatFromValue(std::get<1>(slider)));
 		tile->SetFloat(kTileValue_user3, 20);
 	}
+	else if (type == kSettingType_Font)
+	{
+		SInt32 id = std::get<SInt32>(value);
+		std::string valueString;
+		if (!id)
+		{
+			valueString = "--"; // Display name or display value if name not found
+			tile->GetChild("lb_toggle_value")->SetFloat(kTileValue_font, 7);
+		}
+		else if (fontMap.contains(value))
+		{
+			valueString = "Font " + GetStringFromValue(value);//fontMap[value];
+			tile->GetChild("lb_toggle_value")->SetFloat(kTileValue_font, id);
+		}
+		else
+		{
+			valueString = "Font " + GetStringFromValue(value);
+			tile->GetChild("lb_toggle_value")->SetFloat(kTileValue_font, id);
+		}
+		tile->SetString(kTileValue_user0, valueString.c_str());
+	}
+	else if (type == kSettingType_Control)
+	{
+		tile->SetString("_Keyboard", std::get<SInt32>(value) ? GetStringFromValue(value).c_str() : "--");
+		const auto mouseValue = ReadINI(control[0]);
+		tile->SetString("_Mouse", std::get<SInt32>(mouseValue) ? GetStringFromValue(mouseValue).c_str() : "--");
+		const auto controllerValue = ReadINI(control[1]);
+		tile->SetString("_Controller", std::get<SInt32>(controllerValue) ? GetStringFromValue(controllerValue).c_str() : "--");
+	}
 }
 
 SM_Value SM_Setting::GetValuePrev(SM_Value value)
@@ -895,6 +934,13 @@ SM_Value SM_Setting::GetValuePrev(SM_Value value)
 		if (choice.empty()) return value;
 		if (auto iter = choice.find(value); iter == choice.end() || --iter == choice.end())
 			newValue = choice.rbegin()->first;
+		else newValue = iter->first;
+	}
+	else if (type == kSettingType_Font)
+	{
+		if (fontMap.empty()) return value;
+		if (auto iter = fontMap.find(value); iter == fontMap.end() || --iter == fontMap.end())
+			newValue = fontMap.rbegin()->first;
 		else newValue = iter->first;
 	}
 	else if (type == kSettingType_Slider)
@@ -917,29 +963,30 @@ SM_Value SM_Setting::GetValueNext(SM_Value value)
 			newValue = choice.begin()->first;
 		else newValue = iter->first;
 	}
+	else if (type == kSettingType_Font)
+	{
+		if (fontMap.empty()) return value;
+		if (auto iter = fontMap.find(value); iter == fontMap.end() || ++iter == fontMap.end())
+			newValue = fontMap.begin()->first;
+		else newValue = iter->first;
+	}
 	else if (type == kSettingType_Slider)
 	{
 		newValue = value + std::get<2>(slider);
 		if (newValue > std::get<1>(slider)) return value;
 	}
 
-
 	return newValue;
 }
 
 const char* SM_Setting::GetTemplate() const
 {
-	switch (type)
-	{
-	case kSettingType_Choice:
-		return "SettingChoiceTemplate";
-	case kSettingType_Slider:
-		return "SettingSliderTemplate";
-	case kSettingType_Subsetting:
-		return "SettingSubsettingTemplate";
-	default:
-		return "SettingNoneTemplate";
-	}
+	if (type == kSettingType_Choice)		return "SettingChoiceTemplate";
+	if (type == kSettingType_Slider)		return "SettingSliderTemplate";
+	if (type == kSettingType_Font)			return "SettingFontTemplate";
+	if (type == kSettingType_Control)		return "SettingControlTemplate";
+	if (type == kSettingType_Subsetting)	return "SettingSubsettingTemplate";
+	return "SettingNoneTemplate";
 };
 
 void ModConfigurationMenu::DisplaySettings(std::string tab)
@@ -1054,40 +1101,6 @@ void ModConfigurationMenu::Free()
 
 	OSInputGlobals::GetSingleton()->SetDebounceMenuMode(false);
 };
-
-/*
-void ModConfigurationMenu::LoadINIs()
-{
-	char INIPath[MAX_PATH];
-	auto errVal = ini.LoadFile(TweaksINIPath);
-	if (errVal == SI_Error::SI_FILE)
-	{
-		Log(true, Log::kConsole) << FormatString("ModConfigurationMenu:: Failed to read INI");
-		return;
-	}
-
-	
-	if (g_bMultiINISupport)
-	{
-		CSimpleIni tempINI;
-		tempINI.SetUnicode();
-
-		char* namePtr = StrLenCopy(INIPath, tweaksINIsPath, 30); // keep pointer "namePtr" to the end of the string
-		MemCopy(namePtr, "*.ini", 6); // and append "*.ini" to INIPath
-
-		for (DirectoryIterator dirIter(INIPath); dirIter; ++dirIter)
-		{
-			if (!dirIter.IsFile()) continue;
-			StrCopy(namePtr, dirIter.Get());
-
-			tempINI.LoadFile(INIPath);
-			CopyValuesFrom(ini, tempINI);
-
-			tempINI.Reset();
-		}
-	}
-}
-*/
 
 void ModConfigurationMenu::Destructor(bool doFree) 
 {
@@ -1248,13 +1261,8 @@ void __fastcall OnAltTabReloadStewMenu(OSGlobals* osGlobals, void* edx, int isAc
 
 bool ModConfigurationMenu::HasTiles()
 {
-	for (Tile* tile : this->tiles)
-	{
-		if (!tile) return false;
-	}
-
+	for (const auto tile : tiles) if (!tile) return false;
 	if (!searchBar.tile) return false;
-
 	return true;
 }
 
@@ -1277,10 +1285,6 @@ void ShowTweaksMenu()
 {
 	Tile* prevMenu = Menu::GetTileMenu(MENU_ID);
 	if (prevMenu) prevMenu->Destroy(true);
-
-	// TODO: Font setup, also LOL stewie running fucking console lmao
-	// setup the menu font (requires JIP LN NVSE)
-//	consoleItfc->RunScriptLine2("SetFontFile 42 \"textures\\fonts\\Monofonto_STn.fnt\"", nullptr, true);
 
 	const auto newDepth = StdCall<Float32>(0xA1DFB0);
 
@@ -1332,17 +1336,17 @@ void ShowTweaksMenu()
 	Setting* sSettings = (Setting*)0x11D1FE0;
 	menu->menuTitle->SetString(kTileValue_string, FormatString("Mod %s", sSettings->data.str).c_str());
 
-	auto modsListBox = &menu->modsListBox;
+	const auto modsListBox = &menu->modsListBox;
 	modsListBox->parentTile = menu->tweaksListBackground;
 	modsListBox->templateName = "ModTemplate";
 	modsListBox->scrollBar = modsListBox->parentTile->GetChild("lb_scrollbar");
 
-	auto categoriesListBox = &menu->categoriesListBox;
+	const auto categoriesListBox = &menu->categoriesListBox;
 	categoriesListBox->parentTile = menu->categoriesBackground;
 	categoriesListBox->templateName = "CategoryTemplate";
 	categoriesListBox->scrollBar = categoriesListBox->parentTile->GetChild("lb_scrollbar");
 
-	auto settingsListBox = &menu->settingsListBox;
+	const auto settingsListBox = &menu->settingsListBox;
 	settingsListBox->parentTile = menu->subSettingsListBackground;
 	settingsListBox->templateName = "SettingNoneTebmplate";
 	settingsListBox->scrollBar = settingsListBox->parentTile->GetChild("lb_scrollbar");
@@ -1363,4 +1367,60 @@ void ShowTweaksMenu()
 //	ModConfigurationMenu::GetSingleton()->SetActiveMod(modsListBox->list.first.data->object);
 
 	menu->HideTitle(false);
+
+	fontMap.emplace(0, "--");
+
+	for (const auto iter : FontManager::GetSingleton()->fontInfos)
+	{
+		fontMap.emplace(static_cast<SInt32>(iter->id), std::string(iter->fontData->textures[0].fileName));
+	};
+	for (const auto iter : FontManager::GetSingleton()->extraFonts)
+	{
+		fontMap.emplace(static_cast<SInt32>(iter->id), std::string(iter->fontData->textures[0].fileName));
+	};
+
+}
+
+void HotkeyField::Init()
+{
+	tile = nullptr;
+	isActive = false;
+	frameDebounce = true;
+	value = 0;
+}
+
+int HotkeyField::GetPressedKey()
+{
+	if (frameDebounce) return 0;
+
+	const auto input = OSInputGlobals::GetSingleton();
+	for (int i = Scancodes::_Escape; i < 265; ++i)
+	{
+		if (input->GetKeyState(i, OSInputGlobals::isPressed))
+		{
+			return i;
+		}
+	}
+
+	return 0;
+}
+
+int HotkeyField::Update()
+{
+	const auto key = GetPressedKey();
+	if (key > 0) value = key == _Escape ? 0 : key;
+
+	frameDebounce = false;
+	return key;
+}
+
+void HotkeyField::SetActive(bool active)
+{
+	frameDebounce = active;
+	isActive = active;
+}
+
+void HotkeyField::Free()
+{
+
 }

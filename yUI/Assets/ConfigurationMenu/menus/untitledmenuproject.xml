@@ -10,12 +10,12 @@
 	<_PCButton_X>  STW_ContinueButton </_PCButton_X>
 	<_PCButton_E>  STW_BackButton </_PCButton_E>
 
+	<_controlDevice>0</_controlDevice>
+
 	<_IsCategoriesActive></_IsCategoriesActive>
 	<_FilterMode></_FilterMode>
 	<_IsSearchActive></_IsSearchActive>
 	<_separatorX>368</_separatorX>			<!-- ===== SEPARATES LEFT AND RIGHT SIDES OF THE MENU =====  -->
-	<_STwidth>1100</_STwidth>	<!--===== WIDTH OF THE MENU =====  -->
-	<_STheight> <copy src="screen()" trait="height"/><sub> 200 </sub></_STheight>	<!-- ===== HEIGHT OF THE MENU, BASED ON SCREEN HEIGHT MINUS VALUE =====  -->
 	<_subSpacing>8</_subSpacing>
 	<_CursorX></_CursorX>
 	<_CursorY></_CursorY>
@@ -35,7 +35,7 @@
 
 
   <hotrect name="main_device_button">
-    <id> 15 </id>
+    <id> 30 </id>
     <include src="text_box.xml"/>
     <depth> 3 </depth>
     <user0> 1 </user0>
@@ -44,171 +44,156 @@
       <gt> 0 </gt>
       <and src="me" trait="user0"/>
     </visible>
-    <target>
-      <copy src="sibling(saveload_container)" trait="_enabled"/>
-      <onlyif src="globals" trait="_Has360Controller" />
-      <add>
-        <copy src="sibling(options_container)" trait="_enabled"/>
-        <onlyifnot src="io" trait="user5"/>
-      </add>
-    </target>
-    <string> &-sDevice; </string>
-    <justify> &right; </justify>
-    <clicksound> UIMenuOK </clicksound>
-    <alpha>
-      <copy> 40 </copy>
-      <onlyif src="me" trait="_box_visible"/>
-    </alpha>
-    <_x>
-      <copy src="sibling(main_defaults_button)" trait="_x"/>
-    </_x>
-    <_y>
-      <copy src="sibling(main_defaults_button)" trait="_y"/>
-      <sub>47</sub>
-    </_y>
-    <_glow> 1 </_glow>
-    <brightness>
-      <copy src="me" trait="_line_alpha"/>
-    </brightness>
-    <_horbuf>
-      <copy src="sibling(main_defaults_button)" trait="_horbuf"/>
-    </_horbuf>
-    <_verbuf>
-      <copy src="sibling(main_defaults_button)" trait="_verbuf"/>
-    </_verbuf>
-    <_fixedwidth>
-      <copy src="sibling(main_defaults_button)" trait="_fixedwidth"/>
-    </_fixedwidth>
-    <_xbox_button> &xbuttonx; </_xbox_button>
-    <user0> 1 </user0>
-    <!-- additional visibility check -->
-    <_line_alpha>
-      <copy src="sibling(options_container)" trait="_alpha"/>
-      <max src="sibling(saveload_container)" trait="_alpha"/>
-      <min>
-        <copy> 128 </copy>
-        <add>
-          <copy> 127 </copy>
-          <onlyif src="me" trait="target"/>
-        </add>
-      </min>
-    </_line_alpha>
-  </hotrect>
+    <target>1 </target>
+	<string> &-sDevice; </string>
+	<justify> &right; </justify>
+	<clicksound> UIMenuOK </clicksound>
+	<alpha>
+		<copy> 40 </copy>
+		<onlyif src="me" trait="_box_visible"/>
+	</alpha>
+	<_x> <copy src="sibling(main_defaults_button)" trait="_x"/> </_x>
+	<_y> <copy src="sibling(main_defaults_button)" trait="_y"/> <sub> 47 </sub> </_y>
+	<_glow> 1 </_glow>
+	<brightness>
+		<copy src="me" trait="_line_alpha"/>
+	</brightness>
+	<_horbuf>
+		<copy src="sibling(main_defaults_button)" trait="_horbuf"/>
+	</_horbuf>
+	<_verbuf>
+		<copy src="sibling(main_defaults_button)" trait="_verbuf"/>
+	</_verbuf>
+	<_fixedwidth>
+			<copy src="sibling(main_defaults_button)" trait="_fixedwidth"/>
+	</_fixedwidth>
+	<_xbox_button> &xbuttonx; </_xbox_button>
+	<user0> 1 </user0>
+	<!-- additional visibility check -->
+	<_line_alpha>
+		<copy> 128 </copy>
+		<add>
+			<copy> 127 </copy>
+			<onlyif src="me" trait="target"/>
+		</add>
+	</_line_alpha>
+	</hotrect>
 
-  <hotrect name="main_defaults_button">
-    <!-- Used for defaults button with options or delete button with save/load -->
-    <id> 4 </id>
-    <include src="text_box.xml"/>
-    <depth> 3 </depth>
-    <user0> 1 </user0>
-    <visible>
-      <copy src="me" trait="_line_alpha"/>
-      <gt> 0 </gt>
-      <and src="me" trait="user0"/>
-    </visible>
-    <target>
-      <copy src="sibling(options_container)" trait="_enabled"/>
-      <or>
-        <copy src="io" trait="user5"/>
-        <and src="sibling(saveload_container)" trait="_enabled"/>
-        <and src="me" trait="_target"/>
-      </or>
-    </target>
-    <_target> 0 </_target>
-    <!-- Set in code:  true when a save game is currently highlighted -->
-    <justify> &right; </justify>
-    <clicksound> UIMenuOK </clicksound>
-    <alpha>
-      <copy> 40 </copy>
-      <onlyif src="me" trait="_box_visible"/>
-    </alpha>
-    <_x>
-     500
-    </_x>
-    <_y>
-500    </_y>
-    <_glow> 1 </_glow>
-    <_xbox_button> &xbuttony; </_xbox_button>
-    <_fixedwidth> 150 </_fixedwidth>
-    <brightness>
-      <copy src="me" trait="_line_alpha"/>
-    </brightness>
-    <_horbuf> 30 </_horbuf>
-    <_verbuf> 10 </_verbuf>
-    <user0> 1 </user0>
-    <!-- additional visibility check -->
-    <_line_alpha>
-      <copy src="sibling(options_container)" trait="_alpha"/>
-      <max>
-        <copy src="sibling(saveload_container)" trait="_alpha"/>
-        <onlyif>
-          <copy src="io" trait="user5"/>
-        </onlyif>
-      </max>
-      <min>
-        <copy> 128 </copy>
-        <add>
-          <copy> 127 </copy>
-          <onlyif src="me" trait="target"/>
-        </add>
-      </min>
-    </_line_alpha>
-  </hotrect>
+	<hotrect name="main_defaults_button">
+		<!-- Used for defaults button with options or delete button with save/load -->
+		<id> 4 </id>
+		<include src="text_box.xml"/>
+		<depth> 3 </depth>
+		<user0> 1 </user0>
+		<visible>
+			<copy src="me" trait="_line_alpha"/>
+			<gt> 0 </gt>
+			<and src="me" trait="user0"/>
+		</visible>
+		<target>
+			<copy src="sibling(options_container)" trait="_enabled"/>
+			<or>
+			<copy src="io" trait="user5"/>
+			<and src="sibling(saveload_container)" trait="_enabled"/>
+			<and src="me" trait="_target"/>
+			</or>
+		</target>
+		<_target> 0 </_target>
+		<!-- Set in code:	true when a save game is currently highlighted -->
+		<string> &-sDefaults; </string>
+		<justify> &right; </justify>
+		<clicksound> UIMenuOK </clicksound>
+		<alpha>
+			<copy> 40 </copy>
+			<onlyif src="me" trait="_box_visible"/>
+		</alpha>
 
-  <hotrect name="main_back_button">
-    <id> 5 </id>
-    <include src="text_box.xml"/>
-    <depth> 3 </depth>
-    <visible>
-      <copy src="me" trait="_line_alpha"/>
-      <gt> 0 </gt>
-    </visible>
-    <string> &-sBack; </string>
-    <justify> &right; </justify>
-    <clicksound> UIMenuCancel </clicksound>
-    <alpha>
-      <copy> 40 </copy>
-      <onlyif src="me" trait="_box_visible"/>
-    </alpha>
-    <_glow> 1 </_glow>
-    <_alpha> 0 </_alpha>
-    <!-- Fade value. Set in code by fade control -->
-    <_x>
-      <copy src="sibling(main_defaults_button)" trait="_x"/>
-    </_x>
-    <_y>
-      <copy src="sibling(main_defaults_button)" trait="_y"/>
-      <sub src="me" trait="height"/>
-      <sub src="screen" trait="cropy"/>
-      <sub src="screen" trait="cropy"/>
-    </_y>
-    <_line_alpha>
-      <copy src="me" trait="_alpha"/>
-      <min>
-        <copy> 255 </copy>
-        <sub>
-          <copy> 127 </copy>
-          <onlyifnot src="me" trait="target"/>
-        </sub>
-      </min>
-    </_line_alpha>
-    <brightness>
-      <copy src="me" trait="_line_alpha"/>
-    </brightness>
-    <_xbox_button> &xbuttonb; </_xbox_button>
-    <_fixedwidth>
-      <copy src="sibling(main_defaults_button)" trait="_fixedwidth"/>
-    </_fixedwidth>
-    <_horbuf>
-      <copy src="sibling(main_defaults_button)" trait="_horbuf"/>
-    </_horbuf>
-    <_verbuf>
-      <copy src="sibling(main_defaults_button)" trait="_verbuf"/>
-    </_verbuf>
-    <visible> 1 </visible>
-    <alpha> 255 </alpha>
-    <brightness> 255 </brightness>
-  </hotrect>
+		<_x> <copy src="sibling(main_back_button)" trait="_x"/> </_x>
+		<_y> <copy src="sibling(main_back_button)" trait="_y"/> <sub> 47 </sub> </_y> <!-- not height but rather 47 to mimic vanilla -->
+
+		<_glow> 1 </_glow>
+		<_xbox_button> &xbuttony; </_xbox_button>
+		<_fixedwidth> 150 </_fixedwidth>
+		<brightness>
+			<copy src="me" trait="_line_alpha"/>
+		</brightness>
+		<_horbuf> 30 </_horbuf>
+		<_verbuf> 10 </_verbuf>
+		<user0> 1 </user0>
+		<!-- additional visibility check -->
+		<_line_alpha>
+			<copy src="sibling(options_container)" trait="_alpha"/>
+			<max>
+			<copy src="sibling(saveload_container)" trait="_alpha"/>
+			<onlyif>
+				<copy src="io" trait="user5"/>
+			</onlyif>
+			</max>
+			<min>
+			<copy> 128 </copy>
+			<add>
+				<copy> 127 </copy>
+				<onlyif src="me" trait="target"/>
+			</add>
+			</min>
+		</_line_alpha>
+	</hotrect>
+
+	<hotrect name="main_back_button">
+		<id> 7 </id>
+		<include src="text_box.xml"/>
+		<depth> 3 </depth>
+		<visible>
+			<copy src="me" trait="_line_alpha"/>
+			<gt> 0 </gt>
+		</visible>
+		<string> &-sBack; </string>
+		<justify> &right; </justify>
+		<clicksound> UIMenuCancel </clicksound>
+		<alpha>
+			<copy> 40 </copy>
+			<onlyif src="me" trait="_box_visible"/>
+		</alpha>
+		<_glow> 1 </_glow>
+		<_alpha> 255 </_alpha>
+		<!-- Fade value. Set in code by fade control -->
+		<_x>
+			<copy src="screen" trait="width"/>
+			<sub src="screen" trait="cropx"/>
+			<sub src="screen" trait="cropx"/>
+		</_x>
+		<_y> 
+			<copy src="screen" trait="height"/>
+			<sub src="me" trait="height"/>
+			<sub src="screen" trait="cropy"/>
+			<sub src="screen" trait="cropy"/>
+		</_y>
+		
+		<_line_alpha>
+			<copy src="me" trait="_alpha"/>
+			<min>
+				<copy> 255 </copy>
+				<sub>
+					<copy> 127 </copy>
+					<onlyifnot src="me" trait="target"/>
+				</sub>
+			</min>
+		</_line_alpha>
+		<brightness>
+			<copy src="me" trait="_line_alpha"/>
+		</brightness>
+		<_xbox_button> &xbuttonb; </_xbox_button>
+		<_fixedwidth>
+			<copy src="sibling(main_defaults_button)" trait="_fixedwidth"/>
+		</_fixedwidth>
+		<_horbuf>
+			<copy src="sibling(main_defaults_button)" trait="_horbuf"/>
+		</_horbuf>
+		<_verbuf>
+			<copy src="sibling(main_defaults_button)" trait="_verbuf"/>
+		</_verbuf>
+		<visible> 1 </visible>
+	</hotrect>
 
 
 	<image name="STW_Background">
@@ -223,19 +208,10 @@
 		<height> <copy src="screen" trait="height"/> <add> 350 </add> </height>
 	</image>
 
-	<hotrect name="ExitRect">	<!-- ===== ID 7 EXIT, STICKS TO THE RIGHT SIDE OF THE MENU =====  -->
-		<id> 7 </id>
-		<x>	<copy src="sibling(STW_Background)" trait="x"/><add src="sibling(STW_Background)" trait="width"/></x>
-		<y>0</y>
-		<width><copy src="screen()" trait="width"/><sub src="me()" trait="x"/></width>
-		<height> <copy src="screen()" trait="height"/></height>
-		<clicksound> UIMenuCancel </clicksound>
-	</hotrect>
-
 	<rect name="STW_MainRect">	<!-- ===== MAIN POSITIONING RECT ===== -->
 
-		<width> <copy src="io()" trait="_STwidth"/></width>
-		<height> <copy src="io()" trait="_STheight"/></height>
+		<width> <copy src="screen()" trait="width"/> </width>
+		<height> <copy src="screen()" trait="height"/> </height>
 		<x>		<copy src="screen()" trait="width"/>		<sub src="me()" trait="width"/>		<div> 2 </div>		</x>
 		<y>		<copy src="screen()" trait="height"/>		<sub src="me()" trait="height"/>		<div> 2 </div>		</y>
 		<locus> 0 </locus>
@@ -249,17 +225,17 @@
 		</text>
 
 <!--
-		<image name="STW_Headline_h1">	 ===== TOP LEFT HORIZONTAL BRACKET =====  
+		<image name="STW_Headline_h1">	 ===== TOP LEFT HORIZONTAL BRACKET =====	
 			<include src="line.xml"/>
 			<_length><copy src="sibling(STW_Headline_Title)" trait="x"/>	<sub> 20 </sub> </_length>
 		</image>
 
-		<image name="STW_Headline_v1">	 ===== TOP LEFT VERTICAL BRACKET =====  
+		<image name="STW_Headline_v1">	 ===== TOP LEFT VERTICAL BRACKET =====	
 			<include src="vertical_fade_line.xml"/>
 			<height>160</height>
 		</image>
 
-		<image name="STW_Headline_h2">	===== TOP RIGHT HORIZONTAL BRACKET =====  
+		<image name="STW_Headline_h2">	===== TOP RIGHT HORIZONTAL BRACKET =====	
 			<include src="line.xml"/>
 			<_length><copy src="parent()" trait="width"/><sub src="me()" trait="x"/></_length>
 			<x><copy src="sibling(STW_Headline_Title)" trait="x"/><add src="sibling(STW_Headline_Title)" trait="width"/><add> 20 </add></x>
@@ -271,7 +247,7 @@
 			<_x><copy src="sibling(STW_Headline_h2)" trait="x"/><add src="sibling(STW_Headline_h2)" trait="width"/><sub src="me()" trait="width"/></_x>
 		</image>
 
-		<rect name="STW_BottomBracket">	 ===== BOTTOM HORIZONTAL BRACKET =====  
+		<rect name="STW_BottomBracket">	 ===== BOTTOM HORIZONTAL BRACKET =====	
 			<include src="bottom_bracket.xml"/>
 			<visible> 1 </visible>
 			<y> <copy src="parent()" trait="height"/> </y>
@@ -279,14 +255,14 @@
 			<height> 160 </height>
 		</rect>
 
-		<image name="SeparatorMidTop">	 ===== TOP MIDDLE SEPARATOR =====  
+		<image name="SeparatorMidTop">	 ===== TOP MIDDLE SEPARATOR =====	
 			<include src="vertical_fade_line.xml"/>
 			<x> <copy src="io()" trait="_separatorX"/><add>3</add></x>
 			<y> 0 </y>
 			<height>160</height>
 		</image>
 
-		<image name="SeparatorMidBottom">	 ===== BOTTOM MIDDLE SEPARATOR =====  
+		<image name="SeparatorMidBottom">	 ===== BOTTOM MIDDLE SEPARATOR =====	
 			<include src="vertical_fade_line.xml"/>
 			<_bottom_to_top>&true;</_bottom_to_top>
 			<x> <copy src="io()" trait="_separatorX"/><add>3</add></x>
@@ -294,7 +270,7 @@
 			<height>160</height>
 		</image>
 -->
-		<hotrect name="ActiveOnlyParent">	<!-- ===== ACTIVE FILTER =====  -->
+		<hotrect name="ActiveOnlyParent">	<!-- ===== ACTIVE FILTER =====	-->
 			<visible><copy src="io()" trait="_IsCategoriesActive"/><eq>0</eq></visible>
 			<visible> 0 </visible>
 			<locus> &true; </locus>
@@ -318,7 +294,7 @@
 					<copy src="io()" trait="_FilterMode" /> 
 					<copy src="me()" trait="_file_" /> 
 				</filename>
-				<height> <copy> 28 </copy>  </height>
+				<height> <copy> 28 </copy>	</height>
 				<width> <copy> 28 </copy> </width>
 				<x><copy src="parent()" trait="width"/><sub src="me()" trait="width"/> <div> 2 </div></x>
 				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <div> 2 </div></y>
@@ -326,7 +302,7 @@
 			</image>
 		</hotrect>
 
-		<hotrect name="SearchParent">	<!-- ===== SEARCH =====  -->
+		<hotrect name="SearchParent">	<!-- ===== SEARCH =====	-->
 			<visible><copy src="io()" trait="_IsCategoriesActive"/><eq>0</eq></visible>
 			<visible> 0 </visible>
 			<locus> &true; </locus>
@@ -400,7 +376,7 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 
 		</hotrect>
 
-		<hotrect name="Categories"> <!-- ===== Categories =====  -->
+		<hotrect name="Categories"> <!-- ===== Categories =====	-->
 			<locus> &true; </locus>
 			<x> 0 </x>
 			<x> 0 </x>
@@ -429,7 +405,7 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 				<zoom> &scale; </zoom>
 				<brightness><copy> 180 </copy> <add><copy src="parent()" trait="_highlight"/><mul>75</mul></add></brightness>
 				<rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </rotateaxisx>
-				<rotateaxisy> <copy src="me()" trait="height"/>   <div> 2 </div> </rotateaxisy>
+				<rotateaxisy> <copy src="me()" trait="height"/>	 <div> 2 </div> </rotateaxisy>
 				<rotateangle>	 <copy>90</copy><mul><copy src="io()" trait="_IsCategoriesActive"/><eq>0</eq></mul> <mul> 3.141592654 </mul> <div> 180 </div> </rotateangle>
 			</image>
 
@@ -448,7 +424,7 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 				<visible>1</visible>
 				<include src="line.xml"/>
 				<x> 2 </x>
-				<y>  <copy src="parent()" trait="height"/> </y>
+				<y>	<copy src="parent()" trait="height"/> </y>
 				<_length><copy src="io()" trait="_separatorX"/><sub src="me()" trait="x"/><add>3</add></_length>
 			</image>
 
@@ -469,12 +445,10 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 			<_scrollbar_pos> &left; </_scrollbar_pos>
 			<target> &true; </target>
 			<id> 2 </id>
-			<x> 0</x>
-			<y> 150 </y>
-<!--		<width><copy src="io()" trait="_separatorX"/><sub src="me()" trait="x"/><add>12</add></width>-->
+			<x> 0 </x>
+			<y> <copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <div> 2 </div> </y>
 			<width> 400 </width>
-			<height> <copy src="parent()" trait="height"/><sub src="me()" trait="y"/><sub>8</sub></height>
-			<visible><copy src="io()" trait="_IsCategoriesActive"/><eq>0</eq></visible>
+			<visible> <copy src="io()" trait="_IsCategoriesActive"/> <eq>0</eq> </visible>
 			<_number_of_visible_items> 7 </_number_of_visible_items>
 		</hotrect>
 
@@ -497,7 +471,7 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 			<x>400</x>
 			<y>800</y>
 			<include src="top_bracket.xml"/>				<!-- BRACKET ABOVE THE TEXT -->
-			<width>  900 </width>
+			<width>	900 </width>
 			<height> 60 </height>
 			<locus> &true; </locus>
 
@@ -507,7 +481,7 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 				<x>15</x>
 				<brightness>300</brightness>
 				<font> 42 </font>
-				<wrapwidth> <copy src="parent()" trait="width"/> <sub> 25 </sub>  </wrapwidth>
+				<wrapwidth> <copy src="parent()" trait="width"/> <sub> 25 </sub>	</wrapwidth>
 			</text>
 		</rect>	<!-- end STW_SelectionInfoRect -->
 	</rect> <!-- end STW_MainRect -->
@@ -544,7 +518,7 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 			<clicksound> UIMenuPrevNext </clicksound>
 			<_wrapper> <copy src="sibling(lb_highlight_box)" trait="width"/> </_wrapper>
 			<_VerticalSpacing> <copy>42</copy> <add src="io()" trait="_subSpacing"/> </_VerticalSpacing>
-      
+		
 			<_mouseover>
 				<copy>1</copy>
 				<onlyif>
@@ -597,7 +571,7 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 				<locus> &true; </locus>
 				<id>102</id>
 
-				<x> <copy src="sibling(DecreaseArrow)" trait="x"/> <add src="sibling(DecreaseArrow)" trait="width"/><add> 1 </add>  </x>
+				<x> <copy src="sibling(DecreaseArrow)" trait="x"/> <add src="sibling(DecreaseArrow)" trait="width"/><add> 1 </add>	</x>
 				<y> <copy src="sibling(DecreaseArrow)" trait="height"/><sub src="me()" trait="height"/> <div> 2 </div><add src="sibling(DecreaseArrow)" trait="y"/></y>
 				<width> <copy src="parent()" trait="_wrapper"/><sub> 120 </sub><min> 302 </min></width>
 				<height> 12 </height>
@@ -606,7 +580,7 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 				<target> &true; </target>
 				<repeathorizontal> &true; </repeathorizontal>
 
-				<_Value>	<!-- ex _current     remapped value -->
+				<_Value>	<!-- ex _current	 remapped value -->
 					<copy> 0 </copy>
 
 					<add>
@@ -621,7 +595,7 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 					</add>
 				</_Value>
 
-				<user0></user0>		<!-- ex _max     Max amount -->
+				<user0></user0>		<!-- ex _max	 Max amount -->
 				<_min></_min>		<!-- Min amount -->
 
 				<user1>														<!-- Drag value: goes from 0 to 1 based on mouse drag -->
@@ -632,7 +606,7 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 					<min> 1 </min>
 				</user1>
 
-				<user2></user2>		<!-- EX _setV      SET IN CODE -->
+				<user2></user2>		<!-- EX _setV		SET IN CODE -->
 
 				<_zero>	<!-- Remapped zero on 0-1 scale == (0 - _min) / (user0 - _min) * (1 - 0) + 0 -->
 					<copy> 0 </copy>
@@ -948,7 +922,7 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 				</visible>
 				<filename> <copy src="parent" trait="user1"/> </filename>
 				<texatlas> Interface\InterfaceShared.tai </texatlas> <!-- Make sure to pull button icons from the texture atlas -->
-				<!-- #37077: For reasons unknown, making the icons 64x64 introduces small artifacts.  Going to 63x63 seems to fix it -->
+				<!-- #37077: For reasons unknown, making the icons 64x64 introduces small artifacts.	Going to 63x63 seems to fix it -->
 				<width> 63 </width>
 				<height> 63 </height>
 				<alpha>
@@ -982,7 +956,7 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 		</hotrect>
 	</template>
 
-  <template name="ModTemplate"> <hotrect name="ModItem">
+	<template name="ModTemplate"> <hotrect name="ModItem">
 		<include src="list_box_template.xml"/>
 		<_TextAlpha> 255 </_TextAlpha>
 		<mouseoversound> UIMenuFocus </mouseoversound>
@@ -1009,14 +983,14 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 				</add>
 			</brightness>
 
-      <alpha>
-        <copy src="parent" trait="_TextAlpha"/>
-        <sub>
-          <copy> 128 </copy>
-          <onlyif src="grandparent" trait="_selected"/>
-          <onlyifnot src="parent" trait="_selected"/>
-        </sub>
-      </alpha>
+		<alpha>
+		<copy src="parent" trait="_TextAlpha"/>
+		<sub>
+			<copy> 128 </copy>
+			<onlyif src="grandparent" trait="_selected"/>
+			<onlyifnot src="parent" trait="_selected"/>
+		</sub>
+		</alpha>
 
 			<x> 10 </x>
 			<y>
@@ -1028,10 +1002,10 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 					<copy src="globals" trait="_VUI+FontY_"/>
 				</add>
 			</y>
-    </text>
+	</text>
 	</hotrect> </template>
 
-  <template name="SettingNoneTemplate"> <hotrect name="SettingItem">
+	<template name="SettingNoneTemplate"> <hotrect name="SettingItem">
 		<include src="list_box_template.xml"/>
 		<mouseoversound> &nosound; </mouseoversound>
 		<clicksound> &nosound; </clicksound>
@@ -1083,293 +1057,293 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 		</text>
 	</hotrect> </template>
 
-  <template name="SettingSliderTemplate"> <hotrect name="SettingItem">
-    <include src="list_box_template.xml"/>
-    <mouseoversound> &nosound; </mouseoversound>
-    <clicksound> &nosound; </clicksound>
-    <xdefault> 1 </xdefault>
-    <repeathorizontal> 1 </repeathorizontal>
-    <user0></user0>
-    <!-- num ticks to display -->
-    <user1>
-      <copy src="me" trait="user3"/>
-      <div> 5 </div>
-    </user1>
-    <user2> 1 </user2>
-    <!-- arrow display (0=left 1=both 2=right) -->
-    <user3></user3>
-    <!-- max ticks to display -->
-    <user4> 10 </user4>
-    <!-- arrow spacing -->
-    <_VUI+Value>
-      <!--VUI+ 0 for min, 1 for max -->
-      <copy src="me" trait="user0"/>
-      <div src="me" trait="user3"/>
-    </_VUI+Value>
-    <brightness>
-      <copy src="io" trait="brightness"/>
-    </brightness>
-    <_VerticalSpacing> 10 </_VerticalSpacing>
+	<template name="SettingSliderTemplate"> <hotrect name="SettingItem">
+		<include src="list_box_template.xml"/>
+		<mouseoversound> &nosound; </mouseoversound>
+		<clicksound> &nosound; </clicksound>
+		<xdefault> 1 </xdefault>
+		<repeathorizontal> 1 </repeathorizontal>
+		<user0></user0>
+		<!-- num ticks to display -->
+		<user1>
+			<copy src="me" trait="user3"/>
+			<div> 5 </div>
+		</user1>
+		<user2> 1 </user2>
+		<!-- arrow display (0=left 1=both 2=right) -->
+		<user3></user3>
+		<!-- max ticks to display -->
+		<user4> 10 </user4>
+		<!-- arrow spacing -->
+		<_VUI+Value>
+			<!--VUI+ 0 for min, 1 for max -->
+			<copy src="me" trait="user0"/>
+			<div src="me" trait="user3"/>
+		</_VUI+Value>
+		<brightness>
+			<copy src="io" trait="brightness"/>
+		</brightness>
+		<_VerticalSpacing> 10 </_VerticalSpacing>
 
-    <text name="ListItemText">
-      <font>
-        <copy src="io" trait="font" />
-      </font>
-      <string>
-        <copy src="parent" trait="string"/>
-      </string>
-      <brightness>
-        <copy> 255 </copy>
-        <add>
-          <copy src="globals" trait="_VUI+Highlighting" />
-          <div> 2 </div>
-          <onlyif>
-            <copy src="parent" trait="mouseover" />
-            <and src="globals" trait="_Has360Controller" />
-            <copy src="sibling(lb_meter_hotrect)" trait="mouseover" />
-            <or src="sibling(lb_meter_left)" trait="mouseover" />
-            <or src="sibling(lb_meter_right)" trait="mouseover" />
-          </onlyif>
-        </add>
-      </brightness>
-      <x> 10 </x>
-      <y>
-        <copy src="parent" trait="height" />
-        <sub src="me" trait="height" />
-        <div> 2 </div>
-        <add>
-          <copy src="me" trait="font" />
-          <copy src="globals" trait="_VUI+FontY_"/>
-        </add>
-      </y>
-    </text>
+		<text name="ListItemText">
+			<font>
+			<copy src="io" trait="font" />
+			</font>
+			<string>
+			<copy src="parent" trait="string"/>
+			</string>
+			<brightness>
+			<copy> 255 </copy>
+			<add>
+				<copy src="globals" trait="_VUI+Highlighting" />
+				<div> 2 </div>
+				<onlyif>
+				<copy src="parent" trait="mouseover" />
+				<and src="globals" trait="_Has360Controller" />
+				<copy src="sibling(lb_meter_hotrect)" trait="mouseover" />
+				<or src="sibling(lb_meter_left)" trait="mouseover" />
+				<or src="sibling(lb_meter_right)" trait="mouseover" />
+				</onlyif>
+			</add>
+			</brightness>
+			<x> 10 </x>
+			<y>
+			<copy src="parent" trait="height" />
+			<sub src="me" trait="height" />
+			<div> 2 </div>
+			<add>
+				<copy src="me" trait="font" />
+				<copy src="globals" trait="_VUI+FontY_"/>
+			</add>
+			</y>
+		</text>
 
-    <image name="lb_meter_left">
-      <id> 100 </id>
-      <filename> Interface\Main\main_arrow_left.dds </filename>
-      <alpha>
-        <copy src="grandparent" trait="_alpha"/>
-      </alpha>
-      <target> 1 </target>
-      <mouseoversound> UIMenuFocus </mouseoversound>
-      <clicksound> UIMenuPrevNext </clicksound>
-      <depth> 3 </depth>
-      <visible>
-        <copy src="parent" trait="mouseover"/>
-        <add src="me" trait="mouseover"/>
-        <add src="sibling(lb_meter_hotrect)" trait="mouseover"/>
-        <add src="sibling(lb_meter_right)" trait="mouseover"/>
-        <eq> 1 </eq>
-        <and>
-          <copy src="parent" trait="user2"/>
-          <lt> 2 </lt>
-        </and>
-        <and>
-          <!--VUI+ don't display for values < 0 -->
-          <copy src="parent" trait="_VUI+Value" />
-          <gte> 0 </gte>
-        </and>
-      </visible>
-      <x>
-        <copy src="sibling(lb_meter_hotrect)" trait="x"/>
-        <sub src="parent" trait="user4"/>
-        <sub src="me" trait="width"/>
-      </x>
-      <y>
-        <copy src="parent" trait="height"/>
-        <sub src="me" trait="height"/>
-        <div> 2 </div>
-        <add> 0.5 </add>
-      </y>
-      <width> 13 </width>
-      <height> 23 </height>
-      <zoom> &scale; </zoom>
-    </image>
+		<image name="lb_meter_left">
+			<id> 100 </id>
+			<filename> Interface\Main\main_arrow_left.dds </filename>
+			<alpha>
+			<copy src="grandparent" trait="_alpha"/>
+			</alpha>
+			<target> 1 </target>
+			<mouseoversound> UIMenuFocus </mouseoversound>
+			<clicksound> UIMenuPrevNext </clicksound>
+			<depth> 3 </depth>
+			<visible>
+			<copy src="parent" trait="mouseover"/>
+			<add src="me" trait="mouseover"/>
+			<add src="sibling(lb_meter_hotrect)" trait="mouseover"/>
+			<add src="sibling(lb_meter_right)" trait="mouseover"/>
+			<eq> 1 </eq>
+			<and>
+				<copy src="parent" trait="user2"/>
+				<lt> 2 </lt>
+			</and>
+			<and>
+				<!--VUI+ don't display for values < 0 -->
+				<copy src="parent" trait="_VUI+Value" />
+				<gte> 0 </gte>
+			</and>
+			</visible>
+			<x>
+			<copy src="sibling(lb_meter_hotrect)" trait="x"/>
+			<sub src="parent" trait="user4"/>
+			<sub src="me" trait="width"/>
+			</x>
+			<y>
+			<copy src="parent" trait="height"/>
+			<sub src="me" trait="height"/>
+			<div> 2 </div>
+			<add> 0.5 </add>
+			</y>
+			<width> 13 </width>
+			<height> 23 </height>
+			<zoom> &scale; </zoom>
+		</image>
 
-    <hotrect name="lb_meter_hotrect">
-      <id> 102 </id>
-      <locus> 1 </locus>
-      <!--VUI+ disable clicking when the meter is beyond its limits -->
-      <target>
-        <copy src="parent" trait="_VUI+Value" />
-        <gte> 0 </gte>
-        <and>
-          <copy src="parent" trait="_VUI+Value" />
-          <lte> 1 </lte>
-        </and>
-      </target>
-      <alpha>
-        <copy src="globals" trait="_VUI+Highlighting" />
-        <onlyif>
-          <copy src="parent" trait="_VUI+Highlighted" />
-          <and src="globals" trait="_Has360Controller" />
-          <or src="me" trait="mouseover" />
-          <or src="sibling(lb_meter_left)" trait="mouseover" />
-          <or src="sibling(lb_meter_right)" trait="mouseover" />
-        </onlyif>
-        <add> 100 </add>
-      </alpha>
-      <mouseoversound> UIMenuFocus </mouseoversound>
-      <clicksound> UIMenuPrevNext </clicksound>
-      <depth> 3 </depth>
-      <x>
-        <copy src="me" trait="_center_x"/>
-        <sub>
-          <copy src="me" trait="width"/>
-          <div> 2 </div>
-        </sub>
-      </x>
-      <y>
-        <copy src="parent" trait="height"/>
-        <sub src="me" trait="height"/>
-        <div> 2 </div>
-      </y>
-      <width>
-        <copy src="parent" trait="user3"/>
-        <mul> 8 </mul>
-      </width>
-      <height> 23 </height>
-      <!--VUI+ see meter.xml -->
-      <_alpha>
-        <copy src="grandparent" trait="_alpha"/>
-      </_alpha>
-      <_center_x>
-        <copy src="io" trait="_center_x"/>
-      </_center_x>
-      <brightness>
-        <!--VUI+ target highlighting -->
-        <copy src="globals" trait="_VUI+Highlighting" />
-        <onlyif>
-          <copy src="parent" trait="_VUI+Highlighted" />
-          <and src="globals" trait="_Has360Controller" />
-          <or src="me" trait="mouseover" />
-          <or src="sibling(lb_meter_left)" trait="mouseover" />
-          <or src="sibling(lb_meter_right)" trait="mouseover" />
-        </onlyif>
-      </brightness>
+		<hotrect name="lb_meter_hotrect">
+			<id> 102 </id>
+			<locus> 1 </locus>
+			<!--VUI+ disable clicking when the meter is beyond its limits -->
+			<target>
+			<copy src="parent" trait="_VUI+Value" />
+			<gte> 0 </gte>
+			<and>
+				<copy src="parent" trait="_VUI+Value" />
+				<lte> 1 </lte>
+			</and>
+			</target>
+			<alpha>
+			<copy src="globals" trait="_VUI+Highlighting" />
+			<onlyif>
+				<copy src="parent" trait="_VUI+Highlighted" />
+				<and src="globals" trait="_Has360Controller" />
+				<or src="me" trait="mouseover" />
+				<or src="sibling(lb_meter_left)" trait="mouseover" />
+				<or src="sibling(lb_meter_right)" trait="mouseover" />
+			</onlyif>
+			<add> 100 </add>
+			</alpha>
+			<mouseoversound> UIMenuFocus </mouseoversound>
+			<clicksound> UIMenuPrevNext </clicksound>
+			<depth> 3 </depth>
+			<x>
+			<copy src="me" trait="_center_x"/>
+			<sub>
+				<copy src="me" trait="width"/>
+				<div> 2 </div>
+			</sub>
+			</x>
+			<y>
+			<copy src="parent" trait="height"/>
+			<sub src="me" trait="height"/>
+			<div> 2 </div>
+			</y>
+			<width>
+			<copy src="parent" trait="user3"/>
+			<mul> 8 </mul>
+			</width>
+			<height> 23 </height>
+			<!--VUI+ see meter.xml -->
+			<_alpha>
+			<copy src="grandparent" trait="_alpha"/>
+			</_alpha>
+			<_center_x>
+			<copy src="io" trait="_center_x"/>
+			</_center_x>
+			<brightness>
+			<!--VUI+ target highlighting -->
+			<copy src="globals" trait="_VUI+Highlighting" />
+			<onlyif>
+				<copy src="parent" trait="_VUI+Highlighted" />
+				<and src="globals" trait="_Has360Controller" />
+				<or src="me" trait="mouseover" />
+				<or src="sibling(lb_meter_left)" trait="mouseover" />
+				<or src="sibling(lb_meter_right)" trait="mouseover" />
+			</onlyif>
+			</brightness>
 
-      <rect name="lb_meter_image">
-        <include src="meter.xml"/>
-        <alpha>
-          <copy src="parent" trait="_alpha"/>
-          <add>
-            <copy src="parent" trait="brightness" />
-            <mul> 2 </mul>
-          </add>
-          <!--VUI+ target highlighting -->
-        </alpha>
-        <width>
-          <copy src="parent" trait="width"/>
-        </width>
-        <_Value>
-          <copy src="grandparent" trait="_VUI+Value"/>
-          <min> 1 </min>
-          <!--VUI+ don't allow the meter bar to break outside its limits -->
-          <max> 0 </max>
-        </_Value>
-      </rect>
+			<rect name="lb_meter_image">
+			<include src="meter.xml"/>
+			<alpha>
+				<copy src="parent" trait="_alpha"/>
+				<add>
+				<copy src="parent" trait="brightness" />
+				<mul> 2 </mul>
+				</add>
+				<!--VUI+ target highlighting -->
+			</alpha>
+			<width>
+				<copy src="parent" trait="width"/>
+			</width>
+			<_Value>
+				<copy src="grandparent" trait="_VUI+Value"/>
+				<min> 1 </min>
+				<!--VUI+ don't allow the meter bar to break outside its limits -->
+				<max> 0 </max>
+			</_Value>
+			</rect>
 
-      <!--VUI+ the following displays a percentage of the meter's value when it's overdriven above 1 or below 0; this is helpful when using FalloutPrefs tweaks -->
-      <text name="VUI+Overdrive">
-        <string>
-          <copy src="grandparent" trait="_VUI+Value" />
-          <mul> 100 </mul>
-        </string>
-        <font> 3 </font>
-        <justify> &center; </justify>
-        <x>
-          <copy src="parent" trait="width" />
-          <sub src="sibling(VUI+OverdrivePercent)" trait="width" />
-          <div> 2 </div>
-        </x>
-        <y>
-          <copy src="parent" trait="height" />
-          <sub src="me" trait="height" />
-          <div> 2 </div>
-          <add>
-            <copy src="me" trait="font" />
-            <copy src="globals" trait="_VUI+FontY_"/>
-          </add>
-          <sub> 0.5 </sub>
-        </y>
-        <alpha> 500 </alpha>
-        <depth> 3 </depth>
-        <visible>
-          <copy src="grandparent" trait="_VUI+Value" />
-          <gt> 1 </gt>
-          <or>
-            <copy src="grandparent" trait="_VUI+Value" />
-            <lt> 0 </lt>
-          </or>
-        </visible>
-        <systemcolor> &hudalt; </systemcolor>
-      </text>
-      <include src="VUI+\outline.xml"/>
+			<!--VUI+ the following displays a percentage of the meter's value when it's overdriven above 1 or below 0; this is helpful when using FalloutPrefs tweaks -->
+			<text name="VUI+Overdrive">
+			<string>
+				<copy src="grandparent" trait="_VUI+Value" />
+				<mul> 100 </mul>
+			</string>
+			<font> 3 </font>
+			<justify> &center; </justify>
+			<x>
+				<copy src="parent" trait="width" />
+				<sub src="sibling(VUI+OverdrivePercent)" trait="width" />
+				<div> 2 </div>
+			</x>
+			<y>
+				<copy src="parent" trait="height" />
+				<sub src="me" trait="height" />
+				<div> 2 </div>
+				<add>
+				<copy src="me" trait="font" />
+				<copy src="globals" trait="_VUI+FontY_"/>
+				</add>
+				<sub> 0.5 </sub>
+			</y>
+			<alpha> 500 </alpha>
+			<depth> 3 </depth>
+			<visible>
+				<copy src="grandparent" trait="_VUI+Value" />
+				<gt> 1 </gt>
+				<or>
+				<copy src="grandparent" trait="_VUI+Value" />
+				<lt> 0 </lt>
+				</or>
+			</visible>
+			<systemcolor> &hudalt; </systemcolor>
+			</text>
+			<include src="VUI+\outline.xml"/>
 
-      <text name="VUI+OverdrivePercent">
-        <string>%</string>
-        <font> 3 </font>
-        <y>
-          <copy src="sibling(VUI+Overdrive)" trait="y" />
-        </y>
-        <x>
-          <copy src="sibling(VUI+Overdrive)" trait="width" />
-          <div> 2 </div>
-          <add src="sibling(VUI+Overdrive)" trait="x" />
-        </x>
-        <alpha> 500 </alpha>
-        <systemcolor> &hudalt; </systemcolor>
-        <depth> 3 </depth>
-        <visible>
-          <copy src="sibling(VUI+Overdrive)" trait="visible" />
-        </visible>
-      </text>
-      <include src="VUI+\outline.xml"/>
-    </hotrect>
+			<text name="VUI+OverdrivePercent">
+			<string>%</string>
+			<font> 3 </font>
+			<y>
+				<copy src="sibling(VUI+Overdrive)" trait="y" />
+			</y>
+			<x>
+				<copy src="sibling(VUI+Overdrive)" trait="width" />
+				<div> 2 </div>
+				<add src="sibling(VUI+Overdrive)" trait="x" />
+			</x>
+			<alpha> 500 </alpha>
+			<systemcolor> &hudalt; </systemcolor>
+			<depth> 3 </depth>
+			<visible>
+				<copy src="sibling(VUI+Overdrive)" trait="visible" />
+			</visible>
+			</text>
+			<include src="VUI+\outline.xml"/>
+		</hotrect>
 
-    <image name="lb_meter_right">
-      <id> 101 </id>
-      <alpha>
-        <copy src="grandparent" trait="_alpha"/>
-      </alpha>
-      <filename> Interface\Main\main_arrow_right.dds </filename>
-      <target> 1 </target>
-      <mouseoversound> UIMenuFocus </mouseoversound>
-      <clicksound> UIMenuPrevNext </clicksound>
-      <depth> 3 </depth>
-      <visible>
-        <copy src="parent" trait="mouseover"/>
-        <add src="me" trait="mouseover"/>
-        <add src="sibling(lb_meter_hotrect)" trait="mouseover"/>
-        <add src="sibling(lb_meter_left)" trait="mouseover"/>
-        <eq> 1 </eq>
-        <and>
-          <copy src="parent" trait="user2"/>
-          <gt> 0 </gt>
-        </and>
-        <and>
-          <!--VUI+ don't display for values > 1 -->
-          <copy src="parent" trait="_VUI+Value" />
-          <lte> 1 </lte>
-        </and>
-      </visible>
-      <x>
-        <copy src="sibling(lb_meter_hotrect)" trait="x"/>
-        <add src="sibling(lb_meter_hotrect)" trait="width"/>
-        <add src="parent" trait="user4"/>
-      </x>
-      <y>
-        <copy src="sibling(lb_meter_left)" trait="y"/>
-      </y>
-      <width>
-        <copy src="sibling(lb_meter_left)" trait="width"/>
-      </width>
-      <height>
-        <copy src="sibling(lb_meter_left)" trait="height"/>
-      </height>
-      <zoom> &scale; </zoom>
-    </image>
-  </hotrect> </template>
+		<image name="lb_meter_right">
+			<id> 101 </id>
+			<alpha>
+			<copy src="grandparent" trait="_alpha"/>
+			</alpha>
+			<filename> Interface\Main\main_arrow_right.dds </filename>
+			<target> 1 </target>
+			<mouseoversound> UIMenuFocus </mouseoversound>
+			<clicksound> UIMenuPrevNext </clicksound>
+			<depth> 3 </depth>
+			<visible>
+			<copy src="parent" trait="mouseover"/>
+			<add src="me" trait="mouseover"/>
+			<add src="sibling(lb_meter_hotrect)" trait="mouseover"/>
+			<add src="sibling(lb_meter_left)" trait="mouseover"/>
+			<eq> 1 </eq>
+			<and>
+				<copy src="parent" trait="user2"/>
+				<gt> 0 </gt>
+			</and>
+			<and>
+				<!--VUI+ don't display for values > 1 -->
+				<copy src="parent" trait="_VUI+Value" />
+				<lte> 1 </lte>
+			</and>
+			</visible>
+			<x>
+			<copy src="sibling(lb_meter_hotrect)" trait="x"/>
+			<add src="sibling(lb_meter_hotrect)" trait="width"/>
+			<add src="parent" trait="user4"/>
+			</x>
+			<y>
+			<copy src="sibling(lb_meter_left)" trait="y"/>
+			</y>
+			<width>
+			<copy src="sibling(lb_meter_left)" trait="width"/>
+			</width>
+			<height>
+			<copy src="sibling(lb_meter_left)" trait="height"/>
+			</height>
+			<zoom> &scale; </zoom>
+		</image>
+	</hotrect> </template>
 
 	<template name="SettingChoiceTemplate"> <hotrect name="SettingItem">
 		<include src="list_box_template.xml"/>
@@ -1502,7 +1476,315 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 		</image>
 	</hotrect> </template>
 
-		<template name="SettingSubsettingTemplate"> <hotrect name="SettingItem">
+	<template name="SettingFontTemplate"> <hotrect name="SettingItem">
+		<include src="list_box_template.xml"/>
+		<mouseoversound> &nosound; </mouseoversound>
+		<clicksound> &nosound; </clicksound>
+		<xdefault> 1 </xdefault>
+		<user0></user0> <!-- value string -->
+		<user4> 0 </user4> <!-- arrow spacing -->
+		<brightness> <copy src="io" trait="brightness"/> </brightness>
+		<_VerticalSpacing> 10 </_VerticalSpacing>
+
+		<text name="ListItemText">
+			<font> <copy src="io" trait="font" /> </font>
+			<string> <copy src="parent" trait="string"/> </string>
+
+			<brightness>
+				<copy> 255 </copy>
+				<add>
+					<copy src="globals" trait="_VUI+Highlighting" /> <div> 2 </div>
+					<onlyif>
+						<copy src="parent" trait="mouseover" />
+						<and src="globals" trait="_Has360Controller" />
+						<or src="sibling(lb_toggle_value)" trait="mouseover" />
+						<or src="sibling(lb_toggle_left)" trait="mouseover" />
+						<or src="sibling(lb_toggle_right)" trait="mouseover" />
+					</onlyif>
+				</add>
+			</brightness>
+			
+			<alpha>
+				<copy src="grandparent" trait="_alpha"/>
+				<min>
+					<copy> 255 </copy>
+					<sub>
+						<copy> 128 </copy>
+						<onlyifnot src="parent" trait="_enabled"/>
+					</sub>
+				</min>
+			</alpha>
+
+			<x> 10 </x>
+			<y>
+				<copy src="parent" trait="height" />
+				<sub src="me" trait="height" />
+				<div> 2 </div>
+				<add>
+					<copy src="me" trait="font" />
+					<copy src="globals" trait="_VUI+FontY_"/>
+				</add>
+			</y>
+		</text>
+
+		<image name="lb_toggle_left">
+			<id> 100 </id>
+			<filename> Interface\Main\main_arrow_left.dds </filename>
+			<mouseoversound> UIMenuFocus </mouseoversound>
+			<clicksound> UIMenuPrevNext </clicksound>
+			<alpha> <copy src="sibling(ListItemText)" trait="alpha"/> </alpha>
+			<target> 1 </target>
+			<depth> 5 </depth>
+			<visible>
+				<copy src="parent" trait="mouseover"/>
+				<add src="me" trait="mouseover"/>
+				<add src="sibling(lb_toggle_right)" trait="mouseover"/>
+				<add src="sibling(lb_toggle_value)" trait="mouseover"/>
+			</visible>
+			<x>
+				<copy src="sibling(lb_toggle_value)" trait="_x"/>
+				<sub> <copy src="sibling(lb_toggle_value)" trait="width"/> <div> 2 </div> </sub>
+				<sub src="parent" trait="user4"/>
+				<sub src="me" trait="width"/>
+			</x>
+			<y>
+				<copy src="parent" trait="height"/>
+				<sub src="me" trait="height"/>
+				<div> 2 </div>
+				<add> 0.5 </add>
+			</y>
+			<width> 13 </width>
+			<height> 23 </height>
+			<zoom> &scale; </zoom>
+		</image>
+
+		<hotrect name="lb_toggle_value">
+			<include src="text_box.xml"/>
+			<id> 99 </id>
+			<mouseoversound> UIMenuFocus </mouseoversound>
+			<clicksound> UIMenuPrevNext </clicksound>
+			<depth> 3 </depth>
+			<_VUI+Highlight> <!--VUI+ brightness of this string must be controlled through the text_box template, otherwise it gets buggy when clicked upon -->
+				<copy src="parent" trait="mouseover" />
+				<and src="globals" trait="_Has360Controller" />
+				<or src="sibling(lb_toggle_left)" trait="mouseover" />
+				<or src="sibling(lb_toggle_right)" trait="mouseover" />
+			</_VUI+Highlight>
+			<string> <copy src="parent" trait="user0"/> </string>
+			<justify> &center; </justify>
+			<_glow> 1 </_glow>
+			<_x> <copy src="io" trait="_center_x"/> </_x>
+			<_y> 
+				<copy src="me" trait="font" />
+				<copy src="globals" trait="_VUI+FontY_"/> 
+				<mul> -0.5 </mul>
+			</_y>
+			<_box_visible> 0 </_box_visible>
+			<_horbuf> 20 </_horbuf>
+			<_verbuf> 10 </_verbuf>
+			<_line_alpha> <copy src="sibling(ListItemText)" trait="alpha"/> </_line_alpha>
+		</hotrect>
+
+		<image name="lb_toggle_right">
+			<id> 101 </id>
+			<alpha> <copy src="sibling(ListItemText)" trait="alpha"/> </alpha>
+			<filename> Interface\Main\main_arrow_right.dds </filename>
+			<mouseoversound> UIMenuFocus </mouseoversound>
+			<clicksound> UIMenuPrevNext </clicksound>
+			<target> 1 </target>
+			<depth> 5 </depth>
+			<visible>
+				<copy src="parent" trait="mouseover"/>
+				<add src="me" trait="mouseover"/>
+				<add src="sibling(lb_toggle_left)" trait="mouseover"/>
+				<add src="sibling(lb_toggle_value)" trait="mouseover"/>
+			</visible>
+			<x>
+				<copy src="sibling(lb_toggle_value)" trait="_x"/>
+				<add> <copy src="sibling(lb_toggle_value)" trait="width"/> <div> 2 </div> </add>
+				<add src="parent" trait="user4"/>
+			</x>
+			<y> <copy src="sibling(lb_toggle_left)" trait="y"/> </y>
+			<width> <copy src="sibling(lb_toggle_left)" trait="width"/> </width>
+			<height> <copy src="sibling(lb_toggle_left)" trait="height"/> </height>
+			<zoom> &scale; </zoom>
+		</image>
+	</hotrect> </template>
+
+	<template name="SettingControlTemplate"> <hotrect name="SettingItem">
+		<include src="list_box_template.xml"/>
+		<mouseoversound> &nosound; </mouseoversound>
+		<clicksound> &nosound; </clicksound>
+		<xdefault> 1 </xdefault>
+		<user4> 0 </user4> <!-- arrow spacing -->
+		<brightness> <copy src="io" trait="brightness"/> </brightness>
+		<_VerticalSpacing> 10 </_VerticalSpacing>
+
+		<_Keyboard>test1</_Keyboard>
+		<_Mouse>test2</_Mouse>
+		<_Controller>test3</_Controller>
+		<_ControllerImage> 0 </_ControllerImage>
+
+		<text name="ListItemText">
+			<font> <copy src="io" trait="font" /> </font>
+			<string> <copy src="parent" trait="string"/> </string>
+
+			<brightness>
+				<copy> 255 </copy>
+				<add>
+					<copy src="globals" trait="_VUI+Highlighting" /> <div> 2 </div>
+					<onlyif>
+						<copy src="parent" trait="mouseover" />
+						<and src="globals" trait="_Has360Controller" />
+						<or src="sibling(lb_toggle_value)" trait="mouseover" />
+						<or src="sibling(lb_toggle_left)" trait="mouseover" />
+						<or src="sibling(lb_toggle_right)" trait="mouseover" />
+					</onlyif>
+				</add>
+			</brightness>
+			
+			<alpha>
+				<copy src="grandparent" trait="_alpha"/>
+				<min>
+					<copy> 255 </copy>
+					<sub>
+						<copy> 128 </copy>
+						<onlyifnot src="parent" trait="_enabled"/>
+					</sub>
+				</min>
+			</alpha>
+
+			<x> 10 </x>
+			<y>
+				<copy src="parent" trait="height" />
+				<sub src="me" trait="height" />
+				<div> 2 </div>
+				<add>
+					<copy src="me" trait="font" />
+					<copy src="globals" trait="_VUI+FontY_"/>
+				</add>
+			</y>
+		</text>
+
+		<hotrect name="lb_toggle_value">
+			<include src="text_box.xml"/>
+			<visible> <copy src="io" trait="_controlDevice"/> <eq>0</eq> </visible>
+			<id> 99 </id>
+			<mouseoversound> UIMenuFocus </mouseoversound>
+			<clicksound> UIMenuPrevNext </clicksound>
+			<depth> 3 </depth>
+			<_VUI+Highlight> <!--VUI+ brightness of this string must be controlled through the text_box template, otherwise it gets buggy when clicked upon -->
+				<copy src="parent" trait="mouseover" />
+				<and src="globals" trait="_Has360Controller" />
+				<or src="sibling(lb_toggle_left)" trait="mouseover" />
+				<or src="sibling(lb_toggle_right)" trait="mouseover" />
+			</_VUI+Highlight>
+			
+			<string> <copy src="parent()" trait="_Keyboard"/> </string>
+			<justify> &center; </justify>
+			<_glow> 1 </_glow>
+			<_x> <copy src="io" trait="_center_x"/> </_x>
+			<_y> 0 </_y>
+			<_box_visible> 0 </_box_visible>
+			<_horbuf> 20 </_horbuf>
+			<_verbuf> 10 </_verbuf>
+			<_line_alpha> <copy src="sibling(ListItemText)" trait="alpha"/> </_line_alpha>
+		</hotrect>
+		
+		<hotrect name="lb_toggle_value2">
+			<include src="text_box.xml"/>
+			<visible> <copy src="io" trait="_controlDevice"/> <eq>1</eq> </visible>
+			<id> 99 </id>
+			<mouseoversound> UIMenuFocus </mouseoversound>
+			<clicksound> UIMenuPrevNext </clicksound>
+			<depth> 3 </depth>
+			<_VUI+Highlight> <!--VUI+ brightness of this string must be controlled through the text_box template, otherwise it gets buggy when clicked upon -->
+				<copy src="parent" trait="mouseover" />
+				<and src="globals" trait="_Has360Controller" />
+				<or src="sibling(lb_toggle_left)" trait="mouseover" />
+				<or src="sibling(lb_toggle_right)" trait="mouseover" />
+			</_VUI+Highlight>
+			
+			<string> <copy src="parent()" trait="_Mouse"/> </string>
+			<justify> &center; </justify>
+			<_glow> 1 </_glow>
+			<_x> <copy src="io" trait="_center_x"/> </_x>
+			<_y> 0 </_y>
+			<_box_visible> 0 </_box_visible>
+			<_horbuf> 20 </_horbuf>
+			<_verbuf> 10 </_verbuf>
+			<_line_alpha> <copy src="sibling(ListItemText)" trait="alpha"/> </_line_alpha>
+		</hotrect>
+		
+		<hotrect name="lb_toggle_value3">
+			<include src="text_box.xml"/>
+			<visible> 
+				<copy src="io" trait="_controlDevice"/> <eq>2</eq> 
+				<onlyifnot src="parent" trait="_ControllerImage"/>
+			</visible>
+			<id> 99 </id>
+			<mouseoversound> UIMenuFocus </mouseoversound>
+			<clicksound> UIMenuPrevNext </clicksound>
+			<depth> 3 </depth>
+			<_VUI+Highlight> <!--VUI+ brightness of this string must be controlled through the text_box template, otherwise it gets buggy when clicked upon -->
+				<copy src="parent" trait="mouseover" />
+				<and src="globals" trait="_Has360Controller" />
+				<or src="sibling(lb_toggle_left)" trait="mouseover" />
+				<or src="sibling(lb_toggle_right)" trait="mouseover" />
+			</_VUI+Highlight>
+			
+			<string> <copy src="parent()" trait="_Controller"/> </string>
+			<justify> &center; </justify>
+			<_glow> 1 </_glow>
+			<_x> <copy src="io" trait="_center_x"/> </_x>
+			<_y> 0 </_y>
+			<_box_visible> 0 </_box_visible>
+			<_horbuf> 20 </_horbuf>
+			<_verbuf> 10 </_verbuf>
+			<_line_alpha> <copy src="sibling(ListItemText)" trait="alpha"/> </_line_alpha>
+		</hotrect>
+		
+		<image name="lb_item_button_icon">
+			<visible>
+				<copy src="io" trait="_controlDevice"/> <eq>2</eq> 
+				<onlyif src="parent" trait="_ControllerImage"/>
+			</visible>
+			<filename> <copy src="parent()" trait="_Controller"/> </filename>
+			<texatlas> Interface\InterfaceShared.tai </texatlas> <!-- Make sure to pull button icons from the texture atlas -->
+			<!-- #37077: For reasons unknown, making the icons 64x64 introduces small artifacts. Going to 63x63 seems to fix it -->
+			<width> 63 </width>
+			<height> 63 </height>
+			<alpha>
+				<copy src="grandparent" trait="_alpha"/>
+				<min>
+					<copy> 255 </copy>
+					<sub>
+						<copy> 128 </copy>
+						<onlyifnot>
+							<copy src="grandparent" trait="_enabled"/>
+							<or src="parent" trait="_selected"/>
+							<and src="parent" trait="_enabled"/>
+						</onlyifnot>
+					</sub>
+				</min>
+			</alpha>
+			<brightness> <copy src="sibling" trait="brightness" /> </brightness> <!--VUI+ target highlighting -->
+			<x>
+				<copy src="sibling(lb_item_button_text)" trait="x"/>
+				<sub>
+					<copy src="me" trait="width"/>
+					<div> 2 </div>
+				</sub>
+			</x>
+			<y>
+				<copy src="parent" trait="height"/>
+				<sub src="me" trait="height"/>
+				<div> 2 </div>
+			</y>
+		</image>
+	</hotrect> </template>
+
+	<template name="SettingSubsettingTemplate"> <hotrect name="SettingItem">
 		<include src="list_box_template.xml"/>
 		<mouseoversound> &nosound; </mouseoversound>
 		<clicksound> &nosound; </clicksound>
@@ -1563,17 +1845,17 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 			<depth> 5 </depth>
 			<visible> 1 </visible>
 			<x>
-        <copy src="io" trait="_center_x"/>
+		<copy src="io" trait="_center_x"/>
 				<add src="parent" trait="user4"/>
 			</x>
 			<y>
-        <copy src="parent" trait="height"/>
-        <sub src="me" trait="height"/>
-        <div> 2 </div>
-        <add> 0.5 </add>
-      </y>
-      <width> 13 </width>
-      <height> 23 </height>
+		<copy src="parent" trait="height"/>
+		<sub src="me" trait="height"/>
+		<div> 2 </div>
+		<add> 0.5 </add>
+		</y>
+		<width> 13 </width>
+		<height> 23 </height>
 			<zoom> &scale; </zoom>
 		</image>
 	</hotrect> </template>

@@ -633,8 +633,9 @@ namespace UserInterface::LootMenu
 
 	bool OnPreActivate(TESObjectREFR* thisObj, Actor* ref, bool isActivationNotPrevented)
 	{
+		if (ref != g_player) return true;
 		if (!container && Container::Change(Container::Filter(thisObj))) Box::Update();
-		if (!container || thisObj != container || ref != g_player || !isActivationNotPrevented) return true;
+		if (!container || thisObj != container || !isActivationNotPrevented) return true;
 		return Action(ActionToTake());
 	}
 

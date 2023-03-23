@@ -76,7 +76,7 @@ namespace SortingIcons::Icons
 		if (icon->GetValue(kTileValue_user1)) width += icon->GetFloat(kTileValue_user1);
 
 		text->SetFloat(kTileValue_x, x + width, true);
-		text->SetFloat(kTileValue_wrapwidth, text->GetFloat(kTileValue_wrapwidth) - width, true);
+		text->SetFloat(kTileValue_wrapwidth, text->GetFloat(kTileValue_wrapwidth) - width, false);
 	}
 
 	void __fastcall InjectTileSetTileString(Tile* tile, const InventoryChanges* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate)

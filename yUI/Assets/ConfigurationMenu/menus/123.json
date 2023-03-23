@@ -161,8 +161,16 @@ iButtonAlt = 0
 	"tags": ["Controls"],
 	"condition": [ { "JLMbEnable":1 } ],
 	"type": "control",
-	"keyboard": "JustMods.ini:Loot Menu:iKey1",
-	"controller": "JustMods.ini:Loot Menu:iButton1"
+	
+	"path": "JustMods.ini",
+	"category": "Loot Menu",
+	"value": "iKey1",
+	"valueDefault": 1,
+
+	"controllerPath": "JustMods.ini",
+	"controllerCategory": "Loot Menu",
+	"controllerValue": "iButton1",
+	"controllerValueDefault": 128
 },
 /*
 iMode1 = 1
