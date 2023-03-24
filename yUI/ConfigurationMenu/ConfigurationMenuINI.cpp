@@ -1,5 +1,5 @@
 #pragma once
-#include "ConfigurationMenu/StewMenu/ConfigurationMenuStew.h"
+#include "ConfigurationMenuStew.h"
 #include <SimpleINILibrary.h>
 
 inline std::map<std::tuple<std::filesystem::path, std::string, std::string>, SM_Value> ini_map;

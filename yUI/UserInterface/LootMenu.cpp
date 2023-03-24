@@ -673,7 +673,7 @@ namespace UserInterface::LootMenu
 
 		enable			= ini.GetOrCreate("General", "bLootMenu", true, "; enable 'Loot Menu' feature. If required files are not found this will do nothing.");
 
-		block			= ini.GetOrCreate("Loot Menu", "bOnlyOpenLootMenuAfterFirstInteraction", false, "; I recommend considering enabling this option, as it's a little less performance intensive and as bug-free as regular container menu");
+		block			= ini.GetOrCreate("Loot Menu", "bBlockBeforeActivate", false, "; I recommend considering enabling this option, as it's a little less performance intensive and as bug-free as regular container menu");
 
 		key1Base		= ini.GetOrCreate("Loot Menu", "iKey1", 0, nullptr);
 		key2Base		= ini.GetOrCreate("Loot Menu", "iKey2", 0, nullptr);

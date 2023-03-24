@@ -2,7 +2,7 @@
 #include "ConfigurationMenu.h"
 
 #include "SafeWrite.h"
-#include "StewMenu/ConfigurationMenuStew.h"
+#include "ConfigurationMenuStew.h"
 
 namespace ConfigurationMenu
 {
