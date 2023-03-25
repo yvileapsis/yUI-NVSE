@@ -1,0 +1,119 @@
+﻿{
+"tags": [
+{
+	"id": "Quality-of-life",
+	"name": "Quality-of-life",
+	"description": "Minor improvements"
+},
+{
+	"id": "HUD",
+	"name": "HUD",
+	"description": "Having to do with heads up display"
+}
+],
+"mods": [{
+	"id": "TEST0",
+	"name": "TEST0",
+	"nameShort": "TEST0",
+	"version": "5.0",
+	"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+	"condition": [ { "JLMbEnable": 1 } ],
+	"tags": [ "Quality-of-life", "HUD" ]
+}, 
+{
+	"id": "TEST1",
+	"name": "TESЕ1",
+	"nameShort": "TEST1",
+	"version": "5.0",
+	"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+	"condition": [ { "JLMbEnable": 1 } ],
+	"tags": [ "Quality-of-life", "HUD" ]
+},
+{
+	"id": "TEST1",
+	"name": "TESЕ1",
+	"nameShort": "TEST1",
+	"version": "5.0",
+	"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+	"condition": [ { "JLMbEnable": 1 } ],
+	"tags": [ "Quality-of-life", "HUD" ]
+},
+{
+	"id": "TEST1",
+	"name": "TESЕ1",
+	"nameShort": "TEST1",
+	"version": "5.0",
+	"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+	"condition": [ { "JLMbEnable": 1 } ],
+	"tags": [ "Quality-of-life", "HUD" ]
+},
+{
+	"id": "TEST1",
+	"name": "TESЕ1",
+	"nameShort": "TEST1",
+	"version": "5.0",
+	"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+	"condition": [ { "JLMbEnable": 1 } ],
+	"tags": [ "Quality-of-life", "HUD" ]
+},{
+	"id": "TEST1",
+	"name": "TESЕ1",
+	"nameShort": "TEST1",
+	"version": "5.0",
+	"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+	"condition": [ { "JLMbEnable": 1 } ],
+	"tags": [ "Quality-of-life", "HUD" ]
+},{
+	"id": "TEST1",
+	"name": "TESЕ1",
+	"nameShort": "TEST1",
+	"version": "5.0",
+	"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+	"condition": [ { "JLMbEnable": 1 } ],
+	"tags": [ "Quality-of-life", "HUD" ]
+},{
+	"id": "TEST1",
+	"name": "TESЕ1",
+	"nameShort": "TEST1",
+	"version": "5.0",
+	"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+	"condition": [ { "JLMbEnable": 1 } ],
+	"tags": [ "Quality-of-life", "HUD" ]
+},{
+	"id": "TEST1",
+	"name": "TESЕ1",
+	"nameShort": "TEST1",
+	"version": "5.0",
+	"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+	"condition": [ { "JLMbEnable": 1 } ],
+	"tags": [ "Quality-of-life", "HUD" ]
+},
+{
+	"id": "TEST1",
+	"name": "TESЕ1",
+	"nameShort": "TEST1",
+	"version": "5.0",
+	"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+	"condition": [ { "JLMbEnable": 1 } ],
+	"tags": [ "Quality-of-life", "HUD" ]
+},
+{
+	"id": "TEST2",
+	"name": "TESЕ2",
+	"nameShort": "TEST2",
+	"version": "5.0",
+	"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+	"condition": [ { "JLMbEnable": 1 } ],
+	"tags": [ "Quality-of-life", "HUD" ]
+},
+	{
+		"id": "JDC",
+		"name": "Just Dynamic Crosshair",
+		"nameShort": "Dynamic Crosshair",
+		"version": "5.0",
+		"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+		"condition": [ { "JLMbEnable": 1 } ],
+		"tags": [ "Quality-of-life", "HUD" ]
+	}
+]
+}

@@ -1,0 +1,667 @@
+{
+"mods": [
+{
+	"id": "JLM",
+	"name": "Just Loot Menu",
+	"nameShort":  "Loot Menu",
+	"version": "5.0",
+	"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+	"condition": [ { "JLMbEnable": 1 } ],
+	"tags": [ "Quality-of-life", "HUD" ]
+}
+],
+"settings": [
+{
+	"id": "JLMbEnable",
+	"name": "Enable Just Loot Menu",
+	"description": "Enable Loot Menu",
+	"mods": [ "JLM" ],
+	"tags": [ "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "General",
+	"value": "bLootMenu",
+
+	"valueDefault": 1,
+	"type": "choice",
+	"values": [ { "name": "OFF" }, { "name": "ON" } ]
+},
+{
+	"name": "1st action control",
+	"description": "Determine control used as a trigger for the 1st action.",
+	"mods": [ "JLM" ],
+	"tags": [ "Controls" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "control",
+
+	"path": "JustMods.ini",
+	"category": "Loot Menu",
+	"value": "iKey1",
+	"valueDefault": 0,
+
+	"mousePath": "JustMods.ini",
+	"mouseCategory": "Loot Menu",
+	"mouseValue": "iKey1",
+	"mouseValueDefault": 0,
+
+	"controllerPath": "JustMods.ini",
+	"controllerCategory": "Loot Menu",
+	"controllerValue": "iButton1",
+	"controllerValueDefault": 0
+},
+{
+	"name": "2nd action control",
+	"description": "Determine control used as a trigger for the 2nd action.",
+	"mods": [ "JLM" ],
+	"tags": [ "Controls" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "control",
+
+	"path": "JustMods.ini",
+	"category": "Loot Menu",
+	"value": "iKey2",
+	"valueDefault": 0,
+
+	"mousePath": "JustMods.ini",
+	"mouseCategory": "Loot Menu",
+	"mouseValue": "iKey2",
+	"mouseValueDefault": 0,
+
+	"controllerPath": "JustMods.ini",
+	"controllerCategory": "Loot Menu",
+	"controllerValue": "iButton2",
+	"controllerValueDefault": 0
+},
+{
+	"name": "3rd action control",
+	"description": "Determine control used as a trigger for the 3rd action.",
+	"mods": [ "JLM" ],
+	"tags": [ "Controls" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "control",
+
+	"path": "JustMods.ini",
+	"category": "Loot Menu",
+	"value": "iKey3",
+	"valueDefault": 0,
+
+	"mousePath": "JustMods.ini",
+	"mouseCategory": "Loot Menu",
+	"mouseValue": "iKey3",
+	"mouseValueDefault": 0,
+
+	"controllerPath": "JustMods.ini",
+	"controllerCategory": "Loot Menu",
+	"controllerValue": "iButton3",
+	"controllerValueDefault": 0
+},
+{
+	"name": "Alt action control",
+	"description": "Determine control used as a trigger for the alt action.",
+	"mods": [ "JLM" ],
+	"tags": [ "Controls" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "control",
+
+	"path": "JustMods.ini",
+	"category": "Loot Menu",
+	"value": "iKeyAlt",
+	"valueDefault": 0,
+
+	"mousePath": "JustMods.ini",
+	"mouseCategory": "Loot Menu",
+	"mouseValue": "iKeyAlt",
+	"mouseValueDefault": 0,
+
+	"controllerPath": "JustMods.ini",
+	"controllerCategory": "Loot Menu",
+	"controllerValue": "iButtonAlt",
+	"controllerValueDefault": 0
+},
+{
+	"name": "Scroll up control",
+	"description": "Determine control used to scroll menu up.",
+	"mods": [ "JLM" ],
+	"tags": [ "Controls" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "control",
+
+	"path": "JustMods.ini",
+	"category": "Loot Menu",
+	"value": "iKeyScrollUp",
+	"valueDefault": 0,
+
+	"mousePath": "JustMods.ini",
+	"mouseCategory": "Loot Menu",
+	"mouseValue": "iKeyScrollUp",
+	"mouseValueDefault": 264,
+
+	"controllerPath": "JustMods.ini",
+	"controllerCategory": "Loot Menu",
+	"controllerValue": "iButtonScrollUp",
+	"controllerValueDefault": 0
+},
+{
+	"name": "Scroll down control",
+	"description": "Determine control used to scroll menu down.",
+	"mods": [ "JLM" ],
+	"tags": [ "Controls" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "control",
+
+	"path": "JustMods.ini",
+	"category": "Loot Menu",
+	"value": "iKeyScrollDown",
+	"valueDefault": 0,
+
+	"mousePath": "JustMods.ini",
+	"mouseCategory": "Loot Menu",
+	"mouseValue": "iKeyScrollDown",
+	"mouseValueDefault": 265,
+
+	"controllerPath": "JustMods.ini",
+	"controllerCategory": "Loot Menu",
+	"controllerValue": "iButtonScrollDown",
+	"controllerValueDefault": 0
+},
+{
+	"name": "1st action",
+	"description": "Action activated by 1st control.",
+	"mods": [ "JLM" ],
+	"tags": [ "Controls", "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "choice",
+
+	"valueDefault": 1,
+	"values": [ { "name": "None" }, { "name": "Take" }, { "name": "Equip" }, { "name": "Take All" }, { "name": "Open" } ],
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "iMode1"
+},
+{
+	"name": "1st alt action",
+	"description": "Action activated by 1st control and alt control pressed at the same time.",
+	"mods": [ "JLM" ],
+	"tags": [ "Controls", "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "choice",
+
+	"valueDefault": 2,
+	"values": [ { "name": "None" }, { "name": "Take" }, { "name": "Equip" }, { "name": "Take All" }, { "name": "Open" } ],
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "iMode1Alt"
+},
+{
+	"name": "2nd action",
+	"description": "Action activated by 2nd control.",
+	"mods": [ "JLM" ],
+	"tags": [ "Controls", "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "choice",
+
+	"valueDefault": 4,
+	"values": [ { "name": "None" }, { "name": "Take" }, { "name": "Equip" }, { "name": "Take All" }, { "name": "Open" } ],
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "iMode2"
+},
+{
+	"name": "2nd alt action",
+	"description": "Action activated by 2nd control and alt control pressed at the same time.",
+	"mods": [ "JLM" ],
+	"tags": [ "Controls", "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "choice",
+
+	"valueDefault": 3,
+	"values": [ { "name": "None" }, { "name": "Take" }, { "name": "Equip" }, { "name": "Take All" }, { "name": "Open" } ],
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "iMode2Alt"
+},
+{
+	"name": "3rd action",
+	"description": "Action activated by 3rd control.",
+	"mods": [ "JLM" ],
+	"tags": [ "Controls", "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "choice",
+
+	"valueDefault": 1,
+	"values": [ { "name": "None" }, { "name": "Take" }, { "name": "Equip" }, { "name": "Take All" }, { "name": "Open" } ],
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "iMode3"
+},
+{
+	"name": "3rd alt action",
+	"description": "Action activated by 3rd control and alt control pressed at the same time.",
+	"mods": [ "JLM" ],
+	"tags": [ "Controls", "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "choice",
+
+	"valueDefault": 1,
+	"values": [ { "name": "None" }, { "name": "Take" }, { "name": "Equip" }, { "name": "Take All" }, { "name": "Open" } ],
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "iMode3Alt"
+},
+{
+	"name": "Take Smart Min",
+	"description": "The amount of items wah wah wah whatever.",
+
+	"mods": [ "JLM" ],
+	"tags": [ "Gameplay" ],
+
+	"valueDefault": 5,
+	"type": "slider",
+
+	"valueMin": 0,
+	"valueMax": 20,
+	"valueDelta": 1,
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "iTakeSmartMin",
+
+	"condition": [ { "JLMbEnable": 1 } ]
+},
+{
+	"name": "Take Weightless",
+	"description": "Take full stacks of weightless items.",
+	"mods": [ "JLM" ],
+	"tags": [ "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "choice",
+	"valueDefault": 1,
+	"values": [ { "name": "OFF" }, { "name": "ON" } ],
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "bTakeWeightless"
+},
+{
+	"name": "Block Before Activate",
+	"description": "Open container only after the first activate.",
+	"mods": [ "JLM" ],
+	"tags": [ "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "choice",
+	"valueDefault": 0,
+	"values": [ { "name": "OFF" }, { "name": "ON" } ],
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "bBlockBeforeActivate"
+},
+{
+	"name": "Overscroll",
+	"description": "Allow unlimited scrolling.",
+	"mods": [ "JLM" ],
+	"tags": [ "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "choice",
+	"valueDefault": 0,
+	"values": [ { "name": "OFF" }, { "name": "ON" } ],
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "bOverScroll"
+},
+{
+	"name": "Hide Prompt",
+	"description": "Hide vanilla interaction prompt saying 'Search' when Loot Menu is open.",
+	"mods": [ "JLM" ],
+	"tags": [ "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "choice",
+	"valueDefault": 1,
+	"values": [ { "name": "OFF" }, { "name": "ON" } ],
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "bHidePrompt"
+},
+
+{
+	"name": "Hide Name",
+	"description": "Hides container name in Loot Menu.",
+	"mods": [ "JLM" ],
+	"tags": [ "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "choice",
+	"valueDefault": 0,
+	"values": [ { "name": "OFF" }, { "name": "ON" } ],
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "bHideName"
+},
+
+{
+	"name": "Max Items",
+	"description": "Max amount of items displayed at any time in Loot Menu.",
+	"mods": [ "JLM" ],
+	"tags": [ "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "slider",
+	"valueDefault": 5,
+	"valueMin": 0,
+	"valueMax": 20,
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "iItemsMax"
+},
+{
+	"id": "JLMiJustify",
+	"name": "iJustify",
+	"description": "",
+	"mods": [ "JLM" ],
+	"tags": [ "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "choice",
+	"valueDefault": 3,
+
+	"values": [
+		{ "value": 1, "name": "Upper Left" },
+		{ "value": 2, "name": "Upper Center" },
+		{ "value": 3, "name": "Upper Right" },
+		{ "value": 4, "name": "Center Left" },
+		{ "value": 5, "name": "True Center" },
+		{ "value": 6, "name": "Center Right" },
+		{ "value": 7, "name": "Lower Left" },
+		{ "value": 8, "name": "Lower Center" },
+		{ "value": 9, "name": "Lower Right" }
+	],
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "iJustify"
+},
+{
+	"name": "Height Min",
+	"mods": "JLMVisuals",
+	"tags": "Visuals",
+	"type": "slider",
+
+	"valueDefault": 32.00,
+	"valueDelta": 0.5,
+	"valueMin": 0.00,
+	"valueMax": 960.00,
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "fHeightMin"
+},
+{
+	"name": "Height Max",
+	"mods": "JLMVisuals",
+	"tags": "Visuals",
+	"type": "slider",
+
+	"valueDefault": 400.00,
+	"valueDelta": 0.5,
+	"valueMin": 0.00,
+	"valueMax": 960.00,
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "fHeightMax"
+},
+{
+	"id": "JLMVisuals",
+	"name": "Visuals",
+	"description": "",
+	"mods": [ "JLM" ],
+	"tags": [ "Visuals" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "subsetting"
+},
+{
+	"name": "Width Min",
+	"mods": "JLMVisuals",
+	"tags": "Visuals",
+	"type": "slider",
+
+	"valueDefault": 400.00,
+	"valueDelta": 0.5,
+	"valueMin": 0.00,
+	"valueMax": 960.00,
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "fWidthMin"
+},
+{
+	"name": "Width Max",
+	"mods": "JLMVisuals",
+	"tags": "Visuals",
+	"type": "slider",
+
+	"valueDefault": 640.00,
+	"valueDelta": 0.5,
+	"valueMin": 0.00,
+	"valueMax": 960.00,
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "fWidthMax"
+},
+{
+	"name": "Offset X",
+	"mods": "JLMVisuals",
+	"tags": "Visuals",
+	"type": "slider",
+
+	"valueDefault": 0.625000,
+	"valueDelta": 0.005,
+	"valueMin": 0.00,
+	"valueMax": 1.00,
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "fOffsetX"
+},
+{
+	"name": "Offset Y",
+	"mods": "JLMVisuals",
+	"tags": "Visuals",
+	"type": "slider",
+
+	"valueDefault": 0.500000,
+	"valueDelta": 0.005,
+	"valueMin": 0.00,
+	"valueMax": 1.00,
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "fOffsetY"
+},
+ 	
+{
+	"name": "Indent Item",
+	"mods": "JLMVisuals",
+	"tags": "Visuals",
+	"type": "slider",
+
+	"valueDefault": 8.000000,
+	"valueDelta": 0.5,
+	"valueMin": 0.00,
+	"valueMax": 960.00,
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "fIndentItem"
+},
+
+{
+	"name": "Indent Text X",
+	"mods": "JLMVisuals",
+	"tags": "Visuals",
+	"type": "slider",
+
+	"valueDefault": 10.000000,
+	"valueDelta": 0.5,
+	"valueMin": 0.00,
+	"valueMax": 960.00,
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "fIndentTextX"
+},
+
+{
+	"name": "Indent Text Y",
+	"mods": "JLMVisuals",
+	"tags": "Visuals",
+	"type": "slider",
+
+	"valueDefault": 10.000000,
+	"valueDelta": 0.5,
+	"valueMin": 0.00,
+	"valueMax": 960.00,
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "fIndentTextY"
+},
+{
+	"name": "Weight Visible",
+	"description": "",
+	"mods": [ "JLM" ],
+	"tags": [ "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "choice",
+	"valueDefault": 1,
+	"values": [ { "name": "OFF" }, { "name": "Overenc." }, { "name": "ON" } ],
+		
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "iWeightVisible"
+},
+{
+	"name": "Weight Alt Color",
+	"description": "",
+	"mods": [ "JLM" ],
+	"tags": [ "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "choice",
+	"valueDefault": 1,
+	"values": [ { "name": "OFF" }, { "name": "Overenc." }, { "name": "Item" } ],
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "iWeightAltColor"
+},
+{
+	"name": "Font",
+	"description": "",
+	"mods": [ "JLM" ],
+	"tags": [ "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "font",
+	"valueDefault": 0,
+
+	"value2Default": 0.00,
+	"value2": "JustMods.ini:Loot Menu:fFontY",
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "iFont"
+},
+{
+	"name": "Hwad Font",
+	"description": "",
+	"mods": [ "JLM" ],
+	"tags": [ "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "font",
+	"valueDefault": 0,
+
+	"value2Default": 0.00,
+	"value2": "JustMods.ini:Loot Menu:fFontHeadY",
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "iFontHead"
+},
+{
+	"name": "Sounds",
+	"description": "",
+	"mods": [ "JLM" ],
+	"tags": [ "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "choice",
+	"valueDefault": 1,
+	"values": [ { "name": "OFF" }, { "name": "ON" } ],
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "bSounds"
+},
+{
+	"name": "Show Equip",
+	"description": "",
+	"mods": [ "JLM" ],
+	"tags": [ "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "choice",
+	"valueDefault": 1,
+	"values": [ { "name": "OFF" }, { "name": "ON" } ],
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "bShowEquip"
+},
+{
+	"name": "Show Icon",
+	"description": "",
+	"mods": [ "JLM" ],
+	"tags": [ "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "choice",
+	"valueDefault": 1,
+	"values": [ { "name": "OFF" }, { "name": "ON" } ],
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "bShowIcon"
+},
+{
+	"name": "Show Meter",
+	"description": "",
+	"mods": [ "JLM" ],
+	"tags": [ "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "choice",
+	"valueDefault": 1,
+	"values": [ { "name": "OFF" }, { "name": "ON" } ],
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "bShowMeter"
+},
+{
+	"name": "Show Name",
+	"description": "",
+	"mods": [ "JLM" ],
+	"tags": [ "Gameplay" ],
+	"condition": [ { "JLMbEnable": 1 } ],
+	"type": "choice",
+	"valueDefault": 1,
+	"values": [ { "name": "OFF" }, { "name": "ON" } ],
+
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
+	"category": "Loot Menu",
+	"value": "bShowName"
+}
+]
+}
