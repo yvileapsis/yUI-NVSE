@@ -540,11 +540,12 @@ ControlName** g_keyNames = (ControlName**)0x011D52F0;
 ControlName** g_mouseButtonNames = (ControlName**)0x011D5240;
 ControlName** g_joystickNames = (ControlName**)0x011D51B0;
 
-std::string GetDXDescription(UInt32 keycode)
+std::string GetStringForScancode(UInt32 keycode)
 {
-	const char* keyName = "<no key>";
+	std::string keyName = "<no key>";
 
-	if (keycode <= 220)
+	if (!keycode) keyName = "--";
+	else if (keycode <= 220)
 	{
 		if (g_keyNames[keycode])
 			keyName = g_keyNames[keycode]->name;
@@ -560,44 +561,8 @@ std::string GetDXDescription(UInt32 keycode)
 		keyName = "WheelUp";
 	else if (keycode == 265)
 		keyName = "WheelDown";
-
-	return keyName;
-}
-
-std::string ScancodeToString(UInt32 scancode)
-{
-	std::string result;
-
-	const char* keyName = nullptr;
-	if (scancode <= 220)
-	{
-		if (g_keyNames[scancode])
-			keyName = g_keyNames[scancode]->name;
-	}
-	else if (255 <= scancode && scancode <= 263)
-	{
-		if (scancode == 255)
-			scancode = 256;
-		if (g_mouseButtonNames[scancode - 256])
-			keyName = g_mouseButtonNames[scancode - 256]->name;
-	}
-	else if (scancode == 264)		//OB doesn't provide names for wheel up/down
-		keyName = "WheelUp";
-	else if (scancode == 265)
-		keyName = "WheelDown";
-	else if (scancode == 221)
+	else if (keycode == 221)
 		keyName = "Select";
 
-	if (!keyName)
-	{
-		char buf[0x40];
-		snprintf(buf, sizeof(buf), scancode ? "Unknown Key: %d" : "--", scancode);
-		result = buf;
-	}
-	else
-	{
-		result = keyName;
-	}
-
-	return result;
+	return keyName;
 }

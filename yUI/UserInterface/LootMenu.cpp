@@ -778,9 +778,9 @@ namespace UserInterface::LootMenu
 		}
 		else
 		{
-			tileMain->SetString("_KeyString1", key1 ? (GetDXDescription(key1) + ")").c_str() : "");
-			tileMain->SetString("_KeyString2", key2 ? (GetDXDescription(key2) + ")").c_str() : "");
-			tileMain->SetString("_KeyString3", key3 ? (GetDXDescription(key3) + ")").c_str() : "");
+			tileMain->SetString("_KeyString1", key1 ? (GetStringForScancode(key1) + ")").c_str() : "");
+			tileMain->SetString("_KeyString2", key2 ? (GetStringForScancode(key2) + ")").c_str() : "");
+			tileMain->SetString("_KeyString3", key3 ? (GetStringForScancode(key3) + ")").c_str() : "");
 		}
 	}
 

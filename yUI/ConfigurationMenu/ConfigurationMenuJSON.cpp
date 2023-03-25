@@ -18,6 +18,7 @@ SM_Value GetValueFromElement(const nlohmann::basic_json<>& elem)
 	if (elem.is_number_integer() || elem.is_number_unsigned()) return elem.get<SInt32>();
 	if (elem.is_string()) return elem.get<std::string>();
 	if (elem.is_number_float()) return elem.get<Float64>();
+	return 0;
 }
 
 TagJSON::TagJSON(const nlohmann::basic_json<>& elem)
