@@ -1046,6 +1046,12 @@ void ModConfigurationMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 	case kModConfigurationMenu_SettingListItem:
 	{
 		auto item = settingsListBox.GetItemForTile(activeTile);
+
+		const UInt32 listindex = activeTile->GetFloat(kTileValue_x);
+
+		settingsListBox.parentTile->GetChild("lb_highlight_box")->SetFloat(kTileValue_x, activeTile->GetFloat(kTileValue_x), true);
+		settingsListBox.parentTile->GetChild("lb_highlight_box")->SetFloat(kTileValue_width, activeTile->GetFloat(kTileValue_width), true);
+
 		break;
 	}
 
@@ -1245,7 +1251,7 @@ void ModConfigurationMenu::Update()
 		}
 	}
 
-	SetCursorPosTraits();
+//	SetCursorPosTraits();
 }
 
 

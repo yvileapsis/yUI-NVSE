@@ -116,7 +116,7 @@
     <ClCompile Include="..\game\Containers.cpp">
       <Filter>game</Filter>
     </ClCompile>
-        <ClCompile Include="..\game\NiNodes.cpp">
+    <ClCompile Include="..\game\NiNodes.cpp">
       <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="..\game\GameProcess.cpp">
@@ -128,7 +128,7 @@
     <ClCompile Include="MiscFeatures\FixProjectileEffects.cpp">
       <Filter>features</Filter>
     </ClCompile>
-    <ClCompile Include="MiscFeatures\FixSleepWaitMenuString.cpp">
+    <ClCompile Include="MiscFeatures\FixLocaleStringscpp">
       <Filter>features</Filter>
     </ClCompile>
     <ClCompile Include="MiscFeatures\FixReorderMCM.cpp">
@@ -173,8 +173,9 @@
     <ClCompile Include="UserInterface\WeaponHweel.cpp">
       <Filter>features\UserInterface</Filter>
     </ClCompile>
-    <ClCompile Include="events.cpp">
-      <Filter>features\UserInterface</Filter>
+    <ClCompile Include="UserInterface\events.cpp" />
+    <ClCompile Include="MiscFeatures\PatchB42InjectHideCrosshair.cpp">
+      <Filter>features</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
