@@ -1,0 +1,119 @@
+<mouseoversound> &nosound; </mouseoversound>
+<clicksound> &nosound; </clicksound>
+
+<brightness> <copy src="io" trait="brightness"/> </brightness>
+<_VerticalSpacing> 10 </_VerticalSpacing>
+<_HorizontalSpacing> 10 </_HorizontalSpacing>
+<user4> 0 </user4> <!-- arrow spacing -->
+<xdefault> 1 </xdefault>
+
+<width> 
+	<copy src="parent" trait="width"/> 
+	<sub src="parent" trait="_highX"/>
+	<onlyifnot src="parent" trait="_doublestacked"/> 
+	<add>
+		<copy src="parent" trait="width"/> 
+		<sub src="parent" trait="_highX"/>
+		<sub src="parent" trait="_doublestack_width"/>
+		<div> 2 </div>
+		<onlyif src="parent" trait="_doublestacked"/> 
+	</add>
+</width>
+
+<_rightside> <copy src="me" trait="listindex"/> <mod> 2 </mod> <and src="parent" trait="_doublestacked"/> </_rightside>
+
+<x> 
+	<copy src="parent" trait="_highX"/> 
+	<add> 
+		<copy src="parent" trait="width"/>
+		<sub src="parent" trait="_highX"/>
+		<div> 2 </div>
+		<onlyif src="me" trait="_rightside"/>
+	</add>
+</x>
+
+<y>
+	<copy src="me" trait="_y"/>
+	<sub>
+		<copy src="sibling(lb_scrollbar)" trait="_current_value"/>
+		<mul src="parent" trait="_scroll_delta"/>
+	</sub>
+
+	<div>
+		<copy> 1 </copy>
+		<add src="parent" trait="_doublestacked"/> 
+	</div>
+	<floor></floor>
+
+	<sub> 
+		<copy src="parent" trait="_scroll_delta"/>
+		<div> 2 </div>
+		<onlyif src="me" trait="_rightside"/>
+	</sub>
+</y>
+
+<_valueX> 
+	<copy src="me" trait="width"/> 
+	<sub>
+		<copy src="child(lb_toggle_value)" trait="width"/>
+		<add src="child(lb_meter_hotrect)" trait="width"/>
+		<div> 2 </div>
+		<add src="me" trait="user4"/>
+		<add src="child(lb_toggle_right)" trait="width"/>
+		<add src="child(lb_meter_right)" trait="width"/>
+		<add src="me" trait="_HorizontalSpacing"/>
+		<max> 
+			<copy> 75 </copy>
+			<onlyifnot src="parent" trait="_doublestacked"/>
+			<add> 75 </add> 
+		</max> 
+	</sub> 
+</_valueX>
+
+<_toggleMouseover> 
+	<copy src="child(lb_toggle_value)" trait="mouseover"/>
+	<or src="child(lb_toggle_left)" trait="mouseover"/>
+	<or src="child(lb_toggle_right)" trait="mouseover"/>
+	<or src="child(lb_meter_hotrect)" trait="mouseover"/>
+	<or src="child(lb_meter_left)" trait="mouseover"/>
+	<or src="child(lb_meter_right)" trait="mouseover"/>
+</_toggleMouseover>
+
+<text name="ListItemText">
+	<font> <copy src="io" trait="font" /> </font>
+	<string> <copy src="parent" trait="string"/> </string>
+
+	<brightness>
+		<copy> 255 </copy>
+		<add>
+			<copy src="globals" trait="_VUI+Highlighting" /> <div> 2 </div>
+			<onlyif>
+				<copy src="parent" trait="mouseover" />
+				<and src="globals" trait="_Has360Controller" />
+				<or src="parent" trait="_toggleMouseover" />
+			</onlyif>
+		</add>
+	</brightness>
+	
+	<alpha>
+		<copy src="grandparent" trait="_alpha"/>
+		<min>
+			<copy> 255 </copy>
+			<sub>
+				<copy> 128 </copy>
+				<onlyifnot src="parent" trait="_enabled"/>
+			</sub>
+		</min>
+	</alpha>
+
+	<x> <copy src="parent" trait="_HorizontalSpacing"/> </x>
+	<y>
+		<copy src="parent" trait="height"/>
+		<sub src="me" trait="height"/>
+		<div> 2 </div>
+		<add>
+			<copy src="me" trait="font"/>
+			<copy src="globals" trait="_VUI+FontY_"/>
+		</add>
+	</y>
+</text>

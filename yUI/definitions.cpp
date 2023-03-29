@@ -19,7 +19,7 @@ INIT_MODULE(Fix::TablineSelected)
 INIT_MODULE(Fix::ReorderMCM)
 INIT_MODULE(Fix::ProjectileEffects)
 INIT_MODULE(Fix::TouchpadScrolling)
-INIT_MODULE(Fix::SleepWaitMenuString)
+INIT_MODULE(Fix::LocaleStrings)
 
 INIT_MODULE(Patch::RestoreFO3Spread)
 INIT_MODULE(Patch::ArmedUnarmed)
@@ -28,10 +28,11 @@ INIT_MODULE(Patch::MatchedCursor)
 INIT_MODULE(Patch::MultiplicativeShots)
 INIT_MODULE(Patch::TimeMult)
 INIT_MODULE(Patch::CharGenMenuSRemoval)
+INIT_MODULE(Patch::B42InjectHideCrosshair)
 
 void Inits()
 {
-	ConfigurationMenu::Init();
+//	ConfigurationMenu::Init();
 	SortingIcons::Init();
 
 	UserInterface::EventLayer::Init();
@@ -47,7 +48,7 @@ void Inits()
 //	Fix::ReorderMCM::Init();
 //	Fix::ProjectileEffects::Init();
 	Fix::TouchpadScrolling::Init();
-	Fix::SleepWaitMenuString::Init();
+	Fix::LocaleStrings::Init();
 
 //	Patch::RestoreFO3Spread::Init();
 //	Patch::ArmedUnarmed::Init();
@@ -56,4 +57,5 @@ void Inits()
 //	Patch::MultiplicativeShots::Init();
 	Patch::TimeMult::Init();
 	Patch::CharGenMenuSRemoval::Init();
+	Patch::B42InjectHideCrosshair::Init();
 }

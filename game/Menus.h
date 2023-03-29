@@ -349,6 +349,30 @@ public:
 		return listItem;
 	}
 
+	void HandleScrollbar()
+	{
+		if (!parentTile) return;
+
+		const auto valueNum = parentTile->GetFloat(kTileValue_height);
+
+		UInt32 items = 1;
+
+		if (unk20 > 0.0 && valueNum > 0.0)
+		{
+			if (valueNum < unk20)
+				items = max(std::ceil(GetNumVisibleItems() * (unk20 - valueNum) / unk20) + 1, 2);
+
+			if (items > 1)
+				parentTile->SetFloat("_scroll_delta", std::ceil((unk20 - valueNum) / (items - 1)));
+		}
+
+		const bool doublestacked = parentTile->GetFloat("_doublestacked");
+
+		if (!scrollBar) return;
+
+		scrollBar->SetFloat("_number_of_items", std::floor(doublestacked ? (items * 0.667) : items));
+	}
+
 	void SortAlt(ListBoxItem<Item>* listItem, SortingFunction sortingFunction = nullptr)
 	{
 		if (sortingFunction)
@@ -362,7 +386,7 @@ public:
 			if (this->flags & kFlag_RecalculateHeightsOnInsert)
 			{
 				ThisCall(0x7269D0, this, listItem->tile);
-				ThisCall(0x71AD30, this);
+				HandleScrollbar();
 			}
 			listItem->tile->SetFloat(kTileValue_listindex, this->itemCount++);
 		}

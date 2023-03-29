@@ -217,11 +217,15 @@ private:
 	public:
 		Tile* Insert(SM_Setting* item)
 		{
-			const auto tile = ListBox::Insert(item, item->name.c_str(), nullptr, item->GetTemplate());
+//			const auto tile = ListBox::Insert(item, item->name.c_str(), nullptr, item->GetTemplate());
 
-			tile->SetFloat(kTileValue_id, kModConfigurationMenu_SettingListItem);
+			const auto tile = ListBox::InsertAlt(item, item->name.c_str(), item->GetTemplate());
 
-			return tile;
+			SortAlt(tile);
+
+			tile->tile->SetFloat(kTileValue_id, kModConfigurationMenu_SettingListItem);
+
+			return tile->tile;
 		}
 	};
 
@@ -236,6 +240,9 @@ public:
 		subSettingInput.Init();
 		hotkeyInput.Init();
 		settingsListBox.Init();
+//		settingsListBox.flags &= ~ModsListBox::kFlag_RecalculateHeightsOnInsert;
+
+
 		touchedSubsettings.Init();
 		touchedTweaks.Init();
 

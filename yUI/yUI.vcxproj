@@ -158,9 +158,10 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClCompile Include="MiscFeatures\FixTablineSelected.cpp" />
     <ClCompile Include="MiscFeatures\FixTouchpadScrolling.cpp" />
     <ClCompile Include="MiscFeatures\FixReorderMCM.cpp" />
-    <ClCompile Include="MiscFeatures\FixSleepWaitMenuString.cpp" />
+    <ClCompile Include="MiscFeatures\FixLocaleStrings.cpp" />
     <ClCompile Include="MiscFeatures\PatchAlterSpread.cpp" />
     <ClCompile Include="MiscFeatures\PatchArmedUnarmed.cpp" />
+    <ClCompile Include="MiscFeatures\PatchB42InjectHideCrosshair.cpp" />
     <ClCompile Include="MiscFeatures\PatchExplosionForce.cpp" />
     <ClCompile Include="MiscFeatures\PatchMatchedCursor.cpp" />
     <ClCompile Include="MiscFeatures\PatchMultiplicativeShots.cpp" />
