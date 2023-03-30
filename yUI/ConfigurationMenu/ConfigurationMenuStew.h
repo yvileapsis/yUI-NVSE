@@ -92,6 +92,7 @@ struct SM_Setting
 	class None
 	{
 	public:
+		virtual ~None() = default;
 
 		virtual SM_Value Read() { return 0; }
 		virtual void Write(const SM_Value& value) {}
@@ -101,11 +102,7 @@ struct SM_Setting
 		virtual bool IsToggleable() { return false; }
 	};
 
-	class Subsetting : public None
-	{
-	public:
-
-	};
+	class Subsetting : public None {};
 
 	class Choice : public None
 	{
