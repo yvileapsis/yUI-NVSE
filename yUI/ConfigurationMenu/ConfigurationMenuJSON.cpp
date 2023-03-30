@@ -21,6 +21,26 @@ SM_Value GetValueFromElement(const nlohmann::basic_json<>& elem)
 	return 0;
 }
 
+SM_Setting::SettingSource GetSourceFromElement(const nlohmann::basic_json<>& elem, const std::string& path = "path",
+                                               const std::string& category = "category", const std::string&
+                                               value = "value", const std::string& valueDefault = "valueDefault")
+{
+	SM_Setting::SettingSource source{};
+
+	std::filesystem::path pathGot;
+	std::string categoryGot, valueGot;
+
+	if (elem.contains(path))		pathGot = elem[path].get<std::string>();
+	if (elem.contains(category))	categoryGot = elem[category].get<std::string>();
+	if (elem.contains(value))		valueGot = elem[value].get<std::string>();
+
+	source.setting = std::make_tuple(pathGot, categoryGot, valueGot);
+
+	if (elem.contains(valueDefault)) source.defaultValue = GetValueFromElement(elem[valueDefault]);
+
+	return source;
+}
+
 TagJSON::TagJSON(const nlohmann::basic_json<>& elem)
 {
 	if (elem.contains("id"))			id = elem["id"].get<std::string>();
@@ -60,19 +80,14 @@ SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem)
 		else									type = kSettingType_None;
 	}
 
-	std::filesystem::path path;
-	std::string category, value;
-	if (elem.contains("path"))		path = elem["path"].get<std::string>();
-	if (elem.contains("category"))	category = elem["category"].get<std::string>();
-	if (elem.contains("value"))		value = elem["value"].get<std::string>();
-	setting = std::make_tuple(path, category, value);
-
-	if (elem.contains("valueDefault")) valueDefault = GetValueFromElement(elem["valueDefault"]);
-
 	if (type == kSettingType_Choice)
 	{
+		Choice choice{};
+
+		choice.setting = GetSourceFromElement(elem);
+
 		SInt32 valueLess = 0;
-		if (!elem.contains("values")) Log(true) << "WAAAAAAAAA, broke";
+		if (!elem.contains("values")) {}
 		else for (const auto& i : elem["values"])
 		{
 			SM_Value value;
@@ -85,12 +100,18 @@ SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem)
 			else name = GetStringFromValue(value);
 			if (i.contains("description")) description = i["description"].get<std::string>();
 
-			choice.emplace(value, std::make_pair(name, description));
+			choice.choice.emplace(value, std::make_pair(name, description));
 		}
+
+		data = std::make_unique<Choice>(choice);
 	}
 	else if (type == kSettingType_Slider)
 	{
+		Slider slider{};
+
 		SM_Value valueMin, valueMax, valueDelta;
+
+		slider.setting = GetSourceFromElement(elem);
 
 		if (elem.contains("valueMin")) valueMin = GetValueFromElement(elem["valueMin"]);
 		else valueMin = MININT32;
@@ -99,31 +120,34 @@ SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem)
 		if (elem.contains("valueDelta")) valueDelta = GetValueFromElement(elem["valueDelta"]);
 		else valueMin = 1;
 
-		slider = std::make_tuple(valueMin, valueMax, valueDelta);
+		slider.slider = std::make_tuple(valueMin, valueMax, valueDelta);
+
+		data = std::make_unique<Slider>(slider);
 	}
 	else if (type == kSettingType_Control)
 	{
-		std::filesystem::path mousePath;
-		std::string mouseCategory, mouseValue;
-		if (elem.contains("mousePath"))			mousePath = elem["mousePath"].get<std::string>();
-		if (elem.contains("mouseCategory"))		mouseCategory = elem["mouseCategory"].get<std::string>();
-		if (elem.contains("mouseValue"))		mouseValue = elem["mouseValue"].get<std::string>();
+		Control control{};
 
-		SM_Value mouseValueDefault;
-		if (elem.contains("mouseValueDefault")) mouseValueDefault = GetValueFromElement(elem["mouseValueDefault"]);
+		control.keyboard = GetSourceFromElement(elem);
+		control.mouse = GetSourceFromElement(elem, "mousePath", "mouseCategory", "mouseValue", "mouseValueDefault");
+		control.controller = GetSourceFromElement(elem, "controllerPath", "controllerCategory", "controllerValue", "controllerValueDefault");
 
-		control[0] = std::make_pair(std::make_tuple(mousePath, mouseCategory, mouseValue), mouseValueDefault);
+		data = std::make_unique<Control>(control);
+	}
+	else if (type == kSettingType_Font)
+	{
+		Font font{};
 
-		std::filesystem::path controllerPath;
-		std::string controllerCategory, controllerValue;
-		if (elem.contains("controllerPath"))		controllerPath = elem["controllerPath"].get<std::string>();
-		if (elem.contains("controllerCategory"))	controllerCategory = elem["controllerCategory"].get<std::string>();
-		if (elem.contains("controllerValue"))		controllerValue = elem["controllerValue"].get<std::string>();
+		font.font = GetSourceFromElement(elem);
+		font.fontY = GetSourceFromElement(elem, "fontYPath", "fontYCategory", "fontYValue", "fontYDefault");
 
-		SM_Value controllerValueDefault;
-		if (elem.contains("controllerValueDefault")) controllerValueDefault = GetValueFromElement(elem["controllerValueDefault"]);
+		data = std::make_unique<Font>(font);
+	}
+	else
+	{
+		None none{};
 
-		control[1] = std::make_pair(std::make_tuple(controllerPath, controllerCategory, controllerValue), controllerValueDefault);
+		data = std::make_unique<None>(none);
 	}
 }
 

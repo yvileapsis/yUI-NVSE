@@ -74,6 +74,97 @@ public:
 
 struct SM_Setting
 {
+	class SettingSource
+	{
+	public:
+		typedef std::tuple<std::filesystem::path, std::string, std::string> INISetting;
+		INISetting setting;
+		// TODO: gamesetting and global
+		SM_Value defaultValue;
+
+		SM_Value ReadINI();
+		void WriteINI(const SM_Value& value);
+	};
+
+	typedef std::map<SM_Value, std::pair<std::string, std::string>> SM_ValueChoice;
+	typedef std::tuple<SM_Value, SM_Value, SM_Value> SM_ValueSlider;
+
+	class None
+	{
+	public:
+
+		virtual SM_Value Read() { return 0; }
+		virtual void Write(const SM_Value& value) {}
+		virtual void Display(Tile* tile) {}
+		virtual SM_Value GetPrev(const SM_Value& value) { return value; };
+		virtual SM_Value GetNext(const SM_Value& value) { return value; };
+		virtual bool IsToggleable() { return false; }
+	};
+
+	class Subsetting : public None
+	{
+	public:
+
+	};
+
+	class Choice : public None
+	{
+	public:
+		SettingSource setting;
+		SM_ValueChoice choice;
+
+		SM_Value Read() override { return setting.ReadINI(); }
+		void Write(const SM_Value& value) override { setting.WriteINI(value); }
+		void Display(Tile* tile) override;
+		SM_Value GetPrev(const SM_Value& value) override;
+		SM_Value GetNext(const SM_Value& value) override;
+		bool IsToggleable() override { return true; }
+	};
+
+	class Slider : public None
+	{
+	public:
+		SettingSource setting;
+		SM_ValueSlider slider;
+
+		SM_Value Read() override { return setting.ReadINI(); }
+		void Write(const SM_Value& value) override { setting.WriteINI(value); }
+		void Display(Tile* tile) override;
+		SM_Value GetPrev(const SM_Value& value) override;
+		SM_Value GetNext(const SM_Value& value) override;
+		bool IsToggleable() override { return true; }
+	};
+
+	class Control : public None
+	{
+	public:
+		SettingSource keyboard;
+		SettingSource mouse;
+		SettingSource controller;
+
+		void Display(Tile* tile) override;
+	};
+
+	class Font : public None
+	{
+	public:
+		SettingSource font;
+		SettingSource fontY;
+
+		SM_Value Read() override { return font.ReadINI(); }
+		void Write(const SM_Value& value) override { font.WriteINI(value); fontY.WriteINI(value); }
+		void Display(Tile* tile) override;
+		SM_Value GetPrev(const SM_Value& value) override;
+		SM_Value GetNext(const SM_Value& value) override;
+		bool IsToggleable() override { return true; }
+	};
+
+	class Input : public None
+	{
+	public:
+		SettingSource setting;
+	};
+
 	enum ElementType
 	{
 		kSettingType_None,
@@ -85,43 +176,24 @@ struct SM_Setting
 		kSettingType_Input,
 	};
 
-	typedef std::tuple<std::filesystem::path, std::string, std::string> INISetting;
+	void Toggle(const bool backward);
+	void Display(Tile* tile);
+
+	const char* GetTemplate() const;
+
+	ElementType type;
+	std::unique_ptr<None> data;
 
 	std::string name;
 	std::string id;
 	std::string description;
 
-	ElementType type;
-
 	SInt32 priority = 0;
 
 	std::unordered_set<std::string> tags;
 	std::unordered_set<std::string> mods;
-
-	INISetting setting;
-	SM_Value valueDefault;
-
-	typedef std::map<SM_Value, std::pair<std::string, std::string>> SM_ValueChoice;
-	typedef std::tuple<SM_Value, SM_Value, SM_Value> SM_ValueSlider;
-	typedef std::pair<INISetting, SM_Value> SM_ValueControl;
-
-	SM_ValueChoice choice;
-	SM_ValueSlider slider;
-	SM_ValueControl control[2];
-
-	void SetDisplayedValue(Tile* tile, const SM_Value& value);
-
-	SM_Value ReadINI();
-	static SM_Value ReadINI(const SM_ValueControl& control);
-	void WriteINI(const SM_Value& value);
-	static void WriteINI(const SM_ValueControl& control, const SM_Value& value);
-
-	SM_Value GetValuePrev(SM_Value value);
-	SM_Value GetValueNext(SM_Value value);
-
-	const char* GetTemplate() const;
-
 };
+
 struct SubsettingList : TList<SM_Setting>
 {
 	void Destroy()

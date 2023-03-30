@@ -7,7 +7,7 @@
 #include "InterfaceManager.h"
 #include "SafeWrite.h"
 
-const char* MenuPath = R"(Data\Menus\untitledmenuproject.xml)";
+const char* MenuPath = R"(Data\Menus\ConfigurationMenu.xml)";
 
 ModConfigurationMenu* g_stewMenu;
 
@@ -477,7 +477,7 @@ void ModConfigurationMenu::SetInSubsettingInputMode(bool isActive)
 				if (tile->parent)
 				{
 					// set the input string back to the current value of the setting
-					//activeInputSubsetting->SetDisplayedValue(tile->parent);
+					//activeInputSubsetting->Display(tile->parent);
 
 					// ensure the input field has the same value so UpdateCaretDisplay doesn't reset the string
 					auto strVal = tile->GetValue(kTileValue_string);
@@ -532,7 +532,7 @@ void ModConfigurationMenu::SetInHotkeyMode(bool isActive)
 //			activeHotkeySubsetting->data.valueInt = hotkeyInput.value;
 			if (tile->parent)
 			{
-				activeHotkeySubsetting->SetDisplayedValue(tile->parent);
+				activeHotkeySubsetting->Display(tile->parent);
 			}
 			activeHotkeySubsetting = nullptr;
 		}
@@ -743,10 +743,8 @@ bool ModConfigurationMenu::HandleActiveSliderArrows(Tile* tile,  bool isRightArr
 
 	if (!setting) return false;
 
-	const auto value = setting->ReadINI();
-	const SM_Value newValue = isRightArrow ? setting->GetValueNext(value) : setting->GetValuePrev(value);
-	setting->WriteINI(newValue);
-	setting->SetDisplayedValue(tile, newValue);
+	setting->Toggle(!isRightArrow);
+	setting->Display(tile);
 
 	return true;
 }
@@ -882,106 +880,127 @@ void ModConfigurationMenu::SetActiveSubsettingValueFromInput()
 	}*/
 }
 
-void SM_Setting::SetDisplayedValue(Tile* tile, const SM_Value& value)
+void SM_Setting::Toggle(const bool backward)
 {
-	if (type == kSettingType_Choice)
-	{
-		const std::string valueString = choice.contains(value) ? choice[value].first : GetStringFromValue(value); // Display name or display value if name not found
-		tile->SetString(kTileValue_user0, valueString.c_str());
-	}
-	else if (type == kSettingType_Slider)
-	{
-		tile->SetFloat(kTileValue_user0, 20 * GetFloatFromValue(value) / GetFloatFromValue(std::get<1>(slider)));
-		tile->SetFloat(kTileValue_user3, 20);
-	}
-	else if (type == kSettingType_Font)
-	{
-		SInt32 id = std::get<SInt32>(value);
-		std::string valueString;
-		if (!id)
-		{
-			valueString = "--"; // Display name or display value if name not found
-			tile->GetChild("lb_toggle_value")->SetFloat(kTileValue_font, 7);
-		}
-		else if (fontMap.contains(value))
-		{
-			valueString = "Font " + GetStringFromValue(value);//fontMap[value];
-			tile->GetChild("lb_toggle_value")->SetFloat(kTileValue_font, id);
-		}
-		else
-		{
-			valueString = "Font " + GetStringFromValue(value);
-			tile->GetChild("lb_toggle_value")->SetFloat(kTileValue_font, id);
-		}
-		tile->SetString(kTileValue_user0, valueString.c_str());
-	}
-	else if (type == kSettingType_Control)
-	{
-		const auto key = GetStringForScancode(std::get<SInt32>(value), 0);
-		tile->SetString("_Keyboard", key.c_str());
+	if (!data->IsToggleable()) return;
 
-		const auto mouseValue = ReadINI(control[0]);
-		const auto mouse = GetStringForScancode(std::get<SInt32>(mouseValue), 1);
-		tile->SetString("_Mouse", mouse.c_str());
+	const auto value = data->Read();
+	const SM_Value newValue = !backward ? data->GetNext(value) : data->GetPrev(value);
 
-		const auto controllerValue = ReadINI(control[1]);
-		const auto controller = GetStringForScancode(std::get<SInt32>(controllerValue), 2);
+	data->Write(newValue);
+}
+
+void SM_Setting::Display(Tile* tile)
+{
+	data->Display(tile);
+}
+
+void SM_Setting::Choice::Display(Tile* tile)
+{
+	const auto value = Read();
+	const std::string valueString = choice.contains(value) ? choice[value].first : GetStringFromValue(value); // Display name or display value if name not found
+	tile->SetString(kTileValue_user0, valueString.c_str());
+}
+
+void SM_Setting::Slider::Display(Tile* tile)
+{
+	const auto value = Read();
+	tile->SetFloat(kTileValue_user0, 20 * GetFloatFromValue(value) / GetFloatFromValue(std::get<1>(slider)));
+	tile->SetFloat(kTileValue_user3, 20);
+}
+
+void SM_Setting::Font::Display(Tile* tile)
+{
+	const auto value = Read();
+	SInt32 id = std::get<SInt32>(value);
+	std::string valueString;
+	if (!id)
+	{
+		valueString = "--"; // Display name or display value if name not found
+		tile->GetChild("lb_toggle_value")->SetFloat(kTileValue_font, 7);
+	}
+	else if (fontMap.contains(value))
+	{
+		valueString = "Font " + GetStringFromValue(value);//fontMap[value];
+		tile->GetChild("lb_toggle_value")->SetFloat(kTileValue_font, id);
+	}
+	else
+	{
+		valueString = "Font " + GetStringFromValue(value);
+		tile->GetChild("lb_toggle_value")->SetFloat(kTileValue_font, id);
+	}
+	tile->SetString(kTileValue_user0, valueString.c_str());
+}
+
+
+void SM_Setting::Control::Display(Tile* tile)
+{
+	const auto value = keyboard.ReadINI();
+	const auto key = GetStringForScancode(std::get<SInt32>(value), 1);
+	tile->SetString("_Keyboard", key.c_str());
+
+	const auto mouseValue = mouse.ReadINI();
+	const auto mouse = GetStringForScancode(std::get<SInt32>(mouseValue), 2);
+	tile->SetString("_Mouse", mouse.c_str());
+
+	const auto controllerValue = controller.ReadINI();
+
+	if (IsViableControllerString(std::get<SInt32>(controllerValue)))
+	{
+		const auto controller = GetControllerString(std::get<SInt32>(controllerValue));
 		tile->SetString("_Controller", controller.c_str());
+		tile->SetFloat("_ControllerImage", true);
+	}
+	else
+	{
+		const auto controller = GetControllerString(std::get<SInt32>(controllerValue));
+		tile->SetString("_Controller", controller.c_str());
+		tile->SetFloat("_ControllerImage", false);
 	}
 }
 
-SM_Value SM_Setting::GetValuePrev(SM_Value value)
+SM_Value SM_Setting::Choice::GetPrev(const SM_Value& value)
 {
-	SM_Value newValue = value;
-
-	if (type == kSettingType_Choice)
-	{
-		if (choice.empty()) return value;
-		if (auto iter = choice.find(value); iter == choice.end() || --iter == choice.end())
-			newValue = choice.rbegin()->first;
-		else newValue = iter->first;
-	}
-	else if (type == kSettingType_Font)
-	{
-		if (fontMap.empty()) return value;
-		if (auto iter = fontMap.find(value); iter == fontMap.end() || --iter == fontMap.end())
-			newValue = fontMap.rbegin()->first;
-		else newValue = iter->first;
-	}
-	else if (type == kSettingType_Slider)
-	{
-		newValue = value - std::get<2>(slider);
-		if (newValue < std::get<0>(slider)) return value;
-	}
-
-	return newValue;
+	if (choice.empty()) return value;
+	if (auto iter = choice.find(value); iter == choice.end() || --iter == choice.end())
+		return choice.rbegin()->first;
+	else return iter->first;
 }
 
-SM_Value SM_Setting::GetValueNext(SM_Value value)
+SM_Value SM_Setting::Choice::GetNext(const SM_Value& value)
 {
-	SM_Value newValue = value;
+	if (choice.empty()) return value;
+	if (auto iter = choice.find(value); iter == choice.end() || ++iter == choice.end())
+		return choice.begin()->first;
+	else return iter->first;
+}
 
-	if (type == kSettingType_Choice)
-	{
-		if (choice.empty()) return value;
-		if (auto iter = choice.find(value); iter == choice.end() || ++iter == choice.end())
-			newValue = choice.begin()->first;
-		else newValue = iter->first;
-	}
-	else if (type == kSettingType_Font)
-	{
-		if (fontMap.empty()) return value;
-		if (auto iter = fontMap.find(value); iter == fontMap.end() || ++iter == fontMap.end())
-			newValue = fontMap.begin()->first;
-		else newValue = iter->first;
-	}
-	else if (type == kSettingType_Slider)
-	{
-		newValue = value + std::get<2>(slider);
-		if (newValue > std::get<1>(slider)) return value;
-	}
+SM_Value SM_Setting::Slider::GetPrev(const SM_Value& value)
+{
+	SM_Value newValue = value - std::get<2>(slider);
+	return newValue < std::get<0>(slider) ? value : newValue;
+}
 
-	return newValue;
+SM_Value SM_Setting::Slider::GetNext(const SM_Value& value)
+{
+	SM_Value newValue = value + std::get<2>(slider);
+	return newValue > std::get<1>(slider) ? value : newValue;
+}
+
+SM_Value SM_Setting::Font::GetPrev(const SM_Value& value)
+{
+	if (fontMap.empty()) return value;
+	if (auto iter = fontMap.find(value); iter == fontMap.end() || --iter == fontMap.end())
+		return fontMap.rbegin()->first;
+	else return iter->first;
+}
+
+SM_Value SM_Setting::Font::GetNext(const SM_Value& value)
+{
+	if (fontMap.empty()) return value;
+	if (auto iter = fontMap.find(value); iter == fontMap.end() || ++iter == fontMap.end())
+		return fontMap.begin()->first;
+	else return iter->first;
 }
 
 const char* SM_Setting::GetTemplate() const
@@ -1003,8 +1022,8 @@ void ModConfigurationMenu::DisplaySettings(std::string tab)
 		if (!it->mods.contains(tab)) continue;
 
 		const auto tile = settingsListBox.Insert(it.get());
-		const auto value = it->ReadINI();
-		it->SetDisplayedValue(tile, value);
+		
+		it->Display(tile);
 	}
 }
 
@@ -1302,7 +1321,7 @@ void ShowTweaksMenu()
 	if (!hasAddedNewTrait)
 	{
 		hasAddedNewTrait = true;
-		CdeclCall(0x9FF8A0, "&UMPMenu;", MENU_ID);
+		CdeclCall(0x9FF8A0, "&ConfigurationMenu;", MENU_ID);
 	}
 
 	// allow hot-reloading the menu even if UIO is installed

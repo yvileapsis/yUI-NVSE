@@ -32,7 +32,7 @@ inline void ReadINIInternal(const std::filesystem::path& iniPath, const std::fil
 	ini.SaveFile(iniPath.c_str(), false);
 }
 
-SM_Value SM_Setting::ReadINI()
+SM_Value SM_Setting::SettingSource::ReadINI()
 {
 	std::filesystem::path iniPath = GetCurPath();
 	iniPath += std::get<0>(setting);
@@ -45,10 +45,10 @@ SM_Value SM_Setting::ReadINI()
 
 	if (ini_map.contains(settingTuple)) return ini_map[settingTuple];
 
-	return valueDefault;
+	return defaultValue;
 }
 
-inline void WriteINIInternal(const std::filesystem::path& iniPath, const SM_Setting::INISetting& setting, const SM_Value& value)
+inline void WriteINIInternal(const std::filesystem::path& iniPath, const SM_Setting::SettingSource::INISetting& setting, const SM_Value& value)
 {
 	CSimpleIniA ini;
 	ini.SetUnicode();
@@ -64,7 +64,7 @@ inline void WriteINIInternal(const std::filesystem::path& iniPath, const SM_Sett
 	ini.SaveFile(iniPath.c_str(), false);
 }
 
-void SM_Setting::WriteINI(const SM_Value& value)
+void SM_Setting::SettingSource::WriteINI(const SM_Value& value)
 {
 	std::filesystem::path iniPath = GetCurPath();
 	iniPath += std::get<0>(setting);
@@ -72,31 +72,4 @@ void SM_Setting::WriteINI(const SM_Value& value)
 	ini_map[setting] = value;
 
 	WriteINIInternal(iniPath, setting, value);
-}
-
-
-SM_Value SM_Setting::ReadINI(const SM_ValueControl& control)
-{
-	std::filesystem::path iniPath = GetCurPath();
-	iniPath += std::get<0>(control.first);
-
-	const auto settingTuple = control.first;
-
-	if (ini_map.contains(settingTuple)) return ini_map[settingTuple];
-
-	ReadINIInternal(iniPath, std::get<0>(control.first));
-
-	if (ini_map.contains(settingTuple)) return ini_map[settingTuple];
-
-	return control.second;
-}
-
-void SM_Setting::WriteINI(const SM_ValueControl& control, const SM_Value& value)
-{
-	std::filesystem::path iniPath = GetCurPath();
-	iniPath += std::get<0>(control.first);
-
-	ini_map[control.first] = value;
-
-	WriteINIInternal(iniPath, control.first, value);
 }

@@ -1,5 +1,5 @@
-<menu name="UMPMenu">
-	<class> &UMPMenu; </class>
+<menu name="ConfigurationMenu">
+	<class> &ConfigurationMenu; </class>
 	<menufade> 0.2 </menufade>
 	<stackingtype> &no_click_past; </stackingtype>
 
@@ -25,7 +25,7 @@
 
 	<_device_0> &-sDeviceKeyboard; </_device_0>
 	<_device_1> &-sDeviceMouse; </_device_1>
-	<_device_2> &-sDeviceJoystick; </_device_2>
+	<_device_2> &-sDeviceGamepad; </_device_2>
 
 
 	<hotrect name="main_device_button">
@@ -1150,7 +1150,7 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 			</alpha>
 			<brightness> <copy src="sibling" trait="brightness" /> </brightness> <!--VUI+ target highlighting -->
 			<x>
-				<copy src="sibling(lb_item_button_text)" trait="x"/>
+				<copy src="parent" trait="_valueX"/>
 				<sub>
 					<copy src="me" trait="width"/>
 					<div> 2 </div>

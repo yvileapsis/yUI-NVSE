@@ -539,23 +539,26 @@ void FramerateTracker::Update(void)
 ControlName** g_keyNames = (ControlName**)0x011D52F0;
 ControlName** g_mouseButtonNames = (ControlName**)0x011D5240;
 ControlName** g_joystickNames = (ControlName**)0x011D51B0;
+ControlName** g_controllerNames = (ControlName**)0x011D5268;
+
 
 std::string GetStringForScancode(UInt32 keycode, UInt32 device)
 {
 	std::string keyName = "--";
 
-	if (device == 0)
+	if (!keycode) return keyName;
+
+	if (device & 1)
 	{
-		if (!keycode) {}
-		else if (keycode <= 220)
+		if (keycode > 220)
 		{
-			if (g_keyNames[keycode])
-				keyName = g_keyNames[keycode]->name;
+			if (keycode == 221)
+				keyName = "Select";
 		}
-		else if (keycode == 221)
-			keyName = "Select";
+		else if (g_keyNames[keycode])
+			keyName = g_keyNames[keycode]->name;
 	}
-	else if (device == 1)
+	if (device & 2)
 	{
 		if (255 <= keycode && keycode <= 263)
 		{
@@ -570,14 +573,38 @@ std::string GetStringForScancode(UInt32 keycode, UInt32 device)
 			keyName = "WheelDown";
 
 	}
-	else if (device == 2)
+	if (device & 4)
 	{
-		if (!keycode) {}
-		else if (keycode)
-		{
-			if (g_joystickNames[keycode])
-				keyName = g_joystickNames[keycode]->name;
-		}
+		if (g_joystickNames[keycode])
+			keyName = g_joystickNames[keycode]->name;
+	}
+	if (device & 8)
+	{
+		if (g_joystickNames[keycode])
+			keyName = g_joystickNames[keycode]->name;
 	}
 	return keyName;
+}
+
+std::unordered_map<UInt32, std::string> controllerButtons{
+	{0x20, "back"}, {0x40, "ls"}, {0x80, "rs"},
+	{0x100, "lb"}, {0x200, "rb"}, {0x1000, "a"},
+	{0x2000, "b"}, {0x4000, "x"}, {0x8000, "y"}
+};
+
+bool IsViableControllerString(UInt32 keycode)
+{
+	return controllerButtons.contains(keycode);
+}
+
+std::string GetControllerString(UInt32 keycode)
+{
+	if (controllerButtons.contains(keycode)) return "glow_general_button_" + controllerButtons[keycode] + ".dds";
+
+	if (keycode == 0x1) return "Up";
+	if (keycode == 0x2) return "Down";
+	if (keycode == 0x10) return "Start";
+	if (keycode == 0x400) return "Guide";
+
+	return "--";
 }
