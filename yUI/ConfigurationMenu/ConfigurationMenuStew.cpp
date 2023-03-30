@@ -917,11 +917,16 @@ void SM_Setting::SetDisplayedValue(Tile* tile, const SM_Value& value)
 	}
 	else if (type == kSettingType_Control)
 	{
-		tile->SetString("_Keyboard", std::get<SInt32>(value) ? GetStringFromValue(value).c_str() : "--");
+		const auto key = GetStringForScancode(std::get<SInt32>(value), 0);
+		tile->SetString("_Keyboard", key.c_str());
+
 		const auto mouseValue = ReadINI(control[0]);
-		tile->SetString("_Mouse", std::get<SInt32>(mouseValue) ? GetStringFromValue(mouseValue).c_str() : "--");
+		const auto mouse = GetStringForScancode(std::get<SInt32>(mouseValue), 1);
+		tile->SetString("_Mouse", mouse.c_str());
+
 		const auto controllerValue = ReadINI(control[1]);
-		tile->SetString("_Controller", std::get<SInt32>(controllerValue) ? GetStringFromValue(controllerValue).c_str() : "--");
+		const auto controller = GetStringForScancode(std::get<SInt32>(controllerValue), 2);
+		tile->SetString("_Controller", controller.c_str());
 	}
 }
 

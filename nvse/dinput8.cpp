@@ -540,29 +540,44 @@ ControlName** g_keyNames = (ControlName**)0x011D52F0;
 ControlName** g_mouseButtonNames = (ControlName**)0x011D5240;
 ControlName** g_joystickNames = (ControlName**)0x011D51B0;
 
-std::string GetStringForScancode(UInt32 keycode)
+std::string GetStringForScancode(UInt32 keycode, UInt32 device)
 {
-	std::string keyName = "<no key>";
+	std::string keyName = "--";
 
-	if (!keycode) keyName = "--";
-	else if (keycode <= 220)
+	if (device == 0)
 	{
-		if (g_keyNames[keycode])
-			keyName = g_keyNames[keycode]->name;
+		if (!keycode) {}
+		else if (keycode <= 220)
+		{
+			if (g_keyNames[keycode])
+				keyName = g_keyNames[keycode]->name;
+		}
+		else if (keycode == 221)
+			keyName = "Select";
 	}
-	else if (255 <= keycode && keycode <= 263)
+	else if (device == 1)
 	{
-		if (keycode == 255)
-			keycode = 256;
-		if (g_mouseButtonNames[keycode - 256])
-			keyName = g_mouseButtonNames[keycode - 256]->name;
-	}
-	else if (keycode == 264)
-		keyName = "WheelUp";
-	else if (keycode == 265)
-		keyName = "WheelDown";
-	else if (keycode == 221)
-		keyName = "Select";
+		if (255 <= keycode && keycode <= 263)
+		{
+			if (keycode == 255)
+				keycode = 256;
+			if (g_mouseButtonNames[keycode - 256])
+				keyName = g_mouseButtonNames[keycode - 256]->name;
+		}
+		else if (keycode == 264)
+			keyName = "WheelUp";
+		else if (keycode == 265)
+			keyName = "WheelDown";
 
+	}
+	else if (device == 2)
+	{
+		if (!keycode) {}
+		else if (keycode)
+		{
+			if (g_joystickNames[keycode])
+				keyName = g_joystickNames[keycode]->name;
+		}
+	}
 	return keyName;
 }

@@ -156,4 +156,4 @@ struct ControlName
 	UInt32		unkC;
 };
 
-std::string GetStringForScancode(UInt32 keycode);
+std::string GetStringForScancode(UInt32 keycode, UInt32 device);

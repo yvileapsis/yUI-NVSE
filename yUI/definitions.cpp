@@ -32,7 +32,7 @@ INIT_MODULE(Patch::B42InjectHideCrosshair)
 
 void Inits()
 {
-//	ConfigurationMenu::Init();
+	ConfigurationMenu::Init();
 	SortingIcons::Init();
 
 	UserInterface::EventLayer::Init();
