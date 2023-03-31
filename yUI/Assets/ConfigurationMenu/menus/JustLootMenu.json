@@ -35,17 +35,17 @@
 	"condition": [ { "JLMbEnable": 1 } ],
 	"type": "control",
 
-	"path": "JustMods.ini",
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
 	"category": "Loot Menu",
 	"value": "iKey1",
 	"valueDefault": 0,
 
-	"mousePath": "JustMods.ini",
+	"mousePath": "\\Data\\NVSE\\Plugins\\yUI.ini",
 	"mouseCategory": "Loot Menu",
 	"mouseValue": "iKey1",
 	"mouseValueDefault": 0,
 
-	"controllerPath": "JustMods.ini",
+	"controllerPath": "\\Data\\NVSE\\Plugins\\yUI.ini",
 	"controllerCategory": "Loot Menu",
 	"controllerValue": "iButton1",
 	"controllerValueDefault": 0
@@ -58,17 +58,17 @@
 	"condition": [ { "JLMbEnable": 1 } ],
 	"type": "control",
 
-	"path": "JustMods.ini",
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
 	"category": "Loot Menu",
 	"value": "iKey2",
 	"valueDefault": 0,
 
-	"mousePath": "JustMods.ini",
+	"mousePath": "\\Data\\NVSE\\Plugins\\yUI.ini",
 	"mouseCategory": "Loot Menu",
 	"mouseValue": "iKey2",
 	"mouseValueDefault": 0,
 
-	"controllerPath": "JustMods.ini",
+	"controllerPath": "\\Data\\NVSE\\Plugins\\yUI.ini",
 	"controllerCategory": "Loot Menu",
 	"controllerValue": "iButton2",
 	"controllerValueDefault": 0
@@ -81,17 +81,17 @@
 	"condition": [ { "JLMbEnable": 1 } ],
 	"type": "control",
 
-	"path": "JustMods.ini",
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
 	"category": "Loot Menu",
 	"value": "iKey3",
 	"valueDefault": 0,
 
-	"mousePath": "JustMods.ini",
+	"mousePath": "\\Data\\NVSE\\Plugins\\yUI.ini",
 	"mouseCategory": "Loot Menu",
 	"mouseValue": "iKey3",
 	"mouseValueDefault": 0,
 
-	"controllerPath": "JustMods.ini",
+	"controllerPath": "\\Data\\NVSE\\Plugins\\yUI.ini",
 	"controllerCategory": "Loot Menu",
 	"controllerValue": "iButton3",
 	"controllerValueDefault": 0
@@ -104,17 +104,17 @@
 	"condition": [ { "JLMbEnable": 1 } ],
 	"type": "control",
 
-	"path": "JustMods.ini",
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
 	"category": "Loot Menu",
 	"value": "iKeyAlt",
 	"valueDefault": 0,
 
-	"mousePath": "JustMods.ini",
+	"mousePath": "\\Data\\NVSE\\Plugins\\yUI.ini",
 	"mouseCategory": "Loot Menu",
 	"mouseValue": "iKeyAlt",
 	"mouseValueDefault": 0,
 
-	"controllerPath": "JustMods.ini",
+	"controllerPath": "\\Data\\NVSE\\Plugins\\yUI.ini",
 	"controllerCategory": "Loot Menu",
 	"controllerValue": "iButtonAlt",
 	"controllerValueDefault": 0
@@ -127,17 +127,17 @@
 	"condition": [ { "JLMbEnable": 1 } ],
 	"type": "control",
 
-	"path": "JustMods.ini",
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
 	"category": "Loot Menu",
 	"value": "iKeyScrollUp",
 	"valueDefault": 0,
 
-	"mousePath": "JustMods.ini",
+	"mousePath": "\\Data\\NVSE\\Plugins\\yUI.ini",
 	"mouseCategory": "Loot Menu",
 	"mouseValue": "iKeyScrollUp",
 	"mouseValueDefault": 264,
 
-	"controllerPath": "JustMods.ini",
+	"controllerPath": "\\Data\\NVSE\\Plugins\\yUI.ini",
 	"controllerCategory": "Loot Menu",
 	"controllerValue": "iButtonScrollUp",
 	"controllerValueDefault": 0
@@ -150,17 +150,17 @@
 	"condition": [ { "JLMbEnable": 1 } ],
 	"type": "control",
 
-	"path": "JustMods.ini",
+	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
 	"category": "Loot Menu",
 	"value": "iKeyScrollDown",
 	"valueDefault": 0,
 
-	"mousePath": "JustMods.ini",
+	"mousePath": "\\Data\\NVSE\\Plugins\\yUI.ini",
 	"mouseCategory": "Loot Menu",
 	"mouseValue": "iKeyScrollDown",
 	"mouseValueDefault": 265,
 
-	"controllerPath": "JustMods.ini",
+	"controllerPath": "\\Data\\NVSE\\Plugins\\yUI.ini",
 	"controllerCategory": "Loot Menu",
 	"controllerValue": "iButtonScrollDown",
 	"controllerValueDefault": 0
@@ -573,7 +573,7 @@
 	"valueDefault": 0,
 
 	"value2Default": 0.00,
-	"value2": "JustMods.ini:Loot Menu:fFontY",
+	"value2": "\\Data\\NVSE\\Plugins\\yUI.ini:Loot Menu:fFontY",
 
 	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
 	"category": "Loot Menu",
@@ -589,7 +589,7 @@
 	"valueDefault": 0,
 
 	"value2Default": 0.00,
-	"value2": "JustMods.ini:Loot Menu:fFontHeadY",
+	"value2": "\\Data\\NVSE\\Plugins\\yUI.ini:Loot Menu:fFontHeadY",
 
 	"path": "\\Data\\NVSE\\Plugins\\yUI.ini",
 	"category": "Loot Menu",
