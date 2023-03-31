@@ -270,14 +270,6 @@ enum TileIDs
 	kModConfigurationMenu_SliderText = 105,
 };
 
-enum FilterMode
-{
-	kFilterMode_ShowAll = 0,
-	kFilterMode_ShowActive,
-	kFilterMode_ShowInActive,
-	kFilterMode_Count,
-};
-
 struct HotkeyField
 {
 	Tile* tile;
@@ -334,7 +326,6 @@ public:
 		touchedSubsettings.Init();
 		touchedTweaks.Init();
 
-		filterMode = FilterMode::kFilterMode_ShowAll;
 		isDraggingCategoriesSlider = false;
 		activeInputSubsetting = nullptr;
 		activeHotkeySubsetting = nullptr;
@@ -407,7 +398,7 @@ public:
 
 	InputField searchBar;
 	FILETIME lastXMLWriteTime;
-	UInt8 filterMode;
+
 	TList<SM_Setting> touchedSubsettings;
 	TList<SM_Mod> touchedTweaks;
 
@@ -431,14 +422,12 @@ public:
 	void SetCategoriesListActive(bool isVisible);
 	bool GetCategoriesListActive();
 	void ClearAndCloseSearch();
-	void CycleFilterMode();
 	void DisplaySettings(std::string tab);
 	void SetActiveMod(SM_Mod* mod);
 	bool IsSubsettingInputValid();
 	void SetActiveSubsettingValueFromInput();
 	void SetInHotkeyMode(bool isActive);
 	bool GetInHotkeyMode();
-	void SetCursorPosTraits() const;
 
 	void ReadJSON(const std::filesystem::path& path);
 	void ReadJSONForPath(const std::filesystem::path& path);

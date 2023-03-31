@@ -76,32 +76,6 @@ void ModConfigurationMenu::HandleMousewheel(UInt32 tileID, Tile* tile)
 
 }
 
-void SetSliderDisplayedValues(Tile* sliderRect, SM_Setting* setting)
-{
-	/*
-	char buf[0x40];
-	if (setting->GetDataType() == SubSettingData::kSettingDataType_Integer)
-	{
-		sliderRect->SetFloat(kTileValue_user2, setting->data.valueInt);
-		snprintf(buf, sizeof buf, "%d", setting->data.valueInt);
-	}
-	else
-	{
-		sliderRect->SetFloat(kTileValue_user2, setting->data.valueFloat);
-		snprintf(buf, sizeof buf, "%.4f", setting->data.valueFloat);
-	}
-
-	if (auto sliderTextRect = sliderRect->parent->GetChildByID(kModConfigurationMenu_SliderText))
-	{
-		if (auto sliderText = sliderTextRect->GetChildByID(kModConfigurationMenu_SubsettingInputFieldText))
-		{
-			sliderText->SetString(kTileValue_string, buf);
-		}
-	}
-	*/
-	sliderRect->SetFloat(kTileValue_dragx, 0);
-}
-
 void ModConfigurationMenu::HandleActiveMenuClickHeld(UInt32 tileID, Tile* activeTile)
 {
 	if (tileID == kModConfigurationMenu_SliderDraggableRect)
@@ -133,10 +107,10 @@ void ModConfigurationMenu::HandleActiveMenuClickHeld(UInt32 tileID, Tile* active
 
 	if (tileID == kModConfigurationMenu_SliderLeftArrow || tileID == kModConfigurationMenu_SliderRightArrow)
 	{
-		auto timeClickHeld = InterfaceManager::GetSingleton()->timeLeftClickHeld;
-		if (timeClickHeld > 0.3)
+		if (InterfaceManager::GetSingleton()->timeLeftClickHeld > 0.3)
 		{
-//			this->HandleActiveSliderArrows(tileID != kModConfigurationMenu_SliderLeftArrow);
+			const auto option = activeTile->parent;
+			settingsListBox.GetItemForTile(option)->Next(tileID != kModConfigurationMenu_SliderLeftArrow)->Display(option);
 		}
 	}
 }
@@ -244,7 +218,6 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 
 	case kModConfigurationMenu_ToggleShowActive:
 	{
-		this->CycleFilterMode();
 		break;
 	}
 
@@ -558,26 +531,6 @@ bool ModConfigurationMenu::GetInHotkeyMode()
 	return hotkeyInput.isActive;
 }
 
-bool __cdecl FilterTweaksOnActiveTrait(SM_Mod* item)
-{
-	auto filterMode = ModConfigurationMenu::GetSingleton()->filterMode;
-	if (filterMode == FilterMode::kFilterMode_ShowAll) return false;
-
-//	if (item->value == 0)
-	{
-		return filterMode == kFilterMode_ShowActive;
-	}
-
-	return filterMode == kFilterMode_ShowInActive;
-}
-
-bool __cdecl FilterOnSelectedCategory(SM_Mod* item)
-{
-//	const auto selectedCategory = ModConfigurationMenu::GetSingleton()->selectedCategory;
-//	return !selectedCategory.empty() && item->category != selectedCategory;
-	return false;
-}
-
 bool __cdecl HideItemsNotMatchingFilterString(SM_Mod* item)
 {
 	const auto searchStr = ModConfigurationMenu::GetSingleton()->searchBar.GetText();
@@ -587,16 +540,9 @@ bool __cdecl HideItemsNotMatchingFilterString(SM_Mod* item)
 	return true;
 }
 
-bool __cdecl TweakFilter(SM_Mod* item)
-{
-	if (FilterTweaksOnActiveTrait(item)) return true;
-	if (HideItemsNotMatchingFilterString(item)) return true;
-	return FilterOnSelectedCategory(item);
-}
-
 void ModConfigurationMenu::RefreshFilter()
 {
-	modsListBox.Filter(TweakFilter);
+//	modsListBox.Filter(TweakFilter);
 
 	auto textColor = modsListBox.GetNumVisibleItems() ? 1 : 2;
 	searchBar.tile->SetFloat(kTileValue_systemcolor, textColor);
@@ -609,14 +555,6 @@ void ModConfigurationMenu::RefreshFilter()
 			this->SetActiveMod(nullptr);
 		}
 	}
-}
-
-void ModConfigurationMenu::CycleFilterMode()
-{
-	++filterMode;
-	if (filterMode >= kFilterMode_Count) filterMode = kFilterMode_ShowAll;
-	this->tile->SetFloat("_FilterMode", filterMode);
-	this->RefreshFilter();
 }
 
 int reloadTweaksMenuFrameDelay;
@@ -1091,7 +1029,6 @@ void ModConfigurationMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 
 	case kModConfigurationMenu_CategoryItem:
 	{
-		PlayGameSound("UIMenuFocus");
 		break;
 	}
 
@@ -1119,8 +1056,6 @@ void ModConfigurationMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 
 void ModConfigurationMenu::HandleUnmouseover(UInt32 tileID, Tile* tile)
 {
-//	modsListBox.SetSelected(nullptr);
-//	settingsListBox.SetSelected(nullptr);
 	selectionText->SetString(kTileValue_string, "");
 }
 
@@ -1177,24 +1112,6 @@ void ModConfigurationMenu::Close()
 void ModConfigurationMenu::HandleControllerConnectOrDisconnect(bool isControllerConnected)
 {
 
-}
-
-void ModConfigurationMenu::SetCursorPosTraits() const
-{
-	auto im = InterfaceManager::GetSingleton();
-
-	static float lastX;
-	static float lastY;
-
-	auto xPos = im->cursorX;
-	auto yPos = im->cursorY;
-	if (xPos != lastX || yPos != lastY)
-	{
-		lastX = xPos;
-		lastY = yPos;
-		tile->SetFloat("_CursorX", im->cursorX);
-		tile->SetFloat("_CursorY", im->cursorY);
-	}
 }
 
 void ModConfigurationMenu::Update() 
@@ -1286,17 +1203,6 @@ void ModConfigurationMenu::Update()
 	}
 
 //	SetCursorPosTraits();
-}
-
-
-void __fastcall OnAltTabReloadStewMenu(OSGlobals* osGlobals, void* edx, int isActive)
-{
-	ThisCall(0x871C90, osGlobals, isActive);
-	ModConfigurationMenu* menu = ModConfigurationMenu::GetSingleton();
-	if (menu && menu->XMLHasChanges())
-	{
-		menu->ReloadMenuXML();
-	}
 }
 
 bool ModConfigurationMenu::HasTiles()
