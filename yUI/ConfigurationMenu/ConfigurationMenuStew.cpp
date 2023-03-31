@@ -9,9 +9,11 @@
 
 const char* MenuPath = R"(Data\Menus\ConfigurationMenu.xml)";
 
-ModConfigurationMenu* g_stewMenu;
+ModConfigurationMenu* g_ConfigurationMenu;
 
-ModConfigurationMenu* ModConfigurationMenu::GetSingleton() { return g_stewMenu; };
+ModConfigurationMenu* ModConfigurationMenu::GetSingleton() { return g_ConfigurationMenu; };
+
+UInt32 ModConfigurationMenu::GetID() { return static_cast<UInt32>(MENU_ID); }
 
 _declspec(naked) bool IsControllerConnected()
 {
@@ -25,8 +27,6 @@ _declspec(naked) bool IsControllerConnected()
 		ret
 	}
 }
-
-int g_bTweaksMenuShowSettingPathOnSubsettings = true;
 
 void ModConfigurationMenu::SetTile(UInt32 tileID, Tile* tile)
 {
@@ -308,11 +308,28 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 		break;
 	}
 
-	case kModConfigurationMenu_ChoiceText:
 	case kModConfigurationMenu_SliderLeftArrow:
+	{
+		const auto option = clickedTile->parent;
+		if (!IsShiftHeld())
+			settingsListBox.GetItemForTile(option)->Next(false)->Display(option);
+		else
+			settingsListBox.GetItemForTile(option)->Last(false)->Display(option);
+		break;
+	}
+	case kModConfigurationMenu_ChoiceText:
+	{
+		const auto option = clickedTile->parent;
+		settingsListBox.GetItemForTile(option)->Next(!IsShiftHeld())->Display(option);
+		break;
+	}
 	case kModConfigurationMenu_SliderRightArrow:
 	{
-		HandleActiveSliderArrows(clickedTile->parent, tileID != kModConfigurationMenu_SliderLeftArrow);
+		const auto option = clickedTile->parent;
+		if (!IsShiftHeld())
+			settingsListBox.GetItemForTile(option)->Next()->Display(option);
+		else
+			settingsListBox.GetItemForTile(option)->Last()->Display(option);
 		break;
 	}
 	case kModConfigurationMenu_SliderText:
@@ -366,10 +383,6 @@ bool ModConfigurationMenu::IsSearchSuspended()
 	return !searchBar.isActive && !searchBar.GetText().empty();
 }
 
-// disable the warnings for 'discarding return value of function with 'nodiscard' attribute' 
-// since we only need the parse length of the stol and stof calls
-#pragma warning( push )
-#pragma warning( disable: 4834 )
 bool ModConfigurationMenu::IsSubsettingInputValid()
 {
 	/*
@@ -420,7 +433,6 @@ bool ModConfigurationMenu::IsSubsettingInputValid()
 	}*/
 	return true;
 }
-#pragma warning( pop )
 
 void ModConfigurationMenu::SetInSubsettingInputMode(bool isActive)
 {
@@ -730,25 +742,6 @@ bool ModConfigurationMenu::HandleKeyboardInput(UInt32 key)
 	return false;
 }
 
-UInt32 ModConfigurationMenu::GetID(void)
-{
-	return UInt32(MENU_ID);
-}
-
-bool ModConfigurationMenu::HandleActiveSliderArrows(Tile* tile,  bool isRightArrow, float scale)
-{
-	if (!tile) return false;
-
-	const auto setting = this->settingsListBox.GetItemForTile(tile);
-
-	if (!setting) return false;
-
-	setting->Toggle(!isRightArrow);
-	setting->Display(tile);
-
-	return true;
-}
-
 bool ModConfigurationMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode code, float keyState)
 {
 	switch (code)
@@ -880,38 +873,23 @@ void ModConfigurationMenu::SetActiveSubsettingValueFromInput()
 	}*/
 }
 
-void SM_Setting::Toggle(const bool backward)
-{
-	if (!data->IsToggleable()) return;
-
-	const auto value = data->Read();
-	const SM_Value newValue = !backward ? data->GetNext(value) : data->GetPrev(value);
-
-	data->Write(newValue);
-}
-
-void SM_Setting::Display(Tile* tile)
-{
-	data->Display(tile);
-}
-
 void SM_Setting::Choice::Display(Tile* tile)
 {
-	const auto value = Read();
+	const auto value = setting.ReadINI();
 	const std::string valueString = choice.contains(value) ? choice[value].first : GetStringFromValue(value); // Display name or display value if name not found
 	tile->SetString(kTileValue_user0, valueString.c_str());
 }
 
 void SM_Setting::Slider::Display(Tile* tile)
 {
-	const auto value = Read();
+	const auto value = setting.ReadINI();
 	tile->SetFloat(kTileValue_user0, 20 * GetFloatFromValue(value) / GetFloatFromValue(std::get<1>(slider)));
 	tile->SetFloat(kTileValue_user3, 20);
 }
 
 void SM_Setting::Font::Display(Tile* tile)
 {
-	const auto value = Read();
+	const auto value = font.ReadINI();
 	SInt32 id = std::get<SInt32>(value);
 	std::string valueString;
 	if (!id)
@@ -975,16 +953,44 @@ SM_Value SM_Setting::Choice::GetNext(const SM_Value& value)
 	else return iter->first;
 }
 
-SM_Value SM_Setting::Slider::GetPrev(const SM_Value& value)
+void SM_Setting::Choice::Next(const bool forward)
+{
+	const auto value = setting.ReadINI();
+	const auto newValue = forward ? GetNext(value) : GetPrev(value);
+	Write(newValue);
+}
+
+void SM_Setting::Choice::Last(const bool forward)
+{
+	const auto value = setting.ReadINI();
+	const auto newValue = forward ? choice.rbegin()->first : choice.begin()->first;
+	Write(newValue);
+}
+
+SM_Value SM_Setting::Slider::GetPrev(const SM_Value& value) const
 {
 	SM_Value newValue = value - std::get<2>(slider);
 	return newValue < std::get<0>(slider) ? value : newValue;
 }
 
-SM_Value SM_Setting::Slider::GetNext(const SM_Value& value)
+SM_Value SM_Setting::Slider::GetNext(const SM_Value& value) const
 {
 	SM_Value newValue = value + std::get<2>(slider);
 	return newValue > std::get<1>(slider) ? value : newValue;
+}
+
+void SM_Setting::Slider::Next(const bool forward)
+{
+	const auto value = setting.ReadINI();
+	const auto newValue = forward ? GetNext(value) : GetPrev(value);
+	Write(newValue);
+}
+
+void SM_Setting::Slider::Last(const bool forward)
+{
+	const auto value = setting.ReadINI();
+	const auto newValue = forward ? std::get<1>(slider) : std::get<0>(slider);
+	Write(newValue);
 }
 
 SM_Value SM_Setting::Font::GetPrev(const SM_Value& value)
@@ -1003,15 +1009,19 @@ SM_Value SM_Setting::Font::GetNext(const SM_Value& value)
 	else return iter->first;
 }
 
-const char* SM_Setting::GetTemplate() const
+void SM_Setting::Font::Next(const bool forward)
 {
-	if (type == kSettingType_Choice)		return "SettingChoiceTemplate";
-	if (type == kSettingType_Slider)		return "SettingSliderTemplate";
-	if (type == kSettingType_Font)			return "SettingFontTemplate";
-	if (type == kSettingType_Control)		return "SettingControlTemplate";
-	if (type == kSettingType_Subsetting)	return "SettingSubsettingTemplate";
-	return "SettingNoneTemplate";
-};
+	const auto value = font.ReadINI();
+	const SM_Value newValue = forward ? GetNext(value) : GetPrev(value);
+	Write(newValue);
+}
+
+void SM_Setting::Font::Last(const bool forward)
+{
+	const auto value = font.ReadINI();
+	const auto newValue = forward ? 8 : 1;
+	Write(newValue);
+}
 
 void ModConfigurationMenu::DisplaySettings(std::string tab)
 {
@@ -1136,7 +1146,7 @@ void ModConfigurationMenu::Destructor(bool doFree)
 {
 	this->Free();
 	if (doFree) GameHeapFree(this);
-	g_stewMenu = nullptr;
+	g_ConfigurationMenu = nullptr;
 }
 
 int g_bShownTweaksMenuReloadWarning = false;
@@ -1356,7 +1366,7 @@ void ShowTweaksMenu()
 		return;
 	}
 
-	g_stewMenu = menu;
+	g_ConfigurationMenu = menu;
 	float stackingType = tile->GetFloat(kTileValue_stackingtype);
 	if (stackingType == 6006.0 || stackingType == 102.0)
 	{

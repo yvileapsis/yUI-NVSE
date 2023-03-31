@@ -94,15 +94,20 @@ struct SM_Setting
 	public:
 		virtual ~None() = default;
 
-		virtual SM_Value Read() { return 0; }
+		virtual const char* GetTemplate() { return "SettingNoneTemplate"; }
+
 		virtual void Write(const SM_Value& value) {}
 		virtual void Display(Tile* tile) {}
-		virtual SM_Value GetPrev(const SM_Value& value) { return value; };
-		virtual SM_Value GetNext(const SM_Value& value) { return value; };
-		virtual bool IsToggleable() { return false; }
+
+		virtual void Next(const bool forward = true) {};
+		virtual void Last(const bool forward = true) {};
 	};
 
-	class Subsetting : public None {};
+	class Subsetting : public None
+	{
+		const char* GetTemplate() override { return "SettingSubsettingTemplate"; }
+
+	};
 
 	class Choice : public None
 	{
@@ -110,12 +115,16 @@ struct SM_Setting
 		SettingSource setting;
 		SM_ValueChoice choice;
 
-		SM_Value Read() override { return setting.ReadINI(); }
+		const char* GetTemplate() override { return "SettingChoiceTemplate"; }
+
 		void Write(const SM_Value& value) override { setting.WriteINI(value); }
 		void Display(Tile* tile) override;
-		SM_Value GetPrev(const SM_Value& value) override;
-		SM_Value GetNext(const SM_Value& value) override;
-		bool IsToggleable() override { return true; }
+
+		SM_Value GetPrev(const SM_Value& value);
+		SM_Value GetNext(const SM_Value& value);
+
+		void Next(const bool forward) override;
+		void Last(const bool forward) override;
 	};
 
 	class Slider : public None
@@ -124,12 +133,16 @@ struct SM_Setting
 		SettingSource setting;
 		SM_ValueSlider slider;
 
-		SM_Value Read() override { return setting.ReadINI(); }
+		const char* GetTemplate() override { return "SettingSliderTemplate"; }
+
 		void Write(const SM_Value& value) override { setting.WriteINI(value); }
 		void Display(Tile* tile) override;
-		SM_Value GetPrev(const SM_Value& value) override;
-		SM_Value GetNext(const SM_Value& value) override;
-		bool IsToggleable() override { return true; }
+
+		SM_Value GetPrev(const SM_Value& value) const;
+		SM_Value GetNext(const SM_Value& value) const;
+
+		void Next(const bool forward) override;
+		void Last(const bool forward) override;
 	};
 
 	class Control : public None
@@ -138,6 +151,8 @@ struct SM_Setting
 		SettingSource keyboard;
 		SettingSource mouse;
 		SettingSource controller;
+
+		const char* GetTemplate() override { return "SettingControlTemplate"; }
 
 		void Display(Tile* tile) override;
 	};
@@ -148,12 +163,16 @@ struct SM_Setting
 		SettingSource font;
 		SettingSource fontY;
 
-		SM_Value Read() override { return font.ReadINI(); }
+		const char* GetTemplate() override { return "SettingFontTemplate"; }
+
 		void Write(const SM_Value& value) override { font.WriteINI(value); fontY.WriteINI(value); }
 		void Display(Tile* tile) override;
-		SM_Value GetPrev(const SM_Value& value) override;
-		SM_Value GetNext(const SM_Value& value) override;
-		bool IsToggleable() override { return true; }
+
+		static SM_Value GetPrev(const SM_Value& value);
+		static SM_Value GetNext(const SM_Value& value);
+
+		void Next(const bool forward) override;
+		void Last(const bool forward) override;
 	};
 
 	class Input : public None
@@ -173,10 +192,10 @@ struct SM_Setting
 		kSettingType_Input,
 	};
 
-	void Toggle(const bool backward);
-	void Display(Tile* tile);
-
-	const char* GetTemplate() const;
+	SM_Setting* Next(const bool forward = true) { data->Next(forward); return this; };
+	SM_Setting* Last(const bool forward = true) { data->Last(forward); return this; }
+	SM_Setting* Display(Tile* tile) { data->Display(tile); return this; };
+	const char* GetTemplate() const { return data->GetTemplate(); }
 
 	ElementType type;
 	std::unique_ptr<None> data;
@@ -326,24 +345,24 @@ public:
 	};
 	~ModConfigurationMenu() {};
 
-	virtual void	Destructor(bool doFree);
-	virtual void	SetTile(UInt32 tileID, Tile* value);
-	virtual void	HandleLeftClick(UInt32 tileID, Tile* activeTile);
-	virtual void	HandleClick(UInt32 tileID, Tile* clickedButton);
-	virtual void	HandleMouseover(UInt32 tileID, Tile* activeTile);
-	virtual void	HandleUnmouseover(UInt32 tileID, Tile* tile);
-	virtual void	PostDragTileChange(UInt32 tileID, Tile* newTile, Tile* activeTile) {};
-	virtual void	PreDragTileChange(UInt32 tileID, Tile* oldTile, Tile* activeTile) {};
-	virtual void	HandleActiveMenuClickHeld(UInt32 tileID, Tile* activeTile);
-	virtual void	OnClickHeld(UInt32 tileID, Tile* activeTile) {};
-	virtual void	HandleMousewheel(UInt32 tileID, Tile* tile);
-	virtual void	Update(void);
-	virtual bool	HandleKeyboardInput(UInt32 inputChar);
-	virtual UInt32	GetID(void);
-	virtual bool	HandleSpecialKeyInput(MenuSpecialKeyboardInputCode code, float keyState); // isHeld, isPressed etc.
-	virtual bool	HandleControllerInput(int a2, Tile* tile);
-	virtual void	OnUpdateUserTrait(int tileVal) {};
-	virtual void	HandleControllerConnectOrDisconnect(bool isControllerConnected);
+	void	Destructor(bool doFree) override;
+	void	SetTile(UInt32 tileID, Tile* value) override;
+	void	HandleLeftClick(UInt32 tileID, Tile* activeTile) override;
+	void	HandleClick(UInt32 tileID, Tile* clickedButton) override;
+	void	HandleMouseover(UInt32 tileID, Tile* activeTile) override;
+	void	HandleUnmouseover(UInt32 tileID, Tile* tile) override;
+	void	PostDragTileChange(UInt32 tileID, Tile* newTile, Tile* activeTile) override {};
+	void	PreDragTileChange(UInt32 tileID, Tile* oldTile, Tile* activeTile) override {};
+	void	HandleActiveMenuClickHeld(UInt32 tileID, Tile* activeTile) override;
+	void	OnClickHeld(UInt32 tileID, Tile* activeTile) override {};
+	void	HandleMousewheel(UInt32 tileID, Tile* tile) override;
+	void	Update(void) override;
+	bool	HandleKeyboardInput(UInt32 inputChar) override;
+	UInt32	GetID() override;
+	bool	HandleSpecialKeyInput(MenuSpecialKeyboardInputCode code, float keyState) override; // isHeld, isPressed etc.
+	bool	HandleControllerInput(int a2, Tile* tile) override;
+	void	OnUpdateUserTrait(int tileVal) override {};
+	void	HandleControllerConnectOrDisconnect(bool isControllerConnected) override;
 
 	union
 	{
@@ -413,7 +432,6 @@ public:
 	bool GetCategoriesListActive();
 	void ClearAndCloseSearch();
 	void CycleFilterMode();
-	bool HandleActiveSliderArrows(Tile* tile, bool isRightArrow, float scale = 0.05F);
 	void DisplaySettings(std::string tab);
 	void SetActiveMod(SM_Mod* mod);
 	bool IsSubsettingInputValid();
