@@ -63,13 +63,13 @@ template <typename Item> struct TListNode
 	{
 		TListNode* pNext = next;
 		next = next->next;
-		FormHeapFree(pNext);
+		GameHeapFree(pNext);
 		return next;
 	}
 
 	TListNode<Item>* Append(Item* _data)
 	{
-		const auto newNode = static_cast<TListNode*>(FormHeapAlloc(sizeof(TListNode)));
+		const auto newNode = static_cast<TListNode*>(GameHeapAlloc(sizeof(TListNode)));
 		newNode->data = _data;
 		newNode->next = next;
 		next = newNode;
@@ -78,7 +78,7 @@ template <typename Item> struct TListNode
 
 	TListNode<Item>* Insert(Item* _data)
 	{
-		const auto newNode = static_cast<TListNode*>(FormHeapAlloc(sizeof(TListNode)));
+		const auto newNode = static_cast<TListNode*>(GameHeapAlloc(sizeof(TListNode)));
 		newNode->data = data;
 		data = _data;
 		newNode->next = next;

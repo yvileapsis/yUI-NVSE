@@ -87,7 +87,7 @@ TESActorBase* Actor::GetActorBase()
 
 TESObjectREFR* TESObjectREFR::Create(bool bTemp)
 {
-	const auto refr = static_cast<TESObjectREFR*>(FormHeapAlloc(sizeof(TESObjectREFR)));
+	const auto refr = static_cast<TESObjectREFR*>(GameHeapAlloc(sizeof(TESObjectREFR)));
 	ThisStdCall(s_TESObject_REFR_init, refr);
 //	if (bTemp) MarkAsTemporary();
 	return refr;

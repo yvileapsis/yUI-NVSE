@@ -439,21 +439,21 @@ class Menu
 public:
 	// TODO: figure out why it needs implementations
 	virtual void	Destructor(bool freeMemory) {};
-	virtual void	SetTile(UInt32 tileID, Tile* value) {};
+	virtual void	SetTile(UInt32 tileID, Tile* activeTile) {};
 	virtual void	HandleLeftClick(UInt32 tileID, Tile* activeTile) {};
-	virtual void	HandleClick(UInt32 tileID, Tile* clickedButton) {};	// buttonID = <id> trait defined in XML
-	virtual void	HandleMouseover(UInt32 tileID, Tile* tile) {};	//called on mouseover, activeTile is moused-over Tile
-	virtual void	HandleUnmouseover(UInt32 tileID, Tile* tile) {};
+	virtual void	HandleClick(UInt32 tileID, Tile* activeTile) {};	// buttonID = <id> trait defined in XML
+	virtual void	HandleMouseover(UInt32 tileID, Tile* activeTile) {};	//called on mouseover, activeTile is moused-over Tile
+	virtual void	HandleUnmouseover(UInt32 tileID, Tile* activeTile) {};
 	virtual void	PostDragTileChange(UInt32 tileID, Tile* newTile, Tile* activeTile) {};
 	virtual void	PreDragTileChange(UInt32 tileID, Tile* oldTile, Tile* activeTile) {};
 	virtual void	HandleActiveMenuClickHeld(UInt32 tileID, Tile* activeTile) {};
 	virtual void	OnClickHeld(UInt32 tileID, Tile* activeTile) {};
-	virtual void	HandleMousewheel(UInt32 tileID, Tile* tile) {};
+	virtual void	HandleMousewheel(UInt32 tileID, Tile* activeTile) {};
 	virtual void	Update() {};
 	virtual bool	HandleKeyboardInput(UInt32 inputChar) { return false; };	//for keyboard shortcuts, return true if handled
 	virtual UInt32	GetID() { return 0; };
 	virtual bool	HandleSpecialKeyInput(MenuSpecialKeyboardInputCode code, float keyState) { return false; };
-	virtual bool	HandleControllerInput(int a2, Tile* tile) { return false; };
+	virtual bool	HandleControllerInput(int code, Tile* activeTile) { return false; };
 	virtual void    OnUpdateUserTrait(int tileVal) {};
 	virtual void	HandleControllerConnectOrDisconnect(bool isControllerConnected) {};
 

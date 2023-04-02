@@ -90,10 +90,6 @@ __forceinline void* GameHeapAlloc(UInt32 size) { return ThisStdCall<void*>(0xAA3
 template <typename t> __forceinline t* GameHeapAlloc(UInt32 size) { return ThisStdCall<t*>(0xAA3E40, (void*)0x11F6238, size); }
 template <typename t> __forceinline void GameHeapFree(t* ptr) { ThisStdCall(0xAA4060, (t*)0x11F6238, ptr); }
 
-__forceinline void* FormHeapAlloc(UInt32 size) { return CdeclCall<void*>(0x00401000, size); }
-__forceinline void	FormHeapFree(void* ptr) { CdeclCall(0x00401030, ptr); }
-
-
 const char * GetObjectClassName(void * obj);
 const std::filesystem::path& GetFalloutDirectory();
 std::string GetNVSEConfigOption(const char * section, const char * key);
@@ -188,7 +184,7 @@ void MakeUpper(std::string& str);
 void MakeUpper(char* str);
 void MakeLower(std::string& str);
 
-// this copies the string onto the FormHeap - used to work around alloc/dealloc mismatch when passing
+// this copies the string onto the GameHeap - used to work around alloc/dealloc mismatch when passing
 // data between nvse and plugins
 char* CopyCString(const char* src);
 
@@ -353,7 +349,7 @@ std::vector<T> MapTo(const V& v, const F& f)
 template <typename T, const UInt32 ConstructorPtr = 0, typename... Args>
 T* New(Args &&... args)
 {
-	auto* alloc = FormHeapAlloc(sizeof(T));
+	auto* alloc = GameHeapAlloc(sizeof(T));
 	if constexpr (ConstructorPtr)
 	{
 		ThisStdCall(ConstructorPtr, alloc, std::forward<Args>(args)...);
@@ -372,7 +368,7 @@ void Delete(T* t, Args &&... args)
 	{
 		ThisStdCall(DestructorPtr, t, std::forward<Args>(args)...);
 	}
-	FormHeapFree(t);
+	GameHeapFree(t);
 }
 
 template <typename T>

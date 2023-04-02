@@ -251,7 +251,7 @@ struct NVSEMessagingInterface
 *	TESForm*, a C string, a double-precision float, or an Array*; the latter allows for the creation 
 *	of multi-dimensional arrays.
 *
-*	The three "Create" functions accept a size, an array of Element values, the script from which
+*	The three "Creator" functions accept a size, an array of Element values, the script from which
 *	your command was invoked, and (for map-types) an array of Element keys of the appropriate type.
 *	The arrays of keys and values should be of the same size and ordered so that key[i] corresponds to
 *	value[i]. Pass a size of 0 to create an empty array. The creation methods return NULL if creation 
@@ -344,7 +344,7 @@ struct NVSEArrayVarInterface
 		TESForm*		Form() { return dataType == kType_Form ? form : NULL; }
 		const char*		String() { return dataType == kType_String ? str : NULL; }
 		Array*			Array() { return dataType == kType_Array ? arr : NULL; }
-		void			Reset() { if (dataType == kType_String) { FormHeapFree(str); dataType = kType_Invalid; str = NULL; } }
+		void			Reset() { if (dataType == kType_String) { GameHeapFree(str); dataType = kType_Invalid; str = NULL; } }
 
 	};
 
@@ -979,7 +979,7 @@ typedef bool (* _NVSEPlugin_Load)(const NVSEInterface * nvse);
  *	This is required to prevent conflicts between multiple plugins, as each
  *	command must be assigned a unique opcode.
  *	
- *	The base API is pretty simple. Create a project based on the
+ *	The base API is pretty simple. Creator a project based on the
  *	yUI project included with the NVSE source code, then define
  *	and export these functions:
  *	

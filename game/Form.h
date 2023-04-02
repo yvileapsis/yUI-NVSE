@@ -2472,7 +2472,7 @@ public:
 
 	//EffectItem* Clone() const;
 	//void CopyFrom(const EffectItem* from);
-	//static EffectItem* Create();
+	//static EffectItem* Creator();
 	//static EffectItem* ProxyEffectItemFor(UInt32 effectCode);
 	//
 	//bool operator<(EffectItem*rhs) const;

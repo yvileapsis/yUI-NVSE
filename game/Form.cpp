@@ -298,7 +298,7 @@ UInt8 TESPackage::TargetData::TargetCodeForString(const char* targetStr)
 
 TESPackage::TargetData* TESPackage::TargetData::Create()
 {
-	const auto data = (TargetData*)FormHeapAlloc(sizeof(TargetData));
+	const auto data = (TargetData*)GameHeapAlloc(sizeof(TargetData));
 
 	// fill out with same defaults as editor uses
 	data->count = 0;
@@ -351,7 +351,7 @@ void TESPackage::SetTarget(eObjectType typeCode, UInt32 count)
 
 TESPackage::LocationData* TESPackage::LocationData::Create()
 {
-	const auto data = (LocationData*)FormHeapAlloc(sizeof(LocationData));
+	const auto data = (LocationData*)GameHeapAlloc(sizeof(LocationData));
 
 	data->locationType = kPackLocation_CurrentLocation;
 	data->object.form = nullptr;

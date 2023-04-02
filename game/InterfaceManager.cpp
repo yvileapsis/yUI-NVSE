@@ -15,7 +15,7 @@ void FontTextReplaced::GetVariableEscapedText(const char* input) { Font__CheckFo
 
 FontInfo* FontInfo::Load(const char* path, UInt32 ID)
 {
-	FontInfo* info = (FontInfo*)FormHeapAlloc(sizeof(FontInfo));
+	FontInfo* info = (FontInfo*)GameHeapAlloc(sizeof(FontInfo));
 	return (FontInfo*)ThisStdCall(0x00A12020, info, ID, path, 1);
 }
 

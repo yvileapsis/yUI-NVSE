@@ -15,128 +15,128 @@
 			"name": "TEST0",
 			"nameShort": "TEST0",
 			"version": "5.0",
-			"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+			"description": "Testing CBT and HUD",
 			"condition": [{
 				"JDCbEnable": 1
 			}],
-			"tags": ["Quality-of-life", "HUD"]
+			"tags": ["ERP", "CBT"]
 		},
 		{
 			"id": "TEST1",
 			"name": "TESЕ1",
 			"nameShort": "TEST1",
 			"version": "5.0",
-			"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+			"description": "Testing CBT and HUD",
 			"condition": [{
 				"JDCbEnable": 1
 			}],
-			"tags": ["Quality-of-life", "HUD"]
+			"tags": ["ERP", "CBT"]
 		},
 		{
 			"id": "TEST1",
 			"name": "TESЕ1",
 			"nameShort": "TEST1",
 			"version": "5.0",
-			"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+			"description": "Testing CBT and HUD",
 			"condition": [{
 				"JDCbEnable": 1
 			}],
-			"tags": ["Quality-of-life", "HUD"]
+			"tags": ["ERP", "CBT"]
 		},
 		{
 			"id": "TEST1",
 			"name": "TESЕ1",
 			"nameShort": "TEST1",
 			"version": "5.0",
-			"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+			"description": "Testing CBT and HUD",
 			"condition": [{
 				"JDCbEnable": 1
 			}],
-			"tags": ["Quality-of-life", "HUD"]
+			"tags": ["ERP", "CBT"]
 		},
 		{
 			"id": "TEST1",
 			"name": "TESЕ1",
 			"nameShort": "TEST1",
 			"version": "5.0",
-			"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+			"description": "Testing CBT and HUD",
 			"condition": [{
 				"JDCbEnable": 1
 			}],
-			"tags": ["Quality-of-life", "HUD"]
+			"tags": ["ERP", "CBT"]
 		}, {
 			"id": "TEST1",
 			"name": "TESЕ1",
 			"nameShort": "TEST1",
 			"version": "5.0",
-			"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+			"description": "Testing CBT and HUD",
 			"condition": [{
 				"JDCbEnable": 1
 			}],
-			"tags": ["Quality-of-life", "HUD"]
+			"tags": ["ERP", "CBT"]
 		}, {
 			"id": "TEST1",
 			"name": "TESЕ1",
 			"nameShort": "TEST1",
 			"version": "5.0",
-			"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+			"description": "Testing CBT and HUD",
 			"condition": [{
 				"JDCbEnable": 1
 			}],
-			"tags": ["Quality-of-life", "HUD"]
+			"tags": ["ERP", "CBT"]
 		}, {
 			"id": "TEST1",
 			"name": "TESЕ1",
 			"nameShort": "TEST1",
 			"version": "5.0",
-			"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+			"description": "Testing CBT and HUD",
 			"condition": [{
 				"JDCbEnable": 1
 			}],
-			"tags": ["Quality-of-life", "HUD"]
+			"tags": ["ERP", "CBT"]
 		}, {
 			"id": "TEST1",
 			"name": "TESЕ1",
 			"nameShort": "TEST1",
 			"version": "5.0",
-			"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+			"description": "Testing CBT and HUD",
 			"condition": [{
 				"JDCbEnable": 1
 			}],
-			"tags": ["Quality-of-life", "HUD"]
+			"tags": ["ERP", "CBT"]
 		},
 		{
 			"id": "TEST1",
 			"name": "TESЕ1",
 			"nameShort": "TEST1",
 			"version": "5.0",
-			"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+			"description": "Testing CBT and HUD",
 			"condition": [{
 				"JDCbEnable": 1
 			}],
-			"tags": ["Quality-of-life", "HUD"]
+			"tags": ["ERP", "CBT"]
 		},
 		{
 			"id": "TEST2",
 			"name": "TESЕ2",
 			"nameShort": "TEST2",
 			"version": "5.0",
-			"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+			"description": "Testing CBT and HUD",
 			"condition": [{
 				"JDCbEnable": 1
 			}],
-			"tags": ["Quality-of-life", "HUD"]
+			"tags": ["ERP", "CBT"]
 		},
 		{
 			"id": "JDC",
 			"name": "Just Dynamic Crosshair",
 			"nameShort": "Dynamic Crosshair",
 			"version": "5.0",
-			"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+			"description": "Testing CBT and HUD",
 			"condition": [{
 				"JDCbEnable": 1
 			}],
-			"tags": ["Quality-of-life", "HUD"]
+			"tags": ["HUD", "CBT"]
 		}
 	],
 	"settings": [

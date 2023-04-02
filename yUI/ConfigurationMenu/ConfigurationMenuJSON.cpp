@@ -56,7 +56,7 @@ ModJSON::ModJSON(const nlohmann::basic_json<>& elem)
 
 	if (elem.contains("version"))		version = elem["version"].get<std::string>();
 
-	if (elem.contains("tags"))			tags.insert_range(GetSetFromElement<std::string>(elem["tags"]));
+	if (elem.contains("modTags"))			tags.insert_range(GetSetFromElement<std::string>(elem["modTags"]));
 }
 
 SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem)
@@ -159,12 +159,15 @@ void ModConfigurationMenu::ReadJSON(const std::filesystem::path& path)
 		std::ifstream i(path);
 		auto j = nlohmann::json::parse(i, nullptr, true, true);
 
-		if (!j.contains("tags") || !j["tags"].is_array())
+		if (!j.contains("modTags") || !j["modTags"].is_array())
 			Log() << "JSON message: ySI item array not detected in " + path.string();
-		else for (const auto& elem : j["tags"]) if (!elem.is_object())
+		else for (const auto& elem : j["modTags"]) if (!elem.is_object())
 			Log() << "JSON error: Expected object";
 		else
-			g_Tags.push_back(std::make_unique<SM_Tag>(TagJSON(elem)));
+		{
+			const auto tag = TagJSON(elem);
+			g_Tags.emplace(tag.id, std::make_unique<SM_Tag>(tag));
+		}
 
 		if (!j.contains("mods") || !j["mods"].is_array())
 			Log() << "JSON message: ySI category array not detected in " + path.string();

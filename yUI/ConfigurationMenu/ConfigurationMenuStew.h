@@ -44,35 +44,28 @@ inline SM_Value operator-(const SM_Value& left, const SM_Value& right)
 	return GetFloatFromValue(left) - GetFloatFromValue(right);
 }
 
-
 class SM_Tag
 {
 public:
 	std::string id;
 	std::string name;
 	std::string description;
+
+	SInt32 priority;
+
+	virtual std::string GetName() { return !name.empty() ? name : id; }
+	virtual std::string GetDescription() { return FormatString("%s\n- %s", description.c_str(), " "); }
 };
 
-class SM_Mod
+class SM_Mod : public SM_Tag
 {
 public:
-	std::string id;
-	std::string version;
 
 	std::unordered_set<std::string> tags;
-
-	std::string name;
-	std::string category;
-	std::string description;
-
-	std::string settingPath;
-	std::string settingCategory;
-	std::string settingName;
-
-	signed int priority;
+	std::string version;
 };
 
-struct SM_Setting
+struct SM_Setting : public SM_Tag
 {
 	class SettingSource
 	{
@@ -123,8 +116,8 @@ struct SM_Setting
 		SM_Value GetPrev(const SM_Value& value);
 		SM_Value GetNext(const SM_Value& value);
 
-		void Next(const bool forward) override;
-		void Last(const bool forward) override;
+		void Next(bool forward) override;
+		void Last(bool forward) override;
 	};
 
 	class Slider : public None
@@ -141,8 +134,8 @@ struct SM_Setting
 		SM_Value GetPrev(const SM_Value& value) const;
 		SM_Value GetNext(const SM_Value& value) const;
 
-		void Next(const bool forward) override;
-		void Last(const bool forward) override;
+		void Next(bool forward) override;
+		void Last(bool forward) override;
 	};
 
 	class Control : public None
@@ -171,8 +164,8 @@ struct SM_Setting
 		static SM_Value GetPrev(const SM_Value& value);
 		static SM_Value GetNext(const SM_Value& value);
 
-		void Next(const bool forward) override;
-		void Last(const bool forward) override;
+		void Next(bool forward) override;
+		void Last(bool forward) override;
 	};
 
 	class Input : public None
@@ -200,32 +193,17 @@ struct SM_Setting
 	ElementType type;
 	std::unique_ptr<None> data;
 
-	std::string name;
-	std::string id;
-	std::string description;
-
-	SInt32 priority = 0;
-
 	std::unordered_set<std::string> tags;
 	std::unordered_set<std::string> mods;
-};
 
-struct SubsettingList : TList<SM_Setting>
-{
-	void Destroy()
+	std::string GetName() override
 	{
-		for (auto iter : *this)
-		{
-//			auto item = iter;
-//			iter->destroy;
-		}
-		this->DeleteAll();
+		return FormatString("%s\n- %s", description.c_str(), "settingName.c_str()");
 	}
 };
 
 extern const char* MenuPath;
 
-void ShowTweaksMenu();
 void WriteValueToINIs(const char* category, const char* name, const char* value);
 
 // randomly selected from the unused menu codes between 1001 and 1084 inclusive (to be compatible with the menu visibility array)
@@ -234,7 +212,6 @@ constexpr auto MENU_ID = 1042;
 enum TileIDs
 {
 	kModConfigurationMenu_Title = 0,
-	kModConfigurationMenu_ModList = 2,
 
 	kModConfigurationMenu_SelectionText = 4,
 
@@ -243,23 +220,26 @@ enum TileIDs
 
 	kModConfigurationMenu_Exit = 7,
 	kModConfigurationMenu_Back = 8,
-
-	kModConfigurationMenu_ModListItem = 12,
-
-	kModConfigurationMenu_CategoriesBackground = 13,
-	kModConfigurationMenu_CategoryItem = 14,
-	kModConfigurationMenu_CategoriesButton = 15,
-
+	kModConfigurationMenu_DeviceButton = 30,
 	kModConfigurationMenu_CancelSearch = 16,
 
-	kModConfigurationMenu_ActiveCategory = 17,
-	kModConfigurationMenu_ToggleShowActive = 18,
+	kModConfigurationMenu_ModList = 11,
+	kModConfigurationMenu_ModListItem = 12,
 
 	kModConfigurationMenu_SettingList = 19,
 	kModConfigurationMenu_SettingListItem = 20,
 
+	kModConfigurationMenu_CategoryLeftArrow = 13,
+	kModConfigurationMenu_CategoryText = 14,
+	kModConfigurationMenu_CategoryRightArrow = 15,
 
-	kModConfigurationMenu_DeviceButton = 30,
+	kModConfigurationMenu_ActiveCategory = 17,
+	kModConfigurationMenu_ToggleShowActive = 18,
+
+	kModConfigurationMenu_SettingCategoryLeftArrow = 23,
+	kModConfigurationMenu_SettingCategoryText = 24,
+	kModConfigurationMenu_SettingCategoryRightArrow = 25,
+
 
 	kModConfigurationMenu_ChoiceText = 99,
 	kModConfigurationMenu_SliderLeftArrow = 100,
@@ -287,73 +267,60 @@ struct HotkeyField
 class ModConfigurationMenu : public Menu
 {
 private:
-	void Free();
-
-	typedef ListBox<SM_Mod> ModsListBox;
-	typedef ListBox<char> CategoryListBox;
-
-	class SettingsListBox : public ListBox<SM_Setting>
-	{
-	public:
-		Tile* Insert(SM_Setting* item)
-		{
-//			const auto tile = ListBox::Insert(item, item->name.c_str(), nullptr, item->GetTemplate());
-
-			const auto tile = ListBox::InsertAlt(item, item->name.c_str(), item->GetTemplate());
-
-			SortAlt(tile);
-
-			tile->tile->SetFloat(kTileValue_id, kModConfigurationMenu_SettingListItem);
-
-			return tile->tile;
-		}
-	};
+	void* operator new(size_t size) { return GameHeapAlloc<void>(size); }
+	void operator delete(void* ptr) { GameHeapFree(ptr); }
 
 public:
 	ModConfigurationMenu()
 	{
-		memset(tiles, 0, sizeof(tiles));
+		memset(tiles, 0, sizeof tiles);
 		modsListBox.Init();
-		modsListBox.flags &= ~ModsListBox::kFlag_RecalculateHeightsOnInsert;
-		categoriesListBox.Init();
+		modsListBox.flags &= ~ListBox<SM_Mod>::kFlag_RecalculateHeightsOnInsert;
+
 		searchBar.Init();
 		subSettingInput.Init();
 		hotkeyInput.Init();
 		settingsListBox.Init();
 //		settingsListBox.flags &= ~ModsListBox::kFlag_RecalculateHeightsOnInsert;
 
-
-		touchedSubsettings.Init();
-		touchedTweaks.Init();
-
-		isDraggingCategoriesSlider = false;
-		activeInputSubsetting = nullptr;
-		activeHotkeySubsetting = nullptr;
-
 		lastXMLWriteTime.dwLowDateTime = 0;
 		lastXMLWriteTime.dwHighDateTime = 0;
 
 	};
-	~ModConfigurationMenu() {};
+	~ModConfigurationMenu()
+	{
+		modsListBox.Destroy();
+
+		settingsListBox.Destroy();
+		searchBar.Free();
+		subSettingInput.Free();
+		hotkeyInput.Free();
+
+		Menu::Free();
+
+		OSInputGlobals::GetSingleton()->SetDebounceMenuMode(false);
+	};
 
 	void	Destructor(bool doFree) override;
-	void	SetTile(UInt32 tileID, Tile* value) override;
+	void	SetTile(UInt32 tileID, Tile* activeTile) override;
 	void	HandleLeftClick(UInt32 tileID, Tile* activeTile) override;
-	void	HandleClick(UInt32 tileID, Tile* clickedButton) override;
+	void	HandleClick(UInt32 tileID, Tile* activeTile) override;
 	void	HandleMouseover(UInt32 tileID, Tile* activeTile) override;
-	void	HandleUnmouseover(UInt32 tileID, Tile* tile) override;
+	void	HandleUnmouseover(UInt32 tileID, Tile* activeTile) override;
 	void	PostDragTileChange(UInt32 tileID, Tile* newTile, Tile* activeTile) override {};
 	void	PreDragTileChange(UInt32 tileID, Tile* oldTile, Tile* activeTile) override {};
 	void	HandleActiveMenuClickHeld(UInt32 tileID, Tile* activeTile) override;
 	void	OnClickHeld(UInt32 tileID, Tile* activeTile) override {};
-	void	HandleMousewheel(UInt32 tileID, Tile* tile) override;
-	void	Update(void) override;
-	bool	HandleKeyboardInput(UInt32 inputChar) override;
+	void	HandleMousewheel(UInt32 tileID, Tile* activeTile) override;
+	void	Update() override;
+	bool	HandleKeyboardInput(UInt32 key) override;
 	UInt32	GetID() override;
 	bool	HandleSpecialKeyInput(MenuSpecialKeyboardInputCode code, float keyState) override; // isHeld, isPressed etc.
-	bool	HandleControllerInput(int a2, Tile* tile) override;
+	bool	HandleControllerInput(int code, Tile* activeTile) override;
 	void	OnUpdateUserTrait(int tileVal) override {};
 	void	HandleControllerConnectOrDisconnect(bool isControllerConnected) override;
+
+	static ModConfigurationMenu* Create() { return new ModConfigurationMenu(); };
 
 	union
 	{
@@ -363,9 +330,7 @@ public:
 			Tile* doneTile;
 			Tile* menuTitle;
 			Tile* tweaksListBackground;
-			Tile* categoriesBackground;
 
-			Tile* categoriesButton;
 			TileText* currentCategory;
 			Tile* selectionText;
 			Tile* searchIcon;
@@ -373,43 +338,39 @@ public:
 			Tile* searchCancel;
 			Tile* showActive;
 			Tile* subSettingsListBackground;
+
+			Tile* categoriesMods;
+			Tile* categoriesSettings;
 		};
 	};
 
-	std::vector<std::unique_ptr<SM_Tag>>		g_Tags;
-	std::vector<std::unique_ptr<SM_Mod>>		g_Mods;
-	std::vector<std::unique_ptr<SM_Setting>>	g_Settings;
+	std::map<std::string, std::unique_ptr<SM_Tag>>	g_Tags;
+	std::vector<std::unique_ptr<SM_Mod>>			g_Mods;
+	std::vector<std::unique_ptr<SM_Setting>>		g_Settings;
 
-	ModsListBox modsListBox;
-	SettingsListBox settingsListBox;
-	CategoryListBox categoriesListBox;
+	SM_Mod* activeMod;
+	ListBox<SM_Mod> modsListBox;
+	std::list<std::string> modTags;
+	std::string activeModTag;
+
+	SM_Setting* activeSetting;
+	ListBox<SM_Setting> settingsListBox;
+	std::list<std::string> settingTags;
+	std::string activeSettingTag;
+
 
 	InputField subSettingInput;
 
 	HotkeyField hotkeyInput;
 
-	SM_Setting* activeInputSubsetting;
-	SM_Setting* activeHotkeySubsetting;
 
-	std::string activeTab;
-	std::string activeTag;
-
-	SM_Mod* activeTweak;
 
 	InputField searchBar;
 	FILETIME lastXMLWriteTime;
-
-	TList<SM_Setting> touchedSubsettings;
-	TList<SM_Mod> touchedTweaks;
-
-
-	// debounce to prevent the categories list closing after dragging the slider
-	bool isDraggingCategoriesSlider;
-
+	
 	OSInputGlobals::ControlType controlDevice = OSInputGlobals::kControlType_Keyboard;
 
 	bool HasTiles();
-	static ModConfigurationMenu* Create() { return new ModConfigurationMenu(); };
 	void Close();
 	void RefreshFilter();
 	void ReloadMenuXML();
@@ -423,7 +384,17 @@ public:
 	bool GetCategoriesListActive();
 	void ClearAndCloseSearch();
 	void DisplaySettings(std::string tab);
+
 	void SetActiveMod(SM_Mod* mod);
+	void SetActiveModTag(std::string tag);
+	void SetActiveSettingTag(std::string tag);
+
+	std::string GetModNextTag();
+	std::string GetModPrevTag();
+
+	std::string GetSettingNextTag();
+	std::string GetSettingPrevTag();
+
 	bool IsSubsettingInputValid();
 	void SetActiveSubsettingValueFromInput();
 	void SetInHotkeyMode(bool isActive);
@@ -434,13 +405,7 @@ public:
 
 	static ModConfigurationMenu* GetSingleton();
 
-	void* operator new(size_t size)
-	{
-		return FormHeapAlloc(size);
-	}
+	static ModConfigurationMenu* ReloadMenu();
+	void ShowTweaksMenu();
 
-	void operator delete(void* ptr)
-	{
-		FormHeapFree(ptr);
-	}
 };

@@ -485,7 +485,7 @@ void MakeLower(std::string& str)
 char* CopyCString(const char* src)
 {
 	UInt32 size = src ? strlen(src) : 0;
-	char* result = (char*)FormHeapAlloc(size+1);
+	char* result = (char*)GameHeapAlloc(size+1);
 	result[size] = 0;
 	if (size) {
 		strcpy_s(result, size+1, src);

@@ -193,7 +193,7 @@
 	<image name="STW_Background">
 		<filename> Interface\Shared\Background\solid_black.dds </filename> <!--VUI+ vanilla is too fuzzy -->
 		<zoom> &scale; </zoom>
-		<depth> 1 </depth>
+		<depth> 0 </depth>
 		<brightness> <copy src="globals" trait="_VUI+DarkBrightness" /> </brightness>
 		<alpha>180</alpha>
 		<x> <copy src="screen" trait="width"/> <sub src="me()" trait="width"/> <div> 2 </div> </x>
@@ -209,7 +209,7 @@
 		<x>		<copy src="screen()" trait="width"/>		<sub src="me()" trait="width"/>		<div> 2 </div>		</x>
 		<y>		<copy src="screen()" trait="height"/>		<sub src="me()" trait="height"/>		<div> 2 </div>		</y>
 		<locus> 0 </locus>
-		<depth> 2 </depth>
+		<depth> 3 </depth>
 
 		<text name="STW_Headline_Title">
 			<id> 0 </id>
@@ -349,7 +349,7 @@
 					<copy src="me()" trait="_file_" /> 
 				</filename>
 				<x><copy src="parent()" trait="width"/><sub src="me()" trait="width"/> <sub> 6 </sub></x>
-v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <div> 2 </div></y>
+				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <div> 2 </div></y>
 				<height> 22 </height>
 				<width> 22 </width>
 				<zoom> &scale; </zoom>
@@ -370,114 +370,278 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 
 		</hotrect>
 
-		<hotrect name="Categories"> <!-- ===== Categories =====	-->
-			<locus> &true; </locus>
+		<rect name="ModList">
+			<width> 400 </width>
+			<_what> 275 </_what>
 			<x> 0 </x>
-			<x> 0 </x>
-			<y> 0 </y>
-			<width><copy src="io()" trait="_separatorX"/></width>
-			<height> 56 </height>
-			<id> 15 </id>
-			<target> &true; </target>
-			<clicksound> UIMenuOK </clicksound>
-			<mouseoversound> UIPipboyScroll</mouseoversound>
-			<_highlight>
-				<copy>1</copy>
-				<onlyif>
-					<copy src="me()" trait="mouseover"/>
-					<or><copy src="io()" trait="_IsCategoriesActive"/></or>
-				</onlyif>
-			</_highlight>
-			<visible> 0 </visible>
 
-			<image name="CategoryIcon">
-				<filename>lStewieAl\category.dds</filename>
-				<x><copy> 0 </copy><sub><copy src="me()" trait="width"/> <div> 2 </div></sub><add> 23 </add></x>
-				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <div> 2 </div></y>
-				<height> <copy> 26 </copy> <add><copy src="parent()" trait="_highlight"/><mul>5</mul></add> </height>
-				<width> <copy> 26 </copy> <add><copy src="parent()" trait="_highlight"/><mul>5</mul></add> </width>
+<!--			<image name="CM_Container_headline_h1">
+				<include src="line.xml"/>
+				<y>
+					<copy src="me" trait="height"/>
+					<add src="parent" trait="_what"/>
+				</y>
+				<_length> 25 </_length>
+			</image>-->
+
+			<image name="LeftFilterArrow">
+				<id> 13 </id>
+				<filename> Interface\Main\main_arrow_left.dds </filename>
+				<x>
+					<copy src="sibling(Title)" trait="x"/>
+					<sub> 15 </sub>
+				</x>
+				<y> 
+					<copy src="me" trait="height"/>
+					<div> -4 </div>
+					<add src="parent" trait="_what"/>
+				</y>
+				<width> 17.5 </width>
+				<height> 35 </height>
 				<zoom> &scale; </zoom>
-				<brightness><copy> 180 </copy> <add><copy src="parent()" trait="_highlight"/><mul>75</mul></add></brightness>
-				<rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </rotateaxisx>
-				<rotateaxisy> <copy src="me()" trait="height"/>	 <div> 2 </div> </rotateaxisy>
-				<rotateangle>	 <copy>90</copy><mul><copy src="io()" trait="_IsCategoriesActive"/><eq>0</eq></mul> <mul> 3.141592654 </mul> <div> 180 </div> </rotateangle>
+				<target> 1 </target>
+				<brightness>
+					<copy src="globals" trait="_VUI+Highlighting" />
+					<onlyif src="me" trait="mouseover"/>
+					<add> 240 </add>
+				</brightness>
 			</image>
 
-			<text name="CategoryTitle">
-				<y><copy src="parent()" trait="height"/><sub src="me()" trait="height"/><add>17</add><div>2</div></y>
-				<x> 40 </x>
-				<zoom> 100 </zoom>
-				<string>Category</string>
-				<visible> 1 </visible>
-				<font> 6 </font>
-				<id> 17 </id>
-				<brightness><copy src="sibling(CategoryIcon)" trait="brightness"/></brightness>
+			<text name="Title">
+				<id> 14 </id>
+				<string>Test</string>
+				<x>
+					<copy src="parent()" trait="width"/>
+					<sub src="me()" trait="width"/>
+					<div> 2 </div>
+					<add>
+						<copy src="sibling" trait="font" />
+						<copy src="globals" trait="_VUI+FontX_"/>
+					</add>
+				</x>
+				<y>
+					<copy src="me" trait="height"/>
+					<div> -2 </div>
+					<add src="parent" trait="_what"/>
+					<add>
+						<copy src="me" trait="font" />
+						<copy src="globals" trait="_VUI+FontY_"/>
+					</add>
+				</y>
+				<font> 7 </font>
+				<target> 1 </target>
+				<wheelable> 1 </wheelable>
+				<brightness>
+					<copy src="globals" trait="_VUI+Highlighting" />
+					<onlyif src="me" trait="mouseover"/>
+					<add> 255 </add>
+				</brightness>
 			</text>
 
-			<image name="SeparatorCategory">
-				<visible>1</visible>
-				<include src="line.xml"/>
-				<x> 2 </x>
-				<y>	<copy src="parent()" trait="height"/> </y>
-				<_length><copy src="io()" trait="_separatorX"/><sub src="me()" trait="x"/><add>3</add></_length>
+			<image name="RightFilterArrow">
+				<id> 15 </id>
+				<filename> Interface\Main\main_arrow_right.dds </filename>
+				<x>
+					<copy src="sibling(Title)" trait="x"/>
+					<add src="sibling(Title)" trait="width"/>
+					<add> 15 </add>
+				</x>
+				<y>
+					<copy src="me" trait="height"/>
+					<div> -4 </div>
+					<add src="parent" trait="_what"/>
+				</y>
+				<width> 17.5 </width>
+				<height> 35 </height>
+				<zoom> &scale; </zoom>
+				<target> 1 </target>
+				<brightness>
+					<copy src="globals" trait="_VUI+Highlighting" />
+					<onlyif src="me" trait="mouseover"/>
+					<add> 240 </add>
+				</brightness>
 			</image>
 
-			<hotrect name="CategoriesList">
-				<include src="list_box_ST.xml"/>
-				<_scrollbar_pos> &right; </_scrollbar_pos>
-				<id> 13 </id>
-				<y><copy src="parent()" trait="height"/><add> 8 </add></y>
-				<x>8</x>
-				<width> <copy src="parent()" trait="width"/><sub src="me()" trait="x"/><add>12</add></width>
-				<height> <copy src="grandparent()" trait="height"/><sub src="parent()" trait="y"/><sub src="me()" trait="y"/><sub>8</sub></height>
-				<visible><copy src="io()" trait="_IsCategoriesActive"/></visible>
+			<!--<image name="CM_Container_headline_h2">
+				<include src="line.xml"/>
+				<_length>
+					<copy src="parent" trait="width"/>
+					<sub src="me" trait="x"/>
+				</_length>
+				<x>
+					<copy src="sibling" trait="width"/>
+					<onlyif src="sibling" trait="visible" />
+					<add src="sibling" trait="x"/>
+					<add> 3 </add>
+				</x>
+				<y> 
+					<copy src="me" trait="height"/>
+					<div> 1 </div>
+					<add src="parent" trait="_what"/>
+				</y>
+			</image>-->
+		
+			<hotrect name="ModList">
+				<include src="list_box.xml"/>
+				<_scrollbar_pos> &left; </_scrollbar_pos>
+				<target> &true; </target>
+				<id> 11 </id>
+				<x> <copy src="parent()" trait="x"/> </x>
+				<y> <copy src="grandparent()" trait="height"/> <sub src="me()" trait="height"/> <div> 2 </div> </y>
+				<width> <copy src="parent()" trait="width"/> </width>
+				<visible> <copy src="io()" trait="_IsCategoriesActive"/> <eq>0</eq> </visible>
+				<_number_of_visible_items> 7 </_number_of_visible_items>
 			</hotrect>
-		</hotrect>
+		</rect>
 
-		<hotrect name="ModList">
-			<include src="list_box.xml"/>
-			<_scrollbar_pos> &left; </_scrollbar_pos>
-			<target> &true; </target>
-			<id> 2 </id>
-			<x> 0 </x>
-			<y> <copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <div> 2 </div> </y>
-			<width> 400 </width>
-			<visible> <copy src="io()" trait="_IsCategoriesActive"/> <eq>0</eq> </visible>
-			<_number_of_visible_items> 7 </_number_of_visible_items>
-		</hotrect>
-
-		<hotrect name="SettingsList">
-			<_doublestacked> 0 </_doublestacked>
-			<include src="list_box.xml"/>
-			<_scrollbar_pos> &left; </_scrollbar_pos>
-
-			<id> 19 </id>
-
-			<x> 400 </x>
-			<y> 160 </y>
-
+		<rect name="SettingsList">
 			<width> 900 </width>
-			<_doublestack_width> 10 </_doublestack_width>
-			<height> <copy src="parent()" trait="height"/> <sub src="me()" trait="y"/> <sub> 160 </sub> </height>			
-			
-			<visible>1</visible>
-			<_number_of_visible_items> 11 </_number_of_visible_items>
-			<_alpha> 255 </_alpha>
-			
-			<!-- This listbox is special in that it can be double-stacked. This implies that highlight box can not be used to determine width and such.
-			Copy of <x> trait of highlight box. -->
-			<_highX> 
-				<copy src="child(lb_scrollbar)" trait="x"/>
-				<add src="child(lb_scrollbar)" trait="width"/>
-				<onlyif src="me" trait="_scrollbar_vis"/> <!-- true(2) or -1(default) meaning visibility is calculated-->
-				<add src="me" trait="_item_offset"/>
-				<onlyif>
-					<copy src="me" trait="_scrollbar_pos"/>
-					<eq> &left; </eq> <!-- Position of highlight defaults to zero when scrollbar is on right. -->
-				</onlyif> <!-- Item offset will instead be applied from left edge of scrollbar -->
-				<sub src="me" trait="_VUI+ScrollbarOffsetX" />
-			</_highX>
-		</hotrect>
+			<_what> 100 </_what>
+			<x> 400 </x>
+<!--			<image name="CM_Container_headline_h1">
+				<include src="line.xml"/>
+				<y>
+					<copy src="me" trait="height"/>
+					<add src="parent" trait="_what"/>
+				</y>
+				<_length> 25 </_length>
+			</image>-->
+
+			<image name="LeftFilterArrow">
+				<id> 23 </id>
+				<filename> Interface\Main\main_arrow_left.dds </filename>
+				<x>
+					<copy src="sibling(Title)" trait="x"/>
+					<sub> 15 </sub>
+				</x>
+				<y> 
+					<copy src="me" trait="height"/>
+					<div> -4 </div>
+					<add src="parent" trait="_what"/>
+				</y>
+				<width> 17.5 </width>
+				<height> 35 </height>
+				<zoom> &scale; </zoom>
+				<target> 1 </target>
+				<brightness>
+					<copy src="globals" trait="_VUI+Highlighting" />
+					<onlyif src="me" trait="mouseover"/>
+					<add> 240 </add>
+				</brightness>
+				<depth> 2 </depth>
+			</image>
+
+			<text name="Title">
+				<id> 24 </id>
+				<string>Test</string>
+				<x>
+					<copy src="parent()" trait="width"/>
+					<sub src="me()" trait="width"/>
+					<div> 2 </div>
+					<add>
+						<copy src="sibling" trait="font" />
+						<copy src="globals" trait="_VUI+FontX_"/>
+					</add>
+					<add src="parent()" trait="x"/>
+				</x>
+				<y>
+					<copy src="me" trait="height"/>
+					<div> -2 </div>
+					<add src="parent" trait="_what"/>
+					<add>
+						<copy src="me" trait="font" />
+						<copy src="globals" trait="_VUI+FontY_"/>
+					</add>
+				</y>
+				<font> 7 </font>
+				<target> 1 </target>
+				<wheelable> 1 </wheelable>
+				<brightness>
+					<copy src="globals" trait="_VUI+Highlighting" />
+					<onlyif src="me" trait="mouseover"/>
+					<add> 255 </add>
+				</brightness>
+				<depth> 2 </depth>
+			</text>
+
+			<image name="RightFilterArrow">
+				<id> 25 </id>
+				<filename> Interface\Main\main_arrow_right.dds </filename>
+				<x>
+					<copy src="sibling(Title)" trait="x"/>
+					<add src="sibling(Title)" trait="width"/>
+					<add> 15 </add>
+				</x>
+				<y>
+					<copy src="me" trait="height"/>
+					<div> -4 </div>
+					<add src="parent" trait="_what"/>
+				</y>
+				<width> 17.5 </width>
+				<height> 35 </height>
+				<zoom> &scale; </zoom>
+				<target> 1 </target>
+				<brightness>
+					<copy src="globals" trait="_VUI+Highlighting" />
+					<onlyif src="me" trait="mouseover"/>
+					<add> 240 </add>
+				</brightness>
+				<depth> 2 </depth>
+			</image>
+
+			<!--<image name="CM_Container_headline_h2">
+				<include src="line.xml"/>
+				<_length>
+					<copy src="parent" trait="width"/>
+					<sub src="me" trait="x"/>
+				</_length>
+				<x>
+					<copy src="sibling" trait="width"/>
+					<onlyif src="sibling" trait="visible" />
+					<add src="sibling" trait="x"/>
+					<add> 3 </add>
+				</x>
+				<y> 
+					<copy src="me" trait="height"/>
+					<div> 1 </div>
+					<add src="parent" trait="_what"/>
+				</y>
+			</image>-->
+		
+			<hotrect name="SettingsList">
+						
+				<_doublestacked> 0 </_doublestacked>
+				<include src="list_box.xml"/>
+				<_scrollbar_pos> &left; </_scrollbar_pos>
+
+				<id> 19 </id>
+
+				<x> <copy src="parent()" trait="x"/> </x>
+				<y> 160 </y>
+
+				<width> <copy src="parent()" trait="width"/> </width>
+				<_doublestack_width> 10 </_doublestack_width>
+				<height> <copy src="grandparent()" trait="height"/> <sub src="me()" trait="y"/> <sub> 160 </sub> </height>			
+				
+				<visible>1</visible>
+				<_number_of_visible_items> 11 </_number_of_visible_items>
+				<_alpha> 255 </_alpha>
+				
+				<!-- This listbox is special in that it can be double-stacked. This implies that highlight box can not be used to determine width and such.
+				Copy of <x> trait of highlight box. -->
+				<_highX> 
+					<copy src="child(lb_scrollbar)" trait="x"/>
+					<add src="child(lb_scrollbar)" trait="width"/>
+					<onlyif src="me" trait="_scrollbar_vis"/> <!-- true(2) or -1(default) meaning visibility is calculated-->
+					<add src="me" trait="_item_offset"/>
+					<onlyif>
+						<copy src="me" trait="_scrollbar_pos"/>
+						<eq> &left; </eq> <!-- Position of highlight defaults to zero when scrollbar is on right. -->
+					</onlyif> <!-- Item offset will instead be applied from left edge of scrollbar -->
+					<sub src="me" trait="_VUI+ScrollbarOffsetX" />
+				</_highX>
+			</hotrect>
+		</rect>
 
 		<rect name="STW_SelectionInfoRect">	<!-- ===== SELECTION INFO RECT ===== -->
 			<visible> <copy src="child(STW_SelectionText)" trait="width"/> <gt>35</gt> </visible>
@@ -493,34 +657,11 @@ v				<y><copy src="parent()" trait="height"/> <sub src="me()" trait="height"/> <
 				<y>15</y>
 				<x>15</x>
 				<brightness>300</brightness>
-				<font> 42 </font>
+				<font> 1 </font>
 				<wrapwidth> <copy src="parent()" trait="width"/> <sub> 25 </sub>	</wrapwidth>
 			</text>
 		</rect>	<!-- end STW_SelectionInfoRect -->
 	</rect> <!-- end STW_MainRect -->
-
-	<template name="CategoryTemplate">
-		<hotrect name="STW_Item">
-			<include src="list_box_template.xml"/>
-
-			<_TextAlpha> 255 </_TextAlpha>
-			<mouseoversound> &nosound; </mouseoversound>
-			<clicksound> UIMenuPrevNext </clicksound>
-			<_VerticalSpacing> 8 </_VerticalSpacing>
-			<_wrapper> <copy src="sibling(lb_highlight_box)" trait="width"/> </_wrapper>
-
-			<text name="ListItemText">
-				<brightness>220</brightness>
-				<font> 7 </font>
-				<string> <copy src="parent()" trait="string"/> </string>
-				<wrapwidth> <copy src="parent()" trait="_wrapper"/><sub src="me()" trait="x"/><sub> 10 </sub></wrapwidth>
-				<x> 0 </x>
-				<y> 0 </y>
-				<alpha> <copy src="parent()" trait="_TextAlpha"/> </alpha>
-			</text>
-
-		</hotrect>
-	</template>
 
 	<template name="SubSettingTemplate_Input">
 		<hotrect name="STW_Item">

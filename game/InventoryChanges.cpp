@@ -25,7 +25,7 @@ void InventoryChanges::Cleanup()
 
 InventoryChanges* InventoryChanges::Create(TESForm* pForm, UInt32 count, ExtendDataList* pExtendDataList)
 {
-	const auto xData = static_cast<InventoryChanges*>(FormHeapAlloc(sizeof(InventoryChanges)));
+	const auto xData = static_cast<InventoryChanges*>(GameHeapAlloc(sizeof(InventoryChanges)));
 	if (xData) {
 		memset(xData, 0, sizeof(InventoryChanges));
 		if (pForm) {
@@ -33,7 +33,7 @@ InventoryChanges* InventoryChanges::Create(TESForm* pForm, UInt32 count, ExtendD
 			xData->countDelta = count;
 			if (pExtendDataList == nullptr)
 			{
-				pExtendDataList = static_cast<ExtendDataList*>(FormHeapAlloc(sizeof(ExtendDataList)));
+				pExtendDataList = static_cast<ExtendDataList*>(GameHeapAlloc(sizeof(ExtendDataList)));
 				if (pExtendDataList) memset(pExtendDataList, 0, sizeof(ExtendDataList));
 			}
 			xData->extendData = pExtendDataList;
@@ -65,7 +65,7 @@ bool InventoryChanges::Remove(ExtraDataList* toRemove, bool bFree)
 			countDelta -= count;
 			if (bFree) {
 				toRemove->RemoveAll(true);
-				FormHeapFree(toRemove);
+				GameHeapFree(toRemove);
 			}
 			return true;
 		}
@@ -251,7 +251,7 @@ InventoryChanges::WithExtraData InventoryChanges::HotkeySet(const UInt8 hotkey)
 
 ExtraContainerChangesData* ExtraContainerChangesData::Create(TESObjectREFR* owner)
 {
-	const auto data = static_cast<ExtraContainerChangesData*>(FormHeapAlloc(sizeof(ExtraContainerChangesData)));
+	const auto data = static_cast<ExtraContainerChangesData*>(GameHeapAlloc(sizeof(ExtraContainerChangesData)));
 	if (data) {
 		data->owner = owner;
 		data->objList = nullptr;

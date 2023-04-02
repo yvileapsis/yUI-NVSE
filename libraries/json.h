@@ -94,7 +94,7 @@
     #define NLOHMANN_JSON_NAMESPACE_NO_VERSION 0
 #endif
 
-// Construct the namespace ABI tags component
+// Construct the namespace ABI modTags component
 #define NLOHMANN_JSON_ABI_TAGS_CONCAT_EX(a, b) json_abi ## a ## b
 #define NLOHMANN_JSON_ABI_TAGS_CONCAT(a, b) \
     NLOHMANN_JSON_ABI_TAGS_CONCAT_EX(a, b)
@@ -5294,7 +5294,7 @@ namespace std
 #if defined(__clang__)
     // Fix: https://github.com/nlohmann/json/issues/1401
     #pragma clang diagnostic push
-    #pragma clang diagnostic ignored "-Wmismatched-tags"
+    #pragma clang diagnostic ignored "-Wmismatched-modTags"
 #endif
 template<typename IteratorType>
 class tuple_size<::nlohmann::detail::iteration_proxy_value<IteratorType>>
@@ -9109,12 +9109,12 @@ NLOHMANN_JSON_NAMESPACE_BEGIN
 namespace detail
 {
 
-/// how to treat CBOR tags
+/// how to treat CBOR modTags
 enum class cbor_tag_handler_t
 {
     error,   ///< throw a parse_error exception in case of a tag
-    ignore,  ///< ignore tags
-    store    ///< store tags as binary type
+    ignore,  ///< ignore modTags
+    store    ///< store modTags as binary type
 };
 
 /*!
@@ -19342,7 +19342,7 @@ class basic_json // NOLINT(cppcoreguidelines-special-member-functions,hicpp-spec
     using json_serializer = JSONSerializer<T, SFINAE>;
     /// how to treat decoding errors
     using error_handler_t = detail::error_handler_t;
-    /// how to treat CBOR tags
+    /// how to treat CBOR modTags
     using cbor_tag_handler_t = detail::cbor_tag_handler_t;
     /// helper type for initializer lists of basic_json values
     using initializer_list_t = std::initializer_list<detail::json_ref<basic_json>>;

@@ -7,7 +7,7 @@ String::~String()
 {
 	if (m_data)
 	{
-		FormHeapFree(m_data);
+		GameHeapFree(m_data);
 		m_data = NULL;
 	}
 	m_bufLen = m_dataLen = 0;
@@ -16,7 +16,7 @@ String::~String()
 bool String::Set(const char* src)
 {
 	if (!src) {
-		FormHeapFree(m_data);
+		GameHeapFree(m_data);
 		m_data = 0;
 		m_bufLen = 0;
 		m_dataLen = 0;
@@ -28,8 +28,8 @@ bool String::Set(const char* src)
 	// realloc if needed
 	if (srcLen > m_bufLen)
 	{
-		FormHeapFree(m_data);
-		m_data = (char*)FormHeapAlloc(srcLen + 1);
+		GameHeapFree(m_data);
+		m_data = (char*)GameHeapAlloc(srcLen + 1);
 		m_bufLen = m_data ? srcLen : 0;
 	}
 
