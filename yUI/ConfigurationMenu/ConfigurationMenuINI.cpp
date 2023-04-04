@@ -21,9 +21,9 @@ inline void ReadINIInternal(const std::filesystem::path& iniPath, const std::fil
 		{
 			SM_Value value;
 
-			if (key.pItem[0] == 'b' || key.pItem[0] == 'i') value.emplace<SInt32>(ini.GetLongValue(section.pItem, key.pItem));
-			else if (key.pItem[0] == 'f') value.emplace<Float64>(ini.GetDoubleValue(section.pItem, key.pItem));
-			else if (key.pItem[0] == 's') value.emplace<std::string>(ini.GetValue(section.pItem, key.pItem));
+			if (key.pItem[0] == 'b' || key.pItem[0] == 'i') value = ini.GetLongValue(section.pItem, key.pItem);
+			else if (key.pItem[0] == 'f') value = ini.GetDoubleValue(section.pItem, key.pItem);
+			else if (key.pItem[0] == 's') value = static_cast<std::string>(ini.GetValue(section.pItem, key.pItem));
 
 			ini_map.emplace(std::make_tuple(iniPath2, section.pItem, key.pItem), value);
 		}
@@ -54,12 +54,12 @@ inline void WriteINIInternal(const std::filesystem::path& iniPath, const SM_Sett
 	ini.SetUnicode();
 	if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
-	if (std::holds_alternative<std::string>(value))
-		ini.SetValue(std::get<1>(setting).c_str(), std::get<2>(setting).c_str(), std::get<std::string>(value).c_str());
-	else if (std::holds_alternative<Float64>(value)) 
-		ini.SetDoubleValue(std::get<1>(setting).c_str(), std::get<2>(setting).c_str(), std::get<Float64>(value));
-	else if (std::holds_alternative<SInt32>(value))
-		ini.SetLongValue(std::get<1>(setting).c_str(), std::get<2>(setting).c_str(), std::get<SInt32>(value));
+	if (value.IsString())
+		ini.SetValue(std::get<1>(setting).c_str(), std::get<2>(setting).c_str(), static_cast<std::string>(value).c_str());
+	else if (value.IsFloat()) 
+		ini.SetDoubleValue(std::get<1>(setting).c_str(), std::get<2>(setting).c_str(), value);
+	else if (value.IsInteger())
+		ini.SetLongValue(std::get<1>(setting).c_str(), std::get<2>(setting).c_str(), value);
 
 	ini.SaveFile(iniPath.c_str(), false);
 }

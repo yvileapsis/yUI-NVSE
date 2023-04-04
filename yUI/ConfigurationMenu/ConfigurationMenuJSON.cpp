@@ -18,7 +18,7 @@ SM_Value GetValueFromElement(const nlohmann::basic_json<>& elem)
 	if (elem.is_number_integer() || elem.is_number_unsigned()) return elem.get<SInt32>();
 	if (elem.is_string()) return elem.get<std::string>();
 	if (elem.is_number_float()) return elem.get<Float64>();
-	return 0;
+	return static_cast<SInt32>(0);
 }
 
 SM_Setting::SettingSource GetSourceFromElement(const nlohmann::basic_json<>& elem, const std::string& path = "path",
@@ -56,7 +56,7 @@ ModJSON::ModJSON(const nlohmann::basic_json<>& elem)
 
 	if (elem.contains("version"))		version = elem["version"].get<std::string>();
 
-	if (elem.contains("modTags"))			tags.insert_range(GetSetFromElement<std::string>(elem["modTags"]));
+	if (elem.contains("tags"))			tags.insert_range(GetSetFromElement<std::string>(elem["tags"]));
 }
 
 SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem)
@@ -97,7 +97,7 @@ SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem)
 			if (i.contains("value")) value = GetValueFromElement(i["value"]);
 			else value = valueLess++;
 			if (i.contains("name")) name = i["name"].get<std::string>();
-			else name = GetStringFromValue(value);
+			else name = (value).GetAsString();
 			if (i.contains("description")) description = i["description"].get<std::string>();
 
 			choice.choice.emplace(value, std::make_pair(name, description));
@@ -114,11 +114,11 @@ SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem)
 		slider.setting = GetSourceFromElement(elem);
 
 		if (elem.contains("valueMin")) valueMin = GetValueFromElement(elem["valueMin"]);
-		else valueMin = MININT32;
+		else valueMin = (SInt32) MININT32;
 		if (elem.contains("valueMax")) valueMax = GetValueFromElement(elem["valueMax"]);
-		else valueMax = MAXINT32;
+		else valueMax = (SInt32)MAXINT32;
 		if (elem.contains("valueDelta")) valueDelta = GetValueFromElement(elem["valueDelta"]);
-		else valueMin = 1;
+		else valueMin = (SInt32) 1;
 
 		slider.slider = std::make_tuple(valueMin, valueMax, valueDelta);
 
@@ -159,9 +159,9 @@ void ModConfigurationMenu::ReadJSON(const std::filesystem::path& path)
 		std::ifstream i(path);
 		auto j = nlohmann::json::parse(i, nullptr, true, true);
 
-		if (!j.contains("modTags") || !j["modTags"].is_array())
+		if (!j.contains("tags") || !j["tags"].is_array())
 			Log() << "JSON message: ySI item array not detected in " + path.string();
-		else for (const auto& elem : j["modTags"]) if (!elem.is_object())
+		else for (const auto& elem : j["tags"]) if (!elem.is_object())
 			Log() << "JSON error: Expected object";
 		else
 		{

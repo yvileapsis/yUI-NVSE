@@ -11,38 +11,76 @@
 
 #include "Menus.h"
 
-typedef std::variant<SInt32, Float64, std::string> SM_Value;
+class SM_Value
+{
+	enum Type
+	{
+		kNone = 0,
+		kInteger = 1,
+		kFloat = 2,
+		kString = 3
+	};
+
+	Type type = kNone;
+	SInt64 intval = 0;
+	Float64 floatval = 0;
+	std::string stringval;
+
+public:
+	SM_Value() = default;
+	SM_Value(const SInt32 value) : type(kInteger), intval(value) {}
+	explicit SM_Value(const UInt32 value) : type(kInteger), intval(value) {}
+	SM_Value(const Float64 value) : type(kFloat), floatval(value) {}
+	SM_Value(std::string value) : type(kString), stringval(std::move(value)) {}
+
+	bool IsInteger() const { return type == kInteger; }
+	bool IsFloat() const { return type == kFloat; }
+	bool IsString() const { return type == kString; }
+
+	SInt32 GetAsInteger() const
+	{
+		if (IsInteger()) return intval;
+		if (IsFloat()) return floatval;
+		return 0;
+	}
+
+	Float64 GetAsFloat() const
+	{
+		if (IsInteger()) return intval;
+		if (IsFloat()) return floatval;
+		return 0;
+	}
+
+	std::string GetAsString() const
+	{
+		if (IsInteger()) return std::to_string(intval);
+		if (IsFloat()) return std::to_string(floatval);
+		if (IsString()) return stringval;
+		return "";
+	}
+
+	operator SInt32 () const { return GetAsInteger(); }
+	explicit operator Float64 () const { return GetAsFloat(); }
+	operator std::string () const { return GetAsString(); }
+
+	SM_Value operator+(const SM_Value& right) const
+	{
+		if (IsString() && right.IsString())
+			return GetAsString() + right.GetAsString();
+		if (IsInteger() && right.IsInteger())
+			return GetAsInteger() + right.GetAsInteger();
+		return GetAsFloat() + right.GetAsFloat();
+	}
+
+	SM_Value operator-(const SM_Value& right) const
+	{
+		if (IsInteger() && right.IsInteger())
+			return GetAsInteger() - right.GetAsInteger();
+		return GetAsFloat() - right.GetAsFloat();
+	}
+};
 
 inline std::map<SM_Value, std::string> fontMap;
-
-inline std::string GetStringFromValue(const SM_Value& value)
-{
-	if (std::holds_alternative<std::string>(value)) return std::get<std::string>(value);
-	if (std::holds_alternative<Float64>(value)) return std::to_string(std::get<Float64>(value));
-	if (std::holds_alternative<SInt32>(value)) return std::to_string(std::get<SInt32>(value));
-	return "";
-}
-
-inline Float64 GetFloatFromValue(const SM_Value& value)
-{
-	if (std::holds_alternative<Float64>(value)) return std::get<Float64>(value);
-	if (std::holds_alternative<SInt32>(value)) return std::get<SInt32>(value);
-	return 0;
-}
-
-inline SM_Value operator+(const SM_Value& left, const SM_Value& right)
-{
-	if (std::holds_alternative<SInt32>(left) && std::holds_alternative<SInt32>(right)) 
-		return std::get<SInt32>(left) + std::get<SInt32>(right);
-	return GetFloatFromValue(left) + GetFloatFromValue(right);
-}
-
-inline SM_Value operator-(const SM_Value& left, const SM_Value& right)
-{
-	if (std::holds_alternative<SInt32>(left) && std::holds_alternative<SInt32>(right))
-		return std::get<SInt32>(left) - std::get<SInt32>(right);
-	return GetFloatFromValue(left) - GetFloatFromValue(right);
-}
 
 class SM_Tag
 {
@@ -350,12 +388,12 @@ public:
 
 	SM_Mod* activeMod;
 	ListBox<SM_Mod> modsListBox;
-	std::list<std::string> modTags;
+	std::set<std::string> modTags;
 	std::string activeModTag;
 
 	SM_Setting* activeSetting;
 	ListBox<SM_Setting> settingsListBox;
-	std::list<std::string> settingTags;
+	std::set<std::string> settingTags;
 	std::string activeSettingTag;
 
 
