@@ -460,11 +460,7 @@ public:
 	void RefreshFilter();
 	void ReloadMenuXML();
 	bool XMLHasChanges();
-	void SetInSearchMode(bool isSearchMode);
-	bool GetInSearchMode();
-	void SetInSubsettingInputMode(bool isActive);
-	bool GetInSubsettingInputMode();
-	bool IsSearchSuspended();
+
 	void ClearAndCloseSearch();
 
 	void DisplayMods();
