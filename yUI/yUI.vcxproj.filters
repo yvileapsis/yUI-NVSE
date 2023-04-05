@@ -26,9 +26,6 @@
     <ClCompile Include="ConfigurationMenu\ConfigurationMenu.cpp">
       <Filter>features\ConfigurationMenu</Filter>
     </ClCompile>
-    <ClCompile Include="ConfigurationMenu\InputField.cpp">
-      <Filter>features\ConfigurationMenu</Filter>
-    </ClCompile>
     <ClCompile Include="ConfigurationMenu\ConfigurationMenuJSON.cpp">
       <Filter>features\ConfigurationMenu</Filter>
     </ClCompile>
@@ -128,9 +125,6 @@
     <ClCompile Include="MiscFeatures\FixProjectileEffects.cpp">
       <Filter>features</Filter>
     </ClCompile>
-    <ClCompile Include="MiscFeatures\FixLocaleStringscpp">
-      <Filter>features</Filter>
-    </ClCompile>
     <ClCompile Include="MiscFeatures\FixReorderMCM.cpp">
       <Filter>features</Filter>
     </ClCompile>
@@ -177,6 +171,7 @@
     <ClCompile Include="MiscFeatures\PatchB42InjectHideCrosshair.cpp">
       <Filter>features</Filter>
     </ClCompile>
+    <ClCompile Include="MiscFeatures\FixLocaleStrings.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h" />
@@ -210,9 +205,6 @@
       <Filter>nvse</Filter>
     </ClInclude>
     <ClInclude Include="ConfigurationMenu\ConfigurationMenu.h">
-      <Filter>features\ConfigurationMenu</Filter>
-    </ClInclude>
-    <ClInclude Include="ConfigurationMenu\InputField.h">
       <Filter>features\ConfigurationMenu</Filter>
     </ClInclude>
     <ClInclude Include="ConfigurationMenu\ConfigurationMenuStew.h">

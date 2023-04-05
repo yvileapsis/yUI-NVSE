@@ -140,7 +140,6 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClCompile Include="..\nvse\Utilities.cpp" />
     <ClCompile Include="ConfigurationMenu\ConfigurationMenuINI.cpp" />
     <ClCompile Include="ConfigurationMenu\ConfigurationMenu.cpp" />
-    <ClCompile Include="ConfigurationMenu\InputField.cpp" />
     <ClCompile Include="ConfigurationMenu\ConfigurationMenuJSON.cpp" />
     <ClCompile Include="ConfigurationMenu\ConfigurationMenuStew.cpp" />
     <ClCompile Include="ConfigurationMenu\HookMCM.cpp" />
@@ -220,7 +219,6 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClInclude Include="main.h" />
     <ClInclude Include="SortingIcons\SortingIcons.h" />
     <ClInclude Include="ConfigurationMenu\ConfigurationMenu.h" />
-    <ClInclude Include="ConfigurationMenu\InputField.h" />
     <ClInclude Include="ConfigurationMenu\ConfigurationMenuStew.h" />
   </ItemGroup>
   <ItemGroup>

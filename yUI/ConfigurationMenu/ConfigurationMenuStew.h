@@ -1,15 +1,46 @@
 #pragma once
-#include <map>
 
-#include "Containers.h"
 #include "Utilities.h"
-#include "InputField.h"
+#include "Menus.h"
 
 #include <set>
+#include <map>
 #include <utility>
 #include <variant>
 
-#include "Menus.h"
+
+struct InputField
+{
+	// used for filtering which characters are valid
+	enum InputType
+	{
+		kInputType_String = 0,
+		kInputType_Integer,
+		kInputType_Float
+	};
+
+	Tile* tile;
+	std::string input;
+	bool isActive;
+	bool isCaretShown;
+	SInt16 caretIndex;
+	UInt32 lastCaretUpdateTime;
+	UInt8 inputType;
+
+	void Init();
+	void Set(std::string str);
+
+	std::string GetText();
+	UInt16 GetLen();
+	void UpdateCaretDisplay();
+	void SetActive(bool active);
+	bool IsKeyValid(UInt32 key);
+	bool HandleSpecialInputKey(UInt32 key);
+	void HandleKeyboardShortcuts(UInt32 key);
+	bool HandleKey(UInt32 key);
+	void Update();
+	void Free();
+};
 
 class SM_Value
 {
@@ -80,8 +111,6 @@ public:
 	}
 };
 
-inline std::map<SM_Value, std::string> fontMap;
-
 class SM_Tag
 {
 public:
@@ -91,6 +120,12 @@ public:
 
 	SInt32 priority;
 
+	SM_Tag() = default;
+	SM_Tag(std::string id, std::string name, std::string description)
+	: id(std::move(id)), name(std::move(name)), description(std::move(description))
+	{}
+
+	virtual std::string GetID() { return id; }
 	virtual std::string GetName() { return !name.empty() ? name : id; }
 	virtual std::string GetDescription() { return FormatString("%s\n- %s", description.c_str(), " "); }
 };
@@ -234,7 +269,7 @@ struct SM_Setting : public SM_Tag
 	std::unordered_set<std::string> tags;
 	std::unordered_set<std::string> mods;
 
-	std::string GetName() override
+	std::string GetDescription() override
 	{
 		return FormatString("%s\n- %s", description.c_str(), "settingName.c_str()");
 	}
@@ -401,7 +436,7 @@ public:
 
 	HotkeyField hotkeyInput;
 
-
+	std::map<SM_Value, std::string> fontMap;
 
 	InputField searchBar;
 	FILETIME lastXMLWriteTime;
@@ -418,8 +453,6 @@ public:
 	void SetInSubsettingInputMode(bool isActive);
 	bool GetInSubsettingInputMode();
 	bool IsSearchSuspended();
-	void SetCategoriesListActive(bool isVisible);
-	bool GetCategoriesListActive();
 	void ClearAndCloseSearch();
 	void DisplaySettings(std::string tab);
 

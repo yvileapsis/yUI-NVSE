@@ -1,5 +1,4 @@
 #include "ConfigurationMenuStew.h"
-#include <sstream>
 
 #include "dinput8.h"
 #include "functions.h"
@@ -14,6 +13,15 @@ ModConfigurationMenu* g_ConfigurationMenu;
 ModConfigurationMenu* ModConfigurationMenu::GetSingleton() { return g_ConfigurationMenu; }
 
 UInt32 ModConfigurationMenu::GetID() { return static_cast<UInt32>(MENU_ID); }
+
+void ModConfigurationMenu::Destructor(bool doFree)
+{
+	this->~ModConfigurationMenu();
+
+	if (doFree) this->operator delete(this);
+
+	g_ConfigurationMenu = nullptr;
+}
 
 SM_Tag* tagDefault;
 
@@ -34,42 +42,18 @@ void ModConfigurationMenu::SetTile(const UInt32 tileID, Tile* activeTile)
 {
 	switch (tileID)
 	{
-	case kModConfigurationMenu_Title:
-		this->menuTitle = activeTile;
-		break;
-	case kModConfigurationMenu_ModList:
-		this->tweaksListBackground = activeTile;
-		break;
-	case kModConfigurationMenu_SelectionText:
-		this->selectionText = activeTile;
-		break;
-	case kModConfigurationMenu_Exit:
-		this->doneTile = activeTile;
-		break;
-	case kModConfigurationMenu_SearchBar:
-		this->searchBar.tile = activeTile;
-		break;
-	case kModConfigurationMenu_SearchIcon:
-		this->searchIcon = activeTile;
-		break;
-	case kModConfigurationMenu_CancelSearch:
-		this->searchCancel = activeTile;
-		break;
-	case kModConfigurationMenu_ActiveCategory:
-		this->currentCategory = (TileText*)activeTile;
-		break;
-	case kModConfigurationMenu_SettingCategoryText:
-		this->categoriesSettings = activeTile;
-		break;
-	case kModConfigurationMenu_ToggleShowActive:
-		this->showActive = activeTile;
-		break;
-	case kModConfigurationMenu_SettingList:
-		this->subSettingsListBackground = activeTile;
-		break;
-	case kModConfigurationMenu_CategoryText:
-		categoriesMods = activeTile;
-		break;
+	case kModConfigurationMenu_Title:				menuTitle = activeTile; break;
+	case kModConfigurationMenu_ModList:				tweaksListBackground = activeTile; break;
+	case kModConfigurationMenu_SelectionText:		selectionText = activeTile; break;
+	case kModConfigurationMenu_Exit:				doneTile = activeTile; break;
+	case kModConfigurationMenu_SearchBar:			searchBar.tile = activeTile; break;
+	case kModConfigurationMenu_SearchIcon:			searchIcon = activeTile; break;
+	case kModConfigurationMenu_CancelSearch:		searchCancel = activeTile; break;
+	case kModConfigurationMenu_ActiveCategory:		currentCategory = (TileText*)activeTile; break;
+	case kModConfigurationMenu_SettingCategoryText:	categoriesSettings = activeTile; break;
+	case kModConfigurationMenu_ToggleShowActive:	showActive = activeTile; break;
+	case kModConfigurationMenu_SettingList:			subSettingsListBackground = activeTile; break;
+	case kModConfigurationMenu_CategoryText:		categoriesMods = activeTile; break;
 	}
 }
 
@@ -117,27 +101,12 @@ void ModConfigurationMenu::HandleActiveMenuClickHeld(UInt32 tileID, Tile* active
 	}
 }
 
-void ModConfigurationMenu::SetCategoriesListActive(bool isVisible)
-{
-	this->tile->SetFloat("_IsCategoriesActive", isVisible);
-}
-
-bool ModConfigurationMenu::GetCategoriesListActive()
-{
-	return this->tile->GetFloat("_IsCategoriesActive");
-}
-
 void ModConfigurationMenu::HandleLeftClick(UInt32 tileID, Tile* clickedTile)
 {
 //	if (clickedTile == categoriesListBox.scrollBar || clickedTile->parent == categoriesListBox.scrollBar)
 	{
 //		this->isDraggingCategoriesSlider = true;
 	}
-}
-
-void SetTweakNotSelected(Tile* tile, SM_Mod* tweak)
-{
-	tile->SetFloat("_selected", 0);
 }
 
 std::string ModConfigurationMenu::GetModNextTag()
@@ -233,8 +202,7 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 
 		auto mod = modsListBox.GetItemForTile(clickedTile);
 
-		modsListBox.ForEach(SetTweakNotSelected);
-
+		modsListBox.ForEach([](Tile* tile, SM_Mod* tweak) { tile->SetFloat("_selected", 0); });
 		clickedTile->parent->SetFloat("_selected", 1);
 		clickedTile->SetFloat("_selected", 1);
 
@@ -243,32 +211,6 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 		break;
 	}
 
-/*	case kModConfigurationMenu_CategoriesButton:
-	{
-		SetCategoriesListActive(!GetCategoriesListActive());
-		break;
-	}
-
-	case kModConfigurationMenu_CategoryItem:
-	{
-		// clear all the selected traits from the categoriesMods
-
-		auto categoryStr = categoriesListBox.GetItemForTile(clickedTile);
-		if (categoryStr)
-		{
-			this->currentCategory->SetString(kTileValue_string, categoryStr);
-		}
-		else
-		{
-			// when clicking <All>
-			this->currentCategory->SetString(kTileValue_string, clickedTile->GetValue(kTileValue_string)->str);
-		}
-
-		categoriesListBox.SaveScrollPosition();
-		this->SetCategoriesListActive(false);
-		this->RefreshFilter();
-		break;
-	}*/
 	case kModConfigurationMenu_SearchIcon:
 	{
 		this->SetInSearchMode(true);
@@ -404,229 +346,6 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 	}
 }
 
-void ModConfigurationMenu::SetInSearchMode(bool isSearchMode)
-{
-	searchBar.SetActive(isSearchMode);
-
-	bool isSuspendedSearch = !isSearchMode && !searchBar.GetText().empty();
-	this->tile->SetFloat("_IsSearchActive", isSuspendedSearch ? 2 : isSearchMode);
-
-	if (isSearchMode)
-	{
-		this->SetInSubsettingInputMode(false);
-	}
-}
-
-bool ModConfigurationMenu::GetInSearchMode()
-{
-	return searchBar.isActive;
-}
-
-bool ModConfigurationMenu::IsSearchSuspended()
-{
-	return !searchBar.isActive && !searchBar.GetText().empty();
-}
-
-bool ModConfigurationMenu::IsSubsettingInputValid()
-{
-	/*
-	auto dataType = activeInputSubsetting->GetDataType();
-	switch (dataType)
-	{
-	case SubSettingData::kSettingDataType_String:
-	{
-		break;
-	}
-	case SubSettingData::kSettingDataType_Integer:
-	{
-		try
-		{
-			size_t parseLen = 0;
-			std::stol(subSettingInput.GetText(), &parseLen);
-
-			if (parseLen != subSettingInput.GetLen())
-			{
-				// reached if user types something like 12dkaodk, since the function will parse the 12, and then return it
-				return false;
-			}
-		}
-		catch (...)
-		{
-			return false;
-		}
-		break;
-	}
-	case SubSettingData::kSettingDataType_Float:
-	{
-		try
-		{
-			size_t parseLen = 0;
-			std::stof(subSettingInput.GetText(), &parseLen);
-
-			if (parseLen != subSettingInput.GetLen())
-			{
-				return false;
-			}
-		}
-		catch (...)
-		{
-			return false;
-		}
-		break;
-	}
-	}*/
-	return true;
-}
-
-void ModConfigurationMenu::SetInSubsettingInputMode(bool isActive)
-{
-	auto tile = subSettingInput.tile;
-	if (tile)
-	{
-		if (tile->parent)
-		{
-			if (auto boxBackground = tile->parent->GetChildByID(kModConfigurationMenu_SubsettingInputFieldText_BoxBG))
-			{
-				boxBackground->SetFloat("_BackgroundVisible", isActive);
-			}
-		}
-	}
-
-	if (isActive)
-	{
-//		subSettingInput.inputType = activeInputSubsetting->type;
-	}
-	else
-	{
-//		if (activeInputSubsetting)
-		{
-			if (this->IsSubsettingInputValid())
-			{
-				this->SetActiveSubsettingValueFromInput();
-
-				/*
-				if (activeInputSubsetting->IsSlider())
-				{
-					if (tile->parent)
-					{
-						if (auto sliderTile = tile->parent->parent)
-						{
-							if (auto sliderRect = sliderTile->GetChildByID(kModConfigurationMenu_SliderDraggableRect))
-							{
-								// update the sliders
-								SetSliderDisplayedValues(sliderRect, activeInputSubsetting);
-
-								// recalculate the min/max values
-								auto minValue = sliderRect->GetFloat(_MinTrait);
-								auto maxValue = sliderRect->GetFloat(_MaxTrait);
-								auto value = sliderRect->GetFloat(_ValueTrait);
-
-								sliderRect->SetFloat(_MinTrait, min(minValue, value));
-								sliderRect->SetFloat(_MaxTrait, max(maxValue, value));
-							}
-						}
-					}
-				}*/
-			}
-//			else
-			{
-				if (tile->parent)
-				{
-					// set the input string back to the current value of the setting
-					//activeInputSubsetting->Display(tile->parent);
-
-					// ensure the input field has the same value so UpdateCaretDisplay doesn't reset the string
-					auto strVal = tile->GetValue(kTileValue_string);
-					auto str = strVal ? strVal->str : "";
-					subSettingInput.Set(str);
-				}
-			}
-
-			if (tile)
-			{
-				tile->SetFloat(kTileValue_systemcolor, 1);
-			}
-		}
-
-	//	activeInputSubsetting = nullptr;
-	}
-
-	subSettingInput.SetActive(isActive);
-}
-
-bool ModConfigurationMenu::GetInSubsettingInputMode()
-{
-	return subSettingInput.isActive;
-}
-
-void ModConfigurationMenu::SetInHotkeyMode(bool isActive)
-{
-/*	auto tile = hotkeyInput.tile;
-	if (tile)
-	{
-		if (tile->parent)
-		{
-			if (auto boxBackground = tile->parent->GetChildByID(kModConfigurationMenu_SubsettingInputFieldText_BoxBG))
-			{
-				boxBackground->SetFloat("_BackgroundVisible", isActive);
-			}
-		}
-	}
-
-	if (activeHotkeySubsetting)
-	{
-		if (isActive)
-		{
-//			hotkeyInput.value = activeHotkeySubsetting->data.valueInt;
-			if (tile)
-			{
-				tile->SetString(kTileValue_string, "...");
-			}
-		}
-		else
-		{
-//			activeHotkeySubsetting->data.valueInt = hotkeyInput.value;
-			if (tile->parent)
-			{
-				activeHotkeySubsetting->Display(tile->parent);
-			}
-			activeHotkeySubsetting = nullptr;
-		}
-	}
-
-	hotkeyInput.SetActive(isActive);*/
-}
-
-bool ModConfigurationMenu::GetInHotkeyMode()
-{
-	return hotkeyInput.isActive;
-}
-
-bool __cdecl HideItemsNotMatchingFilterString(SM_Mod* item)
-{
-	const auto searchStr = ModConfigurationMenu::GetSingleton()->searchBar.GetText();
-	if (item->name.find(searchStr) != std::string::npos) return false;
-//	if (item->settingName.find(searchStr) != std::string::npos) return false;
-	if (item->description.find(searchStr) != std::string::npos) return false;
-	return true;
-}
-
-void ModConfigurationMenu::RefreshFilter()
-{
-//	modsListBox.Filter(TweakFilter);
-
-	auto textColor = modsListBox.GetNumVisibleItems() ? 1 : 2;
-	searchBar.tile->SetFloat(kTileValue_systemcolor, textColor);
-
-	if (auto selectedTile = modsListBox.GetTileFromItem(&activeMod))
-	{
-		// if the selected tweak is filtered out
-		if (selectedTile->GetFloat(kTileValue_listindex) < 0)
-		{
-			this->SetActiveMod(nullptr);
-		}
-	}
-}
 
 int reloadTweaksMenuFrameDelay;
 void __fastcall ReloadTweaksMenuInOneFrameHook(void* startMenu)
@@ -667,13 +386,6 @@ bool ModConfigurationMenu::XMLHasChanges()
 		CloseHandle(tweaksXMLHandle);
 	}
 	return true;
-}
-
-void ModConfigurationMenu::ClearAndCloseSearch()
-{
-	searchBar.Set("");
-	this->SetInSearchMode(false);
-	this->RefreshFilter();
 }
 
 bool ModConfigurationMenu::HandleKeyboardInput(UInt32 key) 
@@ -757,29 +469,15 @@ bool ModConfigurationMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode co
 	{
 	case kMenu_Tab:
 	{
-		if (this->GetInSearchMode())
-		{
-			this->SetInSearchMode(false);
-		}
-		else if (this->GetCategoriesListActive())
-		{
-			this->SetCategoriesListActive(false);
-		}
-		else if (this->GetInSubsettingInputMode())
-		{
-			this->SetInSubsettingInputMode(false);
-		}
-		else
-		{
-			this->Close();
-		}
+
+		this->Close();
+
 		return true;
 	}
 	case kMenu_ShiftLeft:
 	{
 		if (modsListBox.GetSelectedTile())
 		{
-			this->SetCategoriesListActive(true);
 			modsListBox.SaveScrollPosition();
 //			this->HandleMouseover(kModConfigurationMenu_CategoriesBackground, nullptr);
 //			categoriesListBox.RestorePosition();
@@ -796,7 +494,6 @@ bool ModConfigurationMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode co
 	{
 		if (modsListBox.GetNumVisibleItems())
 		{
-			this->SetCategoriesListActive(false);
 //			categoriesListBox.SaveScrollPosition();
 			this->HandleMouseover(kModConfigurationMenu_ModList, nullptr);
 			modsListBox.RestorePosition();
@@ -835,53 +532,6 @@ bool ModConfigurationMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode co
 	return false;
 }
 
-bool ModConfigurationMenu::HandleControllerInput(int code, Tile* tile)
-{
-	this->SetInSearchMode(false);
-	if (this->GetInSubsettingInputMode() && code != OSInputGlobals::kXboxCtrl_BUTTON_A)
-	{
-		this->SetInSubsettingInputMode(false);
-	}
-
-	if (code == OSInputGlobals::kXboxCtrl_L3 || code == OSInputGlobals::kXboxCtrl_R3)
-	{
-		this->HandleClick(kModConfigurationMenu_ToggleShowActive, nullptr);
-		return true;
-	}
-
-	return false;
-}
-
-void ModConfigurationMenu::SetActiveSubsettingValueFromInput()
-{
-	/*
-	auto category = activeInputSubsetting->settingCategory;
-	auto name = activeInputSubsetting->id;
-
-	auto dataType = activeInputSubsetting->GetDataType();
-	switch (dataType)
-	{
-	case SubSettingData::kSettingDataType_String:
-	{
-		activeInputSubsetting->data.valueStr = subSettingInput.GetText();
-		ini.SetValue(category.c_str(), name.c_str(), activeInputSubsetting->data.valueStr.c_str());
-		break;
-	}
-	case SubSettingData::kSettingDataType_Integer:
-	{
-		activeInputSubsetting->data.valueInt = std::stol(subSettingInput.GetText());
-		ini.SetLongValue(category.c_str(), name.c_str(), activeInputSubsetting->data.valueInt);
-		break;
-	}
-	case SubSettingData::kSettingDataType_Float:
-	{
-		activeInputSubsetting->data.valueFloat = std::stof(subSettingInput.GetText());
-		ini.SetDoubleValue(category.c_str(), name.c_str(), activeInputSubsetting->data.valueFloat);
-		break;
-	}
-	}*/
-}
-
 void SM_Setting::Choice::Display(Tile* tile)
 {
 	const auto value = setting.ReadINI();
@@ -898,6 +548,7 @@ void SM_Setting::Slider::Display(Tile* tile)
 
 void SM_Setting::Font::Display(Tile* tile)
 {
+	const auto fontMap = ModConfigurationMenu::GetSingleton()->fontMap;
 	const auto value = font.ReadINI();
 	const SInt32 id = value;
 	std::string valueString;
@@ -1004,6 +655,7 @@ void SM_Setting::Slider::Last(const bool forward)
 
 SM_Value SM_Setting::Font::GetPrev(const SM_Value& value)
 {
+	const auto fontMap = ModConfigurationMenu::GetSingleton()->fontMap;
 	if (fontMap.empty()) return value;
 	if (auto iter = fontMap.find(value); iter == fontMap.end() || --iter == fontMap.end())
 		return fontMap.rbegin()->first;
@@ -1012,6 +664,7 @@ SM_Value SM_Setting::Font::GetPrev(const SM_Value& value)
 
 SM_Value SM_Setting::Font::GetNext(const SM_Value& value)
 {
+	const auto fontMap = ModConfigurationMenu::GetSingleton()->fontMap;
 	if (fontMap.empty()) return value;
 	if (auto iter = fontMap.find(value); iter == fontMap.end() || ++iter == fontMap.end())
 		return fontMap.begin()->first;
@@ -1044,7 +697,7 @@ void ModConfigurationMenu::DisplaySettings(std::string tab)
 
 		for (const auto& iter : it->tags) set.emplace(iter);
 
-		const auto tile = settingsListBox.InsertAlt(it.get(), it->name.c_str(), it->GetTemplate());
+		const auto tile = settingsListBox.InsertAlt(it.get(), it->GetName().c_str(), it->GetTemplate());
 
 		settingsListBox.SortAlt(tile);
 
@@ -1053,19 +706,13 @@ void ModConfigurationMenu::DisplaySettings(std::string tab)
 		it->Display(tile->tile);
 	}
 
-	for (const auto& iter : set)
-		settingTags.emplace(iter);
+	for (const auto& iter : set) settingTags.emplace(iter);
 
 	SetActiveSettingTag(*settingTags.begin());
 }
 
 void ModConfigurationMenu::SetActiveMod(SM_Mod* mod)
 {
-//	this->SetInSubsettingInputMode(false);
-//	this->SetInHotkeyMode(false);
-//	subSettingInput.tile = nullptr;
-//	hotkeyInput.tile = nullptr;
-
 	activeMod = mod;
 
 	DisplaySettings(mod ? mod->id : "");
@@ -1096,7 +743,7 @@ void ModConfigurationMenu::SetActiveSettingTag(std::string tag)
 	const auto filter = [](SM_Setting* setting)
 	{
 		const auto menu = GetSingleton();
-		if (menu->activeSettingTag == tagDefault->id) return false;
+		if (menu->activeSettingTag == tagDefault->GetID()) return false;
 		if (setting->tags.contains(menu->activeSettingTag)) return false;
 		return true;
 	};
@@ -1170,15 +817,8 @@ void ModConfigurationMenu::HandleUnmouseover(UInt32 tileID, Tile* tile)
 	selectionText->SetString(kTileValue_string, "");
 }
 
-void ModConfigurationMenu::Destructor(bool doFree) 
-{
-	this->~ModConfigurationMenu();
 
-	if (doFree) this->operator delete(this);
-	;
-	g_ConfigurationMenu = nullptr;
-}
-
+/*
 int g_bShownTweaksMenuReloadWarning = false;
 void RestartGameWarningCallback()
 {
@@ -1190,10 +830,11 @@ void RestartGameWarningCallback()
 //		WriteValueToINIs("INI", "bShownTweaksMenuReloadWarning", " 1");
 	}
 }
+*/
 
 void ModConfigurationMenu::Close()
 {
-	if (!g_bShownTweaksMenuReloadWarning)
+//	if (!g_bShownTweaksMenuReloadWarning)
 	{
 //		if (!touchedTweaks.Empty() || !touchedSubsettings.Empty())
 		{
@@ -1313,7 +954,7 @@ signed int __cdecl CompareTweaksAlphabetically(ListBoxItem<SM_Mod>* a, ListBoxIt
 
 	if (itemA->priority == itemB->priority)
 	{
-		return (itemA->name <=> itemB->name)._Value;
+		return (itemA->GetName() <=> itemB->GetName())._Value;
 	}
 
 	return itemA->priority > itemB->priority ? -1 : 1;
@@ -1385,41 +1026,27 @@ void ModConfigurationMenu::ShowTweaksMenu()
 	modsListBox.templateName = "ModTemplate";
 	modsListBox.scrollBar = modsListBox.parentTile->GetChild("lb_scrollbar");
 
-
 	settingsListBox.parentTile = subSettingsListBackground;
 	settingsListBox.templateName = "SettingNoneTebmplate";
 	settingsListBox.scrollBar = settingsListBox.parentTile->GetChild("lb_scrollbar");
 
 
-	SM_Tag tag{};
-
-	tag.id = "_Mods";
-	tag.name = "Mods";
-	tag.description = "Mods can be filtered by modTags.";
-
-	g_Tags.emplace(tag.id, std::make_unique<SM_Tag>(tag));
+	g_Tags.emplace("_Mods", std::make_unique<SM_Tag>("_Mods", "Mods", "Mods can be filtered by modTags."));
 	tagDefault = g_Tags.begin()->second.get();
 
 	ReadJSONForPath(GetCurPath() + R"(\Data\menus\)");
 
 	std::unordered_set<std::string> set;
-	for (const auto& iter : g_Mods) for (const auto& iter2 : iter->tags)
-	{
-		set.emplace(iter2);
-	}
-	modTags.emplace(tagDefault->id);
-	for (const auto& iter : set)
-	{
-		modTags.emplace(iter);
-	}
+	for (const auto& mod : g_Mods) for (const auto& tag : mod->tags) set.emplace(tag);
 
-	SetActiveModTag(tagDefault->id);
+	modTags.emplace(tagDefault->GetID());
+
+	for (const auto& tag : set) modTags.emplace(tag);
+
+	SetActiveModTag(tagDefault->GetID());
 
 	for (const auto& mod : g_Mods)
-	{
-		const auto tile = modsListBox.Insert(mod.get(), mod->name.c_str());
-		tile->SetFloat(kTileValue_id, kModConfigurationMenu_ModListItem);
-	}
+		modsListBox.Insert(mod.get(), mod->GetName().c_str())->SetFloat(kTileValue_id, kModConfigurationMenu_ModListItem);
 
 	modsListBox.Sort(CompareTweaksAlphabetically);
 
@@ -1427,14 +1054,10 @@ void ModConfigurationMenu::ShowTweaksMenu()
 
 	fontMap.emplace(SM_Value(static_cast<SInt32>(0)), "--");
 
-	for (const auto iter : FontManager::GetSingleton()->fontInfos)
-	{
-		fontMap.emplace(static_cast<SInt32>(iter->id), std::string(iter->fontData->textures[0].fileName));
-	};
-	for (const auto iter : FontManager::GetSingleton()->extraFonts)
-	{
-		fontMap.emplace(static_cast<SInt32>(iter->id), std::string(iter->fontData->textures[0].fileName));
-	};
+	for (const auto font : FontManager::GetSingleton()->fontInfos)
+		fontMap.emplace(static_cast<SInt32>(font->id), std::string(font->fontData->textures[0].fileName));
+	for (const auto font : FontManager::GetSingleton()->extraFonts)
+		fontMap.emplace(static_cast<SInt32>(font->id), std::string(font->fontData->textures[0].fileName));;
 
 }
 
@@ -1480,4 +1103,521 @@ void HotkeyField::SetActive(bool active)
 void HotkeyField::Free()
 {
 
+}
+
+
+
+void ModConfigurationMenu::SetActiveSubsettingValueFromInput()
+{
+	/*
+	auto category = activeInputSubsetting->settingCategory;
+	auto name = activeInputSubsetting->id;
+
+	auto dataType = activeInputSubsetting->GetDataType();
+	switch (dataType)
+	{
+	case SubSettingData::kSettingDataType_String:
+	{
+		activeInputSubsetting->data.valueStr = subSettingInput.GetText();
+		ini.SetValue(category.c_str(), name.c_str(), activeInputSubsetting->data.valueStr.c_str());
+		break;
+	}
+	case SubSettingData::kSettingDataType_Integer:
+	{
+		activeInputSubsetting->data.valueInt = std::stol(subSettingInput.GetText());
+		ini.SetLongValue(category.c_str(), name.c_str(), activeInputSubsetting->data.valueInt);
+		break;
+	}
+	case SubSettingData::kSettingDataType_Float:
+	{
+		activeInputSubsetting->data.valueFloat = std::stof(subSettingInput.GetText());
+		ini.SetDoubleValue(category.c_str(), name.c_str(), activeInputSubsetting->data.valueFloat);
+		break;
+	}
+	}*/
+}
+
+void ModConfigurationMenu::SetInSearchMode(bool isSearchMode)
+{
+	searchBar.SetActive(isSearchMode);
+
+	bool isSuspendedSearch = !isSearchMode && !searchBar.GetText().empty();
+	this->tile->SetFloat("_IsSearchActive", isSuspendedSearch ? 2 : isSearchMode);
+
+	if (isSearchMode)
+	{
+		this->SetInSubsettingInputMode(false);
+	}
+}
+
+bool ModConfigurationMenu::GetInSearchMode()
+{
+	return searchBar.isActive;
+}
+
+bool ModConfigurationMenu::IsSearchSuspended()
+{
+	return !searchBar.isActive && !searchBar.GetText().empty();
+}
+
+bool ModConfigurationMenu::IsSubsettingInputValid()
+{
+	/*
+	auto dataType = activeInputSubsetting->GetDataType();
+	switch (dataType)
+	{
+	case SubSettingData::kSettingDataType_String:
+	{
+		break;
+	}
+	case SubSettingData::kSettingDataType_Integer:
+	{
+		try
+		{
+			size_t parseLen = 0;
+			std::stol(subSettingInput.GetText(), &parseLen);
+
+			if (parseLen != subSettingInput.GetLen())
+			{
+				// reached if user types something like 12dkaodk, since the function will parse the 12, and then return it
+				return false;
+			}
+		}
+		catch (...)
+		{
+			return false;
+		}
+		break;
+	}
+	case SubSettingData::kSettingDataType_Float:
+	{
+		try
+		{
+			size_t parseLen = 0;
+			std::stof(subSettingInput.GetText(), &parseLen);
+
+			if (parseLen != subSettingInput.GetLen())
+			{
+				return false;
+			}
+		}
+		catch (...)
+		{
+			return false;
+		}
+		break;
+	}
+	}*/
+	return true;
+}
+
+void ModConfigurationMenu::SetInSubsettingInputMode(bool isActive)
+{
+	auto tile = subSettingInput.tile;
+	if (tile)
+	{
+		if (tile->parent)
+		{
+			if (auto boxBackground = tile->parent->GetChildByID(kModConfigurationMenu_SubsettingInputFieldText_BoxBG))
+			{
+				boxBackground->SetFloat("_BackgroundVisible", isActive);
+			}
+		}
+	}
+
+	if (isActive)
+	{
+		//		subSettingInput.inputType = activeInputSubsetting->type;
+	}
+	else
+	{
+		//		if (activeInputSubsetting)
+		{
+			if (this->IsSubsettingInputValid())
+			{
+				this->SetActiveSubsettingValueFromInput();
+
+				/*
+				if (activeInputSubsetting->IsSlider())
+				{
+					if (tile->parent)
+					{
+						if (auto sliderTile = tile->parent->parent)
+						{
+							if (auto sliderRect = sliderTile->GetChildByID(kModConfigurationMenu_SliderDraggableRect))
+							{
+								// update the sliders
+								SetSliderDisplayedValues(sliderRect, activeInputSubsetting);
+
+								// recalculate the min/max values
+								auto minValue = sliderRect->GetFloat(_MinTrait);
+								auto maxValue = sliderRect->GetFloat(_MaxTrait);
+								auto value = sliderRect->GetFloat(_ValueTrait);
+
+								sliderRect->SetFloat(_MinTrait, min(minValue, value));
+								sliderRect->SetFloat(_MaxTrait, max(maxValue, value));
+							}
+						}
+					}
+				}*/
+			}
+			//			else
+			{
+				if (tile->parent)
+				{
+					// set the input string back to the current value of the setting
+					//activeInputSubsetting->Display(tile->parent);
+
+					// ensure the input field has the same value so UpdateCaretDisplay doesn't reset the string
+					auto strVal = tile->GetValue(kTileValue_string);
+					auto str = strVal ? strVal->str : "";
+					subSettingInput.Set(str);
+				}
+			}
+
+			if (tile)
+			{
+				tile->SetFloat(kTileValue_systemcolor, 1);
+			}
+		}
+
+		//	activeInputSubsetting = nullptr;
+	}
+
+	subSettingInput.SetActive(isActive);
+}
+
+bool ModConfigurationMenu::GetInSubsettingInputMode()
+{
+	return subSettingInput.isActive;
+}
+
+void ModConfigurationMenu::SetInHotkeyMode(bool isActive)
+{
+	/*	auto tile = hotkeyInput.tile;
+		if (tile)
+		{
+			if (tile->parent)
+			{
+				if (auto boxBackground = tile->parent->GetChildByID(kModConfigurationMenu_SubsettingInputFieldText_BoxBG))
+				{
+					boxBackground->SetFloat("_BackgroundVisible", isActive);
+				}
+			}
+		}
+
+		if (activeHotkeySubsetting)
+		{
+			if (isActive)
+			{
+	//			hotkeyInput.value = activeHotkeySubsetting->data.valueInt;
+				if (tile)
+				{
+					tile->SetString(kTileValue_string, "...");
+				}
+			}
+			else
+			{
+	//			activeHotkeySubsetting->data.valueInt = hotkeyInput.value;
+				if (tile->parent)
+				{
+					activeHotkeySubsetting->Display(tile->parent);
+				}
+				activeHotkeySubsetting = nullptr;
+			}
+		}
+
+		hotkeyInput.SetActive(isActive);*/
+}
+
+bool ModConfigurationMenu::GetInHotkeyMode()
+{
+	return hotkeyInput.isActive;
+}
+
+bool __cdecl HideItemsNotMatchingFilterString(SM_Mod* item)
+{
+	const auto searchStr = ModConfigurationMenu::GetSingleton()->searchBar.GetText();
+	if (item->name.find(searchStr) != std::string::npos) return false;
+	//	if (item->settingName.find(searchStr) != std::string::npos) return false;
+	if (item->description.find(searchStr) != std::string::npos) return false;
+	return true;
+}
+
+void ModConfigurationMenu::RefreshFilter()
+{
+	//	modsListBox.Filter(TweakFilter);
+
+	auto textColor = modsListBox.GetNumVisibleItems() ? 1 : 2;
+	searchBar.tile->SetFloat(kTileValue_systemcolor, textColor);
+
+	if (auto selectedTile = modsListBox.GetTileFromItem(&activeMod))
+	{
+		// if the selected tweak is filtered out
+		if (selectedTile->GetFloat(kTileValue_listindex) < 0)
+		{
+			this->SetActiveMod(nullptr);
+		}
+	}
+}
+
+void ModConfigurationMenu::ClearAndCloseSearch()
+{
+	searchBar.Set("");
+	this->SetInSearchMode(false);
+	this->RefreshFilter();
+}
+
+bool ModConfigurationMenu::HandleControllerInput(int code, Tile* tile)
+{
+	this->SetInSearchMode(false);
+	if (this->GetInSubsettingInputMode() && code != OSInputGlobals::kXboxCtrl_BUTTON_A)
+	{
+		this->SetInSubsettingInputMode(false);
+	}
+
+	if (code == OSInputGlobals::kXboxCtrl_L3 || code == OSInputGlobals::kXboxCtrl_R3)
+	{
+		this->HandleClick(kModConfigurationMenu_ToggleShowActive, nullptr);
+		return true;
+	}
+
+	return false;
+}
+
+void InputField::Init()
+{
+	this->tile = nullptr;
+	input.clear();
+	isActive = false;
+	isCaretShown = false;
+	caretIndex = 0;
+	lastCaretUpdateTime = 0;
+	inputType = kInputType_String;
+}
+
+void InputField::Set(std::string str)
+{
+	input = str;
+	if (str.empty())
+	{
+		tile->SetString(kTileValue_string, "");
+		caretIndex = 0;
+	}
+	else
+	{
+		caretIndex = str.length();
+	}
+}
+
+std::string InputField::GetText()
+{
+	return input;
+}
+
+UInt16 InputField::GetLen()
+{
+	return input.length();
+}
+
+void InputField::UpdateCaretDisplay()
+{
+	static const UInt32 _CaretIndex = Tile::TraitNameToID("_CaretIndex");
+
+	std::string inputString;
+	inputString = GetText();
+	if (isActive)
+	{
+		inputString.insert(caretIndex, isCaretShown ? "|" : " ");
+		tile->SetFloat(_CaretIndex, caretIndex);
+	}
+	tile->SetString(kTileValue_string, inputString.c_str());
+}
+
+void InputField::SetActive(bool active)
+{
+	isActive = active;
+	lastCaretUpdateTime = 0;
+	isCaretShown = false;
+
+	if (tile)
+	{
+		static auto textAlphaTrait = Tile::TraitNameToID("_IsActive");
+		tile->SetFloat(textAlphaTrait, active);
+		if (!active)
+		{
+			UpdateCaretDisplay();
+		}
+	}
+}
+
+bool InputField::IsKeyValid(UInt32 key)
+{
+	if (key >= kInputCode_Backspace) return false;
+
+	if (inputType != kInputType_String)
+	{
+		if (key == '-')
+		{
+			return caretIndex == 0 && GetText()[0] != '-';
+		}
+
+		if (inputType == kInputType_Float)
+		{
+			// only allow one . character
+			if (key == '.') return strchr(GetText().c_str(), '.') == nullptr;
+		}
+		return key >= '0' && key <= '9';
+	}
+
+	return key != '\t' && key != '`' && key != '\r' && key != '\n';
+}
+
+
+
+bool InputField::HandleSpecialInputKey(UInt32 key)
+{
+	switch (key)
+	{
+	case kInputCode_Backspace:
+	case kInputCode_Delete:
+	{
+		if (key == kInputCode_Backspace)
+		{
+			if (IsControlHeld())
+			{
+				//				caretIndex = (input.c_str()).EraseWord(caretIndex);
+			}
+			else
+			{
+				input.erase(--caretIndex);
+				caretIndex = max(0, caretIndex);
+			}
+		}
+		else
+		{
+			if (IsControlHeld())
+			{
+				//				input.EraseNextWord(caretIndex);
+			}
+			else
+			{
+				input.erase(caretIndex);
+				caretIndex = min(input.length(), caretIndex);
+			}
+		}
+
+		if (input.length())
+		{
+			tile->SetString(kTileValue_string, this->GetText().c_str());
+		}
+		else
+		{
+			tile->SetString(kTileValue_string, "");
+		}
+
+		return true;
+	}
+	case kInputCode_ArrowLeft:
+	{
+		if (IsControlHeld())
+		{
+			caretIndex -= GetCharsSinceSpace(input.c_str(), caretIndex);
+		}
+		else
+		{
+			--caretIndex;
+		}
+		caretIndex = max(0, caretIndex);
+		return true;
+	}
+	case kInputCode_ArrowRight:
+	{
+		if (IsControlHeld())
+		{
+			caretIndex += GetCharsTillSpace(input.c_str(), caretIndex) + 1;
+		}
+		else
+		{
+			++caretIndex;
+		}
+		caretIndex = min(input.length(), caretIndex);
+		return true;
+	}
+	case kInputCode_Enter:
+	{
+		SetActive(false);
+		return true;
+	}
+	case kInputCode_Home:
+	{
+		caretIndex = 0;
+		return true;
+	}
+	case kInputCode_End:
+	{
+		caretIndex = input.length();
+		return true;
+	}
+	}
+
+	return false;
+}
+
+void InputField::HandleKeyboardShortcuts(UInt32 key)
+{
+	if ((key | 0x20) == 'v')
+	{
+		// handle pasting from clipboard
+		auto clipboardText = GetClipboardText();
+		auto len = min(200, clipboardText.length()); // cap paste to 200 characters
+		for (int i = 0; i < len; ++i)
+		{
+			if (char c = clipboardText[i]; IsKeyValid(c))
+			{
+				input.insert(caretIndex++, 1, c);
+			}
+		}
+	}
+}
+
+bool InputField::HandleKey(UInt32 key)
+{
+	lastCaretUpdateTime = 0;
+	isCaretShown = false;
+
+	if (IsKeyValid(key))
+	{
+		if (IsControlHeld())
+		{
+			HandleKeyboardShortcuts(key);
+		}
+		else
+		{
+			input.insert(caretIndex++, 1, key);
+		}
+
+		tile->SetString(kTileValue_string, this->GetText().c_str());
+		return true;
+	}
+
+	return HandleSpecialInputKey(key);
+}
+
+void InputField::Update()
+{
+	if (isActive)
+	{
+		auto currentTime = StdCall<UInt32>(0x457FE0);
+		if (currentTime - lastCaretUpdateTime > 530)
+		{
+			isCaretShown = !isCaretShown;
+			lastCaretUpdateTime = currentTime;
+			UpdateCaretDisplay();
+		}
+	}
+}
+
+void InputField::Free()
+{
 }
