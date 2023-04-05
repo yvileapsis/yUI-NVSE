@@ -219,7 +219,6 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClInclude Include="main.h" />
     <ClInclude Include="SortingIcons\SortingIcons.h" />
     <ClInclude Include="ConfigurationMenu\ConfigurationMenu.h" />
-    <ClInclude Include="ConfigurationMenu\ConfigurationMenuStew.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\game\GameRTTI.inc" />

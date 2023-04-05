@@ -6,6 +6,7 @@
 <_HorizontalSpacing> 10 </_HorizontalSpacing>
 <user4> 0 </user4> <!-- arrow spacing -->
 <xdefault> 1 </xdefault>
+<id> 20 </id>
 
 <width> 
 	<copy src="parent" trait="width"/> 

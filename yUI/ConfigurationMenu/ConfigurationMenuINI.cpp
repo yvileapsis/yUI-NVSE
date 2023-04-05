@@ -1,5 +1,5 @@
 #pragma once
-#include "ConfigurationMenuStew.h"
+#include "ConfigurationMenu.h"
 #include <SimpleINILibrary.h>
 
 inline std::map<std::tuple<std::filesystem::path, std::string, std::string>, SM_Value> ini_map;
@@ -32,7 +32,7 @@ inline void ReadINIInternal(const std::filesystem::path& iniPath, const std::fil
 	ini.SaveFile(iniPath.c_str(), false);
 }
 
-SM_Value SM_Setting::SettingSource::ReadINI()
+SM_Value CMSetting::SettingSource::ReadINI()
 {
 	std::filesystem::path iniPath = GetCurPath();
 	iniPath += std::get<0>(setting);
@@ -48,7 +48,7 @@ SM_Value SM_Setting::SettingSource::ReadINI()
 	return defaultValue;
 }
 
-inline void WriteINIInternal(const std::filesystem::path& iniPath, const SM_Setting::SettingSource::INISetting& setting, const SM_Value& value)
+inline void WriteINIInternal(const std::filesystem::path& iniPath, const CMSetting::SettingSource::INISetting& setting, const SM_Value& value)
 {
 	CSimpleIniA ini;
 	ini.SetUnicode();
@@ -64,7 +64,7 @@ inline void WriteINIInternal(const std::filesystem::path& iniPath, const SM_Sett
 	ini.SaveFile(iniPath.c_str(), false);
 }
 
-void SM_Setting::SettingSource::WriteINI(const SM_Value& value)
+void CMSetting::SettingSource::WriteINI(const SM_Value& value)
 {
 	std::filesystem::path iniPath = GetCurPath();
 	iniPath += std::get<0>(setting);

@@ -3,6 +3,12 @@
 #include "PluginAPI.h"
 #include <string>
 
+bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS);
+bool Cmd_SetyCMFloat_Execute(COMMAND_ARGS);
+
+void WriteMCMHooks();
+void FixReorderMCM();
+
 std::string MCMPath(UInt32 child, UInt32 grandchild, std::string src)
 {
 

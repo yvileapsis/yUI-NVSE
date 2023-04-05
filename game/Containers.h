@@ -599,7 +599,7 @@ public:
 	virtual Tile*	GetTileByIndex(int index, char isNotTileListIndex) { return nullptr; };
 	virtual void	Destructor(bool doFree) {};
 	virtual void	FreeAllTiles(void) {};
-	virtual void	Sort(signed int(__cdecl*)(Item*, Item*)) {};
+	virtual void	Sort(SInt32(__cdecl*)(Item*, Item*)) {};
 
 	TList<Item>		list;	// 004
 };	// 00C

@@ -1,9 +1,9 @@
-#include "ConfigurationMenuStew.h"
+#include "ConfigurationMenu.h"
 #include "json.h"
 
-class TagJSON : public SM_Tag { public: TagJSON(const nlohmann::basic_json<>& elem); };
-class ModJSON : public SM_Mod { public: ModJSON(const nlohmann::basic_json<>& elem); };
-class SettingJSON : public SM_Setting { public: SettingJSON(const nlohmann::basic_json<>& elem); };
+class TagJSON : public CMTag { public: TagJSON(const nlohmann::basic_json<>& elem); };
+class ModJSON : public CMMod { public: ModJSON(const nlohmann::basic_json<>& elem); };
+class SettingJSON : public CMSetting { public: SettingJSON(const nlohmann::basic_json<>& elem); };
 
 template <typename T> std::vector<T> GetSetFromElement(const nlohmann::basic_json<>& elem)
 {
@@ -21,11 +21,11 @@ SM_Value GetValueFromElement(const nlohmann::basic_json<>& elem)
 	return static_cast<SInt32>(0);
 }
 
-SM_Setting::SettingSource GetSourceFromElement(const nlohmann::basic_json<>& elem, const std::string& path = "path",
+CMSetting::SettingSource GetSourceFromElement(const nlohmann::basic_json<>& elem, const std::string& path = "path",
                                                const std::string& category = "category", const std::string&
                                                value = "value", const std::string& valueDefault = "valueDefault")
 {
-	SM_Setting::SettingSource source{};
+	CMSetting::SettingSource source{};
 
 	std::filesystem::path pathGot;
 	std::string categoryGot, valueGot;
@@ -166,7 +166,7 @@ void ModConfigurationMenu::ReadJSON(const std::filesystem::path& path)
 		else
 		{
 			const auto tag = TagJSON(elem);
-			g_Tags.emplace(tag.id, std::make_unique<SM_Tag>(tag));
+			g_Tags.emplace(tag.id, std::make_unique<CMTag>(tag));
 		}
 
 		if (!j.contains("mods") || !j["mods"].is_array())
@@ -174,14 +174,14 @@ void ModConfigurationMenu::ReadJSON(const std::filesystem::path& path)
 		else for (const auto& elem : j["mods"]) if (!elem.is_object())
 			Log() << "JSON error: Expected object";
 		else 
-			g_Mods.push_back(std::make_unique<SM_Mod>(ModJSON(elem)));
+			g_Mods.push_back(std::make_unique<CMMod>(ModJSON(elem)));
 
 		if (!j.contains("settings") || !j["settings"].is_array())
 			Log() << "JSON message: ySI tab array not detected in " + path.string();
 		else for (const auto& elem : j["settings"]) if (!elem.is_object())
 			Log() << "JSON error: Expected object";
 		else
-			g_Settings.push_back(std::make_unique<SM_Setting>(SettingJSON(elem)));
+			g_Settings.push_back(std::make_unique<CMSetting>(SettingJSON(elem)));
 	}
 	catch (nlohmann::json::exception& e)
 	{

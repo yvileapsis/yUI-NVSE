@@ -1,8 +1,7 @@
 #include "main.h"
-#include "ConfigurationMenu.h"
 
 #include "SafeWrite.h"
-#include "ConfigurationMenuStew.h"
+#include "ConfigurationMenu.h"
 
 namespace ConfigurationMenu
 {
@@ -25,7 +24,8 @@ namespace ConfigurationMenu
 
 	inline void TweaksButtonCallback()
 	{
-		ModConfigurationMenu::ReloadMenu()->ShowTweaksMenu();
+		const auto menu = ModConfigurationMenu::ReloadMenu();
+		menu->ShowTweaksMenu();
 		// return the StartMenu to the settings menu, to prevent a visual bug since we don't open a sub-menu
 		//CdeclCall(0x7D0700); // MenuButton:Settings
 	}

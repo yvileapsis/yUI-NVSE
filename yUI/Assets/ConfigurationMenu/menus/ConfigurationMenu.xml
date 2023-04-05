@@ -730,6 +730,7 @@
 		<_TextAlpha> 255 </_TextAlpha>
 		<mouseoversound> UIMenuFocus </mouseoversound>
 		<clicksound> UIMenuOK </clicksound>
+		<id> 12 </id>
 
 		<_VerticalSpacing> 8 </_VerticalSpacing>
 		<_wrapper> <copy src="sibling(lb_highlight_box)" trait="width"/> </_wrapper>

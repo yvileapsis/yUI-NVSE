@@ -207,9 +207,6 @@
     <ClInclude Include="ConfigurationMenu\ConfigurationMenu.h">
       <Filter>features\ConfigurationMenu</Filter>
     </ClInclude>
-    <ClInclude Include="ConfigurationMenu\ConfigurationMenuStew.h">
-      <Filter>features\ConfigurationMenu</Filter>
-    </ClInclude>
     <ClInclude Include="SortingIcons\SortingIcons.h">
       <Filter>features\SortingIcons</Filter>
     </ClInclude>
