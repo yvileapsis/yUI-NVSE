@@ -127,7 +127,7 @@ public:
 
 	virtual std::string GetID() { return id; }
 	virtual std::string GetName() { return !name.empty() ? name : id; }
-	virtual std::string GetDescription() { return FormatString("%s\n- %s", description.c_str(), " "); }
+	virtual std::string GetDescription() const { return FormatString("%s\n- %s", description.c_str(), " "); }
 };
 
 class CMMod : public CMTag
@@ -155,6 +155,7 @@ struct CMSetting : public CMTag
 		void WriteINI(const SM_Value& value);
 	};
 
+	// TODO: tagify this
 	typedef std::map<SM_Value, std::pair<std::string, std::string>> SM_ValueChoice;
 	typedef std::tuple<SM_Value, SM_Value, SM_Value> SM_ValueSlider;
 
@@ -273,7 +274,7 @@ struct CMSetting : public CMTag
 	std::unordered_set<std::string> tags;
 	std::unordered_set<std::string> mods;
 
-	std::string GetDescription() override
+	std::string GetDescription() const override
 	{
 		return FormatString("%s\n- %s", description.c_str(), "settingName.c_str()");
 	}
@@ -298,7 +299,6 @@ enum TileIDs
 	kModConfigurationMenu_Exit = 7,
 	kModConfigurationMenu_Back = 8,
 	kModConfigurationMenu_DeviceButton = 30,
-	kModConfigurationMenu_CancelSearch = 16,
 
 	kModConfigurationMenu_ModList = 11,
 	kModConfigurationMenu_ModListItem = 12,
@@ -309,9 +309,6 @@ enum TileIDs
 	kModConfigurationMenu_CategoryLeftArrow = 13,
 	kModConfigurationMenu_CategoryText = 14,
 	kModConfigurationMenu_CategoryRightArrow = 15,
-
-	kModConfigurationMenu_ActiveCategory = 17,
-	kModConfigurationMenu_ToggleShowActive = 18,
 
 	kModConfigurationMenu_SettingCategoryLeftArrow = 23,
 	kModConfigurationMenu_SettingCategoryText = 24,
@@ -351,6 +348,8 @@ public:
 	ModConfigurationMenu()
 	{
 		memset(tiles, 0, sizeof tiles);
+
+		id = MENU_ID;
 		modsListBox.Init();
 		modsListBox.flags &= ~ListBox<CMMod>::kFlag_RecalculateHeightsOnInsert;
 
@@ -406,15 +405,9 @@ public:
 		{
 			Tile* doneTile;
 			Tile* menuTitle;
-			Tile* tweaksListBackground;
 
-			TileText* currentCategory;
-			Tile* selectionText;
-			Tile* searchIcon;
-
-			Tile* searchCancel;
-			Tile* showActive;
-			Tile* subSettingsListBackground;
+			Tile* modsListBackground;
+			Tile* settingsListBackground;
 		};
 	};
 
@@ -444,6 +437,42 @@ public:
 	ListBoxWithFilter<CMMod> modsListBox;
 	ListBoxWithFilter<CMSetting> settingsListBox;
 
+	class Description
+	{
+	public:
+		Tile* tile;
+
+		void Set(const std::string& str) const
+		{
+			tile->SetString(kTileValue_string, str.c_str());
+		}
+
+		void operator<<=(const CMSetting* setting) const
+		{
+			Set(setting->GetDescription());
+		}
+
+		void operator<<=(const CMMod* mod) const
+		{
+			Set(mod->GetDescription());
+		}
+
+		template <typename Item> void operator<<=(const ListBoxWithFilter<Item>& listBox) const
+		{
+			const auto menu = GetSingleton();
+			if (menu->g_Tags.contains(listBox.tagActive) && menu->g_Tags[listBox.tagActive].get())
+				Set(menu->g_Tags[listBox.tagActive].get()->GetDescription());
+			else Set("");
+		}
+
+		void operator<<=(const std::string& str) const
+		{
+			Set(str);
+		}
+	};
+	Description description;
+
+
 	InputField subSettingInput;
 
 	HotkeyField hotkeyInput;
@@ -461,8 +490,6 @@ public:
 	void ReloadMenuXML();
 	bool XMLHasChanges();
 
-	void ClearAndCloseSearch();
-
 	void DisplayMods();
 	void DisplaySettings(std::string tab);
 
@@ -472,9 +499,7 @@ public:
 	void FilterMods();
 	void FilterSettings();
 
-	bool IsSubsettingInputValid();
 	void SetActiveSubsettingValueFromInput();
-	void SetInHotkeyMode(bool isActive);
 	bool GetInHotkeyMode();
 
 	void ReadJSON(const std::filesystem::path& path);
