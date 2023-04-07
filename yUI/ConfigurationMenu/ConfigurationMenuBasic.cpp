@@ -57,11 +57,9 @@ ModConfigurationMenu* ModConfigurationMenu::ReloadMenu()
 
 	Tile* tile = InterfaceManager::GetSingleton()->menuRoot->InjectUIXML(MenuPath, true); // creates menu by itself
 
-	assert(tile->GetParentMenu() == GetSingleton());
-
 	const auto menu = GetSingleton();
 
-	if (!menu)
+	if (!menu || menu != tile->GetParentMenu())
 	{
 		Log(g_LogLevel >= Log::kError, Log::kBoth) << "Configuration Menu: Failed Init!";
 		return nullptr;
@@ -69,7 +67,7 @@ ModConfigurationMenu* ModConfigurationMenu::ReloadMenu()
 
 	if (menu->GetID() != MENU_ID)
 	{
-		Log(true, Log::kBoth) << FormatString(
+		Log(g_LogLevel >= Log::kError, Log::kBoth) << FormatString(
 			"Configuration Menu: Expected <class> %d </class>, found class '%d!'", MENU_ID, menu->GetID());
 		delete menu;
 		return nullptr;
@@ -80,7 +78,7 @@ ModConfigurationMenu* ModConfigurationMenu::ReloadMenu()
 	if (!menu->HasTiles())
 	{
 		menu->Close();
-		Log(true, Log::kConsole) << FormatString("Configuration Menu: Expected tiles missing!");
+		Log(g_LogLevel >= Log::kError, Log::kBoth) << "Configuration Menu: Expected tiles missing!";
 		return nullptr;
 	}
 
@@ -128,9 +126,11 @@ void ModConfigurationMenu::Close()
 	Menu::Close();
 }
 
+// called by the game
 ModConfigurationMenu::~ModConfigurationMenu()
 {
-	g_ConfigurationMenu.release(); // if we're in the destructor unique_ptr should be invalid
+	// if we're in the destructor unique_ptr should be invalid
+	g_ConfigurationMenu.release();
 
 	modsListBox.Destroy();
 	settingsListBox.Destroy();
