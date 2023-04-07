@@ -295,8 +295,9 @@ public:
 	Tile*						GetChild(const std::string& childName) const;
 	Tile*						GetComponent(const std::string& componentPath);
 
-	__forceinline Tile*			ReadXML(const std::filesystem::path& xmlPath) { return ThisCall<Tile*>(0xA01B00, this, xmlPath.generic_string().c_str()); }
+	__forceinline Tile*			ReadXML(const std::filesystem::path& xmlPath) { return ThisCall<Tile*>(0xA01B00, this, xmlPath.generic_string().c_str()); };
 	__forceinline Tile*			InjectUIXML(const std::filesystem::path& str) { return exists(str) ? ReadXML(str) : nullptr; };
+	Tile*						InjectUIXML(const std::filesystem::path& str, bool IgnoreUIO);
 
 	__forceinline Float32		GetFloat(const UInt32 id) { return ThisCall<Float32>(0xA011B0, this, id); };
 	__forceinline Float32		GetFloat(const char* id) { return this->GetFloat(TraitNameToID(id)); };

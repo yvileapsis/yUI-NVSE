@@ -141,7 +141,8 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClCompile Include="ConfigurationMenu\ConfigurationMenuINI.cpp" />
     <ClCompile Include="ConfigurationMenu\ConfigurationMenu.cpp" />
     <ClCompile Include="ConfigurationMenu\ConfigurationMenuJSON.cpp" />
-    <ClCompile Include="ConfigurationMenu\ConfigurationMenuStew.cpp" />
+    <ClCompile Include="ConfigurationMenu\ConfigurationMenuOptions.cpp" />
+    <ClCompile Include="ConfigurationMenu\ConfigurationMenuBasic.cpp" />
     <ClCompile Include="ConfigurationMenu\HookMCM.cpp" />
     <ClCompile Include="definitions.cpp" />
     <ClCompile Include="dllmain.c">

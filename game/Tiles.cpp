@@ -1,6 +1,8 @@
 #include <Tiles.h>
 #include <Menus.h>
 
+#include "SafeWrite.h"
+
 NiTMapBase <const char*, int>* g_traitNameMap = reinterpret_cast<NiTMapBase<const char*, int>*>(0x011F32F4);
 
 __declspec(naked) TileValue* __fastcall Tile::GetValue(UInt32 typeID)
@@ -70,6 +72,18 @@ Tile* Tile::GetComponent(const std::string& componentPath)
 		if (!child) return nullptr;
 	}
 	return child;
+}
+
+Tile* Tile::InjectUIXML(const std::filesystem::path& xmlPath, bool ignoreUIO)
+{
+	if (ignoreUIO) 	// allow hot-reloading the menu even if UIO is installed
+	{
+		const UInt32 previousResolveXMLFile = DetourRelCall(0xA01B87, 0xA01E20);
+		const auto tile = InjectUIXML(xmlPath);
+		WriteRelCall(0xA01B87, previousResolveXMLFile);
+		return tile;
+	}
+	return InjectUIXML(xmlPath);
 }
 
 Tile* Tile::LookUpRectByName(const char* name)

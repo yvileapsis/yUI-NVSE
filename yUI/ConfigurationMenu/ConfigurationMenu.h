@@ -8,6 +8,7 @@
 #include <utility>
 #include <variant>
 
+inline UInt32 g_LogLevel = 3;
 
 struct InputField
 {
@@ -340,44 +341,18 @@ struct HotkeyField
 
 class ModConfigurationMenu : public Menu
 {
-private:
-	void* operator new(size_t size) { return GameHeapAlloc<void>(size); }
-	void operator delete(void* ptr) { GameHeapFree(ptr); }
 
 public:
-	ModConfigurationMenu()
-	{
-		memset(tiles, 0, sizeof tiles);
+//	void* operator new(size_t size) { return GameHeapAlloc<void>(size); }
+//	void operator delete(void* ptr) { GameHeapFree(ptr); }
 
-		id = MENU_ID;
-		modsListBox.Init();
-		modsListBox.flags &= ~ListBox<CMMod>::kFlag_RecalculateHeightsOnInsert;
+	ModConfigurationMenu();
 
-		searchBar.Init();
-		subSettingInput.Init();
-		hotkeyInput.Init();
-		settingsListBox.Init();
-//		settingsListBox.flags &= ~ModsListBox::kFlag_RecalculateHeightsOnInsert;
+	static ModConfigurationMenu* Create();
 
-		lastXMLWriteTime.dwLowDateTime = 0;
-		lastXMLWriteTime.dwHighDateTime = 0;
+	~ModConfigurationMenu() override;
 
-	};
-	~ModConfigurationMenu()
-	{
-		modsListBox.Destroy();
-
-		settingsListBox.Destroy();
-		searchBar.Free();
-		subSettingInput.Free();
-		hotkeyInput.Free();
-
-		Menu::Free();
-
-		OSInputGlobals::GetSingleton()->SetDebounceMenuMode(false);
-	};
-
-	void	Destructor(bool doFree) override;
+//	void	Destructor(bool doFree) override;
 	void	SetTile(UInt32 tileID, Tile* activeTile) override;
 	void	HandleLeftClick(UInt32 tileID, Tile* activeTile) override;
 	void	HandleClick(UInt32 tileID, Tile* activeTile) override;
@@ -395,8 +370,6 @@ public:
 	bool	HandleControllerInput(int code, Tile* activeTile) override;
 	void	OnUpdateUserTrait(int tileVal) override {};
 	void	HandleControllerConnectOrDisconnect(bool isControllerConnected) override;
-
-	static ModConfigurationMenu* Create() { return new ModConfigurationMenu(); };
 
 	union
 	{

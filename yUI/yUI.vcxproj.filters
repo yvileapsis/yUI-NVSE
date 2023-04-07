@@ -29,7 +29,7 @@
     <ClCompile Include="ConfigurationMenu\ConfigurationMenuJSON.cpp">
       <Filter>features\ConfigurationMenu</Filter>
     </ClCompile>
-    <ClCompile Include="ConfigurationMenu\ConfigurationMenuStew.cpp">
+    <ClCompile Include="ConfigurationMenu\ConfigurationMenuOptions.cpp">
       <Filter>features\ConfigurationMenu</Filter>
     </ClCompile>
     <ClCompile Include="ConfigurationMenu\ConfigurationMenuINI.cpp">
@@ -172,6 +172,9 @@
       <Filter>features</Filter>
     </ClCompile>
     <ClCompile Include="MiscFeatures\FixLocaleStrings.cpp" />
+    <ClCompile Include="ConfigurationMenu\ConfigurationMenuBasic.cpp">
+      <Filter>features\ConfigurationMenu</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h" />
