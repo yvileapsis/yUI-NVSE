@@ -346,6 +346,8 @@ public:
 	}
 
 	Tile* GetByTraitName(const char* traitName) { return CdeclCall<Tile*>(0xA08B20, this, traitName); };
+
+	std::string GetFullPath();
 };
 static_assert(sizeof(Tile) == 0x38);
 

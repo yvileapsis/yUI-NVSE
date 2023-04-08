@@ -98,6 +98,19 @@ Tile* Tile::AddTileFromTemplate(const char* templateName, const char* altName)
 	return tile;
 }
 
+std::string Tile::GetFullPath()
+{
+	auto tileMenu = this;
+
+	std::string fullPath = std::string(tileMenu->name.CStr());
+
+	while (NOT_TYPE(tileMenu, TileMenu) && (tileMenu = tileMenu->parent)) {
+		fullPath = std::string(tileMenu->name.CStr()) + "/" + fullPath;
+	} 
+	
+	return fullPath;
+}
+
 
 void Debug_DumpTraits(void)
 {
