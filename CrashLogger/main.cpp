@@ -67,6 +67,7 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 
 	Log() << FormatString("Yvile's Cobb Crash Logger Version %s. At %s", CrashLogger_VERSION_STR, std::to_string(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now())).c_str());
 	Log() << ("If this file is empty, then your game didn't crash! :snig: \n");
+	CrashLogger::Apply();
 
 	return true;
 }
@@ -116,7 +117,6 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	Log::Init(path, CrashLogger_STR);
 
 	for (const auto& i : pluginLoad) i(); // call all plugin load functions
-	CobbPatches::CrashLog::Apply(true);
 
 	return true;
 }

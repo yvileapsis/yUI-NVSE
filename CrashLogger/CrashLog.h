@@ -1,14 +1,9 @@
 #pragma once
 
-namespace CobbPatches {
-   namespace CrashLog {
-      void Apply(bool isNewVegas);
-   };
-};
-
-
-#include <typeinfo>
-#include <Windows.h>
+namespace CrashLogger
+{
+	void Apply();
+}
 
 struct TypeDescriptor
 {
