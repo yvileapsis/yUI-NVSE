@@ -150,7 +150,6 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\CrashLogger\nvse\p
     </ClCompile>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="functions.cpp" />
-    <ClCompile Include="StackWalk.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\game\ConsoleManager.h" />
@@ -191,7 +190,6 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\CrashLogger\nvse\p
     <ClInclude Include="functions.h" />
     <ClInclude Include="definitions.h" />
     <ClInclude Include="main.h" />
-    <ClInclude Include="StackWalk.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\game\GameRTTI.inc" />

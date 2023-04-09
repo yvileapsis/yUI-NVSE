@@ -84,7 +84,6 @@
       <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="CrashLog.cpp" />
-    <ClCompile Include="StackWalk.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h" />
@@ -193,7 +192,6 @@
       <Filter>game</Filter>
     </ClInclude>
     <ClInclude Include="CrashLog.h" />
-    <ClInclude Include="StackWalk.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />

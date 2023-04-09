@@ -216,6 +216,7 @@ public:
 
 class Model // NiObject
 {
+public:
 	const char	* path;		// 004
 	UInt32		counter;	// 008
 	NiNode		* ninode;	// 00C

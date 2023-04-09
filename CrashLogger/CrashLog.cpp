@@ -2,11 +2,13 @@
 
 #include "CrashLog.h"
 
+#include <DbgHelp.h>
+
 #include "Form.h"
+#include "GameTasks.h"
 #include "Menus.h"
 #include "Reference.h"
 #include "SafeWrite.h"
-#include "StackWalk.h"
 #include "Tiles.h"
 
 #define SYMOPT_EX_WINE_NATIVE_MODULES  1000
@@ -167,6 +169,31 @@ namespace YvilesMagicBox
 		return "";
 	}
 
+	std::string Handle(BSFile* model)
+	{
+		return printTypeName(model) + ": " + FormatString("%s", model->m_path);
+	}
+
+	std::string Handle(TESModel* model)
+	{
+		return printTypeName(model) + ": " + FormatString("%s", model->nifPath.CStr());
+	}
+
+	std::string Handle(QueuedModel* model)
+	{
+		return printTypeName(model) + ": " + FormatString("%s %s", model->model->path, model->tesModel->nifPath.CStr());
+	}
+
+	std::string Handle(TESTexture* texture)
+	{
+		return printTypeName(texture) + ": " + FormatString("%s", texture->ddsPath.CStr());
+	}
+
+	std::string Handle(QueuedTexture* texture)
+	{
+		return printTypeName(texture) + ": " + FormatString("%s", texture->name);
+	}
+
 	std::string GetStringForVTBL(void* ptr, UInt32 vtbl)
 	{
 		
@@ -174,10 +201,12 @@ namespace YvilesMagicBox
 		{
 			// UI
 
-		case 0x10472D0:				return "BSSimpleArray<char const *>:";
-		case 0x10472CC:				return "BSSimpleArray<char const *>:";
-		case 0x106EDEC:				return "BSSimpleArray<Tile::Value*>:";
+		case 0x10472D0:				return "BSSimpleArray<char const *>";
+		case 0x10472CC:				return "BSSimpleArray<char const *>";
+		case 0x106EDEC:				return "BSSimpleArray<Tile::Value*>";
 		case 0x106CC64:				return "BSSimpleArray<float>";
+
+		case 0x010C1740:			return "BSTaskManagerThread<__int64>";
 
 		case kVtbl_Menu:
 		case kVtbl_TutorialMenu:
@@ -223,6 +252,11 @@ namespace YvilesMagicBox
 		case kVtbl_TileMenu:		
 		case kVtbl_TileRect:		
 		case kVtbl_TileImage:		return Handle(reinterpret_cast<Tile*>(ptr));
+
+
+		case kVtbl_TESIcon:
+		case kVtbl_TESTexture: return Handle(reinterpret_cast<TESTexture*>(ptr));
+		case kVtbl_QueuedTexture: return Handle(reinterpret_cast<QueuedTexture*>(ptr));
 
 
 
@@ -316,7 +350,17 @@ namespace YvilesMagicBox
 		case kVtbl_TESBoundAnimObject:
 		case kVtbl_TESBoundTreeObject:
 		case kVtbl_BGSMessage:
-
+		case kVtbl_BGSDehydrationStage:
+		case kVtbl_BGSHungerStage:
+		case kVtbl_BGSSleepDeprevationStage:
+		case kVtbl_TESPackage:
+		case kVtbl_NavMesh:
+		case kVtbl_TESTopicInfo:
+		case kVtbl_MagicItemForm:
+		case kVtbl_SpellItem:
+		case kVtbl_MagicItemObject:
+		case kVtbl_IngredientItem:
+		case kVtbl_TESAmmoEffect:
 			return Handle(reinterpret_cast<TESForm*>(ptr));
 
 			// ObjectREFR
@@ -358,22 +402,23 @@ namespace YvilesMagicBox
 
 
 
-		case kVtbl_BGSDehydrationStage:
-		case kVtbl_BGSHungerStage:
-		case kVtbl_BGSSleepDeprevationStage:
+			// model
+		case kVtbl_BSFile:		return Handle(reinterpret_cast<BSFile*>(ptr));
+		case kVtbl_TESModel:	return Handle(reinterpret_cast<TESModel*>(ptr));
+		case kVtbl_QueuedModel:	return Handle(reinterpret_cast<QueuedModel*>(ptr));
+
+
+
 		case kVtbl_ShadowSceneNode:
 
-		case kVtbl_MagicItemObject:
-		case kVtbl_TESIcon:
+
+
 		case kVtbl_MagicItem:
 		case kVtbl_TESFullName:
 		case kVtbl_BaseFormComponent:
 		case kVtbl_Setting:
 		case kVtbl_GameSettingCollection:
 		case kVtbl_EffectItemList:
-		case kVtbl_MagicItemForm:
-		case kVtbl_IngredientItem:
-		case kVtbl_SpellItem:
 		case kVtbl_ExtraCell3D:
 		case kVtbl_BSExtraData:
 		case kVtbl_ExtraHavok:
@@ -511,8 +556,7 @@ namespace YvilesMagicBox
 		case kVtbl_ExtraFollowerSwimBreadcrumbs:
 		case kVtbl_NiAlphaProperty:
 		case kVtbl_NiProperty:
-		case kVtbl_QueuedTexture:
-		case kVtbl_QueuedModel:
+
 		case kVtbl_BSStream:
 		case kVtbl_QueuedTreeBillboard:
 		case kVtbl_QueuedTreeModel:
@@ -561,20 +605,24 @@ namespace YvilesMagicBox
 		case kVtbl_TESDescription:
 		case kVtbl_TESEnchantableForm:
 
-		case kVtbl_TESHealthForm:
 		case kVtbl_TESImageSpaceModifiableForm:
 		case kVtbl_TESLeveledList:
-		case kVtbl_TESModel:
+
 		case kVtbl_TESModelList:
 		case kVtbl_TESModelTextureSwap:
+
+		case kVtbl_TESHealthForm:
+
 		case kVtbl_TESProduceForm:
 		case kVtbl_TESRaceForm:
 		case kVtbl_TESReactionForm:
 		case kVtbl_TESScriptableForm:
-		case kVtbl_TESSpellList:
-		case kVtbl_TESTexture:
+
 		case kVtbl_TESValueForm:
 		case kVtbl_TESWeightForm:
+
+
+		case kVtbl_TESSpellList:
 
 		case kVtbl_AnimSequenceBase:
 		case kVtbl_AnimSequenceMultiple:
@@ -702,8 +750,7 @@ namespace YvilesMagicBox
 		case kVtbl_BGSTextureSet:
 		case kVtbl_MediaLocationController:
 		case kVtbl_MediaSet:
-		case kVtbl_TESAmmoEffect:
-
+// w
 		case kVtbl_hkpClosestRayHitCollector:
 		case kVtbl_TESLoadScreen:
 		case kVtbl_TESLoadScreenType:
@@ -737,7 +784,7 @@ namespace YvilesMagicBox
 		case kVtbl_BGSTextureModel:
 
 		case kVtbl_TopicInfoArray:
-		case kVtbl_TESTopicInfo:
+
 		case kVtbl_BGSAcousticSpaceListener:
 		case kVtbl_bhkEntityListener:
 		case kVtbl_TargetEntry:
@@ -808,8 +855,8 @@ namespace YvilesMagicBox
 		case kVtbl_bhkTransformShape:
 		case kVtbl_bhkCapsuleShape:
 		case kVtbl_ActorValueInfo:
-		case kVtbl_TESPackage:
-		case kVtbl_TESAmbushPackageData:
+
+			case kVtbl_TESAmbushPackageData:
 		case kVtbl_TESPackageData:
 		case kVtbl_TESDialoguePackageData:
 		case kVtbl_TESEatPackageData:
@@ -828,8 +875,8 @@ namespace YvilesMagicBox
 		case kVtbl_NiSkinInstance:
 		case kVtbl_BSTempEffectParticle:
 		case kVtbl_BSTempEffectSimpleDecal:
-		case kVtbl_NavMesh:
-		case kVtbl_NavMeshPOVSearch:
+
+			case kVtbl_NavMeshPOVSearch:
 		case kVtbl_NavMeshSearch:
 		case kVtbl_NavMeshSearchClosePoint:
 		case kVtbl_NavMeshSearchFlee:
@@ -1322,7 +1369,7 @@ namespace YvilesMagicBox
 		case kVtbl_Archive:
 		case kVtbl_ArchiveFile:
 		case kVtbl_CompressedArchiveFile:
-		case kVtbl_BSFile:
+
 		case kVtbl_BSTaskletManagerCallback:
 		case kVtbl_BSFileCache:
 		case kVtbl_BSSearchPath:
@@ -2098,13 +2145,13 @@ namespace YvilesMagicBox
 		case kVtbl_NiGPUProgramCache:
 		case kVtbl_NiMaterialResource:
 		case kVtbl_StartMenuOption:
-		case kVtbl_StartMenuUserOption: return printTypeName(ptr) + ":";
+		case kVtbl_StartMenuUserOption: return printTypeName(ptr);
 
 
 		default: break;
 		}
 		if (vtbl >= 0x1000000 && vtbl <= 0x1200000)
-			return FormatString("¯\\_(ツ)_/¯: 0x%08X %s", vtbl, printTypeName(ptr).c_str());
+			return FormatString("¯\\_(ツ)_/¯: 0x%08X", vtbl);
 
 		return "";
 	}
@@ -2119,9 +2166,7 @@ namespace YvilesMagicBox
 
 		while (vtbl = CanDereference(ptr))
 		{
-			
-			std::string onetime = GetStringForVTBL((void*)ptr, vtbl);
-			if (!onetime.empty()) return onetime;
+			if (std::string onetime = GetStringForVTBL((void*)ptr, vtbl); !onetime.empty()) return full + onetime;
 
 
 			if (depth == 0) break;
@@ -2133,7 +2178,7 @@ namespace YvilesMagicBox
 			ptr = vtbl;
 		}
 
-		return full;
+		return "";
 	}
 }
 
