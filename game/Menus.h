@@ -2824,12 +2824,12 @@ struct StartMenuOption
 		kQuitGameMenu = 0x2000,
 	};
 
-	UInt32* vtable;
+	static StartMenuOption* Create(const char* str, void (*callback)(void), UInt32 flags);
+	virtual ~StartMenuOption() {};
 	const char* displayString;
 	void (*callback)(void);	// 08
 	UInt32 data;
 
-	static StartMenuOption* Create(const char* str, void (*callback)(void), UInt32 flags);
 };
 
 // 30
@@ -2854,6 +2854,8 @@ struct StartMenuUserOption : StartMenuOption
 
 	StartMenuUserOption* Init(char* str, void (*_callback)(StartMenuUserOption*), WhichMenus flags, int _type, int _numOptions, int _buttonWidth, char** optionNames);
 	static StartMenuUserOption* Create(char* str, void(__cdecl* callback)(StartMenuUserOption*), WhichMenus flags, int type, int numOptions, int buttonWidth, char** optionNames);
+
+	~StartMenuUserOption() override {};
 
 	void UpdateVisibility() { ThisCall(0x7D4CE0, StartMenu::GetSingleton(), this, NULL); };
 };

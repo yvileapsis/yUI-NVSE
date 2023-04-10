@@ -86,7 +86,7 @@ bool IsInStartMenu()
 StartMenuOption* StartMenuOption::Create(const char* str, void (*callback)(void), UInt32 flags)
 {
 	StartMenuOption* option = (StartMenuOption*)GameHeapAlloc(sizeof(StartMenuOption));
-	option->vtable = (UInt32*)kVtbl_StartMenuOption;
+	*reinterpret_cast<UInt32*>(option) = kVtbl_StartMenuOption;
 	option->displayString = str;
 	option->callback = callback;
 	option->data = flags;

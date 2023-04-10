@@ -28,6 +28,7 @@ namespace CrashLogger::Handle
 
 	std::string AsMenu(void* ptr) { return static_cast<Menu*>(ptr)->tile->GetFullPath(); }
 	std::string AsTile(void* ptr) { return static_cast<Tile*>(ptr)->GetFullPath(); }
+	std::string AsStartMenuOption(void* ptr) { return static_cast<StartMenuOption*>(ptr)->displayString; }
 
 	std::string AsTESForm(void* ptr) { const auto form = static_cast<TESForm*>(ptr); return FormatString("%08X (%s)", form->refID, form->GetName()); }
 	std::string AsTESObjectREFR(void* ptr) { const auto refr = static_cast<TESObjectREFR*>(ptr);
@@ -40,9 +41,9 @@ namespace CrashLogger::Handle
 		for (const auto iter : *TESForm::GetAll())
 		{
 			if (iter->typeID == kFormType_Character && static_cast<Character*>(iter)->baseProcess == process)
-				return FormatString("%08X (%s)", iter->refID, iter->GetName());
+				return FormatString("form %08X (%s)", iter->refID, iter->GetName());
 			if (iter->typeID == kFormType_Creature && static_cast<Creature*>(iter)->baseProcess == process)
-				return FormatString("%08X (%s)", iter->refID, iter->GetName());
+				return FormatString("form %08X (%s)", iter->refID, iter->GetName());
 		}
 		return "";
 	}
@@ -144,9 +145,16 @@ namespace CrashLogger::NVVtables
 
 	void FillLabels()
 	{
+		Push(0x10F1EE0, nullptr, "TypeInfo", Label::kType_RTTIClass);
+
 		Push(0x11F3374, Handle::AsUInt32, "TileValueIndirectTemp", Label::kType_Global);
 		Push(0x118FB0C, nullptr, "ShowWhoDetects", Label::kType_Global);
+
+		Push(0x11846D4, nullptr, "Actor", Label::kType_RTTIClass, 0x8);
+		Push(0x1184920, nullptr, "MovingObject", Label::kType_RTTIClass, 0x8);
+		Push(0x11840C4, nullptr, "TESAmmo", Label::kType_RTTIClass, 0x8);
 		
+
 		Push(0x1094D9C, nullptr, "Tile::MenuStringMap");
 		Push(0x10472CC, nullptr, "BSSimpleArray<const char*>", Label::kType_RTTIClass,0x8);
 		Push(0x106EDEC, nullptr, "BSSimpleArray<Tile::Value*>");
@@ -220,6 +228,9 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_TileText);
 		Push(kVtbl_Tile3D);
 
+		Push(kVtbl_StartMenuOption, Handle::AsStartMenuOption);
+		Push(kVtbl_StartMenuUserOption);
+
 		Push(kVtbl_TESForm, Handle::AsTESForm);
 
 		Push(kVtbl_AlchemyItem);
@@ -292,11 +303,23 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_TESObjectCONT);
 		Push(kVtbl_TESObjectDOOR);
 		Push(kVtbl_TESObjectIMOD);
+		Push(kVtbl_TESObjectLIGH);
 		Push(kVtbl_TESObjectMISC);
 		Push(kVtbl_TESObjectSTAT);
 		Push(kVtbl_TESObjectTREE);
 		Push(kVtbl_TESObjectWEAP);
 		Push(kVtbl_TESPackage);
+		Push(kVtbl_AlarmPackage);
+		Push(kVtbl_BackUpPackage);
+		Push(kVtbl_DialoguePackage);
+		Push(kVtbl_EscortActorPackageData);
+		Push(kVtbl_FleePackage);
+		Push(kVtbl_GuardActorPackageData);
+		Push(kVtbl_PatrolActorPackageData);
+		Push(kVtbl_SandBoxActorPackageData);
+		Push(kVtbl_SearchPackage);
+		Push(kVtbl_SpectatorPackage);
+		Push(kVtbl_TrespassPackage);
 		Push(kVtbl_TESQuest);
 		Push(kVtbl_TESRace);
 		Push(kVtbl_TESRecipe);
@@ -309,6 +332,11 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_TESWaterForm);
 		Push(kVtbl_TESWeather);
 		Push(kVtbl_TESWorldSpace);
+		Push(kVtbl_TESLoadScreen);
+		Push(kVtbl_TESRecipeCategory);
+		Push(kVtbl_TESActorBase);
+		Push(kVtbl_TESIdleForm);
+
 
 		Push(kVtbl_TESObjectREFR, Handle::AsTESObjectREFR);
 		Push(kVtbl_MobileObject);
@@ -316,6 +344,15 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_Creature);
 		Push(kVtbl_Character);
 		Push(kVtbl_PlayerCharacter);
+		Push(kVtbl_Explosion);
+		Push(kVtbl_Projectile);
+		Push(kVtbl_ArrowProjectile);
+		Push(kVtbl_BeamProjectile);
+		Push(kVtbl_ContinuousBeamProjectile);
+		Push(kVtbl_FlameProjectile);
+		Push(kVtbl_GrenadeProjectile);
+		Push(kVtbl_MissileProjectile);
+
 
 		Push(kVtbl_BaseProcess, Handle::AsBaseProcess);
 		Push(kVtbl_LowProcess);
@@ -336,6 +373,7 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_BSFadeNode);
 		Push(kVtbl_NiProperty);
 		Push(kVtbl_NiAlphaProperty);
+		Push(kVtbl_NiCamera);
 
 
 		// animations
@@ -698,9 +736,8 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_MediaSet);
 		// w
 		Push(kVtbl_hkpClosestRayHitCollector);
-		Push(kVtbl_TESLoadScreen);
+
 		Push(kVtbl_TESLoadScreenType);
-		Push(kVtbl_TESRecipeCategory);
 
 		Push(kVtbl_MobIterOperator);
 		Push(kVtbl_BGSBodyPart);
@@ -722,9 +759,8 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_Reset3DMobIterator);
 		Push(kVtbl_TESAnimGroup);
 
-		Push(kVtbl_TESActorBase);
 		Push(kVtbl_ActorValueOwner);
-		Push(kVtbl_TESIdleForm);
+
 		Push(kVtbl_TESModelAnim);
 
 		Push(kVtbl_BGSTextureModel);
@@ -975,7 +1011,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_ActorsScriptTaskData);
 		Push(kVtbl_MovementTaskData);
 		Push(kVtbl_AITaskThread);
-		Push(kVtbl_ArrowProjectile);
 
 		Push(kVtbl_bhkCharacterListenerArrow);
 		Push(kVtbl_BSPlayerDistanceCheckController);
@@ -984,8 +1019,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_ActorPathingMessageQueue);
 		Push(kVtbl_LipTask);
 
-
-		Push(kVtbl_BeamProjectile);
 		Push(kVtbl_CombatAction);
 		Push(kVtbl_CombatActionAttackRanged);
 		Push(kVtbl_CombatActionAttackRangedFromCover);
@@ -1041,18 +1074,15 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_CombatGroupStrategyAdvance);
 		Push(kVtbl_CombatTargetMap);
 		Push(kVtbl_CombatThreatMap);
-		Push(kVtbl_ContinuousBeamProjectile);
-		Push(kVtbl_Explosion);
+
 		Push(kVtbl_bhkLiquidAction);
 		Push(kVtbl_hkpFixedBufferCdPointCollector);
-		Push(kVtbl_FlameProjectile);
-		Push(kVtbl_GrenadeProjectile);
-		Push(kVtbl_MissileProjectile);
+
 		Push(kVtbl_bhkHingeConstraint);
 		Push(kVtbl_bhkConstraint);
 		Push(kVtbl_hkHingeConstraintCinfo);
 		Push(kVtbl_hkConstraintCinfo);
-		Push(kVtbl_Projectile);
+
 		Push(kVtbl_ProjectileListener);
 		Push(kVtbl_CombatProcedureActivateObject);
 		Push(kVtbl_CombatProcedure);
@@ -1074,17 +1104,7 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_DoorInPathFilter);
 		Push(kVtbl_PlayerMover);
 		Push(kVtbl_VirtualActorPathHandler);
-		Push(kVtbl_AlarmPackage);
-		Push(kVtbl_BackUpPackage);
-		Push(kVtbl_DialoguePackage);
-		Push(kVtbl_EscortActorPackageData);
-		Push(kVtbl_FleePackage);
-		Push(kVtbl_GuardActorPackageData);
-		Push(kVtbl_PatrolActorPackageData);
-		Push(kVtbl_SandBoxActorPackageData);
-		Push(kVtbl_SearchPackage);
-		Push(kVtbl_SpectatorPackage);
-		Push(kVtbl_TrespassPackage);
+
 		Push(kVtbl_CEnumPins);
 		Push(kVtbl_CEnumMediaTypes);
 		Push(kVtbl_CMediaSample);
@@ -1192,7 +1212,7 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_NiCullingProcess);
 		Push(kVtbl_NiTexturingProperty);
 		Push(kVtbl_NiTimeController);
-		Push(kVtbl_NiCamera);
+
 		Push(kVtbl_NiTriStrips);
 		Push(kVtbl_NiLight);
 		Push(kVtbl_NiStringExtraData);
@@ -1291,11 +1311,13 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_AbstractHeap);
 		Push(kVtbl_FutBinaryFileC);
 		Push(kVtbl_BSFaceGenBinaryFile);
+
 		Push(kVtbl_BSAudio);
 		Push(kVtbl_BSAudioManager);
 		Push(kVtbl_BSAudioManagerThread);
 		Push(kVtbl_AudioLoadTask);
 		Push(kVtbl_BSGameSound);
+
 		Push(kVtbl_BSWin32Audio);
 		Push(kVtbl_BSWin32AudioListener);
 		Push(kVtbl_BSAudioListener);
@@ -1446,10 +1468,12 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_BSReference);
 		Push(kVtbl_BSNodeReferences);
 		Push(kVtbl_MessageHandler);
+
 		Push(kVtbl_QueuedChildren);
 		Push(kVtbl_QueuedParents);
 		Push(kVtbl_QueuedFile);
 		Push(kVtbl_QueuedFileEntry);
+
 		Push(kVtbl_IOManager);
 		Push(kVtbl_BSTaskThread);
 		Push(kVtbl_BSXFlags);
@@ -2086,8 +2110,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_NiSCMExtraData);
 		Push(kVtbl_NiGPUProgramCache);
 		Push(kVtbl_NiMaterialResource);
-		Push(kVtbl_StartMenuOption);
-		Push(kVtbl_StartMenuUserOption);
 	};
 
 	/*
