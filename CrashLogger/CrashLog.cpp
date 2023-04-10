@@ -91,7 +91,7 @@ namespace CrashLogger::NVVtables
 		Handle::_Handler function;
 		std::string name;
 
-		Label(UInt32 address, Handle::_Handler function = lastHandler, Type type = kType_RTTIClass, std::string name = "", UInt32 size = 4)
+		Label(UInt32 address, Handle::_Handler function = lastHandler, std::string name = "", Type type = kType_RTTIClass, UInt32 size = 4)
 			: type(type), address(address), size(size), function(function), name(std::move(name))
 		{
 			lastHandler = function;
@@ -122,9 +122,32 @@ namespace CrashLogger::NVVtables
 		}
 	};
 
-	std::vector setOfLabels{
+	static std::vector setOfLabels{
 
-		Label(0x011F3374, Handle::AsUInt32, Label::kType_Global, "TileValueIndirectTemp"),
+		Label(0x11F3374, Handle::AsUInt32, "TileValueIndirectTemp", Label::kType_Global),
+
+		Label(0x1094D9C, nullptr, "Tile::MenuStringMap"),
+		Label(0x10472CC, nullptr, "BSSimpleArray<const char*>", Label::kType_RTTIClass, 0x8),
+		Label(0x106EDEC, nullptr, "BSSimpleArray<Tile::Value*>"),
+		Label(0x106CC64, nullptr, "BSSimpleArray<Float32>", Label::kType_RTTIClass, 0x8),
+		Label(0x10C1740, nullptr, "BSTaskManagerThread<SInt64>"),
+		Label(0x1094E7C, nullptr, "NiTPointerMap<Tile::Value*, Tile::Reaction*>"),
+
+
+		Label(0x104A284, nullptr, "TESNPC::TESActorBase"),
+		Label(0x104A270, nullptr, "TESNPC::Container"),
+		Label(0x104A25C, nullptr, "TESNPC::TouchSpell"),
+		Label(0x104A23C, nullptr, "TESNPC::SpellList"),
+		Label(0x104A21C, nullptr, "TESNPC::AI"),
+		Label(0x104A204, nullptr, "TESNPC::Health"),
+		Label(0x104A1F0, nullptr, "TESNPC::Attributes"),
+		Label(0x104A1DC, nullptr, "TESNPC::Animation"),
+		Label(0x104A1C8, nullptr, "TESNPC::FullName"),
+		Label(0x104A1A4, nullptr, "TESNPC::Model"),
+		Label(0x104A190, nullptr, "TESNPC::Scriptable"),
+		Label(0x104A160, nullptr, "TESNPC::AVOwner"),
+		Label(0x104A14C, nullptr, "TESNPC::Destructible"),
+		Label(0x104A138, nullptr, "TESNPC::Race"),
 
 		Label(kVtbl_Menu, Handle::AsMenu),
 		Label(kVtbl_TutorialMenu),
@@ -2033,39 +2056,8 @@ namespace CrashLogger::NVVtables
 	std::string GetStringForVTBL(void* ptr, UInt32 vtbl)
 	{
 		for (const auto& iter : setOfLabels)
-		{
 			if (iter.Satisfies(ptr)) return iter.Get(ptr);
-		}
 
-		switch (vtbl)
-		{
-		case 0x1094D9C:				return "Tile::MenuStringMap";
-		case 0x10472D0:				return "BSSimpleArray<char const *>";
-		case 0x10472CC:				return "BSSimpleArray<char const *>";
-		case 0x106EDEC:				return "BSSimpleArray<Tile::Value*>";
-		case 0x106CC64:				return "BSSimpleArray<float>";
-
-		case 0x010C1740:			return "BSTaskManagerThread<__int64>";
-		case 0x01094E7C:			return "NiTPointerMap<Tile::Value*, Tile::Reaction*>";
-
-			// NPC parts
-		case 0x104A284: return "TESNPC::TESActorBase:";
-		case 0x104A270: return "TESNPC::container:";
-		case 0x104A25C: return "TESNPC::touchSpell:";
-		case 0x104A23C: return "TESNPC::spellList:";
-		case 0x104A21C: return "TESNPC::ai:";
-		case 0x104A204: return "TESNPC::health:";
-		case 0x104A1F0: return "TESNPC::attributes:";
-		case 0x104A1DC: return "TESNPC::animation:";
-		case 0x104A1C8: return "TESNPC::fullName:";
-		case 0x104A1A4: return "TESNPC::model:";
-		case 0x104A190: return "TESNPC::scriptable:";
-		case 0x104A160: return "TESNPC::avOwner:";
-		case 0x104A14C: return "TESNPC::destructible:";
-		case 0x104A138: return "TESNPC::race:";
-
-		default: break;
-		}
 		if (vtbl > 0x1000000 && vtbl < 0x1200000)
 			return FormatString("¯\\_(Ö)_/¯: 0x%08X", vtbl);
 
