@@ -3,6 +3,10 @@
 namespace CrashLogger
 {
 	void Apply();
+	namespace NVVtables
+	{
+		void FillLabels();
+	}
 }
 
 struct TypeDescriptor

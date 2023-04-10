@@ -18,7 +18,7 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	if (msg->type == NVSEMessagingInterface::kMessage_DeferredInit)
 	{
 		InitSingletons();
-
+		CrashLogger::NVVtables::FillLabels();
 		//Log() << CrashLogger_VERSION_STR;
 
 		for (const auto& i : deferredInit) i(); // call all deferred init functions
