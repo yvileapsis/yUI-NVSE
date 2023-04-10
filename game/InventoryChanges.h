@@ -1,7 +1,7 @@
 #pragma once
 #include <containers.h>
 #include <Utilities.h>
-#include <Form.h>
+#include <TESForm.h>
 
 struct InventoryChanges
 {

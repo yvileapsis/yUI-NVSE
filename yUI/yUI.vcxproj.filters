@@ -5,9 +5,6 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="definitions.cpp" />
-    <ClCompile Include="..\nvse\printf.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
     <ClCompile Include="..\nvse\SafeWrite.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
@@ -68,10 +65,10 @@
     <ClCompile Include="..\game\InventoryChanges.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\Form.cpp">
+    <ClCompile Include="..\game\TESForm.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\Reference.cpp">
+    <ClCompile Include="..\game\TESObjectREFR.cpp">
       <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="..\game\OSDepend.cpp">
@@ -92,13 +89,13 @@
     <ClCompile Include="..\game\GameTasks.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\Tiles.cpp">
+    <ClCompile Include="..\game\Tile.cpp">
       <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="..\game\Types.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\Menus.cpp">
+    <ClCompile Include="..\game\Menu.cpp">
       <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="..\game\ConsoleManager.cpp">
@@ -119,7 +116,7 @@
     <ClCompile Include="..\game\GameProcess.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\Object.cpp">
+    <ClCompile Include="..\game\TESObject.cpp">
       <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="MiscFeatures\FixProjectileEffects.cpp">
@@ -175,6 +172,9 @@
     <ClCompile Include="ConfigurationMenu\ConfigurationMenuBasic.cpp">
       <Filter>features\ConfigurationMenu</Filter>
     </ClCompile>
+    <ClCompile Include="..\game\BaseFormComponent.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h" />
@@ -201,9 +201,6 @@
     <ClInclude Include="..\nvse\Utilities.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\nvse\printf.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
     <ClInclude Include="..\nvse\Logging.h">
       <Filter>nvse</Filter>
     </ClInclude>
@@ -225,10 +222,10 @@
     <ClInclude Include="..\game\InventoryChanges.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\Form.h">
+    <ClInclude Include="..\game\TESForm.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\Reference.h">
+    <ClInclude Include="..\game\TESObjectREFR.h">
       <Filter>game</Filter>
     </ClInclude>
     <ClInclude Include="..\game\OSDepend.h">
@@ -252,13 +249,13 @@
     <ClInclude Include="..\game\GameTasks.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\Tiles.h">
+    <ClInclude Include="..\game\Tile.h">
       <Filter>game</Filter>
     </ClInclude>
     <ClInclude Include="..\game\Types.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\Menus.h">
+    <ClInclude Include="..\game\Menu.h">
       <Filter>game</Filter>
     </ClInclude>
     <ClInclude Include="..\game\CommandTable.h">
@@ -285,7 +282,10 @@
     <ClInclude Include="..\game\Containers.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\Object.h">
+    <ClInclude Include="..\game\TESObject.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\BaseFormComponent.h">
       <Filter>game</Filter>
     </ClInclude>
   </ItemGroup>

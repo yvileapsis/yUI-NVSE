@@ -54,9 +54,9 @@ public:
 	CriticalSection() { InitializeCriticalSection(&critSection); }
 	~CriticalSection() { DeleteCriticalSection(&critSection); }
 
-	void	Enter(void) { EnterCriticalSection(&critSection); }
-	void	Leave(void) { LeaveCriticalSection(&critSection); }
-	bool	TryEnter(void) { return TryEnterCriticalSection(&critSection) != 0; }
+	void	Enter() { EnterCriticalSection(&critSection); }
+	void	Leave() { LeaveCriticalSection(&critSection); }
+	bool	TryEnter() { return TryEnterCriticalSection(&critSection) != 0; }
 
 private:
 	CRITICAL_SECTION	critSection;
@@ -111,7 +111,7 @@ bool GetNVSEConfigOption_UInt32(const char * section, const char * key, UInt32 *
 #define DEFINE_MEMBER_FN_LONG(className, functionName, retnType, address, ...)		\
 	typedef retnType (className::* _##functionName##_type)(__VA_ARGS__);			\
 																					\
-	inline _##functionName##_type * _##functionName##_GetPtr(void)					\
+	inline _##functionName##_type * _##functionName##_GetPtr()					\
 	{																				\
 		static const UInt32 _address = address;										\
 		return (_##functionName##_type *)&_address;									\
@@ -139,22 +139,22 @@ namespace MersenneTwister
 	void init_by_array(unsigned long init_key[], int key_length);
 
 	/* generates a random number on [0,0xffffffff]-interval */
-	unsigned long genrand_int32(void);
+	unsigned long genrand_int32();
 
 	/* generates a random number on [0,0x7fffffff]-interval */
-	long genrand_int31(void);
+	long genrand_int31();
 
 	/* generates a random number on [0,1]-real-interval */
-	double genrand_real1(void);
+	double genrand_real1();
 
 	/* generates a random number on [0,1)-real-interval */
-	double genrand_real2(void);
+	double genrand_real2();
 
 	/* generates a random number on (0,1)-real-interval */
-	double genrand_real3(void);
+	double genrand_real3();
 
 	/* generates a random number on [0,1) with 53-bit resolution*/
-	double genrand_res53(void);
+	double genrand_res53();
 
 };
 

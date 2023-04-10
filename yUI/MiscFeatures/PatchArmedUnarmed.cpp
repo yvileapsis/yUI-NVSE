@@ -5,8 +5,8 @@
 #include <SafeWrite.h>
 #include <SimpleINILibrary.h>
 
-#include "Form.h"
-#include "Reference.h"
+#include "TESForm.h"
+#include "TESObjectREFR.h"
 
 namespace Patch::ArmedUnarmed
 {

@@ -1,7 +1,7 @@
 #include "SortingIcons.h"
 
 #include <GameSettings.h>
-#include <Tiles.h>
+#include <Tile.h>
 #include <InterfaceManager.h>
 #include <functions.h>
 

@@ -18,7 +18,7 @@ public:
 	bool		Append(const char* toAppend);
 	double		Compare(const String& compareTo, bool caseSensitive = false);
 
-	const char* CStr(void);
+	const char* CStr();
 
 	void		AppendChar(char toAppend);
 	void		InsertChar(char toInsert, UInt32 index);
@@ -592,13 +592,13 @@ public:
 	~BSSimpleList<Item>() {};
 
 	virtual bool	SetSelectedTile(Tile* tile) { return false; };
-	virtual Tile*	GetSelectedTile(void) { return nullptr; };
+	virtual Tile*	GetSelectedTile() { return nullptr; };
 	virtual Tile*	HandleKeyboardInput(KeyboardMenuInputCode code) { return nullptr; };
 	virtual bool	IsMenuEqual(Menu* that) { return false; };
-	virtual void	ScrollToHighlight(void) {};
+	virtual void	ScrollToHighlight() {};
 	virtual Tile*	GetTileByIndex(int index, char isNotTileListIndex) { return nullptr; };
 	virtual void	Destructor(bool doFree) {};
-	virtual void	FreeAllTiles(void) {};
+	virtual void	FreeAllTiles() {};
 	virtual void	Sort(SInt32(__cdecl*)(Item*, Item*)) {};
 
 	TList<Item>		list;	// 004

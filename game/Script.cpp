@@ -1,7 +1,7 @@
 #include <Script.h>
 
-#include <Form.h>
-#include <Reference.h>
+#include <TESForm.h>
+#include <TESObjectREFR.h>
 #include <GameRTTI.h>
 #include <CommandTable.h>
 
@@ -152,7 +152,7 @@ void Script::DeleteScript() const
 	ThisStdCall(0x5AA170, this, false);
 }
 
-ScriptEventList* Script::CreateEventList(void)
+ScriptEventList* Script::CreateEventList()
 {
 	ScriptEventList* result = nullptr;
 //	EnterCriticalSection(&csGameScript);
@@ -297,7 +297,7 @@ UInt32 Script::AddVariable(TESForm * form)
 	return resultIdx;
 }
 
-void Script::CleanupVariables(void)
+void Script::CleanupVariables()
 {
 	delete refList.var;
 

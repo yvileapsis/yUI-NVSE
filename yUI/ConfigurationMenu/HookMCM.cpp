@@ -1,5 +1,5 @@
 #include "main.h"
-#include "Menus.h"
+#include "Menu.h"
 #include "PluginAPI.h"
 #include <string>
 

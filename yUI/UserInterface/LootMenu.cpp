@@ -5,7 +5,7 @@
 
 #include <dinput8.h>
 
-#include <Menus.h>
+#include <Menu.h>
 #include <GameData.h>
 #include <InterfaceManager.h>
 

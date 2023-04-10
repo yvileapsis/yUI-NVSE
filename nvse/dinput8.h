@@ -40,7 +40,7 @@ public:
 	/**
 	 *	Returns the single instance of the derived class
 	 */
-	static T& GetSingleton(void)
+	static T& GetSingleton()
 	{
 		assert(ms_Singleton);
 		return *ms_Singleton;
@@ -49,7 +49,7 @@ public:
 	/**
 	 *	Returns a pointer to the single instance of the derived class
 	 */
-	static T* GetSingletonPtr(void)
+	static T* GetSingletonPtr()
 	{
 		return ms_Singleton;
 	}
@@ -129,7 +129,7 @@ class FramerateTracker
 public:
 	FramerateTracker();
 
-	void	Update(void);
+	void	Update();
 
 private:
 	enum

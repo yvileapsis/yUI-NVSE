@@ -1,7 +1,7 @@
 #include <main.h>
-#include <Reference.h>
+#include <TESObjectREFR.h>
 #include <GameData.h>
-#include <Menus.h>
+#include <Menu.h>
 
 void InitSingletons()
 {

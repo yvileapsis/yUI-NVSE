@@ -112,6 +112,7 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\game\BaseFormComponent.cpp" />
     <ClCompile Include="..\game\ConsoleManager.cpp" />
     <ClCompile Include="..\game\Containers.cpp" />
     <ClCompile Include="..\game\SaveLoadGame.cpp" />
@@ -119,23 +120,22 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClCompile Include="..\game\BSExtraData.cpp" />
     <ClCompile Include="..\game\GameData.cpp" />
     <ClCompile Include="..\game\InventoryChanges.cpp" />
-    <ClCompile Include="..\game\Form.cpp" />
-    <ClCompile Include="..\game\Reference.cpp" />
+    <ClCompile Include="..\game\TESForm.cpp" />
+    <ClCompile Include="..\game\TESObjectREFR.cpp" />
     <ClCompile Include="..\game\OSDepend.cpp" />
     <ClCompile Include="..\game\GameRTTI.cpp" />
     <ClCompile Include="..\game\Script.cpp" />
     <ClCompile Include="..\game\GameSettings.cpp" />
     <ClCompile Include="..\game\GameTasks.cpp" />
-    <ClCompile Include="..\game\Tiles.cpp" />
+    <ClCompile Include="..\game\Tile.cpp" />
     <ClCompile Include="..\game\Types.cpp" />
-    <ClCompile Include="..\game\Menus.cpp" />
+    <ClCompile Include="..\game\Menu.cpp" />
     <ClCompile Include="..\game\Sound.cpp" />
     <ClCompile Include="..\game\GameProcess.cpp" />
     <ClCompile Include="..\game\NiNodes.cpp" />
-    <ClCompile Include="..\game\Object.cpp" />
+    <ClCompile Include="..\game\TESObject.cpp" />
     <ClCompile Include="..\nvse\dinput8.cpp" />
     <ClCompile Include="..\nvse\Logging.cpp" />
-    <ClCompile Include="..\nvse\printf.cpp" />
     <ClCompile Include="..\nvse\SafeWrite.cpp" />
     <ClCompile Include="..\nvse\Utilities.cpp" />
     <ClCompile Include="ConfigurationMenu\ConfigurationMenuINI.cpp" />
@@ -181,6 +181,7 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClCompile Include="UserInterface\WeaponHweel.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\game\BaseFormComponent.h" />
     <ClInclude Include="..\game\ConsoleManager.h" />
     <ClInclude Include="..\game\Containers.h" />
     <ClInclude Include="..\game\SaveLoadGame.h" />
@@ -190,8 +191,8 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClInclude Include="..\game\GameData.h" />
     <ClInclude Include="..\game\GameEffects.h" />
     <ClInclude Include="..\game\InventoryChanges.h" />
-    <ClInclude Include="..\game\Form.h" />
-    <ClInclude Include="..\game\Reference.h" />
+    <ClInclude Include="..\game\TESForm.h" />
+    <ClInclude Include="..\game\TESObjectREFR.h" />
     <ClInclude Include="..\game\OSDepend.h" />
     <ClInclude Include="..\game\GameProcess.h" />
     <ClInclude Include="..\game\GameRTTI.h" />
@@ -199,17 +200,16 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClInclude Include="..\game\GameSettings.h" />
     <ClInclude Include="..\game\Sound.h" />
     <ClInclude Include="..\game\GameTasks.h" />
-    <ClInclude Include="..\game\Tiles.h" />
+    <ClInclude Include="..\game\Tile.h" />
     <ClInclude Include="..\game\Types.h" />
-    <ClInclude Include="..\game\Menus.h" />
+    <ClInclude Include="..\game\Menu.h" />
     <ClInclude Include="..\game\NiNodes.h" />
     <ClInclude Include="..\game\NiObjects.h" />
     <ClInclude Include="..\game\NiTypes.h" />
     <ClInclude Include="..\nvse\Logging.h" />
-    <ClInclude Include="..\game\Object.h" />
+    <ClInclude Include="..\game\TESObject.h" />
     <ClInclude Include="..\nvse\PluginAPI.h" />
     <ClInclude Include="..\nvse\prefix.h" />
-    <ClInclude Include="..\nvse\printf.h" />
     <ClInclude Include="..\nvse\SafeWrite.h" />
     <ClInclude Include="..\nvse\Utilities.h" />
     <ClInclude Include="..\nvse\dinput8.h" />

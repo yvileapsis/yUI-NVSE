@@ -116,202 +116,169 @@ class WeaponInfo : public InventoryChanges {};
 class BaseProcess
 {
 public:
-	BaseProcess();
-	~BaseProcess();
 
-	struct Data004 {
-		TESPackage		* package;		// 000
-		TESPackageData	* packageData;	// 004
-		TESObjectREFR	* targetRef;	// 008
-		UInt32			unk00C;			// 00C	Initialized to 0FFFFFFFFh, set to 0 on start
-		float			flt010;			// 010	Initialized to -1.0	. Set to GameHour on start so some time
-		UInt32			flags;			// 014	Flags, bit0 would be not created and initialized
-	};	// 018
 
-	struct	Data02C {
-		float	flt000;
-		float	flt004;
-		float	flt008;
-		float	flt00C;
-		float	flt010;
-		float	flt014;
-		float	flt018;
-		float	flt01C;
-		float	flt020;
-		float	flt024;
-		float	flt028;
-		float	flt02C;
-		UInt32	unk030;
-		UInt32	unk034;
-		float	flt038;
-		float	flt03C;
-		UInt8	byt040;
-		UInt8	fil041[3];
-		UInt32	unk044;			// 044	flags, bit28 = IsGhostn
-	};
-
-	virtual void			Destroy(bool noDealloc);
-	virtual void			Copy(void);
-	virtual void			CopyPackage(void);
-	virtual void			Unk_03(void);
-	virtual void			Update(void);
-	virtual void			Unk_05(void);
-	virtual void			Unk_06(void);
-	virtual void			Unk_07(void);
-	virtual void			Unk_08(void);
-	virtual void			Unk_09(void);
-	virtual void			Unk_0A(void);
-	virtual void			Unk_0B(void);
-	virtual void			Unk_0C(void);
-	virtual void			Unk_0D(void);
-	virtual void			Unk_0E(void);
-	virtual void			Unk_0F(void);
-	virtual void			Unk_10(void);
-	virtual void			Unk_11(void);
-	virtual void			Unk_12(void);
-	virtual void			Unk_13(void);
-	virtual void			Unk_14(void);
-	virtual void			Unk_15(void);
-	virtual void			Unk_16(void);
-	virtual void			Unk_17(void);
-	virtual void			Unk_18(void);
-	virtual void			Unk_19(void);
-	virtual void			Unk_1A(void);
-	virtual void			Unk_1B(void);
-	virtual void			Unk_1C(void);
-	virtual void			Unk_1D(void);
-	virtual void			Unk_1E(void);
-	virtual void			Unk_1F(void);
-	virtual void			Unk_20(void);
-	virtual void			Unk_21(void);
-	virtual void			Unk_22(void);
-	virtual void			Unk_23(void);
-	virtual void			Unk_24(void);
-	virtual void			Unk_25(void);
-	virtual void			Unk_26(void);
-	virtual void			Unk_27(void);
-	virtual void			Unk_28(void);
-	virtual void			Unk_29(void);
-	virtual void			Unk_2A(void);
-	virtual void			Unk_2B(void);
-	virtual void			Unk_2C(void);
-	virtual void			Unk_2D(void);
-	virtual void			Unk_2E(void);
-	virtual void			Unk_2F(void);
-	virtual void			Unk_30(void);
-	virtual void			Unk_31(void);
-	virtual void			Unk_32(void);
-	virtual void			Unk_33(void);
-	virtual void			Unk_34(void);
-	virtual void			Unk_35(void);
-	virtual void			StopIdle(Actor*);
-	virtual void			Unk_37(void);
-	virtual void			Unk_38(void);
-	virtual void			Unk_39(void);
-	virtual void			Unk_3A(void);
-	virtual void			Unk_3B(void);
-	virtual void			Unk_3C(void);
-	virtual void			Unk_3D(void);
-	virtual void			Unk_3E(void);
-	virtual void			Unk_3F(void);
-	virtual void			Unk_40(void);
-	virtual void			Unk_41(void);
-	virtual void			Unk_42(void);
-	virtual void			Unk_43(void);
-	virtual bool			HasCaughtPlayerPickpocketting(void);
-	virtual void			Unk_45(void);
-	virtual void			Unk_46(void);
-	virtual void			Unk_47(void);
-	virtual void			Unk_48(void);
-	virtual void			Unk_49(void);
-	virtual void			Unk_4A(void);		// Due to context, could be GetCombatTarget
-	virtual void			Unk_4B(void);
-	virtual void			Unk_4C(void);
-	virtual void			Unk_4D(void);
-	virtual void			Unk_4E(void);
-	virtual void			Unk_4F(void);
-	virtual void			Unk_50(void);
-	//	I FEEL INSANE BUT I HAVE 1 TOO MANY VIRTUAL CALLS BEFORE 0x52
-	virtual WeaponInfo*	GetWeaponInfo();	// unk0114
-	virtual AmmoInfo*	GetAmmoInfo();		// unk0118
-	// BUT THIS FIXES IT SOMEHOW
-	virtual void			Unk_51(void);
-	virtual void			Unk_54(void);
-	virtual void			Unk_55(void);
-	virtual void			Unk_56(void);
-	virtual void			Unk_57(void);
-	virtual void			Unk_58(void);
-	virtual void			Unk_59(void);
+	BaseProcess() {};
+	virtual ~BaseProcess() {};
+	virtual void			Copy() {};
+	virtual void			CopyPackage() {};
+	virtual void			Unk_03() {};
+	virtual void			Update() {};
+	virtual void			Unk_05() {};
+	virtual void			Unk_06() {};
+	virtual void			Unk_07() {};
+	virtual void			Unk_08() {};
+	virtual void			Unk_09() {};
+	virtual void			Unk_0A() {};
+	virtual void			Unk_0B() {};
+	virtual void			Unk_0C() {};
+	virtual void			Unk_0D() {};
+	virtual void			Unk_0E() {};
+	virtual void			Unk_0F() {};
+	virtual void			GetUnk0B4() {};
+	virtual void			Unk_11() {};
+	virtual void			Unk_12() {};
+	virtual void			Unk_13() {};
+	virtual void			Unk_14() {};
+	virtual void			Unk_15() {};
+	virtual void			Unk_16() {};
+	virtual void			Unk_17() {};
+	virtual void			GetIdleDoneOnce() {};
+	virtual void			Unk_19() {};
+	virtual void			Unk_1A() {};
+	virtual void			Unk_1B() {};
+	virtual void			Unk_1C() {};
+	virtual void			Unk_1D() {};
+	virtual void			Unk_1E() {};
+	virtual void			Unk_1F() {};
+	virtual void			Unk_20() {};
+	virtual void			Unk_21() {};
+	virtual void			Unk_22() {};
+	virtual void			Unk_23() {};
+	virtual void			Unk_24() {};
+	virtual void			Unk_25() {};
+	virtual void			Unk_26() {};
+	virtual void			Unk_27() {};
+	virtual void			Unk_28() {};
+	virtual void			Unk_29() {};
+	virtual void			Unk_2A() {};
+	virtual void			Unk_2B() {};
+	virtual void			Unk_2C() {};
+	virtual void			Unk_2D() {};
+	virtual void			Unk_2E() {};
+	virtual void			Unk_2F() {};
+	virtual void			Unk_30() {};
+	virtual void			Unk_31() {};
+	virtual void			Unk_32() {};
+	virtual void			Unk_33() {};
+	virtual void			Unk_34() {};
+	virtual void			Unk_35() {};
+	virtual void			StopIdle(Actor*) {};
+	virtual void			Unk_37() {};
+	virtual void			Unk_38() {};
+	virtual void			Unk_39() {};
+	virtual void			SetUnkA4() {};
+	virtual void			Unk_3B() {};
+	virtual void			Unk_3C() {};
+	virtual void			Unk_3D() {};
+	virtual void			Unk_3E() {};
+	virtual void			Unk_3F() {};
+	virtual void			Unk_40() {};
+	virtual void			CheckForExpiredDetectionEvent() {};
+	virtual void			Unk_42() {};
+	virtual void			Unk_43() {};
+	virtual bool			GetCaughtPlayerPickpocketting() {};
+	virtual void			SetCaughtPlayerPickpocketting() {};
+	virtual void			Unk_46() {};
+	virtual void			Unk_47() {};
+	virtual void			Unk_48() {};
+	virtual void			Unk_49() {};
+	virtual void			GetUnk040() {};		// Due to context, could be GetCombatTarget
+	virtual void			Unk_4B() {};
+	virtual void			Unk_4C() {};
+	virtual void			Unk_4D() {};
+	virtual void			Unk_4E() {};
+	virtual void			Unk_4F() {};
+	virtual void			Unk_50() {};
+	virtual WeaponInfo*		GetWeaponInfo() {};	// unk0114
+	virtual AmmoInfo*		GetAmmoInfo() {};		// unk0118
+	virtual void			Unk_51() {};
+	virtual void			Unk_54() {};
+	virtual void			Unk_55();
+	virtual void			Unk_56();
+	virtual void			Unk_57();
+	virtual void			ChangeWeapon();
+	virtual void			Unk_59();
 	virtual void			UpdateAmmoInfo(AmmoInfo* ammoInfo);
-	virtual void			Unk_5B(void);
-	virtual void			Unk_5C(void);
-	virtual void			Unk_5D(void);	// Called by 5E with count itemExtraList item
-	virtual void			Unk_5E(void);	// EquipItem and UnEquipItem doEquip item count itemExtraList bytes = [equipArgC lockUnequip unk unEquipArcC lockEquip arg14 ] (arg as from Actor::(Un)EquipItem)
-	virtual void			Unk_5F(void);
-	virtual void			Unk_60(void);
+	virtual void			Unk_5B();
+	virtual void			Unk_5C();
+	virtual void			Unk_5D();	// Called by 5E with count itemExtraList item
+	virtual void			Unk_5E();	// EquipItem and UnEquipItem doEquip item count itemExtraList bytes = [equipArgC lockUnequip unk unEquipArcC lockEquip arg14 ] (arg as from Actor::(Un)EquipItem)
+	virtual void			Unk_5F();
+	virtual void			Unk_60();
 	virtual NiNode*			GetProjectileNode();
 	virtual void			SetProjectileNode(NiNode* node);
-	virtual void			Unk_63(void);
+	virtual void			Unk_63();
 
 	virtual NiNode*			GetWeaponBone(void* bipedNames);
-	virtual void			Unk_65(void);
-	virtual void			Unk_66(void);
-	virtual void			Unk_67(void);
-	virtual void			Unk_68(void);
-	virtual void			Unk_69(void);
-	virtual void			Unk_6A(void);
-	virtual void			Unk_6B(void);
-	virtual void			Unk_6C(void);
-	virtual void			Unk_6D(void);
-	virtual AnimData*		GetAnimData(void);
-	virtual void			Unk_6F(void);
-	virtual void			Unk_70(void);
-	virtual void			Unk_71(void);
-	virtual void			Unk_72(void);
-	virtual void			Unk_73(void);
-	virtual void			Unk_74(void);
-	virtual void			Unk_75(void);
-	virtual void			Unk_76(void);
-	virtual void			Unk_77(void);
-	virtual void			Unk_78(void);
-	virtual void			Unk_79(void);
-	virtual void			Unk_7A(void);
-	virtual void			Unk_7B(void);
-	virtual void			Unk_7C(void);
-	virtual void			Unk_7D(void);
-	virtual void			Unk_7E(void);
-	virtual void			Unk_7F(void);
-	virtual void			Unk_80(void);
-	virtual void			Unk_81(void);
-	virtual void			Unk_82(void);
-	virtual void			GetInterruptPackage(void);	// 083 - GetInterruptPackage
-	virtual void			SetInterruptPackage(void);	// 084 - SetInterruptPackage
-	virtual void			StopInterruptPackage(void);	// 085 - StopInterruptPackage
-	virtual void			Unk_86(void);	// 086 - SetInterruptPackageTargetRef
-	virtual void			Unk_87(void);	// 087 - SetInterruptPackageTargetRef
-	virtual void			Unk_88(void);	// 088 - IncreaseInterruptPackageUnk00C
-	virtual void			Unk_89(void);
-	virtual void			Unk_8A(void);
-	virtual void			GetStablePackage(void);	// 08B - GetStablePackage
-	virtual void			SetStablePackage(void);	// 08C - SetStablePackage
-	virtual void			StopStablePackage(void);	// 08D - StopStablePackage
-	virtual void			SetStablePackageUnk00C(void);
-	virtual void			GetStablePackageUnk00C(void);
-	virtual void			IncreaseStablePackageUnk00C(void);
-	virtual void			Unk_91(void);
-	virtual void			Unk_92(void);	// Only HighProcess, get Unk0454
-	virtual void			Unk_93(void);
-	virtual void			Unk_94(void);
-	virtual void			Unk_95(void);
-	virtual void			Unk_96(void);
-	virtual void			Unk_97(void);
-	virtual void			Unk_98(void);
-	virtual void			Unk_99(void);
-	virtual void			Unk_9A(void);
-	virtual void			Unk_9B(void);
-	virtual void			Unk_9C(void);
+	virtual void			Unk_65();
+	virtual void			Unk_66();
+	virtual void			Unk_67();
+	virtual void			Unk_68();
+	virtual void			Unk_69();
+	virtual void			Unk_6A();
+	virtual void			Unk_6B();
+	virtual void			Unk_6C();
+	virtual void			Unk_6D();
+	virtual AnimData*		GetAnimData();
+	virtual void			Unk_6F();
+	virtual void			Unk_70();
+	virtual void			Unk_71();
+	virtual void			Unk_72();
+	virtual void			Unk_73();
+	virtual void			Unk_74();
+	virtual void			Unk_75();
+	virtual void			Unk_76();
+	virtual void			Unk_77();
+	virtual void			Unk_78();
+	virtual void			Unk_79();
+	virtual void			Unk_7A();
+	virtual void			Unk_7B();
+	virtual void			Unk_7C();
+	virtual void			Unk_7D();
+	virtual void			Unk_7E();
+	virtual void			Unk_7F();
+	virtual void			Unk_80();
+	virtual void			Unk_81();
+	virtual void			Unk_82();
+	virtual void			GetInterruptPackage();	// 083 - GetInterruptPackage
+	virtual void			SetInterruptPackage();	// 084 - SetInterruptPackage
+	virtual void			StopInterruptPackage();	// 085 - StopInterruptPackage
+	virtual void			Unk_86();	// 086 - SetInterruptPackageTargetRef
+	virtual void			Unk_87();	// 087 - SetInterruptPackageTargetRef
+	virtual void			Unk_88();	// 088 - IncreaseInterruptPackageUnk00C
+	virtual void			Unk_89();
+	virtual void			Unk_8A();
+	virtual void			GetStablePackage();	// 08B - GetStablePackage
+	virtual void			SetStablePackage();	// 08C - SetStablePackage
+	virtual void			StopStablePackage();	// 08D - StopStablePackage
+	virtual void			SetStablePackageUnk00C();
+	virtual void			GetStablePackageUnk00C();
+	virtual void			IncreaseStablePackageUnk00C();
+	virtual void			Unk_91();
+	virtual void			Unk_92();	// Only HighProcess, get Unk0454
+	virtual void			Unk_93();
+	virtual void			Unk_94();
+	virtual void			Unk_95();
+	virtual void			Unk_96();
+	virtual void			Unk_97();
+	virtual void			Unk_98();
+	virtual void			Unk_99();
+	virtual void			Unk_9A();
+	virtual void			Unk_9B();
+	virtual void			Unk_9C();
 	virtual TESPackageData*	GetPackageData();
-	virtual void			Unk_9E(void);
+	virtual void			Unk_9E();
 	virtual TESPackage*		GetCurrentPackage();
 	virtual UInt32			GetPackageInfo0C();
 	virtual void			Unk_A1();
@@ -646,7 +613,37 @@ public:
 	virtual void			Unk_1EA();
 	virtual void			Unk_1EB();
 	virtual void			Unk_1EC();
-	virtual void			Unk_1ED();	// Leads to Last Target
+
+	struct Data004 {
+		TESPackage* package;		// 000
+		TESPackageData* packageData;	// 004
+		TESObjectREFR* targetRef;	// 008
+		UInt32			unk00C;			// 00C	Initialized to 0FFFFFFFFh, set to 0 on start
+		float			flt010;			// 010	Initialized to -1.0	. Set to GameHour on start so some time
+		UInt32			flags;			// 014	Flags, bit0 would be not created and initialized
+	};	// 018
+
+	struct	Data02C {
+		float	flt000;
+		float	flt004;
+		float	flt008;
+		float	flt00C;
+		float	flt010;
+		float	flt014;
+		float	flt018;
+		float	flt01C;
+		float	flt020;
+		float	flt024;
+		float	flt028;
+		float	flt02C;
+		UInt32	unk030;
+		UInt32	unk034;
+		float	flt038;
+		float	flt03C;
+		UInt8	byt040;
+		UInt8	fil041[3];
+		UInt32	unk044;			// 044	flags, bit28 = IsGhostn
+	};
 
 	PackageInfo		currentPackage;	// 04	current package ?
 	float			flt01C;			// 1C	not initialized, only by descendant!
@@ -661,8 +658,6 @@ static_assert(sizeof(BaseProcess) == 0x30);
 class LowProcess : public BaseProcess
 {
 public:
-	LowProcess();
-	~LowProcess();
 
 	struct FloatPair {
 		float	flt000;
@@ -684,6 +679,9 @@ public:
 		void**						modifiedAV;	// 0C	array of damaged actorValue
 	};	// 10
 
+	LowProcess();
+	~LowProcess() override;
+	virtual void	Unk_1ED();
 	virtual void	Unk_1EE();
 	virtual void	Unk_1EF();
 	virtual void	Unk_1F0();
@@ -709,7 +707,6 @@ public:
 	virtual void	Unk_204();
 	virtual void	Unk_205();
 	virtual void	Unk_206();
-	virtual void	Unk_207();
 
 	UInt8					byt030;		// Flags, used before being initialized . Ok, the initial value is zeroed out by a "and 0" but ???
 	UInt8					pad031[3];
@@ -746,7 +743,7 @@ class MiddleLowProcess : public LowProcess
 {
 public:
 	MiddleLowProcess();
-	~MiddleLowProcess();
+	~MiddleLowProcess() override;
 
 	virtual void	SetAnimation(UInt32 newAnimation);
 
@@ -763,8 +760,9 @@ class MiddleHighProcess : public MiddleLowProcess
 {
 public:
 	MiddleHighProcess();
-	~MiddleHighProcess();
+	~MiddleHighProcess() override;
 
+	virtual void	Unk_208();
 	virtual void	Unk_209();
 	virtual void	Unk_20A();
 	virtual void	Unk_20B();
@@ -873,8 +871,12 @@ static_assert(sizeof(MiddleHighProcess) == 0x25C);
 class HighProcess : public MiddleHighProcess
 {
 public:
-	TList<void>*						detectedActors;		// 25C
-	TList<void>*						detectingActors;	// 260
+
+	~HighProcess() override;
+	virtual void	GetList394();
+
+	TList<Actor>*						detectedActors;		// 25C
+	TList<Actor>*						detectingActors;	// 260
 	void*								ptr264;				// 264
 	void*								ptr268;				// 268
 	void*								ptr26C;				// 26C
@@ -908,7 +910,7 @@ public:
 	float								flt2D8;				// 2D8
 	UInt32								unk2DC;				// 2DC
 	float								flt2E0;				// 2E0
-	void*								ptr2E4;			// 2E4
+	NiBSBoneLODController*				ptr2E4;				// 2E4
 	UInt32								unk2E8;				// 2E8
 	AnimAction							currentAction;		// 2EC
 	UInt8								pad2EE[2];			// 2EE

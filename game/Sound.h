@@ -322,17 +322,17 @@ class BSAudioListener
 {
 public:
 	virtual void	Destroy(bool doFree);
-	virtual void	Unk_01(void);
+	virtual void	Unk_01();
 	virtual void	SetOriginWorldPos(NiPoint3* pos);
-	virtual void	Unk_03(void);
+	virtual void	Unk_03();
 	virtual void	UpdatePositionAndOrientation();
 	virtual void	SetFrontAndTopOrientation(NiPoint3* front, NiPoint3* top);
-	virtual void	Unk_06(void);
-	virtual void	Unk_07(void);
+	virtual void	Unk_06();
+	virtual void	Unk_07();
 	virtual void	SetVelocity(NiPoint3* pVelocity);
-	virtual void	Unk_09(void);
-	virtual void	Unk_0A(void);
-	virtual void	Unk_0B(void);
+	virtual void	Unk_09();
+	virtual void	Unk_0A();
+	virtual void	Unk_0B();
 	virtual void	SetRolloffFactor(float factor);
 };
 
@@ -365,12 +365,12 @@ class BSWin32Audio
 public:
 	virtual void			Destroy(bool doFree);
 	virtual void			CreateAudioListener(HWND _window);
-	virtual void			Unk_02(void);
-	virtual void			Unk_03(void);	// Does nothing
-	virtual void			Unk_04(void);	// Does nothing
+	virtual void			Unk_02();
+	virtual void			Unk_03();	// Does nothing
+	virtual void			Unk_04();	// Does nothing
 	virtual BSGameSound*	CreateGameSound(const char* filePath);
 	virtual void			InsertPathPrefix(char* filePath);	// Prefixes path with data\\sound\\ if fx\\ or song\\.
-	virtual void			Unk_07(void);	// Does nothing
+	virtual void			Unk_07();	// Does nothing
 
 	UInt8					byte04;			// 04
 	UInt8					byte05;			// 05
@@ -385,8 +385,8 @@ public:
 	bool					(*GetSoundDataFromEDID)(const char* EDIDstr, char* outFilePath, UInt32* outFlags, TESSound** outSound);	// 24	0x82D280
 	bool					(*PickSoundFileFromFolder)(char* outFilePath);	// 28	0x5E3630
 	UInt32					(*FillGameSoundProps)(UInt32* mapKey, TESSound* soundForm, UInt32* outFlags0C);	// 2C	0x82D400
-	void					(*sub_832C40)(void);	// 30
-	void					(*sub_832C80)(void);	// 34
+	void					(*sub_832C40)();	// 30
+	void					(*sub_832C80)();	// 34
 	IDirectSound8**			ptr38;					// 38
 	IDirectSoundBuffer*		ptr3C;					// 3C
 	UInt32					unk40[24];				// 40
@@ -401,7 +401,7 @@ class BSThread
 {
 public:
 	virtual void	Destroy(bool doFree);
-	virtual void	Unk_01(void);
+	virtual void	Unk_01();
 
 	LPCRITICAL_SECTION	cs;			// 04
 	UInt32				unk08[10];	// 08

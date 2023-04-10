@@ -261,13 +261,13 @@ public:
 
 	virtual Tile*			Destroy(bool noDealloc);
 	virtual void			Init(Tile* parent, const char* name, Tile* replacedChild);
-	virtual NiNode*			CalcNode(void);
-	virtual UInt32			GetType(void);		// returns one of kTileValue_XXX
-	virtual const char*		GetTypeStr(void);	// 4-byte id
+	virtual NiNode*			CalcNode();
+	virtual UInt32			GetType();		// returns one of kTileValue_XXX
+	virtual const char*		GetTypeStr();	// 4-byte id
 	virtual bool			Unk_05(UInt32 arg0, UInt32 arg1);
 	virtual UInt32			UpdateField(UInt32 valueID, float floatValue, const char* strValue);
-	virtual void			Unk_07(void);
-	virtual UInt32			Unk_08(void);
+	virtual void			Unk_07();
+	virtual UInt32			Unk_08();
 	virtual void			Unk_09(UInt32 arg0, UInt32 arg1, UInt32 arg2);
 
 	struct ChildNode
@@ -384,7 +384,7 @@ class TileText : public Tile
 public:
 };
 
-void Debug_DumpTraits(void);
+void Debug_DumpTraits();
 
 class TileExtra : public NiExtraData
 {

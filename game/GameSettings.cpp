@@ -54,7 +54,7 @@ bool Setting::Get(const char * str)
 	return false;
 }
 
-const char * Setting::Get(void)
+const char * Setting::Get()
 {
 	if (GetType() == kSetting_String)
 	{

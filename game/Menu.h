@@ -1,6 +1,6 @@
 #pragma once
-#include <Reference.h>
-#include <Tiles.h>
+#include <TESObjectREFR.h>
+#include <Tile.h>
 #include <Script.h>
 
 enum
@@ -2742,6 +2742,64 @@ public:
 	~StartMenu();
 	StartMenu();
 
+
+	// 10
+	struct Option
+	{
+		// which menus the option should be shown in
+		enum WhichMenus
+		{
+			kMainMenu = 0x1,
+			kPauseMenu = 0x2,
+			kSettingsMenu = 0x4,
+			kGameplayMenu = 0x8,
+			kDisplayMenu = 0x10,
+			kAudioMenu = 0x20,
+			kControlsMenu = 0x40,
+			kNewGameMenu = 0x80,
+			kContinueGameMenu = 0x100,
+			kQuitGameMenu = 0x2000,
+		};
+
+
+		Option(const char* str, void (*callback)(), UInt32 flags) { ThisCall<Option*>(0x07CE620, this, str, callback, flags); }
+		virtual ~Option() {};
+		const char* displayString;
+		void (*callback)();	// 08
+		UInt32 data;
+	};
+
+	// 30
+	struct UserOption : Option
+	{
+		enum Type
+		{
+			// kToggleCycles will show a right arrow at max value which will cycle it back to the lowest value
+			kToggleCycles = 0,
+			kToggleNoCycle = 1,
+			kSlider = 2
+		};
+
+		const char* templateName;					// 10
+		UInt32 currValue;							// 14
+		UInt32 defaultValue;						// 18
+		Type type;									// 1C
+		UInt32 numOptions;							// 20
+		UInt32 buttonWidth;							// 24
+		const char** currValueName;					// 28
+		void(__cdecl* onSelection)(UserOption*);	// 2C
+
+		UserOption(char* str, void (*_callback)(), WhichMenus flags, int type, int numOptions, int buttonWidth, char** optionNames)
+			: Option(str, _callback, flags)
+		{
+			ThisCall<UserOption*>(0x7D6350, this, str, _callback, flags, type, numOptions, buttonWidth, optionNames);;
+		}
+
+		~UserOption() override {};
+
+		void UpdateVisibility() { ThisCall(0x7D4CE0, StartMenu::GetSingleton(), this, NULL); };
+	};
+
 	enum StartMenuFlags
 	{
 		kInStartMenu = 0x1,
@@ -2783,17 +2841,17 @@ public:
 	TileText* tile078;
 	TileImage* tile07C;
 	TileText* tile080;
-	ListBox<StartMenuOption> options084;
-	ListBox<StartMenuOption> settingsSubMenu;
-	ListBox<StartMenuOption> optionsNewGameMenu;
-	ListBox<StartMenuOption> actionMappingOptions;
+	ListBox<Option> options084;
+	ListBox<Option> settingsSubMenu;
+	ListBox<Option> optionsNewGameMenu;
+	ListBox<Option> actionMappingOptions;
 	ListBox<int> listBox144;
 	ListBox<BGSSaveLoadFileEntry> savesList;
 	UInt32 unk1A4;
 	UInt32 flags;
 	float scrolledLoadedSavesHeight;
 	UInt32 unk1B0;
-	StartMenuOption* brightnessSettingCallback;
+	Option* brightnessSettingCallback;
 	NiSourceTexture* texture1B8;
 	UInt32 unk1BC;
 	TileImage* tile1C0;
@@ -2805,60 +2863,6 @@ public:
 	static StartMenu* GetSingleton() { return *reinterpret_cast<StartMenu**>(0x11DAAC0); };
 };
 static_assert(sizeof(StartMenu) == 0x1D4);
-
-// 10
-struct StartMenuOption
-{
-	// which menus the option should be shown in
-	enum WhichMenus
-	{
-		kMainMenu = 0x1,
-		kPauseMenu = 0x2,
-		kSettingsMenu = 0x4,
-		kGameplayMenu = 0x8,
-		kDisplayMenu = 0x10,
-		kAudioMenu = 0x20,
-		kControlsMenu = 0x40,
-		kNewGameMenu = 0x80,
-		kContinueGameMenu = 0x100,
-		kQuitGameMenu = 0x2000,
-	};
-
-	static StartMenuOption* Create(const char* str, void (*callback)(void), UInt32 flags);
-	virtual ~StartMenuOption() {};
-	const char* displayString;
-	void (*callback)(void);	// 08
-	UInt32 data;
-
-};
-
-// 30
-struct StartMenuUserOption : StartMenuOption
-{
-	enum Type
-	{
-		// kToggleCycles will show a right arrow at max value which will cycle it back to the lowest value
-		kToggleCycles = 0,
-		kToggleNoCycle = 1,
-		kSlider = 2
-	};
-
-	const char* templateName;					// 10
-	UInt32 currValue;							// 14
-	UInt32 defaultValue;						// 18
-	Type type;						// 1C
-	UInt32 numOptions;							// 20
-	UInt32 buttonWidth;							// 24
-	const char** currValueName;					// 28
-	void(__cdecl* onSelection)(StartMenuUserOption*);	// 2C
-
-	StartMenuUserOption* Init(char* str, void (*_callback)(StartMenuUserOption*), WhichMenus flags, int _type, int _numOptions, int _buttonWidth, char** optionNames);
-	static StartMenuUserOption* Create(char* str, void(__cdecl* callback)(StartMenuUserOption*), WhichMenus flags, int type, int numOptions, int buttonWidth, char** optionNames);
-
-	~StartMenuUserOption() override {};
-
-	void UpdateVisibility() { ThisCall(0x7D4CE0, StartMenu::GetSingleton(), this, NULL); };
-};
 
 class NiPointLight;
 
@@ -2921,26 +2925,26 @@ public:
 	~FORenderedMenu();
 
 	virtual void	Destructor(bool doFree);
-	virtual void	Unk_01(void);
-	virtual void	Unk_02(void);
-	virtual void	Unk_03(void);
-	virtual void	Unk_04(void);
-	virtual void	Update(void);
-	virtual void	Unk_06(void);
-	virtual void	Unk_07(void);
-	virtual void	Unk_08(void);
-	virtual void	Init(void);
-	virtual void	ResetNifs(void);
-	virtual void	Unk_0B(void);
-	virtual void	OnMenuOpen(void);
-	virtual void	OnMenuClose(void);
+	virtual void	Unk_01();
+	virtual void	Unk_02();
+	virtual void	Unk_03();
+	virtual void	Unk_04();
+	virtual void	Update();
+	virtual void	Unk_06();
+	virtual void	Unk_07();
+	virtual void	Unk_08();
+	virtual void	Init();
+	virtual void	ResetNifs();
+	virtual void	Unk_0B();
+	virtual void	OnMenuOpen();
+	virtual void	OnMenuClose();
 	virtual void	HandleStaticEffect(float msPassed);
 	virtual void	HandleVerticalHoldEffect(float msPassed);
 	virtual void	HandleShudderEffect(float msPassed);
 	virtual void	Unk_11(float msPassed);
 	virtual void	Unk_12(float msPassed);
 	virtual void	HandleScanlines(float msPassed);
-	virtual void	Unk_14(void);
+	virtual void	Unk_14();
 
 	NiAVObject* screenTriShape;
 	BSFadeNode* node08;
@@ -3260,7 +3264,7 @@ enum Scancodes
 	MouseWheelUp = 0x108,
 	MouseWheelDown = 0x109,
 };
-static BSSimpleArray<StartMenuUserOption*>* g_settingsMenuOptions = (BSSimpleArray<StartMenuUserOption*>*)0x11DAB50;
+static BSSimpleArray<StartMenu::UserOption*>* g_settingsMenuOptions = (BSSimpleArray<StartMenu::UserOption*>*)0x11DAB50;
 void MenuButton_DownloadsClick();
 
 TileValue* StringToTilePath(const std::string& componentPath);

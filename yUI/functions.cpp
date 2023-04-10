@@ -5,7 +5,7 @@
 
 #include "dinput8.h"
 #include "GameData.h"
-#include "Menus.h"
+#include "Menu.h"
 
 
 namespace CraftingComponents

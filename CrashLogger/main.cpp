@@ -1,7 +1,7 @@
 #include <main.h>
-#include <Reference.h>
+#include <TESObjectREFR.h>
 #include <GameData.h>
-#include <Menus.h>
+#include <Menu.h>
 
 #include "CrashLog.h"
 
@@ -18,7 +18,6 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	if (msg->type == NVSEMessagingInterface::kMessage_DeferredInit)
 	{
 		InitSingletons();
-		CrashLogger::NVVtables::FillLabels();
 		//Log() << CrashLogger_VERSION_STR;
 
 		for (const auto& i : deferredInit) i(); // call all deferred init functions
@@ -67,6 +66,8 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 
 	Log() << FormatString("Yvile's Cobb Crash Logger Version %s. At %s", CrashLogger_VERSION_STR, std::to_string(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now())).c_str());
 	Log() << ("If this file is empty, then your game didn't crash! :snig: \n");
+
+	CrashLogger::NVVtables::FillLabels();
 	CrashLogger::Apply();
 
 	return true;

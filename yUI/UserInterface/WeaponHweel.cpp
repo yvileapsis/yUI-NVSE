@@ -1,7 +1,7 @@
 #include <main.h>
 
-#include <Form.h>
-#include <Menus.h>
+#include <TESForm.h>
+#include <Menu.h>
 #include <SimpleINILibrary.h>
 
 #include "functions.h"

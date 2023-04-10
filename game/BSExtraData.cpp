@@ -1,7 +1,7 @@
 #include <BSExtraData.h>
 
-#include <Form.h>
-#include <Reference.h>
+#include <TESForm.h>
+#include <TESObjectREFR.h>
 #include <Script.h>
 #include <GameRTTI.h>
 

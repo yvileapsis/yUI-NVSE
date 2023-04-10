@@ -92,7 +92,7 @@ ModConfigurationMenu* ModConfigurationMenu::ReloadMenu()
 };
 
 
-ModConfigurationMenu::ModConfigurationMenu()
+ModConfigurationMenu::ModConfigurationMenu() : Menu()
 {
 	memset(tiles, 0, sizeof tiles);
 

@@ -6,12 +6,12 @@
 #include <map>
 #include <set>
 
-#include "Form.h"
+#include "TESForm.h"
 #include "GameTasks.h"
-#include "Menus.h"
-#include "Reference.h"
+#include "Tile.h"
+#include "Menu.h"
+#include "TESObjectREFR.h"
 #include "SafeWrite.h"
-#include "Tiles.h"
 
 #define SYMOPT_EX_WINE_NATIVE_MODULES  1000
 
@@ -28,7 +28,7 @@ namespace CrashLogger::Handle
 
 	std::string AsMenu(void* ptr) { return static_cast<Menu*>(ptr)->tile->GetFullPath(); }
 	std::string AsTile(void* ptr) { return static_cast<Tile*>(ptr)->GetFullPath(); }
-	std::string AsStartMenuOption(void* ptr) { return static_cast<StartMenuOption*>(ptr)->displayString; }
+	std::string AsStartMenuOption(void* ptr) { return static_cast<StartMenu::Option*>(ptr)->displayString; }
 
 	std::string AsTESForm(void* ptr) { const auto form = static_cast<TESForm*>(ptr); return FormatString("%08X (%s)", form->refID, form->GetName()); }
 	std::string AsTESObjectREFR(void* ptr) { const auto refr = static_cast<TESObjectREFR*>(ptr);
@@ -228,8 +228,8 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_TileText);
 		Push(kVtbl_Tile3D);
 
-		Push(kVtbl_StartMenuOption, Handle::AsStartMenuOption);
-		Push(kVtbl_StartMenuUserOption);
+		Push(kVtbl_StartMenuOption, Handle::AsStartMenuOption, "StartMenu::Option");
+		Push(kVtbl_StartMenuUserOption, Handle::AsStartMenuOption, "StartMenu::UserOption");
 
 		Push(kVtbl_TESForm, Handle::AsTESForm);
 
@@ -2399,6 +2399,25 @@ namespace CrashLogger
 		return nullptr;
 	}
 	//
+
+	void QuickTest() {
+		const UInt32* playerptr = (UInt32*) g_player->baseProcess;
+		const UInt32 size = sizeof HighProcess;
+
+		for (unsigned int i = 0x97; 4 * i < size; i += 1)
+		{
+			try
+			{
+				std::string result = YvilesMagicBox::DecryptPtr(playerptr[i]);;
+				//if (!result.empty())
+					Log(true, Log::kLog) << FormatString("0x%03X ", 4 * i) + YvilesMagicBox::DecryptPtr(playerptr[i]);
+			}
+			catch (...) {
+			}
+		}
+
+	}
+
 	void Apply() {
 		s_originalFilter = SetUnhandledExceptionFilter(&Filter);
 		//
@@ -2407,5 +2426,7 @@ namespace CrashLogger
 		SafeWrite32(0x00FDF180, (UInt32)&FakeSetUnhandledExceptionFilter);
 		//else SafeWrite32(0x00A281B4, (UInt32)&FakeSetUnhandledExceptionFilter);
 
+
+//		mainLoopDoOnce.push_back(QuickTest);
 	};
 };

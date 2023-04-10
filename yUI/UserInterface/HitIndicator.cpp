@@ -2,8 +2,8 @@
 #include <functions.h>
 #include <SimpleINILibrary.h>
 
-#include <Menus.h>
-#include <Tiles.h>
+#include <Menu.h>
+#include <Tile.h>
 
 namespace UserInterface::HitIndicator
 {

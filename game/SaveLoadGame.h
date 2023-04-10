@@ -122,10 +122,10 @@ class BGSLoadGameBuffer
 	BGSLoadGameBuffer();
 	~BGSLoadGameBuffer();
 
-	virtual UInt8			GetSaveFormVersion(void);	// replaced in descendant 
-	virtual TESForm* getForm(void);				// only implemented in descendants
-	virtual TESObjectREFR* getREFR(void);				// only implemented in descendants
-	virtual Actor* getActor(void);				// only implemented in descendants
+	virtual UInt8			GetSaveFormVersion();	// replaced in descendant 
+	virtual TESForm* getForm();				// only implemented in descendants
+	virtual TESObjectREFR* getREFR();				// only implemented in descendants
+	virtual Actor* getActor();				// only implemented in descendants
 
 	char* chunk;			// 004
 	UInt32	chunkSize;		// 008

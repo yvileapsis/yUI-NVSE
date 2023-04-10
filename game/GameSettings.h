@@ -9,7 +9,7 @@ public:
 	Setting();
 	virtual ~Setting();
 
-	virtual void Unk_01(void);
+	virtual void Unk_01();
 
 	enum EType	{
 		kSetting_Bool = 0,
@@ -84,16 +84,16 @@ public:
 	GameSettingCollection();
 	virtual ~GameSettingCollection();
 
-	virtual void	Unk_01(void);
-	virtual void	Unk_02(void);
-	virtual void	Unk_03(void);
-	virtual void	Unk_04(void);
-	virtual void	Unk_05(void);
-	virtual void	Unk_06(void);
-	virtual void	Unk_07(void);
-	virtual void	Unk_08(void);
-	virtual void	Unk_09(void);
-	virtual void	Unk_0A(void);
+	virtual void	Unk_01();
+	virtual void	Unk_02();
+	virtual void	Unk_03();
+	virtual void	Unk_04();
+	virtual void	Unk_05();
+	virtual void	Unk_06();
+	virtual void	Unk_07();
+	virtual void	Unk_08();
+	virtual void	Unk_09();
+	virtual void	Unk_0A();
 
 	// BSTCaseInsensitiveStringMap <Setting *>
 	typedef NiTMapBase <const char *, Setting *>	SettingMap;
@@ -118,16 +118,16 @@ public:
 	IniSettingCollection();
 	virtual ~IniSettingCollection();
 
-	virtual void	Unk_01(void);
-	virtual void	Unk_02(void);
-	virtual void	Unk_03(void);
-	virtual void	Unk_04(void);
-	virtual void	Unk_05(void);
-	virtual void	Unk_06(void);
-	virtual void	Unk_07(void);
-	virtual void	Unk_08(void);
-	virtual void	Unk_09(void);
-	virtual void	Unk_0A(void);
+	virtual void	Unk_01();
+	virtual void	Unk_02();
+	virtual void	Unk_03();
+	virtual void	Unk_04();
+	virtual void	Unk_05();
+	virtual void	Unk_06();
+	virtual void	Unk_07();
+	virtual void	Unk_08();
+	virtual void	Unk_09();
+	virtual void	Unk_0A();
 
 	// void				** vtbl				// 000
 	char				iniPath[0x100];		// 004

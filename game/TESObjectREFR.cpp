@@ -1,4 +1,5 @@
-#include <Reference.h>
+#include <BaseFormComponent.h>
+#include <TESObjectREFR.h>
 #include <GameRTTI.h>
 #include <InventoryChanges.h>
 #include <GameTasks.h>
@@ -13,7 +14,7 @@
 static constexpr UInt32 s_TESObject_REFR_init						= 0x0055A2F0;	// TESObject_REFR initialization routine (first reference to s_TESObject_REFR_vtbl)
 static constexpr UInt32 s_TESObjectREFR__GetContainer				= 0x0055D310;	// First call in REFR::RemoveItem
 static constexpr UInt32 s_TESObjectREFR_Set3D						= 0x005702E0;	// void : (const char*)
-static constexpr UInt32 s_PlayerCharacter_GetCurrentQuestTargets	= 0x00952BA0;	// BuildedQuestObjectiveTargets* : (void)
+static constexpr UInt32 s_PlayerCharacter_GetCurrentQuestTargets	= 0x00952BA0;	// BuildedQuestObjectiveTargets* : ()
 static constexpr UInt32 s_PlayerCharacter_GenerateNiNode			= 0x0094E1D0; // Func0072
 static constexpr UInt32 kPlayerUpdate3Dpatch						= 0x0094EB7A;
 static constexpr UInt32 TESObjectREFR_Set3D							= 0x0094EB40;

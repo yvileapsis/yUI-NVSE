@@ -1,6 +1,6 @@
 #include <main.h>
 #include <InterfaceManager.h>
-#include <Tiles.h>
+#include <Tile.h>
 #include <SafeWrite.h>
 
 #include <SimpleINILibrary.h>

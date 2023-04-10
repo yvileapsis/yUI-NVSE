@@ -7,10 +7,10 @@
 #include <BSExtraData.h>
 #include <InventoryChanges.h>
 #include <InterfaceManager.h>
-#include <Tiles.h>
+#include <Tile.h>
 #include <Utilities.h>
 
-#include "Form.h"
+#include "TESForm.h"
 
 typedef void(*LoggingFunction)(std::fstream& file, const std::string& str);
 typedef LoggingFunction(*UpdateFunction)();
@@ -197,7 +197,7 @@ void Dump(ExtraContainerChanges* extra)
 	--file;
 }
 
-void DumpFontNames(void)
+void DumpFontNames()
 {
 	FontInfo** fonts = FontManager::GetSingleton()->fontInfos;
 
@@ -222,7 +222,7 @@ Log& Log::operator<<(const std::string& str)
 	return *this;
 }
 
-/*void ScriptEventList::Dump(void)
+/*void ScriptEventList::Dump()
 {
 	const auto nEvents = m_eventList->Count();
 	for (UInt16 n = 0; n < nEvents; ++n)

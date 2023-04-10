@@ -76,12 +76,12 @@ public:
 	/*0B0*/virtual void		Unk_2C(UInt32 arg1);
 	/*0B4*/virtual void		Unk_2D(UInt32 arg1);
 	/*0B8*/virtual void		UpdateTransform(void* updInfo);
-	/*0BC*/virtual void		Unk_2F(void);
+	/*0BC*/virtual void		Unk_2F();
 	/*0C0*/virtual void		UpdateBounds(void* updInfo);
 	/*0C4*/virtual void		Unk_31(UInt32 arg1, UInt32 arg2);
 	/*0C8*/virtual void		Unk_32(UInt32 arg1);
 	/*0CC*/virtual void		Unk_33(UInt32 arg1);
-	/*0D0*/virtual void		Unk_34(void);
+	/*0D0*/virtual void		Unk_34();
 	/*0D4*/virtual void		Unk_35(UInt32 arg1);
 	/*0D8*/virtual void		Unk_36(UInt32 arg1);
 
@@ -146,7 +146,7 @@ public:
 	NiDynamicEffect();
 	~NiDynamicEffect();
 
-	virtual UInt32	GetEffectType(void);
+	virtual UInt32	GetEffectType();
 
 	UInt8	enable;		// 0AC
 	UInt8	pad0AD[3];	// 0AD
@@ -282,7 +282,7 @@ public:
 	/*0F0*/virtual void		RemoveNthObject(UInt32 index);			//	Calls RemoveNthObject2 with arg2 as ptr to NULL
 	/*0F4*/virtual void		Unk_3D(UInt32 arg1, UInt32 arg2, UInt32 arg3);
 	/*0F8*/virtual void		Unk_3E(UInt32 arg1, UInt32 arg2);
-	/*0FC*/virtual void		Unk_3F(void);
+	/*0FC*/virtual void		Unk_3F();
 
 	NiTArray<NiAVObject*>	m_children;		// 9C
 
@@ -398,15 +398,15 @@ public:
 	BSFaceGenNiNode();
 	~BSFaceGenNiNode();
 
-	virtual NiObject *	GetAnimationData(void);
+	virtual NiObject *	GetAnimationData();
 	virtual void		SetAnimationData(NiObject * obj);
 	virtual float *		GetRotation(float * dst);
 	virtual void		SetRotation(float * src);	// ticks bRotatedLastUpdate
-	virtual bool		GetAnimationUpdate(void);
+	virtual bool		GetAnimationUpdate();
 	virtual void		SetAnimationUpdate(bool arg);
-	virtual bool		GetApplyRotationToParent(void);
+	virtual bool		GetApplyRotationToParent();
 	virtual void		SetApplyRotationToParent(bool arg);
-	virtual bool		GetFixedNormals(void);
+	virtual bool		GetFixedNormals();
 	virtual void		SetFixedNormals(bool arg);
 	virtual void		Unk_31(void * arg);	// scans children, "could not find bone for the head node"
 
@@ -606,7 +606,7 @@ public:
 	virtual void	Render(NiRenderer * arg);
 	virtual void	Unk_22(NiRenderer * arg);
 	virtual void	SetGeomData(NiObject * obj);
-	virtual void	Unk_24(void);		// geomData->Unk_15()
+	virtual void	Unk_24();		// geomData->Unk_15()
 	virtual void	Unk_25(NiRenderer * arg);
 
 	NiPropertyState			* unk0AC;	// 0AC
@@ -701,7 +701,7 @@ public:
 
 	virtual void		SetLocalBound(float x, float y, float z, float radius);
 	virtual void		SetInstanceCount(UInt16 count);
-	virtual NiSphere *	GetLocalBound(void);
+	virtual NiSphere *	GetLocalBound();
 
 	UInt16		instanceCount;	// 0C0
 	UInt8		pad0C2[2];		// 0C2

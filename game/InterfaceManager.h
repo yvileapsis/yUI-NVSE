@@ -12,7 +12,7 @@ enum eEmotion {
 
 class ButtonIcon;
 
-typedef void (*_ShowMessageBox_Callback)(void);
+typedef void (*_ShowMessageBox_Callback)();
 extern const _ShowMessageBox_Callback ShowMessageBox_Callback;
 
 typedef bool (*_ShowMessageBox)(const char* message, UInt32 unk1, UInt32 unk2, _ShowMessageBox_Callback callback, UInt32 unk4, UInt32 unk5, float unk6, float unk7, ...);
@@ -286,7 +286,7 @@ public:
 	UInt8					byte4B7;			// 4B7
 	UInt32					queuedPipboyTabToSwitchTo;			// 4B8
 	UInt32					pipBoyMode;			// 4BC
-	void					(*onPipboyOpenCallback)(void);		// 4C0
+	void					(*onPipboyOpenCallback)();		// 4C0
 	UInt32					unk4C4[2];			// 4C4
 	UInt8					byte4CC;			// 4CC
 	UInt8					byte4CD;			// 4CD
@@ -538,7 +538,7 @@ static void(__thiscall* Font__CheckForVariablesInText)(FontInfo*, const char* in
 class DebugText
 {
 public:
-	virtual void    Unk_00(void);
+	virtual void    Unk_00();
 	virtual void    Unk_01(UInt32 arg1, UInt32 arg2);
 	virtual UInt32  Unk_02(UInt32 arg1, UInt32 arg2, UInt32 arg3, UInt32 arg4, UInt32 arg5, UInt32 arg6);
 	virtual UInt32  Unk_03(UInt32 arg1, UInt32 arg2, UInt32 arg3, UInt32 arg4);

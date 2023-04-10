@@ -36,11 +36,11 @@ namespace ConfigurationMenu
 	}
 
 	// wraps a call that adds the settings menu to the start menu 
-	inline void __fastcall addTweaksButton(BSSimpleArray<StartMenuOption*>* startMenuOptions, void* edx, StartMenuOption** settingsMenuItem)
+	inline void __fastcall addTweaksButton(BSSimpleArray<StartMenu::Option*>* startMenuOptions, void* edx, StartMenu::Option** settingsMenuItem)
 	{
 		startMenuOptions->Append(settingsMenuItem);
 
-		StartMenuOption* tweaksButton = StartMenuOption::Create("Mods", TweaksButtonCallback, StartMenuOption::kMainMenu + StartMenuOption::kPauseMenu);
+		StartMenu::Option* tweaksButton = new StartMenu::Option("Mods", TweaksButtonCallback, StartMenu::Option::kMainMenu + StartMenu::Option::kPauseMenu);
 		startMenuOptions->Append(&tweaksButton);
 	}
 

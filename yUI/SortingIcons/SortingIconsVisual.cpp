@@ -1,5 +1,5 @@
 #include "SortingIcons.h"
-#include <Tiles.h>
+#include <Tile.h>
 #include <functions.h>
 
 #include <InterfaceManager.h>

@@ -1,8 +1,8 @@
 #include <InventoryChanges.h>
 
-#include <Form.h>
+#include <TESForm.h>
 #include <BSExtraData.h>
-#include <Reference.h>
+#include <TESObjectREFR.h>
 
 #include <GameRTTI.h>
 

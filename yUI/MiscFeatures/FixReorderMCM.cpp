@@ -1,6 +1,6 @@
 #include <main.h>
-#include <Tiles.h>
-#include <Menus.h>
+#include <Tile.h>
+#include <Menu.h>
 #include <SimpleINILibrary.h>
 
 inline int g_FixReorderMCM = 1;

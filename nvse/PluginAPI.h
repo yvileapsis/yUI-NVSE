@@ -51,7 +51,7 @@ struct NVSEInterface
 
 	// call during your Query or Load functions to get a PluginHandle uniquely identifying your plugin
 	// invalid if called at any other time, so call it once and save the result
-	PluginHandle	(*GetPluginHandle)(void);
+	PluginHandle	(*GetPluginHandle)();
 
 	// CommandReturnType enum defined in CommandTable.h
 	// does the same as RegisterCommand but includes return type; *required* for commands returning arrays
@@ -451,8 +451,8 @@ struct NVSECommandTableInterface
 	};
 
 	UInt32	version;
-	const CommandInfo*	(* Start)(void);
-	const CommandInfo*	(* End)(void);
+	const CommandInfo*	(* Start)();
+	const CommandInfo*	(* End)();
 	CommandInfo*		(* GetByOpcode)(UInt32 opcode);
 	CommandInfo*		(* GetByName)(const char* name);
 	UInt32				(* GetReturnType)(const CommandInfo* cmd);		// return type enum defined in CommandTable.h

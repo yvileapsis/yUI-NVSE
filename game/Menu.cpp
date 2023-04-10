@@ -1,6 +1,6 @@
 #include <Utilities.h>
-#include <Menus.h>
-#include <Reference.h>
+#include <Menu.h>
+#include <TESObjectREFR.h>
 #include <SafeWrite.h>
 
 static UInt8*	g_bUpdatePlayerModel		= (UInt8*)0x011C5CB4;	// this is set to true when player confirms change of race in RaceSexMenu -
@@ -83,7 +83,8 @@ bool IsInStartMenu()
 	return menu && menu->flags & StartMenu::kInStartMenu;
 }
 
-StartMenuOption* StartMenuOption::Create(const char* str, void (*callback)(void), UInt32 flags)
+/*
+StartMenu::Option* StartMenu::Option::Create(const char* str, void (*callback)(), UInt32 flags)
 {
 	StartMenuOption* option = (StartMenuOption*)GameHeapAlloc(sizeof(StartMenuOption));
 	*reinterpret_cast<UInt32*>(option) = kVtbl_StartMenuOption;
@@ -93,10 +94,12 @@ StartMenuOption* StartMenuOption::Create(const char* str, void (*callback)(void)
 
 	return option;
 }
+*/
 
+/*
 StartMenuUserOption* StartMenuUserOption::Init(char* str, void (*callback)(StartMenuUserOption*), StartMenuOption::WhichMenus flags, int type, int numOptions, int buttonWidth, char** optionNames)
 {
-	return CdeclCall<StartMenuUserOption*>(0x7D6350, this, str, callback, flags, type, numOptions, buttonWidth, optionNames);
+	return 
 }
 
 StartMenuUserOption* StartMenuUserOption::Create(char* str, void(__cdecl* callback)(StartMenuUserOption*), StartMenuOption::WhichMenus flags, int type, int numOptions, int buttonWidth, char** optionNames)
@@ -104,7 +107,7 @@ StartMenuUserOption* StartMenuUserOption::Create(char* str, void(__cdecl* callba
 	StartMenuUserOption* option = (StartMenuUserOption*)GameHeapAlloc(sizeof(StartMenuUserOption));
 	return option->Init(str, callback, flags, type, numOptions, buttonWidth, optionNames);
 }
-
+*/
 
 /*
 

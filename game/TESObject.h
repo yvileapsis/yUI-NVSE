@@ -1,5 +1,5 @@
 #pragma once
-#include <Form.h>
+#include <TESForm.h>
 
 class TESObject : public TESForm
 {
@@ -7,21 +7,21 @@ public:
 	TESObject();
 	~TESObject();
 
-	virtual UInt32	Unk_4E(void);
-	virtual bool	Unk_4F(void);
-	virtual UInt32	Unk_50(void);
-	virtual bool	Unk_51(void);
+	virtual UInt32	Unk_4E();
+	virtual bool	Unk_4F();
+	virtual UInt32	Unk_50();
+	virtual bool	Unk_51();
 	virtual void	Unk_52(void* arg);
 	virtual NiNode* _CreateNiNode(TESObjectREFR* refr, void* arg1);
 	virtual void	Unk_54(void* arg);
-	virtual bool	IsInternal(void);
-	virtual bool	IsInternalMarker(void);
-	virtual void	Unk_57(void);
-	virtual bool	Unk_58(void);	// BoundObject: Calls Unk_5F on the object model
+	virtual bool	IsInternal();
+	virtual bool	IsInternalMarker();
+	virtual void	Unk_57();
+	virtual bool	Unk_58();	// BoundObject: Calls Unk_5F on the object model
 	virtual bool	Unk_59(void* arg);
 	virtual void	Unk_5A(void* arg0, void* arg1);
-	virtual UInt32	Unk_5B(void);
-	virtual UInt32	Unk_5C(void);
+	virtual UInt32	Unk_5B();
+	virtual UInt32	Unk_5C();
 	virtual bool	__CreateNiNode(TESObjectREFR* refr);	// if false, no NiNode gets returned by Unk_53, true for NPC
 };
 
@@ -33,7 +33,7 @@ public:
 	~TESBoundObject();
 
 	virtual NiNode* CreateNiNode(TESObjectREFR* refr);	// calls Fn53, for NPC calls ReadBones, for LevelledActor level them if necessary
-	virtual bool	Unk_5F(void);
+	virtual bool	Unk_5F();
 
 	BoundObjectListHead* head;		// 018
 	TESBoundObject* prev;		// 01C
@@ -71,9 +71,9 @@ public:
 	TESActorBase();
 	~TESActorBase();
 
-	virtual BGSBodyPartData* GetBodyPartData(void);
+	virtual BGSBodyPartData* GetBodyPartData();
 	virtual void				Fn_61(void* arg);
-	virtual TESCombatStyle* GetCombatStyle(void);	// Result saved as ZNAM GetCombatStyle
+	virtual TESCombatStyle* GetCombatStyle();	// Result saved as ZNAM GetCombatStyle
 	virtual void				SetCombatStyle(TESCombatStyle* combatStyle);
 	virtual void				SetAttr(UInt32 idx, float value);	// calls Fn65
 	virtual void				SetAttr(UInt32 idx, UInt32 value);

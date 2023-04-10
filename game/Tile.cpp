@@ -1,5 +1,5 @@
-#include <Tiles.h>
-#include <Menus.h>
+#include <Tile.h>
+#include <Menu.h>
 
 #include "SafeWrite.h"
 
@@ -112,7 +112,7 @@ std::string Tile::GetFullPath()
 }
 
 
-void Debug_DumpTraits(void)
+void Debug_DumpTraits()
 {
 	for (UInt32 i = 0; i < g_traitNameMap->numBuckets; i++)
 	{
@@ -134,7 +134,7 @@ const char * Tile::TraitIDToName(int id)
 	return nullptr;
 }
 
-void Debug_DumpTileImages(void) {};
+void Debug_DumpTileImages() {};
 
 TileMenu* Tile::GetTileMenu()
 {

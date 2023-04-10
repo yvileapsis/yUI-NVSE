@@ -334,7 +334,7 @@ public:
 
 	T Get(UInt32 idx) { return (*this)[idx]; }
 
-	UInt32 Length(void) { return firstFreeEntry; }
+	UInt32 Length() { return firstFreeEntry; }
 };
 
 // 8
@@ -394,10 +394,10 @@ public:
 
 		~Iterator() { }
 
-		T_Data*		Get(void);
-		UInt32		GetKey(void);
-		bool		Next(void);
-		bool		Done(void);
+		T_Data*		Get();
+		UInt32		GetKey();
+		bool		Next();
+		bool		Done();
 
 		//		T_Key Key() const { return m_entry->key; }
 
@@ -461,17 +461,17 @@ template <typename T_Data> void NiTPointerMap<T_Data>::Iterator::FindNonEmpty()
 		if ((m_entry = *m_bucket)) return;
 }
 
-template <typename T_Data> T_Data * NiTPointerMap <T_Data>::Iterator::Get(void)
+template <typename T_Data> T_Data * NiTPointerMap <T_Data>::Iterator::Get()
 {
 	return m_entry ? m_entry->data : nullptr;
 }
 
-template <typename T_Data> UInt32 NiTPointerMap <T_Data>::Iterator::GetKey(void)
+template <typename T_Data> UInt32 NiTPointerMap <T_Data>::Iterator::GetKey()
 {
 	return m_entry ? m_entry->key : 0;
 }
 
-template <typename T_Data> bool NiTPointerMap <T_Data>::Iterator::Next(void)
+template <typename T_Data> bool NiTPointerMap <T_Data>::Iterator::Next()
 {
 	if (m_entry) m_entry = m_entry->next;
 
@@ -484,13 +484,13 @@ template <typename T_Data> bool NiTPointerMap <T_Data>::Iterator::Next(void)
 	return m_entry != nullptr;
 }
 
-template <typename T_Data> bool NiTPointerMap <T_Data>::Iterator::Done(void)
+template <typename T_Data> bool NiTPointerMap <T_Data>::Iterator::Done()
 {
 	return m_entry == nullptr;
 }
 
 /*
-template <typename T_Data> void NiTPointerMap <T_Data>::Iterator::FindValid(void)
+template <typename T_Data> void NiTPointerMap <T_Data>::Iterator::FindValid()
 {
 	// validate bucket
 	if(m_bucket >= m_table->m_numBuckets) return;
@@ -576,8 +576,8 @@ public:
 		T*		data;
 	};
 
-	virtual void	Destructor(void);
-	virtual Node*	AllocateNode(void);
+	virtual void	Destructor();
+	virtual Node*	AllocateNode();
 	virtual void	FreeNode(Node * node);
 
 //	void**		_vtbl;		// 000

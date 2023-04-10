@@ -35,14 +35,14 @@ public:
 		return m_device->QueryInterface(riid,ppvObj);
 	}
 
-	ULONG _stdcall AddRef(void)
+	ULONG _stdcall AddRef()
 	{
 		m_refs++;
 
 		return m_refs;
 	}
 
-	ULONG _stdcall Release(void)
+	ULONG _stdcall Release()
 	{
 		m_refs--;
 
@@ -63,8 +63,8 @@ public:
 	HRESULT _stdcall EnumObjects(LPDIENUMDEVICEOBJECTSCALLBACKA a,LPVOID b,DWORD c) { return m_device->EnumObjects(a,b,c); }
 	HRESULT _stdcall GetProperty(REFGUID a,DIPROPHEADER* b) { return m_device->GetProperty(a,b); }
 	HRESULT _stdcall SetProperty(REFGUID a,const DIPROPHEADER* b) { return m_device->SetProperty(a,b); }
-	HRESULT _stdcall Acquire(void) { return m_device->Acquire(); }
-	HRESULT _stdcall Unacquire(void) { return m_device->Unacquire(); }
+	HRESULT _stdcall Acquire() { return m_device->Acquire(); }
+	HRESULT _stdcall Unacquire() { return m_device->Unacquire(); }
 
 	HRESULT _stdcall GetDeviceState(DWORD outDataLen, LPVOID outData)
 	{
@@ -133,7 +133,7 @@ public:
 	HRESULT _stdcall SendForceFeedbackCommand(DWORD a) { return m_device->SendForceFeedbackCommand(a); }
 	HRESULT _stdcall EnumCreatedEffectObjects(LPDIENUMCREATEDEFFECTOBJECTSCALLBACK a,LPVOID b,DWORD c) { return m_device->EnumCreatedEffectObjects(a,b,c); }
 	HRESULT _stdcall Escape(LPDIEFFESCAPE a) { return m_device->Escape(a); }
-	HRESULT _stdcall Poll(void) { return m_device->Poll(); }
+	HRESULT _stdcall Poll() { return m_device->Poll(); }
 	HRESULT _stdcall SendDeviceData(DWORD a,LPCDIDEVICEOBJECTDATA b,LPDWORD c,DWORD d) { return m_device->SendDeviceData(a,b,c,d); }
 	HRESULT _stdcall EnumEffectsInFile(LPCSTR a,LPDIENUMEFFECTSINFILECALLBACK b,LPVOID c,DWORD d) { return m_device->EnumEffectsInFile(a,b,c,d); }
 	HRESULT _stdcall WriteEffectToFile(LPCSTR a,DWORD b,LPDIFILEEFFECT c,DWORD d) { return m_device->WriteEffectToFile(a,b,c,d); }
@@ -156,14 +156,14 @@ public:
 	/*** IUnknown methods ***/
 	HRESULT _stdcall QueryInterface (REFIID riid, LPVOID* ppvObj) { return m_realDInput->QueryInterface(riid, ppvObj); }
 
-	ULONG _stdcall AddRef(void)
+	ULONG _stdcall AddRef()
 	{
 		m_refs++;
 
 		return m_refs;
 	}
 
-	ULONG _stdcall Release(void)
+	ULONG _stdcall Release()
 	{
 		m_refs--;
 
@@ -502,7 +502,7 @@ m_averageFrameTime(0)
 		m_frameTimeHistory[i] = 0;
 }
 
-void FramerateTracker::Update(void)
+void FramerateTracker::Update()
 {
 	DWORD time = GetTickCount64();
 
