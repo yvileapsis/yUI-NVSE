@@ -109,7 +109,13 @@ namespace CrashLogger::NVVtables
 		
 		bool Satisfies(void* ptr) const
 		{
-			return *static_cast<UInt32*>(ptr) >= address && *static_cast<UInt32*>(ptr) <= address + size;
+			__try
+			{
+				return *static_cast<UInt32*>(ptr) >= address && *static_cast<UInt32*>(ptr) <= address + size;
+			}
+			__except (EXCEPTION_EXECUTE_HANDLER) {
+				return false;
+			}
 		}
 
 		static std::string GetTypeName(void* ptr)
@@ -124,10 +130,21 @@ namespace CrashLogger::NVVtables
 			return "None: ";
 		}
 
+		static UInt32 Dereference(void* ptr)
+		{
+			__try
+			{
+				return *static_cast<UInt32*>(ptr);
+			}
+			__except (EXCEPTION_EXECUTE_HANDLER) {
+				return 0;
+			}
+		}
+
 		std::string Get(void* ptr) const
 		{
 			std::string name1 = name.empty() && type == kType_RTTIClass ? GetTypeName(ptr) : name;
-			if (name1.empty()) name1 = FormatString("0x%08X", *(UInt32*)ptr);
+			if (name1.empty()) name1 = FormatString("0x%08X", Dereference(ptr));
 
 			std::string details;
 			if (function) details = function(ptr);
@@ -2123,6 +2140,7 @@ namespace CrashLogger::NVVtables
 	*/
 	std::string GetStringForVTBL(void* ptr, UInt32 vtbl)
 	{
+
 		for (const auto& iter : setOfLabels)
 			if (iter->Satisfies(ptr)) return iter->Get(ptr);
 
@@ -2149,6 +2167,8 @@ namespace CrashLogger::YvilesMagicBox
 		catch (...) { return 0; }
 	}
 
+
+	
 
 	std::string DecryptPtr(UInt32 ptr, UInt32 depth = 5)
 	{
@@ -2367,17 +2387,14 @@ namespace CrashLogger
 		HANDLE  processHandle = GetCurrentProcess();
 		HANDLE  threadHandle = GetCurrentThread();
 
-		try { Calltrace::Get(info, processHandle, threadHandle); }
-		catch (...) {}
+		 { Calltrace::Get(info, processHandle, threadHandle); }
 
-		try { Registry::Get(info); }
-		catch (...) {}
+		 { Registry::Get(info); }
 
-		try { Stack::Get(info); }
-		catch (...) {}
+		 __try { Stack::Get(info); }
+		 __except (EXCEPTION_EXECUTE_HANDLER) {}
 
-		try { ModuleBases::Get(info, processHandle); }
-		catch (...) {}
+		 { ModuleBases::Get(info, processHandle); }
 
 		SymCleanup(processHandle);
 	};
