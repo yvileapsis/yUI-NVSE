@@ -149,7 +149,8 @@ namespace CrashLogger::NVVtables
 
 		Push(0x11F3374, Handle::AsUInt32, "TileValueIndirectTemp", Label::kType_Global);
 		Push(0x118FB0C, nullptr, "ShowWhoDetects", Label::kType_Global);
-
+		Push(0x1042C58, nullptr, "ShowWhoDetects", Label::kType_Global);
+		
 		Push(0x11846D4, nullptr, "Actor", Label::kType_RTTIClass, 0x8);
 		Push(0x1184920, nullptr, "MovingObject", Label::kType_RTTIClass, 0x8);
 		Push(0x11840C4, nullptr, "TESAmmo", Label::kType_RTTIClass, 0x8);
@@ -2230,14 +2231,14 @@ namespace CrashLogger::Calltrace
 			DWORD  offset = 0;
 			if (!moduleAv) {
 				//    Log() << FormatString("porcoddio2 %0X", GetLastError());
-				Log() << FormatString("0x%08X ==> (0x%08X) ¯\\(°_o)/¯ (Corrupt stack or heap?)", frame.AddrPC.Offset, frame.AddrFrame.Offset);
+				Log() << FormatString("0x%08X ==> %20s (0x%08X) : (Corrupt stack or heap?)", frame.AddrPC.Offset, "¯\\(°_o)/¯", frame.AddrFrame.Offset);
 				continue;
 			}
 
 			if (!SymGetSymFromAddr(process, frame.AddrPC.Offset, &offset, symbol)) {
 				//   Log() << FormatString("porcoddio1 %0X", GetLastError());
 				//WIne dbghelp and Windows dbghelp operate totally differently
-				Log() << FormatString("0x%08X ==> (0x%08X) %s : %s+0x%0X ", frame.AddrPC.Offset, frame.AddrFrame.Offset, module.ModuleName, "EntryPoint", (UInt32)-1);
+				Log() << FormatString("0x%08X ==> %20s (0x%08X) : %s+0x%0X ", frame.AddrPC.Offset, module.ModuleName, frame.AddrFrame.Offset, "EntryPoint", (UInt32)-1);
 				continue;
 			}
 
@@ -2250,11 +2251,11 @@ namespace CrashLogger::Calltrace
 			functioName = symbol->Name;
 
 			if (!SymGetLineFromAddr(process, frame.AddrPC.Offset, &offset2, line)) {
-				Log() << FormatString("0x%08X ==> (0x%08X) %s : %s+0x%0X", frame.AddrPC.Offset, frame.AddrFrame.Offset, module.ModuleName, functioName.c_str(), offset);
+				Log() << FormatString("0x%08X ==> %20s (0x%08X) : %s+0x%0X", frame.AddrPC.Offset, module.ModuleName, frame.AddrFrame.Offset, functioName.c_str(), offset);
 				continue;
 			}
 
-			Log() << FormatString("0x%08X ==> %-80s <== <%s:%d>", frame.AddrPC.Offset, FormatString("(0x%08X) %s : %s+0x%0X", frame.AddrFrame.Offset, module.ModuleName, functioName.c_str(), offset).c_str(), line->FileName, line->LineNumber);
+			Log() << FormatString("0x%08X ==> %-80s <== <%s:%d>", frame.AddrPC.Offset, FormatString("%20s (0x%08X) : %s+0x%0X", module.ModuleName, frame.AddrFrame.Offset, functioName.c_str(), offset).c_str(), line->FileName, line->LineNumber);
 		}
 	}
 
@@ -2273,8 +2274,8 @@ namespace CrashLogger::Registry
 		Log() << FormatString("%s | 0x%08X | %s ", "edi", info->ContextRecord->Edi, YvilesMagicBox::DecryptPtr(info->ContextRecord->Edi).c_str());
 		Log() << FormatString("%s | 0x%08X | %s ", "esi", info->ContextRecord->Esi, YvilesMagicBox::DecryptPtr(info->ContextRecord->Esi).c_str());
 		Log() << FormatString("%s | 0x%08X | %s ", "ebp", info->ContextRecord->Ebp, YvilesMagicBox::DecryptPtr(info->ContextRecord->Ebp).c_str());
-		Log() << FormatString("%s | 0x%08X |", "eip", info->ContextRecord->Eip);
 		Log() << FormatString("%s | 0x%08X |", "esp", info->ContextRecord->Esp);
+		Log() << FormatString("%s | 0x%08X |", "eip", info->ContextRecord->Eip);
 	}
 }
 
@@ -2366,13 +2367,17 @@ namespace CrashLogger
 		HANDLE  processHandle = GetCurrentProcess();
 		HANDLE  threadHandle = GetCurrentThread();
 
-		Calltrace::Get(info, processHandle, threadHandle);
+		try { Calltrace::Get(info, processHandle, threadHandle); }
+		catch (...) {}
 
-		Registry::Get(info);
+		try { Registry::Get(info); }
+		catch (...) {}
 
-		Stack::Get(info);
+		try { Stack::Get(info); }
+		catch (...) {}
 
-		ModuleBases::Get(info, processHandle);
+		try { ModuleBases::Get(info, processHandle); }
+		catch (...) {}
 
 		SymCleanup(processHandle);
 	};
