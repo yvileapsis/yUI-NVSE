@@ -49,8 +49,6 @@ namespace UserInterface::DynamicCrosshair
 
 	bool IsPlayerWeaponGood()
 	{
-		const auto proc = BaseProcess();
-
 		const auto weaponInfo = g_player->baseProcess->GetWeaponInfo();
 		if (!weaponInfo) return false;
 		if (!g_player->baseProcess->IsWeaponOut()) return false;
