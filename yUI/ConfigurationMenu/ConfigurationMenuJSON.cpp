@@ -21,11 +21,11 @@ SM_Value GetValueFromElement(const nlohmann::basic_json<>& elem)
 	return static_cast<SInt32>(0);
 }
 
-CMSetting::SettingSource GetSourceFromElement(const nlohmann::basic_json<>& elem, const std::string& path = "path",
+CMSetting::IO GetSourceFromElement(const nlohmann::basic_json<>& elem, const std::string& path = "path",
                                                const std::string& category = "category", const std::string&
                                                value = "value", const std::string& valueDefault = "valueDefault")
 {
-	CMSetting::SettingSource source{};
+	CMSetting::IO source{};
 
 	std::filesystem::path pathGot;
 	std::string categoryGot, valueGot;
@@ -34,9 +34,11 @@ CMSetting::SettingSource GetSourceFromElement(const nlohmann::basic_json<>& elem
 	if (elem.contains(category))	categoryGot = elem[category].get<std::string>();
 	if (elem.contains(value))		valueGot = elem[value].get<std::string>();
 
-	source.setting = std::make_tuple(pathGot, categoryGot, valueGot);
+	source.ini = std::make_tuple(pathGot, categoryGot, valueGot);
 
 	if (elem.contains(valueDefault)) source.defaultValue = GetValueFromElement(elem[valueDefault]);
+
+	if (elem.contains("xmlGlobal")) source.xml = elem["xmlGlobal"].get<std::string>();
 
 	return source;
 }

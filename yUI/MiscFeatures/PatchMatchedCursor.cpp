@@ -12,13 +12,13 @@ namespace Patch::MatchedCursor
 
 	void __fastcall CursorTileSetStringValue(Tile* tile, void* dummyEDX, eTileValue tilevalue, char* src, char propagate)
 	{
-		tile->SetFloat(kTileValue_zoom, -1, propagate);
-		tile->SetFloat(kTileValue_systemcolor, 1, propagate);
+		tile->Set(kTileValue_zoom, -1, propagate);
+		tile->Set(kTileValue_systemcolor, 1, propagate);
 	}
 
 	void __fastcall CursorTileSetIntValue(Tile* tile, void* dummyEDX, eTileValue tilevalue, int value)
 	{
-		tile->SetFloat(kTileValue_visible, value, true);
+		tile->Set(kTileValue_visible, value, true);
 		ThisCall(0xA0B350, InterfaceManager::GetSingleton()->cursor, 1, 0);
 	}
 

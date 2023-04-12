@@ -21,7 +21,7 @@ namespace Fix::TablineSelected
 					tabline = InventoryMenu::GetSingleton()->tile->GetChild("GLOW_BRANCH")->GetChild("IM_Tabline");
 					return;
 				}
-				for (const auto iter : tabline->children) iter->SetFloat(kTileValue_mouseover, 0, false);
+				for (const auto iter : tabline->children) iter->Set(kTileValue_mouseover, 0, false);
 			}
 		}
 		else needToFix = true;

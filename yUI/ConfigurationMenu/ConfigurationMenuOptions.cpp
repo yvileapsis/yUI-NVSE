@@ -24,66 +24,66 @@ void RestartGameWarningCallback()
 
 void CMSetting::Choice::Display(Tile* tile)
 {
-	const auto value = setting.ReadINI();
+	const auto value = setting.Read();
 	const std::string valueString = choice.contains(value) ? choice[value].first : static_cast<std::string>(value); // Display name or display value if name not found
-	tile->SetString(kTileValue_user0, valueString.c_str());
+	tile->Set(kTileValue_user0, valueString);
 }
 
 void CMSetting::Slider::Display(Tile* tile)
 {
-	const auto value = setting.ReadINI();
-	tile->SetFloat(kTileValue_user0, 20 * static_cast<Float64>(value) / static_cast<Float64>(std::get<1>(slider)));
-	tile->SetFloat(kTileValue_user3, 20);
+	const auto value = setting.Read();
+	tile->Set(kTileValue_user0, 20 * static_cast<Float64>(value) / static_cast<Float64>(std::get<1>(slider)));
+	tile->Set(kTileValue_user3, 20);
 }
 
 void CMSetting::Font::Display(Tile* tile)
 {
 	const auto fontMap = ModConfigurationMenu::GetSingleton()->fontMap;
-	const auto value = font.ReadINI();
+	const auto value = font.Read();
 	const SInt32 id = value;
 	std::string valueString;
 	if (!id)
 	{
 		valueString = "--"; // Display name or display value if name not found
-		tile->GetChild("lb_toggle_value")->SetFloat(kTileValue_font, 7);
+		tile->GetChild("lb_toggle_value")->Set(kTileValue_font, 7);
 	}
 	else if (fontMap.contains(value))
 	{
 		valueString = "Font " + value;//fontMap[value];
-		tile->GetChild("lb_toggle_value")->SetFloat(kTileValue_font, id);
+		tile->GetChild("lb_toggle_value")->Set(kTileValue_font, id);
 	}
 	else
 	{
 		valueString = "Font " + value;
-		tile->GetChild("lb_toggle_value")->SetFloat(kTileValue_font, id);
+		tile->GetChild("lb_toggle_value")->Set(kTileValue_font, id);
 	}
-	tile->SetString(kTileValue_user0, valueString.c_str());
+	tile->Set(kTileValue_user0, valueString);
 }
 
 
 void CMSetting::Control::Display(Tile* tile)
 {
-	const auto value = keyboard.ReadINI();
+	const auto value = keyboard.Read();
 	const auto key = GetStringForScancode(value, 1);
-	tile->SetString("_Keyboard", key.c_str());
+	tile->Set("_Keyboard", key);
 
-	const auto mouseValue = mouse.ReadINI();
+	const auto mouseValue = mouse.Read();
 	const auto mouse = GetStringForScancode((mouseValue), 2);
-	tile->SetString("_Mouse", mouse.c_str());
+	tile->Set("_Mouse", mouse);
 
-	const auto controllerValue = controller.ReadINI();
+	const auto controllerValue = controller.Read();
 
 	if (IsViableControllerString((controllerValue)))
 	{
 		const auto controller = GetControllerString((controllerValue));
-		tile->SetString("_Controller", controller.c_str());
-		tile->SetFloat("_ControllerImage", true);
+		tile->Set("_Controller", controller);
+		tile->Set("_ControllerImage", true);
 	}
 	else
 	{
 		const auto controller = GetControllerString((controllerValue));
-		tile->SetString("_Controller", controller.c_str());
-		tile->SetFloat("_ControllerImage", false);
+		tile->Set("_Controller", controller);
+		tile->Set("_ControllerImage", false);
 	}
 }
 
@@ -105,14 +105,14 @@ SM_Value CMSetting::Choice::GetNext(const SM_Value& value)
 
 void CMSetting::Choice::Next(const bool forward)
 {
-	const auto value = setting.ReadINI();
+	const auto value = setting.Read();
 	const auto newValue = forward ? GetNext(value) : GetPrev(value);
 	Write(newValue);
 }
 
 void CMSetting::Choice::Last(const bool forward)
 {
-	const auto value = setting.ReadINI();
+	const auto value = setting.Read();
 	const auto newValue = forward ? choice.rbegin()->first : choice.begin()->first;
 	Write(newValue);
 }
@@ -131,14 +131,14 @@ SM_Value CMSetting::Slider::GetNext(const SM_Value& value) const
 
 void CMSetting::Slider::Next(const bool forward)
 {
-	const auto value = setting.ReadINI();
+	const auto value = setting.Read();
 	const auto newValue = forward ? GetNext(value) : GetPrev(value);
 	Write(newValue);
 }
 
 void CMSetting::Slider::Last(const bool forward)
 {
-	const auto value = setting.ReadINI();
+	const auto value = setting.Read();
 	const auto newValue = forward ? std::get<1>(slider) : std::get<0>(slider);
 	Write(newValue);
 }
@@ -163,14 +163,14 @@ SM_Value CMSetting::Font::GetNext(const SM_Value& value)
 
 void CMSetting::Font::Next(const bool forward)
 {
-	const auto value = font.ReadINI();
+	const auto value = font.Read();
 	const SM_Value newValue = forward ? GetNext(value) : GetPrev(value);
 	Write(newValue);
 }
 
 void CMSetting::Font::Last(const bool forward)
 {
-	const auto value = font.ReadINI();
+	const auto value = font.Read();
 	const auto newValue = SM_Value(static_cast<SInt32>(forward ? 8 : 1));
 	Write(newValue);
 }
@@ -233,9 +233,9 @@ void ModConfigurationMenu::SelectMod(Tile* clickedTile)
 {
 	const auto mod = modsListBox.GetItemForTile(clickedTile);
 
-	modsListBox.ForEach([](Tile* tile, CMMod* tweak) { tile->SetFloat("_selected", 0); });
-	clickedTile->parent->SetFloat("_selected", 1);
-	clickedTile->SetFloat("_selected", 1);
+	modsListBox.ForEach([](Tile* tile, CMMod* tweak) { tile->Set("_selected", (Float32) 0); });
+	clickedTile->parent->Set("_selected", 1);
+	clickedTile->Set("_selected", 1);
 
 	DisplaySettings(mod ? mod->GetID() : "");
 	FilterSettings();
@@ -322,7 +322,7 @@ bool ModConfigurationMenu::XMLHasChanges()
 void ModConfigurationMenu::ShowTweaksMenu()
 {
 	const auto sSettings = reinterpret_cast<Setting*>(0x11D1FE0);
-	menuTitle->SetString(kTileValue_string, FormatString("Mod %s", sSettings->data.str).c_str());
+	menuTitle->Set(kTileValue_string, FormatString("Mod %s", sSettings->data.str));
 
 	modsListBox.parentTile = modsListBackground;
 	modsListBox.templateName = CMMod::GetTemplate();
@@ -364,14 +364,14 @@ void ModConfigurationMenu::Device()
 	if (controlDevice == OSInputGlobals::kControlType_Keyboard) controlDevice = OSInputGlobals::kControlType_Mouse;
 	else if (controlDevice == OSInputGlobals::kControlType_Mouse) controlDevice = OSInputGlobals::kControlType_Joystick;
 	else if (controlDevice == OSInputGlobals::kControlType_Joystick) controlDevice = OSInputGlobals::kControlType_Keyboard;
-	tile->SetFloat("_controlDevice", controlDevice);
+	tile->Set("_controlDevice", controlDevice);
 }
 
 template <typename Item> void ModConfigurationMenu::ListBoxWithFilter<Item>::UpdateTagString()
 {
 	const auto menu = GetSingleton();
 	const auto tag = menu->g_Tags[tagActive].get();
-	tagTile->SetString(kTileValue_string, tag ? tag->GetName().c_str() : tagActive.c_str());
+	tagTile->Set(kTileValue_string, tag ? tag->GetName() : tagActive);
 }
 
 template <typename Item>
@@ -734,7 +734,7 @@ void ModConfigurationMenu::RefreshFilter()
 	//	modsListBox.Filter(TweakFilter);
 
 	auto textColor = modsListBox.GetNumVisibleItems() ? 1 : 2;
-	searchBar.tile->SetFloat(kTileValue_systemcolor, textColor);
+	searchBar.tile->Set(kTileValue_systemcolor, textColor);
 
 //	if (auto selectedTile = modsListBox.GetTileFromItem(&activeMod))
 	{
@@ -772,7 +772,7 @@ void InputField::Set(std::string str)
 	input = str;
 	if (str.empty())
 	{
-		tile->SetString(kTileValue_string, "");
+		tile->Set(kTileValue_string, "");
 		caretIndex = 0;
 	}
 	else
@@ -800,9 +800,9 @@ void InputField::UpdateCaretDisplay()
 	if (isActive)
 	{
 		inputString.insert(caretIndex, isCaretShown ? "|" : " ");
-		tile->SetFloat(_CaretIndex, caretIndex);
+		tile->Set(_CaretIndex, caretIndex);
 	}
-	tile->SetString(kTileValue_string, inputString.c_str());
+	tile->Set(kTileValue_string, inputString);
 }
 
 void InputField::SetActive(bool active)
@@ -814,7 +814,7 @@ void InputField::SetActive(bool active)
 	if (tile)
 	{
 		static auto textAlphaTrait = Tile::TraitNameToID("_IsActive");
-		tile->SetFloat(textAlphaTrait, active);
+		tile->Set(textAlphaTrait, active);
 		if (!active)
 		{
 			UpdateCaretDisplay();
@@ -880,11 +880,11 @@ bool InputField::HandleSpecialInputKey(UInt32 key)
 
 		if (input.length())
 		{
-			tile->SetString(kTileValue_string, this->GetText().c_str());
+			tile->Set(kTileValue_string, GetText());
 		}
 		else
 		{
-			tile->SetString(kTileValue_string, "");
+			tile->Set(kTileValue_string, "");
 		}
 
 		return true;
@@ -968,7 +968,7 @@ bool InputField::HandleKey(UInt32 key)
 			input.insert(caretIndex++, 1, key);
 		}
 
-		tile->SetString(kTileValue_string, this->GetText().c_str());
+		tile->Set(kTileValue_string, GetText());
 		return true;
 	}
 

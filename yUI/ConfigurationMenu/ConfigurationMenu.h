@@ -144,16 +144,25 @@ public:
 
 struct CMSetting : public CMTag
 {
-	class SettingSource
+	class IO
 	{
 	public:
-		typedef std::tuple<std::filesystem::path, std::string, std::string> INISetting;
-		INISetting setting;
+		typedef std::tuple<std::filesystem::path, std::string, std::string> INI;
+		INI ini;
 		// TODO: gamesetting and global
+
+		std::string xml;
+
 		SM_Value defaultValue;
 
-		SM_Value ReadINI();
+		std::optional<SM_Value> ReadINI();
 		void WriteINI(const SM_Value& value);
+
+		std::optional<SM_Value> ReadXML();
+		void WriteXML(const SM_Value& value);
+
+		SM_Value Read();
+		void Write(const SM_Value& value);
 	};
 
 	// TODO: tagify this
@@ -184,12 +193,12 @@ struct CMSetting : public CMTag
 	class Choice : public None
 	{
 	public:
-		SettingSource setting;
+		IO setting;
 		SM_ValueChoice choice;
 
 		const char* GetTemplate() override { return "SettingChoiceTemplate"; }
 
-		void Write(const SM_Value& value) override { setting.WriteINI(value); }
+		void Write(const SM_Value& value) override { setting.Write(value); }
 		void Display(Tile* tile) override;
 
 		SM_Value GetPrev(const SM_Value& value);
@@ -202,12 +211,12 @@ struct CMSetting : public CMTag
 	class Slider : public None
 	{
 	public:
-		SettingSource setting;
+		IO setting;
 		SM_ValueSlider slider;
 
 		const char* GetTemplate() override { return "SettingSliderTemplate"; }
 
-		void Write(const SM_Value& value) override { setting.WriteINI(value); }
+		void Write(const SM_Value& value) override { setting.Write(value); }
 		void Display(Tile* tile) override;
 
 		SM_Value GetPrev(const SM_Value& value) const;
@@ -220,9 +229,9 @@ struct CMSetting : public CMTag
 	class Control : public None
 	{
 	public:
-		SettingSource keyboard;
-		SettingSource mouse;
-		SettingSource controller;
+		IO keyboard;
+		IO mouse;
+		IO controller;
 
 		const char* GetTemplate() override { return "SettingControlTemplate"; }
 
@@ -232,12 +241,12 @@ struct CMSetting : public CMTag
 	class Font : public None
 	{
 	public:
-		SettingSource font;
-		SettingSource fontY;
+		IO font;
+		IO fontY;
 
 		const char* GetTemplate() override { return "SettingFontTemplate"; }
 
-		void Write(const SM_Value& value) override { font.WriteINI(value); fontY.WriteINI(value); }
+		void Write(const SM_Value& value) override { font.Write(value); fontY.Write(value); }
 		void Display(Tile* tile) override;
 
 		static SM_Value GetPrev(const SM_Value& value);
@@ -250,7 +259,7 @@ struct CMSetting : public CMTag
 	class Input : public None
 	{
 	public:
-		SettingSource setting;
+		IO setting;
 	};
 
 	enum ElementType
@@ -417,7 +426,7 @@ public:
 
 		void Set(const std::string& str) const
 		{
-			tile->SetString(kTileValue_string, str.c_str());
+			tile->Set(kTileValue_string, str);
 		}
 
 		void operator<<=(const CMSetting* setting) const

@@ -447,7 +447,6 @@ struct ScriptLineBuffer;
 struct ScriptVar;
 struct Semaphore;
 struct Sound;
-struct TileValue;
 struct VATSCameraData;
 struct VATSTargetBodyPartData;
 struct VATSTargetInfo;

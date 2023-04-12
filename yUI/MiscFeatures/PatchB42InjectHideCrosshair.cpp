@@ -22,12 +22,12 @@ namespace Patch::B42InjectHideCrosshair
 
 	void XilOn()
 	{
-		g_HUDMainMenu->tileReticleCenter->SetFloat(kTileValue_visible, false);
+		g_HUDMainMenu->tileReticleCenter->Set(kTileValue_visible, false);
 	}
 
 	void XilOff()
 	{
-		g_HUDMainMenu->tileReticleCenter->SetFloat(kTileValue_visible, true);
+		g_HUDMainMenu->tileReticleCenter->Set(kTileValue_visible, true);
 	}
 
 	void MainLoopDoOnce()

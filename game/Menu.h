@@ -264,7 +264,7 @@ public:
 		if (tile)
 		{
 			if (!GetItemForTile(tile)) return false;
-			if (!tile->GetFloat("_enabled")) return false;
+			if (!(Float32)tile->Get("_enabled")) return false;
 		}
 
 		selected = tile;
@@ -287,8 +287,8 @@ public:
 		if (!_template) return nullptr;
 
 		const auto newTile = this->parentTile->AddTileFromTemplate(_template);
-		if (!newTile->GetValue(kTileValue_id)) newTile->SetFloat(kTileValue_id, -1);
-		if (text) newTile->SetString(kTileValue_string, text);
+		if (!(Float32)newTile->Get(kTileValue_id)) newTile->Set(kTileValue_id, -1);
+		if (text) newTile->Set(kTileValue_string, text);
 
 		auto listItem = static_cast<ListBoxItem<Item>*>(GameHeapAlloc(sizeof(ListBoxItem<Item*>)));
 		listItem->tile = newTile;
@@ -310,19 +310,19 @@ public:
 				ThisCall(0x7269D0, this, newTile);
 				ThisCall(0x71AD30, this);
 			}
-			newTile->SetFloat(kTileValue_listindex, this->itemCount++);
+			newTile->Set(kTileValue_listindex, this->itemCount++);
 		}
 
 		if (this->itemCount == 1)
 		{
 			const auto numVisibleItemsTrait = Tile::TraitNameToID("_number_of_visible_items");
-			if (this->parentTile->GetFloat(numVisibleItemsTrait) > 0)
+			if ((Float32)this->parentTile->Get(numVisibleItemsTrait) > 0)
 			{
-				auto valPtr = ThisCall<TileValue*>(0xA00E90, this->parentTile, kTileValue_height);
+				auto valPtr = ThisCall<Tile::Value*>(0xA00E90, this->parentTile, kTileValue_height);
 				ThisCall(0xA09200, valPtr);
 				ThisCall(0xA09130, valPtr, 2000, newTile, kTileValue_height);
 
-				auto numVisible = this->parentTile->GetFloat(numVisibleItemsTrait);
+				Float32 numVisible = this->parentTile->Get(numVisibleItemsTrait);
 				ThisCall(0xA09080, valPtr, kTileValue_Mul, numVisible);
 				ThisCall(0xA09410, valPtr, 0);
 			}
@@ -338,8 +338,8 @@ public:
 		if (!_template) return nullptr;
 
 		const auto newTile = this->parentTile->AddTileFromTemplate(_template);
-		if (!newTile->GetValue(kTileValue_id)) newTile->SetFloat(kTileValue_id, -1);
-		if (text) newTile->SetString(kTileValue_string, text);
+		if (!(Float32)newTile->Get(kTileValue_id)) newTile->Set(kTileValue_id, -1);
+		if (text) newTile->Set(kTileValue_string, text);
 
 		auto listItem = static_cast<ListBoxItem<Item>*>(GameHeapAlloc(sizeof(ListBoxItem<Item*>)));
 		listItem->tile = newTile;
@@ -353,7 +353,7 @@ public:
 	{
 		if (!parentTile) return;
 
-		const auto valueNum = parentTile->GetFloat(kTileValue_height);
+		const Float32 valueNum = parentTile->Get(kTileValue_height);
 
 		UInt32 items = 1;
 
@@ -363,14 +363,14 @@ public:
 				items = max(std::ceil(GetNumVisibleItems() * (unk20 - valueNum) / unk20) + 1, 2);
 
 			if (items > 1)
-				parentTile->SetFloat("_scroll_delta", std::ceil((unk20 - valueNum) / (items - 1)));
+				parentTile->Set("_scroll_delta", std::ceil((unk20 - valueNum) / (items - 1)));
 		}
 
-		const bool doublestacked = parentTile->GetFloat("_doublestacked");
+		const Float32 doublestacked = parentTile->Get("_doublestacked");
 
 		if (!scrollBar) return;
 
-		scrollBar->SetFloat("_number_of_items", std::floor(doublestacked ? (items * 0.667) : items));
+		scrollBar->Set("_number_of_items", std::floor(doublestacked ? (items * 0.667) : items));
 	}
 
 	void SortAlt(ListBoxItem<Item>* listItem, SortingFunction sortingFunction = nullptr)
@@ -388,19 +388,19 @@ public:
 				ThisCall(0x7269D0, this, listItem->tile);
 				HandleScrollbar();
 			}
-			listItem->tile->SetFloat(kTileValue_listindex, this->itemCount++);
+			listItem->tile->Set(kTileValue_listindex, this->itemCount++);
 		}
 
 		if (this->itemCount == 1)
 		{
-			const auto numVisibleItemsTrait = Tile::TraitNameToID("_number_of_visible_items");
-			if (this->parentTile->GetFloat(numVisibleItemsTrait) > 0)
+			const Float32 numVisibleItemsTrait = Tile::TraitNameToID("_number_of_visible_items");
+			if (this->parentTile->Get(numVisibleItemsTrait) > 0)
 			{
-				auto valPtr = ThisCall<TileValue*>(0xA00E90, this->parentTile, kTileValue_height);
+				auto valPtr = ThisCall<Tile::Value*>(0xA00E90, this->parentTile, kTileValue_height);
 				ThisCall(0xA09200, valPtr);
 				ThisCall(0xA09130, valPtr, 2000, listItem->tile, kTileValue_height);
 
-				auto numVisible = this->parentTile->GetFloat(numVisibleItemsTrait);
+				Float32 numVisible = this->parentTile->Get(numVisibleItemsTrait);
 				ThisCall(0xA09080, valPtr, kTileValue_Mul, numVisible);
 				ThisCall(0xA09410, valPtr, 0);
 			}
@@ -426,8 +426,8 @@ public:
 		this->RestorePosition();
 	}
 
-	void SetParentEnabled(bool isEnabled) const { parentTile->SetFloat("_enabled", isEnabled); }
-	bool IsEnabled() const { return parentTile && parentTile->GetFloat("_enabled"); }
+	void SetParentEnabled(bool isEnabled) const { parentTile->Set("_enabled", isEnabled); }
+	bool IsEnabled() const { return parentTile && parentTile->Get("_enabled"); }
 	// initialises the fields and appends the menu list to the global listbox array
 	void Init() { ThisCall(0x723750, this); }
 	void Destroy() { ThisCall(0x723820, this); }
@@ -499,7 +499,7 @@ public:
 
 	void					Close()
 	{
-		tile->SetFloat(6002, 1);
+		tile->Set(6002, 1);
 		ThisCall(0xA1D910, this);
 	}
 
@@ -1722,7 +1722,7 @@ struct HackingText
 
 	String str;
 	Tile* tileText;
-	TileValue* tileValueVisibility;
+	Tile::Value* tileValueVisibility;
 	UInt32 displayRate;
 	UInt32 flashOnDuration;
 	UInt32 flashOffDuration;
@@ -1811,7 +1811,7 @@ public:
 	TileImage* hacking_password_file_target;
 	UInt32 controllerSelectedTileIdx;
 	UInt32 transitionToComputersMenuTime;
-	TileValue* hacking_cursor_visibleTrait;
+	Tile::Value* hacking_cursor_visibleTrait;
 	UInt8 shouldNotHighlightWordOnHover;
 	UInt8 hasAllowanceBeenReplenished;
 	UInt8 hasShownHelp;
@@ -1870,7 +1870,7 @@ public:
 	ListBox<MenuEntry> terminalMenuItemsListBox;
 	TList<void> subMenuBGSTerminals;
 	UInt32 time0A0;
-	TileValue* isComputersCursorVisible;
+	Tile::Value* isComputersCursorVisible;
 	BGSTerminal* targetRefBaseForm;
 	TESObjectREFR* targetRef;
 	UInt32 stage;
@@ -2301,7 +2301,7 @@ public:
 			auto entry = ThisCall<Entry*>(0x7B3B80, this, displayString, _id);
 			if (removeSound)
 			{
-				entry->tile->SetString(kTileValue_clicksound, nullptr);
+				entry->tile->Set(kTileValue_clicksound, "");
 			}
 			return entry;
 		}
@@ -2315,10 +2315,10 @@ public:
 
 			auto rsm = RaceSexMenu::GetSingleton();
 			auto tile = rsm->AddTileFromTemplate(rsm->rsmBackground, "RSM_list_item_template", 0);
-			tile->SetString(kTileValue_string, str);
-			tile->SetFloat(kTileValue_user0, this->listItemTemplate->GetFloat(kTileValue_user0));
-			tile->SetFloat(kTileValue_target, true);
-			tile->SetString(kTileValue_clicksound, nullptr);
+			tile->Set(kTileValue_string, str);
+			tile->Set(kTileValue_user0, listItemTemplate->Get(kTileValue_user0));
+			tile->Set(kTileValue_target, true);
+			tile->Set(kTileValue_clicksound, "");
 			entry->tile = tile;
 
 			this->items.Append(entry);
@@ -2334,7 +2334,7 @@ public:
 				return;
 			}
 
-			entry->tile->Destroy(false);
+			entry->tile->~Tile();
 			auto nextInList = items.Remove(entry);
 			if (selectedEntry == entry) selectedEntry = nextInList ? nextInList->data : nullptr;
 		}
@@ -2352,23 +2352,23 @@ public:
 
 			auto topTrait = Tile::TraitNameToID("_top_bound");
 			auto tile = iter->data->tile;
-			float yPos = tile->parent->GetFloat(topTrait);
+			float yPos = tile->parent->Get(topTrait);
 
-			tile->SetFloat(kTileValue_y, yPos);
+			tile->Set(kTileValue_y, yPos);
 			ThisCall(0xA04640, tile, false);
 
 			while (iter = iter->next)
 			{
 				auto tileAbove = iter->prev->data->tile;
-				yPos = tileAbove->GetFloat(kTileValue_y);
-				yPos += tileAbove->GetFloat(kTileValue_height);
+				yPos = tileAbove->Get(kTileValue_y);
+				yPos += tileAbove->Get(kTileValue_height);
 
 				tile = iter->data->tile;
-				tile->SetFloat(kTileValue_y, yPos);
+				tile->Set(kTileValue_y, yPos);
 				ThisCall(0xA04640, tile, false);
 			}
 
-			this->height = max(this->height, items.Tail()->data->tile->GetFloat(kTileValue_height));
+			this->height = max(this->height, items.Tail()->data->tile->Get(kTileValue_height));
 		}
 
 		void UpdateSelectedSquares()
@@ -2452,7 +2452,7 @@ public:
 
 	void RefreshSliders();
 	void UpdateScrollButtonVisibilities() { ThisCall(0x7AF6B0, this); };
-	UInt32 GetCurrentMenuID() { return this->tile->GetFloat(kTileValue_user0); };
+	UInt32 GetCurrentMenuID() { return tile->Get(kTileValue_user0); };
 	void SetMenuActive(UInt32 _id) { ThisCall(0x7AF180, this, _id); };
 	void UpdatePlayerHead() { ThisStdCall(0x007B25A0, this); }
 };
@@ -3267,4 +3267,4 @@ enum Scancodes
 static BSSimpleArray<StartMenu::UserOption*>* g_settingsMenuOptions = (BSSimpleArray<StartMenu::UserOption*>*)0x11DAB50;
 void MenuButton_DownloadsClick();
 
-TileValue* StringToTilePath(const std::string& componentPath);
+Tile::Value* StringToTilePath(const std::string& componentPath);

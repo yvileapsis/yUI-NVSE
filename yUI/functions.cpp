@@ -45,7 +45,7 @@ namespace HideInfoPrompt
 
 	void Update()
 	{
-		g_HUDMainMenu->tileInfo->SetFloat(kTileValue_visible, !shouldHide);
+		g_HUDMainMenu->tileInfo->Set(kTileValue_visible, !shouldHide);
 	}
 }
 

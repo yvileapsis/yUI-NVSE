@@ -511,8 +511,7 @@ template <typename T_Data> void NiTPointerMap <T_Data>::Iterator::FindValid()
 // 10
 // todo: NiTPointerMap should derive from this
 // cleaning that up now could cause problems, so it will wait
-template <typename T_Key, typename T_Data>
-class NiTMapBase
+template <typename T_Key, typename T_Data> class NiTMapBase
 {
 public:
 	NiTMapBase();
@@ -542,7 +541,65 @@ public:
 	{
 		return ThisCall<bool>(0x00853130, this, key, dataOut);
 	}
+
+	class Iterator
+	{
+		friend NiTPointerMap;
+
+		NiTMapBase* m_table;
+		Entry* m_entry;
+		Entry** m_bucket;
+
+		void FindNonEmpty();
+
+	public:
+
+		Iterator() : m_table(nullptr), m_entry(nullptr), m_bucket(nullptr) {}
+		Iterator(NiTMapBase* table, Entry* entry = nullptr)
+			: m_table(table), m_entry(entry), m_bucket(table->buckets) {
+			FindNonEmpty();
+		}
+
+		~Iterator() { }
+
+		T_Data* Get();
+		UInt32		GetKey();
+		bool		Next();
+		bool		Done();
+
+		//		T_Key Key() const { return m_entry->key; }
+
+		explicit operator bool() const { return m_entry != nullptr; }
+		void operator++()
+		{
+			m_entry = m_entry->next;
+			if (!m_entry)
+			{
+				m_bucket++;
+				FindNonEmpty();
+			}
+		}
+
+		Entry* operator->() { return m_entry; }
+		Entry*& operator*() { return m_entry; }
+		Iterator& operator=(const Iterator& rhs)
+		{
+			m_entry = rhs.m_entry;
+			return *this;
+		}
+		bool operator!=(const Iterator& rhs) { return m_entry != rhs.m_entry; }
+	};
+
+	Iterator begin() { return Iterator(this); }
+	Iterator end() { return Iterator(); }
 };
+
+template <typename T_Key, typename T_Data>
+void NiTMapBase<T_Key, T_Data>::Iterator::FindNonEmpty()
+{
+	for (Entry** end = &m_table->buckets[m_table->numBuckets]; m_bucket != end; ++m_bucket)
+		if ((m_entry = *m_bucket)) return;
+}
 
 template <typename T_Key, typename T_Data> class NiTMap : public NiTMapBase<T_Key, T_Data>
 {
@@ -581,9 +638,51 @@ public:
 	virtual void	FreeNode(Node * node);
 
 //	void**		_vtbl;		// 000
-	Node*		start;		// 004
-	Node*		end;		// 008
+	Node*		first;		// 004
+	Node*		last;		// 008
 	UInt32		numItems;	// 00C
+
+
+	class Iterator
+	{
+		Node* m_curr;
+
+	public:
+		Iterator	operator++()
+		{
+			m_curr = m_curr->next;
+			return *this;
+		}
+		T* operator->() const { return m_curr->data; }
+		T*& operator*() const { return m_curr->data; }
+		Iterator& operator=(const Iterator& rhs)
+		{
+			m_curr = rhs.m_curr;
+			return *this;
+		}
+		bool		operator!=(const Iterator& rhs) { return m_curr && m_curr->data; }
+
+		Iterator() : m_curr(nullptr) {}
+		Iterator(Node* node) : m_curr(node) {}
+		Iterator(const T* _list) : m_curr(const_cast<Node*>(&_list->first)) {}
+	};
+
+	Iterator begin() const { return Iterator(this); }
+	Iterator end() const { return Iterator(); }
+
+	UInt32 count() const
+	{
+		if (!first->data) return 0;
+		UInt32 count = 0;
+		for (const auto iter : *this) count++;
+		return count;
+	}
+
+	bool contains(T* item) const
+	{
+		for (const auto iter : *this) if (iter == item) return true;
+		return false;
+	}
 };
 
 // 10

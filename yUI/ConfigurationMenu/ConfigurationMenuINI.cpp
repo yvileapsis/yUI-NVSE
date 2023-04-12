@@ -2,6 +2,8 @@
 #include "ConfigurationMenu.h"
 #include <SimpleINILibrary.h>
 
+#include "InterfaceManager.h"
+
 inline std::map<std::tuple<std::filesystem::path, std::string, std::string>, SM_Value> ini_map;
 
 inline void ReadINIInternal(const std::filesystem::path& iniPath, const std::filesystem::path& iniPath2)
@@ -32,23 +34,7 @@ inline void ReadINIInternal(const std::filesystem::path& iniPath, const std::fil
 	ini.SaveFile(iniPath.c_str(), false);
 }
 
-SM_Value CMSetting::SettingSource::ReadINI()
-{
-	std::filesystem::path iniPath = GetCurPath();
-	iniPath += std::get<0>(setting);
-
-	const auto settingTuple = setting;
-
-	if (ini_map.contains(settingTuple)) return ini_map[settingTuple];
-
-	ReadINIInternal(iniPath, std::get<0>(setting));
-
-	if (ini_map.contains(settingTuple)) return ini_map[settingTuple];
-
-	return defaultValue;
-}
-
-inline void WriteINIInternal(const std::filesystem::path& iniPath, const CMSetting::SettingSource::INISetting& setting, const SM_Value& value)
+inline void WriteINIInternal(const std::filesystem::path& iniPath, const CMSetting::IO::INI& setting, const SM_Value& value)
 {
 	CSimpleIniA ini;
 	ini.SetUnicode();
@@ -64,12 +50,72 @@ inline void WriteINIInternal(const std::filesystem::path& iniPath, const CMSetti
 	ini.SaveFile(iniPath.c_str(), false);
 }
 
-void CMSetting::SettingSource::WriteINI(const SM_Value& value)
+
+std::optional<SM_Value> CMSetting::IO::ReadINI()
 {
 	std::filesystem::path iniPath = GetCurPath();
-	iniPath += std::get<0>(setting);
+	iniPath += std::get<0>(ini);
 
-	ini_map[setting] = value;
+	const auto settingTuple = ini;
 
-	WriteINIInternal(iniPath, setting, value);
+	if (ini_map.contains(settingTuple)) return ini_map[settingTuple];
+
+	ReadINIInternal(iniPath, std::get<0>(ini));
+
+	if (ini_map.contains(settingTuple)) return ini_map[settingTuple];
+
+	return {};
+}
+
+void CMSetting::IO::WriteINI(const SM_Value& value)
+{
+	std::filesystem::path iniPath = GetCurPath();
+	iniPath += std::get<0>(ini);
+
+	ini_map[ini] = value;
+
+	WriteINIInternal(iniPath, ini, value);
+}
+
+std::optional<SM_Value> CMSetting::IO::ReadXML()
+{
+	if (xml.empty()) return {};
+
+	const auto val = HUDMainMenu::GetSingleton()->tile->Get(xml.c_str());
+	const auto val2 = InterfaceManager::GetSingleton()->globalsTile->Get(xml.c_str());
+	if (defaultValue.IsString()) {
+		if (val) return std::string(val);
+		if (val2) return std::string(val2);
+		return {};
+	}
+	if (val) return static_cast<Float32>(val);
+	if (val2) return static_cast<Float32>(val2);
+	return {};
+}
+
+void CMSetting::IO::WriteXML(const SM_Value& value)
+{
+	if (xml.empty()) return;
+
+	if (defaultValue.IsString())
+	{
+		HUDMainMenu::GetSingleton()->tile->Set(xml.c_str(), value.GetAsString());
+		InterfaceManager::GetSingleton()->globalsTile->Set(xml.c_str(), value.GetAsString());
+		return;
+	}
+	HUDMainMenu::GetSingleton()->tile->Set(xml.c_str(), value.GetAsFloat());
+	InterfaceManager::GetSingleton()->globalsTile->Set(xml.c_str(), value.GetAsFloat());
+}
+
+SM_Value CMSetting::IO::Read()
+{
+	if (const auto ini = ReadINI()) return ini.value();
+	if (const auto xml = ReadXML()) return xml.value();
+	return defaultValue;
+}
+
+void CMSetting::IO::Write(const SM_Value& value)
+{
+	WriteINI(value);
+	WriteXML(value);
 }

@@ -5,40 +5,22 @@
 
 NiTMapBase <const char*, int>* g_traitNameMap = reinterpret_cast<NiTMapBase<const char*, int>*>(0x011F32F4);
 
-__declspec(naked) TileValue* __fastcall Tile::GetValue(UInt32 typeID)
+Tile::Value* Tile::GetValue(const UInt32 typeID)
 {
-	__asm
+	const auto data = values.data;
+	auto iterLeft = 0;
+	auto iterRight = values.size;
+	while (iterLeft != iterRight)
 	{
-		push	ebx
-		push	esi
-		push	edi
-		mov		ebx, [ecx+0x14]
-		xor		esi, esi
-		mov		edi, [ecx+0x18]
-		ALIGN 16
-	iterHead:
-		cmp		esi, edi
-		jz		iterEnd
-		lea		ecx, [esi+edi]
-		shr		ecx, 1
-		mov		eax, [ebx+ecx*4]
-		cmp		[eax], edx
-		jz		done
-		jb		isLT
-		mov		edi, ecx
-		jmp		iterHead
-		ALIGN 16
-	isLT:
-		lea		esi, [ecx+1]
-		jmp		iterHead
-	iterEnd:
-		xor		eax, eax
-	done:
-		pop		edi
-		pop		esi
-		pop		ebx
-		retn
+		const auto addr = (iterLeft + iterRight) >> 1;
+
+		Value* result = data[addr];
+		if (result->id == typeID) return result;
+
+		 result->id < typeID ? iterLeft = addr + 1 : iterRight = addr;
 	}
+
+	return nullptr;
 }
 
 Tile* Tile::GetNthChild(UInt32 index)
@@ -111,30 +93,15 @@ std::string Tile::GetFullPath()
 	return fullPath;
 }
 
-
-void Debug_DumpTraits()
-{
-	for (UInt32 i = 0; i < g_traitNameMap->numBuckets; i++)
-	{
-		for (auto bucket = g_traitNameMap->buckets[i]; bucket; bucket = bucket->next)
-		{
-			Log() << FormatString("%s,%08X,%d", bucket->key, bucket->data, bucket->data);
-		}
-	}
-}
-
 // not a one-way mapping, so we just return the first
 // also this is slow and sucks
 const char * Tile::TraitIDToName(int id)
 {
-	for (UInt32 i = 0; i < g_traitNameMap->numBuckets; i++)
-		for (auto bucket = g_traitNameMap->buckets[i]; bucket; bucket = bucket->next)
-			if (bucket->data == id)
-				return bucket->key;
+	for (const auto bucket : *g_traitNameMap)
+		if (bucket->data == id)
+			return bucket->key;
 	return nullptr;
 }
-
-void Debug_DumpTileImages() {};
 
 TileMenu* Tile::GetTileMenu()
 {

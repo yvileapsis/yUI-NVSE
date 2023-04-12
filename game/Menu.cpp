@@ -67,15 +67,13 @@ bool Menu::GetTemplateExists(const std::string& templateName) const
 
 bool InventoryMenu::IsKeyringOpen()
 {
-	return GetSingleton()->tile->GetFloat(*(UInt32*)0x11D9EB8); // Trait_KeyringOpen
+	return GetSingleton()->tile->Get(*(UInt32*)0x11D9EB8); // Trait_KeyringOpen
 }
-
 
 bool DialogMenu::IsNPCTalking()
 {
-	return tile->GetFloat(*(UInt32*)0x11D9500); // g_dialogMenu_TraitShowingText
+	return tile->Get(*(UInt32*)0x11D9500); // g_dialogMenu_TraitShowingText
 }
-
 
 bool IsInStartMenu()
 {
@@ -186,7 +184,7 @@ void RefreshLocalMap()
 }
 };*/
 
-TileValue* StringToTilePath(const std::string& componentPath)
+Tile::Value* StringToTilePath(const std::string& componentPath)
 {
 	const auto firstSlash = componentPath.find_first_of('/');
 	const auto lastSlash = componentPath.find_last_of('/');

@@ -176,7 +176,7 @@ namespace SortingIcons::Keyrings
 	{
 		const auto inventoryMenu = InventoryMenu::GetSingleton();
 		if (!update) for (const auto list = inventoryMenu->itemsList.list; const auto iter : list)
-			if (iter->tile && iter->tile->GetValue(kTileValue_user16)) { iter->tile->Destroy(false); list.RemoveItem(iter); }
+			if (iter->tile && iter->tile->GetValue(kTileValue_user16)) { iter->tile->~Tile(); list.RemoveItem(iter); }
 
 		for (const auto& key : itemCountsForKeyrings | std::views::keys)
 		{
@@ -188,8 +188,8 @@ namespace SortingIcons::Keyrings
 
 			const auto listItem = inventoryMenu->itemsList.InsertAlt(nullptr, keyringname.c_str());
 			const auto tile = listItem->tile;
-			tile->SetFloat(kTileValue_id, 30);
-			tile->SetString(kTileValue_user16, key->tag.c_str());
+			tile->Set(kTileValue_id, 30);
+			tile->Set(kTileValue_user16, key->tag);
 			inventoryMenu->itemsList.SortAlt(listItem, reinterpret_cast<ListBox<InventoryChanges>::SortingFunction>(0x7824E0));
 			Icons::InjectIconTile(Category::Get(key->tag), tile);
 		}
@@ -535,7 +535,7 @@ namespace SortingIcons::Tabs
 		Float32 width = 0;
 		const auto menu = tabline->GetParentMenu();
 
-		tabline->SetFloat(kTileValue_clips, true);
+		tabline->Set(kTileValue_clips, true);
 		int i = 0;
 		for (const auto& tab : g_Tabline)
 		{
@@ -547,27 +547,27 @@ namespace SortingIcons::Tabs
 			if (string.find("&-") == 0)
 				string = GetStringFromGameSettingFromString(string.substr(2, string.length() - 3));
 			Log() << (string);
-			tile->SetString(kTileValue_string, string.c_str(), true);
-			tile->SetFloat(kTileValue_listindex, listIndex);
-			tile->SetFloat(kTileValue_id, traitID); // + listIndex
-			tile->SetFloat(kTileValue_clips, true);
+			tile->Set(kTileValue_string, string, true);
+			tile->Set(kTileValue_listindex, listIndex);
+			tile->Set(kTileValue_id, traitID); // + listIndex
+			tile->Set(kTileValue_clips, true);
 			CdeclCall<void>(0xA04200, 0);
-			if (i < 5) width += trunc(tile->GetFloat(kTileValue_width));
+			if (i < 5) width += trunc(tile->Get(kTileValue_width));
 			listIndex++;
 			tablineTiles.push_back(tile);
 			i++;
 		}
 
-		const auto tablineWidth = tabline->GetFloat(kTileValue_width);
+		const auto tablineWidth = tabline->Get(kTileValue_width);
 		const auto leftLineLength = trunc((tablineWidth - width) / (listIndex + 1));
-		tabline->SetFloat(Tile::TraitNameToID("_LeftLineLength"), leftLineLength);
-		tabline->SetFloat(Tile::TraitNameToID("_ButtonCount"), tablineWidth);
+		tabline->Set(("_LeftLineLength"), leftLineLength);
+		tabline->Set(("_ButtonCount"), tablineWidth);
 
 		auto _x = leftLineLength;
 		for (const auto tile : tablineTiles)
 		{
-			tile->SetFloat(Tile::TraitNameToID("_x"), _x);
-			_x += leftLineLength + trunc(tile->GetFloat(kTileValue_width));
+			tile->Set(("_x"), _x);
+			_x += leftLineLength + trunc(tile->Get(kTileValue_width));
 			i++;
 		}
 
@@ -576,30 +576,30 @@ namespace SortingIcons::Tabs
 
 	UInt32 __fastcall InventoryMenuHandleClickGetFilter(InventoryMenu* menu, SInt32 tileID, Tile* clickedTile)
 	{
-		return clickedTile->GetFloat(kTileValue_listindex);
+		return clickedTile->Get(kTileValue_listindex);
 	}
 
 	void __fastcall InventoryMenuSetupData(InventoryMenu* menu, SInt32 tileID, Tile* clickedTile)
 	{
-		const auto listIndex = clickedTile->GetFloat(kTileValue_listindex);
+		const auto listIndex = clickedTile->Get(kTileValue_listindex);
 
 		if (listIndex == 0) {
-			menu->tileModButton->SetFloat(kTileValue_visible, true);
+			menu->tileModButton->Set(kTileValue_visible, true);
 		}
 		else if (listIndex == 1) {
 			ThisCall(0x718630, &InterfaceManager::GetSingleton()->help, InterfaceManager::kHelpApparel, InventoryMenu::GetMenuID(), 512);
-			menu->tileModButton->SetFloat(kTileValue_visible, false);
-			menu->tileItemIconBadge->SetFloat(kTileValue_visible, false);
-			menu->tileStrReq->SetFloat(kTileValue_visible, false);
+			menu->tileModButton->Set(kTileValue_visible, false);
+			menu->tileItemIconBadge->Set(kTileValue_visible, false);
+			menu->tileStrReq->Set(kTileValue_visible, false);
 		}
 		else if (listIndex == 4) {
 			ThisCall(0x718630, &InterfaceManager::GetSingleton()->help, InterfaceManager::kHelpAmmo, InventoryMenu::GetMenuID(), 500);
 			menu->itemsList.ForEach(reinterpret_cast<ListBox<InventoryChanges>::ForEachFunc>(0x782850), 0, 0x7FFFFFFF);
 		}
 		else {
-			menu->tileModButton->SetFloat(kTileValue_visible, false);
-			menu->tileItemIconBadge->SetFloat(kTileValue_visible, false);
-			menu->tileStrReq->SetFloat(kTileValue_visible, false);
+			menu->tileModButton->Set(kTileValue_visible, false);
+			menu->tileItemIconBadge->Set(kTileValue_visible, false);
+			menu->tileStrReq->Set(kTileValue_visible, false);
 		}
 	}
 

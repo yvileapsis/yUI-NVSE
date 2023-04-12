@@ -18,10 +18,10 @@ namespace ConfigurationMenu
 		{
 			mov ecx, [ebp + 8]
 			cmp ecx, 1047
-			jnz createStewMenu
+			jnz createConfigurationMenu
 			jmp [medicalQuestionaireCaseAddr]
 
-		createStewMenu:
+			createConfigurationMenu:
 			push 0x71F142
 			jmp MCMInit
 		}
@@ -40,7 +40,7 @@ namespace ConfigurationMenu
 	{
 		startMenuOptions->Append(settingsMenuItem);
 
-		StartMenu::Option* tweaksButton = new StartMenu::Option("Mods", TweaksButtonCallback, StartMenu::Option::kMainMenu + StartMenu::Option::kPauseMenu);
+		auto tweaksButton = new StartMenu::Option("Mods", TweaksButtonCallback, StartMenu::Option::kMainMenu + StartMenu::Option::kPauseMenu);
 		startMenuOptions->Append(&tweaksButton);
 	}
 

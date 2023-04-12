@@ -75,17 +75,17 @@ namespace UserInterface::HitMarker
 	{
 		const auto tile = CreateTileForHitMarker();
 
-		tile->SetFloat("_Depth", depth++);
+		tile->Set("_Depth", depth++);
 
-		tile->SetFloat(kTileValue_systemcolor, 1 + static_cast<bool>(flags & kHitMarkerAltColor));
+		tile->Set(kTileValue_systemcolor, 1 + static_cast<bool>(flags & kHitMarkerAltColor));
 
-		tile->SetFloat("_ModeOffset", static_cast<bool>(flags & kHitMarkerOffset));
-		tile->SetFloat("_ModeShake", static_cast<bool>(flags & kHitMarkerShake));
-		tile->SetFloat("_ModeRotate", static_cast<bool>(flags & kHitMarkerRotate));
+		tile->Set("_ModeOffset", static_cast<bool>(flags & kHitMarkerOffset));
+		tile->Set("_ModeShake", static_cast<bool>(flags & kHitMarkerShake));
+		tile->Set("_ModeRotate", static_cast<bool>(flags & kHitMarkerRotate));
 
-		tile->SetFloat("_AlphaMult", flags & kHitMarkerHalfAlpha ? 0.5 : 1);
+		tile->Set("_AlphaMult", flags & kHitMarkerHalfAlpha ? 0.5 : 1);
 
-		tile->GradualSetFloat("_counter", 0, 1, flags & kHitMarkerDouble ? 2 * seconds : seconds, GradualSetFloat::StartToEnd);
+		tile->SetGradual("_counter", 0, 1, flags & kHitMarkerDouble ? 2 * seconds : seconds, GradualSetFloat::StartToEnd);
 	}
 
 	void MainLoop()
@@ -95,8 +95,8 @@ namespace UserInterface::HitMarker
 		if (g_HUDMainMenu->isUsingScope) visible = static_cast<SInt64>(enableScope);
 		else if (g_player->UsingIronSights()) visible = enableSighting;
 		else visible = enableOut;
-		tileMain->SetFloat("_Visible", visible);
-		tileMain->SetFloat("_scope", g_player->UsingIronSights());
+		tileMain->Set("_Visible", visible);
+		tileMain->Set("_scope", g_player->UsingIronSights());
 
 		if (MenuMode() || !visible) { hitMarkers.clear(); return; }
 
@@ -108,8 +108,8 @@ namespace UserInterface::HitMarker
 
 		if (const auto tileJDC = g_HUDMainMenu->tile->GetChild("JDC"))
 		{
-			tileMain->SetFloat("_JDCOffset", tileJDC->GetFloat("_Offset"));
-			tileMain->SetFloat("_JDCLength", tileJDC->GetFloat("_Length"));
+			tileMain->Set("_JDCOffset", tileJDC->Get("_Offset"));
+			tileMain->Set("_JDCLength", tileJDC->Get("_Length"));
 		}
 	}
 
@@ -188,20 +188,20 @@ namespace UserInterface::HitMarker
 		onHit.emplace_back(OnHit);
 		mainLoop.emplace_back(MainLoop);
 
-		if (tileMain->GetChild("JHM")) tileMain->GetChild("JHMContainer")->Destroy(true);
+		if (tileMain->GetChild("JHM")) delete tileMain->GetChild("JHMContainer");
 		tileMain->AddTileFromTemplate("JHMContainer");
 
-		tileMain->SetFloat("_AlphaBase", alpha);
-		tileMain->SetFloat("_LengthBase", length);
-		tileMain->SetFloat("_WidthBase", width);
-		tileMain->SetFloat("_OffsetBase", offset);
+		tileMain->Set("_AlphaBase", alpha);
+		tileMain->Set("_LengthBase", length);
+		tileMain->Set("_WidthBase", width);
+		tileMain->Set("_OffsetBase", offset);
 
-		tileMain->SetFloat("_DynamicLength", dynamic & 1);
-		tileMain->SetFloat("_DynamicOffset", dynamic & 2);
+		tileMain->Set("_DynamicLength", dynamic & 1);
+		tileMain->Set("_DynamicOffset", dynamic & 2);
 
-		tileMain->GradualSetFloat("_GlobalShaker", -0.05, 0.05, 0.15, GradualSetFloat::StartToEndPerpetual);
+		tileMain->SetGradual("_GlobalShaker", -0.05, 0.05, 0.15, GradualSetFloat::StartToEndPerpetual);
 
-		tileMain->SetFloat("_Visible", visible = 0);
+		tileMain->Set("_Visible", visible = 0);
 	}
 
 	void MainLoopDoOnce()

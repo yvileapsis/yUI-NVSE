@@ -16,7 +16,8 @@ _declspec(naked) bool IsControllerConnected()
 	}
 }
 
-UInt32 ModConfigurationMenu::GetID() { return id; }
+// called by TileMenu::InitMenu
+UInt32 ModConfigurationMenu::GetID() { return MENU_ID; }
 
 // not a true unique_ptr since scope is partly managed by the game
 std::unique_ptr<ModConfigurationMenu> g_ConfigurationMenu;
@@ -82,10 +83,10 @@ ModConfigurationMenu* ModConfigurationMenu::ReloadMenu()
 		return nullptr;
 	}
 
-	const float stackingType = tile->GetFloat(kTileValue_stackingtype);
+	const float stackingType = tile->Get(kTileValue_stackingtype);
 	if (stackingType == 6006.0 || stackingType == 102.0)
 	{
-		tile->SetFloat(kTileValue_depth, newDepth, 1);
+		tile->Set(kTileValue_depth, newDepth, 1);
 	}
 
 	return menu;
@@ -138,7 +139,7 @@ ModConfigurationMenu::~ModConfigurationMenu()
 	subSettingInput.Free();
 	hotkeyInput.Free();
 
-	if (tile) tile->Destroy(true);
+	delete tile;
 
 	//	Menu::Free();
 
@@ -490,8 +491,8 @@ void ModConfigurationMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 	}
 	case kModConfigurationMenu_SettingListItem:
 	{
-		settingsListBox.parentTile->GetChild("lb_highlight_box")->SetFloat(kTileValue_x, activeTile->GetFloat(kTileValue_x), true);
-		settingsListBox.parentTile->GetChild("lb_highlight_box")->SetFloat(kTileValue_width, activeTile->GetFloat(kTileValue_width), true);
+		settingsListBox.parentTile->GetChild("lb_highlight_box")->Set(kTileValue_x, (Float32) activeTile->Get(kTileValue_x), true);
+		settingsListBox.parentTile->GetChild("lb_highlight_box")->Set(kTileValue_width, (Float32)activeTile->Get(kTileValue_width), true);
 
 		description <<= settingsListBox.GetItemForTile(activeTile);
 
@@ -551,7 +552,7 @@ void ModConfigurationMenu::Update()
 		auto activeTileID = -1;
 		if (auto tile = InterfaceManager::GetSingleton()->GetActiveTile())
 		{
-			activeTileID = tile->GetFloat(kTileValue_id);
+			activeTileID = tile->Get(kTileValue_id);
 		}
 
 		//		if (activeTileID != kModConfigurationMenu_SearchIcon && activeTileID != kModConfigurationMenu_CancelSearch)

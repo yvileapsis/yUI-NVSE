@@ -56,32 +56,32 @@ namespace SortingIcons::Icons
 			if (!icon) return;
 		}
 
-		if (!filename.empty()) icon->SetString(kTileValue_filename, filename.c_str(), false);
-		if (!texatlas.empty()) icon->SetString(kTileValue_texatlas, texatlas.c_str(), false);
-		if (font.has_value()) icon->SetFloat(kTileValue_texatlas, font.value(), false);
+		if (!filename.empty()) icon->Set(kTileValue_filename, filename, false);
+		if (!texatlas.empty()) icon->Set(kTileValue_texatlas, texatlas, false);
+		if (font.has_value()) icon->Set(kTileValue_texatlas, font.value(), false);
 		if (systemcolor.has_value())
-			icon->SetFloat(kTileValue_systemcolor, systemcolor.value(), false);
+			icon->Set(kTileValue_systemcolor, systemcolor.value(), false);
 		else
-			icon->SetFloat(kTileValue_systemcolor, menu->GetFloat(kTileValue_systemcolor));
+			icon->Set(kTileValue_systemcolor, menu->Get(kTileValue_systemcolor));
 
-		const Float32 x = text->GetFloat(kTileValue_x);
+		const Float32 x = text->Get(kTileValue_x);
 		Float32 width = 0;
 
-		if (icon->GetValue(kTileValue_user0)) width += icon->GetFloat(kTileValue_user0);
+		if (icon->GetValue(kTileValue_user0)) width += icon->Get(kTileValue_user0);
 
-		icon->SetFloat(kTileValue_x, x + width, true);
+		icon->Set(kTileValue_x, x + width, true);
 
-		width += icon->GetFloat(kTileValue_width);
+		width += icon->Get(kTileValue_width);
 
-		if (icon->GetValue(kTileValue_user1)) width += icon->GetFloat(kTileValue_user1);
+		if (icon->GetValue(kTileValue_user1)) width += icon->Get(kTileValue_user1);
 
-		text->SetFloat(kTileValue_x, x + width, true);
-		text->SetFloat(kTileValue_wrapwidth, text->GetFloat(kTileValue_wrapwidth) - width, false);
+		text->Set(kTileValue_x, x + width, true);
+		text->Set(kTileValue_wrapwidth, text->Get(kTileValue_wrapwidth) - width, false);
 	}
 
 	void __fastcall InjectTileSetTileString(Tile* tile, const InventoryChanges* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate)
 	{
-		tile->SetString(tilevalue, tileText, propagate);
+		tile->Set(tilevalue, tileText, propagate);
 		if (entry && entry->form && TryGetTypeOfForm(entry->form)) InjectIconTile(Category::Get(entry->form), tile);
 	}
 
@@ -91,14 +91,14 @@ namespace SortingIcons::Icons
 //		if (g_Categories.empty()) return;
 
 		if (Tile* icon = tile->GetChild("HK_Icon"); icon) {
-			icon->SetFloat(kTileValue_width, tile->GetFloat(kTileValue_width) - 16, propagate);
-			icon->SetFloat(kTileValue_height, tile->GetFloat(kTileValue_height) - 16, propagate);
-			icon->SetFloat(kTileValue_x, 8, propagate);
-			icon->SetFloat(kTileValue_y, 8, propagate);
+			icon->Set(kTileValue_width, (Float32) tile->Get(kTileValue_width) - 16, propagate);
+			icon->Set(kTileValue_height, (Float32) tile->Get(kTileValue_height) - 16, propagate);
+			icon->Set(kTileValue_x, 8, propagate);
+			icon->Set(kTileValue_y, 8, propagate);
 		}
 
 		const auto category = Category::Get(entry->form);
-		tile->SetString(tilevalue, category->IsValid() && !category->filename.empty() ? category->filename.c_str() : src, propagate);
+		tile->Set(tilevalue, category->IsValid() && !category->filename.empty() ? category->filename.c_str() : src, propagate);
 	}
 
 	void __fastcall TagRoseSetStringValue(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate)
@@ -106,22 +106,22 @@ namespace SortingIcons::Icons
 		if (!tile) return;
 //		if (g_Categories.empty()) return;
 
-		if (compassRoseX == 0) compassRoseX = tile->GetFloat(kTileValue_x);
-		if (compassRoseY == 0) compassRoseY = tile->GetFloat(kTileValue_y);
+		if (compassRoseX == 0) compassRoseX = tile->Get(kTileValue_x);
+		if (compassRoseY == 0) compassRoseY = tile->Get(kTileValue_y);
 
-		tile->SetFloat(kTileValue_width, 44, propagate);
-		tile->SetFloat(kTileValue_height, 44, propagate);
-		tile->SetFloat(kTileValue_x, compassRoseX + 3, propagate);
-		tile->SetFloat(kTileValue_y, compassRoseY + 3, propagate);
+		tile->Set(kTileValue_width, 44, propagate);
+		tile->Set(kTileValue_height, 44, propagate);
+		tile->Set(kTileValue_x, compassRoseX + 3, propagate);
+		tile->Set(kTileValue_y, compassRoseY + 3, propagate);
 
 		const auto category = Category::Get(entry->form);
-		tile->SetString(tilevalue, category->IsValid() && !category->filename.empty() ? category->filename.c_str() : src, propagate);
+		tile->Set(tilevalue, category->IsValid() && !category->filename.empty() ? category->filename.c_str() : src, propagate);
 	}
 
 
 	void __fastcall TagPromptPropagateIntValue(Tile* tile, void* dummyedx, UInt32 a2, signed int a3)
 	{
-		tile->SetFloat(a2, a3, true);
+		tile->Set(a2, a3, true);
 
 		const auto ref = HUDMainMenu::GetSingleton()->crosshairRef;
 		const auto item = !ref ? nullptr : ref->baseForm;
@@ -131,22 +131,22 @@ namespace SortingIcons::Icons
 		if (!icon) icon = tile->AddTileFromTemplate("ySIDefault");
 		if (!item || !item->IsInventoryObjectAlt() || !category->IsValid())
 		{
-			icon->SetFloat(kTileValue_visible, false, true);
+			icon->Set(kTileValue_visible, false, true);
 			return;
 		}
 		const auto fontManager = FontManager::GetSingleton();
 		const auto string = tile->GetValue(kTileValue_string)->str;
-		const auto wrapwidth = tile->GetFloat(kTileValue_wrapwidth);
+		const auto wrapwidth = tile->Get(kTileValue_wrapwidth);
 		const auto stringDimensions = fontManager->GetStringDimensions(string, 7, wrapwidth);
 
-		icon->SetFloat(kTileValue_x, -stringDimensions->x / 2 - icon->GetFloat(kTileValue_width) - icon->GetFloat(kTileValue_user1));
-		icon->SetFloat(kTileValue_y, - icon->GetFloat(kTileValue_user2));
-		icon->SetFloat(kTileValue_visible, true, true);
-		icon->SetFloat(kTileValue_systemcolor, tile->GetFloat(kTileValue_systemcolor));
-		icon->SetFloat(kTileValue_brightness, tile->GetFloat(kTileValue_brightness));
-		icon->SetFloat(kTileValue_alpha, tile->GetFloat(kTileValue_alpha));
+		icon->Set(kTileValue_x, -stringDimensions->x / 2 - icon->Get(kTileValue_width) - icon->Get(kTileValue_user1));
+		icon->Set(kTileValue_y, - icon->Get(kTileValue_user2));
+		icon->Set(kTileValue_visible, true, true);
+		icon->Set(kTileValue_systemcolor, tile->Get(kTileValue_systemcolor));
+		icon->Set(kTileValue_brightness, tile->Get(kTileValue_brightness));
+		icon->Set(kTileValue_alpha, tile->Get(kTileValue_alpha));
 
-		icon->SetString(kTileValue_filename, category->filename.c_str());
+		icon->Set(kTileValue_filename, category->filename);
 	}
 }
 

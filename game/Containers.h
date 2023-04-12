@@ -610,7 +610,7 @@ template <typename Item> struct BSSimpleArray
 	virtual void	Destroy(bool doFree);
 	virtual Item* Allocate(UInt32 size);
 
-	Item* data;			// 04
+	Item*			data;			// 04
 	UInt32			size;			// 08
 	UInt32			alloc;			// 0C
 

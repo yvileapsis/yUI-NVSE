@@ -126,7 +126,7 @@ void Dump(Tile* tile)
 
 	for (UInt32 i = 0; i < tile->values.size; i++)
 	{
-		const TileValue* val = tile->values[i];
+		const Tile::Value* val = tile->values[i];
 		const char* traitName = tile->TraitIDToName(val->id);
 		char traitNameIDBuf[16];
 
@@ -222,6 +222,15 @@ Log& Log::operator<<(const std::string& str)
 	return *this;
 }
 
+/*
+extern NiTMapBase<const char*, int>* g_traitNameMap;
+
+void Debug_DumpTraits()
+{
+	for (const auto bucket : *g_traitNameMap)
+		Log() << FormatString("%s, %08X ,%d", bucket->key, bucket->data, bucket->data);
+}
+*/
 /*void ScriptEventList::Dump()
 {
 	const auto nEvents = m_eventList->Count();
