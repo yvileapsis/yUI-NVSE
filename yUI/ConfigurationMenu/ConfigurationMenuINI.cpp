@@ -56,7 +56,7 @@ std::optional<SM_Value> CMSetting::IO::ReadSaved()
 	return {};
 }
 
-void CMSetting::IO::WriteSaved(const SM_Value& value)
+void CMSetting::IO::WriteSaved(const SM_Value& value) const
 {
 }
 
@@ -76,7 +76,7 @@ std::optional<SM_Value> CMSetting::IO::ReadINI()
 	return {};
 }
 
-void CMSetting::IO::WriteINI(const SM_Value& value)
+void CMSetting::IO::WriteINI(const SM_Value& value) const
 {
 	std::filesystem::path iniPath = GetCurPath();
 	iniPath += std::get<0>(ini);
@@ -102,7 +102,7 @@ std::optional<SM_Value> CMSetting::IO::ReadXML()
 	return {};
 }
 
-void CMSetting::IO::WriteXML(const SM_Value& value)
+void CMSetting::IO::WriteXML(const SM_Value& value) const
 {
 	if (xml.empty()) return;
 
@@ -121,7 +121,7 @@ std::optional<SM_Value> CMSetting::IO::ReadGameSetting()
 	return {};
 }
 
-void CMSetting::IO::WriteGameSetting(const SM_Value& value)
+void CMSetting::IO::WriteGameSetting(const SM_Value& value) const
 {
 }
 
@@ -130,7 +130,7 @@ std::optional<SM_Value> CMSetting::IO::ReadGlobal()
 	return {};
 }
 
-void CMSetting::IO::WriteGlobal(const SM_Value& value)
+void CMSetting::IO::WriteGlobal(const SM_Value& value) const
 {
 }
 
@@ -145,7 +145,7 @@ SM_Value CMSetting::IO::Read()
 	return defaultValue;
 }
 
-void CMSetting::IO::Write(const SM_Value& value)
+void CMSetting::IO::Write(const SM_Value& value) const
 {
 	if (g_saveValue) 
 		WriteSaved(value);
