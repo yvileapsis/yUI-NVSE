@@ -51,6 +51,15 @@ inline void WriteINIInternal(const std::filesystem::path& iniPath, const CMSetti
 }
 
 
+std::optional<SM_Value> CMSetting::IO::ReadSaved()
+{
+	return {};
+}
+
+void CMSetting::IO::WriteSaved(const SM_Value& value)
+{
+}
+
 std::optional<SM_Value> CMSetting::IO::ReadINI()
 {
 	std::filesystem::path iniPath = GetCurPath();
@@ -97,7 +106,7 @@ void CMSetting::IO::WriteXML(const SM_Value& value)
 {
 	if (xml.empty()) return;
 
-	if (defaultValue.IsString())
+	if (value.IsString())
 	{
 		HUDMainMenu::GetSingleton()->tile->Set(xml.c_str(), value.GetAsString());
 		InterfaceManager::GetSingleton()->globalsTile->Set(xml.c_str(), value.GetAsString());
@@ -107,15 +116,41 @@ void CMSetting::IO::WriteXML(const SM_Value& value)
 	InterfaceManager::GetSingleton()->globalsTile->Set(xml.c_str(), value.GetAsFloat());
 }
 
+std::optional<SM_Value> CMSetting::IO::ReadGameSetting()
+{
+	return {};
+}
+
+void CMSetting::IO::WriteGameSetting(const SM_Value& value)
+{
+}
+
+std::optional<SM_Value> CMSetting::IO::ReadGlobal()
+{
+	return {};
+}
+
+void CMSetting::IO::WriteGlobal(const SM_Value& value)
+{
+}
+
 SM_Value CMSetting::IO::Read()
 {
-	if (const auto ini = ReadINI()) return ini.value();
-	if (const auto xml = ReadXML()) return xml.value();
+	if (g_saveValue) 
+		if (const auto saved =		ReadSaved()) return saved.value();
+	if (const auto ini =			ReadINI()) return ini.value();
+	if (const auto xml =			ReadXML()) return xml.value();
+	if (const auto global =			ReadGlobal()) return global.value();
+	if (const auto gameSetting =	ReadGameSetting()) return gameSetting.value();
 	return defaultValue;
 }
 
 void CMSetting::IO::Write(const SM_Value& value)
 {
+	if (g_saveValue) 
+		WriteSaved(value);
 	WriteINI(value);
 	WriteXML(value);
+	WriteGlobal(value);
+	WriteGameSetting(value);
 }

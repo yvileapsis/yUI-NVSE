@@ -9,6 +9,7 @@
 #include <variant>
 
 inline UInt32 g_LogLevel = 3;
+inline UInt32 g_saveValue = 1;
 
 struct InputField
 {
@@ -155,11 +156,20 @@ struct CMSetting : public CMTag
 
 		SM_Value defaultValue;
 
+		std::optional<SM_Value> ReadSaved();
+		void WriteSaved(const SM_Value& value);
+
 		std::optional<SM_Value> ReadINI();
 		void WriteINI(const SM_Value& value);
 
 		std::optional<SM_Value> ReadXML();
 		void WriteXML(const SM_Value& value);
+
+		std::optional<SM_Value> ReadGameSetting();
+		void WriteGameSetting(const SM_Value& value);
+
+		std::optional<SM_Value> ReadGlobal();
+		void WriteGlobal(const SM_Value& value);
 
 		SM_Value Read();
 		void Write(const SM_Value& value);
