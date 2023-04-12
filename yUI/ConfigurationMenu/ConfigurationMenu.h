@@ -157,22 +157,22 @@ struct CMSetting : public CMTag
 		SM_Value defaultValue;
 
 		std::optional<SM_Value> ReadSaved();
-		void WriteSaved(const SM_Value& value);
+		void WriteSaved(const SM_Value& value) const;
 
 		std::optional<SM_Value> ReadINI();
-		void WriteINI(const SM_Value& value);
+		void WriteINI(const SM_Value& value) const;
 
 		std::optional<SM_Value> ReadXML();
-		void WriteXML(const SM_Value& value);
+		void WriteXML(const SM_Value& value) const;
 
 		std::optional<SM_Value> ReadGameSetting();
-		void WriteGameSetting(const SM_Value& value);
+		void WriteGameSetting(const SM_Value& value) const;
 
 		std::optional<SM_Value> ReadGlobal();
-		void WriteGlobal(const SM_Value& value);
+		void WriteGlobal(const SM_Value& value) const;
 
 		SM_Value Read();
-		void Write(const SM_Value& value);
+		void Write(const SM_Value& value) const;
 	};
 
 	// TODO: tagify this
