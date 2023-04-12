@@ -1,6 +1,6 @@
 #pragma once
 #include <TESObject.h>
-#include <GameProcess.h>
+#include <BaseProcess.h>
 #include <Sound.h>
 
 typedef std::unordered_map<TESForm*, InventoryItemData> InventoryItemsMap;

@@ -3,7 +3,7 @@
 #include <TESObjectREFR.h>
 
 #include "Script.h"
-#include "GameRTTI.h"
+#include "RTTI.h"
 #include "GameData.h"
 #include "SaveLoadGame.h"
 

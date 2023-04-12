@@ -1,13 +1,13 @@
 #include <BaseFormComponent.h>
 #include <TESObjectREFR.h>
-#include <GameRTTI.h>
+#include <RTTI.h>
 #include <InventoryChanges.h>
 #include <GameTasks.h>
 #include <SafeWrite.h>
 #include <NiObjects.h>
 #include <unordered_set>
 
-#include "GameProcess.h"
+#include "BaseProcess.h"
 #include "GameSettings.h"
 #include <numbers>
 

@@ -2,7 +2,7 @@
 
 #include <TESForm.h>
 #include <TESObjectREFR.h>
-#include <GameRTTI.h>
+#include <RTTI.h>
 #include <CommandTable.h>
 
 UInt32 GetDeclaredVariableType(const char* varName, const char* scriptText)

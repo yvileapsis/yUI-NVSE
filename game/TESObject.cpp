@@ -1,6 +1,6 @@
 #include <TESObject.h>
 
-#include "GameRTTI.h"
+#include "RTTI.h"
 #include "TESObjectREFR.h"
 
 static constexpr UInt8 kHandGripTable[] =

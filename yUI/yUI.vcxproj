@@ -123,7 +123,6 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClCompile Include="..\game\TESForm.cpp" />
     <ClCompile Include="..\game\TESObjectREFR.cpp" />
     <ClCompile Include="..\game\OSDepend.cpp" />
-    <ClCompile Include="..\game\GameRTTI.cpp" />
     <ClCompile Include="..\game\Script.cpp" />
     <ClCompile Include="..\game\GameSettings.cpp" />
     <ClCompile Include="..\game\GameTasks.cpp" />
@@ -131,7 +130,6 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClCompile Include="..\game\Types.cpp" />
     <ClCompile Include="..\game\Menu.cpp" />
     <ClCompile Include="..\game\Sound.cpp" />
-    <ClCompile Include="..\game\GameProcess.cpp" />
     <ClCompile Include="..\game\NiNodes.cpp" />
     <ClCompile Include="..\game\TESObject.cpp" />
     <ClCompile Include="..\nvse\dinput8.cpp" />
@@ -184,6 +182,7 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClInclude Include="..\game\BaseFormComponent.h" />
     <ClInclude Include="..\game\ConsoleManager.h" />
     <ClInclude Include="..\game\Containers.h" />
+    <ClInclude Include="..\game\ProcessLists.h" />
     <ClInclude Include="..\game\SaveLoadGame.h" />
     <ClInclude Include="..\game\InterfaceManager.h" />
     <ClInclude Include="..\game\CommandTable.h" />
@@ -194,8 +193,8 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClInclude Include="..\game\TESForm.h" />
     <ClInclude Include="..\game\TESObjectREFR.h" />
     <ClInclude Include="..\game\OSDepend.h" />
-    <ClInclude Include="..\game\GameProcess.h" />
-    <ClInclude Include="..\game\GameRTTI.h" />
+    <ClInclude Include="..\game\BaseProcess.h" />
+    <ClInclude Include="..\game\RTTI.h" />
     <ClInclude Include="..\game\Script.h" />
     <ClInclude Include="..\game\GameSettings.h" />
     <ClInclude Include="..\game\Sound.h" />
@@ -222,7 +221,6 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClInclude Include="ConfigurationMenu\ConfigurationMenu.h" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\game\GameRTTI.inc" />
     <None Include="exports.def" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

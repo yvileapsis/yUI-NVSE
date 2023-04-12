@@ -3,7 +3,7 @@
 
 #include <SimpleINILibrary.h>
 
-#include <GameRTTI.h>
+#include <RTTI.h>
 #include <TESObjectREFR.h>
 
 namespace Patch::ExplosionForce

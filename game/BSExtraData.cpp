@@ -3,7 +3,7 @@
 #include <TESForm.h>
 #include <TESObjectREFR.h>
 #include <Script.h>
-#include <GameRTTI.h>
+#include <RTTI.h>
 
 static const UInt32 s_ExtraDataListVtbl							= 0x010143E8;	//	0x0100e3a8;
 

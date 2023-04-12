@@ -422,10 +422,9 @@ class LockFreeMap: InterfacedClass
 	UInt32	**buckets;		// 0C array of arg1 DWord elements
 	UInt32	unk010;			// 10 Init'd to arg2
 	Data014	*dat014;		// 14 Init'd to a 16 bytes structure
-	UInt32	unk018;			// 18
+	UInt32 numItems;		// 18
 	UInt32	unk01C;			// 1C
-	UInt32	unk020[2];		// 20 Pair of DWord (TList ?)
-	// ?
+	Semaphore semaphore;	// 20
 };
 
 template<class _C>

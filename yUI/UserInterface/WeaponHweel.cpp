@@ -6,7 +6,7 @@
 
 #include "functions.h"
 #include "dinput8.h"
-#include "GameRTTI.h"
+#include "RTTI.h"
 
 namespace UserInterface::WeaponHweel
 {

@@ -4,7 +4,7 @@
 #include <BSExtraData.h>
 #include <TESObjectREFR.h>
 
-#include <GameRTTI.h>
+#include <RTTI.h>
 
 void InventoryChanges::Cleanup()
 {

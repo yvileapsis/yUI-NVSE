@@ -4,7 +4,7 @@
 #include <SimpleINILibrary.h>
 
 #include <InventoryChanges.h>
-#include <GameRTTI.h>
+#include <RTTI.h>
 
 namespace Fix::ProjectileEffects
 {

@@ -1,6 +1,6 @@
 #include <main.h>
-#include <GameProcess.h>
-#include <GameRTTI.h>
+#include <BaseProcess.h>
+#include <RTTI.h>
 
 #include <SafeWrite.h>
 #include <SimpleINILibrary.h>
