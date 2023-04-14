@@ -2,7 +2,10 @@
 #include "ConfigurationMenu.h"
 #include <SimpleINILibrary.h>
 
+#include "GameData.h"
+#include "TESForm.h"
 #include "InterfaceManager.h"
+#include "Setting.h"
 
 inline std::map<std::tuple<std::filesystem::path, std::string, std::string>, SM_Value> ini_map;
 
@@ -118,20 +121,45 @@ void CMSetting::IO::WriteXML(const SM_Value& value) const
 
 std::optional<SM_Value> CMSetting::IO::ReadGameSetting()
 {
+	if (const auto setting = GetINISetting(gamesetting); setting && !setting->GetAsString().empty()) return setting->GetAsString();
 	return {};
 }
 
 void CMSetting::IO::WriteGameSetting(const SM_Value& value) const
 {
+	if (const auto setting = GetINISetting(gamesetting); setting)
+	{
+		if (value.IsString()) setting->Set(value.GetAsString().c_str());
+		else setting->Set(value.GetAsFloat());
+	}
+}
+
+std::optional<SM_Value> CMSetting::IO::ReadGameINI()
+{
+	if (const auto setting = GetGameSetting(gameini); setting && !setting->GetAsString().empty()) return setting->GetAsString();
+	return {};
+}
+
+void CMSetting::IO::WriteGameINI(const SM_Value& value) const
+{
+	if (const auto setting = GetGameSetting(gameini); setting)
+	{
+		if (value.IsString()) setting->Set(value.GetAsString().c_str());
+		else setting->Set(value.GetAsFloat());
+	}
 }
 
 std::optional<SM_Value> CMSetting::IO::ReadGlobal()
 {
+	for (const auto iter : TESDataHandler::GetSingleton()->globalList)
+		if (std::string(iter->name.CStr()) == global) return iter->data;
 	return {};
 }
 
 void CMSetting::IO::WriteGlobal(const SM_Value& value) const
 {
+	for (const auto iter : TESDataHandler::GetSingleton()->globalList)
+		if (std::string(iter->name.CStr()) == global) iter->data = value.GetAsFloat();
 }
 
 SM_Value CMSetting::IO::Read()
@@ -142,6 +170,7 @@ SM_Value CMSetting::IO::Read()
 	if (const auto xml =			ReadXML()) return xml.value();
 	if (const auto global =			ReadGlobal()) return global.value();
 	if (const auto gameSetting =	ReadGameSetting()) return gameSetting.value();
+	if (const auto gameINI =		ReadGameSetting()) return gameINI.value();
 	return defaultValue;
 }
 
@@ -153,4 +182,5 @@ void CMSetting::IO::Write(const SM_Value& value) const
 	WriteXML(value);
 	WriteGlobal(value);
 	WriteGameSetting(value);
+	WriteGameINI(value);
 }

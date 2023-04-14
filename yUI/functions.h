@@ -38,7 +38,6 @@ AnimData* GetThirdPersonAnimData(AnimData* animData);
 bool TryGetTypeOfForm(TESForm* form);
 
 char* __fastcall StrFromINI(DWORD* address);
-std::string GetStringFromGameSettingFromString(const std::string& settingName);
 
 void RegisterTraitID(const char* var1, UInt32 var2);
 void funpatch();

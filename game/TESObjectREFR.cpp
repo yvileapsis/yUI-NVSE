@@ -8,7 +8,7 @@
 #include <unordered_set>
 
 #include "BaseProcess.h"
-#include "GameSettings.h"
+#include "Setting.h"
 #include <numbers>
 
 static constexpr UInt32 s_TESObject_REFR_init						= 0x0055A2F0;	// TESObject_REFR initialization routine (first reference to s_TESObject_REFR_vtbl)
@@ -237,8 +237,7 @@ Float64 Actor::GetCalculatedSpread(UInt32 mode, InventoryChanges* entry)
 		{
 			const auto spreadPenalty = ThisStdCall<double>(0x8B0DD0, this, 2);
 
-			Setting* fNPCMaxGunWobbleAngle;
-			GameSettingCollection::GetSingleton()->GetGameSetting("fNPCMaxGunWobbleAngle", &fNPCMaxGunWobbleAngle);
+			Setting* fNPCMaxGunWobbleAngle = GetGameSetting("fNPCMaxGunWobbleAngle");
 
 			totalSpread += spreadPenalty * fNPCMaxGunWobbleAngle->data.f * 0.01745329238474369;
 		}
@@ -257,8 +256,7 @@ Float64 Actor::GetCalculatedSpread(UInt32 mode, InventoryChanges* entry)
 
 		if (!this->IsDoingAttackAnim())
 		{
-			Setting* fNonAttackGunWobbleMult;
-			GameSettingCollection::GetSingleton()->GetGameSetting("fNonAttackGunWobbleMult", &fNonAttackGunWobbleMult);
+			const Setting* fNonAttackGunWobbleMult = GetGameSetting("fNonAttackGunWobbleMult");
 
 			totalSpread = totalSpread * fNonAttackGunWobbleMult->data.f;
 		}
@@ -267,9 +265,8 @@ Float64 Actor::GetCalculatedSpread(UInt32 mode, InventoryChanges* entry)
 	}
 	else if (mode == 2)
 	{
-		totalSpread = ThisStdCall<double>(0x8B0DD0, this, 0); 
-		Setting* fGunWobbleMultScope;
-		GameSettingCollection::GetSingleton()->GetGameSetting("fGunWobbleMultScope", &fGunWobbleMultScope);
+		totalSpread = ThisStdCall<double>(0x8B0DD0, this, 0);
+		const Setting* fGunWobbleMultScope = GetGameSetting("fGunWobbleMultScope");
 		totalSpread = totalSpread * fGunWobbleMultScope->data.f;
 
 	}

@@ -2,7 +2,7 @@
 
 #include "dinput8.h"
 #include "functions.h"
-#include "GameSettings.h"
+#include "Setting.h"
 #include "InterfaceManager.h"
 #include "SafeWrite.h"
 

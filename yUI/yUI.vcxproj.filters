@@ -77,7 +77,7 @@
     <ClCompile Include="..\game\Script.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\GameSettings.cpp">
+    <ClCompile Include="..\game\Setting.cpp">
       <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="..\game\Sound.cpp">
@@ -234,7 +234,7 @@
     <ClInclude Include="..\game\Script.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\GameSettings.h">
+    <ClInclude Include="..\game\Setting.h">
       <Filter>game</Filter>
     </ClInclude>
     <ClInclude Include="..\game\Sound.h">

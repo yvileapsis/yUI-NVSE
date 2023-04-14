@@ -124,7 +124,7 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClCompile Include="..\game\TESObjectREFR.cpp" />
     <ClCompile Include="..\game\OSDepend.cpp" />
     <ClCompile Include="..\game\Script.cpp" />
-    <ClCompile Include="..\game\GameSettings.cpp" />
+    <ClCompile Include="..\game\Setting.cpp" />
     <ClCompile Include="..\game\GameTasks.cpp" />
     <ClCompile Include="..\game\Tile.cpp" />
     <ClCompile Include="..\game\Types.cpp" />
@@ -196,7 +196,7 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClInclude Include="..\game\BaseProcess.h" />
     <ClInclude Include="..\game\RTTI.h" />
     <ClInclude Include="..\game\Script.h" />
-    <ClInclude Include="..\game\GameSettings.h" />
+    <ClInclude Include="..\game\Setting.h" />
     <ClInclude Include="..\game\Sound.h" />
     <ClInclude Include="..\game\GameTasks.h" />
     <ClInclude Include="..\game\Tile.h" />

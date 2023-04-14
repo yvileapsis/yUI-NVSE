@@ -116,7 +116,7 @@ public:
 class CMTag
 {
 public:
-	std::string id;
+	std::string id; // TODO: make ID: type + mods alphab. + type + name
 	std::string name;
 	std::string description;
 
@@ -150,9 +150,14 @@ struct CMSetting : public CMTag
 	public:
 		typedef std::tuple<std::filesystem::path, std::string, std::string> INI;
 		INI ini;
-		// TODO: gamesetting and global
 
 		std::string xml;
+
+		std::string global;
+
+		std::string gamesetting;
+
+		std::string gameini;
 
 		SM_Value defaultValue;
 
@@ -167,6 +172,9 @@ struct CMSetting : public CMTag
 
 		std::optional<SM_Value> ReadGameSetting();
 		void WriteGameSetting(const SM_Value& value) const;
+
+		std::optional<SM_Value> ReadGameINI();
+		void WriteGameINI(const SM_Value& value) const;
 
 		std::optional<SM_Value> ReadGlobal();
 		void WriteGlobal(const SM_Value& value) const;

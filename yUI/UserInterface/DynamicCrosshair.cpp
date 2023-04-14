@@ -1,7 +1,7 @@
 #include <main.h>
 
 #include <Menu.h>
-#include <GameSettings.h>
+#include <Setting.h>
 #include <SimpleINILibrary.h>
 
 namespace UserInterface::DynamicCrosshair
@@ -136,8 +136,7 @@ namespace UserInterface::DynamicCrosshair
 
 		if (g_player->UsingIronSights())
 		{
-			Float64 fDefaultWorldFOV;
-			GetNumericIniSetting("fDefaultWorldFOV:Display", &fDefaultWorldFOV);
+			Float64 fDefaultWorldFOV = GetINISetting("fDefaultWorldFOV:Display")->GetAsFloat();
 			spreadTarget *= g_player->worldFOV / fDefaultWorldFOV;
 		}
 
@@ -201,8 +200,7 @@ namespace UserInterface::DynamicCrosshair
 
 		if (distance == 0)
 		{
-			Float64 worldFOV = 0;
-			GetNumericIniSetting("fDefaultWorldFOV:Display", &worldFOV);
+			const Float64 worldFOV = GetINISetting("fDefaultWorldFOV:Display")->GetAsFloat();
 			distance = 0.2;
 			if (worldFOV <= 160) distance += 0.03 * (160 - worldFOV);
 			if (worldFOV <= 100) distance += 0.02 * (100 - worldFOV);

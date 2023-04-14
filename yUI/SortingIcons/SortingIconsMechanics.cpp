@@ -1,6 +1,6 @@
 #include "SortingIcons.h"
 
-#include <GameSettings.h>
+#include <Setting.h>
 #include <Tile.h>
 #include <InterfaceManager.h>
 #include <functions.h>
@@ -183,7 +183,7 @@ namespace SortingIcons::Keyrings
 			const auto keys = itemCountsForKeyrings[key];
 
 			std::string keyringname = key->name;
-			if (keyringname.find("&-") == 0) keyringname = GetStringFromGameSettingFromString(keyringname.substr(2, keyringname.length() - 3));
+			if (keyringname.find("&-") == 0) keyringname = GetGameSetting(keyringname.substr(2, keyringname.length() - 3))->GetAsString();
 			if (keys > 1) keyringname += " (" + std::to_string(keys) + ")";
 
 			const auto listItem = inventoryMenu->itemsList.InsertAlt(nullptr, keyringname.c_str());
@@ -545,7 +545,7 @@ namespace SortingIcons::Tabs
 	//		Log(tab->tab);
 			Log() << (string);
 			if (string.find("&-") == 0)
-				string = GetStringFromGameSettingFromString(string.substr(2, string.length() - 3));
+				string = GetGameSetting(string.substr(2, string.length() - 3))->GetAsString();
 			Log() << (string);
 			tile->Set(kTileValue_string, string, true);
 			tile->Set(kTileValue_listindex, listIndex);

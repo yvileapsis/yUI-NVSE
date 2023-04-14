@@ -1,5 +1,5 @@
 #include <main.h>
-#include <GameSettings.h>
+#include <Setting.h>
 #include <BaseProcess.h>
 
 #include <SafeWrite.h>
@@ -97,15 +97,15 @@ namespace Patch::RestoreFO3Spread
 	Float64 __fastcall AlterSpreadCalculation(Actor* actor, TESObjectWEAP* weapon, Float32 condition, char isAiming,
 		char isSneaking, char isWalking, char isRunning)
 	{
-		const auto IronSightsBonus = GameSettingFromString("fGunSpreadIronSightsBase")->data.f + isAiming * GameSettingFromString("fGunSpreadIronSightsMult")->data.f;
-		const auto CrouchBonus = GameSettingFromString("fGunSpreadCrouchBase")->data.f + isSneaking * GameSettingFromString("fGunSpreadCrouchMult")->data.f;
-		const auto ConditionPenalty = GameSettingFromString("fGunSpreadCondBase")->data.f + condition * GameSettingFromString("fGunSpreadCondMult")->data.f;
-		const auto SkillBonus = 0; // GameSettingFromString("fGunSpreadSkillBase")->data.f + wah * GameSettingFromString("fGunSpreadSkillMult")->data.f;
-		const auto WalkPenalty = GameSettingFromString("fGunSpreadWalkBase")->data.f + isWalking * GameSettingFromString("fGunSpreadWalkMult")->data.f;
-		const auto RunPenalty = GameSettingFromString("fGunSpreadRunBase")->data.f + isRunning * GameSettingFromString("fGunSpreadRunMult")->data.f;
-		const auto ArmPenalty = 0; // GameSettingFromString("fGunSpreadArmBase")->data.f + wah * GameSettingFromString("fGunSpreadArmMult")->data.f;
-	//	const auto NPCArmPenalty = GameSettingFromString("fGunSpreadNPCArmBase")->data.f + wah * GameSettingFromString("fGunSpreadNPCArmMult")->data.f;
-	//	const auto HeadPenalty = GameSettingFromString("fGunSpreadHeadBase")->data.f + wah * GameSettingFromString("fGunSpreadHeadMult")->data.f;
+		const auto IronSightsBonus = GetGameSetting("fGunSpreadIronSightsBase")->GetAsFloat() + isAiming * GetGameSetting("fGunSpreadIronSightsMult")->GetAsFloat();
+		const auto CrouchBonus = GetGameSetting("fGunSpreadCrouchBase")->GetAsFloat() + isSneaking * GetGameSetting("fGunSpreadCrouchMult")->GetAsFloat();
+		const auto ConditionPenalty = GetGameSetting("fGunSpreadCondBase")->GetAsFloat() + condition * GetGameSetting("fGunSpreadCondMult")->GetAsFloat();
+		const auto SkillBonus = 0; // GetGameSetting("fGunSpreadSkillBase")->GetAsFloat() + wah * GetGameSetting("fGunSpreadSkillMult")->GetAsFloat();
+		const auto WalkPenalty = GetGameSetting("fGunSpreadWalkBase")->GetAsFloat() + isWalking * GetGameSetting("fGunSpreadWalkMult")->GetAsFloat();
+		const auto RunPenalty = GetGameSetting("fGunSpreadRunBase")->GetAsFloat() + isRunning * GetGameSetting("fGunSpreadRunMult")->GetAsFloat();
+		const auto ArmPenalty = 0; // GetGameSetting("fGunSpreadArmBase")->GetAsFloat() + wah * GetGameSetting("fGunSpreadArmMult")->GetAsFloat();
+	//	const auto NPCArmPenalty = GetGameSetting("fGunSpreadNPCArmBase")->GetAsFloat() + wah * GetGameSetting("fGunSpreadNPCArmMult")->GetAsFloat();
+	//	const auto HeadPenalty = GetGameSetting("fGunSpreadHeadBase")->GetAsFloat() + wah * GetGameSetting("fGunSpreadHeadMult")->GetAsFloat();
 
 		return  (IronSightsBonus * CrouchBonus * (ConditionPenalty + SkillBonus) * (WalkPenalty + RunPenalty) + ArmPenalty);
 	}
