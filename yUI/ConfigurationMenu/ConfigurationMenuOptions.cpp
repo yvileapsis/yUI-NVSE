@@ -24,14 +24,14 @@ void RestartGameWarningCallback()
 void CMSetting::Choice::Display(Tile* tile)
 {
 	const auto value = setting.Read();
-	const std::string valueString = choice.contains(value) ? choice[value].first : static_cast<std::string>(value); // Display name or display value if name not found
+	const std::string valueString = choice.contains(value) ? choice[value] : static_cast<std::string>(value); // Display name or display value if name not found
 	tile->Set(kTileValue_user0, valueString);
 }
 
 void CMSetting::Slider::Display(Tile* tile)
 {
 	const auto value = setting.Read();
-	tile->Set(kTileValue_user0, 20 * static_cast<Float64>(value) / static_cast<Float64>(std::get<1>(slider)));
+	tile->Set(kTileValue_user0, 20 * static_cast<Float64>(value) / static_cast<Float64>(max));
 	tile->Set(kTileValue_user3, 20);
 }
 
@@ -118,14 +118,14 @@ void CMSetting::Choice::Last(const bool forward)
 
 SM_Value CMSetting::Slider::GetPrev(const SM_Value& value) const
 {
-	SM_Value newValue = value - std::get<2>(slider);
-	return newValue < std::get<0>(slider) ? value : newValue;
+	SM_Value newValue = value - delta;
+	return newValue < max ? value : newValue;
 }
 
 SM_Value CMSetting::Slider::GetNext(const SM_Value& value) const
 {
-	SM_Value newValue = value + std::get<2>(slider);
-	return newValue > std::get<1>(slider) ? value : newValue;
+	SM_Value newValue = value + delta;
+	return newValue > min ? value : newValue;
 }
 
 void CMSetting::Slider::Next(const bool forward)
@@ -138,7 +138,7 @@ void CMSetting::Slider::Next(const bool forward)
 void CMSetting::Slider::Last(const bool forward)
 {
 	const auto value = setting.Read();
-	const auto newValue = forward ? std::get<1>(slider) : std::get<0>(slider);
+	const auto newValue = forward ? max : min;
 	setting.Write(newValue);
 }
 

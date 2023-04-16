@@ -136,6 +136,11 @@ public:
 	virtual std::string GetDescription() const { return FormatString("%s\n- %s", description.c_str(), " "); }
 };
 
+class CMOption : public CMTag
+{
+public:
+};
+
 class CMMod : public CMTag
 {
 public:
@@ -185,10 +190,6 @@ public:
 		void Write(const SM_Value& value) const;
 	};
 
-	// TODO: tagify this
-	typedef std::map<SM_Value, std::pair<std::string, std::string>> SM_ValueChoice;
-	typedef std::tuple<SM_Value, SM_Value, SM_Value> SM_ValueSlider;
-
 	class None
 	{
 	public:
@@ -224,7 +225,7 @@ public:
 	{
 	public:
 		IO setting;
-		SM_ValueChoice choice;
+		std::map<SM_Value, std::string> choice;
 
 		const char* GetTemplate() override { return "SettingChoiceTemplate"; }
 		const char* GetTypeName() override { return "Choice"; }
@@ -249,7 +250,10 @@ public:
 	{
 	public:
 		IO setting;
-		SM_ValueSlider slider;
+
+		SM_Value min;
+		SM_Value max;
+		SM_Value delta;
 
 		const char* GetTemplate() override { return "SettingSliderTemplate"; }
 		const char* GetTypeName() override { return "Slider"; }

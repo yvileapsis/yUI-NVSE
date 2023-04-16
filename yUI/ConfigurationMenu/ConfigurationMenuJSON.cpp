@@ -2,7 +2,6 @@
 #include "json.h"
 
 class TagJSON : public CMTag { public: TagJSON(const nlohmann::basic_json<>& elem); };
-class ModJSON : public CMMod { public: ModJSON(const nlohmann::basic_json<>& elem); };
 class SettingJSON : public CMSetting { public: SettingJSON(const nlohmann::basic_json<>& elem); };
 
 template <typename T> std::vector<T> GetSetFromElement(const nlohmann::basic_json<>& elem)
@@ -50,17 +49,6 @@ TagJSON::TagJSON(const nlohmann::basic_json<>& elem)
 	if (elem.contains("description"))	description = elem["description"].get<std::string>();
 }
 
-ModJSON::ModJSON(const nlohmann::basic_json<>& elem)
-{
-	if (elem.contains("id"))			id = elem["id"].get<std::string>();
-	if (elem.contains("name"))			name = elem["name"].get<std::string>();
-	if (elem.contains("description"))	description = elem["description"].get<std::string>();
-
-	if (elem.contains("version"))		version = elem["version"].get<std::string>();
-
-	if (elem.contains("tags"))			tags.insert_range(GetSetFromElement<std::string>(elem["tags"]));
-}
-
 SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem)
 {
 	if (elem.contains("id"))			id = elem["id"].get<std::string>();
@@ -102,7 +90,7 @@ SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem)
 			else name = (value).GetAsString();
 			if (i.contains("description")) description = i["description"].get<std::string>();
 
-			choice.choice.emplace(value, std::make_pair(name, description));
+			choice.choice.emplace(value, name);
 		}
 
 		data = std::make_unique<Choice>(choice);
@@ -122,7 +110,9 @@ SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem)
 		if (elem.contains("valueDelta")) valueDelta = GetValueFromElement(elem["valueDelta"]);
 		else valueMin = (SInt32) 1;
 
-		slider.slider = std::make_tuple(valueMin, valueMax, valueDelta);
+		slider.min = valueMin;
+		slider.max = valueMax;
+		slider.delta = valueDelta;
 
 		data = std::make_unique<Slider>(slider);
 	}

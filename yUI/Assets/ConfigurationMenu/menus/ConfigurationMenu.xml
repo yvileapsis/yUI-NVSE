@@ -27,6 +27,97 @@
 	<_device_1> &-sDeviceMouse; </_device_1>
 	<_device_2> &-sDeviceGamepad; </_device_2>
 
+	<hotrect name="loadfromjson">
+		<id> 33 </id>
+		<include src="text_box.xml"/>
+		<depth> 3 </depth>
+		<user0> 1 </user0>
+		<visible>
+		  <copy src="me" trait="_line_alpha"/>
+		  <gt> 0 </gt>
+		  <and src="me" trait="user0"/>
+		</visible>
+		<target>1 </target>
+		<string> Load from JSON </string>
+		<justify> &right; </justify>
+		<clicksound> UIMenuOK </clicksound>
+		<alpha>
+			<copy> 40 </copy>
+			<onlyif src="me" trait="_box_visible"/>
+		</alpha>
+		<_x> <copy src="sibling(savetojson)" trait="_x"/> </_x>
+		<_y> <copy src="sibling(savetojson)" trait="_y"/> <sub> 47 </sub> </_y>
+		<_glow> 1 </_glow>
+		<brightness>
+			<copy src="me" trait="_line_alpha"/>
+		</brightness>
+		<_horbuf>
+			<copy src="sibling(main_defaults_button)" trait="_horbuf"/>
+		</_horbuf>
+		<_verbuf>
+			<copy src="sibling(main_defaults_button)" trait="_verbuf"/>
+		</_verbuf>
+		<_fixedwidth>
+				<copy src="sibling(main_defaults_button)" trait="_fixedwidth"/> <mul> 2 </mul>
+		</_fixedwidth>
+		<_xbox_button> &xbuttonx; </_xbox_button>
+		<user0> 1 </user0>
+		<!-- additional visibility check -->
+		<_line_alpha>
+			<copy> 128 </copy>
+			<add>
+				<copy> 127 </copy>
+				<onlyif src="me" trait="target"/>
+			</add>
+		</_line_alpha>
+	</hotrect>
+
+
+	<hotrect name="savetojson">
+		<id> 32 </id>
+		<include src="text_box.xml"/>
+		<depth> 3 </depth>
+		<user0> 1 </user0>
+		<visible>
+		  <copy src="me" trait="_line_alpha"/>
+		  <gt> 0 </gt>
+		  <and src="me" trait="user0"/>
+		</visible>
+		<target>1 </target>
+		<string> Save to JSON </string>
+		<justify> &right; </justify>
+		<clicksound> UIMenuOK </clicksound>
+		<alpha>
+			<copy> 40 </copy>
+			<onlyif src="me" trait="_box_visible"/>
+		</alpha>
+		<_x> <copy src="sibling(main_device_button)" trait="_x"/> </_x>
+		<_y> <copy src="sibling(main_device_button)" trait="_y"/> <sub> 47 </sub> </_y>
+		<_glow> 1 </_glow>
+		<brightness>
+			<copy src="me" trait="_line_alpha"/>
+		</brightness>
+		<_horbuf>
+			<copy src="sibling(main_defaults_button)" trait="_horbuf"/>
+		</_horbuf>
+		<_verbuf>
+			<copy src="sibling(main_defaults_button)" trait="_verbuf"/>
+		</_verbuf>
+		<_fixedwidth>
+				<copy src="sibling(main_defaults_button)" trait="_fixedwidth"/> <mul> 2 </mul>
+		</_fixedwidth>
+		<_xbox_button> &xbuttonx; </_xbox_button>
+		<user0> 1 </user0>
+		<!-- additional visibility check -->
+		<_line_alpha>
+			<copy> 128 </copy>
+			<add>
+				<copy> 127 </copy>
+				<onlyif src="me" trait="target"/>
+			</add>
+		</_line_alpha>
+	</hotrect>
+
 
 	<hotrect name="main_device_button">
 		<id> 30 </id>
@@ -75,7 +166,7 @@
 
 	<hotrect name="main_defaults_button">
 		<!-- Used for defaults button with options or delete button with save/load -->
-		<id> 4 </id>
+		<id> 31 </id>
 		<include src="text_box.xml"/>
 		<depth> 3 </depth>
 		<user0> 1 </user0>
