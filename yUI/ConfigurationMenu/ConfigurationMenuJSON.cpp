@@ -168,13 +168,6 @@ void ModConfigurationMenu::ReadJSON(const std::filesystem::path& path)
 			g_Tags.emplace(tag.id, std::make_unique<CMTag>(tag));
 		}
 
-		if (!j.contains("mods") || !j["mods"].is_array())
-			Log() << "JSON message: ySI category array not detected in " + path.string();
-		else for (const auto& elem : j["mods"]) if (!elem.is_object())
-			Log() << "JSON error: Expected object";
-		else 
-			g_Mods.push_back(std::make_unique<CMMod>(ModJSON(elem)));
-
 		if (!j.contains("settings") || !j["settings"].is_array())
 			Log() << "JSON message: ySI tab array not detected in " + path.string();
 		else for (const auto& elem : j["settings"]) if (!elem.is_object())
