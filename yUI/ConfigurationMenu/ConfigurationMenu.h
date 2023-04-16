@@ -8,6 +8,10 @@
 #include <utility>
 #include <variant>
 
+class CMTag;
+class CMMod;
+class CMSetting;
+
 inline UInt32 g_LogLevel = 3;
 inline UInt32 g_saveValue = 1;
 
@@ -143,8 +147,9 @@ public:
 	static void Display(Tile* tile) {}
 };
 
-struct CMSetting : public CMTag
+class CMSetting : public CMTag
 {
+public:
 	class IO
 	{
 	public:
@@ -160,9 +165,6 @@ struct CMSetting : public CMTag
 		std::string gameini;
 
 		SM_Value defaultValue;
-
-		std::optional<SM_Value> ReadSaved();
-		void WriteSaved(const SM_Value& value) const;
 
 		std::optional<SM_Value> ReadINI();
 		void WriteINI(const SM_Value& value) const;
@@ -194,18 +196,28 @@ struct CMSetting : public CMTag
 
 		static const char* GetTemplateAlt() { return "SettingNoneTemplate"; }
 		virtual const char* GetTemplate() { return GetTemplateAlt(); }
+		virtual const char* GetTypeName() { return "None"; }
 
-		virtual void Write(const SM_Value& value) {}
 		virtual void Display(Tile* tile) {}
 
 		virtual void Next(const bool forward = true) {};
 		virtual void Last(const bool forward = true) {};
+
+		virtual std::vector<SM_Value> GetValues() { return {}; };
+		virtual void SetValues(const std::vector<SM_Value>& values) {};
 	};
 
 	class Subsetting : public None
 	{
+		std::string mod;
 		const char* GetTemplate() override { return "SettingSubsettingTemplate"; }
+		const char* GetTypeName() override { return "Subsetting"; }
 
+		std::vector<SM_Value> GetValues() override {
+			return {};
+//			GetSettingsForString(std::string str);
+		};
+		void SetValues(const std::vector<SM_Value>& values) override {};
 	};
 
 	class Choice : public None
@@ -215,8 +227,8 @@ struct CMSetting : public CMTag
 		SM_ValueChoice choice;
 
 		const char* GetTemplate() override { return "SettingChoiceTemplate"; }
+		const char* GetTypeName() override { return "Choice"; }
 
-		void Write(const SM_Value& value) override { setting.Write(value); }
 		void Display(Tile* tile) override;
 
 		SM_Value GetPrev(const SM_Value& value);
@@ -224,6 +236,13 @@ struct CMSetting : public CMTag
 
 		void Next(bool forward) override;
 		void Last(bool forward) override;
+
+		std::vector<SM_Value> GetValues() override { return { setting.Read() }; };
+
+		void SetValues(const std::vector<SM_Value>& values) override
+		{
+			if (!values.empty()) setting.Write(values[0]);
+		};
 	};
 
 	class Slider : public None
@@ -233,8 +252,8 @@ struct CMSetting : public CMTag
 		SM_ValueSlider slider;
 
 		const char* GetTemplate() override { return "SettingSliderTemplate"; }
+		const char* GetTypeName() override { return "Slider"; }
 
-		void Write(const SM_Value& value) override { setting.Write(value); }
 		void Display(Tile* tile) override;
 
 		SM_Value GetPrev(const SM_Value& value) const;
@@ -242,6 +261,12 @@ struct CMSetting : public CMTag
 
 		void Next(bool forward) override;
 		void Last(bool forward) override;
+
+		std::vector<SM_Value> GetValues() override { return { setting.Read() }; };
+		void SetValues(const std::vector<SM_Value>& values) override
+		{
+			if (!values.empty()) setting.Write(values[0]);
+		};
 	};
 
 	class Control : public None
@@ -252,8 +277,21 @@ struct CMSetting : public CMTag
 		IO controller;
 
 		const char* GetTemplate() override { return "SettingControlTemplate"; }
+		const char* GetTypeName() override { return "Control"; }
 
 		void Display(Tile* tile) override;
+
+		std::vector<SM_Value> GetValues() override { return { keyboard.Read(), mouse.Read(), controller.Read() }; };
+
+		void SetValues(const std::vector<SM_Value>& values) override
+		{
+			if (values.size() >= 3)
+			{
+				keyboard.Write(values[0]);
+				mouse.Write(values[1]);
+				controller.Write(values[2]);
+			}
+		};
 	};
 
 	class Font : public None
@@ -263,8 +301,8 @@ struct CMSetting : public CMTag
 		IO fontY;
 
 		const char* GetTemplate() override { return "SettingFontTemplate"; }
+		const char* GetTypeName() override { return "Font"; }
 
-		void Write(const SM_Value& value) override { font.Write(value); fontY.Write(value); }
 		void Display(Tile* tile) override;
 
 		static SM_Value GetPrev(const SM_Value& value);
@@ -272,6 +310,16 @@ struct CMSetting : public CMTag
 
 		void Next(bool forward) override;
 		void Last(bool forward) override;
+
+		std::vector<SM_Value> GetValues() override { return { font.Read(), fontY.Read() }; };
+		void SetValues(const std::vector<SM_Value>& values) override
+		{
+			if (values.size() >= 2)
+			{
+				font.Write(values[0]);
+				fontY.Write(values[1]);
+			}
+		};
 	};
 
 	class Input : public None
@@ -295,6 +343,9 @@ struct CMSetting : public CMTag
 	CMSetting* Last(const bool forward = true) { data->Last(forward); return this; }
 	CMSetting* Display(Tile* tile) { data->Display(tile); return this; };
 	const char* GetTemplate() const { return data->GetTemplate(); }
+
+	std::vector<SM_Value> GetValues() const { return data->GetValues(); }
+	void SetValues(const std::vector<SM_Value>& values) const { return data->SetValues(values); }
 
 	ElementType type;
 	std::unique_ptr<None> data;
@@ -327,6 +378,9 @@ enum TileIDs
 	kModConfigurationMenu_Exit = 7,
 	kModConfigurationMenu_Back = 8,
 	kModConfigurationMenu_DeviceButton = 30,
+	kModConfigurationMenu_Default = 31,
+	kModConfigurationMenu_SaveToJSON = 32,
+	kModConfigurationMenu_LoadFromJSON = 33,
 
 	kModConfigurationMenu_ModList = 11,
 	kModConfigurationMenu_ModListItem = 12,
@@ -484,6 +538,9 @@ public:
 	
 	OSInputGlobals::ControlType controlDevice = OSInputGlobals::kControlType_Keyboard;
 
+	CMMod* activeMod;
+	CMSetting* activeSetting;
+
 	bool HasTiles();
 	void Close();
 	void RefreshFilter();
@@ -493,11 +550,17 @@ public:
 	void DisplayMods();
 	void DisplaySettings(std::string tab);
 
-	void SelectMod(Tile* mod);
-	void SelectSetting(Tile* mod);
+	void SelectMod(CMMod* mod);
+	void SelectSetting(CMSetting* mod);
+
+	void ClickMod(Tile* mod);
+	void ClickSetting(Tile* mod);
 
 	void FilterMods();
 	void FilterSettings();
+
+	void SaveModJSON(CMMod* mod);
+	void LoadModJSON(CMMod* mod);
 
 	void SetActiveSubsettingValueFromInput();
 	bool GetInHotkeyMode();
@@ -512,6 +575,9 @@ public:
 
 	void Back();
 	void Device();
+	void Default();
+
+	std::vector<CMSetting*> GetSettingsForString(std::string str);
 };
 
 

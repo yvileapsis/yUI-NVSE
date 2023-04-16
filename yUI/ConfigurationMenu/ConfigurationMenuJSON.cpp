@@ -118,7 +118,7 @@ SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem)
 		if (elem.contains("valueMin")) valueMin = GetValueFromElement(elem["valueMin"]);
 		else valueMin = (SInt32) MININT32;
 		if (elem.contains("valueMax")) valueMax = GetValueFromElement(elem["valueMax"]);
-		else valueMax = (SInt32)MAXINT32;
+		else valueMax = (SInt32) MAXINT32;
 		if (elem.contains("valueDelta")) valueDelta = GetValueFromElement(elem["valueDelta"]);
 		else valueMin = (SInt32) 1;
 
@@ -150,6 +150,13 @@ SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem)
 		None none{};
 
 		data = std::make_unique<None>(none);
+	}
+
+	if (id.empty())
+	{
+		for (const auto mod : mods) id += mod;
+		id += data->GetTypeName();
+		id += R"(=')" + name + R"(')";
 	}
 }
 
@@ -198,5 +205,45 @@ void ModConfigurationMenu::ReadJSONForPath(const std::filesystem::path& path)
 	{
 		if (iter.is_directory()) continue;
 		if (iter.path().extension().string() == ".json") ReadJSON(iter.path());
+	}
+}
+
+void ModConfigurationMenu::SaveModJSON(CMMod* mod)
+{
+	nlohmann::basic_json<> j;
+	const std::filesystem::path& path = GetCurPath() + R"(\Data\Config\ConfigurationMenu\)" + mod->GetID() + ".json";
+	std::ofstream i(path);
+
+	for (const auto& setting : GetSettingsForString(mod->GetID()))
+	{
+		j[setting->GetID()].clear();
+		for (const auto& value : setting->GetValues())
+			if (value.IsString())
+				j[setting->GetID()].push_back(value.GetAsString());
+			else if (value.IsFloat())
+				j[setting->GetID()].push_back(value.GetAsFloat());
+			else
+				j[setting->GetID()].push_back(value.GetAsInteger());
+	}
+
+
+	i << j;
+	i.close();
+}
+
+void ModConfigurationMenu::LoadModJSON(CMMod* mod)
+{
+	nlohmann::basic_json<> j;
+	const std::filesystem::path& path = GetCurPath() + R"(\Data\Config\ConfigurationMenu\)" + mod->GetID() + ".json";
+	std::ifstream i(path);
+
+	i >> j;
+
+	for (const auto& setting : g_Settings)
+	{
+		std::vector<SM_Value> vector;
+		for (const auto& iter : j[setting->GetID()])
+			vector.push_back(GetValueFromElement(iter));
+		setting->SetValues(vector);
 	}
 }

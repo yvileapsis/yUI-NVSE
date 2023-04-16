@@ -253,10 +253,21 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 		HandleMouseover(kModConfigurationMenu_SettingCategoryText, nullptr);
 		break;
 	}
+	case kModConfigurationMenu_SaveToJSON: {
+		SaveModJSON(activeMod);
+		for (const auto& iter : settingsListBox.list) iter->object->Display(iter->tile);
+		break;
+	}
+	case kModConfigurationMenu_LoadFromJSON: {
+		LoadModJSON(activeMod);
+		for (const auto& iter : settingsListBox.list) iter->object->Display(iter->tile);
+		break;
+	}
+	case kModConfigurationMenu_Default: { Default(); break; }
 	case kModConfigurationMenu_DeviceButton: { Device(); break; }
 	case kModConfigurationMenu_Exit: { Back(); break; }
-	case kModConfigurationMenu_ModListItem: { SelectMod(clickedTile); break; }
-	case kModConfigurationMenu_SettingListItem: { SelectSetting(clickedTile); break; }
+	case kModConfigurationMenu_ModListItem: { ClickMod(clickedTile); break; }
+	case kModConfigurationMenu_SettingListItem: { ClickSetting(clickedTile); break; }
 	case kModConfigurationMenu_SearchIcon:
 	{
 		//		this->SetInSearchMode(true);

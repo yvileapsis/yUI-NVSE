@@ -53,16 +53,6 @@ inline void WriteINIInternal(const std::filesystem::path& iniPath, const CMSetti
 	ini.SaveFile(iniPath.c_str(), false);
 }
 
-
-std::optional<SM_Value> CMSetting::IO::ReadSaved()
-{
-	return {};
-}
-
-void CMSetting::IO::WriteSaved(const SM_Value& value) const
-{
-}
-
 std::optional<SM_Value> CMSetting::IO::ReadINI()
 {
 	std::filesystem::path iniPath = GetCurPath();
@@ -164,20 +154,20 @@ void CMSetting::IO::WriteGlobal(const SM_Value& value) const
 
 SM_Value CMSetting::IO::Read()
 {
-	if (g_saveValue) 
-		if (const auto saved =		ReadSaved()) return saved.value();
+//	if (g_saveValue) 
+//		if (const auto saved =		ReadSaved()) return saved.value();
 	if (const auto ini =			ReadINI()) return ini.value();
 	if (const auto xml =			ReadXML()) return xml.value();
 	if (const auto global =			ReadGlobal()) return global.value();
 	if (const auto gameSetting =	ReadGameSetting()) return gameSetting.value();
-	if (const auto gameINI =		ReadGameSetting()) return gameINI.value();
+	if (const auto gameINI =		ReadGameINI()) return gameINI.value();
 	return defaultValue;
 }
 
 void CMSetting::IO::Write(const SM_Value& value) const
 {
-	if (g_saveValue) 
-		WriteSaved(value);
+//	if (g_saveValue) 
+//		WriteSaved(value);
 	WriteINI(value);
 	WriteXML(value);
 	WriteGlobal(value);
