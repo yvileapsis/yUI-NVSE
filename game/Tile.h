@@ -247,7 +247,7 @@ public:
 		Value* ptr;
 	public:
 		ValueCaster(Value* ptr = nullptr) : ptr(ptr) {};
-		explicit operator bool() const { return ptr && (ptr->num || ptr->str || ptr->action); }
+		explicit operator bool() const { return ptr; }
 		operator Float32() const { return ptr && ptr->num ? ptr->num : 0.0; }
 		explicit operator UInt32() const { return ptr && ptr->num ? ptr->num : 0; }
 		operator const char*() const { return ptr && ptr->str ? ptr->str : ""; }

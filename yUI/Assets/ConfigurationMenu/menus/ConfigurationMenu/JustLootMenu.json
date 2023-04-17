@@ -9,7 +9,7 @@
 	
 	"category": {
 		"plugin": "yUI",
-		"doublestacked": 0,
+		"doublestacked": 1,
 		"allTag": 1,
 		"category": "JLM"
 	}
@@ -19,7 +19,13 @@
 	"description": "",
 	"categories": [ "JLM" ],
 	"tags": [ "Visuals" ],
-	"condition": [ { "JLMbEnable": 1 } ]
+	"condition": [ { "JLMbEnable": 1 } ],
+	
+	"category": {
+		"doublestacked": 1,
+		"allTag": 1,
+		"category": "JLMVisuals"
+	}
 },
 {
 	"name": "Enable Just Loot Menu",
@@ -467,15 +473,15 @@
 		"value": "iJustify",
 
 		"values": [
-			{ "value": 1, "name": "Upper Left" },
-			{ "value": 2, "name": "Upper Center" },
-			{ "value": 3, "name": "Upper Right" },
-			{ "value": 4, "name": "Center Left" },
-			{ "value": 5, "name": "True Center" },
-			{ "value": 6, "name": "Center Right" },
-			{ "value": 7, "name": "Lower Left" },
-			{ "value": 8, "name": "Lower Center" },
-			{ "value": 9, "name": "Lower Right" }
+			{ "value": 1, "id": "Upper Left" },
+			{ "value": 2, "id": "Upper Center" },
+			{ "value": 3, "id": "Upper Right" },
+			{ "value": 4, "id": "Center Left" },
+			{ "value": 5, "id": "True Center" },
+			{ "value": 6, "id": "Center Right" },
+			{ "value": 7, "id": "Lower Left" },
+			{ "value": 8, "id": "Lower Center" },
+			{ "value": 9, "id": "Lower Right" }
 		]
 	}
 },
@@ -639,7 +645,7 @@
 		"category": "Loot Menu",
 		"value": "iWeightVisible",
 
-		"values": [ { "name": "OFF" }, { "name": "Overenc." }, { "name": "ON" } ]
+		"values": [ { "id": "OFF" }, { "id": "Overenc." }, { "id": "ON" } ]
 	}
 },
 {
@@ -656,7 +662,7 @@
 		"category": "Loot Menu",
 		"value": "iWeightAltColor",
 
-		"values": [ { "name": "OFF" }, { "name": "Overenc." }, { "name": "Item" } ]
+		"values": [ { "id": "OFF" }, { "id": "Overenc." }, { "id": "Item" } ]
 	}
 },
 {

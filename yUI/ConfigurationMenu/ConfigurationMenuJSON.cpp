@@ -1,8 +1,10 @@
 #include "ConfigurationMenu.h"
+
 #include "json.h"
 
 class TagJSON : public CMTag { public: TagJSON(const nlohmann::basic_json<>& elem); };
 class SettingJSON : public CMSetting { public: SettingJSON(const nlohmann::basic_json<>& elem); };
+
 
 template <typename T> std::vector<T> GetSetFromElement(const nlohmann::basic_json<>& elem)
 {
@@ -12,35 +14,94 @@ template <typename T> std::vector<T> GetSetFromElement(const nlohmann::basic_jso
 	return set;
 }
 
-SM_Value GetValueFromElement(const nlohmann::basic_json<>& elem)
+class CMValueJSON : public SM_Value { public : CMValueJSON(const nlohmann::basic_json<>& elem) : SM_Value()
 {
-	if (elem.is_number_integer() || elem.is_number_unsigned()) return elem.get<SInt32>();
-	if (elem.is_string()) return elem.get<std::string>();
-	if (elem.is_number_float()) return elem.get<Float64>();
-	return static_cast<SInt32>(0);
-}
+	if (elem.is_number_integer() || elem.is_number_unsigned())
+		Set(static_cast<SInt64>(elem.get<SInt32>()));;
+	if (elem.is_string())
+		Set(elem.get<std::string>());
+	if (elem.is_number_float()) 
+		Set(elem.get<Float64>());
+} };
 
-CMSetting::IO GetSourceFromElement(const nlohmann::basic_json<>& elem, const std::string& path = "path",
-                                               const std::string& category = "category", const std::string&
-                                               value = "value", const std::string& valueDefault = "valueDefault")
+class CMSettingIOJSON : public CMSetting::IO { public: CMSettingIOJSON(const nlohmann::basic_json<>& elem)
 {
-	CMSetting::IO source{};
-
 	std::filesystem::path pathGot;
 	std::string categoryGot, valueGot;
 
-	if (elem.contains(path))		pathGot = elem[path].get<std::string>();
-	if (elem.contains(category))	categoryGot = elem[category].get<std::string>();
-	if (elem.contains(value))		valueGot = elem[value].get<std::string>();
+	if (elem.contains("path"))		pathGot = elem["path"].get<std::string>();
+	if (elem.contains("category"))	categoryGot = elem["category"].get<std::string>();
+	if (elem.contains("value"))		valueGot = elem["value"].get<std::string>();
 
-	source.ini = std::make_tuple(pathGot, categoryGot, valueGot);
+	ini = std::make_tuple(pathGot, categoryGot, valueGot);
 
-	if (elem.contains(valueDefault)) source.defaultValue = GetValueFromElement(elem[valueDefault]);
+	if (elem.contains("default"))		defaultValue = CMValueJSON(elem["default"]);
+	if (elem.contains("xml"))			xml = elem["xml"].get<std::string>();
+	if (elem.contains("global"))		global = elem["global"].get<std::string>();
+	if (elem.contains("gamesetting"))	gamesetting = elem["gamesetting"].get<std::string>();
+	if (elem.contains("gameini"))		gameini = elem["gameini"].get<std::string>();
+} };
 
-	if (elem.contains("xmlGlobal")) source.xml = elem["xmlGlobal"].get<std::string>();
+class SettingNoneJSON : public CMSetting::None { public: SettingNoneJSON() = default; };
 
-	return source;
-}
+class SettingCategoryJSON : public CMSetting::Category { public: SettingCategoryJSON(const nlohmann::basic_json<>& elem)
+{
+	if (elem.contains("mod"))			mod = elem["mod"].get<std::string>();
+	if (elem.contains("plugin"))		plugin = elem["plugin"].get<std::string>();
+	if (elem.contains("category"))		category = elem["category"].get<std::string>();
+
+	if (elem.contains("doublestacked"))	doublestacked = elem["doublestacked"].get<UInt32>();
+	if (elem.contains("allTag"))		allTag = elem["allTag"].get<UInt32>();
+}};
+
+class SettingSliderJSON : public CMSetting::Slider { public: SettingSliderJSON(const nlohmann::basic_json<>& elem)
+{
+	setting = CMSettingIOJSON(elem);
+
+	if (elem.contains("min")) min = CMValueJSON(elem["min"]);
+	else min = (SInt32)MININT32;
+	if (elem.contains("max")) max = CMValueJSON(elem["max"]);
+	else max = (SInt32)MAXINT32;
+	if (elem.contains("delta")) delta = CMValueJSON(elem["delta"]);
+	else delta = (SInt32)1;
+} };
+
+class SettingChoiceJSON : public CMSetting::Choice { public: SettingChoiceJSON(const nlohmann::basic_json<>& elem)
+{
+	setting = CMSettingIOJSON(elem);
+
+	SInt32 valueLess = 0;
+	if (!elem.contains("values")) {}
+	else for (const auto& i : elem["values"])
+	{
+		SM_Value value;
+		std::string name;
+		std::string description;
+
+		if (i.contains("value")) value = CMValueJSON(i["value"]);
+		else value = (SInt32) valueLess++;
+		if (i.contains("id")) name = i["id"].get<std::string>();
+		else name = (value).GetAsString();
+		if (i.contains("description")) description = i["description"].get<std::string>();
+
+		choice.emplace(value, name);
+	}
+}};
+
+class SettingControlJSON : public CMSetting::Control { public: SettingControlJSON(const nlohmann::basic_json<>& elem)
+{
+	keyboard = CMSettingIOJSON(elem["keyboard"]);
+	mouse = CMSettingIOJSON(elem["mouse"]);
+	controller = CMSettingIOJSON(elem["controller"]);
+} };
+
+class SettingFontJSON : public CMSetting::Font { public: SettingFontJSON(const nlohmann::basic_json<>& elem)
+{
+	font = CMSettingIOJSON(elem);
+	fontY = CMSettingIOJSON(elem["fontY"]);
+}};
+
+class SettingInputJSON : public CMSetting::Input { public: SettingInputJSON(const nlohmann::basic_json<>& elem); };
 
 TagJSON::TagJSON(const nlohmann::basic_json<>& elem)
 {
@@ -53,94 +114,18 @@ SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem)
 {
 	if (elem.contains("id"))			id = elem["id"].get<std::string>();
 	if (elem.contains("name"))			name = elem["name"].get<std::string>();
+	if (elem.contains("shortName"))		nameShort = elem["shortName"].get<std::string>();
 	if (elem.contains("description"))	description = elem["description"].get<std::string>();
 
 	if (elem.contains("tags"))			tags.insert_range(GetSetFromElement<std::string>(elem["tags"]));
-	if (elem.contains("mods"))			mods.insert_range(GetSetFromElement<std::string>(elem["mods"]));
+	if (elem.contains("categories"))	mods.insert_range(GetSetFromElement<std::string>(elem["categories"]));
 
-	if (!elem.contains("type"))			type = kSettingType_None;
-	else
-	{
-		const auto typeString = elem["type"].get<std::string>();
-		if (typeString == "choice")				type = kSettingType_Choice;
-		else if (typeString == "control")		type = kSettingType_Control;
-		else if (typeString == "slider")		type = kSettingType_Slider;
-		else if (typeString == "subsetting")	type = kSettingType_Subsetting;
-		else if (typeString == "font")			type = kSettingType_Font;
-		else									type = kSettingType_None;
-	}
-
-	if (type == kSettingType_Choice)
-	{
-		Choice choice{};
-
-		choice.setting = GetSourceFromElement(elem);
-
-		SInt32 valueLess = 0;
-		if (!elem.contains("values")) {}
-		else for (const auto& i : elem["values"])
-		{
-			SM_Value value;
-			std::string name;
-			std::string description;
-
-			if (i.contains("value")) value = GetValueFromElement(i["value"]);
-			else value = valueLess++;
-			if (i.contains("name")) name = i["name"].get<std::string>();
-			else name = (value).GetAsString();
-			if (i.contains("description")) description = i["description"].get<std::string>();
-
-			choice.choice.emplace(value, name);
-		}
-
-		data = std::make_unique<Choice>(choice);
-	}
-	else if (type == kSettingType_Slider)
-	{
-		Slider slider{};
-
-		SM_Value valueMin, valueMax, valueDelta;
-
-		slider.setting = GetSourceFromElement(elem);
-
-		if (elem.contains("valueMin")) valueMin = GetValueFromElement(elem["valueMin"]);
-		else valueMin = (SInt32) MININT32;
-		if (elem.contains("valueMax")) valueMax = GetValueFromElement(elem["valueMax"]);
-		else valueMax = (SInt32) MAXINT32;
-		if (elem.contains("valueDelta")) valueDelta = GetValueFromElement(elem["valueDelta"]);
-		else valueMin = (SInt32) 1;
-
-		slider.min = valueMin;
-		slider.max = valueMax;
-		slider.delta = valueDelta;
-
-		data = std::make_unique<Slider>(slider);
-	}
-	else if (type == kSettingType_Control)
-	{
-		Control control{};
-
-		control.keyboard = GetSourceFromElement(elem);
-		control.mouse = GetSourceFromElement(elem, "mousePath", "mouseCategory", "mouseValue", "mouseValueDefault");
-		control.controller = GetSourceFromElement(elem, "controllerPath", "controllerCategory", "controllerValue", "controllerValueDefault");
-
-		data = std::make_unique<Control>(control);
-	}
-	else if (type == kSettingType_Font)
-	{
-		Font font{};
-
-		font.font = GetSourceFromElement(elem);
-		font.fontY = GetSourceFromElement(elem, "fontYPath", "fontYCategory", "fontYValue", "fontYDefault");
-
-		data = std::make_unique<Font>(font);
-	}
-	else
-	{
-		None none{};
-
-		data = std::make_unique<None>(none);
-	}
+	if (elem.contains("category"))		data = std::make_unique<Category>(SettingCategoryJSON(elem["category"]));
+	else if (elem.contains("choice"))	data = std::make_unique<Choice>(SettingChoiceJSON(elem["choice"]));
+	else if (elem.contains("slider"))	data = std::make_unique<Slider>(SettingSliderJSON(elem["slider"]));
+	else if (elem.contains("control"))	data = std::make_unique<Control>(SettingControlJSON(elem["control"]));
+	else if (elem.contains("font"))		data = std::make_unique<Font>(SettingFontJSON(elem["font"]));
+	else								data = std::make_unique<None>(SettingNoneJSON());
 
 	if (id.empty())
 	{
@@ -191,13 +176,13 @@ void ModConfigurationMenu::ReadJSONForPath(const std::filesystem::path& path)
 	}
 }
 
-void ModConfigurationMenu::SaveModJSON(CMMod* mod)
+void ModConfigurationMenu::SaveModJSON(CMSetting* mod)
 {
 	nlohmann::basic_json<> j;
 	const std::filesystem::path& path = GetCurPath() + R"(\Data\Config\ConfigurationMenu\)" + mod->GetID() + ".json";
 	std::ofstream i(path);
 
-	for (const auto& setting : GetSettingsForString(mod->GetID()))
+	for (const auto& setting : GetSettingsForString(((CMSetting::Category*) mod->data.get())->category))
 	{
 		j[setting->GetID()].clear();
 		for (const auto& value : setting->GetValues())
@@ -214,7 +199,7 @@ void ModConfigurationMenu::SaveModJSON(CMMod* mod)
 	i.close();
 }
 
-void ModConfigurationMenu::LoadModJSON(CMMod* mod)
+void ModConfigurationMenu::LoadModJSON(CMSetting* mod)
 {
 	nlohmann::basic_json<> j;
 	const std::filesystem::path& path = GetCurPath() + R"(\Data\Config\ConfigurationMenu\)" + mod->GetID() + ".json";
@@ -226,7 +211,7 @@ void ModConfigurationMenu::LoadModJSON(CMMod* mod)
 	{
 		std::vector<SM_Value> vector;
 		for (const auto& iter : j[setting->GetID()])
-			vector.push_back(GetValueFromElement(iter));
+			vector.push_back(CMValueJSON(iter));
 		setting->SetValues(vector);
 	}
 }

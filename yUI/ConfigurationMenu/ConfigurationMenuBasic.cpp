@@ -99,7 +99,7 @@ ModConfigurationMenu::ModConfigurationMenu() : Menu()
 
 	id = MENU_ID;
 	modsListBox.Init();
-	modsListBox.flags &= ~ListBox<CMMod>::kFlag_RecalculateHeightsOnInsert;
+	modsListBox.flags &= ~ListBox<CMSetting>::kFlag_RecalculateHeightsOnInsert;
 
 	searchBar.Init();
 	subSettingInput.Init();
@@ -111,6 +111,10 @@ ModConfigurationMenu::ModConfigurationMenu() : Menu()
 
 	lastXMLWriteTime.dwLowDateTime = 0;
 	lastXMLWriteTime.dwHighDateTime = 0;
+
+	// prevent Escape closing the whole start menu if StewMenu is open
+	*(UInt8*)0x119F348 = 0;
+
 }
 
 
@@ -327,6 +331,7 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 
 bool ModConfigurationMenu::HandleKeyboardInput(UInt32 key)
 {
+	return false;
 	if (IsControlHeld())
 	{
 		if ((key | 0x20) == 'f')
@@ -372,6 +377,7 @@ bool ModConfigurationMenu::HandleKeyboardInput(UInt32 key)
 			}
 			else
 			{
+				return true;
 				PlayGameSound("UIMenuCancel");
 			}
 			return true;
@@ -585,6 +591,7 @@ void ModConfigurationMenu::Update()
 		}
 
 	}
+	return;
 
 	if (this->GetInHotkeyMode())
 	{

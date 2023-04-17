@@ -55,6 +55,8 @@ inline void WriteINIInternal(const std::filesystem::path& iniPath, const CMSetti
 
 std::optional<SM_Value> CMSetting::IO::ReadINI()
 {
+	if (std::get<0>(ini).empty() || std::get<1>(ini).empty() || std::get<2>(ini).empty()) return {};
+
 	std::filesystem::path iniPath = GetCurPath();
 	iniPath += std::get<0>(ini);
 
@@ -71,6 +73,8 @@ std::optional<SM_Value> CMSetting::IO::ReadINI()
 
 void CMSetting::IO::WriteINI(const SM_Value& value) const
 {
+	if (std::get<0>(ini).empty() || std::get<1>(ini).empty() || std::get<2>(ini).empty()) return;
+
 	std::filesystem::path iniPath = GetCurPath();
 	iniPath += std::get<0>(ini);
 
@@ -90,9 +94,15 @@ std::optional<SM_Value> CMSetting::IO::ReadXML()
 		if (val2) return std::string(val2);
 		return {};
 	}
-	if (val) return static_cast<Float32>(val);
-	if (val2) return static_cast<Float32>(val2);
+	if (defaultValue.IsFloat()) {
+		if (val) return static_cast<Float32>(val);
+		if (val2) return static_cast<Float32>(val2);
+		return {};
+	}
+	if (val) return (SInt32) static_cast<Float32>(val);
+	if (val2) return (SInt32) static_cast<Float32>(val2);
 	return {};
+
 }
 
 void CMSetting::IO::WriteXML(const SM_Value& value) const
@@ -102,11 +112,11 @@ void CMSetting::IO::WriteXML(const SM_Value& value) const
 	if (value.IsString())
 	{
 		HUDMainMenu::GetSingleton()->tile->Set(xml.c_str(), value.GetAsString());
-		InterfaceManager::GetSingleton()->globalsTile->Set(xml.c_str(), value.GetAsString());
+		InterfaceManager::GetSingleton()->globalsTile->Set(xml.c_str(), value.GetAsString(), true);
 		return;
 	}
 	HUDMainMenu::GetSingleton()->tile->Set(xml.c_str(), value.GetAsFloat());
-	InterfaceManager::GetSingleton()->globalsTile->Set(xml.c_str(), value.GetAsFloat());
+	InterfaceManager::GetSingleton()->globalsTile->Set(xml.c_str(), value.GetAsFloat(), true);
 }
 
 std::optional<SM_Value> CMSetting::IO::ReadGameSetting()

@@ -9,7 +9,6 @@
 #include <variant>
 
 class CMTag;
-class CMMod;
 class CMSetting;
 
 inline UInt32 g_LogLevel = 3;
@@ -100,6 +99,27 @@ public:
 	explicit operator Float64 () const { return GetAsFloat(); }
 	operator std::string () const { return GetAsString(); }
 
+	SM_Value Set(SInt64 value)
+	{
+		type = kInteger;
+		intval = value;
+		return GetAsInteger();
+	}
+
+	SM_Value Set(Float64 value)
+	{
+		type = kFloat;
+		floatval = value;
+		return GetAsFloat();
+	}
+
+	SM_Value Set(std::string value)
+	{
+		type = kString;
+		stringval = value;
+		return GetAsString();
+	}
+
 	SM_Value operator+(const SM_Value& right) const
 	{
 		if (IsString() && right.IsString())
@@ -122,6 +142,7 @@ class CMTag
 public:
 	std::string id; // TODO: make ID: type + mods alphab. + type + name
 	std::string name;
+	std::string nameShort;
 	std::string description;
 
 	SInt32 priority;
@@ -141,16 +162,6 @@ class CMOption : public CMTag
 public:
 };
 
-class CMMod : public CMTag
-{
-public:
-
-	std::unordered_set<std::string> tags;
-	std::string version;
-
-	static const char* GetTemplate() { return "ModTemplate"; }
-	static void Display(Tile* tile) {}
-};
 
 class CMSetting : public CMTag
 {
@@ -199,6 +210,8 @@ public:
 		virtual const char* GetTemplate() { return GetTemplateAlt(); }
 		virtual const char* GetTypeName() { return "None"; }
 
+		virtual bool IsCategory() { return false; }
+
 		virtual void Display(Tile* tile) {}
 
 		virtual void Next(const bool forward = true) {};
@@ -206,19 +219,32 @@ public:
 
 		virtual std::vector<SM_Value> GetValues() { return {}; };
 		virtual void SetValues(const std::vector<SM_Value>& values) {};
+
+		virtual void Click() {};
 	};
 
-	class Subsetting : public None
+	class Category : public None
 	{
+	public:
 		std::string mod;
+		std::string plugin;
+		bool doublestacked;
+		bool allTag;
+		std::string category;
+
 		const char* GetTemplate() override { return "SettingSubsettingTemplate"; }
 		const char* GetTypeName() override { return "Subsetting"; }
+
+		bool IsCategory() override { return true; }
 
 		std::vector<SM_Value> GetValues() override {
 			return {};
 //			GetSettingsForString(std::string str);
 		};
 		void SetValues(const std::vector<SM_Value>& values) override {};
+
+		void Click() override;
+
 	};
 
 	class Choice : public None
@@ -348,10 +374,11 @@ public:
 	CMSetting* Display(Tile* tile) { data->Display(tile); return this; };
 	const char* GetTemplate() const { return data->GetTemplate(); }
 
+	CMSetting* Click() { data->Click(); return this; }
+
 	std::vector<SM_Value> GetValues() const { return data->GetValues(); }
 	void SetValues(const std::vector<SM_Value>& values) const { return data->SetValues(values); }
 
-	ElementType type;
 	std::unique_ptr<None> data;
 
 	std::unordered_set<std::string> tags;
@@ -370,46 +397,6 @@ void WriteValueToINIs(const char* category, const char* name, const char* value)
 // randomly selected from the unused menu codes between 1001 and 1084 inclusive (to be compatible with the menu visibility array)
 constexpr auto MENU_ID = 1042;
 
-enum TileIDs
-{
-	kModConfigurationMenu_Title = 0,
-
-	kModConfigurationMenu_SelectionText = 4,
-
-	kModConfigurationMenu_SearchBar = 5,
-	kModConfigurationMenu_SearchIcon = 6,
-
-	kModConfigurationMenu_Exit = 7,
-	kModConfigurationMenu_Back = 8,
-	kModConfigurationMenu_DeviceButton = 30,
-	kModConfigurationMenu_Default = 31,
-	kModConfigurationMenu_SaveToJSON = 32,
-	kModConfigurationMenu_LoadFromJSON = 33,
-
-	kModConfigurationMenu_ModList = 11,
-	kModConfigurationMenu_ModListItem = 12,
-
-	kModConfigurationMenu_SettingList = 19,
-	kModConfigurationMenu_SettingListItem = 20,
-
-	kModConfigurationMenu_CategoryLeftArrow = 13,
-	kModConfigurationMenu_CategoryText = 14,
-	kModConfigurationMenu_CategoryRightArrow = 15,
-
-	kModConfigurationMenu_SettingCategoryLeftArrow = 23,
-	kModConfigurationMenu_SettingCategoryText = 24,
-	kModConfigurationMenu_SettingCategoryRightArrow = 25,
-
-
-	kModConfigurationMenu_ChoiceText = 99,
-	kModConfigurationMenu_SliderLeftArrow = 100,
-	kModConfigurationMenu_SliderRightArrow = 101,
-	kModConfigurationMenu_SliderDraggableRect = 102,
-	kModConfigurationMenu_SubsettingInputFieldText = 103,
-	kModConfigurationMenu_SubsettingInputFieldText_BoxBG = 104,
-	kModConfigurationMenu_SliderText = 105,
-};
-
 struct HotkeyField
 {
 	Tile* tile;
@@ -426,10 +413,47 @@ struct HotkeyField
 
 class ModConfigurationMenu : public Menu
 {
-
 public:
-//	void* operator new(size_t size) { return GameHeapAlloc<void>(size); }
-//	void operator delete(void* ptr) { GameHeapFree(ptr); }
+	enum TileIDs
+	{
+		kModConfigurationMenu_Title = 0,
+
+		kModConfigurationMenu_SelectionText = 4,
+
+		kModConfigurationMenu_SearchBar = 5,
+		kModConfigurationMenu_SearchIcon = 6,
+
+		kModConfigurationMenu_Exit = 7,
+		kModConfigurationMenu_Back = 8,
+		kModConfigurationMenu_DeviceButton = 30,
+		kModConfigurationMenu_Default = 31,
+		kModConfigurationMenu_SaveToJSON = 32,
+		kModConfigurationMenu_LoadFromJSON = 33,
+
+		kModConfigurationMenu_ModList = 11,
+		kModConfigurationMenu_ModListItem = 12,
+
+		kModConfigurationMenu_SettingList = 19,
+		kModConfigurationMenu_SettingListItem = 20,
+
+		kModConfigurationMenu_CategoryLeftArrow = 13,
+		kModConfigurationMenu_CategoryText = 14,
+		kModConfigurationMenu_CategoryRightArrow = 15,
+
+		kModConfigurationMenu_SettingCategoryLeftArrow = 23,
+		kModConfigurationMenu_SettingCategoryText = 24,
+		kModConfigurationMenu_SettingCategoryRightArrow = 25,
+
+
+		kModConfigurationMenu_ChoiceText = 99,
+		kModConfigurationMenu_SliderLeftArrow = 100,
+		kModConfigurationMenu_SliderRightArrow = 101,
+		kModConfigurationMenu_SliderDraggableRect = 102,
+		kModConfigurationMenu_SubsettingInputFieldText = 103,
+		kModConfigurationMenu_SubsettingInputFieldText_BoxBG = 104,
+		kModConfigurationMenu_SliderText = 105,
+	};
+
 
 	ModConfigurationMenu();
 
@@ -470,7 +494,6 @@ public:
 	};
 
 	std::map<std::string, std::unique_ptr<CMTag>>	g_Tags;
-	std::vector<std::unique_ptr<CMMod>>			g_Mods;
 	std::vector<std::unique_ptr<CMSetting>>		g_Settings;
 
 	template <typename Item> class ListBoxWithFilter : public ListBox<Item>
@@ -492,7 +515,7 @@ public:
 
 	CMTag* tagDefault = nullptr;
 
-	ListBoxWithFilter<CMMod> modsListBox;
+	ListBoxWithFilter<CMSetting> modsListBox;
 	ListBoxWithFilter<CMSetting> settingsListBox;
 
 	class Description
@@ -508,11 +531,6 @@ public:
 		void operator<<=(const CMSetting* setting) const
 		{
 			Set(setting->GetDescription());
-		}
-
-		void operator<<=(const CMMod* mod) const
-		{
-			Set(mod->GetDescription());
 		}
 
 		template <typename Item> void operator<<=(const ListBoxWithFilter<Item>& listBox) const
@@ -542,7 +560,7 @@ public:
 	
 	OSInputGlobals::ControlType controlDevice = OSInputGlobals::kControlType_Keyboard;
 
-	CMMod* activeMod;
+	CMSetting* activeMod;
 	CMSetting* activeSetting;
 
 	bool HasTiles();
@@ -551,10 +569,10 @@ public:
 	void ReloadMenuXML();
 	bool XMLHasChanges();
 
-	void DisplayMods();
-	void DisplaySettings(std::string tab);
+	void DisplayMods(std::string tab);
+	void DisplaySettings(std::string tab, bool doublestacked = false);
 
-	void SelectMod(CMMod* mod);
+	void SelectMod(CMSetting* mod);
 	void SelectSetting(CMSetting* mod);
 
 	void ClickMod(Tile* mod);
@@ -563,8 +581,8 @@ public:
 	void FilterMods();
 	void FilterSettings();
 
-	void SaveModJSON(CMMod* mod);
-	void LoadModJSON(CMMod* mod);
+	void SaveModJSON(CMSetting* mod);
+	void LoadModJSON(CMSetting* mod);
 
 	void SetActiveSubsettingValueFromInput();
 	bool GetInHotkeyMode();
