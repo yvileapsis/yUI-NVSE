@@ -588,8 +588,6 @@ enum KeyboardMenuInputCode;
 template <class Item> class BSSimpleList
 {
 public:
-	BSSimpleList<Item>() {};
-	~BSSimpleList<Item>() {};
 
 	virtual bool	SetSelectedTile(Tile* tile) { return false; };
 	virtual Tile*	GetSelectedTile() { return nullptr; };
@@ -597,9 +595,8 @@ public:
 	virtual bool	IsMenuEqual(Menu* that) { return false; };
 	virtual void	ScrollToHighlight() {};
 	virtual Tile*	GetTileByIndex(int index, char isNotTileListIndex) { return nullptr; };
-	virtual void	Destructor(bool doFree) {};
-	virtual void	FreeAllTiles() {};
-	virtual void	Sort(SInt32(__cdecl*)(Item*, Item*)) {};
+
+	BSSimpleList() { ThisCall(0x7240C0, this); };
 
 	TList<Item>		list;	// 004
 };	// 00C

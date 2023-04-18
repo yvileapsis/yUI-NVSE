@@ -186,7 +186,7 @@ void CMSetting::Font::Last(const bool forward)
 
 void ModConfigurationMenu::DisplayMods(std::string tab)
 {
-	const auto compareAlphabetically = [](ListBoxItem<CMSetting>* a, ListBoxItem<CMSetting>* b)
+	auto compareAlphabetically = [](ListBoxItem<CMSetting>* a, ListBoxItem<CMSetting>* b)
 	{
 		auto itemA = a->object;
 		auto itemB = b->object;
@@ -199,7 +199,7 @@ void ModConfigurationMenu::DisplayMods(std::string tab)
 		return static_cast<SInt32>( itemA->priority > itemB->priority ? -1 : 1);
 	};
 
-	modsListBox.FreeAllTiles();
+	modsListBox.listBox.FreeAllTiles();
 	modsListBox.ClearTags();
 	modsListBox << "";
 
@@ -211,24 +211,24 @@ void ModConfigurationMenu::DisplayMods(std::string tab)
 
 		if (!mod->data->IsCategory()) continue;
 
-		const auto item = modsListBox.InsertAlt(mod, mod->GetName().c_str());
-		modsListBox.SortAlt(item);
+		const auto item = modsListBox.listBox.InsertAlt(mod, mod->GetName().c_str());
+		modsListBox.listBox.SortAlt(item);
 
 		for (const auto& tag : mod->tags) modsListBox <<= tag;
 	}
 
 	// TODO:: Figure out why it needs Sort, probably something to do with recalculate on insert flag
-	modsListBox.Sort(compareAlphabetically);
+	modsListBox.listBox.Sort(compareAlphabetically);
 
 	++modsListBox;
 }
 
 void ModConfigurationMenu::DisplaySettings(std::string tab, bool doublestacked)
 {
-	settingsListBox.FreeAllTiles();
+	settingsListBox.listBox.FreeAllTiles();
 	settingsListBox.ClearTags();
 
-	settingsListBox.parentTile->Set("_doublestacked", doublestacked);
+	settingsListBox.listBox.parentTile->Set("_doublestacked", doublestacked);
 
 	// TODO: add order of displayed tags;
 	settingsListBox << "";
@@ -248,12 +248,12 @@ void ModConfigurationMenu::SelectMod(CMSetting* mod)
 {
 	activeMod = mod;
 
-	modsListBox.ForEach([](Tile* tile, CMSetting* mod)
+	modsListBox.listBox.ForEach([](Tile* tile, CMSetting* mod)
 	{
 		const auto menu = GetSingleton();
 		tile->Set("_selected", menu->activeMod == mod ? 1 : 0);
 	});
-	modsListBox.parentTile->Set("_selected", 1);
+	modsListBox.listBox.parentTile->Set("_selected", 1);
 
 	mod->Click();
 }
@@ -267,10 +267,10 @@ void ModConfigurationMenu::FilterSettings()
 		if (setting->tags.contains(menu->settingsListBox.tagActive)) return false;
 		return true;
 	};
-	settingsListBox.Filter(filter);
+	settingsListBox.listBox.Filter(filter);
 }
 
-void ModConfigurationMenu::ClickMod(Tile* clickedTile) { SelectMod(modsListBox.GetItemForTile(clickedTile)); }
+void ModConfigurationMenu::ClickMod(Tile* clickedTile) { SelectMod(modsListBox.listBox.GetItemForTile(clickedTile)); }
 
 void ModConfigurationMenu::FilterMods() 
 {
@@ -281,7 +281,7 @@ void ModConfigurationMenu::FilterMods()
 		if (mod->tags.contains(menu->modsListBox.tagActive)) return false;
 		return true;
 	};
-	modsListBox.Filter(filter);
+	modsListBox.listBox.Filter(filter);
 }
 
 
@@ -297,7 +297,7 @@ void ModConfigurationMenu::SelectSetting(CMSetting* setting)
 	}
 }
 
-void ModConfigurationMenu::ClickSetting(Tile* clickedTile) { SelectSetting(settingsListBox.GetItemForTile(clickedTile)); }
+void ModConfigurationMenu::ClickSetting(Tile* clickedTile) { SelectSetting(settingsListBox.listBox.GetItemForTile(clickedTile)); }
 
 int reloadTweaksMenuFrameDelay;
 void __fastcall ReloadTweaksMenuInOneFrameHook(void* startMenu)
@@ -347,13 +347,13 @@ void ModConfigurationMenu::ShowTweaksMenu()
 	const auto sSettings = reinterpret_cast<Setting*>(0x11D1FE0);
 	menuTitle->Set(kTileValue_string, FormatString("Mod %s", sSettings->data.str));
 
-	modsListBox.parentTile = modsListBackground;
-	modsListBox.templateName = "ModTemplate";
-	modsListBox.scrollBar = modsListBox.parentTile->GetChild("lb_scrollbar");
+	modsListBox.listBox.parentTile = modsListBackground;
+	modsListBox.listBox.templateName = "ModTemplate";
+	modsListBox.listBox.scrollBar = modsListBox.listBox.parentTile->GetChild("lb_scrollbar");
 
-	settingsListBox.parentTile = settingsListBackground;
-	settingsListBox.templateName = CMSetting::None::GetTemplateAlt();
-	settingsListBox.scrollBar = settingsListBox.parentTile->GetChild("lb_scrollbar");
+	settingsListBox.listBox.parentTile = settingsListBackground;
+	settingsListBox.listBox.templateName = CMSetting::None::GetTemplateAlt();
+	settingsListBox.listBox.scrollBar = settingsListBox.listBox.parentTile->GetChild("lb_scrollbar");
 
 	if (!tagDefault)
 	{
@@ -408,36 +408,33 @@ std::vector<CMSetting*> ModConfigurationMenu::GetSettingsForString(std::string s
 	return ret;
 }
 
-template <typename Item> void ModConfigurationMenu::ListBoxWithFilter<Item>::UpdateTagString()
+void ModConfigurationMenu::ListBoxWithFilter::UpdateTagString()
 {
 	const auto menu = GetSingleton();
 	const auto tag = menu->g_Tags[tagActive].get();
 	tagTile->Set(kTileValue_string, tag ? tag->GetName() : tagActive);
 }
 
-template <typename Item>
-void ModConfigurationMenu::ListBoxWithFilter<Item>::ClearTags()
+void ModConfigurationMenu::ListBoxWithFilter::ClearTags()
 {
 	tags.clear();
 }
 
-template <typename Item> void ModConfigurationMenu::ListBoxWithFilter<Item>::operator<<(const std::string& tag)
+void ModConfigurationMenu::ListBoxWithFilter::operator<<(const std::string& tag)
 {
 	tagActive = tag;
 	UpdateTagString();
 }
 
-template <typename Item>
-void ModConfigurationMenu::ListBoxWithFilter<Item>::operator<<=(const std::string& tag)
+void ModConfigurationMenu::ListBoxWithFilter::operator<<=(const std::string& tag)
 {
 	tags.emplace(tag);
 }
 
-template <typename Item>
-ListBoxItem<Item>* ModConfigurationMenu::ListBoxWithFilter<Item>::operator<<=(Item* tag)
+ListBoxItem<CMSetting>* ModConfigurationMenu::ListBoxWithFilter::operator<<=(CMSetting* tag)
 {
-	const auto item = this->InsertAlt(tag, tag->GetName().c_str(), tag->GetTemplate());
-	this->SortAlt(item);
+	const auto item = this->listBox.InsertAlt(tag, tag->GetName().c_str(), tag->GetTemplate());
+	this->listBox.SortAlt(item);
 	return item;
 }
 
@@ -774,7 +771,7 @@ void ModConfigurationMenu::RefreshFilter()
 {
 	//	modsListBox.Filter(TweakFilter);
 
-	auto textColor = modsListBox.GetNumVisibleItems() ? 1 : 2;
+	auto textColor = modsListBox.listBox.GetNumVisibleItems() ? 1 : 2;
 	searchBar.tile->Set(kTileValue_systemcolor, textColor);
 
 //	if (auto selectedTile = modsListBox.GetTileFromItem(&activeMod))

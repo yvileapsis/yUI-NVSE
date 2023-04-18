@@ -3,23 +3,12 @@
 #include "functions.h"
 #include "InterfaceManager.h"
 
-_declspec(naked) bool IsControllerConnected()
-{
-	_asm
-	{
-		cmp byte ptr ds : [0x11D8C50] , 1 // isControllerDisabled
-		je done
-		cmp byte ptr ds : [0x11D8A84] , 0 // isControllerConnected
-		done :
-		setne al
-		ret
-	}
-}
+bool IsControllerConnected() { return *(UInt8*)0x11D8C50 || *(UInt8*)0x11D8A84 == 0; }
 
 // called by TileMenu::InitMenu
 UInt32 ModConfigurationMenu::GetID() { return MENU_ID; }
 
-// not a true unique_ptr since scope is partly managed by the game
+// not a true unique_ptr since scope is partly managed by the game, 
 std::unique_ptr<ModConfigurationMenu> g_ConfigurationMenu;
 
 ModConfigurationMenu* ModConfigurationMenu::GetSingleton() { return g_ConfigurationMenu.get(); }
@@ -98,13 +87,13 @@ ModConfigurationMenu::ModConfigurationMenu() : Menu()
 	memset(tiles, 0, sizeof tiles);
 
 	id = MENU_ID;
-	modsListBox.Init();
-	modsListBox.flags &= ~ListBox<CMSetting>::kFlag_RecalculateHeightsOnInsert;
+
+//	ThisCall(0x723750, &modsListBox);
+	modsListBox.listBox.flags &= ~ListBox<CMSetting>::kFlag_RecalculateHeightsOnInsert;
 
 	searchBar.Init();
 	subSettingInput.Init();
 	hotkeyInput.Init();
-	settingsListBox.Init();
 
 //	description.Set("");
 //	settingsListBox.flags &= ~ModsListBox::kFlag_RecalculateHeightsOnInsert;
@@ -137,8 +126,6 @@ ModConfigurationMenu::~ModConfigurationMenu()
 	// if we're in the destructor unique_ptr should be invalid
 	g_ConfigurationMenu.release();
 
-	modsListBox.Destroy();
-	settingsListBox.Destroy();
 	searchBar.Free();
 	subSettingInput.Free();
 	hotkeyInput.Free();
@@ -175,7 +162,7 @@ void ModConfigurationMenu::HandleActiveMenuClickHeld(UInt32 tileID, Tile* active
 {
 	if (tileID == kModConfigurationMenu_SliderDraggableRect)
 	{
-		auto setting = this->settingsListBox.GetItemForTile(activeTile->parent);
+		auto setting = this->settingsListBox.listBox.GetItemForTile(activeTile->parent);
 		/*	if (setting->IsSlider())
 			{
 				auto newValue = activeTile->GetFloat(_ValueTrait);
@@ -205,7 +192,7 @@ void ModConfigurationMenu::HandleActiveMenuClickHeld(UInt32 tileID, Tile* active
 		if (InterfaceManager::GetSingleton()->timeLeftClickHeld > 0.3)
 		{
 			const auto option = activeTile->parent;
-			settingsListBox.GetItemForTile(option)->Next(tileID != kModConfigurationMenu_SliderLeftArrow)->Display(option);
+			settingsListBox.listBox.GetItemForTile(option)->Next(tileID != kModConfigurationMenu_SliderLeftArrow)->Display(option);
 		}
 	}
 }
@@ -218,7 +205,7 @@ void ModConfigurationMenu::HandleLeftClick(UInt32 tileID, Tile* clickedTile)
 	}
 }
 
-template <typename Item> void ModConfigurationMenu::ListBoxWithFilter<Item>::operator++()
+void ModConfigurationMenu::ListBoxWithFilter::operator++()
 {
 	if (tags.empty()) return;
 	auto iter = tags.find(tagActive);
@@ -226,7 +213,7 @@ template <typename Item> void ModConfigurationMenu::ListBoxWithFilter<Item>::ope
 	UpdateTagString();
 }
 
-template <typename Item> void ModConfigurationMenu::ListBoxWithFilter<Item>::operator--()
+void ModConfigurationMenu::ListBoxWithFilter::operator--()
 {
 	if (tags.empty()) return;
 	auto iter = tags.find(tagActive);
@@ -259,12 +246,12 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 	}
 	case kModConfigurationMenu_SaveToJSON: {
 		SaveModJSON(activeMod);
-		for (const auto& iter : settingsListBox.list) iter->object->Display(iter->tile);
+		for (const auto& iter : settingsListBox.listBox.list) iter->object->Display(iter->tile);
 		break;
 	}
 	case kModConfigurationMenu_LoadFromJSON: {
 		LoadModJSON(activeMod);
-		for (const auto& iter : settingsListBox.list) iter->object->Display(iter->tile);
+		for (const auto& iter : settingsListBox.listBox.list) iter->object->Display(iter->tile);
 		break;
 	}
 	case kModConfigurationMenu_Default: { Default(); break; }
@@ -281,24 +268,24 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 	{
 		const auto option = clickedTile->parent;
 		if (!IsShiftHeld())
-			settingsListBox.GetItemForTile(option)->Next(false)->Display(option);
+			settingsListBox.listBox.GetItemForTile(option)->Next(false)->Display(option);
 		else
-			settingsListBox.GetItemForTile(option)->Last(false)->Display(option);
+			settingsListBox.listBox.GetItemForTile(option)->Last(false)->Display(option);
 		break;
 	}
 	case kModConfigurationMenu_ChoiceText:
 	{
 		const auto option = clickedTile->parent;
-		settingsListBox.GetItemForTile(option)->Next(!IsShiftHeld())->Display(option);
+		settingsListBox.listBox.GetItemForTile(option)->Next(!IsShiftHeld())->Display(option);
 		break;
 	}
 	case kModConfigurationMenu_SliderRightArrow:
 	{
 		const auto option = clickedTile->parent;
 		if (!IsShiftHeld())
-			settingsListBox.GetItemForTile(option)->Next()->Display(option);
+			settingsListBox.listBox.GetItemForTile(option)->Next()->Display(option);
 		else
-			settingsListBox.GetItemForTile(option)->Last()->Display(option);
+			settingsListBox.listBox.GetItemForTile(option)->Last()->Display(option);
 		break;
 	}
 	case kModConfigurationMenu_SliderText:
@@ -310,7 +297,7 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 		{
 			auto inputFieldTextTile = clickedTile->GetChildByID(kModConfigurationMenu_SubsettingInputFieldText);
 			subSettingInput.tile = inputFieldTextTile;
-			auto setting = settingsListBox.GetItemForTile(tile);
+			auto setting = settingsListBox.listBox.GetItemForTile(tile);
 			/*
 			if (setting->IsSlider())
 			{
@@ -418,33 +405,33 @@ bool ModConfigurationMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode co
 	}
 	case kMenu_ShiftLeft:
 	{
-		if (modsListBox.GetSelectedTile())
+		if (modsListBox.listBox.GetSelectedTile())
 		{
-			modsListBox.SaveScrollPosition();
+			modsListBox.listBox.SaveScrollPosition();
 			//			this->HandleMouseover(kModConfigurationMenu_CategoriesBackground, nullptr);
 			//			categoriesListBox.RestorePosition();
 		}
-		else if (settingsListBox.GetSelectedTile() && modsListBox.GetNumVisibleItems())
+		else if (settingsListBox.listBox.GetSelectedTile() && modsListBox.listBox.GetNumVisibleItems())
 		{
-			settingsListBox.SaveScrollPosition();
+			settingsListBox.listBox.SaveScrollPosition();
 			this->HandleMouseover(kModConfigurationMenu_ModList, nullptr);
-			modsListBox.RestorePosition();
+			modsListBox.listBox.RestorePosition();
 		}
 		return true;
 	}
 	case kMenu_ShiftRight:
 	{
-		if (modsListBox.GetNumVisibleItems())
+		if (modsListBox.listBox.GetNumVisibleItems())
 		{
 			//			categoriesListBox.SaveScrollPosition();
 			this->HandleMouseover(kModConfigurationMenu_ModList, nullptr);
-			modsListBox.RestorePosition();
+			modsListBox.listBox.RestorePosition();
 		}
-		else if (modsListBox.GetSelectedTile() && settingsListBox.GetNumVisibleItems())
+		else if (modsListBox.listBox.GetSelectedTile() && settingsListBox.listBox.GetNumVisibleItems())
 		{
-			modsListBox.SaveScrollPosition();
+			modsListBox.listBox.SaveScrollPosition();
 			this->HandleMouseover(kModConfigurationMenu_SettingList, nullptr);
-			settingsListBox.RestorePosition();
+			settingsListBox.listBox.RestorePosition();
 		}
 		return true;
 	}
@@ -496,22 +483,22 @@ void ModConfigurationMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 	}
 	case kModConfigurationMenu_ModListItem:
 	{
-		description <<= modsListBox.GetItemForTile(activeTile);
+		description <<= modsListBox.listBox.GetItemForTile(activeTile);
 		break;
 	}
 	case kModConfigurationMenu_SliderDraggableRect:
 	case kModConfigurationMenu_SliderLeftArrow:
 	case kModConfigurationMenu_SliderRightArrow:
 	{
-		auto item = settingsListBox.GetItemForTile(activeTile->parent);
+		auto item = settingsListBox.listBox.GetItemForTile(activeTile->parent);
 		break;
 	}
 	case kModConfigurationMenu_SettingListItem:
 	{
-		settingsListBox.parentTile->GetChild("lb_highlight_box")->Set(kTileValue_x, (Float32) activeTile->Get(kTileValue_x), true);
-		settingsListBox.parentTile->GetChild("lb_highlight_box")->Set(kTileValue_width, (Float32)activeTile->Get(kTileValue_width), true);
+		settingsListBox.listBox.parentTile->GetChild("lb_highlight_box")->Set(kTileValue_x, (Float32) activeTile->Get(kTileValue_x), true);
+		settingsListBox.listBox.parentTile->GetChild("lb_highlight_box")->Set(kTileValue_width, (Float32)activeTile->Get(kTileValue_width), true);
 
-		description <<= settingsListBox.GetItemForTile(activeTile);
+		description <<= settingsListBox.listBox.GetItemForTile(activeTile);
 
 		break;
 	}
@@ -626,7 +613,7 @@ void ModConfigurationMenu::Update()
 			int deadzoneRS = *(UInt32*)0x9455F5;
 			if (abs(rightStickX) > deadzoneRS)
 			{
-				if (auto activeSubsetting = settingsListBox.GetSelected())
+				if (auto activeSubsetting = settingsListBox.listBox.GetSelected())
 				{
 					/*
 					if (activeSubsetting->IsSlider())

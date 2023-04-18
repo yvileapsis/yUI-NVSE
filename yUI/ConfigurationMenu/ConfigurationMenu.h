@@ -496,9 +496,14 @@ public:
 	std::map<std::string, std::unique_ptr<CMTag>>	g_Tags;
 	std::vector<std::unique_ptr<CMSetting>>		g_Settings;
 
-	template <typename Item> class ListBoxWithFilter : public ListBox<Item>
+
+	class ListBoxWithFilter
 	{
 	public:
+		ListBoxWithFilter() {}
+		~ListBoxWithFilter() {}
+
+		ListBox<CMSetting> listBox;
 		std::set<std::string> tags;
 		std::string tagActive;
 		TileText* tagTile;
@@ -510,13 +515,13 @@ public:
 		void operator--();
 		void operator<<(const std::string& tag);
 		void operator<<=(const std::string& tag);
-		ListBoxItem<Item>* operator<<=(Item* tag);
+		ListBoxItem<CMSetting>* operator<<=(CMSetting* tag);
 	};
 
 	CMTag* tagDefault = nullptr;
 
-	ListBoxWithFilter<CMSetting> modsListBox;
-	ListBoxWithFilter<CMSetting> settingsListBox;
+	ListBoxWithFilter modsListBox{};
+	ListBoxWithFilter settingsListBox{};
 
 	class Description
 	{
@@ -533,7 +538,7 @@ public:
 			Set(setting->GetDescription());
 		}
 
-		template <typename Item> void operator<<=(const ListBoxWithFilter<Item>& listBox) const
+		void operator<<=(const ListBoxWithFilter& listBox) const
 		{
 			const auto menu = GetSingleton();
 			if (menu->g_Tags.contains(listBox.tagActive) && menu->g_Tags[listBox.tagActive].get())

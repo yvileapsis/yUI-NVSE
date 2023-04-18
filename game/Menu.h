@@ -194,6 +194,12 @@ template <typename Item> struct ListBoxItem
 template <typename Item> class ListBox : public BSSimpleList<ListBoxItem<Item>>
 {
 public:
+
+	ListBox() { ThisCall(0x723750, this); }
+	virtual	~ListBox() { ThisCall(0x723820, this); };
+	virtual void	FreeAllTiles() {};
+	virtual void	Sort(SInt32(__cdecl*)(ListBoxItem<Item>*, ListBoxItem<Item>*)) {};
+
 	enum
 	{
 		kFlag_RecalculateHeightsOnInsert = 1,
@@ -429,8 +435,7 @@ public:
 	void SetParentEnabled(bool isEnabled) const { parentTile->Set("_enabled", isEnabled); }
 	bool IsEnabled() const { return parentTile && parentTile->Get("_enabled"); }
 	// initialises the fields and appends the menu list to the global listbox array
-	void Init() { ThisCall(0x723750, this); }
-	void Destroy() { ThisCall(0x723820, this); }
+
 };
 static_assert(sizeof(ListBox<void*>) == 0x30);
 
@@ -441,7 +446,7 @@ public:
 
 	Menu() { ThisCall(0xA1C4A0, this); };
 	virtual ~Menu() { ThisCall(0xA1C520, this); };
-//	virtual void	Destructor(bool freeMemory) {};
+
 	virtual void	SetTile(UInt32 tileID, Tile* activeTile) {};
 	virtual void	HandleLeftClick(UInt32 tileID, Tile* activeTile) {};
 	virtual void	HandleClick(UInt32 tileID, Tile* activeTile) {};	// buttonID = <id> trait defined in XML
