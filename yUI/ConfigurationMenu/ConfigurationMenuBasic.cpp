@@ -33,9 +33,6 @@ const char* MenuPath = R"(Data\Menus\ConfigurationMenu.xml)";
 
 ModConfigurationMenu* ModConfigurationMenu::ReloadMenu()
 {
-	//	if (g_ConfigurationMenu) g_ConfigurationMenu->tile->Destroy(true);
-	//	g_ConfigurationMenu = nullptr;
-
 	const auto newDepth = StdCall<Float32>(0xA1DFB0);
 
 	if (!hasAddedNewTrait)
@@ -43,7 +40,6 @@ ModConfigurationMenu* ModConfigurationMenu::ReloadMenu()
 		hasAddedNewTrait = true;
 		CdeclCall(0x9FF8A0, "&ConfigurationMenu;", MENU_ID);
 	}
-
 
 	Tile* tile = InterfaceManager::GetSingleton()->menuRoot->InjectUIXML(MenuPath, true); // creates menu by itself
 
@@ -88,8 +84,7 @@ ModConfigurationMenu::ModConfigurationMenu() : Menu()
 
 	id = MENU_ID;
 
-//	ThisCall(0x723750, &modsListBox);
-	modsListBox.listBox.flags &= ~ListBox<CMSetting>::kFlag_RecalculateHeightsOnInsert;
+//	modsListBox.listBox.flags &= ~ListBox<CMSetting>::kFlag_RecalculateHeightsOnInsert;
 
 	searchBar.Init();
 	subSettingInput.Init();

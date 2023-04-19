@@ -30,7 +30,7 @@ namespace ConfigurationMenu
 	inline void TweaksButtonCallback()
 	{
 		const auto menu = ModConfigurationMenu::ReloadMenu();
-		menu->ShowTweaksMenu();
+		menu->ShowMenuFirstTime();
 		// return the StartMenu to the settings menu, to prevent a visual bug since we don't open a sub-menu
 		//CdeclCall(0x7D0700); // MenuButton:Settings
 	}

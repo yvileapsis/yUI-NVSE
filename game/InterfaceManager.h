@@ -518,7 +518,6 @@ struct __declspec(align(4)) FontTextReplaced
 		wrapLines = 0;
 		length = 0;
 		newLineCharacter = 0;
-		lineWidths.Init();
 	}
 	;
 

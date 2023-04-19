@@ -442,7 +442,18 @@ static_assert(sizeof(ListBox<void*>) == 0x30);
 class Menu
 {
 public:
-	// TODO: figure out why it needs implementations
+
+	// check 1 at 0xA0B174, 0x70D529, 0x70D592 :: set at 0x712224
+	// check 2 at 0x711FF1 :: set 2 at 0xA1D987 (when closes menu), 0xA1DA41
+	// check 4 at 0xA1D9EC (when closing menu) :: set at 0x7036A4, 0x71204D
+	// check 8 at 0x712194 :: set 8 at 0xA1DB8F (when opening menu), 0x720B39
+	enum MenuVisibilityState
+	{
+		kMenuStateIsReady = 0x1,
+		kMenuStateIsFadeOut = 0x2,
+		kMenuStateIsInit = 0x4,
+		kMenuStateIsFadeIn = 0x8,
+	};
 
 	Menu() { ThisCall(0xA1C4A0, this); };
 	virtual ~Menu() { ThisCall(0xA1C520, this); };
@@ -493,25 +504,14 @@ public:
 	UInt8				byte1F;				// 1F
 	UInt32				id;					// 20
 	UInt32				visibilityState;	// 24 :: Initialised to 4
-	// check 1 at 0xA0B174, 0x70D529, 0x70D592 :: set at 0x712224
-	// check 2 at 0x711FF1 :: set 2 at 0xA1D987 (when closes menu), 0xA1DA41
-	// check 4 at 0xA1D9EC (when closing menu) :: set at 0x7036A4, 0x71204D
-	// check 8 at 0x712194 :: set 8 at 0xA1DB8F (when opening menu), 0x720B39
 
 	Menu*					HandleMenuInput(UInt32 tileID, Tile* clickedTile);
 	__forceinline Tile*		AddTileFromTemplate(Tile* destTile, const char* templateName, UInt32 arg3 = 0)	{ return ThisCall<Tile*>(0xA1DDB0, this, destTile, templateName, arg3); }
 	bool					GetTemplateExists(const std::string& templateName) const;
 
-	void					Close()
-	{
-		tile->Set(6002, 1);
-		ThisCall(0xA1D910, this);
-	}
-
-	__forceinline void			Free() { ThisCall(0xA1C520, this); }
-
 	__forceinline void			RegisterTile(Tile* tile, bool noAppendToMenuStack) { ThisCall(0xA1DC70, this, tile, noAppendToMenuStack); };
-	__forceinline void			HideTitle(bool noFadeIn) { ThisCall(0xA1DC20, this, noFadeIn); };
+	__forceinline void			Open(bool noFadeIn = false) { ThisCall(0xA1DC20, this, noFadeIn); }; // fade in
+	__forceinline void			Close() { tile->Set(6002, 1); ThisCall(0xA1D910, this); } // fade out
 
 
 	static bool					IsVisible(const UInt32 menuType);
@@ -527,6 +527,10 @@ public:
 	static bool					RefreshItemsListForm(TESForm* form = nullptr);
 	static void					RefreshItemsListQuick();
 
+	static void  SetTileFade(Tile* tile, bool startToFinish = true, Float32 duration = 0.25)
+	{
+		tile->SetGradual("_alpha", startToFinish ? 0 : 255.0, !startToFinish ? 0 : 255.0, duration);
+	}
 };
 
 class MenuItemEntryList : public ListBox<InventoryChanges>

@@ -47,7 +47,7 @@ struct InputField
 	void Free();
 };
 
-class SM_Value
+class CMValue
 {
 	enum Type
 	{
@@ -63,11 +63,11 @@ class SM_Value
 	std::string stringval;
 
 public:
-	SM_Value() = default;
-	SM_Value(const SInt32 value) : type(kInteger), intval(value) {}
-	explicit SM_Value(const UInt32 value) : type(kInteger), intval(value) {}
-	SM_Value(const Float64 value) : type(kFloat), floatval(value) {}
-	SM_Value(std::string value) : type(kString), stringval(std::move(value)) {}
+	CMValue() = default;
+	CMValue(const SInt32 value) : type(kInteger), intval(value) {}
+	explicit CMValue(const UInt32 value) : type(kInteger), intval(value) {}
+	CMValue(const Float64 value) : type(kFloat), floatval(value) {}
+	CMValue(std::string value) : type(kString), stringval(std::move(value)) {}
 
 	bool IsInteger() const { return type == kInteger; }
 	bool IsFloat() const { return type == kFloat; }
@@ -99,28 +99,28 @@ public:
 	explicit operator Float64 () const { return GetAsFloat(); }
 	operator std::string () const { return GetAsString(); }
 
-	SM_Value Set(SInt64 value)
+	CMValue Set(SInt64 value)
 	{
 		type = kInteger;
 		intval = value;
 		return GetAsInteger();
 	}
 
-	SM_Value Set(Float64 value)
+	CMValue Set(Float64 value)
 	{
 		type = kFloat;
 		floatval = value;
 		return GetAsFloat();
 	}
 
-	SM_Value Set(std::string value)
+	CMValue Set(std::string value)
 	{
 		type = kString;
 		stringval = value;
 		return GetAsString();
 	}
 
-	SM_Value operator+(const SM_Value& right) const
+	CMValue operator+(const CMValue& right) const
 	{
 		if (IsString() && right.IsString())
 			return GetAsString() + right.GetAsString();
@@ -129,7 +129,7 @@ public:
 		return GetAsFloat() + right.GetAsFloat();
 	}
 
-	SM_Value operator-(const SM_Value& right) const
+	CMValue operator-(const CMValue& right) const
 	{
 		if (IsInteger() && right.IsInteger())
 			return GetAsInteger() - right.GetAsInteger();
@@ -180,25 +180,25 @@ public:
 
 		std::string gameini;
 
-		SM_Value defaultValue;
+		CMValue defaultValue;
 
-		std::optional<SM_Value> ReadINI();
-		void WriteINI(const SM_Value& value) const;
+		std::optional<CMValue> ReadINI();
+		void WriteINI(const CMValue& value) const;
 
-		std::optional<SM_Value> ReadXML();
-		void WriteXML(const SM_Value& value) const;
+		std::optional<CMValue> ReadXML();
+		void WriteXML(const CMValue& value) const;
 
-		std::optional<SM_Value> ReadGameSetting();
-		void WriteGameSetting(const SM_Value& value) const;
+		std::optional<CMValue> ReadGameSetting();
+		void WriteGameSetting(const CMValue& value) const;
 
-		std::optional<SM_Value> ReadGameINI();
-		void WriteGameINI(const SM_Value& value) const;
+		std::optional<CMValue> ReadGameINI();
+		void WriteGameINI(const CMValue& value) const;
 
-		std::optional<SM_Value> ReadGlobal();
-		void WriteGlobal(const SM_Value& value) const;
+		std::optional<CMValue> ReadGlobal();
+		void WriteGlobal(const CMValue& value) const;
 
-		SM_Value Read();
-		void Write(const SM_Value& value) const;
+		CMValue Read();
+		void Write(const CMValue& value) const;
 	};
 
 	class None
@@ -217,10 +217,10 @@ public:
 		virtual void Next(const bool forward = true) {};
 		virtual void Last(const bool forward = true) {};
 
-		virtual std::vector<SM_Value> GetValues() { return {}; };
-		virtual void SetValues(const std::vector<SM_Value>& values) {};
+		virtual std::vector<CMValue> GetValues() { return {}; };
+		virtual void SetValues(const std::vector<CMValue>& values) {};
 
-		virtual void Click() {};
+		virtual void Click(Tile* tile) {};
 	};
 
 	class Category : public None
@@ -237,13 +237,10 @@ public:
 
 		bool IsCategory() override { return true; }
 
-		std::vector<SM_Value> GetValues() override {
-			return {};
-//			GetSettingsForString(std::string str);
-		};
-		void SetValues(const std::vector<SM_Value>& values) override {};
+		std::vector<CMValue> GetValues() override;
+		void SetValues(const std::vector<CMValue>& values) override {};
 
-		void Click() override;
+		void Click(Tile* tile) override;
 
 	};
 
@@ -251,22 +248,22 @@ public:
 	{
 	public:
 		IO setting;
-		std::map<SM_Value, std::string> choice;
+		std::map<CMValue, std::string> choice;
 
 		const char* GetTemplate() override { return "SettingChoiceTemplate"; }
 		const char* GetTypeName() override { return "Choice"; }
 
 		void Display(Tile* tile) override;
 
-		SM_Value GetPrev(const SM_Value& value);
-		SM_Value GetNext(const SM_Value& value);
+		CMValue GetPrev(const CMValue& value);
+		CMValue GetNext(const CMValue& value);
 
 		void Next(bool forward) override;
 		void Last(bool forward) override;
 
-		std::vector<SM_Value> GetValues() override { return { setting.Read() }; };
+		std::vector<CMValue> GetValues() override { return { setting.Read() }; };
 
-		void SetValues(const std::vector<SM_Value>& values) override
+		void SetValues(const std::vector<CMValue>& values) override
 		{
 			if (!values.empty()) setting.Write(values[0]);
 		};
@@ -277,23 +274,23 @@ public:
 	public:
 		IO setting;
 
-		SM_Value min;
-		SM_Value max;
-		SM_Value delta;
+		CMValue min;
+		CMValue max;
+		CMValue delta;
 
 		const char* GetTemplate() override { return "SettingSliderTemplate"; }
 		const char* GetTypeName() override { return "Slider"; }
 
 		void Display(Tile* tile) override;
 
-		SM_Value GetPrev(const SM_Value& value) const;
-		SM_Value GetNext(const SM_Value& value) const;
+		CMValue GetPrev(const CMValue& value) const;
+		CMValue GetNext(const CMValue& value) const;
 
 		void Next(bool forward) override;
 		void Last(bool forward) override;
 
-		std::vector<SM_Value> GetValues() override { return { setting.Read() }; };
-		void SetValues(const std::vector<SM_Value>& values) override
+		std::vector<CMValue> GetValues() override { return { setting.Read() }; };
+		void SetValues(const std::vector<CMValue>& values) override
 		{
 			if (!values.empty()) setting.Write(values[0]);
 		};
@@ -311,9 +308,9 @@ public:
 
 		void Display(Tile* tile) override;
 
-		std::vector<SM_Value> GetValues() override { return { keyboard.Read(), mouse.Read(), controller.Read() }; };
+		std::vector<CMValue> GetValues() override { return { keyboard.Read(), mouse.Read(), controller.Read() }; };
 
-		void SetValues(const std::vector<SM_Value>& values) override
+		void SetValues(const std::vector<CMValue>& values) override
 		{
 			if (values.size() >= 3)
 			{
@@ -335,14 +332,14 @@ public:
 
 		void Display(Tile* tile) override;
 
-		static SM_Value GetPrev(const SM_Value& value);
-		static SM_Value GetNext(const SM_Value& value);
+		static CMValue GetPrev(const CMValue& value);
+		static CMValue GetNext(const CMValue& value);
 
 		void Next(bool forward) override;
 		void Last(bool forward) override;
 
-		std::vector<SM_Value> GetValues() override { return { font.Read(), fontY.Read() }; };
-		void SetValues(const std::vector<SM_Value>& values) override
+		std::vector<CMValue> GetValues() override { return { font.Read(), fontY.Read() }; };
+		void SetValues(const std::vector<CMValue>& values) override
 		{
 			if (values.size() >= 2)
 			{
@@ -374,10 +371,10 @@ public:
 	CMSetting* Display(Tile* tile) { data->Display(tile); return this; };
 	const char* GetTemplate() const { return data->GetTemplate(); }
 
-	CMSetting* Click() { data->Click(); return this; }
+	CMSetting* Click(Tile* tile) { data->Click(tile); return this; }
 
-	std::vector<SM_Value> GetValues() const { return data->GetValues(); }
-	void SetValues(const std::vector<SM_Value>& values) const { return data->SetValues(values); }
+	std::vector<CMValue> GetValues() const { return data->GetValues(); }
+	void SetValues(const std::vector<CMValue>& values) const { return data->SetValues(values); }
 
 	std::unique_ptr<None> data;
 
@@ -461,7 +458,6 @@ public:
 
 	~ModConfigurationMenu() override;
 
-//	void	Destructor(bool doFree) override;
 	void	SetTile(UInt32 tileID, Tile* activeTile) override;
 	void	HandleLeftClick(UInt32 tileID, Tile* activeTile) override;
 	void	HandleClick(UInt32 tileID, Tile* activeTile) override;
@@ -501,27 +497,34 @@ public:
 	{
 	public:
 		ListBoxWithFilter() {}
-		~ListBoxWithFilter() {}
+		~ListBoxWithFilter() = default;
 
 		ListBox<CMSetting> listBox;
+
+		std::string categoryActive = "!NotEmpty";
+
+		TileText* tagTile;
 		std::set<std::string> tags;
 		std::string tagActive;
-		TileText* tagTile;
 
 		void UpdateTagString();
-		void ClearTags();
 
 		void operator++();
 		void operator--();
 		void operator<<(const std::string& tag);
 		void operator<<=(const std::string& tag);
-		ListBoxItem<CMSetting>* operator<<=(CMSetting* tag);
+
+		void Display(const std::string& category, bool display, bool all, bool doublestacked = false);
+		void Click(Tile* clickedTile)
+		{
+			listBox.GetItemForTile(clickedTile)->Click(clickedTile);
+		}
 	};
 
 	CMTag* tagDefault = nullptr;
 
-	ListBoxWithFilter modsListBox{};
-	ListBoxWithFilter settingsListBox{};
+	ListBoxWithFilter modsListBox;
+	ListBoxWithFilter settingsListBox;
 
 	class Description
 	{
@@ -530,7 +533,7 @@ public:
 
 		void Set(const std::string& str) const
 		{
-			tile->Set(kTileValue_string, str);
+			if (tile) tile->Set(kTileValue_string, str);
 		}
 
 		void operator<<=(const CMSetting* setting) const
@@ -558,27 +561,20 @@ public:
 
 	HotkeyField hotkeyInput;
 
-	std::map<SM_Value, std::string> fontMap;
+	std::map<CMValue, std::string> fontMap;
 
 	InputField searchBar;
 	FILETIME lastXMLWriteTime;
 	
 	OSInputGlobals::ControlType controlDevice = OSInputGlobals::kControlType_Keyboard;
 
-	CMSetting* activeMod;
-	CMSetting* activeSetting;
+
 
 	bool HasTiles();
 	void Close();
 	void RefreshFilter();
 	void ReloadMenuXML();
 	bool XMLHasChanges();
-
-	void DisplayMods(std::string tab);
-	void DisplaySettings(std::string tab, bool doublestacked = false);
-
-	void SelectMod(CMSetting* mod);
-	void SelectSetting(CMSetting* mod);
 
 	void ClickMod(Tile* mod);
 	void ClickSetting(Tile* mod);
@@ -598,7 +594,7 @@ public:
 	static ModConfigurationMenu* GetSingleton();
 
 	static ModConfigurationMenu* ReloadMenu();
-	void ShowTweaksMenu();
+	void ShowMenuFirstTime();
 
 	void Back();
 	void Device();

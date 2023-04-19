@@ -7,7 +7,7 @@
 #include "InterfaceManager.h"
 #include "Setting.h"
 
-inline std::map<std::tuple<std::filesystem::path, std::string, std::string>, SM_Value> ini_map;
+inline std::map<std::tuple<std::filesystem::path, std::string, std::string>, CMValue> ini_map;
 
 inline void ReadINIInternal(const std::filesystem::path& iniPath, const std::filesystem::path& iniPath2)
 {
@@ -24,7 +24,7 @@ inline void ReadINIInternal(const std::filesystem::path& iniPath, const std::fil
 		ini.GetAllKeys(section.pItem, keys);
 		for (const auto& key : keys)
 		{
-			SM_Value value;
+			CMValue value;
 
 			if (key.pItem[0] == 'b' || key.pItem[0] == 'i') value = ini.GetLongValue(section.pItem, key.pItem);
 			else if (key.pItem[0] == 'f') value = ini.GetDoubleValue(section.pItem, key.pItem);
@@ -37,7 +37,7 @@ inline void ReadINIInternal(const std::filesystem::path& iniPath, const std::fil
 	ini.SaveFile(iniPath.c_str(), false);
 }
 
-inline void WriteINIInternal(const std::filesystem::path& iniPath, const CMSetting::IO::INI& setting, const SM_Value& value)
+inline void WriteINIInternal(const std::filesystem::path& iniPath, const CMSetting::IO::INI& setting, const CMValue& value)
 {
 	CSimpleIniA ini;
 	ini.SetUnicode();
@@ -53,7 +53,7 @@ inline void WriteINIInternal(const std::filesystem::path& iniPath, const CMSetti
 	ini.SaveFile(iniPath.c_str(), false);
 }
 
-std::optional<SM_Value> CMSetting::IO::ReadINI()
+std::optional<CMValue> CMSetting::IO::ReadINI()
 {
 	if (std::get<0>(ini).empty() || std::get<1>(ini).empty() || std::get<2>(ini).empty()) return {};
 
@@ -71,7 +71,7 @@ std::optional<SM_Value> CMSetting::IO::ReadINI()
 	return {};
 }
 
-void CMSetting::IO::WriteINI(const SM_Value& value) const
+void CMSetting::IO::WriteINI(const CMValue& value) const
 {
 	if (std::get<0>(ini).empty() || std::get<1>(ini).empty() || std::get<2>(ini).empty()) return;
 
@@ -83,7 +83,7 @@ void CMSetting::IO::WriteINI(const SM_Value& value) const
 	WriteINIInternal(iniPath, ini, value);
 }
 
-std::optional<SM_Value> CMSetting::IO::ReadXML()
+std::optional<CMValue> CMSetting::IO::ReadXML()
 {
 	if (xml.empty()) return {};
 
@@ -105,7 +105,7 @@ std::optional<SM_Value> CMSetting::IO::ReadXML()
 
 }
 
-void CMSetting::IO::WriteXML(const SM_Value& value) const
+void CMSetting::IO::WriteXML(const CMValue& value) const
 {
 	if (xml.empty()) return;
 
@@ -119,13 +119,13 @@ void CMSetting::IO::WriteXML(const SM_Value& value) const
 	InterfaceManager::GetSingleton()->globalsTile->Set(xml.c_str(), value.GetAsFloat(), true);
 }
 
-std::optional<SM_Value> CMSetting::IO::ReadGameSetting()
+std::optional<CMValue> CMSetting::IO::ReadGameSetting()
 {
 	if (const auto setting = GetINISetting(gamesetting); setting && !setting->GetAsString().empty()) return setting->GetAsString();
 	return {};
 }
 
-void CMSetting::IO::WriteGameSetting(const SM_Value& value) const
+void CMSetting::IO::WriteGameSetting(const CMValue& value) const
 {
 	if (const auto setting = GetINISetting(gamesetting); setting)
 	{
@@ -134,13 +134,13 @@ void CMSetting::IO::WriteGameSetting(const SM_Value& value) const
 	}
 }
 
-std::optional<SM_Value> CMSetting::IO::ReadGameINI()
+std::optional<CMValue> CMSetting::IO::ReadGameINI()
 {
 	if (const auto setting = GetGameSetting(gameini); setting && !setting->GetAsString().empty()) return setting->GetAsString();
 	return {};
 }
 
-void CMSetting::IO::WriteGameINI(const SM_Value& value) const
+void CMSetting::IO::WriteGameINI(const CMValue& value) const
 {
 	if (const auto setting = GetGameSetting(gameini); setting)
 	{
@@ -149,20 +149,20 @@ void CMSetting::IO::WriteGameINI(const SM_Value& value) const
 	}
 }
 
-std::optional<SM_Value> CMSetting::IO::ReadGlobal()
+std::optional<CMValue> CMSetting::IO::ReadGlobal()
 {
 	for (const auto iter : TESDataHandler::GetSingleton()->globalList)
 		if (std::string(iter->name.CStr()) == global) return iter->data;
 	return {};
 }
 
-void CMSetting::IO::WriteGlobal(const SM_Value& value) const
+void CMSetting::IO::WriteGlobal(const CMValue& value) const
 {
 	for (const auto iter : TESDataHandler::GetSingleton()->globalList)
 		if (std::string(iter->name.CStr()) == global) iter->data = value.GetAsFloat();
 }
 
-SM_Value CMSetting::IO::Read()
+CMValue CMSetting::IO::Read()
 {
 //	if (g_saveValue) 
 //		if (const auto saved =		ReadSaved()) return saved.value();
@@ -174,7 +174,7 @@ SM_Value CMSetting::IO::Read()
 	return defaultValue;
 }
 
-void CMSetting::IO::Write(const SM_Value& value) const
+void CMSetting::IO::Write(const CMValue& value) const
 {
 //	if (g_saveValue) 
 //		WriteSaved(value);

@@ -21,9 +21,20 @@ void RestartGameWarningCallback()
 }
 */
 
-void CMSetting::Category::Click()
+std::vector<CMValue> CMSetting::Category::GetValues()
 {
-	ModConfigurationMenu::GetSingleton()->DisplaySettings(category, doublestacked);
+	std::vector<CMValue> ret;
+	for (const auto iter : ModConfigurationMenu::GetSingleton()->GetSettingsForString(category)) {
+		const auto values = iter->GetValues();
+		ret.insert(ret.end(), values.begin(), values.end());
+	}
+	return ret;
+}
+
+void CMSetting::Category::Click(Tile* tile)
+{
+	ModConfigurationMenu::GetSingleton()->modsListBox.Display(category, false, true, doublestacked);
+	ModConfigurationMenu::GetSingleton()->settingsListBox.Display(category, true, allTag, doublestacked);
 }
 
 void CMSetting::Choice::Display(Tile* tile)
@@ -96,7 +107,7 @@ void CMSetting::Control::Display(Tile* tile)
 	}
 }
 
-SM_Value CMSetting::Choice::GetPrev(const SM_Value& value)
+CMValue CMSetting::Choice::GetPrev(const CMValue& value)
 {
 	if (choice.empty()) return value;
 	if (auto iter = choice.find(value); iter == choice.end() || --iter == choice.end())
@@ -104,7 +115,7 @@ SM_Value CMSetting::Choice::GetPrev(const SM_Value& value)
 	else return iter->first;
 }
 
-SM_Value CMSetting::Choice::GetNext(const SM_Value& value)
+CMValue CMSetting::Choice::GetNext(const CMValue& value)
 {
 	if (choice.empty()) return value;
 	if (auto iter = choice.find(value); iter == choice.end() || ++iter == choice.end())
@@ -126,15 +137,15 @@ void CMSetting::Choice::Last(const bool forward)
 	setting.Write(newValue);
 }
 
-SM_Value CMSetting::Slider::GetPrev(const SM_Value& value) const
+CMValue CMSetting::Slider::GetPrev(const CMValue& value) const
 {
-	SM_Value newValue = value - delta;
+	CMValue newValue = value - delta;
 	return newValue < min ? value : newValue;
 }
 
-SM_Value CMSetting::Slider::GetNext(const SM_Value& value) const
+CMValue CMSetting::Slider::GetNext(const CMValue& value) const
 {
-	SM_Value newValue = value + delta;
+	CMValue newValue = value + delta;
 	return newValue > max ? value : newValue;
 }
 
@@ -152,7 +163,7 @@ void CMSetting::Slider::Last(const bool forward)
 	setting.Write(newValue);
 }
 
-SM_Value CMSetting::Font::GetPrev(const SM_Value& value)
+CMValue CMSetting::Font::GetPrev(const CMValue& value)
 {
 	const auto fontMap = ModConfigurationMenu::GetSingleton()->fontMap;
 	if (fontMap.empty()) return value;
@@ -161,7 +172,7 @@ SM_Value CMSetting::Font::GetPrev(const SM_Value& value)
 	else return iter->first;
 }
 
-SM_Value CMSetting::Font::GetNext(const SM_Value& value)
+CMValue CMSetting::Font::GetNext(const CMValue& value)
 {
 	const auto fontMap = ModConfigurationMenu::GetSingleton()->fontMap;
 	if (fontMap.empty()) return value;
@@ -173,20 +184,45 @@ SM_Value CMSetting::Font::GetNext(const SM_Value& value)
 void CMSetting::Font::Next(const bool forward)
 {
 	const auto value = font.Read();
-	const SM_Value newValue = forward ? GetNext(value) : GetPrev(value);
+	const CMValue newValue = forward ? GetNext(value) : GetPrev(value);
 	font.Write(newValue);
 }
 
 void CMSetting::Font::Last(const bool forward)
 {
 	const auto value = font.Read();
-	const auto newValue = SM_Value(static_cast<SInt32>(forward ? 8 : 1));
+	const auto newValue = CMValue(static_cast<SInt32>(forward ? 8 : 1));
 	font.Write(newValue);
 }
 
-void ModConfigurationMenu::DisplayMods(std::string tab)
+void ModConfigurationMenu::ListBoxWithFilter::Display(const std::string& category, bool display, bool all, bool doublestacked)
 {
-	auto compareAlphabetically = [](ListBoxItem<CMSetting>* a, ListBoxItem<CMSetting>* b)
+	listBox.parentTile->Set("_doublestacked", doublestacked);
+
+	if (categoryActive != category)
+	{
+		listBox.FreeAllTiles();
+
+		*this << "";
+		// TODO: add order of displayed tags;
+
+		if (all) *this <<= "!All";
+
+		for (const auto& setting : GetSingleton()->GetSettingsForString(category))
+		{
+			if (!display && !setting->data->IsCategory()) continue;
+
+			const auto item = listBox.InsertAlt(setting, setting->GetName().c_str(), display ? setting->GetTemplate() : "");
+			listBox.SortAlt(item);
+			for (const auto& tag : setting->tags) *this <<= tag;
+		}
+
+		++*this;
+
+	}
+	categoryActive = category;
+
+		auto compareAlphabetically = [](ListBoxItem<CMSetting>* a, ListBoxItem<CMSetting>* b)
 	{
 		auto itemA = a->object;
 		auto itemB = b->object;
@@ -198,64 +234,14 @@ void ModConfigurationMenu::DisplayMods(std::string tab)
 
 		return static_cast<SInt32>( itemA->priority > itemB->priority ? -1 : 1);
 	};
-
-	modsListBox.listBox.FreeAllTiles();
-	modsListBox.ClearTags();
-	modsListBox << "";
-
-	modsListBox <<= "!Mods";
-	for (const auto& mod : GetSettingsForString(tab))
-	{
-//		const auto item = modsListBox <<= mod.get();
-//		item->object->Display(item->tile);
-
-		if (!mod->data->IsCategory()) continue;
-
-		const auto item = modsListBox.listBox.InsertAlt(mod, mod->GetName().c_str());
-		modsListBox.listBox.SortAlt(item);
-
-		for (const auto& tag : mod->tags) modsListBox <<= tag;
-	}
+	 
 
 	// TODO:: Figure out why it needs Sort, probably something to do with recalculate on insert flag
-	modsListBox.listBox.Sort(compareAlphabetically);
+	listBox.Sort(compareAlphabetically);
 
-	++modsListBox;
-}
+	if (display) for (const auto& setting : listBox.list)
+		setting->object->Display(setting->tile);
 
-void ModConfigurationMenu::DisplaySettings(std::string tab, bool doublestacked)
-{
-	settingsListBox.listBox.FreeAllTiles();
-	settingsListBox.ClearTags();
-
-	settingsListBox.listBox.parentTile->Set("_doublestacked", doublestacked);
-
-	// TODO: add order of displayed tags;
-	settingsListBox << "";
-
-	for (const auto& setting : GetSettingsForString(tab))
-	{
-		const auto item = settingsListBox <<= setting;
-		item->object->Display(item->tile);
-
-		for (const auto& tag : setting->tags) settingsListBox <<= tag;
-	}
-
-	++settingsListBox;
-}
-
-void ModConfigurationMenu::SelectMod(CMSetting* mod)
-{
-	activeMod = mod;
-
-	modsListBox.listBox.ForEach([](Tile* tile, CMSetting* mod)
-	{
-		const auto menu = GetSingleton();
-		tile->Set("_selected", menu->activeMod == mod ? 1 : 0);
-	});
-	modsListBox.listBox.parentTile->Set("_selected", 1);
-
-	mod->Click();
 }
 
 void ModConfigurationMenu::FilterSettings()
@@ -270,7 +256,7 @@ void ModConfigurationMenu::FilterSettings()
 	settingsListBox.listBox.Filter(filter);
 }
 
-void ModConfigurationMenu::ClickMod(Tile* clickedTile) { SelectMod(modsListBox.listBox.GetItemForTile(clickedTile)); }
+void ModConfigurationMenu::ClickMod(Tile* clickedTile) { modsListBox.Click(clickedTile); }
 
 void ModConfigurationMenu::FilterMods() 
 {
@@ -284,20 +270,7 @@ void ModConfigurationMenu::FilterMods()
 	modsListBox.listBox.Filter(filter);
 }
 
-
-void ModConfigurationMenu::SelectSetting(CMSetting* setting)
-{
-	activeSetting = setting;
-	setting->Click();
-	DisplayMods("");
-	// TODO: subsetting virtual function
-//	if (setting->type == setting->kSettingType_Subsetting)
-	{
-//		DisplaySettings(setting ? setting->GetID() : "");
-	}
-}
-
-void ModConfigurationMenu::ClickSetting(Tile* clickedTile) { SelectSetting(settingsListBox.listBox.GetItemForTile(clickedTile)); }
+void ModConfigurationMenu::ClickSetting(Tile* clickedTile) { settingsListBox.Click(clickedTile); }
 
 int reloadTweaksMenuFrameDelay;
 void __fastcall ReloadTweaksMenuInOneFrameHook(void* startMenu)
@@ -306,7 +279,7 @@ void __fastcall ReloadTweaksMenuInOneFrameHook(void* startMenu)
 	if (!--reloadTweaksMenuFrameDelay)
 	{
 		WriteRelCall(0x7CFA8C, 0x7D5830);
-		if (const auto menu = ModConfigurationMenu::ReloadMenu()) menu->ShowTweaksMenu();
+		if (const auto menu = ModConfigurationMenu::ReloadMenu()) menu->ShowMenuFirstTime();
 	}
 }
 
@@ -341,11 +314,11 @@ bool ModConfigurationMenu::XMLHasChanges()
 }
 
 
-void ModConfigurationMenu::ShowTweaksMenu()
+void ModConfigurationMenu::ShowMenuFirstTime()
 {
 
-	const auto sSettings = reinterpret_cast<Setting*>(0x11D1FE0);
-	menuTitle->Set(kTileValue_string, FormatString("Mod %s", sSettings->data.str));
+//	const auto sSettings = reinterpret_cast<Setting*>(0x11D1FE0);
+//	menuTitle->Set(kTileValue_string, FormatString("Mod %s", sSettings->data.str));
 
 	modsListBox.listBox.parentTile = modsListBackground;
 	modsListBox.listBox.templateName = "ModTemplate";
@@ -357,23 +330,22 @@ void ModConfigurationMenu::ShowTweaksMenu()
 
 	if (!tagDefault)
 	{
-		g_Tags.emplace("!Mods", std::make_unique<CMTag>("!Mods", "Mods", "Mods can be filtered by modTags."));
+		g_Tags.emplace("!All", std::make_unique<CMTag>("!All", "All", "Settings can be filtered by tags."));
 		tagDefault = g_Tags.begin()->second.get();
 	}
 
 	ReadJSONForPath(GetCurPath() + R"(\Data\menus\ConfigurationMenu\)");
 
-	DisplaySettings("");
+	settingsListBox.Display("", true, true, false);
 
-	HideTitle(false);
-
-	fontMap.emplace(SM_Value(static_cast<SInt32>(0)), "--");
+	fontMap.emplace(CMValue(static_cast<SInt32>(0)), "--");
 
 	for (const auto font : FontManager::GetSingleton()->fontInfos)
 		fontMap.emplace(static_cast<SInt32>(font->id), std::string(font->fontData->textures[0].fileName));
 	for (const auto font : FontManager::GetSingleton()->extraFonts)
 		fontMap.emplace(static_cast<SInt32>(font->id), std::string(font->fontData->textures[0].fileName));;
 
+	Open();
 }
 
 void ModConfigurationMenu::Back()
@@ -415,11 +387,6 @@ void ModConfigurationMenu::ListBoxWithFilter::UpdateTagString()
 	tagTile->Set(kTileValue_string, tag ? tag->GetName() : tagActive);
 }
 
-void ModConfigurationMenu::ListBoxWithFilter::ClearTags()
-{
-	tags.clear();
-}
-
 void ModConfigurationMenu::ListBoxWithFilter::operator<<(const std::string& tag)
 {
 	tagActive = tag;
@@ -429,13 +396,6 @@ void ModConfigurationMenu::ListBoxWithFilter::operator<<(const std::string& tag)
 void ModConfigurationMenu::ListBoxWithFilter::operator<<=(const std::string& tag)
 {
 	tags.emplace(tag);
-}
-
-ListBoxItem<CMSetting>* ModConfigurationMenu::ListBoxWithFilter::operator<<=(CMSetting* tag)
-{
-	const auto item = this->listBox.InsertAlt(tag, tag->GetName().c_str(), tag->GetTemplate());
-	this->listBox.SortAlt(item);
-	return item;
 }
 
 void HotkeyField::Init()

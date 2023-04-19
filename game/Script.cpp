@@ -421,8 +421,7 @@ void ScriptEventList::EventCreate(UInt32 eventCode, TESObjectREFR* container)
 	}
 
 	if (!m_eventList) {
-		m_eventList = (ScriptEventList::EventList*)GameHeapAlloc(sizeof(ScriptEventList::EventList));
-		m_eventList->Init();
+		m_eventList = new EventList{};
 	}
 	if (m_eventList && pEvent)
 		m_eventList->AddAt(pEvent, 0);

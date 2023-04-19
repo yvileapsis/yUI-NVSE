@@ -14,7 +14,7 @@ template <typename T> std::vector<T> GetSetFromElement(const nlohmann::basic_jso
 	return set;
 }
 
-class CMValueJSON : public SM_Value { public : CMValueJSON(const nlohmann::basic_json<>& elem) : SM_Value()
+class CMValueJSON : public CMValue { public : CMValueJSON(const nlohmann::basic_json<>& elem) : CMValue()
 {
 	if (elem.is_number_integer() || elem.is_number_unsigned())
 		Set(static_cast<SInt64>(elem.get<SInt32>()));;
@@ -74,7 +74,7 @@ class SettingChoiceJSON : public CMSetting::Choice { public: SettingChoiceJSON(c
 	if (!elem.contains("values")) {}
 	else for (const auto& i : elem["values"])
 	{
-		SM_Value value;
+		CMValue value;
 		std::string name;
 		std::string description;
 
@@ -182,16 +182,16 @@ void ModConfigurationMenu::SaveModJSON(CMSetting* mod)
 	const std::filesystem::path& path = GetCurPath() + R"(\Data\Config\ConfigurationMenu\)" + mod->GetID() + ".json";
 	std::ofstream i(path);
 
-	for (const auto& setting : GetSettingsForString(((CMSetting::Category*) mod->data.get())->category))
+	for (const auto& setting : settingsListBox.listBox.list)
 	{
-		j[setting->GetID()].clear();
-		for (const auto& value : setting->GetValues())
+		j[setting->object->GetID()].clear();
+		for (const auto& value : setting->object->GetValues())
 			if (value.IsString())
-				j[setting->GetID()].push_back(value.GetAsString());
+				j[setting->object->GetID()].push_back(value.GetAsString());
 			else if (value.IsFloat())
-				j[setting->GetID()].push_back(value.GetAsFloat());
+				j[setting->object->GetID()].push_back(value.GetAsFloat());
 			else
-				j[setting->GetID()].push_back(value.GetAsInteger());
+				j[setting->object->GetID()].push_back(value.GetAsInteger());
 	}
 
 
@@ -209,7 +209,7 @@ void ModConfigurationMenu::LoadModJSON(CMSetting* mod)
 
 	for (const auto& setting : g_Settings)
 	{
-		std::vector<SM_Value> vector;
+		std::vector<CMValue> vector;
 		for (const auto& iter : j[setting->GetID()])
 			vector.push_back(CMValueJSON(iter));
 		setting->SetValues(vector);

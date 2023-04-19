@@ -94,6 +94,13 @@ public:
 
 	Node	first;
 
+
+	TList(Item* item = nullptr)
+	{
+		first.data = item;
+		first.next = nullptr;
+	}
+
 	Node* GetLastNode() const
 	{
 		Node* node = Head();
@@ -130,12 +137,6 @@ public:
 		} while ((node = node->next));
 
 		return nullptr;
-	}
-
-	void Init(Item* item = nullptr)
-	{
-		first.data = item;
-		first.next = NULL;
 	}
 
 	Node* Head() const { return const_cast<Node*>(&first); }
