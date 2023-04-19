@@ -137,14 +137,14 @@ void ModConfigurationMenu::SetTile(const UInt32 tileID, Tile* activeTile)
 {
 	switch (tileID)
 	{
-	case kModConfigurationMenu_Title:				menuTitle = activeTile; break;
-	case kModConfigurationMenu_ModList:				modsListBackground = activeTile; break;
-	case kModConfigurationMenu_SelectionText:		description.tile = activeTile; break;
-	case kModConfigurationMenu_Exit:				doneTile = activeTile; break;
-	case kModConfigurationMenu_SearchBar:			searchBar.tile = activeTile; break;
-	case kModConfigurationMenu_SettingCategoryText:	settingsListBox.tagTile = (TileText*)activeTile; break;
-	case kModConfigurationMenu_SettingList:			settingsListBackground = activeTile; break;
-	case kModConfigurationMenu_CategoryText:		modsListBox.tagTile = (TileText*)activeTile; break;
+	case kModConfigurationMenu_Title:				menuTitle = activeTile; return;
+	case kModConfigurationMenu_ModList:				modsListBackground = activeTile; return;
+	case kModConfigurationMenu_SelectionText:		description.tile = activeTile; return;
+	case kModConfigurationMenu_Exit:				doneTile = activeTile; return;
+	case kModConfigurationMenu_SearchBar:			searchBar.tile = activeTile; return;
+	case kModConfigurationMenu_SettingCategoryText:	settingsListBox.tagTile = (TileText*)activeTile; return;
+	case kModConfigurationMenu_SettingList:			settingsListBackground = activeTile; return;
+	case kModConfigurationMenu_CategoryText:		modsListBox.tagTile = (TileText*)activeTile; return;
 	}
 }
 
@@ -194,10 +194,7 @@ void ModConfigurationMenu::HandleActiveMenuClickHeld(UInt32 tileID, Tile* active
 
 void ModConfigurationMenu::HandleLeftClick(UInt32 tileID, Tile* clickedTile)
 {
-	//	if (clickedTile == categoriesListBox.scrollBar || clickedTile->parent == categoriesListBox.scrollBar)
-	{
-		//		this->isDraggingCategoriesSlider = true;
-	}
+
 }
 
 void ModConfigurationMenu::ListBoxWithFilter::operator++()
@@ -239,21 +236,13 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 		HandleMouseover(kModConfigurationMenu_SettingCategoryText, nullptr);
 		break;
 	}
-	case kModConfigurationMenu_SaveToJSON: {
-		SaveModJSON(activeMod);
-		for (const auto& iter : settingsListBox.listBox.list) iter->object->Display(iter->tile);
-		break;
-	}
-	case kModConfigurationMenu_LoadFromJSON: {
-		LoadModJSON(activeMod);
-		for (const auto& iter : settingsListBox.listBox.list) iter->object->Display(iter->tile);
-		break;
-	}
-	case kModConfigurationMenu_Default: { Default(); break; }
-	case kModConfigurationMenu_DeviceButton: { Device(); break; }
-	case kModConfigurationMenu_Exit: { Back(); break; }
-	case kModConfigurationMenu_ModListItem: { ClickMod(clickedTile); break; }
-	case kModConfigurationMenu_SettingListItem: { ClickSetting(clickedTile); break; }
+	case kModConfigurationMenu_SaveToJSON:		SaveToJSON(); return;
+	case kModConfigurationMenu_LoadFromJSON:	LoadFromJSON(); return;
+	case kModConfigurationMenu_Default:			Default(); return;
+	case kModConfigurationMenu_DeviceButton:	Device(); return;
+	case kModConfigurationMenu_Exit:			Back(); return;
+	case kModConfigurationMenu_ModListItem:		ClickMod(clickedTile); return;
+	case kModConfigurationMenu_SettingListItem:	ClickSetting(clickedTile); return;
 	case kModConfigurationMenu_SearchIcon:
 	{
 		//		this->SetInSearchMode(true);
@@ -393,11 +382,7 @@ bool ModConfigurationMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode co
 {
 	switch (code)
 	{
-	case kMenu_Tab:
-	{
-		Back();
-		return true;
-	}
+	case kMenu_Tab: Back(); return true;
 	case kMenu_ShiftLeft:
 	{
 		if (modsListBox.listBox.GetSelectedTile())
@@ -431,14 +416,7 @@ bool ModConfigurationMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode co
 		return true;
 	}
 	case kMenu_LeftArrow:
-	case kMenu_RightArrow:
-	{
-		//		if (this->HandleActiveSliderArrows( code == kMenu_RightArrow))
-		{
-			return true;
-		}
-		break;
-	}
+	case kMenu_RightArrow: return true;
 	case kMenu_PageDown:
 	case kMenu_PageUp:
 	{

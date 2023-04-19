@@ -21,6 +21,12 @@ void RestartGameWarningCallback()
 }
 */
 
+void CMSetting::Category::Default()
+{
+	for (const auto iter : ModConfigurationMenu::GetSingleton()->GetSettingsForString(category))
+		iter->Default();
+}
+
 std::vector<CMValue> CMSetting::Category::GetValues()
 {
 	std::vector<CMValue> ret;
@@ -33,8 +39,25 @@ std::vector<CMValue> CMSetting::Category::GetValues()
 
 void CMSetting::Category::Click(Tile* tile)
 {
-	ModConfigurationMenu::GetSingleton()->modsListBox.Display(category, false, true, doublestacked);
-	ModConfigurationMenu::GetSingleton()->settingsListBox.Display(category, true, allTag, doublestacked);
+	const auto menu = ModConfigurationMenu::GetSingleton();
+
+	std::string modsCategory;
+	std::string settingsCategory;
+
+	if (auto iter = std::ranges::find(menu->categoryHistory, category); iter == menu->categoryHistory.end())
+	{
+		menu->categoryHistory.push_back(category);
+	}
+
+	if (auto iter = std::ranges::find(menu->categoryHistory, category); iter != menu->categoryHistory.end())
+	{
+		settingsCategory = *iter;
+		if (iter != menu->categoryHistory.begin()) modsCategory = *iter;
+		menu->categoryHistory.erase(++iter, menu->categoryHistory.end());
+	}
+
+	menu->modsListBox.Display(modsCategory, false, true, doublestacked);
+	menu->settingsListBox.Display(settingsCategory, true, allTag, doublestacked);
 }
 
 void CMSetting::Choice::Display(Tile* tile)
@@ -348,6 +371,24 @@ void ModConfigurationMenu::ShowMenuFirstTime()
 	Open();
 }
 
+void ModConfigurationMenu::SaveToJSON()
+{
+	for (const auto& iter : settingsListBox.listBox.list)
+	{
+		SaveModJSON(iter->object);
+		iter->object->Display(iter->tile);
+	}
+}
+
+void ModConfigurationMenu::LoadFromJSON()
+{
+	for (const auto& iter : settingsListBox.listBox.list)
+	{
+		LoadModJSON(iter->object);
+		iter->object->Display(iter->tile);
+	}
+}
+
 void ModConfigurationMenu::Back()
 {
 	Close();
@@ -365,7 +406,11 @@ void ModConfigurationMenu::Device()
 
 void ModConfigurationMenu::Default()
 {
-//	SaveModToJSON(activeMod);
+	for (const auto& iter : settingsListBox.listBox.list)
+	{
+		iter->object->Default();
+		iter->object->Display(iter->tile);
+	}
 }
 
 std::vector<CMSetting*> ModConfigurationMenu::GetSettingsForString(std::string str)

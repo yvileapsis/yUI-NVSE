@@ -199,6 +199,8 @@ public:
 
 		CMValue Read();
 		void Write(const CMValue& value) const;
+
+		void Default();
 	};
 
 	class None
@@ -216,6 +218,8 @@ public:
 
 		virtual void Next(const bool forward = true) {};
 		virtual void Last(const bool forward = true) {};
+
+		virtual void Default() {};
 
 		virtual std::vector<CMValue> GetValues() { return {}; };
 		virtual void SetValues(const std::vector<CMValue>& values) {};
@@ -236,6 +240,8 @@ public:
 		const char* GetTypeName() override { return "Subsetting"; }
 
 		bool IsCategory() override { return true; }
+
+		void Default() override;
 
 		std::vector<CMValue> GetValues() override;
 		void SetValues(const std::vector<CMValue>& values) override {};
@@ -260,6 +266,8 @@ public:
 
 		void Next(bool forward) override;
 		void Last(bool forward) override;
+
+		void Default() override { setting.Default(); }
 
 		std::vector<CMValue> GetValues() override { return { setting.Read() }; };
 
@@ -289,6 +297,8 @@ public:
 		void Next(bool forward) override;
 		void Last(bool forward) override;
 
+		void Default() override { setting.Default(); }
+
 		std::vector<CMValue> GetValues() override { return { setting.Read() }; };
 		void SetValues(const std::vector<CMValue>& values) override
 		{
@@ -307,6 +317,8 @@ public:
 		const char* GetTypeName() override { return "Control"; }
 
 		void Display(Tile* tile) override;
+
+		void Default() override { keyboard.Default(); mouse.Default(); controller.Default(); }
 
 		std::vector<CMValue> GetValues() override { return { keyboard.Read(), mouse.Read(), controller.Read() }; };
 
@@ -338,6 +350,8 @@ public:
 		void Next(bool forward) override;
 		void Last(bool forward) override;
 
+		void Default() override { font.Default(); fontY.Default(); }
+
 		std::vector<CMValue> GetValues() override { return { font.Read(), fontY.Read() }; };
 		void SetValues(const std::vector<CMValue>& values) override
 		{
@@ -368,6 +382,9 @@ public:
 
 	CMSetting* Next(const bool forward = true) { data->Next(forward); return this; };
 	CMSetting* Last(const bool forward = true) { data->Last(forward); return this; }
+
+	CMSetting* Default() { data->Default(); return this; };
+
 	CMSetting* Display(Tile* tile) { data->Display(tile); return this; };
 	const char* GetTemplate() const { return data->GetTemplate(); }
 
@@ -383,7 +400,7 @@ public:
 
 	std::string GetDescription() const override
 	{
-		return FormatString("%s\n- %s", description.c_str(), "settingName.c_str()");
+		return description;
 	}
 };
 
@@ -568,7 +585,7 @@ public:
 	
 	OSInputGlobals::ControlType controlDevice = OSInputGlobals::kControlType_Keyboard;
 
-
+	std::vector<std::string> categoryHistory;
 
 	bool HasTiles();
 	void Close();
@@ -595,6 +612,10 @@ public:
 
 	static ModConfigurationMenu* ReloadMenu();
 	void ShowMenuFirstTime();
+
+
+	void SaveToJSON();
+	void LoadFromJSON();
 
 	void Back();
 	void Device();

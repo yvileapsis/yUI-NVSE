@@ -184,3 +184,8 @@ void CMSetting::IO::Write(const CMValue& value) const
 	WriteGameSetting(value);
 	WriteGameINI(value);
 }
+
+void CMSetting::IO::Default()
+{
+	Write(defaultValue);
+}
