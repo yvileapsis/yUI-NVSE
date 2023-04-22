@@ -30,7 +30,7 @@ class CMSettingIOJSON : public CMSetting::IO { public: CMSettingIOJSON(const nlo
 	std::string categoryGot, valueGot;
 
 	if (elem.contains("path"))		pathGot = elem["path"].get<std::string>();
-	if (elem.contains("id"))	categoryGot = elem["id"].get<std::string>();
+	if (elem.contains("category"))	categoryGot = elem["category"].get<std::string>();
 	if (elem.contains("value"))		valueGot = elem["value"].get<std::string>();
 
 	ini = std::make_tuple(pathGot, categoryGot, valueGot);
@@ -46,11 +46,16 @@ class SettingNoneJSON : public CMSetting::None { public: SettingNoneJSON() = def
 
 class SettingCategoryJSON : public CMSetting::Category { public: SettingCategoryJSON(const nlohmann::basic_json<>& elem)
 {
-	if (elem.contains("category"))			id = elem["category"].get<std::string>();
+	id = elem.get<std::string>();
 }};
 
 class CategoryJSON : public CMCategory { public: CategoryJSON(const nlohmann::basic_json<>& elem)
 {
+	if (elem.contains("id"))			id = elem["id"].get<std::string>();
+	if (elem.contains("name"))			name = elem["name"].get<std::string>();
+	if (elem.contains("shortName"))		shortName = elem["shortName"].get<std::string>();
+	if (elem.contains("description"))	description = elem["description"].get<std::string>();
+
 	if (elem.contains("mod"))			mod = elem["mod"].get<std::string>();
 	if (elem.contains("plugin"))		plugin = elem["plugin"].get<std::string>();
 	if (elem.contains("doublestacked"))	doublestacked = elem["doublestacked"].get<UInt32>();
@@ -125,7 +130,7 @@ SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem)
 	if (elem.contains("tags"))			tags.insert_range(GetSetFromElement<std::string>(elem["tags"]));
 	if (elem.contains("categories"))	mods.insert_range(GetSetFromElement<std::string>(elem["categories"]));
 
-	if (elem.contains("id"))		data = std::make_unique<Category>(SettingCategoryJSON(elem["id"]));
+	if (elem.contains("category"))		data = std::make_unique<Category>(SettingCategoryJSON(elem["category"]));
 	else if (elem.contains("choice"))	data = std::make_unique<Choice>(SettingChoiceJSON(elem["choice"]));
 	else if (elem.contains("slider"))	data = std::make_unique<Slider>(SettingSliderJSON(elem["slider"]));
 	else if (elem.contains("control"))	data = std::make_unique<Control>(SettingControlJSON(elem["control"]));

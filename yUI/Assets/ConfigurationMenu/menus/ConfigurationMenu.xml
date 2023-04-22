@@ -462,6 +462,8 @@
 		</hotrect>
 
 		<rect name="ModList">
+			<_alpha> 0 </_alpha>
+			
 			<width> 400 </width>
 			<_what> 275 </_what>
 			<x> 0 </x>
@@ -496,6 +498,7 @@
 					<onlyif src="me" trait="mouseover"/>
 					<add> 240 </add>
 				</brightness>
+				<alpha> <copy src="sibling(Title)" trait="alpha"/> </alpha>
 			</image>
 
 			<text name="Title">
@@ -527,6 +530,8 @@
 					<onlyif src="me" trait="mouseover"/>
 					<add> 255 </add>
 				</brightness>
+				<_alpha> <copy src="parent" trait="_alpha"/> </_alpha>
+				<alpha> <copy src="me" trait="_alpha"/> </alpha>
 			</text>
 
 			<image name="RightFilterArrow">
@@ -551,6 +556,7 @@
 					<onlyif src="me" trait="mouseover"/>
 					<add> 240 </add>
 				</brightness>
+				<alpha> <copy src="sibling(Title)" trait="alpha"/> </alpha>
 			</image>
 
 			<!--<image name="CM_Container_headline_h2">
@@ -574,6 +580,7 @@
 		
 			<hotrect name="ModList">
 				<include src="list_box.xml"/>
+				<_alpha> <copy src="parent" trait="_alpha"/> </_alpha>
 				<_scrollbar_pos> &left; </_scrollbar_pos>
 				<target> &true; </target>
 				<id> 11 </id>
@@ -586,6 +593,8 @@
 		</rect>
 
 		<rect name="SettingsList">
+			<_alpha> 0 </_alpha>
+		
 			<width> 900 </width>
 			<_what> 100 </_what>
 			<x> 400 </x>
@@ -620,6 +629,7 @@
 					<add> 240 </add>
 				</brightness>
 				<depth> 2 </depth>
+				<alpha> <copy src="sibling(Title)" trait="alpha"/> </alpha>
 			</image>
 
 			<text name="Title">
@@ -653,6 +663,8 @@
 					<add> 255 </add>
 				</brightness>
 				<depth> 2 </depth>
+				<_alpha> <copy src="parent" trait="_alpha"/> </_alpha>
+				<alpha> <copy src="me" trait="_alpha"/> </alpha>
 			</text>
 
 			<image name="RightFilterArrow">
@@ -678,6 +690,7 @@
 					<add> 240 </add>
 				</brightness>
 				<depth> 2 </depth>
+				<alpha> <copy src="sibling(Title)" trait="alpha"/> </alpha>
 			</image>
 
 			<!--<image name="CM_Container_headline_h2">
@@ -716,8 +729,9 @@
 				
 				<visible>1</visible>
 				<_number_of_visible_items> 11 </_number_of_visible_items>
-				<_alpha> 255 </_alpha>
-				
+				<_alpha> <copy src="parent" trait="_alpha"/> </_alpha>
+				<_line_alpha> <copy src="me()" trait="_alpha"/> </_line_alpha>
+
 				<!-- This listbox is special in that it can be double-stacked. This implies that highlight box can not be used to determine width and such.
 				Copy of <x> trait of highlight box. -->
 				<_highX> 
@@ -819,6 +833,8 @@
 	<template name="ModTemplate"> <hotrect name="ModItem">
 		<include src="list_box_template.xml"/>
 		<_TextAlpha> 255 </_TextAlpha>
+		
+		<_alpha> <copy src="parent()" trait="_alpha"/> </_alpha>
 		<mouseoversound> UIMenuFocus </mouseoversound>
 		<clicksound> UIMenuOK </clicksound>
 		<id> 12 </id>
@@ -844,14 +860,15 @@
 				</add>
 			</brightness>
 
-		<alpha>
-		<copy src="parent" trait="_TextAlpha"/>
-		<sub>
-			<copy> 128 </copy>
-			<onlyif src="grandparent" trait="_selected"/>
-			<onlyifnot src="parent" trait="_selected"/>
-		</sub>
-		</alpha>
+			<alpha>
+				<copy src="parent" trait="_TextAlpha"/>
+				<sub>
+					<copy> 128 </copy>
+					<onlyif src="grandparent" trait="_selected"/>
+					<onlyifnot src="parent" trait="_selected"/>
+				</sub>
+				<min src="parent" trait="_alpha"/>
+			</alpha>
 
 			<x> 10 </x>
 			<y>
@@ -863,7 +880,7 @@
 					<copy src="globals" trait="_VUI+FontY_"/>
 				</add>
 			</y>
-	</text>
+		</text>
 	</hotrect> </template>
 
 	<template name="SettingNoneTemplate"> <hotrect name="SettingItem">
@@ -940,6 +957,17 @@
 		<hotrect name="lb_meter_hotrect">
 			<id> 102 </id>
 			<locus> 1 </locus>
+			
+			<user1>														<!-- Drag value: goes from 0 to 1 based on mouse drag -->
+				<copy src="me()" trait="dragx"/>
+				<sub src="me()" trait="x"/>
+				<div src="me()" trait="width"/>
+				<max> 0 </max>
+				<min> 1 </min>
+			</user1>
+			
+			<draggable> &true; </draggable>
+
 			<!--VUI+ disable clicking when the meter is beyond its limits -->
 			<target>
 				<copy src="parent" trait="_VUI+Value" />

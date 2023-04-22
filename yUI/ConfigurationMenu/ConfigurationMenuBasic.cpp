@@ -156,29 +156,8 @@ void ModConfigurationMenu::HandleActiveMenuClickHeld(UInt32 tileID, Tile* active
 {
 	if (tileID == kModConfigurationMenu_SliderDraggableRect)
 	{
-		auto setting = this->settingsMain.listBox.GetItemForTile(activeTile->parent);
-		/*	if (setting->IsSlider())
-			{
-				auto newValue = activeTile->GetFloat(_ValueTrait);
-
-				auto id = setting->settingCategory;
-				auto name = setting->id;
-
-				if (setting->GetDataType() == SubSettingData::kSettingDataType_Float)
-				{
-					setting->data.valueFloat = newValue;
-					ini.SetDoubleValue(id.c_str(), name.c_str(), newValue);
-				}
-				else
-				{
-					setting->data.valueInt = newValue;
-					ini.SetLongValue(id.c_str(), name.c_str(), newValue);
-				}
-
-				SetSliderDisplayedValues(activeTile, setting);
-
-				this->TouchSubsetting(setting);
-			}*/
+		const auto option = activeTile->parent;
+		settingsMain.listBox.GetItemForTile(option)->Drag(activeTile->Get(kTileValue_user1))->Display(option);
 	}
 
 	if (tileID == kModConfigurationMenu_SliderLeftArrow || tileID == kModConfigurationMenu_SliderRightArrow)
@@ -240,8 +219,8 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 	case kModConfigurationMenu_Default:			Default(); return;
 	case kModConfigurationMenu_DeviceButton:	Device(); return;
 	case kModConfigurationMenu_Exit:			Back(); return;
-	case kModConfigurationMenu_ModListItem:		ClickMod(clickedTile); return;
-	case kModConfigurationMenu_SettingListItem:	ClickSetting(clickedTile); return;
+	case kModConfigurationMenu_ModListItem:		ClickSecondary(clickedTile); return;
+	case kModConfigurationMenu_SettingListItem:	ClickMain(clickedTile); return;
 	case kModConfigurationMenu_SearchIcon:
 	{
 		//		this->SetInSearchMode(true);
@@ -512,6 +491,9 @@ void ModConfigurationMenu::HandleControllerConnectOrDisconnect(bool isController
 
 void ModConfigurationMenu::Update()
 {
+	settingsMain.Update();
+	settingsSecondary.Update();
+
 	searchBar.Update();
 	subSettingInput.Update();
 	auto input = OSInputGlobals::GetSingleton();

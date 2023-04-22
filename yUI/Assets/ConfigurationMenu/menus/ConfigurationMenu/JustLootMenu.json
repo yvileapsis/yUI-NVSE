@@ -1,18 +1,34 @@
 {
+"categories": [
+{
+	"id": "JLM",
+	"name": "Just Loot Menu",
+	"shortName":  "Loot Menu",
+	"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
+
+	"plugin": "yUI",
+	"doublestacked": 1,
+	"allTag": 1
+},
+{
+	"id": "JLMVisuals",
+	"name": "Just Loot Menu Visuals",
+	"shortName":  "Visuals",
+	"description": "",
+
+	"doublestacked": 1,
+	"allTag": 1
+}
+],	
 "settings": [
 {
 	"name": "Just Loot Menu",
-	"nameShort":  "Loot Menu",
+	"shortName":  "Loot Menu",
 	"description": "Just a small mod that adds a FO76-like Loot Menu. Also features container animations by Hitman47101.",
 
 	"tags": [ "Quality-of-life", "HUD" ],
 	
-	"category": {
-		"plugin": "yUI",
-		"doublestacked": 1,
-		"allTag": 1,
-		"category": "JLM"
-	}
+	"category": "JLM"
 },
 {
 	"name": "Visuals",
@@ -21,14 +37,11 @@
 	"tags": [ "Visuals" ],
 	"condition": [ { "JLMbEnable": 1 } ],
 	
-	"category": {
-		"doublestacked": 1,
-		"allTag": 1,
-		"category": "JLMVisuals"
-	}
+	"category": "JLMVisuals"
 },
 {
 	"name": "Enable Just Loot Menu",
+	"shortName":  "Enable",
 	"description": "Enable Loot Menu",
 	"categories": [ "JLM" ],
 	"tags": [ "Gameplay" ],

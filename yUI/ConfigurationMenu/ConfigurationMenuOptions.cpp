@@ -69,7 +69,7 @@ void CMSetting::Font::Display(Tile* tile)
 	std::string valueString;
 	if (!id)
 	{
-		valueString = "--"; // Display name or display value if name not found
+		valueString = "--"; // DisplaySettings name or displayAfterTimer value if name not found
 		tile->GetChild("lb_toggle_value")->Set(kTileValue_font, 7);
 	}
 	else if (fontMap.contains(value))
@@ -168,6 +168,18 @@ void CMSetting::Slider::Last(const bool forward)
 	setting.Write(newValue);
 }
 
+void CMSetting::Slider::Drag(Float32 value)
+{
+	const UInt32 forceTruncating = value * (max - min) / delta.GetAsFloat();
+
+	CMValue newValue;
+
+	if (delta.IsFloat()) newValue.Set(static_cast<Float32>(forceTruncating) * delta.GetAsFloat());
+	else newValue.Set(static_cast<SInt64>(forceTruncating * delta.GetAsInteger()));
+
+	setting.Write(newValue);
+}
+
 CMValue CMSetting::Font::GetPrev(const CMValue& value)
 {
 	const auto fontMap = ModConfigurationMenu::GetSingleton()->fontMap;
@@ -200,34 +212,29 @@ void CMSetting::Font::Last(const bool forward)
 	font.Write(newValue);
 }
 
-void ModConfigurationMenu::SettingList::Display(const std::string& category, bool display, bool all, bool doublestacked)
+void ModConfigurationMenu::SettingList::UpdateSettingsList()
 {
 	listBox.parentTile->Set("_doublestacked", doublestacked);
 
-	if (categoryActive != category)
+	listBox.FreeAllTiles();
+
+	*this << "";
+	// TODO: add order of displayed tags;
+
+	if (allTag) *this <<= "!All";
+
+	for (const auto& setting : GetSingleton()->GetSettingsForString(categoryActive))
 	{
-		listBox.FreeAllTiles();
+		if (!main && !setting->data->IsCategory()) continue;
 
-		*this << "";
-		// TODO: add order of displayed tags;
-
-		if (all) *this <<= "!All";
-
-		for (const auto& setting : GetSingleton()->GetSettingsForString(category))
-		{
-			if (!display && !setting->data->IsCategory()) continue;
-
-			const auto item = listBox.InsertAlt(setting, setting->GetName().c_str(), display ? setting->GetTemplate() : nullptr);
-			listBox.SortAlt(item);
-			for (const auto& tag : setting->tags) *this <<= tag;
-		}
-
-		++*this;
-
+		const auto item = listBox.InsertAlt(setting, main && !doublestacked ? setting->GetName().c_str() : setting->GetShortName().c_str(), main ? setting->GetTemplate() : nullptr);
+		listBox.SortAlt(item);
+		for (const auto& tag : setting->tags) *this <<= tag;
 	}
-	categoryActive = category;
 
-		auto compareAlphabetically = [](ListBoxItem<CMSetting>* a, ListBoxItem<CMSetting>* b)
+	++* this;
+
+	auto compareAlphabetically = [](ListBoxItem<CMSetting>* a, ListBoxItem<CMSetting>* b)
 	{
 		auto itemA = a->object;
 		auto itemB = b->object;
@@ -237,16 +244,99 @@ void ModConfigurationMenu::SettingList::Display(const std::string& category, boo
 			return static_cast<SInt32>((itemA->GetName() <=> itemB->GetName())._Value);
 		}
 
-		return static_cast<SInt32>( itemA->priority > itemB->priority ? -1 : 1);
+		return static_cast<SInt32>(itemA->priority > itemB->priority ? -1 : 1);
 	};
-	 
 
 	// TODO:: Figure out why it needs Sort, probably something to do with recalculate on insert flag
 	listBox.Sort(compareAlphabetically);
 
-	if (display) for (const auto& setting : listBox.list)
-		setting->object->Display(setting->tile);
+}
 
+void ModConfigurationMenu::SettingList::DisplaySettings()
+{
+	if (main) for (const auto& setting : listBox.list)
+		setting->object->Display(setting->tile);
+}
+
+void ModConfigurationMenu::SettingList::Update()
+{
+	if (startTime)
+	{
+		auto percentageCompleted = static_cast<Float32>(GetTickCount() - startTime) / duration;
+
+		if (percentageCompleted > 1.0) percentageCompleted = 1;
+
+		listBox.parentTile->Set("_alpha", (alphaTarget - alphaStart) * percentageCompleted + alphaStart, true);
+		tagTile->Set("_alpha", (alphaTarget - alphaStart) * percentageCompleted + alphaStart, true);
+
+		if (percentageCompleted < 1.0) { }
+		else if (!displayAfterTimer)
+			startTime = 0;
+		else
+		{
+			alphaStart = 0.0;
+			alphaTarget = 255.0;
+			startTime = GetTickCount();
+			duration = 0.25 * 1000;
+
+			UpdateSettingsList();
+			DisplaySettings();
+
+			displayAfterTimer = false;
+		}
+	}
+}
+
+void ModConfigurationMenu::SettingList::Display(const std::string& newcategory, bool newmain, bool newallTag,
+                                                       bool mewdoublestacked)
+{
+	if (categoryActive == newcategory)
+	{
+		DisplaySettings();
+		return;
+	}
+	categoryActive = newcategory;
+
+	main = newmain;
+	allTag = newallTag;
+	doublestacked = mewdoublestacked;
+
+	startTime = GetTickCount();
+	duration = 0.25 * 1000;
+
+	if (listBox.parentTile->Get("_alpha") > 0)
+	{
+		displayAfterTimer = true;
+
+		alphaStart = 255.0;
+		alphaTarget = 0.0;
+	}
+	else
+	{
+		UpdateSettingsList();
+		DisplaySettings();
+
+		displayAfterTimer = false;
+
+		alphaStart = 0.0;
+		alphaTarget = 255.0;
+	}
+
+}
+
+void ModConfigurationMenu::SettingList::Hide()
+{
+	if (listBox.parentTile->Get("_alpha") > 0)
+	{
+		displayAfterTimer = false;
+		categoryActive.clear();
+
+		startTime = GetTickCount();
+		duration = 0.25 * 1000;
+
+		alphaStart = 255.0;
+		alphaTarget = 0.0;
+	}
 }
 
 void ModConfigurationMenu::FilterSettings()
@@ -261,7 +351,16 @@ void ModConfigurationMenu::FilterSettings()
 	settingsMain.listBox.Filter(filter);
 }
 
-void ModConfigurationMenu::ClickMod(Tile* clickedTile) { settingsSecondary.Click(clickedTile); }
+void ModConfigurationMenu::ClickMain(Tile* clickedTile)
+{
+	settingsMain.Click(clickedTile);
+}
+
+void ModConfigurationMenu::ClickSecondary(Tile* clickedTile)
+{
+	categoryHistory.pop_back();
+	settingsSecondary.Click(clickedTile);
+}
 
 void ModConfigurationMenu::FilterMods() 
 {
@@ -274,8 +373,6 @@ void ModConfigurationMenu::FilterMods()
 	};
 	settingsSecondary.listBox.Filter(filter);
 }
-
-void ModConfigurationMenu::ClickSetting(Tile* clickedTile) { settingsMain.Click(clickedTile); }
 
 int reloadTweaksMenuFrameDelay;
 void __fastcall ReloadTweaksMenuInOneFrameHook(void* startMenu)
@@ -638,7 +735,7 @@ void ModConfigurationMenu::SetInSubsettingInputMode(bool isActive)
 				if (tile->parent)
 				{
 					// set the input string back to the current value of the setting
-					//activeInputSubsetting->Display(tile->parent);
+					//activeInputSubsetting->DisplaySettings(tile->parent);
 
 					// ensure the input field has the same value so UpdateCaretDisplay doesn't reset the string
 					auto strVal = tile->GetValue(kTileValue_string);
@@ -693,7 +790,7 @@ void ModConfigurationMenu::SetInHotkeyMode(bool isActive)
 	//			activeHotkeySubsetting->data.valueInt = hotkeyInput.value;
 				if (tile->parent)
 				{
-					activeHotkeySubsetting->Display(tile->parent);
+					activeHotkeySubsetting->DisplaySettings(tile->parent);
 				}
 				activeHotkeySubsetting = nullptr;
 			}
@@ -774,7 +871,7 @@ void ModConfigurationMenu::RefreshFilter()
 		// if the selected tweak is filtered out
 //		if (selectedTile->GetFloat(kTileValue_listindex) < 0)
 		{
-//			this->ClickMod(nullptr);
+//			this->ClickSecondary(nullptr);
 		}
 	}
 }
@@ -800,11 +897,7 @@ void ModConfigurationMenu::DisplaySettings(std::string id)
 
 	const auto category = mapCategories.contains(id) ? mapCategories[id].get() : nullptr;
 
-	const auto allTag = category ? category->allTag : true;
-
-	const auto doublestacked = category ? category->doublestacked : false;
-
-	settingsMain.Display(*iter, true, allTag, doublestacked);
+	settingsMain.Display(id, true, category ? category->allTag : true, category ? category->doublestacked : false);
 
 	if (iter != categoryHistory.begin())
 	{
@@ -812,10 +905,11 @@ void ModConfigurationMenu::DisplaySettings(std::string id)
 
 		const auto category = mapCategories.contains(id) ? mapCategories[id].get() : nullptr;
 
-		const auto allTag = category ? category->allTag : true;
-
-		settingsSecondary.Display(*--iter, false, allTag);
-		++iter;
+		settingsSecondary.Display(id, false, category ? category->allTag : true, false);
+	}
+	else
+	{
+		settingsSecondary.Hide();
 	}
 
 	categoryHistory.erase(++iter, categoryHistory.end());

@@ -161,7 +161,7 @@ public:
 
 	virtual std::string GetID() { return id; }
 	virtual std::string GetName() { return !name.empty() ? name : id; }
-	virtual std::string GetShortName() { return !shortName.empty() ? shortName : id; }
+	virtual std::string GetShortName() { return !shortName.empty() ? shortName : GetName(); }
 
 	virtual std::string GetDescription() const { return description; }
 
@@ -244,12 +244,13 @@ public:
 
 		virtual bool IsCategory() { return false; }
 
-		virtual void Display(Tile* tile) {}
-
 		virtual void Next(const bool forward = true) {};
 		virtual void Last(const bool forward = true) {};
+		virtual void Drag(Float32 value) {};
 
 		virtual void Default() {};
+
+		virtual void Display(Tile* tile) {}
 
 		virtual std::vector<CMValue> GetValues() { return {}; };
 		virtual void SetValues(const std::vector<CMValue>& values) {};
@@ -322,6 +323,8 @@ public:
 
 		void Next(bool forward) override;
 		void Last(bool forward) override;
+
+		void Drag(Float32 value) override;
 
 		void Default() override { setting.Default(); }
 
@@ -408,13 +411,16 @@ public:
 
 	CMSetting* Next(const bool forward = true) { data->Next(forward); return this; };
 	CMSetting* Last(const bool forward = true) { data->Last(forward); return this; }
+	CMSetting* Drag(Float32 value) { data->Drag(value); return this; }
 
 	CMSetting* Default() { data->Default(); return this; };
 
 	CMSetting* Display(Tile* tile) { data->Display(tile); return this; };
-	const char* GetTemplate() const { return data->GetTemplate(); }
 
 	CMSetting* Click(Tile* tile) { data->Click(tile); return this; }
+
+	const char* GetTemplate() const { return data->GetTemplate(); }
+
 
 	std::vector<CMValue> GetValues() const { return data->GetValues(); }
 	void SetValues(const std::vector<CMValue>& values) const { return data->SetValues(values); }
@@ -554,6 +560,16 @@ public:
 		std::set<std::string> tags;
 		std::string tagActive;
 
+		bool main = false;
+		bool allTag = false;
+		bool doublestacked = false;
+
+		Float32 alphaStart = 0;
+		Float32 alphaTarget = 0;
+		Float32 duration = 0;
+		UInt32	startTime = 0;
+		bool	displayAfterTimer = false;
+
 		void UpdateTagString();
 
 		void operator++();
@@ -561,11 +577,15 @@ public:
 		void operator<<(const std::string& tag);
 		void operator<<=(const std::string& tag);
 
-		void Display(const std::string& category, bool display, bool all, bool doublestacked = false);
+		void UpdateSettingsList();
+		void DisplaySettings();
+		void Update();
 		void Click(Tile* clickedTile)
 		{
 			listBox.GetItemForTile(clickedTile)->Click(clickedTile);
 		}
+		void Display(const std::string& newCategory, bool main, bool allTag, bool doublestacked);
+		void Hide();
 	};
 
 	SettingList settingsMain;
@@ -624,8 +644,8 @@ public:
 	void ReloadMenuXML();
 	bool XMLHasChanges();
 
-	void ClickMod(Tile* mod);
-	void ClickSetting(Tile* mod);
+	void ClickMain(Tile* mod);
+	void ClickSecondary(Tile* mod);
 
 	void FilterMods();
 	void FilterSettings();
@@ -656,6 +676,5 @@ public:
 
 	void DisplaySettings(std::string id);
 };
-
 
 //static_assert(sizeof(ModConfigurationMenu) == 436);

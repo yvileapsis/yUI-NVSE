@@ -11,6 +11,14 @@
 	"description": "Having to do with heads up display"
 }
 ],
+"categories": [
+{
+	"id": "VUI+",
+	"plugin": "VUI+",
+	"doublestacked": 0,
+	"allTag": 1
+}
+],
 "settings": [
 {
 	"name": "Vanilla UI Plus",
@@ -19,12 +27,7 @@
 
 	"tags": [ "Quality-of-life", "HUD" ],
 	
-	"category": {
-		"plugin": "VUI+",
-		"doublestacked": 0,
-		"allTag": 1,
-		"category": "VUI+"
-	}
+	"category": "VUI+"
 },
 {
 	"name": "Dialog Max Height",
