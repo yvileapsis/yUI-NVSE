@@ -137,33 +137,63 @@ public:
 	}
 };
 
-class CMTag
+class CMObject
 {
 public:
-	std::string id; // TODO: make ID: type + mods alphab. + type + name
-	std::string name;
-	std::string nameShort;
-	std::string description;
+
+	enum kType
+	{
+		kNone,
+		kTag,
+		kOption,
+		kCategory,
+		kSetting
+	};
 
 	SInt32 priority;
 
-	CMTag() = default;
-	CMTag(std::string id, std::string name, std::string description)
-	: id(std::move(id)), name(std::move(name)), description(std::move(description))
-	{}
+	std::string id; // TODO: make ID: type + mods alphab. + type + name
+
+	std::string name;
+	std::string shortName;
+
+	std::string description;
 
 	virtual std::string GetID() { return id; }
 	virtual std::string GetName() { return !name.empty() ? name : id; }
-	virtual std::string GetDescription() const { return FormatString("%s\n- %s", description.c_str(), " "); }
+	virtual std::string GetShortName() { return !shortName.empty() ? shortName : id; }
+
+	virtual std::string GetDescription() const { return description; }
+
+	virtual UInt32 GetType() { return kNone; };
 };
 
-class CMOption : public CMTag
+class CMTag : public CMObject
+{
+public:
+
+};
+
+class CMOption : public CMObject
 {
 public:
 };
 
+class CMCategory : public CMObject
+{
+public:
+	std::string mod;
+	std::string plugin;
 
-class CMSetting : public CMTag
+	bool doublestacked;
+	bool allTag;
+
+	std::string GetName() override { return !name.empty() ? name : "&All;"; }
+	std::string GetShortName() override { return !name.empty() ? name : "&All;"; }
+};
+
+
+class CMSetting : public CMObject
 {
 public:
 	class IO
@@ -230,11 +260,7 @@ public:
 	class Category : public None
 	{
 	public:
-		std::string mod;
-		std::string plugin;
-		bool doublestacked;
-		bool allTag;
-		std::string category;
+		std::string id;
 
 		const char* GetTemplate() override { return "SettingSubsettingTemplate"; }
 		const char* GetTypeName() override { return "Subsetting"; }
@@ -506,15 +532,19 @@ public:
 		};
 	};
 
-	std::map<std::string, std::unique_ptr<CMTag>>	g_Tags;
-	std::vector<std::unique_ptr<CMSetting>>		g_Settings;
+	std::map<std::string, std::unique_ptr<CMTag>>		mapTags;
+	std::map<std::string, std::unique_ptr<CMCategory>>	mapCategories;
+	std::map<std::string, std::unique_ptr<CMOption>>	mapOptions;
 
+	std::set<std::unique_ptr<CMSetting>>				setSettings;
 
-	class ListBoxWithFilter
+	CMTag* tagDefault = nullptr;
+
+	class SettingList
 	{
 	public:
-		ListBoxWithFilter() {}
-		~ListBoxWithFilter() = default;
+		SettingList() {}
+		~SettingList() = default;
 
 		ListBox<CMSetting> listBox;
 
@@ -538,10 +568,8 @@ public:
 		}
 	};
 
-	CMTag* tagDefault = nullptr;
-
-	ListBoxWithFilter modsListBox;
-	ListBoxWithFilter settingsListBox;
+	SettingList settingsMain;
+	SettingList settingsSecondary;
 
 	class Description
 	{
@@ -558,11 +586,11 @@ public:
 			Set(setting->GetDescription());
 		}
 
-		void operator<<=(const ListBoxWithFilter& listBox) const
+		void operator<<=(const SettingList& listBox) const
 		{
 			const auto menu = GetSingleton();
-			if (menu->g_Tags.contains(listBox.tagActive) && menu->g_Tags[listBox.tagActive].get())
-				Set(menu->g_Tags[listBox.tagActive].get()->GetDescription());
+			if (menu->mapTags.contains(listBox.tagActive) && menu->mapTags[listBox.tagActive].get())
+				Set(menu->mapTags[listBox.tagActive].get()->GetDescription());
 			else Set("");
 		}
 
@@ -573,19 +601,22 @@ public:
 	};
 	Description description;
 
+	OSInputGlobals::ControlType controlDevice = OSInputGlobals::kControlType_Keyboard;
+
+	std::vector<std::string> categoryHistory;
+
+	std::map<CMValue, std::string> fontMap;
+
 
 	InputField subSettingInput;
 
 	HotkeyField hotkeyInput;
+	
 
-	std::map<CMValue, std::string> fontMap;
 
 	InputField searchBar;
 	FILETIME lastXMLWriteTime;
-	
-	OSInputGlobals::ControlType controlDevice = OSInputGlobals::kControlType_Keyboard;
 
-	std::vector<std::string> categoryHistory;
 
 	bool HasTiles();
 	void Close();
@@ -622,6 +653,8 @@ public:
 	void Default();
 
 	std::vector<CMSetting*> GetSettingsForString(std::string str);
+
+	void DisplaySettings(std::string id);
 };
 
 

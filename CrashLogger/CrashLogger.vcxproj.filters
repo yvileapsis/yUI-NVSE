@@ -34,13 +34,10 @@
     <ClCompile Include="..\game\OSDepend.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\GameRTTI.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
     <ClCompile Include="..\game\Script.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="..\game\GameSettings.cpp">
+    <ClCompile Include="..\game\Setting.cpp">
       <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="..\game\Sound.cpp">
@@ -71,9 +68,6 @@
       <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="..\game\NiNodes.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\game\GameProcess.cpp">
       <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="..\game\TESObject.cpp">
@@ -132,16 +126,16 @@
     <ClInclude Include="..\game\OSDepend.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\GameProcess.h">
+    <ClInclude Include="..\game\BaseProcess.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\GameRTTI.h">
+    <ClInclude Include="..\game\RTTI.h">
       <Filter>game</Filter>
     </ClInclude>
     <ClInclude Include="..\game\Script.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\GameSettings.h">
+    <ClInclude Include="..\game\Setting.h">
       <Filter>game</Filter>
     </ClInclude>
     <ClInclude Include="..\game\Sound.h">
@@ -193,9 +187,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
-    <None Include="..\game\GameRTTI.inc">
-      <Filter>game</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="nvse">

@@ -23,14 +23,14 @@ void RestartGameWarningCallback()
 
 void CMSetting::Category::Default()
 {
-	for (const auto iter : ModConfigurationMenu::GetSingleton()->GetSettingsForString(category))
+	for (const auto iter : ModConfigurationMenu::GetSingleton()->GetSettingsForString(id))
 		iter->Default();
 }
 
 std::vector<CMValue> CMSetting::Category::GetValues()
 {
 	std::vector<CMValue> ret;
-	for (const auto iter : ModConfigurationMenu::GetSingleton()->GetSettingsForString(category)) {
+	for (const auto iter : ModConfigurationMenu::GetSingleton()->GetSettingsForString(id)) {
 		const auto values = iter->GetValues();
 		ret.insert(ret.end(), values.begin(), values.end());
 	}
@@ -39,25 +39,7 @@ std::vector<CMValue> CMSetting::Category::GetValues()
 
 void CMSetting::Category::Click(Tile* tile)
 {
-	const auto menu = ModConfigurationMenu::GetSingleton();
-
-	std::string modsCategory;
-	std::string settingsCategory;
-
-	if (auto iter = std::ranges::find(menu->categoryHistory, category); iter == menu->categoryHistory.end())
-	{
-		menu->categoryHistory.push_back(category);
-	}
-
-	if (auto iter = std::ranges::find(menu->categoryHistory, category); iter != menu->categoryHistory.end())
-	{
-		settingsCategory = *iter;
-		if (iter != menu->categoryHistory.begin()) modsCategory = *iter;
-		menu->categoryHistory.erase(++iter, menu->categoryHistory.end());
-	}
-
-	menu->modsListBox.Display(modsCategory, false, true, doublestacked);
-	menu->settingsListBox.Display(settingsCategory, true, allTag, doublestacked);
+	ModConfigurationMenu::GetSingleton()->DisplaySettings(id);
 }
 
 void CMSetting::Choice::Display(Tile* tile)
@@ -218,7 +200,7 @@ void CMSetting::Font::Last(const bool forward)
 	font.Write(newValue);
 }
 
-void ModConfigurationMenu::ListBoxWithFilter::Display(const std::string& category, bool display, bool all, bool doublestacked)
+void ModConfigurationMenu::SettingList::Display(const std::string& category, bool display, bool all, bool doublestacked)
 {
 	listBox.parentTile->Set("_doublestacked", doublestacked);
 
@@ -235,7 +217,7 @@ void ModConfigurationMenu::ListBoxWithFilter::Display(const std::string& categor
 		{
 			if (!display && !setting->data->IsCategory()) continue;
 
-			const auto item = listBox.InsertAlt(setting, setting->GetName().c_str(), display ? setting->GetTemplate() : "");
+			const auto item = listBox.InsertAlt(setting, setting->GetName().c_str(), display ? setting->GetTemplate() : nullptr);
 			listBox.SortAlt(item);
 			for (const auto& tag : setting->tags) *this <<= tag;
 		}
@@ -272,28 +254,28 @@ void ModConfigurationMenu::FilterSettings()
 	const auto filter = [](CMSetting* setting)
 	{
 		const auto menu = GetSingleton();
-		if (menu->settingsListBox.tagActive == menu->tagDefault->GetID()) return false;
-		if (setting->tags.contains(menu->settingsListBox.tagActive)) return false;
+		if (menu->settingsMain.tagActive == menu->tagDefault->GetID()) return false;
+		if (setting->tags.contains(menu->settingsMain.tagActive)) return false;
 		return true;
 	};
-	settingsListBox.listBox.Filter(filter);
+	settingsMain.listBox.Filter(filter);
 }
 
-void ModConfigurationMenu::ClickMod(Tile* clickedTile) { modsListBox.Click(clickedTile); }
+void ModConfigurationMenu::ClickMod(Tile* clickedTile) { settingsSecondary.Click(clickedTile); }
 
 void ModConfigurationMenu::FilterMods() 
 {
 	const auto filter = [](CMSetting* mod)
 	{
 		const auto menu = GetSingleton();
-		if (menu->modsListBox.tagActive == menu->tagDefault->id) return false;
-		if (mod->tags.contains(menu->modsListBox.tagActive)) return false;
+		if (menu->settingsSecondary.tagActive == menu->tagDefault->id) return false;
+		if (mod->tags.contains(menu->settingsSecondary.tagActive)) return false;
 		return true;
 	};
-	modsListBox.listBox.Filter(filter);
+	settingsSecondary.listBox.Filter(filter);
 }
 
-void ModConfigurationMenu::ClickSetting(Tile* clickedTile) { settingsListBox.Click(clickedTile); }
+void ModConfigurationMenu::ClickSetting(Tile* clickedTile) { settingsMain.Click(clickedTile); }
 
 int reloadTweaksMenuFrameDelay;
 void __fastcall ReloadTweaksMenuInOneFrameHook(void* startMenu)
@@ -343,23 +325,23 @@ void ModConfigurationMenu::ShowMenuFirstTime()
 //	const auto sSettings = reinterpret_cast<Setting*>(0x11D1FE0);
 //	menuTitle->Set(kTileValue_string, FormatString("Mod %s", sSettings->data.str));
 
-	modsListBox.listBox.parentTile = modsListBackground;
-	modsListBox.listBox.templateName = "ModTemplate";
-	modsListBox.listBox.scrollBar = modsListBox.listBox.parentTile->GetChild("lb_scrollbar");
+	settingsSecondary.listBox.parentTile = modsListBackground;
+	settingsSecondary.listBox.templateName = "ModTemplate";
+	settingsSecondary.listBox.scrollBar = settingsSecondary.listBox.parentTile->GetChild("lb_scrollbar");
 
-	settingsListBox.listBox.parentTile = settingsListBackground;
-	settingsListBox.listBox.templateName = CMSetting::None::GetTemplateAlt();
-	settingsListBox.listBox.scrollBar = settingsListBox.listBox.parentTile->GetChild("lb_scrollbar");
+	settingsMain.listBox.parentTile = settingsListBackground;
+	settingsMain.listBox.templateName = CMSetting::None::GetTemplateAlt();
+	settingsMain.listBox.scrollBar = settingsMain.listBox.parentTile->GetChild("lb_scrollbar");
 
 	if (!tagDefault)
 	{
-		g_Tags.emplace("!All", std::make_unique<CMTag>("!All", "All", "Settings can be filtered by tags."));
-		tagDefault = g_Tags.begin()->second.get();
+//		mapTags.emplace("!All", std::make_unique<CMTag>("!All", "All", "Settings can be filtered by tags."));
+//		tagDefault = mapTags.begin()->second.get();
 	}
 
 	ReadJSONForPath(GetCurPath() + R"(\Data\menus\ConfigurationMenu\)");
 
-	settingsListBox.Display("", true, true, false);
+	DisplaySettings("");
 
 	fontMap.emplace(CMValue(static_cast<SInt32>(0)), "--");
 
@@ -373,7 +355,7 @@ void ModConfigurationMenu::ShowMenuFirstTime()
 
 void ModConfigurationMenu::SaveToJSON()
 {
-	for (const auto& iter : settingsListBox.listBox.list)
+	for (const auto& iter : settingsMain.listBox.list)
 	{
 		SaveModJSON(iter->object);
 		iter->object->Display(iter->tile);
@@ -382,7 +364,7 @@ void ModConfigurationMenu::SaveToJSON()
 
 void ModConfigurationMenu::LoadFromJSON()
 {
-	for (const auto& iter : settingsListBox.listBox.list)
+	for (const auto& iter : settingsMain.listBox.list)
 	{
 		LoadModJSON(iter->object);
 		iter->object->Display(iter->tile);
@@ -391,9 +373,17 @@ void ModConfigurationMenu::LoadFromJSON()
 
 void ModConfigurationMenu::Back()
 {
-	Close();
-	StartMenu::GetSingleton()->HandleClick(0, nullptr);
-	*(UInt8*)0x119F348 = 1;
+	if (categoryHistory.size() > 1)
+	{
+		categoryHistory.pop_back();
+		DisplaySettings(*categoryHistory.rbegin());
+	}
+	else
+	{
+		Close();
+		StartMenu::GetSingleton()->HandleClick(0, nullptr);
+		*(UInt8*)0x119F348 = 1;
+	}
 }
 
 void ModConfigurationMenu::Device()
@@ -406,7 +396,7 @@ void ModConfigurationMenu::Device()
 
 void ModConfigurationMenu::Default()
 {
-	for (const auto& iter : settingsListBox.listBox.list)
+	for (const auto& iter : settingsMain.listBox.list)
 	{
 		iter->object->Default();
 		iter->object->Display(iter->tile);
@@ -416,7 +406,7 @@ void ModConfigurationMenu::Default()
 std::vector<CMSetting*> ModConfigurationMenu::GetSettingsForString(std::string str)
 {
 	std::vector<CMSetting*> ret;
-	for (const auto& setting : g_Settings)
+	for (const auto& setting : setSettings)
 	{
 		if (str.empty() && setting->mods.empty()) {}
 		else if (!setting->mods.contains(str)) continue;
@@ -425,20 +415,20 @@ std::vector<CMSetting*> ModConfigurationMenu::GetSettingsForString(std::string s
 	return ret;
 }
 
-void ModConfigurationMenu::ListBoxWithFilter::UpdateTagString()
+void ModConfigurationMenu::SettingList::UpdateTagString()
 {
 	const auto menu = GetSingleton();
-	const auto tag = menu->g_Tags[tagActive].get();
+	const auto tag = menu->mapTags[tagActive].get();
 	tagTile->Set(kTileValue_string, tag ? tag->GetName() : tagActive);
 }
 
-void ModConfigurationMenu::ListBoxWithFilter::operator<<(const std::string& tag)
+void ModConfigurationMenu::SettingList::operator<<(const std::string& tag)
 {
 	tagActive = tag;
 	UpdateTagString();
 }
 
-void ModConfigurationMenu::ListBoxWithFilter::operator<<=(const std::string& tag)
+void ModConfigurationMenu::SettingList::operator<<=(const std::string& tag)
 {
 	tags.emplace(tag);
 }
@@ -492,7 +482,7 @@ void HotkeyField::Free()
 void ModConfigurationMenu::SetActiveSubsettingValueFromInput()
 {
 	/*
-	auto category = activeInputSubsetting->settingCategory;
+	auto id = activeInputSubsetting->settingCategory;
 	auto name = activeInputSubsetting->id;
 
 	auto dataType = activeInputSubsetting->GetDataType();
@@ -501,19 +491,19 @@ void ModConfigurationMenu::SetActiveSubsettingValueFromInput()
 	case SubSettingData::kSettingDataType_String:
 	{
 		activeInputSubsetting->data.valueStr = subSettingInput.GetText();
-		ini.SetValue(category.c_str(), name.c_str(), activeInputSubsetting->data.valueStr.c_str());
+		ini.SetValue(id.c_str(), name.c_str(), activeInputSubsetting->data.valueStr.c_str());
 		break;
 	}
 	case SubSettingData::kSettingDataType_Integer:
 	{
 		activeInputSubsetting->data.valueInt = std::stol(subSettingInput.GetText());
-		ini.SetLongValue(category.c_str(), name.c_str(), activeInputSubsetting->data.valueInt);
+		ini.SetLongValue(id.c_str(), name.c_str(), activeInputSubsetting->data.valueInt);
 		break;
 	}
 	case SubSettingData::kSettingDataType_Float:
 	{
 		activeInputSubsetting->data.valueFloat = std::stof(subSettingInput.GetText());
-		ini.SetDoubleValue(category.c_str(), name.c_str(), activeInputSubsetting->data.valueFloat);
+		ini.SetDoubleValue(id.c_str(), name.c_str(), activeInputSubsetting->data.valueFloat);
 		break;
 	}
 	}*/
@@ -774,12 +764,12 @@ bool __cdecl HideItemsNotMatchingFilterString(CMSetting* item)
 
 void ModConfigurationMenu::RefreshFilter()
 {
-	//	modsListBox.Filter(TweakFilter);
+	//	settingsSecondary.Filter(TweakFilter);
 
-	auto textColor = modsListBox.listBox.GetNumVisibleItems() ? 1 : 2;
+	auto textColor = settingsSecondary.listBox.GetNumVisibleItems() ? 1 : 2;
 	searchBar.tile->Set(kTileValue_systemcolor, textColor);
 
-//	if (auto selectedTile = modsListBox.GetTileFromItem(&activeMod))
+//	if (auto selectedTile = settingsSecondary.GetTileFromItem(&activeMod))
 	{
 		// if the selected tweak is filtered out
 //		if (selectedTile->GetFloat(kTileValue_listindex) < 0)
@@ -798,6 +788,39 @@ void ModConfigurationMenu::ClearAndCloseSearch()
 }
 
 */
+
+void ModConfigurationMenu::DisplaySettings(std::string id)
+{
+	if (const auto iter = std::ranges::find(categoryHistory, id); iter == categoryHistory.end())
+		categoryHistory.push_back(id);
+
+	auto iter = std::ranges::find(categoryHistory, id);
+
+	if (iter == categoryHistory.end()) return;
+
+	const auto category = mapCategories.contains(id) ? mapCategories[id].get() : nullptr;
+
+	const auto allTag = category ? category->allTag : true;
+
+	const auto doublestacked = category ? category->doublestacked : false;
+
+	settingsMain.Display(*iter, true, allTag, doublestacked);
+
+	if (iter != categoryHistory.begin())
+	{
+		const auto id = *--iter; ++iter;
+
+		const auto category = mapCategories.contains(id) ? mapCategories[id].get() : nullptr;
+
+		const auto allTag = category ? category->allTag : true;
+
+		settingsSecondary.Display(*--iter, false, allTag);
+		++iter;
+	}
+
+	categoryHistory.erase(++iter, categoryHistory.end());
+}
+
 
 void InputField::Init()
 {

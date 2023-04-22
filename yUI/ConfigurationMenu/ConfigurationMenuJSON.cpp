@@ -30,7 +30,7 @@ class CMSettingIOJSON : public CMSetting::IO { public: CMSettingIOJSON(const nlo
 	std::string categoryGot, valueGot;
 
 	if (elem.contains("path"))		pathGot = elem["path"].get<std::string>();
-	if (elem.contains("category"))	categoryGot = elem["category"].get<std::string>();
+	if (elem.contains("id"))	categoryGot = elem["id"].get<std::string>();
 	if (elem.contains("value"))		valueGot = elem["value"].get<std::string>();
 
 	ini = std::make_tuple(pathGot, categoryGot, valueGot);
@@ -46,13 +46,18 @@ class SettingNoneJSON : public CMSetting::None { public: SettingNoneJSON() = def
 
 class SettingCategoryJSON : public CMSetting::Category { public: SettingCategoryJSON(const nlohmann::basic_json<>& elem)
 {
+	if (elem.contains("category"))			id = elem["category"].get<std::string>();
+}};
+
+class CategoryJSON : public CMCategory { public: CategoryJSON(const nlohmann::basic_json<>& elem)
+{
 	if (elem.contains("mod"))			mod = elem["mod"].get<std::string>();
 	if (elem.contains("plugin"))		plugin = elem["plugin"].get<std::string>();
-	if (elem.contains("category"))		category = elem["category"].get<std::string>();
-
 	if (elem.contains("doublestacked"))	doublestacked = elem["doublestacked"].get<UInt32>();
 	if (elem.contains("allTag"))		allTag = elem["allTag"].get<UInt32>();
+
 }};
+
 
 class SettingSliderJSON : public CMSetting::Slider { public: SettingSliderJSON(const nlohmann::basic_json<>& elem)
 {
@@ -114,13 +119,13 @@ SettingJSON::SettingJSON(const nlohmann::basic_json<>& elem)
 {
 	if (elem.contains("id"))			id = elem["id"].get<std::string>();
 	if (elem.contains("name"))			name = elem["name"].get<std::string>();
-	if (elem.contains("shortName"))		nameShort = elem["shortName"].get<std::string>();
+	if (elem.contains("shortName"))		shortName = elem["shortName"].get<std::string>();
 	if (elem.contains("description"))	description = elem["description"].get<std::string>();
 
 	if (elem.contains("tags"))			tags.insert_range(GetSetFromElement<std::string>(elem["tags"]));
 	if (elem.contains("categories"))	mods.insert_range(GetSetFromElement<std::string>(elem["categories"]));
 
-	if (elem.contains("category"))		data = std::make_unique<Category>(SettingCategoryJSON(elem["category"]));
+	if (elem.contains("id"))		data = std::make_unique<Category>(SettingCategoryJSON(elem["id"]));
 	else if (elem.contains("choice"))	data = std::make_unique<Choice>(SettingChoiceJSON(elem["choice"]));
 	else if (elem.contains("slider"))	data = std::make_unique<Slider>(SettingSliderJSON(elem["slider"]));
 	else if (elem.contains("control"))	data = std::make_unique<Control>(SettingControlJSON(elem["control"]));
@@ -150,15 +155,26 @@ void ModConfigurationMenu::ReadJSON(const std::filesystem::path& path)
 		else
 		{
 			const auto tag = TagJSON(elem);
-			g_Tags.emplace(tag.id, std::make_unique<CMTag>(tag));
+			mapTags.emplace(tag.id, std::make_unique<CMTag>(tag));
 		}
+
+		if (!j.contains("categories") || !j["categories"].is_array())
+			Log() << "JSON message: category array not detected in " + path.string();
+		else for (const auto& elem : j["categories"]) if (!elem.is_object())
+			Log() << "JSON error: Expected object";
+		else
+		{
+			const auto tag = CategoryJSON(elem);
+			mapCategories.emplace(tag.id, std::make_unique<CategoryJSON>(tag));
+		}
+
 
 		if (!j.contains("settings") || !j["settings"].is_array())
 			Log() << "JSON message: ySI tab array not detected in " + path.string();
 		else for (const auto& elem : j["settings"]) if (!elem.is_object())
 			Log() << "JSON error: Expected object";
 		else
-			g_Settings.push_back(std::make_unique<CMSetting>(SettingJSON(elem)));
+			setSettings.emplace(std::make_unique<CMSetting>(SettingJSON(elem)));
 	}
 	catch (nlohmann::json::exception& e)
 	{
@@ -182,7 +198,7 @@ void ModConfigurationMenu::SaveModJSON(CMSetting* mod)
 	const std::filesystem::path& path = GetCurPath() + R"(\Data\Config\ConfigurationMenu\)" + mod->GetID() + ".json";
 	std::ofstream i(path);
 
-	for (const auto& setting : settingsListBox.listBox.list)
+	for (const auto& setting : settingsMain.listBox.list)
 	{
 		j[setting->object->GetID()].clear();
 		for (const auto& value : setting->object->GetValues())
@@ -207,7 +223,7 @@ void ModConfigurationMenu::LoadModJSON(CMSetting* mod)
 
 	i >> j;
 
-	for (const auto& setting : g_Settings)
+	for (const auto& setting : setSettings)
 	{
 		std::vector<CMValue> vector;
 		for (const auto& iter : j[setting->GetID()])
