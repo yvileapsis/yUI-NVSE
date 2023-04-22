@@ -6,6 +6,7 @@
 #include <map>
 #include <set>
 
+#include "GameEffects.h"
 #include "TESForm.h"
 #include "GameTasks.h"
 #include "Tile.h"
@@ -41,9 +42,9 @@ namespace CrashLogger::Handle
 		for (const auto iter : *TESForm::GetAll())
 		{
 			if (iter->typeID == kFormType_Character && static_cast<Character*>(iter)->baseProcess == process)
-				return FormatString("form %08X (%s)", iter->refID, iter->GetName());
+				return FormatString("Form %08X (%s)", iter->refID, iter->GetName());
 			if (iter->typeID == kFormType_Creature && static_cast<Creature*>(iter)->baseProcess == process)
-				return FormatString("form %08X (%s)", iter->refID, iter->GetName());
+				return FormatString("Form %08X (%s)", iter->refID, iter->GetName());
 		}
 		return "";
 	}
@@ -80,6 +81,16 @@ namespace CrashLogger::Handle
 
 	std::string AsTESTexture(void* ptr) { const auto texture = static_cast<TESTexture*>(ptr); return FormatString("%s", texture->ddsPath.CStr()); }
 	std::string AsQueuedTexture(void* ptr) { const auto texture = static_cast<QueuedTexture*>(ptr); return FormatString("%s", texture->name); }
+
+	std::string AsActiveEffect(void* ptr) { const auto effect = static_cast<ActiveEffect*>(ptr); return effect->enchantObject ? FormatString("Enchanted Object %08X (%s)", effect->enchantObject->refID, effect->enchantObject->GetName()) : ""; }
+
+	std::string AsScriptEffect(void* ptr) {
+		const auto effect = static_cast<ScriptEffect*>(ptr);
+		std::string ret;
+		ret += effect->enchantObject ? FormatString("Enchanted Object %08X (%s) ", effect->enchantObject->refID, effect->enchantObject->GetName()) : "";
+		ret += effect->script ? FormatString("Script %08X (%s)", effect->script->refID, effect->script->GetName()) : "";
+		return ret;
+	}
 
 }
 namespace CrashLogger::NVVtables
@@ -180,6 +191,7 @@ namespace CrashLogger::NVVtables
 		Push(0x10C1740, nullptr, "BSTaskManagerThread<SInt64>");
 		Push(0x1094E7C, nullptr, "NiTPointerMap<Tile::Value*; Tile::Reaction*>");
 
+		Push(0x01082F04, nullptr, "BSTCommonScrapHeapMessageQueue<BSPackedTask>");
 
 		Push(0x104A284, nullptr, "TESNPC::TESActorBase");
 		Push(0x104A270, nullptr, "TESNPC::Container");
@@ -195,6 +207,18 @@ namespace CrashLogger::NVVtables
 		Push(0x104A160, nullptr, "TESNPC::AVOwner");
 		Push(0x104A14C, nullptr, "TESNPC::Destructible");
 		Push(0x104A138, nullptr, "TESNPC::Race");
+
+		Push(0x101191C, nullptr, "AlchemyItem::MagicItem");
+		Push(0x1011900, nullptr, "AlchemyItem::MagicItem::TList");
+		Push(0x10118DC, nullptr, "AlchemyItem::Model");
+		Push(0x10118BC, nullptr, "AlchemyItem::Icon");
+		Push(0x10118A8, nullptr, "AlchemyItem::MessageIcon");
+		Push(0x1011894, nullptr, "AlchemyItem::Scriptable");
+		Push(0x1011880, nullptr, "AlchemyItem::Weight");
+		Push(0x101186C, nullptr, "AlchemyItem::EquipType");
+		Push(0x1011858, nullptr, "AlchemyItem::Destructible");
+		Push(0x1011844, nullptr, "AlchemyItem::PickUpPutDownSounds");
+
 
 		Push(kVtbl_Menu, Handle::AsMenu);
 		Push(kVtbl_TutorialMenu);
@@ -405,6 +429,45 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_TESModel, Handle::AsTESModel);
 		Push(kVtbl_QueuedModel, Handle::AsQueuedModel);
 
+		// effects
+		Push(kVtbl_ScriptEffect, Handle::AsScriptEffect);
+		Push(kVtbl_ActiveEffect, Handle::AsActiveEffect);
+		Push(kVtbl_AbsorbEffect);
+		Push(kVtbl_AssociatedItemEffect);
+		Push(kVtbl_BoundItemEffect);
+		Push(kVtbl_CalmEffect);
+		Push(kVtbl_ChameleonEffect);
+		Push(kVtbl_CommandCreatureEffect);
+		Push(kVtbl_CommandEffect);
+		Push(kVtbl_CommandHumanoidEffect);
+		Push(kVtbl_ConcussionEffect);
+		Push(kVtbl_CureEffect);
+		Push(kVtbl_DarknessEffect);
+		Push(kVtbl_DemoralizeEffect);
+		Push(kVtbl_DetectLifeEffect);
+		Push(kVtbl_DisintegrateArmorEffect);
+		Push(kVtbl_DisintegrateWeaponEffect);
+		Push(kVtbl_DispelEffect);
+		Push(kVtbl_FrenzyEffect);
+		Push(kVtbl_InvisibilityEffect);
+		Push(kVtbl_LightEffect);
+		Push(kVtbl_LimbConditionEffect);
+		Push(kVtbl_LockEffect);
+		Push(kVtbl_MagicHitEffect);
+		Push(kVtbl_MagicModelHitEffect);
+		Push(kVtbl_MagicShaderHitEffect);
+		Push(kVtbl_NightEyeEffect);
+		Push(kVtbl_OpenEffect);
+		Push(kVtbl_ParalysisEffect);
+		Push(kVtbl_ReanimateEffect);
+		Push(kVtbl_ShieldEffect);
+		Push(kVtbl_SummonCreatureEffect);
+		Push(kVtbl_SunDamageEffect);
+		Push(kVtbl_TelekinesisEffect);
+		Push(kVtbl_TurnUndeadEffect);
+		Push(kVtbl_ValueAndConditionsEffect);
+		Push(kVtbl_ValueModifierEffect);
+		Push(kVtbl_VampirismEffect);
 
 		Push(kVtbl_MagicItem, nullptr);
 
@@ -934,55 +997,25 @@ namespace CrashLogger::NVVtables
 
 		Push(kVtbl_FOPipboyManager);
 		Push(kVtbl_FORenderedMenu);
-		Push(kVtbl_AbsorbEffect);
-		Push(kVtbl_ActiveEffect);
-		Push(kVtbl_AssociatedItemEffect);
+
+
 		Push(kVtbl_bhkCharacterListenerSpell);
 		Push(kVtbl_bhkTelekinesisListener);
-		Push(kVtbl_BoundItemEffect);
-		Push(kVtbl_CalmEffect);
-		Push(kVtbl_ChameleonEffect);
-		Push(kVtbl_CommandCreatureEffect);
-		Push(kVtbl_CommandEffect);
-		Push(kVtbl_CommandHumanoidEffect);
-		Push(kVtbl_ConcussionEffect);
-		Push(kVtbl_CureEffect);
-		Push(kVtbl_DarknessEffect);
-		Push(kVtbl_DemoralizeEffect);
-		Push(kVtbl_DetectLifeEffect);
-		Push(kVtbl_DisintegrateArmorEffect);
-		Push(kVtbl_DisintegrateWeaponEffect);
-		Push(kVtbl_DispelEffect);
-		Push(kVtbl_FrenzyEffect);
-		Push(kVtbl_InvisibilityEffect);
-		Push(kVtbl_LightEffect);
-		Push(kVtbl_LimbConditionEffect);
-		Push(kVtbl_LockEffect);
+
 		Push(kVtbl_MagicBallProjectile);
 		Push(kVtbl_MagicBoltProjectile);
 		Push(kVtbl_MagicCaster);
 		Push(kVtbl_MagicFogProjectile);
-		Push(kVtbl_MagicHitEffect);
-		Push(kVtbl_MagicModelHitEffect);
+
+
+
+
 		Push(kVtbl_MagicProjectile);
-		Push(kVtbl_MagicShaderHitEffect);
 		Push(kVtbl_MagicSprayProjectile);
 		Push(kVtbl_MagicTarget);
-		Push(kVtbl_NightEyeEffect);
 		Push(kVtbl_NonActorMagicCaster);
 		Push(kVtbl_NonActorMagicTarget);
-		Push(kVtbl_OpenEffect);
-		Push(kVtbl_ParalysisEffect);
-		Push(kVtbl_ReanimateEffect);
-		Push(kVtbl_ScriptEffect);
-		Push(kVtbl_ShieldEffect);
-		Push(kVtbl_SummonCreatureEffect);
-		Push(kVtbl_SunDamageEffect);
-		Push(kVtbl_TelekinesisEffect);
-		Push(kVtbl_TurnUndeadEffect);
-		Push(kVtbl_ValueAndConditionsEffect);
-		Push(kVtbl_ValueModifierEffect);
-		Push(kVtbl_VampirismEffect);
+
 		Push(kVtbl_CBSAStream);
 		Push(kVtbl_CAsyncStream);
 		Push(kVtbl_CBSAReader);
@@ -2130,14 +2163,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_NiMaterialResource);
 	};
 
-	/*
-	{
-
-		,
-
-
-	};
-	*/
 	std::string GetStringForVTBL(void* ptr, UInt32 vtbl)
 	{
 

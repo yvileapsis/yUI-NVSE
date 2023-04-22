@@ -1,4 +1,5 @@
 #pragma once
+#include "Containers.h"
 #include "Types.h"
 
 class ActiveEffect
@@ -27,25 +28,25 @@ public:
 	virtual void			Unk_12();
 	virtual void			Unk_13();
 
-//	void		** _vtbl;			// 00
-	float		timeElapsed;		// 04
-	MagicItem	*magicItem;			// 08
-	EffectItem	* effectItem;		// 0C
-	bool		bApplied;			// 10
-	bool		bTerminated;		// 11 set to 1 when effect is to be removed
-	UInt8		flags12;			// 12
-	UInt8		pad13;				// 13
-	UInt32		unk14;				// 14
-	UInt32		unk18;				// 18 - flags
-	float		magnitude;			// 1C - adjusted based on target?
-	float		duration;			// 20 - adjusted based on target?
-	MagicTarget	* target;			// 24
-	MagicCaster	* caster;			// 28
-	UInt32		spellType;			// 2C e.g. SpellItem::kType_Ability
-	UInt32		sound;				// 30 Sound* in stewie's tweaks
-	UInt32		unk34;				// 34
-	UInt32		unk38;				// 38
-	TESForm		* enchantObject;	// 3C enchanted obj responsible for effect
+//	void		**	_vtbl;			// 00
+	Float32			timeElapsed;		// 04
+	MagicItem*		magicItem;			// 08
+	EffectItem*		effectItem;		// 0C
+	bool			bApplied;			// 10
+	bool			bTerminated;		// 11 set to 1 when effect is to be removed
+	UInt8			flags12;			// 12
+	UInt8			pad13;				// 13
+	UInt32			unk14;				// 14
+	UInt32			unk18;				// 18 - flags
+	Float32			magnitude;			// 1C - adjusted based on target?
+	Float32			duration;			// 20 - adjusted based on target?
+	MagicTarget*	target;			// 24
+	MagicCaster*	caster;			// 28
+	UInt32			spellType;			// 2C e.g. SpellItem::kType_Ability
+	UInt32			sound;				// 30 Sound* in stewie's tweaks
+	UInt32			unk34;				// 34
+	UInt32			unk38;				// 38
+	TESForm*		enchantObject;	// 3C enchanted obj responsible for effect
 	TList<TESForm>	data;			// 40 - in ScriptEffect this is a Script *
 
 	void Remove(bool bRemoveImmediately);
