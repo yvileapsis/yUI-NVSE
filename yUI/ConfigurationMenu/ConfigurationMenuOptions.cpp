@@ -915,6 +915,14 @@ void ModConfigurationMenu::DisplaySettings(std::string id)
 	categoryHistory.erase(++iter, categoryHistory.end());
 }
 
+void ModConfigurationMenu::UpdateEscape()
+{
+	if (OSInputGlobals::GetSingleton()->GetControlState(OSInputGlobals::Escape_, OSInputGlobals::isPressed) && !GetInHotkeyMode())
+	{
+		Back();
+	}
+}
+
 
 void InputField::Init()
 {

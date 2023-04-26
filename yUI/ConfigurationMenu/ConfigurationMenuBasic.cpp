@@ -496,16 +496,13 @@ void ModConfigurationMenu::Update()
 
 	searchBar.Update();
 	subSettingInput.Update();
-	auto input = OSInputGlobals::GetSingleton();
 
-	if (input->GetControlState(OSInputGlobals::Escape_, OSInputGlobals::isPressed) && !this->GetInHotkeyMode())
-	{
-		Back();
-		return;
-	}
+	UpdateEscape();
 
+	return;
+	
 	// close the search and categoriesMods list when clicking elsewhere
-	if (input->GetMouseState(OSInputGlobals::kLeftClick, OSInputGlobals::isDepressed))
+	//if (input->GetMouseState(OSInputGlobals::kLeftClick, OSInputGlobals::isDepressed))
 	{
 		auto activeTileID = -1;
 		if (auto tile = InterfaceManager::GetSingleton()->GetActiveTile())

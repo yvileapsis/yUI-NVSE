@@ -675,6 +675,8 @@ public:
 	std::vector<CMSetting*> GetSettingsForString(std::string str);
 
 	void DisplaySettings(std::string id);
+
+	void UpdateEscape();
 };
 
 //static_assert(sizeof(ModConfigurationMenu) == 436);
