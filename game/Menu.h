@@ -63,7 +63,7 @@ enum MenuSpecialKeyboardInputCode
 	kMenu_PageDown = 0x10,
 };
 
-enum SpecialInputCode
+enum SpecialInputCode : UInt32
 {
 	kInputCode_Backspace = 0x80000000,
 	kInputCode_ArrowLeft = 0x80000001,
@@ -253,7 +253,11 @@ public:
 	typedef void(__cdecl* ForEachFunc)(Tile*, Item*);
 	void ForEach(ForEachFunc func, int maxIndex1 = -1, int maxIndex2 = 0x7FFFFFFF) { ThisCall(0x7314C0, this, func, maxIndex1, maxIndex2); }
 
-	Tile* GetTileFromItem(Item** item) { return ThisCall<Tile*>(0x7A22D0, this, item); }
+	Tile* GetTileFromItem(Item* item)
+	{
+		for (const auto iter : this->list) if (iter->object == item) return iter->tile;
+		return nullptr;
+	}
 
 	Item* GetItemForTile(Tile* tile)
 	{

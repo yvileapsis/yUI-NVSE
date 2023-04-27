@@ -21,13 +21,13 @@ void RestartGameWarningCallback()
 }
 */
 
-void CMSetting::Category::Default()
+void Category::Default()
 {
 	for (const auto iter : ModConfigurationMenu::GetSingleton()->GetSettingsForString(id))
 		iter->Default();
 }
 
-std::vector<CMValue> CMSetting::Category::GetValues()
+std::vector<CMValue> Category::GetValues()
 {
 	std::vector<CMValue> ret;
 	for (const auto iter : ModConfigurationMenu::GetSingleton()->GetSettingsForString(id)) {
@@ -37,12 +37,12 @@ std::vector<CMValue> CMSetting::Category::GetValues()
 	return ret;
 }
 
-void CMSetting::Category::Click(Tile* tile)
+void Category::Click()
 {
-	ModConfigurationMenu::GetSingleton()->DisplaySettings(id);
+	ModConfigurationMenu::GetSingleton()->DisplaySettings(categoryID);
 }
 
-void CMSetting::Choice::Display(Tile* tile)
+void Choice::Display(Tile* tile)
 {
 	const auto value = setting.Read();
 
@@ -53,7 +53,7 @@ void CMSetting::Choice::Display(Tile* tile)
 	tile->Set(kTileValue_user0, valueString);
 }
 
-void CMSetting::Slider::Display(Tile* tile)
+void Slider::Display(Tile* tile)
 {
 	const auto value = setting.Read();
 	const Float64 percent = (Float64) value / (Float64) max;
@@ -61,10 +61,11 @@ void CMSetting::Slider::Display(Tile* tile)
 	tile->Set(kTileValue_user3, 20);
 }
 
-void CMSetting::Font::Display(Tile* tile)
+void Font::Display(Tile* tile)
 {
 	const auto fontMap = ModConfigurationMenu::GetSingleton()->fontMap;
 	const auto value = font.Read();
+	const auto valueY = fontY.Read();
 	const SInt32 id = value;
 	std::string valueString;
 	if (!id)
@@ -74,19 +75,20 @@ void CMSetting::Font::Display(Tile* tile)
 	}
 	else if (fontMap.contains(value))
 	{
-		valueString = "Font " + value;//fontMap[value];
+		valueString = "Font " + value.GetAsString();//fontMap[value];
 		tile->GetChild("lb_toggle_value")->Set(kTileValue_font, id);
 	}
 	else
 	{
-		valueString = "Font " + value;
+		valueString = "Font " + value.GetAsString();
 		tile->GetChild("lb_toggle_value")->Set(kTileValue_font, id);
 	}
 	tile->Set(kTileValue_user0, valueString);
+	tile->Set(kTileValue_user1, valueY.GetAsFloat());
 }
 
 
-void CMSetting::Control::Display(Tile* tile)
+void Control::Display(Tile* tile)
 {
 	const auto value = keyboard.Read();
 	const auto key = GetStringForScancode(value, 1);
@@ -112,7 +114,18 @@ void CMSetting::Control::Display(Tile* tile)
 	}
 }
 
-CMValue CMSetting::Choice::GetPrev(const CMValue& value)
+void Control::ClickOption(Tile* tile)
+{
+	const auto menu = ModConfigurationMenu::GetSingleton();
+	menu->controlHandler.setting = menu->settingsMain.listBox.GetItemForTile(tile);
+}
+
+bool Control::Update()
+{
+	return false;
+}
+
+CMValue Choice::GetPrev(const CMValue& value)
 {
 	if (choice.empty()) return value;
 	if (auto iter = choice.find(value); iter == choice.end() || --iter == choice.end())
@@ -120,7 +133,7 @@ CMValue CMSetting::Choice::GetPrev(const CMValue& value)
 	else return iter->first;
 }
 
-CMValue CMSetting::Choice::GetNext(const CMValue& value)
+CMValue Choice::GetNext(const CMValue& value)
 {
 	if (choice.empty()) return value;
 	if (auto iter = choice.find(value); iter == choice.end() || ++iter == choice.end())
@@ -128,47 +141,55 @@ CMValue CMSetting::Choice::GetNext(const CMValue& value)
 	else return iter->first;
 }
 
-void CMSetting::Choice::Next(const bool forward)
+Choice* Choice::Next(const bool forward)
 {
 	const auto value = setting.Read();
 	const auto newValue = forward ? GetNext(value) : GetPrev(value);
 	setting.Write(newValue);
+
+	return this;
 }
 
-void CMSetting::Choice::Last(const bool forward)
+Choice* Choice::Last(const bool forward)
 {
 	const auto value = setting.Read();
 	const auto newValue = forward ? choice.rbegin()->first : choice.begin()->first;
 	setting.Write(newValue);
+
+	return this;
 }
 
-CMValue CMSetting::Slider::GetPrev(const CMValue& value) const
+CMValue Slider::GetPrev(const CMValue& value) const
 {
 	CMValue newValue = value - delta;
 	return newValue < min ? value : newValue;
 }
 
-CMValue CMSetting::Slider::GetNext(const CMValue& value) const
+CMValue Slider::GetNext(const CMValue& value) const
 {
 	CMValue newValue = value + delta;
 	return newValue > max ? value : newValue;
 }
 
-void CMSetting::Slider::Next(const bool forward)
+Slider* Slider::Next(const bool forward)
 {
 	const auto value = setting.Read();
 	const auto newValue = forward ? GetNext(value) : GetPrev(value);
 	setting.Write(newValue);
+
+	return this;
 }
 
-void CMSetting::Slider::Last(const bool forward)
+Slider* Slider::Last(const bool forward)
 {
 	const auto value = setting.Read();
 	const auto newValue = forward ? max : min;
 	setting.Write(newValue);
+
+	return this;
 }
 
-void CMSetting::Slider::Drag(Float32 value)
+Slider* Slider::Drag(Float32 value)
 {
 	const UInt32 forceTruncating = value * (max - min) / delta.GetAsFloat();
 
@@ -178,9 +199,11 @@ void CMSetting::Slider::Drag(Float32 value)
 	else newValue.Set(static_cast<SInt64>(forceTruncating * delta.GetAsInteger()));
 
 	setting.Write(newValue);
+
+	return this;
 }
 
-CMValue CMSetting::Font::GetPrev(const CMValue& value)
+CMValue Font::GetPrev(const CMValue& value)
 {
 	const auto fontMap = ModConfigurationMenu::GetSingleton()->fontMap;
 	if (fontMap.empty()) return value;
@@ -189,7 +212,7 @@ CMValue CMSetting::Font::GetPrev(const CMValue& value)
 	else return iter->first;
 }
 
-CMValue CMSetting::Font::GetNext(const CMValue& value)
+CMValue Font::GetNext(const CMValue& value)
 {
 	const auto fontMap = ModConfigurationMenu::GetSingleton()->fontMap;
 	if (fontMap.empty()) return value;
@@ -198,34 +221,52 @@ CMValue CMSetting::Font::GetNext(const CMValue& value)
 	else return iter->first;
 }
 
-void CMSetting::Font::Next(const bool forward)
+Font* Font::Next(const bool forward)
 {
 	const auto value = font.Read();
 	const CMValue newValue = forward ? GetNext(value) : GetPrev(value);
 	font.Write(newValue);
+
+	return this;
 }
 
-void CMSetting::Font::Last(const bool forward)
+Font* Font::Last(const bool forward)
 {
 	const auto value = font.Read();
 	const auto newValue = CMValue(static_cast<SInt32>(forward ? 8 : 1));
 	font.Write(newValue);
+
+	return this;
+}
+
+Font* Font::Up(const bool forward)
+{
+	const auto value = fontY.Read();
+	const auto newValue = value.GetAsFloat() + (forward ? -0.5 : 0.5);
+	fontY.Write(newValue);
+
+	return this;
 }
 
 void ModConfigurationMenu::SettingList::UpdateSettingsList()
 {
+	const auto menu = GetSingleton();
+
 	listBox.parentTile->Set("_doublestacked", doublestacked);
 
 	listBox.FreeAllTiles();
 
 	*this << "";
+
+	tags.clear();
+
 	// TODO: add order of displayed tags;
 
 	if (allTag) *this <<= "!All";
 
-	for (const auto& setting : GetSingleton()->GetSettingsForString(categoryActive))
+	for (const auto& setting : menu->GetSettingsForString(categoryActive))
 	{
-		if (!main && !setting->data->IsCategory()) continue;
+		if (!main && !setting->IsCategory()) continue;
 
 		const auto item = listBox.InsertAlt(setting, main && !doublestacked ? setting->GetName().c_str() : setting->GetShortName().c_str(), main ? setting->GetTemplate() : nullptr);
 		listBox.SortAlt(item);
@@ -260,30 +301,31 @@ void ModConfigurationMenu::SettingList::DisplaySettings()
 
 void ModConfigurationMenu::SettingList::Update()
 {
-	if (startTime)
+	for (const auto& setting : listBox.list)
+		setting->object->Update();
+
+	if (!startTime) return;
+	auto percentageCompleted = static_cast<Float32>(GetTickCount() - startTime) / duration;
+
+	if (percentageCompleted > 1.0) percentageCompleted = 1;
+
+	listBox.parentTile->Set("_alpha", (alphaTarget - alphaStart) * percentageCompleted + alphaStart, true);
+	tagTile->Set("_alpha", (alphaTarget - alphaStart) * percentageCompleted + alphaStart, true);
+
+	if (percentageCompleted < 1.0) { }
+	else if (!displayAfterTimer)
+		startTime = 0;
+	else
 	{
-		auto percentageCompleted = static_cast<Float32>(GetTickCount() - startTime) / duration;
+		alphaStart = 0.0;
+		alphaTarget = 255.0;
+		startTime = GetTickCount();
+		duration = 0.25 * 1000;
 
-		if (percentageCompleted > 1.0) percentageCompleted = 1;
+		UpdateSettingsList();
+		DisplaySettings();
 
-		listBox.parentTile->Set("_alpha", (alphaTarget - alphaStart) * percentageCompleted + alphaStart, true);
-		tagTile->Set("_alpha", (alphaTarget - alphaStart) * percentageCompleted + alphaStart, true);
-
-		if (percentageCompleted < 1.0) { }
-		else if (!displayAfterTimer)
-			startTime = 0;
-		else
-		{
-			alphaStart = 0.0;
-			alphaTarget = 255.0;
-			startTime = GetTickCount();
-			duration = 0.25 * 1000;
-
-			UpdateSettingsList();
-			DisplaySettings();
-
-			displayAfterTimer = false;
-		}
+		displayAfterTimer = false;
 	}
 }
 
@@ -329,7 +371,7 @@ void ModConfigurationMenu::SettingList::Hide()
 	if (listBox.parentTile->Get("_alpha") > 0)
 	{
 		displayAfterTimer = false;
-		categoryActive.clear();
+		categoryActive = "!Empty";
 
 		startTime = GetTickCount();
 		duration = 0.25 * 1000;
@@ -356,10 +398,10 @@ void ModConfigurationMenu::ClickMain(Tile* clickedTile)
 	settingsMain.Click(clickedTile);
 }
 
-void ModConfigurationMenu::ClickSecondary(Tile* clickedTile)
+void ModConfigurationMenu::ClickExtra(Tile* clickedTile)
 {
 	categoryHistory.pop_back();
-	settingsSecondary.Click(clickedTile);
+	settingsExtra.Click(clickedTile);
 }
 
 void ModConfigurationMenu::FilterMods() 
@@ -367,11 +409,11 @@ void ModConfigurationMenu::FilterMods()
 	const auto filter = [](CMSetting* mod)
 	{
 		const auto menu = GetSingleton();
-		if (menu->settingsSecondary.tagActive == menu->tagDefault->id) return false;
-		if (mod->tags.contains(menu->settingsSecondary.tagActive)) return false;
+		if (menu->settingsExtra.tagActive == menu->tagDefault->id) return false;
+		if (mod->tags.contains(menu->settingsExtra.tagActive)) return false;
 		return true;
 	};
-	settingsSecondary.listBox.Filter(filter);
+	settingsExtra.listBox.Filter(filter);
 }
 
 int reloadTweaksMenuFrameDelay;
@@ -422,18 +464,21 @@ void ModConfigurationMenu::ShowMenuFirstTime()
 //	const auto sSettings = reinterpret_cast<Setting*>(0x11D1FE0);
 //	menuTitle->Set(kTileValue_string, FormatString("Mod %s", sSettings->data.str));
 
-	settingsSecondary.listBox.parentTile = modsListBackground;
-	settingsSecondary.listBox.templateName = "ModTemplate";
-	settingsSecondary.listBox.scrollBar = settingsSecondary.listBox.parentTile->GetChild("lb_scrollbar");
+	settingsExtra.listBox.parentTile = modsListBackground;
+	settingsExtra.listBox.templateName = "ModTemplate";
+	settingsExtra.listBox.scrollBar = settingsExtra.listBox.parentTile->GetChild("lb_scrollbar");
 
 	settingsMain.listBox.parentTile = settingsListBackground;
-	settingsMain.listBox.templateName = CMSetting::None::GetTemplateAlt();
+	settingsMain.listBox.templateName = CMSetting::GetTemplateAlt();
 	settingsMain.listBox.scrollBar = settingsMain.listBox.parentTile->GetChild("lb_scrollbar");
 
 	if (!tagDefault)
 	{
-//		mapTags.emplace("!All", std::make_unique<CMTag>("!All", "All", "Settings can be filtered by tags."));
-//		tagDefault = mapTags.begin()->second.get();
+		CMTag tag;
+		tag.id = "!All";
+		tag.description = "Settings can be filtered by tags.";
+		mapTags.emplace("!All", std::make_unique<CMTag>(tag));
+		tagDefault = mapTags["!All"].get();
 	}
 
 	ReadJSONForPath(GetCurPath() + R"(\Data\menus\ConfigurationMenu\)");
@@ -516,7 +561,19 @@ void ModConfigurationMenu::SettingList::UpdateTagString()
 {
 	const auto menu = GetSingleton();
 	const auto tag = menu->mapTags[tagActive].get();
-	tagTile->Set(kTileValue_string, tag ? tag->GetName() : tagActive);
+
+	std::string str;
+
+	if (tag == menu->tagDefault)
+	{
+		const auto category = menu->mapCategories.contains(categoryActive) ? menu->mapCategories[categoryActive].get() : nullptr;
+		str = category ? main ? category->GetName() : category->GetShortName() : "All";
+	}
+	else
+	{
+		str = tag ? tag->GetName() : tagActive;
+	}
+	tagTile->Set(kTileValue_string, str);
 }
 
 void ModConfigurationMenu::SettingList::operator<<(const std::string& tag)
@@ -530,50 +587,28 @@ void ModConfigurationMenu::SettingList::operator<<=(const std::string& tag)
 	tags.emplace(tag);
 }
 
-void HotkeyField::Init()
+void HotkeyField::SetActive(CMSetting* set)
 {
-	tile = nullptr;
-	isActive = false;
+	setting = set;
 	frameDebounce = true;
-	value = 0;
 }
 
-int HotkeyField::GetPressedKey()
+
+void ModConfigurationMenu::SettingList::operator++()
 {
-	if (frameDebounce) return 0;
-
-	const auto input = OSInputGlobals::GetSingleton();
-	for (int i = Scancodes::_Escape; i < 265; ++i)
-	{
-		if (input->GetKeyState(i, OSInputGlobals::isPressed))
-		{
-			return i;
-		}
-	}
-
-	return 0;
+	if (tags.empty()) return;
+	auto iter = tags.find(tagActive);
+	tagActive = iter == tags.end() || ++iter == tags.end() ? *tags.begin() : *iter;
+	UpdateTagString();
 }
 
-int HotkeyField::Update()
+void ModConfigurationMenu::SettingList::operator--()
 {
-	const auto key = GetPressedKey();
-	if (key > 0) value = key == _Escape ? 0 : key;
-
-	frameDebounce = false;
-	return key;
+	if (tags.empty()) return;
+	auto iter = tags.find(tagActive);
+	tagActive = iter == tags.end() || iter-- == tags.begin() ? *tags.rbegin() : *iter;
+	UpdateTagString();
 }
-
-void HotkeyField::SetActive(bool active)
-{
-	frameDebounce = active;
-	isActive = active;
-}
-
-void HotkeyField::Free()
-{
-
-}
-
 
 
 void ModConfigurationMenu::SetActiveSubsettingValueFromInput()
@@ -706,29 +741,7 @@ void ModConfigurationMenu::SetInSubsettingInputMode(bool isActive)
 			{
 				this->SetActiveSubsettingValueFromInput();
 
-				
-				if (activeInputSubsetting->IsSlider())
-				{
-					if (tile->parent)
-					{
-						if (auto sliderTile = tile->parent->parent)
-						{
-							if (auto sliderRect = sliderTile->GetChildByID(kModConfigurationMenu_SliderDraggableRect))
-							{
-								// update the sliders
-								SetSliderDisplayedValues(sliderRect, activeInputSubsetting);
-
-								// recalculate the min/max values
-								auto minValue = sliderRect->GetFloat(_MinTrait);
-								auto maxValue = sliderRect->GetFloat(_MaxTrait);
-								auto value = sliderRect->GetFloat(_ValueTrait);
-
-								sliderRect->SetFloat(_MinTrait, min(minValue, value));
-								sliderRect->SetFloat(_MaxTrait, max(maxValue, value));
-							}
-						}
-					}
-				}
+	
 			}
 			//			else
 			{
@@ -845,10 +858,6 @@ else if (setting->IsHotkeyField())
 	}
 }*/
 
-bool ModConfigurationMenu::GetInHotkeyMode()
-{
-	return hotkeyInput.isActive;
-}
 
 bool __cdecl HideItemsNotMatchingFilterString(CMSetting* item)
 {
@@ -861,17 +870,17 @@ bool __cdecl HideItemsNotMatchingFilterString(CMSetting* item)
 
 void ModConfigurationMenu::RefreshFilter()
 {
-	//	settingsSecondary.Filter(TweakFilter);
+	//	settingsExtra.Filter(TweakFilter);
 
-	auto textColor = settingsSecondary.listBox.GetNumVisibleItems() ? 1 : 2;
+	auto textColor = settingsExtra.listBox.GetNumVisibleItems() ? 1 : 2;
 	searchBar.tile->Set(kTileValue_systemcolor, textColor);
 
-//	if (auto selectedTile = settingsSecondary.GetTileFromItem(&activeMod))
+//	if (auto selectedTile = settingsExtra.GetTileFromItem(&activeMod))
 	{
 		// if the selected tweak is filtered out
 //		if (selectedTile->GetFloat(kTileValue_listindex) < 0)
 		{
-//			this->ClickSecondary(nullptr);
+//			this->ClickExtra(nullptr);
 		}
 	}
 }
@@ -905,11 +914,11 @@ void ModConfigurationMenu::DisplaySettings(std::string id)
 
 		const auto category = mapCategories.contains(id) ? mapCategories[id].get() : nullptr;
 
-		settingsSecondary.Display(id, false, category ? category->allTag : true, false);
+		settingsExtra.Display(id, false, category ? category->allTag : true, false);
 	}
 	else
 	{
-		settingsSecondary.Hide();
+		settingsExtra.Hide();
 	}
 
 	categoryHistory.erase(++iter, categoryHistory.end());
@@ -917,7 +926,7 @@ void ModConfigurationMenu::DisplaySettings(std::string id)
 
 void ModConfigurationMenu::UpdateEscape()
 {
-	if (OSInputGlobals::GetSingleton()->GetControlState(OSInputGlobals::Escape_, OSInputGlobals::isPressed) && !GetInHotkeyMode())
+	if (OSInputGlobals::GetSingleton()->GetControlState(OSInputGlobals::Escape_, OSInputGlobals::isPressed))
 	{
 		Back();
 	}
@@ -1025,7 +1034,9 @@ bool InputField::HandleSpecialInputKey(UInt32 key)
 		{
 			if (IsControlHeld())
 			{
-				//				caretIndex = (input.c_str()).EraseWord(caretIndex);
+				const auto whatever = GetCharsSinceSpace(input.c_str(), caretIndex);
+				input.erase(caretIndex, whatever);
+				caretIndex = whatever;
 			}
 			else
 			{
@@ -1037,7 +1048,9 @@ bool InputField::HandleSpecialInputKey(UInt32 key)
 		{
 			if (IsControlHeld())
 			{
-				//				input.EraseNextWord(caretIndex);
+				const auto whatever = GetCharsTillSpace(input.c_str(), caretIndex) + 1;
+				input.erase(caretIndex, whatever);
+				caretIndex = whatever;
 			}
 			else
 			{
@@ -1155,8 +1168,4 @@ void InputField::Update()
 			UpdateCaretDisplay();
 		}
 	}
-}
-
-void InputField::Free()
-{
 }

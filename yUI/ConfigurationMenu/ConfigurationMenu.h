@@ -14,6 +14,8 @@ class CMSetting;
 inline UInt32 g_LogLevel = 3;
 inline UInt32 g_saveValue = 1;
 
+class CMJSONElem;
+
 struct InputField
 {
 	// used for filtering which characters are valid
@@ -44,7 +46,6 @@ struct InputField
 	void HandleKeyboardShortcuts(UInt32 key);
 	bool HandleKey(UInt32 key);
 	void Update();
-	void Free();
 };
 
 class CMValue
@@ -68,6 +69,8 @@ public:
 	explicit CMValue(const UInt32 value) : type(kInteger), intval(value) {}
 	CMValue(const Float64 value) : type(kFloat), floatval(value) {}
 	CMValue(std::string value) : type(kString), stringval(std::move(value)) {}
+
+	CMValue(const CMJSONElem& elem);
 
 	bool IsInteger() const { return type == kInteger; }
 	bool IsFloat() const { return type == kFloat; }
@@ -159,6 +162,10 @@ public:
 
 	std::string description;
 
+	CMObject() = default;
+	CMObject(const CMJSONElem& elem);
+
+	virtual ~CMObject() = default;
 	virtual std::string GetID() { return id; }
 	virtual std::string GetName() { return !name.empty() ? name : id; }
 	virtual std::string GetShortName() { return !shortName.empty() ? shortName : GetName(); }
@@ -172,11 +179,14 @@ class CMTag : public CMObject
 {
 public:
 
+	CMTag() = default;
+	CMTag(const CMJSONElem& elem);
 };
 
 class CMOption : public CMObject
 {
 public:
+	CMOption(const CMJSONElem& elem);
 };
 
 class CMCategory : public CMObject
@@ -188,10 +198,11 @@ public:
 	bool doublestacked;
 	bool allTag;
 
-	std::string GetName() override { return !name.empty() ? name : "&All;"; }
-	std::string GetShortName() override { return !name.empty() ? name : "&All;"; }
-};
+	CMCategory(const CMJSONElem& elem);
 
+	std::string GetName() override { return !name.empty() ? name : "All"; }
+	std::string GetShortName() override { return !shortName.empty() ? shortName : "All"; }
+};
 
 class CMSetting : public CMObject
 {
@@ -211,6 +222,9 @@ public:
 		std::string gameini;
 
 		CMValue defaultValue;
+
+		IO() = default;
+		IO(const CMJSONElem& elem);
 
 		std::optional<CMValue> ReadINI();
 		void WriteINI(const CMValue& value) const;
@@ -233,199 +247,10 @@ public:
 		void Default();
 	};
 
-	class None
-	{
-	public:
-		virtual ~None() = default;
+	CMSetting(const CMJSONElem& elem);
 
-		static const char* GetTemplateAlt() { return "SettingNoneTemplate"; }
-		virtual const char* GetTemplate() { return GetTemplateAlt(); }
-		virtual const char* GetTypeName() { return "None"; }
+	void SetID();
 
-		virtual bool IsCategory() { return false; }
-
-		virtual void Next(const bool forward = true) {};
-		virtual void Last(const bool forward = true) {};
-		virtual void Drag(Float32 value) {};
-
-		virtual void Default() {};
-
-		virtual void Display(Tile* tile) {}
-
-		virtual std::vector<CMValue> GetValues() { return {}; };
-		virtual void SetValues(const std::vector<CMValue>& values) {};
-
-		virtual void Click(Tile* tile) {};
-	};
-
-	class Category : public None
-	{
-	public:
-		std::string id;
-
-		const char* GetTemplate() override { return "SettingSubsettingTemplate"; }
-		const char* GetTypeName() override { return "Subsetting"; }
-
-		bool IsCategory() override { return true; }
-
-		void Default() override;
-
-		std::vector<CMValue> GetValues() override;
-		void SetValues(const std::vector<CMValue>& values) override {};
-
-		void Click(Tile* tile) override;
-
-	};
-
-	class Choice : public None
-	{
-	public:
-		IO setting;
-		std::map<CMValue, std::string> choice;
-
-		const char* GetTemplate() override { return "SettingChoiceTemplate"; }
-		const char* GetTypeName() override { return "Choice"; }
-
-		void Display(Tile* tile) override;
-
-		CMValue GetPrev(const CMValue& value);
-		CMValue GetNext(const CMValue& value);
-
-		void Next(bool forward) override;
-		void Last(bool forward) override;
-
-		void Default() override { setting.Default(); }
-
-		std::vector<CMValue> GetValues() override { return { setting.Read() }; };
-
-		void SetValues(const std::vector<CMValue>& values) override
-		{
-			if (!values.empty()) setting.Write(values[0]);
-		};
-	};
-
-	class Slider : public None
-	{
-	public:
-		IO setting;
-
-		CMValue min;
-		CMValue max;
-		CMValue delta;
-
-		const char* GetTemplate() override { return "SettingSliderTemplate"; }
-		const char* GetTypeName() override { return "Slider"; }
-
-		void Display(Tile* tile) override;
-
-		CMValue GetPrev(const CMValue& value) const;
-		CMValue GetNext(const CMValue& value) const;
-
-		void Next(bool forward) override;
-		void Last(bool forward) override;
-
-		void Drag(Float32 value) override;
-
-		void Default() override { setting.Default(); }
-
-		std::vector<CMValue> GetValues() override { return { setting.Read() }; };
-		void SetValues(const std::vector<CMValue>& values) override
-		{
-			if (!values.empty()) setting.Write(values[0]);
-		};
-	};
-
-	class Control : public None
-	{
-	public:
-		IO keyboard;
-		IO mouse;
-		IO controller;
-
-		const char* GetTemplate() override { return "SettingControlTemplate"; }
-		const char* GetTypeName() override { return "Control"; }
-
-		void Display(Tile* tile) override;
-
-		void Default() override { keyboard.Default(); mouse.Default(); controller.Default(); }
-
-		std::vector<CMValue> GetValues() override { return { keyboard.Read(), mouse.Read(), controller.Read() }; };
-
-		void SetValues(const std::vector<CMValue>& values) override
-		{
-			if (values.size() >= 3)
-			{
-				keyboard.Write(values[0]);
-				mouse.Write(values[1]);
-				controller.Write(values[2]);
-			}
-		};
-	};
-
-	class Font : public None
-	{
-	public:
-		IO font;
-		IO fontY;
-
-		const char* GetTemplate() override { return "SettingFontTemplate"; }
-		const char* GetTypeName() override { return "Font"; }
-
-		void Display(Tile* tile) override;
-
-		static CMValue GetPrev(const CMValue& value);
-		static CMValue GetNext(const CMValue& value);
-
-		void Next(bool forward) override;
-		void Last(bool forward) override;
-
-		void Default() override { font.Default(); fontY.Default(); }
-
-		std::vector<CMValue> GetValues() override { return { font.Read(), fontY.Read() }; };
-		void SetValues(const std::vector<CMValue>& values) override
-		{
-			if (values.size() >= 2)
-			{
-				font.Write(values[0]);
-				fontY.Write(values[1]);
-			}
-		};
-	};
-
-	class Input : public None
-	{
-	public:
-		IO setting;
-	};
-
-	enum ElementType
-	{
-		kSettingType_None,
-		kSettingType_Control,
-		kSettingType_Choice,
-		kSettingType_Slider,
-		kSettingType_Font,
-		kSettingType_Subsetting,
-		kSettingType_Input,
-	};
-
-	CMSetting* Next(const bool forward = true) { data->Next(forward); return this; };
-	CMSetting* Last(const bool forward = true) { data->Last(forward); return this; }
-	CMSetting* Drag(Float32 value) { data->Drag(value); return this; }
-
-	CMSetting* Default() { data->Default(); return this; };
-
-	CMSetting* Display(Tile* tile) { data->Display(tile); return this; };
-
-	CMSetting* Click(Tile* tile) { data->Click(tile); return this; }
-
-	const char* GetTemplate() const { return data->GetTemplate(); }
-
-
-	std::vector<CMValue> GetValues() const { return data->GetValues(); }
-	void SetValues(const std::vector<CMValue>& values) const { return data->SetValues(values); }
-
-	std::unique_ptr<None> data;
 
 	std::unordered_set<std::string> tags;
 	std::unordered_set<std::string> mods;
@@ -434,27 +259,204 @@ public:
 	{
 		return description;
 	}
+
+	~CMSetting() override = default;
+
+	static const char* GetTemplateAlt() { return "SettingNoneTemplate"; }
+	virtual const char* GetTemplate() { return GetTemplateAlt(); }
+	virtual const char* GetTypeName() { return "None"; }
+
+	virtual bool IsCategory() { return false; }
+
+	virtual CMSetting* Next(const bool forward = true) { return this; };
+	virtual CMSetting* Last(const bool forward = true) { return this; };
+	virtual CMSetting* Up(const bool forward = true) { return this; };
+	virtual CMSetting* Drag(Float32 value) { return this; };
+
+	virtual void Default() {};
+
+	virtual void Display(Tile* tile) {}
+
+	virtual std::vector<CMValue> GetValues() { return {}; };
+	virtual void SetValues(const std::vector<CMValue>& values) {};
+
+	virtual void Click() {};
+	virtual void ClickOption(Tile* tile) {};
+
+	virtual bool Update() { return false; };
+};
+
+class Category : public CMSetting
+{
+public:
+	std::string categoryID;
+
+	Category(const CMJSONElem& elem);
+
+	const char* GetTemplate() override { return "SettingSubsettingTemplate"; }
+	const char* GetTypeName() override { return "Subsetting"; }
+
+	bool IsCategory() override { return true; }
+
+	void Default() override;
+
+	std::vector<CMValue> GetValues() override;
+	void SetValues(const std::vector<CMValue>& values) override {};
+
+	void Click() override;
+
+};
+
+class Choice : public CMSetting
+{
+public:
+	IO setting;
+	std::map<CMValue, std::string> choice;
+
+	Choice(const CMJSONElem& elem);
+
+	const char* GetTemplate() override { return "SettingChoiceTemplate"; }
+	const char* GetTypeName() override { return "Choice"; }
+
+	void Display(Tile* tile) override;
+
+	CMValue GetPrev(const CMValue& value);
+	CMValue GetNext(const CMValue& value);
+
+	Choice* Next(bool forward) override;
+	Choice* Last(bool forward) override;
+
+	void Default() override { setting.Default(); }
+
+	std::vector<CMValue> GetValues() override { return { setting.Read() }; };
+
+	void SetValues(const std::vector<CMValue>& values) override
+	{
+		if (!values.empty()) setting.Write(values[0]);
+	};
+};
+
+class Slider : public CMSetting
+{
+public:
+	IO setting;
+
+	CMValue min;
+	CMValue max;
+	CMValue delta;
+
+	Slider(const CMJSONElem& elem);
+
+	const char* GetTemplate() override { return "SettingSliderTemplate"; }
+	const char* GetTypeName() override { return "Slider"; }
+
+	void Display(Tile* tile) override;
+
+	CMValue GetPrev(const CMValue& value) const;
+	CMValue GetNext(const CMValue& value) const;
+
+	Slider* Next(bool forward) override;
+	Slider* Last(bool forward) override;
+
+	Slider* Drag(Float32 value) override;
+
+	void Default() override { setting.Default(); }
+
+	std::vector<CMValue> GetValues() override { return { setting.Read() }; };
+	void SetValues(const std::vector<CMValue>& values) override
+	{
+		if (!values.empty()) setting.Write(values[0]);
+	};
+};
+
+class Control : public CMSetting
+{
+public:
+	IO keyboard;
+	IO mouse;
+	IO controller;
+
+	Control(const CMJSONElem& elem);
+
+	const char* GetTemplate() override { return "SettingControlTemplate"; }
+	const char* GetTypeName() override { return "Control"; }
+
+	void Display(Tile* tile) override;
+
+	void Default() override { keyboard.Default(); mouse.Default(); controller.Default(); }
+
+	std::vector<CMValue> GetValues() override { return { keyboard.Read(), mouse.Read(), controller.Read() }; };
+
+	void SetValues(const std::vector<CMValue>& values) override
+	{
+		if (values.size() >= 3)
+		{
+			keyboard.Write(values[0]);
+			mouse.Write(values[1]);
+			controller.Write(values[2]);
+		}
+	};
+
+	void ClickOption(Tile* tile) override;
+
+	bool Update() override;
+};
+
+class Font : public CMSetting
+{
+public:
+	IO font;
+	IO fontY;
+
+	Font(const CMJSONElem& elem);
+
+	const char* GetTemplate() override { return "SettingFontTemplate"; }
+	const char* GetTypeName() override { return "Font"; }
+
+	void Display(Tile* tile) override;
+
+	static CMValue GetPrev(const CMValue& value);
+	static CMValue GetNext(const CMValue& value);
+
+	Font* Next(bool forward) override;
+	Font* Last(bool forward) override;
+	Font* Up(bool forward) override;
+
+	void Default() override { font.Default(); fontY.Default(); }
+
+	std::vector<CMValue> GetValues() override { return { font.Read(), fontY.Read() }; };
+	void SetValues(const std::vector<CMValue>& values) override
+	{
+		if (values.size() >= 2)
+		{
+			font.Write(values[0]);
+			fontY.Write(values[1]);
+		}
+	};
+};
+
+class Input : public CMSetting
+{
+public:
+	IO setting;
+
+	Input(const CMJSONElem& elem);
 };
 
 extern const char* MenuPath;
-
-void WriteValueToINIs(const char* category, const char* name, const char* value);
 
 // randomly selected from the unused menu codes between 1001 and 1084 inclusive (to be compatible with the menu visibility array)
 constexpr auto MENU_ID = 1042;
 
 struct HotkeyField
 {
-	Tile* tile;
-	int value;
-	bool isActive;
-	bool frameDebounce;	// ignore inputs for the frame it's set active to allow clicking on the input with Spacebar/Enter etc.
+	CMSetting* setting = nullptr;
+	UInt32 value = 0;
+	bool frameDebounce = true;
 
-	void Init();
-	int GetPressedKey();
-	void SetActive(bool active);
-	int Update();
-	void Free();
+	UInt32 GetPressedKey();
+	void SetActive(CMSetting* active);
+	void Update();
 };
 
 class ModConfigurationMenu : public Menu
@@ -582,14 +584,14 @@ public:
 		void Update();
 		void Click(Tile* clickedTile)
 		{
-			listBox.GetItemForTile(clickedTile)->Click(clickedTile);
+			listBox.GetItemForTile(clickedTile)->Click();
 		}
 		void Display(const std::string& newCategory, bool main, bool allTag, bool doublestacked);
 		void Hide();
 	};
 
 	SettingList settingsMain;
-	SettingList settingsSecondary;
+	SettingList settingsExtra;
 
 	class Description
 	{
@@ -619,6 +621,7 @@ public:
 			Set(str);
 		}
 	};
+
 	Description description;
 
 	OSInputGlobals::ControlType controlDevice = OSInputGlobals::kControlType_Keyboard;
@@ -627,6 +630,34 @@ public:
 
 	std::map<CMValue, std::string> fontMap;
 
+	class ControlHandler
+	{
+	public:
+		CMSetting* setting;
+
+		bool debounce;
+
+		bool IsActive()
+		{
+			return setting;
+		}
+
+		void UpdateSetting()
+		{
+//			const auto menu = GetSingleton();
+//			const auto tile = menu->settingsMain.listBox.GetTileFromItem(setting);
+//			setting->Display(tile);
+		}
+
+		void SetKeyboard(UInt32 key)
+		{
+//			reinterpret_cast<CMSetting::Control*>(setting->data.get())->keyboard.Write((SInt32) key);
+//			UpdateSetting();
+		}
+
+	};
+
+	ControlHandler controlHandler;
 
 	InputField subSettingInput;
 
@@ -637,7 +668,6 @@ public:
 	InputField searchBar;
 	FILETIME lastXMLWriteTime;
 
-
 	bool HasTiles();
 	void Close();
 	void RefreshFilter();
@@ -645,7 +675,7 @@ public:
 	bool XMLHasChanges();
 
 	void ClickMain(Tile* mod);
-	void ClickSecondary(Tile* mod);
+	void ClickExtra(Tile* mod);
 
 	void FilterMods();
 	void FilterSettings();
@@ -654,7 +684,6 @@ public:
 	void LoadModJSON(CMSetting* mod);
 
 	void SetActiveSubsettingValueFromInput();
-	bool GetInHotkeyMode();
 
 	void ReadJSON(const std::filesystem::path& path);
 	void ReadJSONForPath(const std::filesystem::path& path);

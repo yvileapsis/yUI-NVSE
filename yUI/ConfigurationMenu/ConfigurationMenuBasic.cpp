@@ -83,19 +83,16 @@ ModConfigurationMenu::ModConfigurationMenu() : Menu()
 
 	id = MENU_ID;
 
-//	settingsSecondary.listBox.flags &= ~ListBox<CMSetting>::kFlag_RecalculateHeightsOnInsert;
+//	settingsExtra.listBox.flags &= ~ListBox<CMSetting>::kFlag_RecalculateHeightsOnInsert;
+//	settingsMain.flags &= ~ModsListBox::kFlag_RecalculateHeightsOnInsert;
 
 	searchBar.Init();
 	subSettingInput.Init();
-	hotkeyInput.Init();
-
-//	description.Set("");
-//	settingsMain.flags &= ~ModsListBox::kFlag_RecalculateHeightsOnInsert;
 
 	lastXMLWriteTime.dwLowDateTime = 0;
 	lastXMLWriteTime.dwHighDateTime = 0;
 
-	// prevent Escape closing the whole start menu if StewMenu is open
+	// prevent Escape closing the whole start menu if Configuration Menu is open
 	*(UInt8*)0x119F348 = 0;
 
 }
@@ -120,13 +117,7 @@ ModConfigurationMenu::~ModConfigurationMenu()
 	// if we're in the destructor unique_ptr should be invalid
 	g_ConfigurationMenu.release();
 
-	searchBar.Free();
-	subSettingInput.Free();
-	hotkeyInput.Free();
-
 	delete tile;
-
-	//	Menu::Free();
 
 	OSInputGlobals::GetSingleton()->SetDebounceMenuMode(false);
 
@@ -143,7 +134,7 @@ void ModConfigurationMenu::SetTile(const UInt32 tileID, Tile* activeTile)
 	case kModConfigurationMenu_SearchBar:			searchBar.tile = activeTile; return;
 	case kModConfigurationMenu_SettingCategoryText:	settingsMain.tagTile = (TileText*)activeTile; return;
 	case kModConfigurationMenu_SettingList:			settingsListBackground = activeTile; return;
-	case kModConfigurationMenu_CategoryText:		settingsSecondary.tagTile = (TileText*)activeTile; return;
+	case kModConfigurationMenu_CategoryText:		settingsExtra.tagTile = (TileText*)activeTile; return;
 	}
 }
 
@@ -175,21 +166,6 @@ void ModConfigurationMenu::HandleLeftClick(UInt32 tileID, Tile* clickedTile)
 
 }
 
-void ModConfigurationMenu::SettingList::operator++()
-{
-	if (tags.empty()) return;
-	auto iter = tags.find(tagActive);
-	tagActive = iter == tags.end() || ++iter == tags.end() ? *tags.begin() : *iter;
-	UpdateTagString();
-}
-
-void ModConfigurationMenu::SettingList::operator--()
-{
-	if (tags.empty()) return;
-	auto iter = tags.find(tagActive);
-	tagActive = iter == tags.end() || iter-- == tags.begin() ? *tags.rbegin() : *iter;
-	UpdateTagString();
-}
 
 void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 {
@@ -199,7 +175,7 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 	case kModConfigurationMenu_CategoryText:
 	case kModConfigurationMenu_CategoryLeftArrow:
 	{
-		tileID != kModConfigurationMenu_CategoryLeftArrow ? ++settingsSecondary : --settingsSecondary;
+		tileID != kModConfigurationMenu_CategoryLeftArrow ? ++settingsExtra : --settingsExtra;
 		FilterMods();
 		HandleMouseover(kModConfigurationMenu_CategoryText, nullptr);
 		break;
@@ -219,7 +195,7 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 	case kModConfigurationMenu_Default:			Default(); return;
 	case kModConfigurationMenu_DeviceButton:	Device(); return;
 	case kModConfigurationMenu_Exit:			Back(); return;
-	case kModConfigurationMenu_ModListItem:		ClickSecondary(clickedTile); return;
+	case kModConfigurationMenu_ModListItem:		ClickExtra(clickedTile); return;
 	case kModConfigurationMenu_SettingListItem:	ClickMain(clickedTile); return;
 	case kModConfigurationMenu_SearchIcon:
 	{
@@ -234,6 +210,12 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 		else
 			settingsMain.listBox.GetItemForTile(option)->Last(false)->Display(option);
 		break;
+	}
+	case 98:
+	{
+		const auto option = clickedTile->parent;
+		settingsMain.listBox.GetItemForTile(option)->ClickOption(option);
+
 	}
 	case kModConfigurationMenu_ChoiceText:
 	{
@@ -250,29 +232,16 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 			settingsMain.listBox.GetItemForTile(option)->Last()->Display(option);
 		break;
 	}
+	case kModConfigurationMenu_SubsettingInputFieldText_BoxBG:
+	{
+		const auto option = clickedTile->parent;
+		settingsMain.listBox.GetItemForTile(option)->Up(false)->Display(option);
+		break;
+	}
 	case kModConfigurationMenu_SliderText:
 	{
-		// remove the caret from the original tile if one exists
-//		this->SetInSubsettingInputMode(false);
-
-		if (auto tile = clickedTile->GetParentByID(kModConfigurationMenu_SettingListItem))
-		{
-			auto inputFieldTextTile = clickedTile->GetChildByID(kModConfigurationMenu_SubsettingInputFieldText);
-			subSettingInput.tile = inputFieldTextTile;
-			auto setting = settingsMain.listBox.GetItemForTile(tile);
-			/*
-			if (setting->IsSlider())
-			{
-				auto strVal = inputFieldTextTile->GetValue(kTileValue_string);
-				auto str = strVal ? strVal->str : "";
-				subSettingInput.Set(str);
-
-				activeInputSubsetting = setting;
-				this->SetInSubsettingInputMode(true);
-
-				this->TouchSubsetting(setting);
-			}*/
-		}
+		const auto option = clickedTile->parent;
+		settingsMain.listBox.GetItemForTile(option)->Up()->Display(option);
 		break;
 	}
 	}
@@ -280,6 +249,18 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 
 bool ModConfigurationMenu::HandleKeyboardInput(UInt32 key)
 {
+	if (key == OSInputGlobals::Escape_)
+	{
+		Back();
+		return true;
+	}
+
+	if (controlHandler.IsActive())
+	{
+		controlHandler.SetKeyboard(key);
+		return true;
+	}
+
 	return false;
 	if (IsControlHeld())
 	{
@@ -363,31 +344,31 @@ bool ModConfigurationMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode co
 	case kMenu_Tab: Back(); return true;
 	case kMenu_ShiftLeft:
 	{
-		if (settingsSecondary.listBox.GetSelectedTile())
+		if (settingsExtra.listBox.GetSelectedTile())
 		{
-			settingsSecondary.listBox.SaveScrollPosition();
+			settingsExtra.listBox.SaveScrollPosition();
 			//			this->HandleMouseover(kModConfigurationMenu_CategoriesBackground, nullptr);
 			//			categoriesListBox.RestorePosition();
 		}
-		else if (settingsMain.listBox.GetSelectedTile() && settingsSecondary.listBox.GetNumVisibleItems())
+		else if (settingsMain.listBox.GetSelectedTile() && settingsExtra.listBox.GetNumVisibleItems())
 		{
 			settingsMain.listBox.SaveScrollPosition();
 			this->HandleMouseover(kModConfigurationMenu_ModList, nullptr);
-			settingsSecondary.listBox.RestorePosition();
+			settingsExtra.listBox.RestorePosition();
 		}
 		return true;
 	}
 	case kMenu_ShiftRight:
 	{
-		if (settingsSecondary.listBox.GetNumVisibleItems())
+		if (settingsExtra.listBox.GetNumVisibleItems())
 		{
 			//			categoriesListBox.SaveScrollPosition();
 			this->HandleMouseover(kModConfigurationMenu_ModList, nullptr);
-			settingsSecondary.listBox.RestorePosition();
+			settingsExtra.listBox.RestorePosition();
 		}
-		else if (settingsSecondary.listBox.GetSelectedTile() && settingsMain.listBox.GetNumVisibleItems())
+		else if (settingsExtra.listBox.GetSelectedTile() && settingsMain.listBox.GetNumVisibleItems())
 		{
-			settingsSecondary.listBox.SaveScrollPosition();
+			settingsExtra.listBox.SaveScrollPosition();
 			this->HandleMouseover(kModConfigurationMenu_SettingList, nullptr);
 			settingsMain.listBox.RestorePosition();
 		}
@@ -421,7 +402,7 @@ void ModConfigurationMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 	case kModConfigurationMenu_CategoryText:
 	case kModConfigurationMenu_CategoryRightArrow:
 	{
-		description <<= settingsSecondary;
+		description <<= settingsExtra;
 		break;
 	}
 
@@ -434,7 +415,7 @@ void ModConfigurationMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 	}
 	case kModConfigurationMenu_ModListItem:
 	{
-		description <<= settingsSecondary.listBox.GetItemForTile(activeTile);
+		description <<= settingsExtra.listBox.GetItemForTile(activeTile);
 		break;
 	}
 	case kModConfigurationMenu_SliderDraggableRect:
@@ -492,7 +473,7 @@ void ModConfigurationMenu::HandleControllerConnectOrDisconnect(bool isController
 void ModConfigurationMenu::Update()
 {
 	settingsMain.Update();
-	settingsSecondary.Update();
+	settingsExtra.Update();
 
 	searchBar.Update();
 	subSettingInput.Update();
@@ -531,6 +512,7 @@ void ModConfigurationMenu::Update()
 	}
 	return;
 
+	/*
 	if (this->GetInHotkeyMode())
 	{
 		auto pressedKey = hotkeyInput.Update();
@@ -555,7 +537,7 @@ void ModConfigurationMenu::Update()
 			//			this->SetInHotkeyMode(false);
 		}
 	}
-
+	*/
 	if (IsControllerConnected())
 	{
 		auto rightStickX = XINPUT_GAMEPAD_EX::GetCurrent()->sThumbRX;

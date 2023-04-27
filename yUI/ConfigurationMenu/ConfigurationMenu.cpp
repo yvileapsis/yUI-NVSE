@@ -6,9 +6,11 @@
 namespace ConfigurationMenu
 {
 
-	void* MCMInit()
+	void* __fastcall MCMInit(UInt32 id)
 	{
-		return ModConfigurationMenu::Create();
+		if (id == MENU_ID)
+			return ModConfigurationMenu::Create();
+		return nullptr;
 	}
 
 	UInt32 medicalQuestionaireCaseAddr;
@@ -27,21 +29,17 @@ namespace ConfigurationMenu
 		}
 	}
 
-	inline void TweaksButtonCallback()
+	inline void ConfigurationMenuButtonCallback()
 	{
-		const auto menu = ModConfigurationMenu::ReloadMenu();
-		menu->ShowMenuFirstTime();
-		// return the StartMenu to the settings menu, to prevent a visual bug since we don't open a sub-menu
-		//CdeclCall(0x7D0700); // MenuButton:Settings
+		ModConfigurationMenu::ReloadMenu()->ShowMenuFirstTime();
 	}
 
-	// wraps a call that adds the settings menu to the start menu 
-	inline void __fastcall addTweaksButton(BSSimpleArray<StartMenu::Option*>* startMenuOptions, void* edx, StartMenu::Option** settingsMenuItem)
+	inline void __fastcall AddConfigurationMenuButton(BSSimpleArray<StartMenu::Option*>* startMenuOptions, void* edx, StartMenu::Option** settingsMenuItem)
 	{
 		startMenuOptions->Append(settingsMenuItem);
 
-		auto tweaksButton = new StartMenu::Option("Mods", TweaksButtonCallback, StartMenu::Option::kMainMenu + StartMenu::Option::kPauseMenu);
-		startMenuOptions->Append(&tweaksButton);
+		auto option = new StartMenu::Option("Mods", ConfigurationMenuButtonCallback, StartMenu::Option::kMainMenu | StartMenu::Option::kPauseMenu);
+		startMenuOptions->Append(&option);
 	}
 
 	void Init()
@@ -53,7 +51,7 @@ namespace ConfigurationMenu
 		// reload the menu when alt-tabbing
 	//	WriteRelCall(0x86A1AB, UInt32(OnAltTabReloadStewMenu));
 
-		WriteRelCall(0x7CCA3E, addTweaksButton);
+		WriteRelCall(0x7CCA3E, AddConfigurationMenuButton);
 		
 //		deferredInit.emplace_back(DeferredInit);
 	}
