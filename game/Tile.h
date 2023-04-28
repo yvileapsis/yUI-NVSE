@@ -242,6 +242,7 @@ public:
 		__forceinline void SetString(const char* str, char chr) { ThisCall<void>(0xA0A300, this, str, chr); }
 	};
 
+	// NOT VANILLA USED FOR CONVENIENCE
 	class ValueCaster
 	{
 		Value* ptr;

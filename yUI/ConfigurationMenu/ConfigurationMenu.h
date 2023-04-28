@@ -247,43 +247,34 @@ public:
 		void Default();
 	};
 
-	CMSetting(const CMJSONElem& elem);
-
-	void SetID();
-
-
 	std::unordered_set<std::string> tags;
 	std::unordered_set<std::string> mods;
 
-	std::string GetDescription() const override
-	{
-		return description;
-	}
+	CMSetting(const CMJSONElem& elem);
 
 	~CMSetting() override = default;
+
+	std::string GetDescription() const override { return description; }
 
 	static const char* GetTemplateAlt() { return "SettingNoneTemplate"; }
 	virtual const char* GetTemplate() { return GetTemplateAlt(); }
 	virtual const char* GetTypeName() { return "None"; }
 
-	virtual bool IsCategory() { return false; }
-
-	virtual CMSetting* Next(const bool forward = true) { return this; };
-	virtual CMSetting* Last(const bool forward = true) { return this; };
 	virtual CMSetting* Up(const bool forward = true) { return this; };
 	virtual CMSetting* Drag(Float32 value) { return this; };
+	virtual CMSetting* Default() { return this; };
+	virtual CMSetting* Display(Tile* tile) { return this; }
 
-	virtual void Default() {};
+	virtual CMSetting* Click(Tile* tile) { return this; };
+	virtual CMSetting* ClickValue(Tile* tile) { return this; };
+	virtual CMSetting* ClickValueAlt(Tile* tile) { return this; };
 
-	virtual void Display(Tile* tile) {}
+	virtual bool IsCategory() { return false; }
 
 	virtual std::vector<CMValue> GetValues() { return {}; };
 	virtual void SetValues(const std::vector<CMValue>& values) {};
 
-	virtual void Click() {};
-	virtual void ClickOption(Tile* tile) {};
-
-	virtual bool Update() { return false; };
+	void SetID();
 };
 
 class Category : public CMSetting
@@ -296,15 +287,13 @@ public:
 	const char* GetTemplate() override { return "SettingSubsettingTemplate"; }
 	const char* GetTypeName() override { return "Subsetting"; }
 
-	bool IsCategory() override { return true; }
+	Category* Default() override;
+	Category* Click(Tile* tile) override;
 
-	void Default() override;
+	bool IsCategory() override { return true; }
 
 	std::vector<CMValue> GetValues() override;
 	void SetValues(const std::vector<CMValue>& values) override {};
-
-	void Click() override;
-
 };
 
 class Choice : public CMSetting
@@ -318,15 +307,14 @@ public:
 	const char* GetTemplate() override { return "SettingChoiceTemplate"; }
 	const char* GetTypeName() override { return "Choice"; }
 
-	void Display(Tile* tile) override;
 
 	CMValue GetPrev(const CMValue& value);
 	CMValue GetNext(const CMValue& value);
 
-	Choice* Next(bool forward) override;
-	Choice* Last(bool forward) override;
-
-	void Default() override { setting.Default(); }
+	Choice* Default() override { setting.Default(); return this; }
+	Choice* Display(Tile* tile) override;
+	Choice* ClickValue(Tile* tile) override;
+	Choice* ClickValueAlt(Tile* tile) override;
 
 	std::vector<CMValue> GetValues() override { return { setting.Read() }; };
 
@@ -350,17 +338,15 @@ public:
 	const char* GetTemplate() override { return "SettingSliderTemplate"; }
 	const char* GetTypeName() override { return "Slider"; }
 
-	void Display(Tile* tile) override;
-
 	CMValue GetPrev(const CMValue& value) const;
 	CMValue GetNext(const CMValue& value) const;
 
-	Slider* Next(bool forward) override;
-	Slider* Last(bool forward) override;
-
 	Slider* Drag(Float32 value) override;
+	Slider* Default() override { setting.Default(); return this; }
+	Slider* Display(Tile* tile) override;
 
-	void Default() override { setting.Default(); }
+	Slider* ClickValue(Tile* tile) override;
+	Slider* ClickValueAlt(Tile* tile) override;
 
 	std::vector<CMValue> GetValues() override { return { setting.Read() }; };
 	void SetValues(const std::vector<CMValue>& values) override
@@ -381,9 +367,9 @@ public:
 	const char* GetTemplate() override { return "SettingControlTemplate"; }
 	const char* GetTypeName() override { return "Control"; }
 
-	void Display(Tile* tile) override;
-
-	void Default() override { keyboard.Default(); mouse.Default(); controller.Default(); }
+	Control* Default() override { keyboard.Default(); mouse.Default(); controller.Default(); return this; }
+	Control* Display(Tile* tile) override;
+	Control* ClickValue(Tile* tile) override;
 
 	std::vector<CMValue> GetValues() override { return { keyboard.Read(), mouse.Read(), controller.Read() }; };
 
@@ -397,9 +383,6 @@ public:
 		}
 	};
 
-	void ClickOption(Tile* tile) override;
-
-	bool Update() override;
 };
 
 class Font : public CMSetting
@@ -413,16 +396,15 @@ public:
 	const char* GetTemplate() override { return "SettingFontTemplate"; }
 	const char* GetTypeName() override { return "Font"; }
 
-	void Display(Tile* tile) override;
-
 	static CMValue GetPrev(const CMValue& value);
 	static CMValue GetNext(const CMValue& value);
-
-	Font* Next(bool forward) override;
-	Font* Last(bool forward) override;
+	
 	Font* Up(bool forward) override;
+	Font* Default() override { font.Default(); fontY.Default(); return this; }
+	Font* Display(Tile* tile) override;
 
-	void Default() override { font.Default(); fontY.Default(); }
+	Font* ClickValue(Tile* tile) override;
+	Font* ClickValueAlt(Tile* tile) override;
 
 	std::vector<CMValue> GetValues() override { return { font.Read(), fontY.Read() }; };
 	void SetValues(const std::vector<CMValue>& values) override
@@ -510,8 +492,8 @@ public:
 	~ModConfigurationMenu() override;
 
 	void	SetTile(UInt32 tileID, Tile* activeTile) override;
-	void	HandleLeftClick(UInt32 tileID, Tile* activeTile) override;
 	void	HandleClick(UInt32 tileID, Tile* activeTile) override;
+	void	HandleUnclick(UInt32 tileID, Tile* activeTile) override;
 	void	HandleMouseover(UInt32 tileID, Tile* activeTile) override;
 	void	HandleUnmouseover(UInt32 tileID, Tile* activeTile) override;
 	void	PostDragTileChange(UInt32 tileID, Tile* newTile, Tile* activeTile) override {};
@@ -582,10 +564,7 @@ public:
 		void UpdateSettingsList();
 		void DisplaySettings();
 		void Update();
-		void Click(Tile* clickedTile)
-		{
-			listBox.GetItemForTile(clickedTile)->Click();
-		}
+		void Click(Tile* clickedTile) { listBox.GetItemForTile(clickedTile)->Click(clickedTile); }
 		void Display(const std::string& newCategory, bool main, bool allTag, bool doublestacked);
 		void Hide();
 	};

@@ -463,8 +463,8 @@ public:
 	virtual ~Menu() { ThisCall(0xA1C520, this); };
 
 	virtual void	SetTile(UInt32 tileID, Tile* activeTile) {};
-	virtual void	HandleLeftClick(UInt32 tileID, Tile* activeTile) {};
-	virtual void	HandleClick(UInt32 tileID, Tile* activeTile) {};	// buttonID = <id> trait defined in XML
+	virtual void	HandleClick(UInt32 tileID, Tile* activeTile) {};
+	virtual void	HandleUnclick(UInt32 tileID, Tile* activeTile) {};	// buttonID = <id> trait defined in XML
 	virtual void	HandleMouseover(UInt32 tileID, Tile* activeTile) {};	//called on mouseover, activeTile is moused-over Tile
 	virtual void	HandleUnmouseover(UInt32 tileID, Tile* activeTile) {};
 	virtual void	PostDragTileChange(UInt32 tileID, Tile* newTile, Tile* activeTile) {};

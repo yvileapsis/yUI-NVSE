@@ -151,23 +151,52 @@ void ModConfigurationMenu::HandleActiveMenuClickHeld(UInt32 tileID, Tile* active
 		settingsMain.listBox.GetItemForTile(option)->Drag(activeTile->Get(kTileValue_user1))->Display(option);
 	}
 
+	return;
 	if (tileID == kModConfigurationMenu_SliderLeftArrow || tileID == kModConfigurationMenu_SliderRightArrow)
 	{
 		if (InterfaceManager::GetSingleton()->timeLeftClickHeld > 0.3)
 		{
 			const auto option = activeTile->parent;
-			settingsMain.listBox.GetItemForTile(option)->Next(tileID != kModConfigurationMenu_SliderLeftArrow)->Display(option);
+			if (tileID != kModConfigurationMenu_SliderLeftArrow)
+			{
+				settingsMain.listBox.GetItemForTile(option)->ClickValue(option)->Display(option);
+			}
+			else
+			{
+				settingsMain.listBox.GetItemForTile(option)->ClickValueAlt(option)->Display(option);
+			}
 		}
 	}
 }
 
-void ModConfigurationMenu::HandleLeftClick(UInt32 tileID, Tile* clickedTile)
+void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 {
+	switch (tileID)
+	{
+	case kModConfigurationMenu_ChoiceText:
+	case kModConfigurationMenu_SliderLeftArrow:
+	{
+		const auto option = clickedTile->parent;
+		settingsMain.listBox.GetItemForTile(option)->ClickValueAlt(option)->Display(option);
+		break;
+	}
+	case 98:
+	{
+		const auto option = clickedTile->parent;
+		settingsMain.listBox.GetItemForTile(option)->ClickValue(option);
 
+	}
+	case kModConfigurationMenu_SliderRightArrow:
+	{
+		const auto option = clickedTile->parent;
+		settingsMain.listBox.GetItemForTile(option)->ClickValue(option)->Display(option);
+		break;
+	}
+	}
 }
 
 
-void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
+void ModConfigurationMenu::HandleUnclick(UInt32 tileID, Tile* clickedTile)
 {
 	switch (tileID)
 	{
@@ -205,31 +234,20 @@ void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
 	case kModConfigurationMenu_SliderLeftArrow:
 	{
 		const auto option = clickedTile->parent;
-		if (!IsShiftHeld())
-			settingsMain.listBox.GetItemForTile(option)->Next(false)->Display(option);
-		else
-			settingsMain.listBox.GetItemForTile(option)->Last(false)->Display(option);
+		settingsMain.listBox.GetItemForTile(option)->ClickValueAlt(option)->Display(option);
 		break;
 	}
 	case 98:
 	{
 		const auto option = clickedTile->parent;
-		settingsMain.listBox.GetItemForTile(option)->ClickOption(option);
+		settingsMain.listBox.GetItemForTile(option)->ClickValue(option);
 
 	}
 	case kModConfigurationMenu_ChoiceText:
-	{
-		const auto option = clickedTile->parent;
-		settingsMain.listBox.GetItemForTile(option)->Next(!IsShiftHeld())->Display(option);
-		break;
-	}
 	case kModConfigurationMenu_SliderRightArrow:
 	{
 		const auto option = clickedTile->parent;
-		if (!IsShiftHeld())
-			settingsMain.listBox.GetItemForTile(option)->Next()->Display(option);
-		else
-			settingsMain.listBox.GetItemForTile(option)->Last()->Display(option);
+		settingsMain.listBox.GetItemForTile(option)->ClickValue(option)->Display(option);
 		break;
 	}
 	case kModConfigurationMenu_SubsettingInputFieldText_BoxBG:
@@ -457,7 +475,7 @@ bool ModConfigurationMenu::HandleControllerInput(int code, Tile* tile)
 
 	if (code == OSInputGlobals::kXboxCtrl_L3 || code == OSInputGlobals::kXboxCtrl_R3)
 	{
-		//		this->HandleClick(kModConfigurationMenu_ToggleShowActive, nullptr);
+		//		this->HandleUnclick(kModConfigurationMenu_ToggleShowActive, nullptr);
 		return true;
 	}
 

@@ -21,28 +21,30 @@ void RestartGameWarningCallback()
 }
 */
 
-void Category::Default()
+Category* Category::Default()
 {
-	for (const auto iter : ModConfigurationMenu::GetSingleton()->GetSettingsForString(id))
+	for (const auto iter : ModConfigurationMenu::GetSingleton()->GetSettingsForString(categoryID))
 		iter->Default();
+	return this;
 }
 
 std::vector<CMValue> Category::GetValues()
 {
 	std::vector<CMValue> ret;
-	for (const auto iter : ModConfigurationMenu::GetSingleton()->GetSettingsForString(id)) {
+	for (const auto iter : ModConfigurationMenu::GetSingleton()->GetSettingsForString(categoryID)) {
 		const auto values = iter->GetValues();
 		ret.insert(ret.end(), values.begin(), values.end());
 	}
 	return ret;
 }
 
-void Category::Click()
+Category* Category::Click(Tile* tile)
 {
 	ModConfigurationMenu::GetSingleton()->DisplaySettings(categoryID);
+	return this;
 }
 
-void Choice::Display(Tile* tile)
+Choice* Choice::Display(Tile* tile)
 {
 	const auto value = setting.Read();
 
@@ -51,17 +53,21 @@ void Choice::Display(Tile* tile)
 	if (valueString.empty()) valueString = static_cast<std::string>(value);
 
 	tile->Set(kTileValue_user0, valueString);
+
+	return this;
 }
 
-void Slider::Display(Tile* tile)
+Slider* Slider::Display(Tile* tile)
 {
 	const auto value = setting.Read();
 	const Float64 percent = (Float64) value / (Float64) max;
 	tile->Set(kTileValue_user0, 20 * percent);
 	tile->Set(kTileValue_user3, 20);
+
+	return this;
 }
 
-void Font::Display(Tile* tile)
+Font* Font::Display(Tile* tile)
 {
 	const auto fontMap = ModConfigurationMenu::GetSingleton()->fontMap;
 	const auto value = font.Read();
@@ -85,10 +91,11 @@ void Font::Display(Tile* tile)
 	}
 	tile->Set(kTileValue_user0, valueString);
 	tile->Set(kTileValue_user1, valueY.GetAsFloat());
+
+	return this;
 }
 
-
-void Control::Display(Tile* tile)
+Control* Control::Display(Tile* tile)
 {
 	const auto value = keyboard.Read();
 	const auto key = GetStringForScancode(value, 1);
@@ -112,17 +119,15 @@ void Control::Display(Tile* tile)
 		tile->Set("_Controller", controller);
 		tile->Set("_ControllerImage", false);
 	}
+	return this;
 }
 
-void Control::ClickOption(Tile* tile)
+Control* Control::ClickValue(Tile* tile)
 {
 	const auto menu = ModConfigurationMenu::GetSingleton();
 	menu->controlHandler.setting = menu->settingsMain.listBox.GetItemForTile(tile);
-}
 
-bool Control::Update()
-{
-	return false;
+	return this;
 }
 
 CMValue Choice::GetPrev(const CMValue& value)
@@ -141,19 +146,23 @@ CMValue Choice::GetNext(const CMValue& value)
 	else return iter->first;
 }
 
-Choice* Choice::Next(const bool forward)
+Choice* Choice::ClickValue(Tile* tile)
 {
 	const auto value = setting.Read();
-	const auto newValue = forward ? GetNext(value) : GetPrev(value);
+
+	const auto newValue = !IsShiftHeld() ? GetNext(value) : choice.rbegin()->first;
+
 	setting.Write(newValue);
 
 	return this;
 }
 
-Choice* Choice::Last(const bool forward)
+Choice* Choice::ClickValueAlt(Tile* tile)
 {
 	const auto value = setting.Read();
-	const auto newValue = forward ? choice.rbegin()->first : choice.begin()->first;
+
+	const auto newValue = !IsShiftHeld() ? GetPrev(value) : choice.begin()->first;
+
 	setting.Write(newValue);
 
 	return this;
@@ -171,19 +180,23 @@ CMValue Slider::GetNext(const CMValue& value) const
 	return newValue > max ? value : newValue;
 }
 
-Slider* Slider::Next(const bool forward)
+Slider* Slider::ClickValue(Tile* tile)
 {
 	const auto value = setting.Read();
-	const auto newValue = forward ? GetNext(value) : GetPrev(value);
+
+	const auto newValue = !IsShiftHeld() ? GetNext(value) : max;
+
 	setting.Write(newValue);
 
 	return this;
 }
 
-Slider* Slider::Last(const bool forward)
+Slider* Slider::ClickValueAlt(Tile* tile)
 {
 	const auto value = setting.Read();
-	const auto newValue = forward ? max : min;
+
+	const auto newValue = !IsShiftHeld() ? GetPrev(value) : min;
+
 	setting.Write(newValue);
 
 	return this;
@@ -221,19 +234,23 @@ CMValue Font::GetNext(const CMValue& value)
 	else return iter->first;
 }
 
-Font* Font::Next(const bool forward)
+Font* Font::ClickValue(Tile* tile)
 {
 	const auto value = font.Read();
-	const CMValue newValue = forward ? GetNext(value) : GetPrev(value);
+
+	const auto newValue = !IsShiftHeld() ? GetNext(value) : CMValue(static_cast<SInt32>(8));
+
 	font.Write(newValue);
 
 	return this;
 }
 
-Font* Font::Last(const bool forward)
+Font* Font::ClickValueAlt(Tile* tile)
 {
 	const auto value = font.Read();
-	const auto newValue = CMValue(static_cast<SInt32>(forward ? 8 : 1));
+
+	const auto newValue = !IsShiftHeld() ? GetPrev(value) : CMValue(static_cast<SInt32>(1));
+
 	font.Write(newValue);
 
 	return this;
@@ -301,9 +318,6 @@ void ModConfigurationMenu::SettingList::DisplaySettings()
 
 void ModConfigurationMenu::SettingList::Update()
 {
-	for (const auto& setting : listBox.list)
-		setting->object->Update();
-
 	if (!startTime) return;
 	auto percentageCompleted = static_cast<Float32>(GetTickCount() - startTime) / duration;
 
@@ -312,8 +326,9 @@ void ModConfigurationMenu::SettingList::Update()
 	listBox.parentTile->Set("_alpha", (alphaTarget - alphaStart) * percentageCompleted + alphaStart, true);
 	tagTile->Set("_alpha", (alphaTarget - alphaStart) * percentageCompleted + alphaStart, true);
 
-	if (percentageCompleted < 1.0) { }
-	else if (!displayAfterTimer)
+	if (percentageCompleted < 1.0) return;
+
+	if (!displayAfterTimer)
 		startTime = 0;
 	else
 	{
@@ -523,7 +538,7 @@ void ModConfigurationMenu::Back()
 	else
 	{
 		Close();
-		StartMenu::GetSingleton()->HandleClick(0, nullptr);
+		StartMenu::GetSingleton()->HandleUnclick(0, nullptr);
 		*(UInt8*)0x119F348 = 1;
 	}
 }
