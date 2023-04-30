@@ -42,6 +42,12 @@ namespace ConfigurationMenu
 		startMenuOptions->Append(&option);
 	}
 
+	void DeferredInit()
+	{
+		WriteMCMHooks();
+
+	}
+
 	void Init()
 	{
 
@@ -53,6 +59,7 @@ namespace ConfigurationMenu
 
 		WriteRelCall(0x7CCA3E, AddConfigurationMenuButton);
 		
-//		deferredInit.emplace_back(DeferredInit);
+		deferredInit.emplace_back(DeferredInit);
+		mainLoop.emplace_back(MainLoop);
 	}
 }

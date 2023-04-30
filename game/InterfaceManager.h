@@ -30,6 +30,15 @@ extern const _QueueUIMessage QueueUIMessage;
 
 const UInt32 kMaxMessageLength = 0x4000;
 
+class bhkSimpleShapePhantom;
+
+struct PlayerCameraSphere
+{
+	bhkSimpleShapePhantom* unk000;
+	bhkSimpleShapePhantom* unk004;
+};
+
+
 // 584
 class InterfaceManager
 {
@@ -184,8 +193,13 @@ public:
 	// set to 3 at 0x714E96, 0x714E20 - checked at 0x70B94E
 	// set to 4 at 0x714D5D, 0x715177 (CloseAllMenus)
 	// set to 5 at 0x70B972 - checked at 0x70BA84, 0x70CA14, 0x70CC7A
-	UInt32					unk010;				// 010
-	UInt32					unk014;				// 014
+	UInt8					byte010;
+	UInt8					byte011;
+	UInt8					statsMenuTab;
+	UInt8					inventoryMenuTab;
+	UInt8					byte14;
+	UInt8					mapMenuTab;
+	UInt8					gap16[2];
 	UInt32					pickLength;			// 018
 	UInt32					unk01C;				// 01C
 	UInt8					byte020;			// 020
@@ -194,30 +208,31 @@ public:
 	UInt8					byte023;			// 023
 	UInt32					unk024;				// 024
 	TileImage*				cursor;				// 028
-	float					flt02C;				// 02C
-	float					flt030;				// 030
-	float					flt034;				// 034
-	float					cursorX;			// 038
-	float					flt03C;				// 03C
-	float					cursorY;			// 040
-	float					mouseWheel;			// 044	-120.0 = down; 120.0 = up
-	float					timeLeftClickHeld;	// 048 time in menus only
+	Float32					flt02C;				// 02C
+	Float32					flt030;				// 030
+	Float32					flt034;				// 034
+	Float32					cursorX;			// 038
+	Float32					flt03C;				// 03C
+	Float32					cursorY;			// 040
+	Float32					mouseWheel;			// 044	-120.0 = down; 120.0 = up
+	Float32					timeLeftClickHeld;	// 048 time in menus only
 	Tile*					draggedTile;		// 04C
-	int						unk050;				// 050
-	float					flt054;				// 054
-	float					flt058;				// 058
-	int						unk05C;				// 05C
-	int						unk060;				// 060
-	int						unk064;				// 064
-	UInt32					unk068[2];			// 068
+	SInt32					dragStartX;			// 050
+	Float32					dragOldX;				// 054
+	Float32					dragOldY;				// 058
+	SInt32					dragStartY;			// 05C
+	Float32					dragNewX;				// 060
+	Float32					dragNewY;				// 064
+	UInt32					unk068;				// 068
+	UInt32					unk06C;				// 06C
 	TList<TESObjectREFR>	selectableRefs;		// 070
 	UInt32					selectedRefIndex;	// 078
 	bool					debugText;			// 07C
-	UInt8					byte07D;			// 07D
+	UInt8					isMouseVisible;		// 07D
 	UInt8					byte07E;			// 07E
 	UInt8					byte07F;			// 07F
-	NiNode*					niNode080;			// 080
-	NiNode*					niNode084;			// 084
+	NiNode*					mainRootNode;			// 080
+	NiNode*					cursorRootNode;			// 084
 	UInt32					unk088;				// 088
 	void*					shaderAccum08C;		// 08C
 	void*					shaderAccum090;		// 090
@@ -228,11 +243,15 @@ public:
 	NiNode*					unk0A4;				// 0A4 saw Tile? seen NiNode
 	UInt32					unk0A8;				// 0A8
 	NiObject*				unk0AC;				// 0AC seen NiAlphaProperty
-	UInt32					unk0B0[3];			// 0B0
+	UInt8					byte0B0;
+	UInt8					byte0B1;
+	UInt16					wrd0B2;
+	UInt32					unk0B4;
+	Tile*					safeZone;
 	Tile*					activeTileAlt;		// 0BC
 	UInt32					unk0C0;				// 0C0
 	UInt32					unk0C4;				// 0C4
-	UInt8					byte0C8;			// 0C8
+	UInt8					shouldHideAllPipboyMenus;			// 0C8
 	UInt8					byte0C9;			// 0C9
 	UInt8					byte0CA;			// 0CA
 	UInt8					byte0CB;			// 0CB
@@ -240,13 +259,16 @@ public:
 	Menu*					activeMenu;			// 0D0
 	Tile*					tile0D4;			// 0D4
 	Menu*					menu0D8;			// 0D8
-	UInt32					unk0DC[2];			// 0DC
+	UInt8					unk0DC;
+	UInt8					IsFullHelp;
+	UInt16					unk0DE;
+	UInt32					unk0E0;
 	UInt8					msgBoxButton;		// 0E4 -1 if no button pressed
 	UInt8					byte0E5;			// 0E5
 	UInt8					byte0E6;			// 0E6
 	UInt8					byte0E7;			// 0E7
 	UInt32					unk0E8;				// 0E8
-	UInt8					byte0EC;			// 0EC
+	UInt8					isEmergencyTextureRelease;			// 0EC
 	UInt8					hasMouseMoved;		// 0ED
 	UInt8					byte0EE;			// 0EE
 	UInt8					byte0EF;			// 0EF
@@ -254,11 +276,12 @@ public:
 	UInt32					unk0F4;				// 0F4
 	UInt32					unk0F8;				// 0F8
 	TESObjectREFR*			crosshairRef;		// 0FC
-	UInt32					unk100[4];			// 100
+	TESObjectREFR*			telekinesisTarget;
+	NiPoint3				pt104;
 	UInt8					byte110;			// 110
 	UInt8					pad111[3];			// 111
 	UInt32					menuStack[10];		// 114
-	void*					ptr13C;				// 13C	Points to a struct, possibly. First member is *bhkSimpleShapePhantom
+	PlayerCameraSphere*		ptr13C;				// 13C	Points to a struct, possibly. First member is *bhkSimpleShapePhantom
 	UInt32					unk140;				// 140
 	UInt32					unk144;				// 144
 	UInt8					byte148;			// 148
@@ -269,17 +292,21 @@ public:
 	UInt32					currentKey;			// 150
 	UInt32					keyRepeatStartTime;	// 154
 	UInt32					lastKeyRepeatTime;	// 158
-	UInt32					unk15C[4];			// 15C
-	void*					renderedMenu;		// 16C
-	UInt8					byte170;			// 170
+	UInt32					unk15C;
+	UInt32					time160;
+	UInt32					ptr164;
+	UInt8					isRenderedMenuSet;
+	UInt8					gap169[3];
+	FORenderedMenu*			renderedMenu;		// 16C
+	UInt8					isMovedMouseInRenderedMenu;			// 170
 	UInt8					byte171;			// 171
 	UInt8					byte172;			// 172
 	UInt8					byte173;			// 173
 	FOPipboyManager*		pipboyManager;		// 174
 	Struct0178				unk178;				// 178
 	VATSHighlightData		vatsHighlightData;	// 1DC
-	float					scale4AC;			// 4AC
-	float					unk4B0;				// 4B0
+	Float32					menuScaledCursorPosX;			// 4AC
+	Float32					menuScaledCursorPosY;				// 4B0
 	UInt8					isRenderedMenuOrPipboyManager;		// 4B4
 	UInt8					byte4B5;			// 4B5
 	UInt8					byte4B6;			// 4B6
@@ -287,12 +314,12 @@ public:
 	UInt32					queuedPipboyTabToSwitchTo;			// 4B8
 	UInt32					pipBoyMode;			// 4BC
 	void					(*onPipboyOpenCallback)();		// 4C0
-	UInt32					unk4C4[2];			// 4C4
-	UInt8					byte4CC;			// 4CC
-	UInt8					byte4CD;			// 4CD
+	TList<void>				list4C4;			// 4C4
+	UInt8					isDestroyAllMenus;			// 4CC
+	UInt8					preventLevelUpTillContainerOpened;			// 4CD
 	UInt8					pad4CE;				// 4CE
 	UInt8					pad4CF;				// 4CF
-	UInt32					unk4D0;				// 4D0
+	Float32					unk4D0;				// 4D0
 	Tutorials				help;				// 4D4
 
 	InterfaceManager();

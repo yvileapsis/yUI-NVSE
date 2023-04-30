@@ -122,10 +122,10 @@ Control* Control::Display(Tile* tile)
 	return this;
 }
 
-Control* Control::ClickValue(Tile* tile)
+Control* Control::ClickValue(Tile* tile, UInt32 option)
 {
 	const auto menu = ModConfigurationMenu::GetSingleton();
-	menu->controlHandler.setting = menu->settingsMain.listBox.GetItemForTile(tile);
+	menu->controlHandler.setting = this;
 
 	return this;
 }
@@ -146,25 +146,33 @@ CMValue Choice::GetNext(const CMValue& value)
 	else return iter->first;
 }
 
-Choice* Choice::ClickValue(Tile* tile)
+Choice* Choice::ClickValue(Tile* tile, UInt32 option)
 {
-	const auto value = setting.Read();
+	switch (option) {
+	case kValue:
+	case kNext:
+	{
+		const auto value = setting.Read();
 
-	const auto newValue = !IsShiftHeld() ? GetNext(value) : choice.rbegin()->first;
+		const auto newValue = !IsShiftHeld() ? GetNext(value) : choice.rbegin()->first;
 
-	setting.Write(newValue);
+		setting.Write(newValue);
 
-	return this;
-}
+		break;
+	}
+	case kValueAlt:
+	case kPrev:
+	{
+		const auto value = setting.Read();
 
-Choice* Choice::ClickValueAlt(Tile* tile)
-{
-	const auto value = setting.Read();
+		const auto newValue = !IsShiftHeld() ? GetPrev(value) : choice.begin()->first;
 
-	const auto newValue = !IsShiftHeld() ? GetPrev(value) : choice.begin()->first;
+		setting.Write(newValue);
 
-	setting.Write(newValue);
-
+		break;
+	}
+	default: break;
+	}
 	return this;
 }
 
@@ -180,25 +188,30 @@ CMValue Slider::GetNext(const CMValue& value) const
 	return newValue > max ? value : newValue;
 }
 
-Slider* Slider::ClickValue(Tile* tile)
+Slider* Slider::ClickValue(Tile* tile, UInt32 option)
 {
-	const auto value = setting.Read();
+	switch (option)
+	{
+	case kNext: {
+		const auto value = setting.Read();
 
-	const auto newValue = !IsShiftHeld() ? GetNext(value) : max;
+		const auto newValue = !IsShiftHeld() ? GetNext(value) : max;
 
-	setting.Write(newValue);
+		setting.Write(newValue);
 
-	return this;
-}
+		break;
+	}
+	case kPrev:
+	{
+		const auto value = setting.Read();
 
-Slider* Slider::ClickValueAlt(Tile* tile)
-{
-	const auto value = setting.Read();
+		const auto newValue = !IsShiftHeld() ? GetPrev(value) : min;
 
-	const auto newValue = !IsShiftHeld() ? GetPrev(value) : min;
+		setting.Write(newValue);
 
-	setting.Write(newValue);
-
+		break;
+	}
+	}
 	return this;
 }
 
@@ -234,34 +247,45 @@ CMValue Font::GetNext(const CMValue& value)
 	else return iter->first;
 }
 
-Font* Font::ClickValue(Tile* tile)
+Font* Font::ClickValue(Tile* tile, UInt32 option)
 {
-	const auto value = font.Read();
+	switch (option)
+	{
+	case kValue:
+	case kNext:
+	{
+		const auto value = font.Read();
+		const auto newValue = !IsShiftHeld() ? GetNext(value) : CMValue(static_cast<SInt32>(8));
+		font.Write(newValue);
 
-	const auto newValue = !IsShiftHeld() ? GetNext(value) : CMValue(static_cast<SInt32>(8));
+		break;
+	}
+	case kValueAlt:
+	case kPrev:
+	{
+		const auto value = font.Read();
+		const auto newValue = !IsShiftHeld() ? GetPrev(value) : CMValue(static_cast<SInt32>(1));
+		font.Write(newValue);
 
-	font.Write(newValue);
+		break;
+	}
+	case kUp:
+	{
+		const auto value = fontY.Read();
+		const auto newValue = value.GetAsFloat() + 0.5;
+		fontY.Write(newValue);
 
-	return this;
-}
+		break;
+	}
+	case kDown:
+	{
+		const auto value = fontY.Read();
+		const auto newValue = value.GetAsFloat() - 0.5;
+		fontY.Write(newValue);
 
-Font* Font::ClickValueAlt(Tile* tile)
-{
-	const auto value = font.Read();
-
-	const auto newValue = !IsShiftHeld() ? GetPrev(value) : CMValue(static_cast<SInt32>(1));
-
-	font.Write(newValue);
-
-	return this;
-}
-
-Font* Font::Up(const bool forward)
-{
-	const auto value = fontY.Read();
-	const auto newValue = value.GetAsFloat() + (forward ? -0.5 : 0.5);
-	fontY.Write(newValue);
-
+		break;
+	}
+	}
 	return this;
 }
 
@@ -408,15 +432,27 @@ void ModConfigurationMenu::FilterSettings()
 	settingsMain.listBox.Filter(filter);
 }
 
-void ModConfigurationMenu::ClickMain(Tile* clickedTile)
+void ModConfigurationMenu::ClickItem(Tile* activeTile)
 {
-	settingsMain.Click(clickedTile);
+	settingsMain.listBox.GetItemForTile(activeTile)->Click(activeTile);
 }
 
-void ModConfigurationMenu::ClickExtra(Tile* clickedTile)
+void ModConfigurationMenu::ClickExtra(Tile* activeTile)
 {
 	categoryHistory.pop_back();
-	settingsExtra.Click(clickedTile);
+	settingsExtra.listBox.GetItemForTile(activeTile)->Click(activeTile);
+}
+
+void ModConfigurationMenu::ClickValue(Tile* activeTile, CMSetting::ClickType type)
+{
+	const auto option = activeTile->parent;
+	settingsMain.listBox.GetItemForTile(option)->ClickValue(option, type)->Display(option);
+}
+
+void ModConfigurationMenu::Drag(Tile* activeTile)
+{
+	const auto option = activeTile->parent;
+	settingsMain.listBox.GetItemForTile(option)->Drag(activeTile->Get(kTileValue_user1))->Display(option);
 }
 
 void ModConfigurationMenu::FilterMods() 
@@ -479,11 +515,9 @@ void ModConfigurationMenu::ShowMenuFirstTime()
 //	const auto sSettings = reinterpret_cast<Setting*>(0x11D1FE0);
 //	menuTitle->Set(kTileValue_string, FormatString("Mod %s", sSettings->data.str));
 
-	settingsExtra.listBox.parentTile = modsListBackground;
 	settingsExtra.listBox.templateName = "ModTemplate";
 	settingsExtra.listBox.scrollBar = settingsExtra.listBox.parentTile->GetChild("lb_scrollbar");
 
-	settingsMain.listBox.parentTile = settingsListBackground;
 	settingsMain.listBox.templateName = CMSetting::GetTemplateAlt();
 	settingsMain.listBox.scrollBar = settingsMain.listBox.parentTile->GetChild("lb_scrollbar");
 
@@ -497,6 +531,7 @@ void ModConfigurationMenu::ShowMenuFirstTime()
 	}
 
 	ReadJSONForPath(GetCurPath() + R"(\Data\menus\ConfigurationMenu\)");
+	ReadMCM();
 
 	DisplaySettings("");
 
@@ -737,7 +772,7 @@ void ModConfigurationMenu::SetInSubsettingInputMode(bool isActive)
 	{
 		if (tile->parent)
 		{
-			if (auto boxBackground = tile->parent->GetChildByID(kModConfigurationMenu_SubsettingInputFieldText_BoxBG))
+			if (auto boxBackground = tile->parent->GetChildByID(kTileID_SubsettingInputFieldText_BoxBG))
 			{
 				boxBackground->SetFloat("_BackgroundVisible", isActive);
 			}
@@ -796,7 +831,7 @@ void ModConfigurationMenu::SetInHotkeyMode(bool isActive)
 		{
 			if (tile->parent)
 			{
-				if (auto boxBackground = tile->parent->GetChildByID(kModConfigurationMenu_SubsettingInputFieldText_BoxBG))
+				if (auto boxBackground = tile->parent->GetChildByID(kTileID_SubsettingInputFieldText_BoxBG))
 				{
 					boxBackground->SetFloat("_BackgroundVisible", isActive);
 				}
@@ -830,7 +865,7 @@ void ModConfigurationMenu::SetInHotkeyMode(bool isActive)
 /* CLICK SETTING 
 if (setting->IsInputField())
 {
-	auto inputFieldTextTile = clickedTile->GetChildByID(kModConfigurationMenu_SubsettingInputFieldText);
+	auto inputFieldTextTile = clickedTile->GetChildByID(kTileID_SubsettingInputFieldText);
 	subSettingInput.tile = inputFieldTextTile;
 	if (inputFieldTextTile)
 	{
@@ -845,7 +880,7 @@ if (setting->IsInputField())
 	}
 	else
 	{
-		Log(true, Log::kConsole) << FormatString("ModConfigurationMenu: Failed to find input text tile (ID: %d)", kModConfigurationMenu_SubsettingInputFieldText);
+		Log(true, Log::kConsole) << FormatString("ModConfigurationMenu: Failed to find input text tile (ID: %d)", kTileID_SubsettingInputFieldText);
 	}
 }
 else if (setting->IsCheckboxField())
@@ -864,7 +899,7 @@ else if (setting->IsDropdown())
 else if (setting->IsHotkeyField())
 {
 	activeHotkeySubsetting = setting;
-	auto inputFieldTextTile = clickedTile->GetChildByID(kModConfigurationMenu_SubsettingInputFieldText);
+	auto inputFieldTextTile = clickedTile->GetChildByID(kTileID_SubsettingInputFieldText);
 	if (inputFieldTextTile)
 	{
 		hotkeyInput.tile = inputFieldTextTile;

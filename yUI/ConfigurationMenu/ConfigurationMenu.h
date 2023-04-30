@@ -8,6 +8,11 @@
 #include <utility>
 #include <variant>
 
+class MCMMod;
+class MCMItem;
+void WriteMCMHooks();
+void MainLoop();
+
 class CMTag;
 class CMSetting;
 
@@ -197,8 +202,10 @@ public:
 
 	bool doublestacked;
 	bool allTag;
+	bool compatibilityMode;
 
 	CMCategory(const CMJSONElem& elem);
+	CMCategory(const MCMMod& item);
 
 	std::string GetName() override { return !name.empty() ? name : "All"; }
 	std::string GetShortName() override { return !shortName.empty() ? shortName : "All"; }
@@ -210,7 +217,33 @@ public:
 	class IO
 	{
 	public:
-		typedef std::tuple<std::filesystem::path, std::string, std::string> INI;
+
+		class INI
+		{
+		public:
+			std::filesystem::path file;
+			std::string category;
+			std::string setting;
+
+			bool operator <(const INI& rhs) const
+			{
+				if (file != rhs.file)
+					return file < rhs.file;
+
+				if (category != rhs.category)
+					return category < rhs.category;
+
+				return setting < rhs.setting;
+			}
+		};
+
+		class MCM
+		{
+			UInt8 modID;
+			UInt8 tab;
+			UInt8 option;
+		};
+
 		INI ini;
 
 		std::string xml;
@@ -250,7 +283,9 @@ public:
 	std::unordered_set<std::string> tags;
 	std::unordered_set<std::string> mods;
 
+	CMSetting() {};
 	CMSetting(const CMJSONElem& elem);
+	CMSetting(const MCMMod& mod, const MCMItem& item);
 
 	~CMSetting() override = default;
 
@@ -260,14 +295,23 @@ public:
 	virtual const char* GetTemplate() { return GetTemplateAlt(); }
 	virtual const char* GetTypeName() { return "None"; }
 
-	virtual CMSetting* Up(const bool forward = true) { return this; };
 	virtual CMSetting* Drag(Float32 value) { return this; };
 	virtual CMSetting* Default() { return this; };
 	virtual CMSetting* Display(Tile* tile) { return this; }
 
 	virtual CMSetting* Click(Tile* tile) { return this; };
-	virtual CMSetting* ClickValue(Tile* tile) { return this; };
-	virtual CMSetting* ClickValueAlt(Tile* tile) { return this; };
+
+	enum ClickType
+	{
+		kValue,
+		kValueAlt,
+		kNext,
+		kPrev,
+		kUp,
+		kDown
+	};
+
+	virtual CMSetting* ClickValue(Tile* tile, UInt32 option) { return this; };
 
 	virtual bool IsCategory() { return false; }
 
@@ -283,6 +327,7 @@ public:
 	std::string categoryID;
 
 	Category(const CMJSONElem& elem);
+	Category(const MCMMod& mod);
 
 	const char* GetTemplate() override { return "SettingSubsettingTemplate"; }
 	const char* GetTypeName() override { return "Subsetting"; }
@@ -303,6 +348,7 @@ public:
 	std::map<CMValue, std::string> choice;
 
 	Choice(const CMJSONElem& elem);
+	Choice(const MCMMod& mod, const MCMItem& item);
 
 	const char* GetTemplate() override { return "SettingChoiceTemplate"; }
 	const char* GetTypeName() override { return "Choice"; }
@@ -313,8 +359,7 @@ public:
 
 	Choice* Default() override { setting.Default(); return this; }
 	Choice* Display(Tile* tile) override;
-	Choice* ClickValue(Tile* tile) override;
-	Choice* ClickValueAlt(Tile* tile) override;
+	Choice* ClickValue(Tile* tile, UInt32 option) override;
 
 	std::vector<CMValue> GetValues() override { return { setting.Read() }; };
 
@@ -334,6 +379,7 @@ public:
 	CMValue delta;
 
 	Slider(const CMJSONElem& elem);
+	Slider(const MCMMod& mod, const MCMItem& item);
 
 	const char* GetTemplate() override { return "SettingSliderTemplate"; }
 	const char* GetTypeName() override { return "Slider"; }
@@ -345,8 +391,7 @@ public:
 	Slider* Default() override { setting.Default(); return this; }
 	Slider* Display(Tile* tile) override;
 
-	Slider* ClickValue(Tile* tile) override;
-	Slider* ClickValueAlt(Tile* tile) override;
+	Slider* ClickValue(Tile* tile, UInt32 option) override;
 
 	std::vector<CMValue> GetValues() override { return { setting.Read() }; };
 	void SetValues(const std::vector<CMValue>& values) override
@@ -363,13 +408,14 @@ public:
 	IO controller;
 
 	Control(const CMJSONElem& elem);
+	Control(const MCMMod& mod, const MCMItem& item);
 
 	const char* GetTemplate() override { return "SettingControlTemplate"; }
 	const char* GetTypeName() override { return "Control"; }
 
 	Control* Default() override { keyboard.Default(); mouse.Default(); controller.Default(); return this; }
 	Control* Display(Tile* tile) override;
-	Control* ClickValue(Tile* tile) override;
+	Control* ClickValue(Tile* tile, UInt32 option) override;
 
 	std::vector<CMValue> GetValues() override { return { keyboard.Read(), mouse.Read(), controller.Read() }; };
 
@@ -399,12 +445,10 @@ public:
 	static CMValue GetPrev(const CMValue& value);
 	static CMValue GetNext(const CMValue& value);
 	
-	Font* Up(bool forward) override;
 	Font* Default() override { font.Default(); fontY.Default(); return this; }
 	Font* Display(Tile* tile) override;
 
-	Font* ClickValue(Tile* tile) override;
-	Font* ClickValueAlt(Tile* tile) override;
+	Font* ClickValue(Tile* tile, UInt32 option) override;
 
 	std::vector<CMValue> GetValues() override { return { font.Read(), fontY.Read() }; };
 	void SetValues(const std::vector<CMValue>& values) override
@@ -446,42 +490,32 @@ class ModConfigurationMenu : public Menu
 public:
 	enum TileIDs
 	{
-		kModConfigurationMenu_Title = 0,
+		kTileID_Back = 0,
+		kTileID_Default = 1,
+		kTileID_DeviceButton = 2,
+		kTileID_SaveToJSON = 4,
+		kTileID_LoadFromJSON = 5,
 
-		kModConfigurationMenu_SelectionText = 4,
+		kTileID_Title = 10,
+		kTileID_SelectionText = 11,
 
-		kModConfigurationMenu_SearchBar = 5,
-		kModConfigurationMenu_SearchIcon = 6,
+		kTileID_SettingList = 20,
+		kTileID_SettingListItem,
+		kTileID_SettingText,
+		kTileID_SettingLeftArrow,
+		kTileID_SettingRightArrow,
 
-		kModConfigurationMenu_Exit = 7,
-		kModConfigurationMenu_Back = 8,
-		kModConfigurationMenu_DeviceButton = 30,
-		kModConfigurationMenu_Default = 31,
-		kModConfigurationMenu_SaveToJSON = 32,
-		kModConfigurationMenu_LoadFromJSON = 33,
+		kTileID_ExtraList = 30,
+		kTileID_ExtraListItem,
+		kTileID_ExtraText,
+		kTileID_ExtraLeftArrow,
+		kTileID_ExtraRightArrow,
 
-		kModConfigurationMenu_ModList = 11,
-		kModConfigurationMenu_ModListItem = 12,
-
-		kModConfigurationMenu_SettingList = 19,
-		kModConfigurationMenu_SettingListItem = 20,
-
-		kModConfigurationMenu_CategoryLeftArrow = 13,
-		kModConfigurationMenu_CategoryText = 14,
-		kModConfigurationMenu_CategoryRightArrow = 15,
-
-		kModConfigurationMenu_SettingCategoryLeftArrow = 23,
-		kModConfigurationMenu_SettingCategoryText = 24,
-		kModConfigurationMenu_SettingCategoryRightArrow = 25,
-
-
-		kModConfigurationMenu_ChoiceText = 99,
-		kModConfigurationMenu_SliderLeftArrow = 100,
-		kModConfigurationMenu_SliderRightArrow = 101,
-		kModConfigurationMenu_SliderDraggableRect = 102,
-		kModConfigurationMenu_SubsettingInputFieldText = 103,
-		kModConfigurationMenu_SubsettingInputFieldText_BoxBG = 104,
-		kModConfigurationMenu_SliderText = 105,
+		kTileID_SettingValue = 100,
+		kTileID_SettingPrev = 101,
+		kTileID_SettingNext = 102,
+		kTileID_SettingUp = 103,
+		kTileID_SettingDown = 104,
 	};
 
 
@@ -509,16 +543,19 @@ public:
 	void	OnUpdateUserTrait(int tileVal) override {};
 	void	HandleControllerConnectOrDisconnect(bool isControllerConnected) override;
 
+	void	UpdateRightClick();
+
+	void	HandleRightClick(UInt32 tileID, Tile* activeTile);
+	void	HandleRightUnclick(UInt32 tileID, Tile* activeTile);
+
 	union
 	{
 		Tile* tiles[11];
 		struct
 		{
-			Tile* doneTile;
+			Tile* tileBackButton;
 			Tile* menuTitle;
 
-			Tile* modsListBackground;
-			Tile* settingsListBackground;
 		};
 	};
 
@@ -564,7 +601,6 @@ public:
 		void UpdateSettingsList();
 		void DisplaySettings();
 		void Update();
-		void Click(Tile* clickedTile) { listBox.GetItemForTile(clickedTile)->Click(clickedTile); }
 		void Display(const std::string& newCategory, bool main, bool allTag, bool doublestacked);
 		void Hide();
 	};
@@ -597,7 +633,7 @@ public:
 
 		void operator<<=(const std::string& str) const
 		{
-			Set(str);
+//			Set(str);
 		}
 	};
 
@@ -612,9 +648,36 @@ public:
 	class ControlHandler
 	{
 	public:
-		CMSetting* setting;
+		Control* setting = nullptr;
 
-		bool debounce;
+		bool debounce = false;
+
+		static UInt32 GetKey()
+		{
+			const auto input = OSInputGlobals::GetSingleton();
+			for (int i = OSInputGlobals::_Escape; i < OSInputGlobals::Delete_ + 20; ++i)
+				if (input->GetKeyState(i, OSInputGlobals::isPressed))
+					return i;
+			return 0;
+		}
+
+		static UInt32 GetController()
+		{
+			const auto input = OSInputGlobals::GetSingleton();
+			for (int i = OSInputGlobals::kXboxCtrl_DPAD_UP; i < OSInputGlobals::kXboxCtrl_R3; ++i)
+				if (input->GetControllerValue(i, OSInputGlobals::isPressed))
+					return i;
+			return 0;
+		}
+
+		static UInt32 GetMouse()
+		{
+			const auto input = OSInputGlobals::GetSingleton();
+			for (int i = OSInputGlobals::LeftMouse; i < OSInputGlobals::MouseWheelDown; ++i)
+				if (input->GetKeyState(i, OSInputGlobals::isPressed))
+					return i;
+			return 0;
+		}
 
 		bool IsActive()
 		{
@@ -623,17 +686,56 @@ public:
 
 		void UpdateSetting()
 		{
-//			const auto menu = GetSingleton();
-//			const auto tile = menu->settingsMain.listBox.GetTileFromItem(setting);
-//			setting->Display(tile);
+			const auto menu = GetSingleton();
+			const auto tile = menu->settingsMain.listBox.GetTileFromItem(setting);
+			setting->Display(tile);
 		}
 
 		void SetKeyboard(UInt32 key)
 		{
-//			reinterpret_cast<CMSetting::Control*>(setting->data.get())->keyboard.Write((SInt32) key);
-//			UpdateSetting();
+			if (key == OSInputGlobals::_Escape) key = 0;
+
+			setting->keyboard.Write((SInt32) key);
+			UpdateSetting();
+			setting = nullptr;
 		}
 
+		void SetMouse(UInt32 key)
+		{
+			setting->mouse.Write((SInt32)key);
+			UpdateSetting();
+			setting = nullptr;
+		}
+
+		void SetController(UInt32 key)
+		{
+			setting->controller.Write((SInt32)key);
+			UpdateSetting();
+			setting = nullptr;
+		}
+
+		bool HandleControl()
+		{
+			if (IsActive())
+			{
+				if (const auto key = GetKey())
+				{
+					SetKeyboard(key);
+					return true;
+				}
+				if (const auto key = GetMouse())
+				{
+					SetMouse(key);
+					return true;
+				}
+				if (const auto key = GetController()) 
+				{
+//					SetController(key);
+					return true;
+				}
+			}
+			return false;
+		}
 	};
 
 	ControlHandler controlHandler;
@@ -653,9 +755,10 @@ public:
 	void ReloadMenuXML();
 	bool XMLHasChanges();
 
-	void ClickMain(Tile* mod);
+	void ClickItem(Tile* mod);
 	void ClickExtra(Tile* mod);
-
+	void ClickValue(Tile* value, CMSetting::ClickType option = CMSetting::kValue);
+	void Drag(Tile* mod);
 	void FilterMods();
 	void FilterSettings();
 
@@ -666,6 +769,7 @@ public:
 
 	void ReadJSON(const std::filesystem::path& path);
 	void ReadJSONForPath(const std::filesystem::path& path);
+	void ReadMCM();
 
 	static ModConfigurationMenu* GetSingleton();
 

@@ -424,6 +424,7 @@ class hkReferencedObject;
 class hkpRigidBody;
 class hkpWorld;
 class hkpWorldObject;
+class bhkSimpleShapePhantom;
 struct ActorHitData;
 struct AnimData;
 struct CombatActors;

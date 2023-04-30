@@ -188,9 +188,9 @@ Tile::Value* StringToTilePath(const std::string& componentPath)
 {
 	const auto firstSlash = componentPath.find_first_of('/');
 	const auto lastSlash = componentPath.find_last_of('/');
-	const auto tileMenu = Menu::GetTileMenu(componentPath.substr(0, firstSlash - 1));
-	const auto tile = tileMenu->GetComponent(componentPath.substr(firstSlash + 1, lastSlash - 1));
-	const auto component = Tile::TraitNameToID(componentPath.substr(lastSlash + 1).data());
+	const auto tileMenu = Menu::GetTileMenu(componentPath.substr(0, firstSlash));
+	const auto tile = tileMenu->GetComponent(componentPath.substr(firstSlash + 2, lastSlash));
+	const auto component = Tile::TraitNameToID(componentPath.substr(lastSlash + 2).data());
 	return tile->GetValue(component);
 }
 

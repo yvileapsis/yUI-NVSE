@@ -44,6 +44,7 @@ UInt8 TESDataHandler::GetModIndex(const char* modName)
 
 const char* TESDataHandler::GetNthModName(UInt32 modIndex)
 {
+	if (modIndex == 0xFF) return "Runtime";
 	if (const auto iter = GetActiveModList()[modIndex]) return iter->name;
 	return "";
 }

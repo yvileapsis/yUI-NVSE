@@ -31,7 +31,7 @@ CMSetting::IO::IO(const CMJSONElem& elem)
 	if (elem.contains("category"))	categoryGot = elem["category"].get<std::string>();
 	if (elem.contains("value"))		valueGot = elem["value"].get<std::string>();
 
-	ini = std::make_tuple(pathGot, categoryGot, valueGot);
+	ini = INI(pathGot, categoryGot, valueGot);
 
 	if (elem.contains("default"))		defaultValue = CMValue(CMJSONElem(elem["default"]));
 	if (elem.contains("xml"))			xml = elem["xml"].get<std::string>();

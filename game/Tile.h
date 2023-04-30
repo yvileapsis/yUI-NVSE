@@ -370,6 +370,8 @@ public:
 	Tile* GetByTraitName(const char* traitName) { return CdeclCall<Tile*>(0xA08B20, this, traitName); };
 
 	std::string GetFullPath();
+
+	bool PlayTileSound(UInt32 id = kTileValue_clicksound) { return ThisCall<char>(0xA0B110, this, id); }
 };
 static_assert(sizeof(Tile) == 0x38);
 

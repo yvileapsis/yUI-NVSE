@@ -7,7 +7,7 @@
 #include "InterfaceManager.h"
 #include "Setting.h"
 
-inline std::map<std::tuple<std::filesystem::path, std::string, std::string>, CMValue> ini_map;
+inline std::map<CMSetting::IO::INI, CMValue> ini_map;
 
 inline void ReadINIInternal(const std::filesystem::path& iniPath, const std::filesystem::path& iniPath2)
 {
@@ -30,7 +30,9 @@ inline void ReadINIInternal(const std::filesystem::path& iniPath, const std::fil
 			else if (key.pItem[0] == 'f') value = ini.GetDoubleValue(section.pItem, key.pItem);
 			else if (key.pItem[0] == 's') value = static_cast<std::string>(ini.GetValue(section.pItem, key.pItem));
 
-			ini_map.emplace(std::make_tuple(iniPath2, section.pItem, key.pItem), value);
+			CMSetting::IO::INI ini1{ iniPath2, section.pItem, key.pItem };
+
+			ini_map.emplace(ini1, value);
 		}
 	}
 
@@ -44,27 +46,27 @@ inline void WriteINIInternal(const std::filesystem::path& iniPath, const CMSetti
 	if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
 	if (value.IsString())
-		ini.SetValue(std::get<1>(setting).c_str(), std::get<2>(setting).c_str(), static_cast<std::string>(value).c_str());
+		ini.SetValue(setting.category.c_str(), setting.setting.c_str(), static_cast<std::string>(value).c_str());
 	else if (value.IsFloat()) 
-		ini.SetDoubleValue(std::get<1>(setting).c_str(), std::get<2>(setting).c_str(), value);
+		ini.SetDoubleValue(setting.category.c_str(), setting.setting.c_str(), value);
 	else if (value.IsInteger())
-		ini.SetLongValue(std::get<1>(setting).c_str(), std::get<2>(setting).c_str(), value);
+		ini.SetLongValue(setting.category.c_str(), setting.setting.c_str(), value);
 
 	ini.SaveFile(iniPath.c_str(), false);
 }
 
 std::optional<CMValue> CMSetting::IO::ReadINI()
 {
-	if (std::get<0>(ini).empty() || std::get<1>(ini).empty() || std::get<2>(ini).empty()) return {};
+	if (ini.file.empty() || ini.category.empty() || ini.setting.empty()) return {};
 
 	std::filesystem::path iniPath = GetCurPath();
-	iniPath += std::get<0>(ini);
+	iniPath += ini.file;
 
 	const auto settingTuple = ini;
 
 	if (ini_map.contains(settingTuple)) return ini_map[settingTuple];
 
-	ReadINIInternal(iniPath, std::get<0>(ini));
+	ReadINIInternal(iniPath, ini.file);
 
 	if (ini_map.contains(settingTuple)) return ini_map[settingTuple];
 
@@ -73,10 +75,10 @@ std::optional<CMValue> CMSetting::IO::ReadINI()
 
 void CMSetting::IO::WriteINI(const CMValue& value) const
 {
-	if (std::get<0>(ini).empty() || std::get<1>(ini).empty() || std::get<2>(ini).empty()) return;
+	if (ini.file.empty() || ini.category.empty() || ini.setting.empty()) return;
 
 	std::filesystem::path iniPath = GetCurPath();
-	iniPath += std::get<0>(ini);
+	iniPath += ini.file;
 
 	ini_map[ini] = value;
 

@@ -1,4 +1,5 @@
 #include "ConfigurationMenu.h"
+#include "ConsoleManager.h"
 
 #include "functions.h"
 #include "InterfaceManager.h"
@@ -24,7 +25,6 @@ static bool hasAddedNewTrait = false;
 bool ModConfigurationMenu::HasTiles()
 {
 	//	for (const auto tile : tiles) if (!tile) return false;
-	if (!searchBar.tile) return false;
 	return true;
 }
 
@@ -94,7 +94,6 @@ ModConfigurationMenu::ModConfigurationMenu() : Menu()
 
 	// prevent Escape closing the whole start menu if Configuration Menu is open
 	*(UInt8*)0x119F348 = 0;
-
 }
 
 
@@ -127,14 +126,17 @@ void ModConfigurationMenu::SetTile(const UInt32 tileID, Tile* activeTile)
 {
 	switch (tileID)
 	{
-	case kModConfigurationMenu_Title:				menuTitle = activeTile; return;
-	case kModConfigurationMenu_ModList:				modsListBackground = activeTile; return;
-	case kModConfigurationMenu_SelectionText:		description.tile = activeTile; return;
-	case kModConfigurationMenu_Exit:				doneTile = activeTile; return;
-	case kModConfigurationMenu_SearchBar:			searchBar.tile = activeTile; return;
-	case kModConfigurationMenu_SettingCategoryText:	settingsMain.tagTile = (TileText*)activeTile; return;
-	case kModConfigurationMenu_SettingList:			settingsListBackground = activeTile; return;
-	case kModConfigurationMenu_CategoryText:		settingsExtra.tagTile = (TileText*)activeTile; return;
+	case kTileID_Back:				tileBackButton = activeTile; return;
+
+	case kTileID_Title:				menuTitle = activeTile; return;
+	case kTileID_SelectionText:		description.tile = activeTile; return;
+
+	case kTileID_SettingList:		settingsMain.listBox.parentTile = activeTile; return;
+	case kTileID_SettingText:		settingsMain.tagTile = (TileText*)activeTile; return;
+
+	case kTileID_ExtraList:			settingsExtra.listBox.parentTile = activeTile; return;
+	case kTileID_ExtraText:			settingsExtra.tagTile = (TileText*)activeTile; return;
+	default: break;
 	}
 }
 
@@ -145,139 +147,89 @@ void ModConfigurationMenu::HandleMousewheel(UInt32 tileID, Tile* activeTile)
 
 void ModConfigurationMenu::HandleActiveMenuClickHeld(UInt32 tileID, Tile* activeTile)
 {
-	if (tileID == kModConfigurationMenu_SliderDraggableRect)
+	switch (tileID)
 	{
-		const auto option = activeTile->parent;
-		settingsMain.listBox.GetItemForTile(option)->Drag(activeTile->Get(kTileValue_user1))->Display(option);
+	case kTileID_SettingValue: Drag(activeTile); break;
+	case kTileID_SettingPrev:
+	case kTileID_SettingNext:
+	{
+		if (InterfaceManager::GetSingleton()->timeLeftClickHeld > 0.5)
+			ClickValue(activeTile, tileID != kTileID_SettingPrev ? CMSetting::kNext : CMSetting::kPrev);
+		break;
 	}
-
-	return;
-	if (tileID == kModConfigurationMenu_SliderLeftArrow || tileID == kModConfigurationMenu_SliderRightArrow)
-	{
-		if (InterfaceManager::GetSingleton()->timeLeftClickHeld > 0.3)
-		{
-			const auto option = activeTile->parent;
-			if (tileID != kModConfigurationMenu_SliderLeftArrow)
-			{
-				settingsMain.listBox.GetItemForTile(option)->ClickValue(option)->Display(option);
-			}
-			else
-			{
-				settingsMain.listBox.GetItemForTile(option)->ClickValueAlt(option)->Display(option);
-			}
-		}
+	default: break;
 	}
 }
 
-void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* clickedTile)
+void ModConfigurationMenu::HandleClick(UInt32 tileID, Tile* activeTile)
 {
-	switch (tileID)
-	{
-	case kModConfigurationMenu_ChoiceText:
-	case kModConfigurationMenu_SliderLeftArrow:
-	{
-		const auto option = clickedTile->parent;
-		settingsMain.listBox.GetItemForTile(option)->ClickValueAlt(option)->Display(option);
-		break;
-	}
-	case 98:
-	{
-		const auto option = clickedTile->parent;
-		settingsMain.listBox.GetItemForTile(option)->ClickValue(option);
-
-	}
-	case kModConfigurationMenu_SliderRightArrow:
-	{
-		const auto option = clickedTile->parent;
-		settingsMain.listBox.GetItemForTile(option)->ClickValue(option)->Display(option);
-		break;
-	}
-	}
+	if (controlHandler.HandleControl()) return;
 }
 
-
-void ModConfigurationMenu::HandleUnclick(UInt32 tileID, Tile* clickedTile)
+void ModConfigurationMenu::HandleUnclick(UInt32 tileID, Tile* activeTile)
 {
 	switch (tileID)
 	{
-	case kModConfigurationMenu_CategoryRightArrow:
-	case kModConfigurationMenu_CategoryText:
-	case kModConfigurationMenu_CategoryLeftArrow:
-	{
-		tileID != kModConfigurationMenu_CategoryLeftArrow ? ++settingsExtra : --settingsExtra;
-		FilterMods();
-		HandleMouseover(kModConfigurationMenu_CategoryText, nullptr);
-		break;
-	}
+	case kTileID_Back:				Back(); break;
+	case kTileID_Default:			Default(); break;
+	case kTileID_DeviceButton:		Device(); break;
+	case kTileID_SaveToJSON:		SaveToJSON(); break;
+	case kTileID_LoadFromJSON:		LoadFromJSON(); break;
 
-	case kModConfigurationMenu_SettingCategoryRightArrow:
-	case kModConfigurationMenu_SettingCategoryText:
-	case kModConfigurationMenu_SettingCategoryLeftArrow:
+	case kTileID_SettingRightArrow:
+	case kTileID_SettingText:
+	case kTileID_SettingLeftArrow:
 	{
-		tileID != kModConfigurationMenu_SettingCategoryLeftArrow ? ++settingsMain : --settingsMain;
+		tileID != kTileID_SettingLeftArrow ? ++settingsMain : --settingsMain;
 		FilterSettings();
-		HandleMouseover(kModConfigurationMenu_SettingCategoryText, nullptr);
+		HandleMouseover(kTileID_SettingText, nullptr);
 		break;
 	}
-	case kModConfigurationMenu_SaveToJSON:		SaveToJSON(); return;
-	case kModConfigurationMenu_LoadFromJSON:	LoadFromJSON(); return;
-	case kModConfigurationMenu_Default:			Default(); return;
-	case kModConfigurationMenu_DeviceButton:	Device(); return;
-	case kModConfigurationMenu_Exit:			Back(); return;
-	case kModConfigurationMenu_ModListItem:		ClickExtra(clickedTile); return;
-	case kModConfigurationMenu_SettingListItem:	ClickMain(clickedTile); return;
-	case kModConfigurationMenu_SearchIcon:
-	{
-		//		this->SetInSearchMode(true);
-		break;
-	}
-	case kModConfigurationMenu_SliderLeftArrow:
-	{
-		const auto option = clickedTile->parent;
-		settingsMain.listBox.GetItemForTile(option)->ClickValueAlt(option)->Display(option);
-		break;
-	}
-	case 98:
-	{
-		const auto option = clickedTile->parent;
-		settingsMain.listBox.GetItemForTile(option)->ClickValue(option);
 
-	}
-	case kModConfigurationMenu_ChoiceText:
-	case kModConfigurationMenu_SliderRightArrow:
+	case kTileID_ExtraRightArrow:
+	case kTileID_ExtraText:
+	case kTileID_ExtraLeftArrow:
 	{
-		const auto option = clickedTile->parent;
-		settingsMain.listBox.GetItemForTile(option)->ClickValue(option)->Display(option);
+		tileID != kTileID_ExtraLeftArrow ? ++settingsExtra : --settingsExtra;
+		FilterMods();
+		HandleMouseover(kTileID_ExtraText, nullptr);
 		break;
 	}
-	case kModConfigurationMenu_SubsettingInputFieldText_BoxBG:
-	{
-		const auto option = clickedTile->parent;
-		settingsMain.listBox.GetItemForTile(option)->Up(false)->Display(option);
-		break;
+
+	case kTileID_ExtraListItem:		ClickExtra(activeTile); break;
+	case kTileID_SettingListItem:	ClickItem(activeTile); break;
+
+	case kTileID_SettingValue:		ClickValue(activeTile); break;
+	case kTileID_SettingPrev:		ClickValue(activeTile, CMSetting::kPrev); break;
+	case kTileID_SettingNext:		ClickValue(activeTile, CMSetting::kNext); break;
+	case kTileID_SettingUp:			ClickValue(activeTile, CMSetting::kUp); break;
+	case kTileID_SettingDown:		ClickValue(activeTile, CMSetting::kDown); break;
+	default: break;
 	}
-	case kModConfigurationMenu_SliderText:
+}
+
+
+void ModConfigurationMenu::HandleRightClick(UInt32 tileID, Tile* activeTile)
+{
+	if (controlHandler.HandleControl()) return;
+}
+
+void ModConfigurationMenu::HandleRightUnclick(UInt32 tileID, Tile* activeTile)
+{
+	switch (tileID)
 	{
-		const auto option = clickedTile->parent;
-		settingsMain.listBox.GetItemForTile(option)->Up()->Display(option);
-		break;
-	}
+	case kTileID_SettingValue:		ClickValue(activeTile, CMSetting::kValueAlt); break;
+	case kTileID_SettingPrev:		ClickValue(activeTile, CMSetting::kPrev); break;
+	case kTileID_SettingNext:		ClickValue(activeTile, CMSetting::kNext); break;
+	case kTileID_SettingUp:			ClickValue(activeTile, CMSetting::kUp); break;
+	case kTileID_SettingDown:		ClickValue(activeTile, CMSetting::kDown); break;
+	default: break;
 	}
 }
 
 bool ModConfigurationMenu::HandleKeyboardInput(UInt32 key)
 {
-	if (key == OSInputGlobals::Escape_)
-	{
-		Back();
-		return true;
-	}
-
-	if (controlHandler.IsActive())
-	{
-		controlHandler.SetKeyboard(key);
-		return true;
-	}
+	if (controlHandler.HandleControl()) return true;
 
 	return false;
 	if (IsControlHeld())
@@ -365,13 +317,13 @@ bool ModConfigurationMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode co
 		if (settingsExtra.listBox.GetSelectedTile())
 		{
 			settingsExtra.listBox.SaveScrollPosition();
-			//			this->HandleMouseover(kModConfigurationMenu_CategoriesBackground, nullptr);
+			//			this->HandleMouseover(kTileID_CategoriesBackground, nullptr);
 			//			categoriesListBox.RestorePosition();
 		}
 		else if (settingsMain.listBox.GetSelectedTile() && settingsExtra.listBox.GetNumVisibleItems())
 		{
 			settingsMain.listBox.SaveScrollPosition();
-			this->HandleMouseover(kModConfigurationMenu_ModList, nullptr);
+			this->HandleMouseover(kTileID_ExtraList, nullptr);
 			settingsExtra.listBox.RestorePosition();
 		}
 		return true;
@@ -381,13 +333,13 @@ bool ModConfigurationMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode co
 		if (settingsExtra.listBox.GetNumVisibleItems())
 		{
 			//			categoriesListBox.SaveScrollPosition();
-			this->HandleMouseover(kModConfigurationMenu_ModList, nullptr);
+			this->HandleMouseover(kTileID_ExtraList, nullptr);
 			settingsExtra.listBox.RestorePosition();
 		}
 		else if (settingsExtra.listBox.GetSelectedTile() && settingsMain.listBox.GetNumVisibleItems())
 		{
 			settingsExtra.listBox.SaveScrollPosition();
-			this->HandleMouseover(kModConfigurationMenu_SettingList, nullptr);
+			this->HandleMouseover(kTileID_SettingList, nullptr);
 			settingsMain.listBox.RestorePosition();
 		}
 		return true;
@@ -413,43 +365,46 @@ bool ModConfigurationMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode co
 
 void ModConfigurationMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 {
+
 	switch (tileID)
 	{
 
-	case kModConfigurationMenu_CategoryLeftArrow:
-	case kModConfigurationMenu_CategoryText:
-	case kModConfigurationMenu_CategoryRightArrow:
+	case kTileID_ExtraLeftArrow:
+	case kTileID_ExtraText:
+	case kTileID_ExtraRightArrow:
 	{
-		description <<= settingsExtra;
+//		description <<= settingsExtra;
 		break;
 	}
 
-	case kModConfigurationMenu_SettingCategoryLeftArrow:
-	case kModConfigurationMenu_SettingCategoryText:
-	case kModConfigurationMenu_SettingCategoryRightArrow:
+	case kTileID_SettingLeftArrow:
+	case kTileID_SettingText:
+	case kTileID_SettingRightArrow:
 	{
-		description <<= settingsMain;
+//		description <<= settingsMain;
 		break;
 	}
-	case kModConfigurationMenu_ModListItem:
+	case kTileID_ExtraListItem:
 	{
-		description <<= settingsExtra.listBox.GetItemForTile(activeTile);
+//		description <<= settingsExtra.listBox.GetItemForTile(activeTile);
 		break;
 	}
-	case kModConfigurationMenu_SliderDraggableRect:
-	case kModConfigurationMenu_SliderLeftArrow:
-	case kModConfigurationMenu_SliderRightArrow:
-	{
-		auto item = settingsMain.listBox.GetItemForTile(activeTile->parent);
-		break;
-	}
-	case kModConfigurationMenu_SettingListItem:
+	case kTileID_SettingListItem:
 	{
 		settingsMain.listBox.parentTile->GetChild("lb_highlight_box")->Set(kTileValue_x, (Float32) activeTile->Get(kTileValue_x), true);
 		settingsMain.listBox.parentTile->GetChild("lb_highlight_box")->Set(kTileValue_width, (Float32)activeTile->Get(kTileValue_width), true);
 
-		description <<= settingsMain.listBox.GetItemForTile(activeTile);
+//		description <<= settingsMain.listBox.GetItemForTile(activeTile);
 
+		break;
+	}
+	case kTileID_SettingValue:
+	case kTileID_SettingPrev:
+	case kTileID_SettingNext:
+	case kTileID_SettingUp:
+	case kTileID_SettingDown:
+	{
+		settingsMain.listBox.SetSelectedTile(activeTile->parent);
 		break;
 	}
 	default:
@@ -459,14 +414,15 @@ void ModConfigurationMenu::HandleMouseover(UInt32 tileID, Tile* activeTile)
 	}
 }
 
-void ModConfigurationMenu::HandleUnmouseover(UInt32 tileID, Tile* tile)
+void ModConfigurationMenu::HandleUnmouseover(UInt32 tileID, Tile* activeTile)
 {
 	description <<= "";
 }
 
 
-bool ModConfigurationMenu::HandleControllerInput(int code, Tile* tile)
+bool ModConfigurationMenu::HandleControllerInput(int code, Tile* activeTile)
 {
+	if (controlHandler.HandleControl()) return true;
 	//	this->SetInSearchMode(false);
 	//	if (this->GetInSubsettingInputMode() && code != OSInputGlobals::kXboxCtrl_BUTTON_A)
 	{
@@ -475,7 +431,7 @@ bool ModConfigurationMenu::HandleControllerInput(int code, Tile* tile)
 
 	if (code == OSInputGlobals::kXboxCtrl_L3 || code == OSInputGlobals::kXboxCtrl_R3)
 	{
-		//		this->HandleUnclick(kModConfigurationMenu_ToggleShowActive, nullptr);
+		//		this->HandleUnclick(kTileID_ToggleShowActive, nullptr);
 		return true;
 	}
 
@@ -484,12 +440,34 @@ bool ModConfigurationMenu::HandleControllerInput(int code, Tile* tile)
 
 void ModConfigurationMenu::HandleControllerConnectOrDisconnect(bool isControllerConnected)
 {
-
 }
 
+void ModConfigurationMenu::UpdateRightClick()
+{
+	const auto manager = InterfaceManager::GetSingleton();
+	auto isActivateDepressed = 0;
+	if (const auto console = ConsoleManager::GetSingleton(); !console || console->isConsoleOpen <= 0)
+		isActivateDepressed = OSInputGlobals::GetSingleton()->GetControlState(OSInputGlobals::Aim, OSInputGlobals::isDepressed);
+	//GetMouseState(OSInputGlobals::kRightClick, OSInputGlobals::isDepressed);
+	//GetControlState(OSInputGlobals::Aim, OSInputGlobals::isDepressed);
+
+	if (isActivateDepressed)
+	{
+		const auto activeTile = manager->activeTile;
+		if (manager->activeMenu == this && visibilityState == 1 && activeTile && activeTile->GetValue(kTileValue_id))
+		{
+			activeTile->PlayTileSound(kTileValue_clicksound);
+			activeTile->Set(kTileValue_clicked, 1);
+			activeTile->Set(kTileValue_clicked, 0);
+			HandleRightUnclick(activeTile->Get(kTileValue_id), activeTile);
+		}
+	}
+}
 
 void ModConfigurationMenu::Update()
 {
+	UpdateRightClick();
+
 	settingsMain.Update();
 	settingsExtra.Update();
 
@@ -509,17 +487,17 @@ void ModConfigurationMenu::Update()
 			activeTileID = tile->Get(kTileValue_id);
 		}
 
-		//		if (activeTileID != kModConfigurationMenu_SearchIcon && activeTileID != kModConfigurationMenu_CancelSearch)
+		//		if (activeTileID != kTileID_SearchIcon && activeTileID != kTileID_CancelSearch)
 		{
 			//			this->SetInSearchMode(false);
 		}
 
-		//		if (activeTileID != kModConfigurationMenu_CategoriesButton && !isDraggingCategoriesSlider)
+		//		if (activeTileID != kTileID_CategoriesButton && !isDraggingCategoriesSlider)
 		{
 			//			this->SetCategoriesListActive(false);
 		}
 
-		if (activeTileID != kModConfigurationMenu_SettingListItem && activeTileID != kModConfigurationMenu_SliderText)
+//		if (activeTileID != kTileID_SettingListItem && activeTileID != kTileID_SliderText)
 		{
 			//			if (this->GetInSubsettingInputMode())
 			{
