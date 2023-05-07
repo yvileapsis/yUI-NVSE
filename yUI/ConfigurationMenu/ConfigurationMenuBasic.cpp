@@ -24,7 +24,7 @@ static bool hasAddedNewTrait = false;
 
 bool ModConfigurationMenu::HasTiles()
 {
-	//	for (const auto tile : tiles) if (!tile) return false;
+//	for (const auto tile : tiles) if (!tile) return false;
 	return true;
 }
 
@@ -99,13 +99,7 @@ ModConfigurationMenu::ModConfigurationMenu() : Menu()
 
 void ModConfigurationMenu::Close()
 {
-	//	if (!g_bShownTweaksMenuReloadWarning)
-	{
-		//		if (!touchedTweaks.Empty() || !touchedSubsettings.Empty())
-		{
-			//			ShowMessageBox("You must restart the game for changes to be applied!", 0, 0, RestartGameWarningCallback, 0, 0x17, 0, 0, (char*)0x103934C, "Don't show this again", NULL); // OK
-		}
-	}
+//	ShowMessageBox("You must restart the game for changes to be applied!", 0, 0, RestartGameWarningCallback, 0, 0x17, 0, 0, (char*)0x103934C, "Don't show this again", NULL); // OK
 
 	Menu::Close();
 }
@@ -231,78 +225,8 @@ bool ModConfigurationMenu::HandleKeyboardInput(UInt32 key)
 {
 	if (controlHandler.HandleControl()) return true;
 
-	return false;
 	if (IsControlHeld())
-	{
-		if ((key | 0x20) == 'f')
-		{
-			//			this->SetInSearchMode(!this->GetInSearchMode());
-			return true;
-		}
-		else if ((key | 0x20) == 'r')
-		{
-			//			if (this->GetInSubsettingInputMode())
-			{
-				subSettingInput.Set("");
-			}
-			//			else if (this->GetInSearchMode() || this->IsSearchSuspended())
-			{
-				//				this->ClearAndCloseSearch();
-			}
-			return true;
-		}
-	}
-
-	//	if (this->GetInSearchMode())
-	{
-		if (searchBar.HandleKey(key))
-		{
-			this->RefreshFilter();
-			return true;
-		}
-	}
-	//	else// if (this->GetInSubsettingInputMode())
-	{
-		if (key == kInputCode_Enter)
-		{
-			// handle it here instead of in the InputField since we want to update the setting string
-//			this->SetInSubsettingInputMode(false);
-			return true;
-		}
-		else if (key != '`' && key != '\t')
-		{
-			if (subSettingInput.HandleKey(key))
-			{
-				//				subSettingInput.tile->SetFloat(kTileValue_systemcolor, this->IsSubsettingInputValid() ? 1 : 2);
-			}
-			else
-			{
-				return true;
-				PlayGameSound("UIMenuCancel");
-			}
-			return true;
-		}
-	}
-	//	else if (this->GetInHotkeyMode())
-	{
-		// ignore all keyboard input while in hotkey mode, hotkeys are checked in ModConfigurationMenu::UpdateTagString to allow checking function keys etc.
-//		return true;
-	}
-	//	else
-	if ((key | 0x20) == 'r')
-	{
-		if (IsShiftHeld())
-		{
-			//			this->WriteAllChangesToINIs();
-
-			//			ReloadINIs();
-		}
-		else
-		{
-			ReloadMenuXML();
-		}
-		return true;
-	}
+		if ((key | 0x20) == 'r') ReloadMenuXML();
 
 	return false;
 }
@@ -349,15 +273,6 @@ bool ModConfigurationMenu::HandleSpecialKeyInput(MenuSpecialKeyboardInputCode co
 	case kMenu_PageDown:
 	case kMenu_PageUp:
 	{
-		bool isRightArrow = code == kMenu_PageUp;
-
-		if (IsControllerConnected())
-		{
-			// page up and page down are inverted on controller for some reason
-			isRightArrow = !isRightArrow;
-		}
-
-		//		return this->HandleActiveSliderArrows(isRightArrow, 0.2);
 	}
 	}
 	return false;
@@ -423,15 +338,9 @@ void ModConfigurationMenu::HandleUnmouseover(UInt32 tileID, Tile* activeTile)
 bool ModConfigurationMenu::HandleControllerInput(int code, Tile* activeTile)
 {
 	if (controlHandler.HandleControl()) return true;
-	//	this->SetInSearchMode(false);
-	//	if (this->GetInSubsettingInputMode() && code != OSInputGlobals::kXboxCtrl_BUTTON_A)
-	{
-		//		this->SetInSubsettingInputMode(false);
-	}
 
 	if (code == OSInputGlobals::kXboxCtrl_L3 || code == OSInputGlobals::kXboxCtrl_R3)
 	{
-		//		this->HandleUnclick(kTileID_ToggleShowActive, nullptr);
 		return true;
 	}
 
@@ -464,6 +373,16 @@ void ModConfigurationMenu::UpdateRightClick()
 	}
 }
 
+void CMSetting::SetID()
+{
+	if (id.empty())
+	{
+		for (const auto& mod : mods) id += mod;
+		id += GetTypeName();
+		id += R"(=')" + name + R"(')";
+	}
+}
+
 void ModConfigurationMenu::Update()
 {
 	UpdateRightClick();
@@ -475,85 +394,4 @@ void ModConfigurationMenu::Update()
 	subSettingInput.Update();
 
 	UpdateEscape();
-
-	return;
-	
-	// close the search and categoriesMods list when clicking elsewhere
-	//if (input->GetMouseState(OSInputGlobals::kLeftClick, OSInputGlobals::isDepressed))
-	{
-		auto activeTileID = -1;
-		if (auto tile = InterfaceManager::GetSingleton()->GetActiveTile())
-		{
-			activeTileID = tile->Get(kTileValue_id);
-		}
-
-		//		if (activeTileID != kTileID_SearchIcon && activeTileID != kTileID_CancelSearch)
-		{
-			//			this->SetInSearchMode(false);
-		}
-
-		//		if (activeTileID != kTileID_CategoriesButton && !isDraggingCategoriesSlider)
-		{
-			//			this->SetCategoriesListActive(false);
-		}
-
-//		if (activeTileID != kTileID_SettingListItem && activeTileID != kTileID_SliderText)
-		{
-			//			if (this->GetInSubsettingInputMode())
-			{
-				//				this->SetInSubsettingInputMode(false);
-			}
-		}
-
-	}
-	return;
-
-	/*
-	if (this->GetInHotkeyMode())
-	{
-		auto pressedKey = hotkeyInput.Update();
-		if (pressedKey)
-		{
-			if (pressedKey != Tilde)
-			{
-				if (pressedKey == _Escape)
-				{
-					PlayGameSound("UIMenuCancel");
-					pressedKey = 0;
-				}
-				else
-				{
-					PlayGameSound("UIPopUpMessageGeneral");
-				}
-
-				//				activeHotkeySubsetting->data.valueInt = pressedKey;
-				//				ini.SetLongValue(activeHotkeySubsetting->settingCategory.c_str(), activeHotkeySubsetting->id.c_str(), pressedKey);
-				//				this->RefreshActiveTweakSelectionSquare();
-			}
-			//			this->SetInHotkeyMode(false);
-		}
-	}
-	*/
-	if (IsControllerConnected())
-	{
-		auto rightStickX = XINPUT_GAMEPAD_EX::GetCurrent()->sThumbRX;
-		if (rightStickX)
-		{
-			int deadzoneRS = *(UInt32*)0x9455F5;
-			if (abs(rightStickX) > deadzoneRS)
-			{
-				if (auto activeSubsetting = settingsMain.listBox.GetSelected())
-				{
-					/*
-					if (activeSubsetting->IsSlider())
-					{
-						float ratio = abs(rightStickX) / 32767.0F;
-						this->HandleActiveSliderArrows(rightStickX > 0, ratio * 0.001);
-					}*/
-				}
-			}
-		}
-	}
-
-	//	SetCursorPosTraits();
 }

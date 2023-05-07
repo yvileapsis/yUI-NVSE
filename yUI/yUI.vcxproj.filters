@@ -17,7 +17,7 @@
     <ClCompile Include="..\nvse\Logging.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="ConfigurationMenu\HookMCM.cpp">
+    <ClCompile Include="ConfigurationMenu\ConfigurationMenuCompatibility.cpp">
       <Filter>features\ConfigurationMenu</Filter>
     </ClCompile>
     <ClCompile Include="ConfigurationMenu\ConfigurationMenu.cpp">

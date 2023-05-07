@@ -21,14 +21,14 @@ void RestartGameWarningCallback()
 }
 */
 
-Category* Category::Default()
+CMSettingCategory* CMSettingCategory::Default()
 {
 	for (const auto iter : ModConfigurationMenu::GetSingleton()->GetSettingsForString(categoryID))
 		iter->Default();
 	return this;
 }
 
-std::vector<CMValue> Category::GetValues()
+std::vector<CMValue> CMSettingCategory::GetValues()
 {
 	std::vector<CMValue> ret;
 	for (const auto iter : ModConfigurationMenu::GetSingleton()->GetSettingsForString(categoryID)) {
@@ -38,13 +38,13 @@ std::vector<CMValue> Category::GetValues()
 	return ret;
 }
 
-Category* Category::Click(Tile* tile)
+CMSettingCategory* CMSettingCategory::Click(Tile* tile)
 {
 	ModConfigurationMenu::GetSingleton()->DisplaySettings(categoryID);
 	return this;
 }
 
-Choice* Choice::Display(Tile* tile)
+CMSettingChoice* CMSettingChoice::Display(Tile* tile)
 {
 	const auto value = setting.Read();
 
@@ -57,7 +57,7 @@ Choice* Choice::Display(Tile* tile)
 	return this;
 }
 
-Slider* Slider::Display(Tile* tile)
+CMSettingSlider* CMSettingSlider::Display(Tile* tile)
 {
 	const auto value = setting.Read();
 	const Float64 percent = (Float64) value / (Float64) max;
@@ -67,7 +67,7 @@ Slider* Slider::Display(Tile* tile)
 	return this;
 }
 
-Font* Font::Display(Tile* tile)
+CMSettingFont* CMSettingFont::Display(Tile* tile)
 {
 	const auto fontMap = ModConfigurationMenu::GetSingleton()->fontMap;
 	const auto value = font.Read();
@@ -81,12 +81,12 @@ Font* Font::Display(Tile* tile)
 	}
 	else if (fontMap.contains(value))
 	{
-		valueString = "Font " + value.GetAsString();//fontMap[value];
+		valueString = "CMSettingFont " + value.GetAsString();//fontMap[value];
 		tile->GetChild("lb_toggle_value")->Set(kTileValue_font, id);
 	}
 	else
 	{
-		valueString = "Font " + value.GetAsString();
+		valueString = "CMSettingFont " + value.GetAsString();
 		tile->GetChild("lb_toggle_value")->Set(kTileValue_font, id);
 	}
 	tile->Set(kTileValue_user0, valueString);
@@ -95,7 +95,7 @@ Font* Font::Display(Tile* tile)
 	return this;
 }
 
-Control* Control::Display(Tile* tile)
+CMSettingControl* CMSettingControl::Display(Tile* tile)
 {
 	const auto value = keyboard.Read();
 	const auto key = GetStringForScancode(value, 1);
@@ -122,7 +122,7 @@ Control* Control::Display(Tile* tile)
 	return this;
 }
 
-Control* Control::ClickValue(Tile* tile, UInt32 option)
+CMSettingControl* CMSettingControl::ClickValue(Tile* tile, UInt32 option)
 {
 	const auto menu = ModConfigurationMenu::GetSingleton();
 	menu->controlHandler.setting = this;
@@ -130,7 +130,7 @@ Control* Control::ClickValue(Tile* tile, UInt32 option)
 	return this;
 }
 
-CMValue Choice::GetPrev(const CMValue& value)
+CMValue CMSettingChoice::GetPrev(const CMValue& value)
 {
 	if (choice.empty()) return value;
 	if (auto iter = choice.find(value); iter == choice.end() || --iter == choice.end())
@@ -138,7 +138,7 @@ CMValue Choice::GetPrev(const CMValue& value)
 	else return iter->first;
 }
 
-CMValue Choice::GetNext(const CMValue& value)
+CMValue CMSettingChoice::GetNext(const CMValue& value)
 {
 	if (choice.empty()) return value;
 	if (auto iter = choice.find(value); iter == choice.end() || ++iter == choice.end())
@@ -146,7 +146,7 @@ CMValue Choice::GetNext(const CMValue& value)
 	else return iter->first;
 }
 
-Choice* Choice::ClickValue(Tile* tile, UInt32 option)
+CMSettingChoice* CMSettingChoice::ClickValue(Tile* tile, UInt32 option)
 {
 	switch (option) {
 	case kValue:
@@ -176,19 +176,19 @@ Choice* Choice::ClickValue(Tile* tile, UInt32 option)
 	return this;
 }
 
-CMValue Slider::GetPrev(const CMValue& value) const
+CMValue CMSettingSlider::GetPrev(const CMValue& value) const
 {
 	CMValue newValue = value - delta;
 	return newValue < min ? value : newValue;
 }
 
-CMValue Slider::GetNext(const CMValue& value) const
+CMValue CMSettingSlider::GetNext(const CMValue& value) const
 {
 	CMValue newValue = value + delta;
 	return newValue > max ? value : newValue;
 }
 
-Slider* Slider::ClickValue(Tile* tile, UInt32 option)
+CMSettingSlider* CMSettingSlider::ClickValue(Tile* tile, UInt32 option)
 {
 	switch (option)
 	{
@@ -215,7 +215,7 @@ Slider* Slider::ClickValue(Tile* tile, UInt32 option)
 	return this;
 }
 
-Slider* Slider::Drag(Float32 value)
+CMSettingSlider* CMSettingSlider::Drag(Float32 value)
 {
 	const UInt32 forceTruncating = value * (max - min) / delta.GetAsFloat();
 
@@ -229,7 +229,7 @@ Slider* Slider::Drag(Float32 value)
 	return this;
 }
 
-CMValue Font::GetPrev(const CMValue& value)
+CMValue CMSettingFont::GetPrev(const CMValue& value)
 {
 	const auto fontMap = ModConfigurationMenu::GetSingleton()->fontMap;
 	if (fontMap.empty()) return value;
@@ -238,7 +238,7 @@ CMValue Font::GetPrev(const CMValue& value)
 	else return iter->first;
 }
 
-CMValue Font::GetNext(const CMValue& value)
+CMValue CMSettingFont::GetNext(const CMValue& value)
 {
 	const auto fontMap = ModConfigurationMenu::GetSingleton()->fontMap;
 	if (fontMap.empty()) return value;
@@ -247,7 +247,7 @@ CMValue Font::GetNext(const CMValue& value)
 	else return iter->first;
 }
 
-Font* Font::ClickValue(Tile* tile, UInt32 option)
+CMSettingFont* CMSettingFont::ClickValue(Tile* tile, UInt32 option)
 {
 	switch (option)
 	{
@@ -481,7 +481,7 @@ void __fastcall ReloadTweaksMenuInOneFrameHook(void* startMenu)
 // reloads the entire menu by closing it, and writing a hook in StartMenu::UpdateTagString which waits a couple frames and then reopens the menu
 void ModConfigurationMenu::ReloadMenuXML()
 {
-	this->Close();
+	Close();
 	WriteRelCall(0x7CFA8C, ReloadTweaksMenuInOneFrameHook);
 	reloadTweaksMenuFrameDelay = 2;
 }
@@ -637,13 +637,6 @@ void ModConfigurationMenu::SettingList::operator<<=(const std::string& tag)
 	tags.emplace(tag);
 }
 
-void HotkeyField::SetActive(CMSetting* set)
-{
-	setting = set;
-	frameDebounce = true;
-}
-
-
 void ModConfigurationMenu::SettingList::operator++()
 {
 	if (tags.empty()) return;
@@ -660,10 +653,10 @@ void ModConfigurationMenu::SettingList::operator--()
 	UpdateTagString();
 }
 
-
+/*
 void ModConfigurationMenu::SetActiveSubsettingValueFromInput()
 {
-	/*
+	
 	auto id = activeInputSubsetting->settingCategory;
 	auto name = activeInputSubsetting->id;
 
@@ -688,32 +681,8 @@ void ModConfigurationMenu::SetActiveSubsettingValueFromInput()
 		ini.SetDoubleValue(id.c_str(), name.c_str(), activeInputSubsetting->data.valueFloat);
 		break;
 	}
-	}*/
-}
-/*
-void ModConfigurationMenu::SetInSearchMode(bool isSearchMode)
-{
-	searchBar.SetActive(isSearchMode);
-
-	bool isSuspendedSearch = !isSearchMode && !searchBar.GetText().empty();
-	this->tile->SetFloat("_IsSearchActive", isSuspendedSearch ? 2 : isSearchMode);
-
-	if (isSearchMode)
-	{
-		this->SetInSubsettingInputMode(false);
 	}
 }
-
-bool ModConfigurationMenu::GetInSearchMode()
-{
-	return searchBar.isActive;
-}
-
-bool ModConfigurationMenu::IsSearchSuspended()
-{
-	return !searchBar.isActive && !searchBar.GetText().empty();
-}
-
 bool ModConfigurationMenu::IsSubsettingInputValid()
 {
 	
@@ -764,7 +733,6 @@ bool ModConfigurationMenu::IsSubsettingInputValid()
 	}
 	return true;
 }
-
 void ModConfigurationMenu::SetInSubsettingInputMode(bool isActive)
 {
 	auto tile = subSettingInput.tile;
@@ -824,43 +792,6 @@ bool ModConfigurationMenu::GetInSubsettingInputMode()
 	return subSettingInput.isActive;
 }
 *//*
-void ModConfigurationMenu::SetInHotkeyMode(bool isActive)
-{
-		auto tile = hotkeyInput.tile;
-		if (tile)
-		{
-			if (tile->parent)
-			{
-				if (auto boxBackground = tile->parent->GetChildByID(kTileID_SubsettingInputFieldText_BoxBG))
-				{
-					boxBackground->SetFloat("_BackgroundVisible", isActive);
-				}
-			}
-		}
-
-		if (activeHotkeySubsetting)
-		{
-			if (isActive)
-			{
-	//			hotkeyInput.value = activeHotkeySubsetting->data.valueInt;
-				if (tile)
-				{
-					tile->SetString(kTileValue_string, "...");
-				}
-			}
-			else
-			{
-	//			activeHotkeySubsetting->data.valueInt = hotkeyInput.value;
-				if (tile->parent)
-				{
-					activeHotkeySubsetting->DisplaySettings(tile->parent);
-				}
-				activeHotkeySubsetting = nullptr;
-			}
-		}
-
-		hotkeyInput.SetActive(isActive);
-}
 */
 /* CLICK SETTING 
 if (setting->IsInputField())
@@ -883,29 +814,6 @@ if (setting->IsInputField())
 		Log(true, Log::kConsole) << FormatString("ModConfigurationMenu: Failed to find input text tile (ID: %d)", kTileID_SubsettingInputFieldText);
 	}
 }
-else if (setting->IsCheckboxField())
-{
-	bool newSettingValue = setting->data.valueInt == 0;
-	setting->data.valueInt = newSettingValue;
-	clickedTile->SetFloat(_SelectedTrait, newSettingValue);
-	ini.SetLongValue(setting->settingCategory.c_str(), setting->id.c_str(), newSettingValue);
-
-	this->TouchSubsetting(setting);
-}
-else if (setting->IsDropdown())
-{
-	this->HandleActiveSliderArrows(true);
-}
-else if (setting->IsHotkeyField())
-{
-	activeHotkeySubsetting = setting;
-	auto inputFieldTextTile = clickedTile->GetChildByID(kTileID_SubsettingInputFieldText);
-	if (inputFieldTextTile)
-	{
-		hotkeyInput.tile = inputFieldTextTile;
-		this->SetInHotkeyMode(true);
-		this->TouchSubsetting(setting);
-	}
 }*/
 
 

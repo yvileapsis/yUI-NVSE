@@ -6,21 +6,22 @@
 #include <set>
 #include <map>
 #include <utility>
-#include <variant>
 
-class MCMMod;
-class MCMItem;
 void WriteMCMHooks();
 void MainLoop();
 
+class CMMCMMod;
+class CMMCMItem;
+class CMJSON;
+
 class CMTag;
 class CMSetting;
+class ModConfigurationMenu;
 
 inline UInt32 g_LogLevel = 3;
 inline UInt32 g_saveValue = 1;
 
-class CMJSONElem;
-
+// TODO: reimplement this last part of stewie code
 struct InputField
 {
 	// used for filtering which characters are valid
@@ -75,7 +76,7 @@ public:
 	CMValue(const Float64 value) : type(kFloat), floatval(value) {}
 	CMValue(std::string value) : type(kString), stringval(std::move(value)) {}
 
-	CMValue(const CMJSONElem& elem);
+	CMValue(const CMJSON& elem);
 
 	bool IsInteger() const { return type == kInteger; }
 	bool IsFloat() const { return type == kFloat; }
@@ -121,7 +122,7 @@ public:
 		return GetAsFloat();
 	}
 
-	CMValue Set(std::string value)
+	CMValue Set(const std::string& value)
 	{
 		type = kString;
 		stringval = value;
@@ -130,17 +131,14 @@ public:
 
 	CMValue operator+(const CMValue& right) const
 	{
-		if (IsString() && right.IsString())
-			return GetAsString() + right.GetAsString();
-		if (IsInteger() && right.IsInteger())
-			return GetAsInteger() + right.GetAsInteger();
+		if (IsString() && right.IsString()) return GetAsString() + right.GetAsString();
+		if (IsInteger() && right.IsInteger()) return GetAsInteger() + right.GetAsInteger();
 		return GetAsFloat() + right.GetAsFloat();
 	}
 
 	CMValue operator-(const CMValue& right) const
 	{
-		if (IsInteger() && right.IsInteger())
-			return GetAsInteger() - right.GetAsInteger();
+		if (IsInteger() && right.IsInteger()) return GetAsInteger() - right.GetAsInteger();
 		return GetAsFloat() - right.GetAsFloat();
 	}
 };
@@ -148,6 +146,7 @@ public:
 class CMObject
 {
 public:
+	friend ModConfigurationMenu;
 
 	enum kType
 	{
@@ -168,7 +167,7 @@ public:
 	std::string description;
 
 	CMObject() = default;
-	CMObject(const CMJSONElem& elem);
+	CMObject(const CMJSON& elem);
 
 	virtual ~CMObject() = default;
 	virtual std::string GetID() { return id; }
@@ -185,13 +184,13 @@ class CMTag : public CMObject
 public:
 
 	CMTag() = default;
-	CMTag(const CMJSONElem& elem);
+	CMTag(const CMJSON& elem);
 };
 
 class CMOption : public CMObject
 {
 public:
-	CMOption(const CMJSONElem& elem);
+	CMOption(const CMJSON& elem);
 };
 
 class CMCategory : public CMObject
@@ -204,8 +203,8 @@ public:
 	bool allTag;
 	bool compatibilityMode;
 
-	CMCategory(const CMJSONElem& elem);
-	CMCategory(const MCMMod& item);
+	CMCategory(const CMJSON& elem);
+	CMCategory(const CMMCMMod& item);
 
 	std::string GetName() override { return !name.empty() ? name : "All"; }
 	std::string GetShortName() override { return !shortName.empty() ? shortName : "All"; }
@@ -257,7 +256,7 @@ public:
 		CMValue defaultValue;
 
 		IO() = default;
-		IO(const CMJSONElem& elem);
+		IO(const CMJSON& elem);
 
 		std::optional<CMValue> ReadINI();
 		void WriteINI(const CMValue& value) const;
@@ -283,9 +282,9 @@ public:
 	std::unordered_set<std::string> tags;
 	std::unordered_set<std::string> mods;
 
-	CMSetting() {};
-	CMSetting(const CMJSONElem& elem);
-	CMSetting(const MCMMod& mod, const MCMItem& item);
+	CMSetting() = default;
+	CMSetting(const CMJSON& elem);
+	CMSetting(const CMMCMMod& mod, const CMMCMItem& item);
 
 	~CMSetting() override = default;
 
@@ -321,19 +320,19 @@ public:
 	void SetID();
 };
 
-class Category : public CMSetting
+class CMSettingCategory : public CMSetting
 {
 public:
 	std::string categoryID;
 
-	Category(const CMJSONElem& elem);
-	Category(const MCMMod& mod);
+	CMSettingCategory(const CMJSON& elem);
+	CMSettingCategory(const CMMCMMod& mod);
 
 	const char* GetTemplate() override { return "SettingSubsettingTemplate"; }
 	const char* GetTypeName() override { return "Subsetting"; }
 
-	Category* Default() override;
-	Category* Click(Tile* tile) override;
+	CMSettingCategory* Default() override;
+	CMSettingCategory* Click(Tile* tile) override;
 
 	bool IsCategory() override { return true; }
 
@@ -341,25 +340,25 @@ public:
 	void SetValues(const std::vector<CMValue>& values) override {};
 };
 
-class Choice : public CMSetting
+class CMSettingChoice : public CMSetting
 {
 public:
 	IO setting;
 	std::map<CMValue, std::string> choice;
 
-	Choice(const CMJSONElem& elem);
-	Choice(const MCMMod& mod, const MCMItem& item);
+	CMSettingChoice(const CMJSON& elem);
+	CMSettingChoice(const CMMCMMod& mod, const CMMCMItem& item);
 
 	const char* GetTemplate() override { return "SettingChoiceTemplate"; }
-	const char* GetTypeName() override { return "Choice"; }
+	const char* GetTypeName() override { return "CMSettingChoice"; }
 
 
 	CMValue GetPrev(const CMValue& value);
 	CMValue GetNext(const CMValue& value);
 
-	Choice* Default() override { setting.Default(); return this; }
-	Choice* Display(Tile* tile) override;
-	Choice* ClickValue(Tile* tile, UInt32 option) override;
+	CMSettingChoice* Default() override { setting.Default(); return this; }
+	CMSettingChoice* Display(Tile* tile) override;
+	CMSettingChoice* ClickValue(Tile* tile, UInt32 option) override;
 
 	std::vector<CMValue> GetValues() override { return { setting.Read() }; };
 
@@ -369,7 +368,7 @@ public:
 	};
 };
 
-class Slider : public CMSetting
+class CMSettingSlider : public CMSetting
 {
 public:
 	IO setting;
@@ -378,20 +377,20 @@ public:
 	CMValue max;
 	CMValue delta;
 
-	Slider(const CMJSONElem& elem);
-	Slider(const MCMMod& mod, const MCMItem& item);
+	CMSettingSlider(const CMJSON& elem);
+	CMSettingSlider(const CMMCMMod& mod, const CMMCMItem& item);
 
 	const char* GetTemplate() override { return "SettingSliderTemplate"; }
-	const char* GetTypeName() override { return "Slider"; }
+	const char* GetTypeName() override { return "CMSettingSlider"; }
 
 	CMValue GetPrev(const CMValue& value) const;
 	CMValue GetNext(const CMValue& value) const;
 
-	Slider* Drag(Float32 value) override;
-	Slider* Default() override { setting.Default(); return this; }
-	Slider* Display(Tile* tile) override;
+	CMSettingSlider* Drag(Float32 value) override;
+	CMSettingSlider* Default() override { setting.Default(); return this; }
+	CMSettingSlider* Display(Tile* tile) override;
 
-	Slider* ClickValue(Tile* tile, UInt32 option) override;
+	CMSettingSlider* ClickValue(Tile* tile, UInt32 option) override;
 
 	std::vector<CMValue> GetValues() override { return { setting.Read() }; };
 	void SetValues(const std::vector<CMValue>& values) override
@@ -400,22 +399,22 @@ public:
 	};
 };
 
-class Control : public CMSetting
+class CMSettingControl : public CMSetting
 {
 public:
 	IO keyboard;
 	IO mouse;
 	IO controller;
 
-	Control(const CMJSONElem& elem);
-	Control(const MCMMod& mod, const MCMItem& item);
+	CMSettingControl(const CMJSON& elem);
+	CMSettingControl(const CMMCMMod& mod, const CMMCMItem& item);
 
 	const char* GetTemplate() override { return "SettingControlTemplate"; }
-	const char* GetTypeName() override { return "Control"; }
+	const char* GetTypeName() override { return "CMSettingControl"; }
 
-	Control* Default() override { keyboard.Default(); mouse.Default(); controller.Default(); return this; }
-	Control* Display(Tile* tile) override;
-	Control* ClickValue(Tile* tile, UInt32 option) override;
+	CMSettingControl* Default() override { keyboard.Default(); mouse.Default(); controller.Default(); return this; }
+	CMSettingControl* Display(Tile* tile) override;
+	CMSettingControl* ClickValue(Tile* tile, UInt32 option) override;
 
 	std::vector<CMValue> GetValues() override { return { keyboard.Read(), mouse.Read(), controller.Read() }; };
 
@@ -431,24 +430,24 @@ public:
 
 };
 
-class Font : public CMSetting
+class CMSettingFont : public CMSetting
 {
 public:
 	IO font;
 	IO fontY;
 
-	Font(const CMJSONElem& elem);
+	CMSettingFont(const CMJSON& elem);
 
 	const char* GetTemplate() override { return "SettingFontTemplate"; }
-	const char* GetTypeName() override { return "Font"; }
+	const char* GetTypeName() override { return "CMSettingFont"; }
 
 	static CMValue GetPrev(const CMValue& value);
 	static CMValue GetNext(const CMValue& value);
 	
-	Font* Default() override { font.Default(); fontY.Default(); return this; }
-	Font* Display(Tile* tile) override;
+	CMSettingFont* Default() override { font.Default(); fontY.Default(); return this; }
+	CMSettingFont* Display(Tile* tile) override;
 
-	Font* ClickValue(Tile* tile, UInt32 option) override;
+	CMSettingFont* ClickValue(Tile* tile, UInt32 option) override;
 
 	std::vector<CMValue> GetValues() override { return { font.Read(), fontY.Read() }; };
 	void SetValues(const std::vector<CMValue>& values) override
@@ -461,29 +460,18 @@ public:
 	};
 };
 
-class Input : public CMSetting
+class CMSettingInput : public CMSetting
 {
 public:
 	IO setting;
 
-	Input(const CMJSONElem& elem);
+	CMSettingInput(const CMJSON& elem);
 };
 
 extern const char* MenuPath;
 
 // randomly selected from the unused menu codes between 1001 and 1084 inclusive (to be compatible with the menu visibility array)
 constexpr auto MENU_ID = 1042;
-
-struct HotkeyField
-{
-	CMSetting* setting = nullptr;
-	UInt32 value = 0;
-	bool frameDebounce = true;
-
-	UInt32 GetPressedKey();
-	void SetActive(CMSetting* active);
-	void Update();
-};
 
 class ModConfigurationMenu : public Menu
 {
@@ -648,7 +636,7 @@ public:
 	class ControlHandler
 	{
 	public:
-		Control* setting = nullptr;
+		CMSettingControl* setting = nullptr;
 
 		bool debounce = false;
 
@@ -742,10 +730,6 @@ public:
 
 	InputField subSettingInput;
 
-	HotkeyField hotkeyInput;
-	
-
-
 	InputField searchBar;
 	FILETIME lastXMLWriteTime;
 
@@ -765,8 +749,6 @@ public:
 	void SaveModJSON(CMSetting* mod);
 	void LoadModJSON(CMSetting* mod);
 
-	void SetActiveSubsettingValueFromInput();
-
 	void ReadJSON(const std::filesystem::path& path);
 	void ReadJSONForPath(const std::filesystem::path& path);
 	void ReadMCM();
@@ -775,7 +757,6 @@ public:
 
 	static ModConfigurationMenu* ReloadMenu();
 	void ShowMenuFirstTime();
-
 
 	void SaveToJSON();
 	void LoadFromJSON();
@@ -790,5 +771,3 @@ public:
 
 	void UpdateEscape();
 };
-
-//static_assert(sizeof(ModConfigurationMenu) == 436);

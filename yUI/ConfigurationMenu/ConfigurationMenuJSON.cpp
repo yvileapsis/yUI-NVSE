@@ -2,7 +2,7 @@
 
 #include "json.h"
 
-class CMJSONElem : public nlohmann::basic_json<> {};
+class CMJSON : public nlohmann::basic_json<> {};
 
 template <typename T> std::vector<T> GetSetFromElement(const nlohmann::basic_json<>& elem)
 {
@@ -12,7 +12,7 @@ template <typename T> std::vector<T> GetSetFromElement(const nlohmann::basic_jso
 	return set;
 }
 
-CMValue::CMValue(const CMJSONElem& elem)
+CMValue::CMValue(const CMJSON& elem)
 {
 	if (elem.is_number_integer() || elem.is_number_unsigned())
 		Set(static_cast<SInt64>(elem.get<SInt32>()));;
@@ -22,7 +22,7 @@ CMValue::CMValue(const CMJSONElem& elem)
 		Set(elem.get<Float64>());
 }
 
-CMSetting::IO::IO(const CMJSONElem& elem)
+CMSetting::IO::IO(const CMJSON& elem)
 {
 	std::filesystem::path pathGot;
 	std::string categoryGot, valueGot;
@@ -33,7 +33,7 @@ CMSetting::IO::IO(const CMJSONElem& elem)
 
 	ini = INI(pathGot, categoryGot, valueGot);
 
-	if (elem.contains("default"))		defaultValue = CMValue(CMJSONElem(elem["default"]));
+	if (elem.contains("default"))		defaultValue = CMValue(CMJSON(elem["default"]));
 	if (elem.contains("xml"))			xml = elem["xml"].get<std::string>();
 	if (elem.contains("global"))		global = elem["global"].get<std::string>();
 	if (elem.contains("gamesetting"))	gamesetting = elem["gamesetting"].get<std::string>();
@@ -41,7 +41,7 @@ CMSetting::IO::IO(const CMJSONElem& elem)
 }
 
 
-CMObject::CMObject(const CMJSONElem& elem)
+CMObject::CMObject(const CMJSON& elem)
 {
 	if (elem.contains("id"))			id = elem["id"].get<std::string>();
 	if (elem.contains("name"))			name = elem["name"].get<std::string>();
@@ -49,22 +49,21 @@ CMObject::CMObject(const CMJSONElem& elem)
 	priority = 0;
 }
 
-CMTag::CMTag(const CMJSONElem& elem) : CMObject(elem)
+CMTag::CMTag(const CMJSON& elem) : CMObject(elem)
 {
 }
 
-CMCategory::CMCategory(const CMJSONElem& elem) : CMObject(elem)
+CMCategory::CMCategory(const CMJSON& elem) : CMObject(elem), compatibilityMode(false)
 {
-	if (elem.contains("shortName"))		shortName = elem["shortName"].get<std::string>();
+	if (elem.contains("shortName")) shortName = elem["shortName"].get<std::string>();
 
-	if (elem.contains("mod"))			mod = elem["mod"].get<std::string>();
-	if (elem.contains("plugin"))		plugin = elem["plugin"].get<std::string>();
-	if (elem.contains("doublestacked"))	doublestacked = elem["doublestacked"].get<UInt32>();
-	if (elem.contains("allTag"))		allTag = elem["allTag"].get<UInt32>();
-
+	if (elem.contains("mod")) mod = elem["mod"].get<std::string>();
+	if (elem.contains("plugin")) plugin = elem["plugin"].get<std::string>();
+	if (elem.contains("doublestacked")) doublestacked = elem["doublestacked"].get<UInt32>();
+	if (elem.contains("allTag")) allTag = elem["allTag"].get<UInt32>();
 }
 
-CMSetting::CMSetting(const CMJSONElem& elem) : CMObject(elem)
+CMSetting::CMSetting(const CMJSON& elem) : CMObject(elem)
 {
 	if (elem.contains("shortName"))		shortName = elem["shortName"].get<std::string>();
 
@@ -72,38 +71,28 @@ CMSetting::CMSetting(const CMJSONElem& elem) : CMObject(elem)
 	if (elem.contains("categories"))	mods.insert_range(GetSetFromElement<std::string>(elem["categories"]));
 }
 
-void CMSetting::SetID()
-{
-	if (id.empty())
-	{
-		for (const auto mod : mods) id += mod;
-		id += GetTypeName();
-		id += R"(=')" + name + R"(')";
-	}
-}
-
-Category::Category(const CMJSONElem& elem) : CMSetting(elem)
+CMSettingCategory::CMSettingCategory(const CMJSON& elem) : CMSetting(elem)
 {
 	categoryID = elem["category"].get<std::string>();
 }
 
-Slider::Slider(const CMJSONElem& elem) : CMSetting(elem)
+CMSettingSlider::CMSettingSlider(const CMJSON& elem) : CMSetting(elem)
 {
 	const auto& subElem = elem["slider"];
-	setting = IO(CMJSONElem(subElem));
+	setting = IO(CMJSON(subElem));
 
-	if (subElem.contains("min")) min = CMValue(CMJSONElem(subElem["min"]));
+	if (subElem.contains("min")) min = CMValue(CMJSON(subElem["min"]));
 	else min = (SInt32)MININT32;
-	if (subElem.contains("max")) max = CMValue(CMJSONElem(subElem["max"]));
+	if (subElem.contains("max")) max = CMValue(CMJSON(subElem["max"]));
 	else max = (SInt32)MAXINT32;
-	if (subElem.contains("delta")) delta = CMValue(CMJSONElem(subElem["delta"]));
+	if (subElem.contains("delta")) delta = CMValue(CMJSON(subElem["delta"]));
 	else delta = (SInt32)1;
 }
 
-Choice::Choice(const CMJSONElem& elem) : CMSetting(elem)
+CMSettingChoice::CMSettingChoice(const CMJSON& elem) : CMSetting(elem)
 {
 	const auto& subElem = elem["choice"];
-	setting = IO(CMJSONElem(subElem));
+	setting = IO(CMJSON(subElem));
 
 	SInt32 valueLess = 0;
 	if (!subElem.contains("values")) {}
@@ -113,7 +102,7 @@ Choice::Choice(const CMJSONElem& elem) : CMSetting(elem)
 		std::string name;
 		std::string description;
 
-		if (i.contains("value")) value = CMValue(CMJSONElem(i["value"]));
+		if (i.contains("value")) value = CMValue(CMJSON(i["value"]));
 		else value = (SInt32)valueLess++;
 		if (i.contains("id")) name = i["id"].get<std::string>();
 		else name = (value).GetAsString();
@@ -123,22 +112,22 @@ Choice::Choice(const CMJSONElem& elem) : CMSetting(elem)
 	}
 }
 
-Control::Control(const CMJSONElem& elem) : CMSetting(elem)
+CMSettingControl::CMSettingControl(const CMJSON& elem) : CMSetting(elem)
 {
 	const auto& subElem = elem["control"];
-	keyboard = IO(CMJSONElem(subElem["keyboard"]));
-	mouse = IO(CMJSONElem(subElem["mouse"]));
-	controller = IO(CMJSONElem(subElem["controller"]));
+	keyboard = IO(CMJSON(subElem["keyboard"]));
+	mouse = IO(CMJSON(subElem["mouse"]));
+	controller = IO(CMJSON(subElem["controller"]));
 }
 
-Font::Font(const CMJSONElem& elem) : CMSetting(elem)
+CMSettingFont::CMSettingFont(const CMJSON& elem) : CMSetting(elem)
 {
 	const auto& subElem = elem["font"];
-	font = IO(CMJSONElem(subElem));
-	fontY = IO(CMJSONElem(subElem["fontY"]));
+	font = IO(CMJSON(subElem));
+	fontY = IO(CMJSON(subElem["fontY"]));
 }
 
-Input::Input(const CMJSONElem& elem) : CMSetting(elem), setting(elem)
+CMSettingInput::CMSettingInput(const CMJSON& elem) : CMSetting(elem), setting(elem)
 {
 }
 
@@ -156,7 +145,7 @@ void ModConfigurationMenu::ReadJSON(const std::filesystem::path& path)
 			Log() << "JSON error: Expected object";
 		else
 		{
-			const auto tag = CMTag(CMJSONElem(elem));
+			const auto tag = CMTag(CMJSON(elem));
 			mapTags.emplace(tag.id, std::make_unique<CMTag>(tag));
 		}
 
@@ -166,7 +155,7 @@ void ModConfigurationMenu::ReadJSON(const std::filesystem::path& path)
 			Log() << "JSON error: Expected object";
 		else
 		{
-			const auto tag = CMCategory(CMJSONElem(elem));
+			const auto tag = CMCategory(CMJSON(elem));
 			mapCategories.emplace(tag.id, std::make_unique<CMCategory>(tag));
 		}
 
@@ -179,12 +168,12 @@ void ModConfigurationMenu::ReadJSON(const std::filesystem::path& path)
 		{
 			std::unique_ptr<CMSetting> setting;
 
-			if (elem.contains("category"))		setting = std::make_unique<Category>(CMJSONElem(elem));
-			else if (elem.contains("choice"))	setting = std::make_unique<Choice>(CMJSONElem(elem));
-			else if (elem.contains("slider"))	setting = std::make_unique<Slider>(CMJSONElem(elem));
-			else if (elem.contains("control"))	setting = std::make_unique<Control>(CMJSONElem(elem));
-			else if (elem.contains("font"))		setting = std::make_unique<Font>(CMJSONElem(elem));
-			else								setting = std::make_unique<CMSetting>(CMJSONElem(elem));
+			if (elem.contains("category"))		setting = std::make_unique<CMSettingCategory>(CMJSON(elem));
+			else if (elem.contains("choice"))	setting = std::make_unique<CMSettingChoice>(CMJSON(elem));
+			else if (elem.contains("slider"))	setting = std::make_unique<CMSettingSlider>(CMJSON(elem));
+			else if (elem.contains("control"))	setting = std::make_unique<CMSettingControl>(CMJSON(elem));
+			else if (elem.contains("font"))		setting = std::make_unique<CMSettingFont>(CMJSON(elem));
+			else								setting = std::make_unique<CMSetting>(CMJSON(elem));
 
 			setSettings.emplace(std::move(setting));
 		}
@@ -244,7 +233,7 @@ void ModConfigurationMenu::LoadModJSON(CMSetting* mod)
 	{
 		std::vector<CMValue> vector;
 		for (const auto& iter : j[setting->GetID()])
-			vector.push_back(CMValue(CMJSONElem(iter)));
+			vector.push_back(CMValue(CMJSON(iter)));
 		setting->SetValues(vector);
 	}
 }

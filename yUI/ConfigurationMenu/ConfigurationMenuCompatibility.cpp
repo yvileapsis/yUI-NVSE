@@ -16,7 +16,7 @@ bool g_NewValue			= false;
 bool g_ShowScale		= false;
 bool g_DefaultScale		= false;
 
-class MCMMod
+class CMMCMMod
 {
 public:
 	std::string id;
@@ -25,7 +25,7 @@ public:
 	UInt8 columns = 1;
 };
 
-class MCMItem
+class CMMCMItem
 {
 public:
 	bool enable = false;
@@ -65,8 +65,8 @@ public:
 
 };
 
-std::unordered_map<UInt8, MCMMod> mods;
-std::unordered_map<UInt8, std::unordered_map<UInt8, MCMItem>> items;
+std::unordered_map<UInt8, CMMCMMod> mods;
+std::unordered_map<UInt8, std::unordered_map<UInt8, CMMCMItem>> items;
 
 std::string MCMPath(UInt32 child, UInt32 grandchild, std::string src)
 {
@@ -251,7 +251,7 @@ bool Cmd_SetUIFloat_Execute(COMMAND_ARGS)
 	return true;
 }
 
-CMCategory::CMCategory(const MCMMod& mod)
+CMCategory::CMCategory(const CMMCMMod& mod)
 {
 	id = mod.id;
 	name = mod.title;
@@ -259,29 +259,29 @@ CMCategory::CMCategory(const MCMMod& mod)
 	compatibilityMode = true;
 }
 
-CMSetting::CMSetting(const MCMMod& mod, const MCMItem& item)
+CMSetting::CMSetting(const CMMCMMod& mod, const CMMCMItem& item)
 {
 	name = item.title;
 	mods.emplace(mod.id);
 }
 
-Category::Category(const MCMMod& mod)
+CMSettingCategory::CMSettingCategory(const CMMCMMod& mod)
 {
 	name = mod.title;
 	categoryID = mod.id;
 }
 
-Choice::Choice(const MCMMod& mod, const MCMItem& item) : CMSetting(mod, item)
+CMSettingChoice::CMSettingChoice(const CMMCMMod& mod, const CMMCMItem& item) : CMSetting(mod, item)
 {
 	setting = IO();
 }
 
-Slider::Slider(const MCMMod& mod, const MCMItem& item) : CMSetting(mod, item)
+CMSettingSlider::CMSettingSlider(const CMMCMMod& mod, const CMMCMItem& item) : CMSetting(mod, item)
 {
 	setting = IO();
 }
 
-Control::Control(const MCMMod& mod, const MCMItem& item) : CMSetting(mod, item)
+CMSettingControl::CMSettingControl(const CMMCMMod& mod, const CMMCMItem& item) : CMSetting(mod, item)
 {
 	keyboard = IO();
 	mouse = IO();
@@ -295,7 +295,7 @@ void ModConfigurationMenu::ReadMCM()
 		const auto tag = CMCategory(mod);
 		mapCategories.emplace(tag.id, std::make_unique<CMCategory>(tag));
 
-		setSettings.emplace(std::make_unique<Category>(mod));
+		setSettings.emplace(std::make_unique<CMSettingCategory>(mod));
 	}
 
 	for (const auto& [mod, val] : items)
@@ -308,23 +308,23 @@ void ModConfigurationMenu::ReadMCM()
 		switch (item.type)
 		{
 		default:
-		case MCMItem::kNone:
-		case MCMItem::kString:		setting = std::make_unique<CMSetting>(mods[mod], item); break;
+		case CMMCMItem::kNone:
+		case CMMCMItem::kString:		setting = std::make_unique<CMSetting>(mods[mod], item); break;
 
-		case MCMItem::kChoice:
-		case MCMItem::kOnOff:
-		case MCMItem::kOnOffCustom:
-		case MCMItem::kTick:		setting = std::make_unique<Choice>(mods[mod], item); break;
+		case CMMCMItem::kChoice:
+		case CMMCMItem::kOnOff:
+		case CMMCMItem::kOnOffCustom:
+		case CMMCMItem::kTick:		setting = std::make_unique<CMSettingChoice>(mods[mod], item); break;
 
-		case MCMItem::kSlider:		setting = std::make_unique<Slider>(mods[mod], item); break;
+		case CMMCMItem::kSlider:		setting = std::make_unique<CMSettingSlider>(mods[mod], item); break;
 
-		case MCMItem::kControl:		setting = std::make_unique<Control>(mods[mod], item);break;
+		case CMMCMItem::kControl:		setting = std::make_unique<CMSettingControl>(mods[mod], item);break;
 //			kThreeSliders = 8,
 //			kRGB = 9,
 		}
 
-		//if (elem.contains("category"))		setting = std::make_unique<Category>(item);
-//		else if (elem.contains("font"))		setting = std::make_unique<Font>(item);
+		//if (elem.contains("category"))		setting = std::make_unique<CMSettingCategory>(item);
+//		else if (elem.contains("font"))		setting = std::make_unique<CMSettingFont>(item);
 
 		setSettings.emplace(std::move(setting));
 	}
@@ -344,7 +344,7 @@ void MainLoop()
 
 	for (const auto iter : modList->list)
 	{
-		MCMMod mod{};
+		CMMCMMod mod{};
 
 		mod.id = g_TESDataHandler->GetNthModName(iter->modIndex);
 		mod.title = iter->GetTheName();
