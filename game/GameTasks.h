@@ -75,8 +75,8 @@ class BSTask
 {
 public:
 	virtual void Destroy(bool doFree);
-	virtual void Run(void) = 0;
-	virtual void Unk_02(void) = 0;
+	virtual void Run() = 0;
+	virtual void Unk_02() = 0;
 	virtual void Unk_03(UInt32 arg0, UInt32 arg1);						// doesNothing
 	virtual bool GetDebugDescription(char* outDesc, UInt32 * arg1) = 0;	// return 0
 
@@ -95,8 +95,8 @@ public:
 class IOTask : public BSTask
 {
 public:
-	virtual void Unk_05(void);			// doesNothing
-	virtual void Unk_06(void);				
+	virtual void Unk_05();			// doesNothing
+	virtual void Unk_06();				
 	virtual void Unk_07(UInt32 arg0);	// most (all?) implementations appear to call IOManager::00C3DF40(this, arg0) eventually. It updates the bits 23/32 of the giant bit flag possibly.
 
 	IOTask();
@@ -120,12 +120,12 @@ public:
 	~QueuedFile();
 
 	//Unk_01:	doesNothing
-	//Unk_02:	virtual void Call_Unk_0A(void);
+	//Unk_02:	virtual void Call_Unk_0A();
 	//Unk_03:	implemented
 	//Unk_07:	recursivly calls Unk_07(arg_0) on all non null children before calling its parent.
-	virtual void Unk_08(void);				// doesNothing
+	virtual void Unk_08();				// doesNothing
 	virtual void Unk_09(UInt32 arg0);
-	virtual void Unk_0A(void);				
+	virtual void Unk_0A();				
 
 	// size?
 	struct FileEntry {
@@ -148,12 +148,12 @@ public:
 	QueuedReference();
 	~QueuedReference();
 
-	virtual void Unk_0B(void);			// Initialize validBip01Names (and cretae the 3D model ?)
-	virtual void Unk_0C(void);
+	virtual void Unk_0B();			// Initialize validBip01Names (and cretae the 3D model ?)
+	virtual void Unk_0C();
 	virtual void Unk_0D(NiNode* arg0);
-	virtual bool Unk_0E(void);
-	virtual void Unk_0F(void);
-	virtual void Unk_10(void);			// doesNothing
+	virtual bool Unk_0E();
+	virtual void Unk_0F();
+	virtual void Unk_10();			// doesNothing
 
 	TESObjectREFR	* refr;				// 028 
 	RefNiRefObject	* unk02C;			// OBSE QueuedChildren	* queuedChildren;	// 02C
@@ -208,7 +208,7 @@ public:
 	QueuedFileEntry();
 	~QueuedFileEntry();
 
-	virtual bool Unk_0B(void) = 0;
+	virtual bool Unk_0B() = 0;
 
 	char	* name;		// 028
 	BSAData	* bsaData;	// 02C
@@ -216,6 +216,7 @@ public:
 
 class Model // NiObject
 {
+public:
 	const char	* path;		// 004
 	UInt32		counter;	// 008
 	NiNode		* ninode;	// 00C
@@ -321,7 +322,7 @@ public:
 	virtual void Unk_0F(UInt32 arg0) = 0;
 	virtual void Unk_10(UInt32 arg0) = 0;
 	virtual void Unk_11(UInt32 arg0) = 0;
-	virtual void Unk_12(void) = 0;
+	virtual void Unk_12() = 0;
 	virtual void Unk_13(UInt32 arg0) = 0;
 
 	UInt32				unk1C;			// 1C
@@ -354,7 +355,7 @@ extern IOManager** g_ioManager;
 // O4 assumed
 class InterfacedClass {
 	virtual void Destroy(bool doFree);
-	virtual void AllocateTLSValue(void) = 0;		// not implemented
+	virtual void AllocateTLSValue() = 0;		// not implemented
 };
 
 // 40
@@ -400,31 +401,30 @@ class LockFreeMap: InterfacedClass
 	};	// most likely an array or a map
 
 	virtual bool Get(_K key, _C *destination) = 0;
-	virtual void Unk_03(void) = 0;
-	virtual void Unk_04(void) = 0;
-	virtual void Unk_05(void) = 0;
-	virtual void Unk_06(void) = 0;
-	virtual void Unk_07(void) = 0;
-	virtual void Unk_08(void) = 0;
+	virtual void Unk_03() = 0;
+	virtual void Unk_04() = 0;
+	virtual void Unk_05() = 0;
+	virtual void Unk_06() = 0;
+	virtual void Unk_07() = 0;
+	virtual void Unk_08() = 0;
 	virtual UInt32 Hash(_K key) = 0;
-	virtual void Unk_0A(void) = 0;
-	virtual void Unk_0B(void) = 0;
-	virtual void Unk_0C(void) = 0;
-	virtual void Unk_0D(void) = 0;
-	virtual void Unk_0E(void) = 0;
-	virtual void Unk_0F(void) = 0;
-	virtual void Unk_10(void) = 0;
-	virtual void Unk_11(void) = 0;
+	virtual void Unk_0A() = 0;
+	virtual void Unk_0B() = 0;
+	virtual void Unk_0C() = 0;
+	virtual void Unk_0D() = 0;
+	virtual void Unk_0E() = 0;
+	virtual void Unk_0F() = 0;
+	virtual void Unk_10() = 0;
+	virtual void Unk_11() = 0;
 
 	Data004	**dat004;		// 04 array of arg0 12 bytes elements (uninitialized)
 	UInt32	bucketCount;	// 08 Init'd to arg1, count of DWord to allocate in array at 000C
 	UInt32	**buckets;		// 0C array of arg1 DWord elements
 	UInt32	unk010;			// 10 Init'd to arg2
 	Data014	*dat014;		// 14 Init'd to a 16 bytes structure
-	UInt32	unk018;			// 18
+	UInt32 numItems;		// 18
 	UInt32	unk01C;			// 1C
-	UInt32	unk020[2];		// 20 Pair of DWord (TList ?)
-	// ?
+	Semaphore semaphore;	// 20
 };
 
 template<class _C>

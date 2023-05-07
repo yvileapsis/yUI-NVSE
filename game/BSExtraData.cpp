@@ -1,9 +1,9 @@
 #include <BSExtraData.h>
 
-#include <Form.h>
-#include <Reference.h>
+#include <TESForm.h>
+#include <TESObjectREFR.h>
 #include <Script.h>
-#include <GameRTTI.h>
+#include <RTTI.h>
 
 static const UInt32 s_ExtraDataListVtbl							= 0x010143E8;	//	0x0100e3a8;
 
@@ -22,7 +22,7 @@ void BaseExtraList::MarkType(UInt32 type, bool bCleared)
 
 ExtraDataList* ExtraDataList::Create(BSExtraData* xBSData)
 {
-	ExtraDataList* xData = (ExtraDataList*)FormHeapAlloc(sizeof(ExtraDataList));
+	ExtraDataList* xData = (ExtraDataList*)GameHeapAlloc(sizeof(ExtraDataList));
 	memset(xData, 0, sizeof(ExtraDataList));
 	((UInt32*)xData)[0] = s_ExtraDataListVtbl;
 	if (xBSData) xData->Add(xBSData);
@@ -32,12 +32,12 @@ ExtraDataList* ExtraDataList::Create(BSExtraData* xBSData)
 
 ExtendDataList* ExtendDataList::Create(ExtraDataList* pExtraDataList)
 {
-	auto xData = (ExtendDataList*)FormHeapAlloc(sizeof(ExtendDataList));
+	auto xData = (ExtendDataList*)GameHeapAlloc(sizeof(ExtendDataList));
 	if (xData) {
 		memset(xData, 0, sizeof(ExtendDataList));
 		if (pExtraDataList)
 			if (xData->AddAt(pExtraDataList, eListEnd) == eListInvalid) {
-				FormHeapFree(xData);
+				GameHeapFree(xData);
 				xData = NULL;
 			}
 	}
@@ -60,7 +60,7 @@ void ExtendDataList::Free(ExtendDataList* xData, bool bFreeList)
 				pExtraDataList = xData->GetNth(i);
 			}
 		}
-		FormHeapFree(xData);
+		GameHeapFree(xData);
 	}
 }
 
@@ -85,7 +85,7 @@ bool ExtendDataList::Remove(ExtendDataList* xData, ExtraDataList* xList, bool bF
 			if (bFreeList) {
 				for (UInt32 j = 0; j < 0xFF; j++)
 					pExtraDataList->RemoveByType(j);
-				FormHeapFree(xList);
+				GameHeapFree(xList);
 			}
 			return true;
 		}
@@ -102,7 +102,7 @@ void InventoryChanges::Free(bool bFreeList) {
 	if (this->extendData) {
 		ExtendDataList::Free(this->extendData, bFreeList);
 	}
-	FormHeapFree(this);
+	GameHeapFree(this);
 }
 
 
@@ -169,7 +169,7 @@ public:
 
 InventoryChangesList* InventoryChangesList::Create(UInt32 refID, UInt32 count, ExtendDataList* pExtendDataList)
 {
-	const auto xData = (InventoryChangesList*)FormHeapAlloc(sizeof(InventoryChangesList));
+	const auto xData = (InventoryChangesList*)GameHeapAlloc(sizeof(InventoryChangesList));
 	if (xData) {
 		memset(xData, 0, sizeof(InventoryChangesList));
 		xData->AddAt(InventoryChanges::Create(TESForm::GetByID(refID), count, pExtendDataList), eListEnd);
@@ -185,7 +185,7 @@ void InventoryChangesList::Free(bool bFreeList) {
 		i++;
 		pX = this->GetNth(i);
 	}
-	FormHeapFree(this);
+	GameHeapFree(this);
 }
 
 static const UInt32 s_ExtraContainerChangesVtbl = 0x01015BB8;	//	0x0100fb78;
@@ -269,9 +269,9 @@ void ExtraContainerChangesFree(ExtraContainerChanges* xData, bool bFreeList) {
 			if (xData->data->objList && bFreeList) {
 				xData->data->objList->Free(true);
 			}
-			FormHeapFree(xData->data);
+			GameHeapFree(xData->data);
 		}
-		FormHeapFree(xData);
+		GameHeapFree(xData);
 	}
 }
 
@@ -287,7 +287,7 @@ void ExtraContainerChangesData::Cleanup()
 			for (SInt32 index = 0; index < iter->extendData->count(); ) {
 				if (const auto xtendData = iter->extendData->GetNth(index); xtendData && !xtendData->m_data) {
 					iter->extendData->RemoveNth(index);
-					FormHeapFree(xtendData);
+					GameHeapFree(xtendData);
 				}
 				else index++;
 			}
@@ -365,7 +365,7 @@ UInt32 ExtraContainerChangesData::GetAllEquipped(std::vector<InventoryChanges*>&
 // static
 BSExtraData* BSExtraData::Create(UInt8 xType, UInt32 size, UInt32 vtbl)
 {
-	void* memory = FormHeapAlloc(size);
+	void* memory = GameHeapAlloc(size);
 	memset(memory, 0, size);
 	static_cast<UInt32*>(memory)[0] = vtbl;
 	const auto xData = static_cast<BSExtraData*>(memory);
@@ -400,7 +400,7 @@ ExtraCannotWear* ExtraCannotWear::Create()
 ExtraLock* ExtraLock::Create()
 {
 	const auto xLock = (ExtraLock*)BSExtraData::Create(kExtraData_Lock, sizeof(ExtraLock), s_ExtraLockVtbl);
-	const auto lockData = (ExtraLockData*)FormHeapAlloc(sizeof(ExtraLockData));
+	const auto lockData = (ExtraLockData*)GameHeapAlloc(sizeof(ExtraLockData));
 	memset(lockData, 0, sizeof(ExtraLockData));
 	xLock->data = lockData;
 	return xLock;
@@ -418,7 +418,7 @@ ExtraTeleport* ExtraTeleport::Create()
 	const auto tele = (ExtraTeleport*)BSExtraData::Create(kExtraData_Teleport, sizeof(ExtraTeleport), s_ExtraTeleportVtbl);
 
 	// create data
-	const auto data = (ExtraTeleportData*)FormHeapAlloc(sizeof(ExtraTeleportData));
+	const auto data = (ExtraTeleportData*)GameHeapAlloc(sizeof(ExtraTeleportData));
 	data->linkedDoor = NULL;
 	data->yRot = -0.0;
 	data->xRot = 0.0;
@@ -613,7 +613,7 @@ ExtraScript* ExtraScript::Create(TESScriptableForm* pScript, bool create, TESObj
 ExtraFactionChanges* ExtraFactionChanges::Create()
 {
 	const auto xFactionChanges = (ExtraFactionChanges*)BSExtraData::Create(kExtraData_FactionChanges, sizeof(ExtraFactionChanges), s_ExtraFactionChangesVtbl);
-	const auto FactionChangesData = (FactionListData*)FormHeapAlloc(sizeof(FactionListData));
+	const auto FactionChangesData = (FactionListData*)GameHeapAlloc(sizeof(FactionListData));
 	memset(FactionChangesData, 0, sizeof(FactionListData));
 	xFactionChanges->data = FactionChangesData;
 	return xFactionChanges;
@@ -653,7 +653,7 @@ void SetExtraFactionRank(BaseExtraList& xDataList, TESFaction* faction, SInt8 ra
 			xFactionChanges = ExtraFactionChanges::Create();
 			xDataList.Add(xFactionChanges);
 		}
-		pData = (FactionListEntry*)FormHeapAlloc(sizeof(FactionListEntry));
+		pData = (FactionListEntry*)GameHeapAlloc(sizeof(FactionListEntry));
 		if (pData) {
 			pData->faction = faction;
 			pData->rank = rank;

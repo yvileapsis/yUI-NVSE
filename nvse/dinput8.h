@@ -40,7 +40,7 @@ public:
 	/**
 	 *	Returns the single instance of the derived class
 	 */
-	static T& GetSingleton(void)
+	static T& GetSingleton()
 	{
 		assert(ms_Singleton);
 		return *ms_Singleton;
@@ -49,7 +49,7 @@ public:
 	/**
 	 *	Returns a pointer to the single instance of the derived class
 	 */
-	static T* GetSingletonPtr(void)
+	static T* GetSingletonPtr()
 	{
 		return ms_Singleton;
 	}
@@ -129,7 +129,7 @@ class FramerateTracker
 public:
 	FramerateTracker();
 
-	void	Update(void);
+	void	Update();
 
 private:
 	enum
@@ -148,3 +148,14 @@ private:
 };
 
 extern FramerateTracker	g_framerateTracker;
+
+struct ControlName
+{
+	UInt32		unk0;
+	const char* name;
+	UInt32		unkC;
+};
+
+std::string GetStringForScancode(UInt32 keycode, UInt32 device = 3);
+bool IsViableControllerString(UInt32 keycode);
+std::string GetControllerString(UInt32 keycode);

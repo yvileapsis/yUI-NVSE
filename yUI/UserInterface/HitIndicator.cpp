@@ -2,8 +2,8 @@
 #include <functions.h>
 #include <SimpleINILibrary.h>
 
-#include <Menus.h>
-#include <Tiles.h>
+#include <Menu.h>
+#include <Tile.h>
 
 namespace UserInterface::HitIndicator
 {
@@ -55,7 +55,7 @@ namespace UserInterface::HitIndicator
 	bool ProcessTilesInUse(Tile* tile, TESObjectREFR* target)
 	{
 		if (!tile) return false;
-		if (rotate == 2) tile->SetFloat("_RotateAngle", g_player->GetHeadingAngle(target));
+		if (rotate == 2) tile->Set("_RotateAngle", g_player->GetHeadingAngle(target));
 		const auto val = tile->GetValue("_counter");
 		if (!val) return false;
 		if (val->num < 1) return true;
@@ -81,17 +81,17 @@ namespace UserInterface::HitIndicator
 	{
 		const auto tile = CreateTileForHitMarker(target);
 
-		tile->SetFloat("_depth", depth++);
+		tile->Set("_depth", depth++);
 
-		tile->SetFloat(kTileValue_systemcolor, 1 + static_cast<bool>(flags & kHitIndicatorAltColor));
+		tile->Set(kTileValue_systemcolor, 1 + static_cast<bool>(flags & kHitIndicatorAltColor));
 
-		tile->SetFloat("_ModeOffset", static_cast<bool>(flags & kHitIndicatorOffset));
-		tile->SetFloat("_ModeShakeVert", static_cast<bool>(flags & kHitIndicatorShakeVert));
-		tile->SetFloat("_ModeShakeHoriz", static_cast<bool>(flags & kHitIndicatorShakeHoriz));
-		tile->SetFloat("_angle", g_player->GetHeadingAngle(target));
-		tile->SetFloat("_alphaMult", flags & kHitIndicatorHalfAlpha ? 0.5 : 1);
+		tile->Set("_ModeOffset", static_cast<bool>(flags & kHitIndicatorOffset));
+		tile->Set("_ModeShakeVert", static_cast<bool>(flags & kHitIndicatorShakeVert));
+		tile->Set("_ModeShakeHoriz", static_cast<bool>(flags & kHitIndicatorShakeHoriz));
+		tile->Set("_angle", g_player->GetHeadingAngle(target));
+		tile->Set("_alphaMult", flags & kHitIndicatorHalfAlpha ? 0.5 : 1);
 
-		tile->GradualSetFloat("_counter", 0, 1, flags & kHitIndicatorDouble ? 2 * seconds : seconds, GradualSetFloat::StartToEnd);
+		tile->SetGradual("_counter", 0, 1, flags & kHitIndicatorDouble ? 2 * seconds : seconds, GradualSetFloat::StartToEnd);
 	}
 
 	void MainLoop()
@@ -101,15 +101,15 @@ namespace UserInterface::HitIndicator
 		if (g_HUDMainMenu->isUsingScope) visible = static_cast<SInt64>(enableScope);
 		else if (g_player->UsingIronSights()) visible = enableSighting;
 		else visible = enableOut;
-		tileMain->SetFloat("_visible", visible);
-		tileMain->SetFloat("_scope", g_player->UsingIronSights());
+		tileMain->Set("_visible", visible);
+		tileMain->Set("_scope", g_player->UsingIronSights());
 
 		if (MenuMode() || !visible) { hitQueue.clear(); return; }
 
 		if (rotate == 1)
 		{
 			const auto newAngle = g_player->pos.z;
-			tileMain->SetFloat("_angleWorld", angle - newAngle);
+			tileMain->Set("_angleWorld", angle - newAngle);
 			angle = newAngle;
 		}
 
@@ -200,18 +200,18 @@ namespace UserInterface::HitIndicator
 		onHit.emplace_back(OnHit);
 		mainLoop.emplace_back(MainLoop);
 
-		if (tileMain->GetChild("JHI")) tileMain->GetChild("JHIContainer")->Destroy(true);
+		if (tileMain->GetChild("JHI")) delete tileMain->GetChild("JHIContainer");
 		tileMain->AddTileFromTemplate("JHIContainer");
 
-		tileMain->SetFloat("_AlphaBase", alpha);
-		tileMain->SetFloat("_HeightBase", height);
-		tileMain->SetFloat("_WidthBase", width);
-		tileMain->SetFloat("_OffsetBase", offset);
+		tileMain->Set("_AlphaBase", alpha);
+		tileMain->Set("_HeightBase", height);
+		tileMain->Set("_WidthBase", width);
+		tileMain->Set("_OffsetBase", offset);
 
-		tileMain->GradualSetFloat("_GlobalShaker", -0.05, 0.05, 0.15, GradualSetFloat::StartToEndPerpetual);
+		tileMain->SetGradual("_GlobalShaker", -0.05, 0.05, 0.15, GradualSetFloat::StartToEndPerpetual);
 
-		tileMain->SetFloat("_visible", visible = 0);
-		tileMain->SetFloat("_scope", 0);
+		tileMain->Set("_visible", visible = 0);
+		tileMain->Set("_scope", 0);
 	}
 
 	void MainLoopDoOnce()

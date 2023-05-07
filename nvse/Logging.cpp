@@ -7,10 +7,10 @@
 #include <BSExtraData.h>
 #include <InventoryChanges.h>
 #include <InterfaceManager.h>
-#include <Tiles.h>
+#include <Tile.h>
 #include <Utilities.h>
 
-#include "Form.h"
+#include "TESForm.h"
 
 typedef void(*LoggingFunction)(std::fstream& file, const std::string& str);
 typedef LoggingFunction(*UpdateFunction)();
@@ -126,7 +126,7 @@ void Dump(Tile* tile)
 
 	for (UInt32 i = 0; i < tile->values.size; i++)
 	{
-		const TileValue* val = tile->values[i];
+		const Tile::Value* val = tile->values[i];
 		const char* traitName = tile->TraitIDToName(val->id);
 		char traitNameIDBuf[16];
 
@@ -197,12 +197,12 @@ void Dump(ExtraContainerChanges* extra)
 	--file;
 }
 
-void DumpFontNames(void)
+void DumpFontNames()
 {
 	FontInfo** fonts = FontManager::GetSingleton()->fontInfos;
 
 	for (UInt32 i = 0; i < FontArraySize; i++)
-		file.Message(FormatString("Font %d is named %s", i + 1, fonts[i]->path));
+		file.Message(FormatString("Font %d is named %s", i + 1, fonts[i]->filePath));
 }
 
 
@@ -222,7 +222,16 @@ Log& Log::operator<<(const std::string& str)
 	return *this;
 }
 
-/*void ScriptEventList::Dump(void)
+/*
+extern NiTMapBase<const char*, int>* g_traitNameMap;
+
+void Debug_DumpTraits()
+{
+	for (const auto bucket : *g_traitNameMap)
+		Log() << FormatString("%s, %08X ,%d", bucket->key, bucket->data, bucket->data);
+}
+*/
+/*void ScriptEventList::Dump()
 {
 	const auto nEvents = m_eventList->Count();
 	for (UInt16 n = 0; n < nEvents; ++n)

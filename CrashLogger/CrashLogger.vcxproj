@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{AE7CFEE7-4058-4E3C-ADC2-AE7480EE2028}</ProjectGuid>
+    <RootNamespace>CrashLogger</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>16.0.28916.169</_ProjectFileVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <OutDir>..\$(Configuration)\</OutDir>
+    <IntDir>..\$(Configuration)\$(ProjectName)\</IntDir>
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>CrashLogger</TargetName>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <OutDir>..\$(Configuration)\</OutDir>
+    <IntDir>..\$(Configuration)\$(ProjectName)\</IntDir>
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>CrashLogger</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\..\nvse;$(SolutionDir)\..;$(SolutionDir)\..\game;$(SolutionDir)\..\libraries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;CrashLogger_EXPORTS;RUNTIME_VERSION=0x040020D0;RUNTIME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <ForcedIncludeFiles>nvse/prefix.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>DebugFull</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <OptimizeReferences>false</OptimizeReferences>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);dbghelp.lib</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent>
+      <Message>
+      </Message>
+      <Command>copy "$(TargetPath)" "$(FalloutNVPath)\Data\NVSE\plugins\$(ProjectName).dll"
+copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\CrashLogger\nvse\plugins"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\..\nvse;$(SolutionDir)\..;$(SolutionDir)\..\game;$(SolutionDir)\..\libraries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;CrashLogger_EXPORTS;RUNTIME_VERSION=0x040020D0;RUNTIME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <PrecompiledHeader />
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <ForcedIncludeFiles>nvse/prefix.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
+    </ClCompile>
+    <Link>
+      <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>false</RandomizedBaseAddress>
+      <DataExecutionPrevention />
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalDependencies>$(CoreLibraryDependencies);%(AdditionalDependencies);dbghelp.lib</AdditionalDependencies>
+    </Link>
+    <PostBuildEvent />
+    <PostBuildEvent>
+      <Command>copy "$(TargetPath)" "$(FalloutNVPath)\Data\NVSE\plugins\$(ProjectName).dll"
+copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\CrashLogger\nvse\plugins"</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\game\BaseFormComponent.cpp" />
+    <ClCompile Include="..\game\ConsoleManager.cpp" />
+    <ClCompile Include="..\game\Containers.cpp" />
+    <ClCompile Include="..\game\SaveLoadGame.cpp" />
+    <ClCompile Include="..\game\InterfaceManager.cpp" />
+    <ClCompile Include="..\game\BSExtraData.cpp" />
+    <ClCompile Include="..\game\GameData.cpp" />
+    <ClCompile Include="..\game\InventoryChanges.cpp" />
+    <ClCompile Include="..\game\TESForm.cpp" />
+    <ClCompile Include="..\game\TESObjectREFR.cpp" />
+    <ClCompile Include="..\game\OSDepend.cpp" />
+    <ClCompile Include="..\game\Script.cpp" />
+    <ClCompile Include="..\game\Setting.cpp" />
+    <ClCompile Include="..\game\GameTasks.cpp" />
+    <ClCompile Include="..\game\Tile.cpp" />
+    <ClCompile Include="..\game\Types.cpp" />
+    <ClCompile Include="..\game\Menu.cpp" />
+    <ClCompile Include="..\game\Sound.cpp" />
+    <ClCompile Include="..\game\NiNodes.cpp" />
+    <ClCompile Include="..\game\TESObject.cpp" />
+    <ClCompile Include="..\nvse\dinput8.cpp" />
+    <ClCompile Include="..\nvse\Logging.cpp" />
+    <ClCompile Include="..\nvse\SafeWrite.cpp" />
+    <ClCompile Include="..\nvse\Utilities.cpp" />
+    <ClCompile Include="CrashLog.cpp" />
+    <ClCompile Include="definitions.cpp" />
+    <ClCompile Include="dllmain.c">
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </ForcedIncludeFiles>
+      <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <ClCompile Include="main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\game\BaseFormComponent.h" />
+    <ClInclude Include="..\game\ConsoleManager.h" />
+    <ClInclude Include="..\game\Containers.h" />
+    <ClInclude Include="..\game\SaveLoadGame.h" />
+    <ClInclude Include="..\game\InterfaceManager.h" />
+    <ClInclude Include="..\game\CommandTable.h" />
+    <ClInclude Include="..\game\BSExtraData.h" />
+    <ClInclude Include="..\game\GameData.h" />
+    <ClInclude Include="..\game\GameEffects.h" />
+    <ClInclude Include="..\game\InventoryChanges.h" />
+    <ClInclude Include="..\game\TESForm.h" />
+    <ClInclude Include="..\game\TESObjectREFR.h" />
+    <ClInclude Include="..\game\OSDepend.h" />
+    <ClInclude Include="..\game\BaseProcess.h" />
+    <ClInclude Include="..\game\RTTI.h" />
+    <ClInclude Include="..\game\Script.h" />
+    <ClInclude Include="..\game\Setting.h" />
+    <ClInclude Include="..\game\Sound.h" />
+    <ClInclude Include="..\game\GameTasks.h" />
+    <ClInclude Include="..\game\Tile.h" />
+    <ClInclude Include="..\game\Types.h" />
+    <ClInclude Include="..\game\Menu.h" />
+    <ClInclude Include="..\game\NiNodes.h" />
+    <ClInclude Include="..\game\NiObjects.h" />
+    <ClInclude Include="..\game\NiTypes.h" />
+    <ClInclude Include="..\nvse\Logging.h" />
+    <ClInclude Include="..\game\TESObject.h" />
+    <ClInclude Include="..\nvse\PluginAPI.h" />
+    <ClInclude Include="..\nvse\prefix.h" />
+    <ClInclude Include="..\nvse\SafeWrite.h" />
+    <ClInclude Include="..\nvse\Utilities.h" />
+    <ClInclude Include="..\nvse\dinput8.h" />
+    <ClInclude Include="..\libraries\json.h" />
+    <ClInclude Include="..\libraries\SimpleINILibrary.h" />
+    <ClInclude Include="CrashLog.h" />
+    <ClInclude Include="definitions.h" />
+    <ClInclude Include="main.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="exports.def" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

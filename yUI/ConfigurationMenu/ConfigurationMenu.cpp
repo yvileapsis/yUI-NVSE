@@ -1,85 +1,65 @@
-#include "ConfigurationMenu.h"
-
 #include "main.h"
+
 #include "SafeWrite.h"
-
-struct MenuItem
-{
-	const char* name;
-};
-
-class ConfigurationMenu1 : public Menu
-{
-	ListBox<MenuItem> listbox;
-};
-
-
-StartMenuOption* yCM1;
-
-void __cdecl yCMCallback()
-{
-	Log(true, Log::kConsole) << "Test";
-//	MenuButton_DownloadsClick();
-	//	ThisCall(0x7D74F0, (void *)( 0x11DAAC0 + 0x0B4), 0);
-	//	static StartMenu* g_StartMenu = StartMenu::GetSingleton();
-	//	((Tile*)(&(g_StartMenu->settingsSubMenu) + 0xC))->SetFloat(TraitNameToID("_enabled"), 1);
-	//	g_StartMenu->GetChild("yCM")->GetChild("yCM")->SetFloat(kTileValue_visible, 0, 0);
-}
-
-void __fastcall AddyCMToSettingsMenu(BSSimpleArray<StartMenuOption*>* settingsMenuOptions, void* edx, StartMenuOption** menuDownloads)
-{
-	//		(*HUDColorSetting)->onSelection = HUDColorSettingCallback;
-	//	(*menuDownloads)->displayString = "Mods";
-	//	(*menuDownloads)->callback = yCMCallback;
-	//	(*menuDownloads)->data = StartMenuOption::kMainMenu + StartMenuOption::kPauseMenu;
-
-	yCM1 = StartMenuOption::Create("Mods", yCMCallback, StartMenuOption::kMainMenu + StartMenuOption::kPauseMenu);
-	settingsMenuOptions->Append(&yCM1);
-
-	settingsMenuOptions->Append(menuDownloads);
-
-
-	//yCM = StartMenuOption::Create("Mods", yCMCallback, StartMenuOption::kMainMenu);
-
-}
+#include "ConfigurationMenu.h"
 
 namespace ConfigurationMenu
 {
+
+	void* __fastcall MCMInit(UInt32 id)
+	{
+		if (id == MENU_ID)
+			return ModConfigurationMenu::Create();
+		return nullptr;
+	}
+
+	UInt32 medicalQuestionaireCaseAddr;
+	__declspec(naked) void MedicalQuestionaireCreateHook()
+	{
+		_asm
+		{
+			mov ecx, [ebp + 8]
+			cmp ecx, 1047
+			jnz createConfigurationMenu
+			jmp [medicalQuestionaireCaseAddr]
+
+			createConfigurationMenu:
+			push 0x71F142
+			jmp MCMInit
+		}
+	}
+
+	inline void ConfigurationMenuButtonCallback()
+	{
+		ModConfigurationMenu::ReloadMenu()->ShowMenuFirstTime();
+	}
+
+	inline void __fastcall AddConfigurationMenuButton(BSSimpleArray<StartMenu::Option*>* startMenuOptions, void* edx, StartMenu::Option** settingsMenuItem)
+	{
+		startMenuOptions->Append(settingsMenuItem);
+
+		auto option = new StartMenu::Option("Mods", ConfigurationMenuButtonCallback, StartMenu::Option::kMainMenu | StartMenu::Option::kPauseMenu);
+		startMenuOptions->Append(&option);
+	}
+
 	void DeferredInit()
 	{
-		const auto tile = StartMenu::GetSingleton()->tile->InjectUIXML(R"(Data\menus\yCM.xml)");
+		WriteMCMHooks();
 
 	}
 
 	void Init()
 	{
 
-		WriteRelCall(0x7CC9D4, UInt32(AddyCMToSettingsMenu));
-		WriteRelJump(0x7CCA43, 0x7CCAAD);
+		SafeWrite8(0x71F1EC + (MENU_ID - 1001), 16); // use switch case for CreditsMenu
+		medicalQuestionaireCaseAddr = DetourVtable(0x71F154 + 4 * 16, UInt32(MedicalQuestionaireCreateHook));
 
+		// reload the menu when alt-tabbing
+	//	WriteRelCall(0x86A1AB, UInt32(OnAltTabReloadStewMenu));
+
+		WriteRelCall(0x7CCA3E, AddConfigurationMenuButton);
+		
 		deferredInit.emplace_back(DeferredInit);
-
-	//	SafeWriteBuf(0x7CBF77
-
-	//	SafeWriteBuf(0x7CBF8C, "\x66\x0F\x1F\x44\x00\x00", 6);//
-	//	SafeWriteBuf(0x7CB674, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CB686, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CB698, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CB6AA, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CB6BC, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CB6CE, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CB6E0, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CBE50, "\x81\x7A\x08\x50\x05\x7D\x00", 7);
-
-	/*	SafeWriteBuf(0x7CC044, "\x0F\x1F\x44\x00\x00", 5);
-		SafeWriteBuf(0x7CC392, "\x0F\x1F\x44\x00\x00", 5);
-		SafeWriteBuf(0x7CC23E, "\x0F\x1F\x44\x00\x00", 5);
-		SafeWriteBuf(0x7CC0C3, "\x0F\x1F\x44\x00\x00", 5);
-		SafeWriteBuf(0x7CC044, "\x0F\x1F\x44\x00\x00", 5);
-		SafeWriteBuf(0x7CC416, "\x0F\x1F\x44\x00\x00", 5);
-		SafeWriteBuf(0x7CC582, "\x0F\x1F\x44\x00\x00", 5);*/
-	//	SafeWriteBuf(0x7CBF59, "\x0F\x1F\x44\x00\x00", 5);
-	//	SafeWriteBuf(0x7CC01F, "\x0F\x1F\x44\x00\x00", 5);
-
+		mainLoop.emplace_back(MainLoop);
 	}
 }

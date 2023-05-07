@@ -1,6 +1,6 @@
 #pragma once
 #include "Utilities.h"
-#include "Form.h"
+#include "TESForm.h"
 
 struct ScriptEventList;
 struct ScriptBuffer;
@@ -94,7 +94,7 @@ public:
 	VariableInfo*	GetVariableInfo(UInt32 idx);
 
 	UInt32			AddVariable(TESForm * form);
-	void			CleanupVariables(void);
+	void			CleanupVariables();
 
 	UInt32			Type() const { return info.type; }
 	bool			IsObjectScript() const {return info.type == eType_Object; }

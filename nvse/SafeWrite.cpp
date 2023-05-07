@@ -110,3 +110,17 @@ void PatchMemoryNop(ULONG_PTR Address, SIZE_T Size)
 
 	FlushInstructionCache(GetCurrentProcess(), (LPVOID)Address, Size);
 }
+
+[[nodiscard]] __declspec(noinline) UInt32 __stdcall DetourVtable(UInt32 addr, UInt32 dst)
+{
+	UInt32 originalFunction = *(UInt32*)addr;
+	SafeWrite32(addr, dst);
+	return originalFunction;
+}
+
+[[nodiscard]] __declspec(noinline) UInt32 __stdcall DetourRelCall(UInt32 jumpSrc, UInt32 jumpTgt)
+{
+	UInt32 originalFunction = *(UInt32*)(jumpSrc + 1) + jumpSrc + 5;
+	WriteRelCall(jumpSrc, jumpTgt);
+	return originalFunction;
+}

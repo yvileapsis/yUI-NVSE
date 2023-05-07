@@ -2,8 +2,8 @@
 
 #include <SafeWrite.h>
 #include <SimpleINILibrary.h>
-#include <Object.h>
-#include <GameRTTI.h>
+#include <TESObject.h>
+#include <RTTI.h>
 
 namespace Patch::MultiplicativeShots
 {

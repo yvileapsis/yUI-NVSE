@@ -1,8 +1,8 @@
 #include <Script.h>
 
-#include <Form.h>
-#include <Reference.h>
-#include <GameRTTI.h>
+#include <TESForm.h>
+#include <TESObjectREFR.h>
+#include <RTTI.h>
 #include <CommandTable.h>
 
 UInt32 GetDeclaredVariableType(const char* varName, const char* scriptText)
@@ -143,7 +143,7 @@ TList<Script::RefVariable>* Script::GetRefList()
 
 Script* Script::CreateScript()
 {
-	auto* buf = FormHeapAlloc(sizeof Script);
+	auto* buf = GameHeapAlloc(sizeof Script);
 	return ThisStdCall<Script*>(0x5AA0F0, buf);
 }
 
@@ -152,7 +152,7 @@ void Script::DeleteScript() const
 	ThisStdCall(0x5AA170, this, false);
 }
 
-ScriptEventList* Script::CreateEventList(void)
+ScriptEventList* Script::CreateEventList()
 {
 	ScriptEventList* result = nullptr;
 //	EnterCriticalSection(&csGameScript);
@@ -264,7 +264,7 @@ UInt32 Script::AddVariable(TESForm * form)
 {
 	UInt32		resultIdx = 1;
 
-	RefVariable	* var = (RefVariable*)FormHeapAlloc(sizeof(RefVariable));
+	RefVariable	* var = (RefVariable*)GameHeapAlloc(sizeof(RefVariable));
 
 	var->name.Set("");
 	var->form = form;
@@ -284,7 +284,7 @@ UInt32 Script::AddVariable(TESForm * form)
 		RefListEntry	* entry;
 		for(entry = &refList; entry->next; entry = entry->next, resultIdx++) ;
 
-		RefListEntry	* newEntry = (RefListEntry *)FormHeapAlloc(sizeof(RefListEntry));
+		RefListEntry	* newEntry = (RefListEntry *)GameHeapAlloc(sizeof(RefListEntry));
 
 		newEntry->var = var;
 		newEntry->next = NULL;
@@ -297,7 +297,7 @@ UInt32 Script::AddVariable(TESForm * form)
 	return resultIdx;
 }
 
-void Script::CleanupVariables(void)
+void Script::CleanupVariables()
 {
 	delete refList.var;
 
@@ -399,9 +399,9 @@ void ScriptEventList::Destructor()
 	if (m_eventList)
 		m_eventList->RemoveAll();
 	while (m_vars) {
-		if (m_vars->var) FormHeapFree(m_vars->var);
+		if (m_vars->var) GameHeapFree(m_vars->var);
 		VarEntry* next = m_vars->next;
-		FormHeapFree(m_vars);
+		GameHeapFree(m_vars);
 		m_vars = next;
 	}
 }
@@ -414,15 +414,14 @@ TList<ScriptEventList::Var>* ScriptEventList::GetVars() const
 void ScriptEventList::EventCreate(UInt32 eventCode, TESObjectREFR* container)
 {
 	// create Event struct
-	const auto pEvent = (ScriptEventList::Event*)FormHeapAlloc(sizeof(ScriptEventList::Event));
+	const auto pEvent = (ScriptEventList::Event*)GameHeapAlloc(sizeof(ScriptEventList::Event));
 	if (pEvent) {
 		pEvent->eventMask = eventCode;
 		pEvent->object = container;
 	}
 
 	if (!m_eventList) {
-		m_eventList = (ScriptEventList::EventList*)FormHeapAlloc(sizeof(ScriptEventList::EventList));
-		m_eventList->Init();
+		m_eventList = new EventList{};
 	}
 	if (m_eventList && pEvent)
 		m_eventList->AddAt(pEvent, 0);

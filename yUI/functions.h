@@ -38,7 +38,6 @@ AnimData* GetThirdPersonAnimData(AnimData* animData);
 bool TryGetTypeOfForm(TESForm* form);
 
 char* __fastcall StrFromINI(DWORD* address);
-std::string GetStringFromGameSettingFromString(const std::string& settingName);
 
 void RegisterTraitID(const char* var1, UInt32 var2);
 void funpatch();
@@ -55,6 +54,8 @@ bool GetCannibalPrompt(TESObjectREFR* ref);
 
 bool IsKeyPressed(UInt32 key, UInt32 flags = 0);
 void DisableKey(UInt32 key, bool disable, UInt32 mask = 0);
+bool IsShiftHeld();
+bool IsControlHeld();
 bool IsButtonPressed(UInt32 button);
 UInt32 GetControl(UInt32 whichControl, UInt32 type = OSInputGlobals::kControlType_Keyboard);
 void SetNativeHandlerFunctionBool(bool trueorfalse);

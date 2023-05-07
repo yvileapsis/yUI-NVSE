@@ -54,9 +54,9 @@ public:
 	CriticalSection() { InitializeCriticalSection(&critSection); }
 	~CriticalSection() { DeleteCriticalSection(&critSection); }
 
-	void	Enter(void) { EnterCriticalSection(&critSection); }
-	void	Leave(void) { LeaveCriticalSection(&critSection); }
-	bool	TryEnter(void) { return TryEnterCriticalSection(&critSection) != 0; }
+	void	Enter() { EnterCriticalSection(&critSection); }
+	void	Leave() { LeaveCriticalSection(&critSection); }
+	bool	TryEnter() { return TryEnterCriticalSection(&critSection) != 0; }
 
 private:
 	CRITICAL_SECTION	critSection;
@@ -87,11 +87,8 @@ public:
 };
 
 __forceinline void* GameHeapAlloc(UInt32 size) { return ThisStdCall<void*>(0xAA3E40, (void*)0x11F6238, size); }
-__forceinline void GameHeapFree(void* ptr) { ThisStdCall(0xAA4060, (void*)0x11F6238, ptr); }
-
-__forceinline void* FormHeapAlloc(UInt32 size) { return CdeclCall<void*>(0x00401000, size); }
-__forceinline void	FormHeapFree(void* ptr) { CdeclCall(0x00401030, ptr); }
-
+template <typename t> __forceinline t* GameHeapAlloc(UInt32 size) { return ThisStdCall<t*>(0xAA3E40, (void*)0x11F6238, size); }
+template <typename t> __forceinline void GameHeapFree(t* ptr) { ThisStdCall(0xAA4060, (t*)0x11F6238, ptr); }
 
 const char * GetObjectClassName(void * obj);
 const std::filesystem::path& GetFalloutDirectory();
@@ -114,7 +111,7 @@ bool GetNVSEConfigOption_UInt32(const char * section, const char * key, UInt32 *
 #define DEFINE_MEMBER_FN_LONG(className, functionName, retnType, address, ...)		\
 	typedef retnType (className::* _##functionName##_type)(__VA_ARGS__);			\
 																					\
-	inline _##functionName##_type * _##functionName##_GetPtr(void)					\
+	inline _##functionName##_type * _##functionName##_GetPtr()					\
 	{																				\
 		static const UInt32 _address = address;										\
 		return (_##functionName##_type *)&_address;									\
@@ -142,22 +139,22 @@ namespace MersenneTwister
 	void init_by_array(unsigned long init_key[], int key_length);
 
 	/* generates a random number on [0,0xffffffff]-interval */
-	unsigned long genrand_int32(void);
+	unsigned long genrand_int32();
 
 	/* generates a random number on [0,0x7fffffff]-interval */
-	long genrand_int31(void);
+	long genrand_int31();
 
 	/* generates a random number on [0,1]-real-interval */
-	double genrand_real1(void);
+	double genrand_real1();
 
 	/* generates a random number on [0,1)-real-interval */
-	double genrand_real2(void);
+	double genrand_real2();
 
 	/* generates a random number on (0,1)-real-interval */
-	double genrand_real3(void);
+	double genrand_real3();
 
 	/* generates a random number on [0,1) with 53-bit resolution*/
-	double genrand_res53(void);
+	double genrand_res53();
 
 };
 
@@ -180,7 +177,6 @@ private:
 
 const char GetSeparatorChar(Script * script);
 std::string GetSeparatorChars(Script * script);
-std::string GetDXDescription(UInt32 keycode);
 
 bool ci_equal(char ch1, char ch2);
 bool ci_less(const char* lh, const char* rh);
@@ -188,7 +184,7 @@ void MakeUpper(std::string& str);
 void MakeUpper(char* str);
 void MakeLower(std::string& str);
 
-// this copies the string onto the FormHeap - used to work around alloc/dealloc mismatch when passing
+// this copies the string onto the GameHeap - used to work around alloc/dealloc mismatch when passing
 // data between nvse and plugins
 char* CopyCString(const char* src);
 
@@ -353,7 +349,7 @@ std::vector<T> MapTo(const V& v, const F& f)
 template <typename T, const UInt32 ConstructorPtr = 0, typename... Args>
 T* New(Args &&... args)
 {
-	auto* alloc = FormHeapAlloc(sizeof(T));
+	auto* alloc = GameHeapAlloc(sizeof(T));
 	if constexpr (ConstructorPtr)
 	{
 		ThisStdCall(ConstructorPtr, alloc, std::forward<Args>(args)...);
@@ -372,7 +368,7 @@ void Delete(T* t, Args &&... args)
 	{
 		ThisStdCall(DestructorPtr, t, std::forward<Args>(args)...);
 	}
-	FormHeapFree(t);
+	GameHeapFree(t);
 }
 
 template <typename T>
@@ -509,3 +505,28 @@ bool IsConsoleOpen();
 __forceinline bool MenuMode() { return CdeclCall<bool>(0x702360); }
 
 int HexStringToInt(const std::string& str);
+
+std::string GetClipboardText();
+
+inline int GetCharsSinceSpace(const char* text, UInt32 offset)
+{
+	const char* barPos = text + offset;
+	int numChars = 0;
+
+	while (barPos != text && !isalnum(*--barPos)) numChars++;
+	while (barPos >= text && isalnum(*barPos--)) numChars++;
+
+	return numChars;
+}
+
+inline int GetCharsTillSpace(const char* text, UInt32 offset)
+{
+	const char* barPos = text + offset;
+
+	int numChars = 0;
+
+	while (isalnum(*++barPos)) numChars++;
+	while (*barPos && !isalnum(*barPos++)) numChars++;
+
+	return numChars;
+}

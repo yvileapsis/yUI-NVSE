@@ -1,7 +1,7 @@
 #include <Types.h>
 #include <string>
-#include <Reference.h>
-#include <GameProcess.h>
+#include <TESObjectREFR.h>
+#include <BaseProcess.h>
 #include "GameData.h"
 /*** String ***/
 

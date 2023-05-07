@@ -1,5 +1,5 @@
 #include <main.h>
-#include <Menus.h>
+#include <Menu.h>
 
 #include <GameData.h>
 #include <functions.h>
@@ -90,7 +90,7 @@ namespace UserInterface::VisualObjectives
 		}
 		const auto tile = CreateTileForVisualObjective(in);
 
-		tile->SetFloat("_Hostile", depth++);
+		tile->Set("_Hostile", depth++);
 
 		// TODO: fix this so it doesn't rely on altMarker but rather somehow checks for target to be player marker
 		const auto distance = !altMarker ? g_player->GetDistance(target) : g_player->GetDistance2D(target);
@@ -99,9 +99,9 @@ namespace UserInterface::VisualObjectives
 		if (distanceMax >= 0 && distance > distanceMax) inDistance = false;
 		if (distanceMin >= 0 && distance < distanceMin) inDistance = false;
 
-		const bool inFocus = tile->GetFloat("_InFocus");
+		const bool inFocus = tile->Get("_InFocus");
 
-		if (altColor) tile->SetFloat("_Hostile", target->IsCrimeOrEnemy());
+		if (altColor) tile->Set("_Hostile", target->IsCrimeOrEnemy());
 
 		std::string string;
 		if (inFocus + distanceHandling - altMarker <= 1) {}
@@ -113,9 +113,9 @@ namespace UserInterface::VisualObjectives
 			string = std::to_string(static_cast<UInt32>(distance / 21.333)) + " ft.";
 		else if (distanceSystem == 2)
 			string = std::to_string(static_cast<UInt32>(distance / 69.99104)) + " m.";
-		tile->SetString("_Distance", string.c_str());
+		tile->Set("_Distance", string);
 
-		tile->SetFloat("_InDistance", inDistance);
+		tile->Set("_InDistance", inDistance);
 
 		string = "";
 
@@ -139,9 +139,9 @@ namespace UserInterface::VisualObjectives
 		}
 
 		if (string == "<no name>") string = "";
-		tile->SetString("_Text", string.c_str());
+		tile->Set("_Text", string);
 
-		tile->SetFloat("_AltMarker", altMarker);
+		tile->Set("_AltMarker", altMarker);
 	}
 
 	void MainLoop()
@@ -164,21 +164,21 @@ namespace UserInterface::VisualObjectives
 
 //		tileMain->SetFloat("_Visible", visible);
 
-		if (visible != oldVisible) tileMain->GradualSetFloat("_AlphaMult", oldVisible, abs(visible), speed, 0);
+		if (visible != oldVisible) tileMain->SetGradual("_AlphaMult", oldVisible, abs(visible), speed, 0);
 
 		if (!visible) return;
 
-		tileMain->SetFloat("_InCombat", g_player->pcInCombat);
-		tileMain->SetFloat("_AlphaCW", HUDMainMenu::GetOpacity());
+		tileMain->Set("_InCombat", g_player->pcInCombat);
+		tileMain->Set("_AlphaCW", HUDMainMenu::GetOpacity());
 
 		offsetHUDMarker = GetJIPAuxVarOrDefault("*_Offset", 0, 0);
 		offsetHUDText = GetJIPAuxVarOrDefault("*_Offset", 1, 0);
 		offsetWorld = GetJIPAuxVarOrDefault("*_Offset", 2, 20);
 
-		tileMain->SetFloat("_OffsetMarker", offsetHUDMarker);
-		tileMain->SetFloat("_OffsetText", offsetHUDText);
+		tileMain->Set("_OffsetMarker", offsetHUDMarker);
+		tileMain->Set("_OffsetText", offsetHUDText);
 
-		for (const auto fst : tilesInUse | std::views::keys) { tilesFree.emplace(fst); fst->SetFloat(kTileValue_visible, 0); }
+		for (const auto fst : tilesInUse | std::views::keys) { tilesFree.emplace(fst); fst->Set(kTileValue_visible, 0); }
 		tilesInUse.clear();
 
 		depth = 0;
@@ -194,9 +194,9 @@ namespace UserInterface::VisualObjectives
 		{
 			NiPoint3 out;
 			const bool onScreen = WorldToScreen(&snd, out, offscreenHandling);
-			fst->SetFloat(kTileValue_visible, onScreen || offscreenHandling != 2);
-			fst->SetFloat("_X", out.x);
-			fst->SetFloat("_Y", out.y);
+			fst->Set(kTileValue_visible, onScreen || offscreenHandling != 2);
+			fst->Set("_X", out.x);
+			fst->Set("_Y", out.y);
 		}
 	}
 
@@ -249,23 +249,23 @@ namespace UserInterface::VisualObjectives
 		mainLoop.emplace_back(MainLoop);
 		onRender.emplace_back(OnRender);
 
-		if (tileMain->GetChild("JVO")) tileMain->GetChild("JVOContainer")->Destroy(true);
+		if (tileMain->GetChild("JVO")) delete tileMain->GetChild("JVOContainer");
 		tileMain->AddTileFromTemplate("JVOContainer");
 
-		tileMain->SetFloat("_DistanceVisible", distanceHandling);
-		tileMain->SetFloat("_TextVisible", textHandling);
+		tileMain->Set("_DistanceVisible", distanceHandling);
+		tileMain->Set("_TextVisible", textHandling);
 
-		tileMain->SetFloat("_AlphaBase", alpha);
-		tileMain->SetFloat("_AlphaMultInactive", alphaMult);
-		tileMain->SetFloat("_RadiusMax", radius);
+		tileMain->Set("_AlphaBase", alpha);
+		tileMain->Set("_AlphaMultInactive", alphaMult);
+		tileMain->Set("_RadiusMax", radius);
 
-		tileMain->SetFloat("_WidthBase", width);
-		tileMain->SetFloat("_HeightBase", height);
-		tileMain->SetFloat("_OffsetWidth", offsetWidth);
-		tileMain->SetFloat("_OffsetHeight", offsetHeight);
+		tileMain->Set("_WidthBase", width);
+		tileMain->Set("_HeightBase", height);
+		tileMain->Set("_OffsetWidth", offsetWidth);
+		tileMain->Set("_OffsetHeight", offsetHeight);
 
-		tileMain->SetFloat("_FontBase", font);
-		tileMain->SetFloat("_FontYBase", fontY);
+		tileMain->Set("_FontBase", font);
+		tileMain->Set("_FontYBase", fontY);
 	}
 
 	void MainLoopDoOnce()

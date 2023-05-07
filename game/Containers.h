@@ -18,7 +18,7 @@ public:
 	bool		Append(const char* toAppend);
 	double		Compare(const String& compareTo, bool caseSensitive = false);
 
-	const char* CStr(void);
+	const char* CStr();
 
 	void		AppendChar(char toAppend);
 	void		InsertChar(char toInsert, UInt32 index);
@@ -63,13 +63,13 @@ template <typename Item> struct TListNode
 	{
 		TListNode* pNext = next;
 		next = next->next;
-		FormHeapFree(pNext);
+		GameHeapFree(pNext);
 		return next;
 	}
 
 	TListNode<Item>* Append(Item* _data)
 	{
-		const auto newNode = static_cast<TListNode*>(FormHeapAlloc(sizeof(TListNode)));
+		const auto newNode = static_cast<TListNode*>(GameHeapAlloc(sizeof(TListNode)));
 		newNode->data = _data;
 		newNode->next = next;
 		next = newNode;
@@ -78,7 +78,7 @@ template <typename Item> struct TListNode
 
 	TListNode<Item>* Insert(Item* _data)
 	{
-		const auto newNode = static_cast<TListNode*>(FormHeapAlloc(sizeof(TListNode)));
+		const auto newNode = static_cast<TListNode*>(GameHeapAlloc(sizeof(TListNode)));
 		newNode->data = data;
 		data = _data;
 		newNode->next = next;
@@ -93,6 +93,13 @@ public:
 	typedef TListNode<Item> Node;
 
 	Node	first;
+
+
+	TList(Item* item = nullptr)
+	{
+		first.data = item;
+		first.next = nullptr;
+	}
 
 	Node* GetLastNode() const
 	{
@@ -130,12 +137,6 @@ public:
 		} while ((node = node->next));
 
 		return nullptr;
-	}
-
-	void Init(Item* item = nullptr)
-	{
-		first.data = item;
-		first.next = NULL;
 	}
 
 	Node* Head() const { return const_cast<Node*>(&first); }
@@ -585,22 +586,18 @@ static_assert(sizeof(DList<void*>) == 0xC);
 enum KeyboardMenuInputCode;
 
 // 010
-template <class Item>
-class BSSimpleList
+template <class Item> class BSSimpleList
 {
 public:
-	BSSimpleList<Item>();
-	~BSSimpleList<Item>();
 
 	virtual bool	SetSelectedTile(Tile* tile) { return false; };
-	virtual Tile* GetSelectedTile(void) { return nullptr; };
-	virtual Tile* HandleKeyboardInput(KeyboardMenuInputCode code) { return nullptr; };
+	virtual Tile*	GetSelectedTile() { return nullptr; };
+	virtual Tile*	HandleKeyboardInput(KeyboardMenuInputCode code) { return nullptr; };
 	virtual bool	IsMenuEqual(Menu* that) { return false; };
-	virtual void	ScrollToHighlight(void) {};
-	virtual Tile* GetTileByIndex(int index, char isNotTileListIndex) { return nullptr; };
-	virtual void	Destructor(bool doFree) {};
-	virtual void	FreeAllTiles(void) {};
-	virtual void	Sort(signed int(__cdecl*)(Item*, Item*)) {};
+	virtual void	ScrollToHighlight() {};
+	virtual Tile*	GetTileByIndex(int index, char isNotTileListIndex) { return nullptr; };
+
+	BSSimpleList() { ThisCall(0x7240C0, this); };
 
 	TList<Item>		list;	// 004
 };	// 00C
@@ -611,7 +608,7 @@ template <typename Item> struct BSSimpleArray
 	virtual void	Destroy(bool doFree);
 	virtual Item* Allocate(UInt32 size);
 
-	Item* data;			// 04
+	Item*			data;			// 04
 	UInt32			size;			// 08
 	UInt32			alloc;			// 0C
 

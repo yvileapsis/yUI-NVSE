@@ -29,12 +29,12 @@ ConsoleManager::TextList* ConsoleManager::TextList::Append(TextNode* append)
 	return this;
 }
 
-char* ConsoleManager::GetConsoleOutputFilename(void)
+char* ConsoleManager::GetConsoleOutputFilename()
 {
 	return GetSingleton()->scofPath;
 };
 
-bool ConsoleManager::HasConsoleOutputFilename(void) {
+bool ConsoleManager::HasConsoleOutputFilename() {
 	return 0 != GetSingleton()->scofPath[0];
 }
 

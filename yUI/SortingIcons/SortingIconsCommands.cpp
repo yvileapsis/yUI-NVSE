@@ -1,7 +1,7 @@
 #include "SortingIcons.h"
 
 #include <main.h>
-#include <Reference.h>
+#include <TESObjectREFR.h>
 #include <PluginAPI.h>
 
 namespace SortingIcons::Commands

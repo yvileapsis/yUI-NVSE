@@ -5,7 +5,7 @@
 
 #include <dinput8.h>
 
-#include <Menus.h>
+#include <Menu.h>
 #include <GameData.h>
 #include <InterfaceManager.h>
 
@@ -200,20 +200,22 @@ namespace UserInterface::LootMenu
 			Float64 x = 0;
 
 			tiles = 0;
+			const auto fontManager = FontManager::GetSingleton();
+			const auto font = tileMain->Get("_Font");
 
 			for (const auto fst : tileMain->GetChild("JLMContainer")->children)
 			{
 				if (items.empty() || item >= items.end())
 				{
-					fst->SetFloat(kTileValue_visible, 0);
+					fst->Set(kTileValue_visible, 0);
 					continue;
 				}
-				fst->SetFloat(kTileValue_visible, 1);
+				fst->Set(kTileValue_visible, 1);
 
 				const auto snd = *item;
 				++item;
 
-				fst->SetFloat(kTileValue_y, y);
+				fst->Set(kTileValue_y, y);
 
 				std::string string = snd->form->GetTheName();
 
@@ -221,49 +223,47 @@ namespace UserInterface::LootMenu
 
 				if (snd->countDelta > 1) string += " (" + std::to_string(snd->countDelta) + ")";
 
-				fst->SetString(kTileValue_string, string.c_str());
+				fst->Set(kTileValue_string, string);
 
-				fst->SetFloat("_Equip", snd->GetEquipped());
+				fst->Set("_Equip", snd->GetEquipped());
 
-				const auto& category = SortingIcons::Category::Get(snd->form);
+				const auto& category = SortingIcons::Category::Get(snd->form->TryGetREFRParent());
 				if (category->IsValid() && !category->filename.empty())
 				{
-					fst->SetFloat("_Icon", true);
-					fst->SetString("_IconFilename", category->filename.c_str());
+					fst->Set("_Icon", true);
+					fst->Set("_IconFilename", category->filename);
 				}
-				else fst->SetFloat("_Icon", false);
+				else fst->Set("_Icon", false);
 
-				if (const auto condition = snd->GetHealthPercentAlt(true); condition != -1)
+				if (const auto condition = snd->GetHealthPercentAlt(true, false); condition != -1)
 				{
-					fst->SetFloat("_Meter", 1);
-					fst->SetFloat("_MeterValue", condition);
-					fst->SetFloat("_MeterArrow", snd->form->TryGetREFRParent()->typeID == kFormType_TESObjectWEAP ? 0.75 : 0.5);
+					fst->Set("_Meter", 1);
+					fst->Set("_MeterValue", condition);
+					fst->Set("_MeterArrow", snd->form->TryGetREFRParent()->typeID == kFormType_TESObjectWEAP ? 0.75 : 0.5);
 				}
-				else fst->SetFloat("_Meter", 0);
+				else fst->Set("_Meter", 0);
 
-				const auto fontManager = FontManager::GetSingleton();
-				const auto font = tileMain->GetFloat("_Font");
-				const auto wrapWidth = fst->GetChild("ButtonText")->GetFloat(kTileValue_wrapwidth);
+				const auto wrapWidth = fst->GetChild("ButtonText")->Get(kTileValue_wrapwidth);
 
 				const auto stringDimensions = fontManager->GetStringDimensions(string.c_str(), font, wrapWidth);
 
 				const auto height = indentTextY + stringDimensions->y;
 
-				x = max(x, stringDimensions->x + fst->GetFloat("_TextWidth"));
+				x = max(x, stringDimensions->x + fst->Get("_TextWidth"));
 
 				if (y + height > heightMax - 3 * indentItem) break;
 				y += height;
 
 				tiles++;
 			}
-			tileMain->SetFloat("_ItemHeightCur", y);
-			tileMain->SetFloat("_ItemWidthCur", x);
+			tileMain->Set("_ItemHeightCur", y);
+			tileMain->Set("_ItemWidthCur", x);
 
 			if (index > tiles - 1) { index = tiles - 1; }
 
 			UInt32 i = 0;
 			for (const auto fst : tileMain->GetChild("JLMContainer")->children) {
-				fst->SetFloat("_Active", i == index);
+				fst->Set("_Active", i == index);
 				if (i == index)
 				{
 					// TODO: send out event
@@ -271,8 +271,8 @@ namespace UserInterface::LootMenu
 				i++;
 			}
 
-			tileMain->SetFloat("_ArrowUp", offset > 0);
-			tileMain->SetFloat("_ArrowDown", offset < items.size() - tiles);
+			tileMain->Set("_ArrowUp", offset > 0);
+			tileMain->Set("_ArrowDown", offset < items.size() - tiles);
 		}
 	}
 
@@ -283,8 +283,11 @@ namespace UserInterface::LootMenu
 		void Show()
 		{
 			owned = container->IsCrimeOrEnemy();
-			tileMain->SetString("_Title", container->GetTheName());
-			tileMain->SetFloat("_SystemColor", 1 + owned);
+
+			tileMain->Set("_Title", FontManager::GetSingleton()->StringShorten(
+				                    container->GetTheName(), tileMain->Get("_FontHead"),
+				                    tileMain->Get("_Width") - indentItem * 3 - 50));
+			tileMain->Set("_SystemColor", 1 + owned);
 
 			Items::Update();
 
@@ -296,8 +299,8 @@ namespace UserInterface::LootMenu
 			if (key3) DisableKey(key3, true);
 			if (keyAlt) DisableKey(keyAlt, true);
 
-			tileMain->SetFloat("_AlphaAC", HUDMainMenu::GetOpacity());
-			tileMain->GradualSetFloat("_AlphaMult", 0, 1, speed, 0);
+			tileMain->Set("_AlphaAC", HUDMainMenu::GetOpacity());
+			tileMain->SetGradual("_AlphaMult", 0, 1, speed, 0);
 
 			isShown = true;
 		}
@@ -312,7 +315,7 @@ namespace UserInterface::LootMenu
 			if (key3) DisableKey(key3, false);
 			if (keyAlt) DisableKey(keyAlt, false);
 
-			tileMain->GradualSetFloat("_AlphaMult", 1, 0, 2 * speed, 0);
+			tileMain->SetGradual("_AlphaMult", 1, 0, 2 * speed, 0);
 
 			isShown = false;
 		}
@@ -397,6 +400,7 @@ namespace UserInterface::LootMenu
 			if (!ref->baseForm->CanContainItems()) return nullptr;
 			if (ref->IsLocked()) return nullptr;
 			if (ref->IsActor() && reinterpret_cast<Actor*>(ref)->lifeState != kLifeState_Dead && reinterpret_cast<Actor*>(ref)->lifeState != kLifeState_Dying) return nullptr;
+			if (g_player->grabbedRef) return nullptr;
 			if (GetCannibalPrompt(ref)) return nullptr;
 			if (CheckContainer(ref) == kDisallow) return nullptr;
 			if (std::string(ref->GetTheName()).empty()) return nullptr;
@@ -449,12 +453,12 @@ namespace UserInterface::LootMenu
 
 			if (weightVisible == 1 && weight / weightmax < 0.9)
 			{
-				tileMain->SetFloat("_WeightVisible", 0);
+				tileMain->Set("_WeightVisible", 0);
 				return;
 			}
 
-			tileMain->SetFloat("_WeightVisible", 1);
-			tileMain->SetString("_Weight", FormatString("%.0f/%.0f", weight, weightmax).c_str());
+			tileMain->Set("_WeightVisible", 1);
+			tileMain->Set("_Weight", FormatString("%.0f/%.0f", weight, weightmax));
 
 			if (!weightAltColor) return;
 
@@ -464,7 +468,7 @@ namespace UserInterface::LootMenu
 				if (item < items.end()) weight += CdeclCall<Float64>(0x48EBC0, (*item)->form, g_player->isHardcore);
 			}
 
-			tileMain->SetFloat("_WeightColor", weight > weightmax);
+			tileMain->Set("_WeightColor", weight > weightmax);
 		}
 	}
 
@@ -495,15 +499,15 @@ namespace UserInterface::LootMenu
 
 			auto action = (alt ? mode1Alt : mode1) << 1;
 			if (action > 0) action -= !owned;
-			tileMain->SetFloat("_Action1", action);
+			tileMain->Set("_Action1", action);
 
 			action = (alt ? mode2Alt : mode2) << 1;
 			if (action > 0) action -= !owned;
-			tileMain->SetFloat("_Action2", action);
+			tileMain->Set("_Action2", action);
 
 			action = (alt ? mode3Alt : mode3) << 1;
 			if (action > 0) action -= !owned;
-			tileMain->SetFloat("_Action3", action);
+			tileMain->Set("_Action3", action);
 		}
 	}
 
@@ -629,8 +633,9 @@ namespace UserInterface::LootMenu
 
 	bool OnPreActivate(TESObjectREFR* thisObj, Actor* ref, bool isActivationNotPrevented)
 	{
+		if (ref != g_player) return true;
 		if (!container && Container::Change(Container::Filter(thisObj))) Box::Update();
-		if (!container || thisObj != container || ref != g_player || !isActivationNotPrevented) return true;
+		if (!container || thisObj != container || !isActivationNotPrevented) return true;
 		return Action(ActionToTake());
 	}
 
@@ -668,7 +673,7 @@ namespace UserInterface::LootMenu
 
 		enable			= ini.GetOrCreate("General", "bLootMenu", true, "; enable 'Loot Menu' feature. If required files are not found this will do nothing.");
 
-		block			= ini.GetOrCreate("Loot Menu", "bOnlyOpenLootMenuAfterFirstInteraction", false, "; I recommend considering enabling this option, as it's a little less performance intensive and as bug-free as regular container menu");
+		block			= ini.GetOrCreate("Loot Menu", "bBlockBeforeActivate", false, "; I recommend considering enabling this option, as it's a little less performance intensive and as bug-free as regular container menu");
 
 		key1Base		= ini.GetOrCreate("Loot Menu", "iKey1", 0, nullptr);
 		key2Base		= ini.GetOrCreate("Loot Menu", "iKey2", 0, nullptr);
@@ -727,33 +732,33 @@ namespace UserInterface::LootMenu
 
 	void ProcessGlobals()
 	{
-		tileMain->SetFloat("_FontBase", font);
-		tileMain->SetFloat("_FontYBase", fontY);
-		tileMain->SetFloat("_FontHeadBase", fontHead);
-		tileMain->SetFloat("_FontHeadYBase", fontHeadY);
+		tileMain->Set("_FontBase", font);
+		tileMain->Set("_FontYBase", fontY);
+		tileMain->Set("_FontHeadBase", fontHead);
+		tileMain->Set("_FontHeadYBase", fontHeadY);
 
-		tileMain->SetFloat("_ItemHeightMin", heightMin);
-		tileMain->SetFloat("_ItemHeightMax", heightMax);
-		tileMain->SetFloat("_ItemWidthMin", widthMin);
-		tileMain->SetFloat("_ItemWidthMax", widthMax);
+		tileMain->Set("_ItemHeightMin", heightMin);
+		tileMain->Set("_ItemHeightMax", heightMax);
+		tileMain->Set("_ItemWidthMin", widthMin);
+		tileMain->Set("_ItemWidthMax", widthMax);
 
-		tileMain->SetFloat("_OffsetX", offsetX);
-		tileMain->SetFloat("_OffsetY", offsetY);
+		tileMain->Set("_OffsetX", offsetX);
+		tileMain->Set("_OffsetY", offsetY);
 
-		tileMain->SetFloat("_ItemIndent", indentItem);
-		tileMain->SetFloat("_TextIndentX", indentTextX);
-		tileMain->SetFloat("_TextIndentY", indentTextY);
+		tileMain->Set("_ItemIndent", indentItem);
+		tileMain->Set("_TextIndentX", indentTextX);
+		tileMain->Set("_TextIndentY", indentTextY);
 
-		tileMain->SetFloat("_BracketTitle", showName);
+		tileMain->Set("_BracketTitle", showName);
 
-		tileMain->SetFloat("_ShowEquip", showEquip);
-		tileMain->SetFloat("_ShowIcon", showIcon);
-		tileMain->SetFloat("_ShowMeter", showMeter);
+		tileMain->Set("_ShowEquip", showEquip);
+		tileMain->Set("_ShowIcon", showIcon);
+		tileMain->Set("_ShowMeter", showMeter);
 
-		tileMain->SetFloat("_JustifyX", justify % 3);
-		tileMain->SetFloat("_JustifyY", floor(justify / 3));
+		tileMain->Set("_JustifyX", justify % 3);
+		tileMain->Set("_JustifyY", floor(justify / 3));
 
-		tileMain->SetFloat("_WeightVisible", 0);
+		tileMain->Set("_WeightVisible", 0);
 
 		key1 = key1Base ? key1Base : GetControl(5, OSInputGlobals::kControlType_Keyboard);
 		key2 = key2Base ? key2Base : GetControl(7, OSInputGlobals::kControlType_Keyboard);
@@ -767,15 +772,15 @@ namespace UserInterface::LootMenu
 
 		if (CdeclCall<bool>(0x4B71D0))
 		{
-			GetStringForButton(button1).empty() ? tileMain->SetFloat("_Button1", button1) : tileMain->SetString("_KeyString1", button1 ? (GetStringForButton(button1) + ")").c_str() : "");
-			GetStringForButton(button2).empty() ? tileMain->SetFloat("_Button2", button2) : tileMain->SetString("_KeyString2", button2 ? (GetStringForButton(button2) + ")").c_str() : "");
-			GetStringForButton(button3).empty() ? tileMain->SetFloat("_Button3", button3) : tileMain->SetString("_KeyString3", button3 ? (GetStringForButton(button3) + ")").c_str() : "");
+			GetStringForButton(button1).empty() ? tileMain->Set("_Button1", button1) : tileMain->Set("_KeyString1", button1 ? (GetStringForButton(button1) + ")").c_str() : "");
+			GetStringForButton(button2).empty() ? tileMain->Set("_Button2", button2) : tileMain->Set("_KeyString2", button2 ? (GetStringForButton(button2) + ")").c_str() : "");
+			GetStringForButton(button3).empty() ? tileMain->Set("_Button3", button3) : tileMain->Set("_KeyString3", button3 ? (GetStringForButton(button3) + ")").c_str() : "");
 		}
 		else
 		{
-			tileMain->SetString("_KeyString1", key1 ? (GetDXDescription(key1) + ")").c_str() : "");
-			tileMain->SetString("_KeyString2", key2 ? (GetDXDescription(key2) + ")").c_str() : "");
-			tileMain->SetString("_KeyString3", key3 ? (GetDXDescription(key3) + ")").c_str() : "");
+			tileMain->Set("_KeyString1", key1 ? (GetStringForScancode(key1) + ")").c_str() : "");
+			tileMain->Set("_KeyString2", key2 ? (GetStringForScancode(key2) + ")").c_str() : "");
+			tileMain->Set("_KeyString3", key3 ? (GetStringForScancode(key3) + ")").c_str() : "");
 		}
 	}
 
@@ -798,7 +803,7 @@ namespace UserInterface::LootMenu
 
 		ProcessGlobals();
 
-		if (tileMain->GetChild("JLMContainer")) tileMain->GetChild("JLMContainer")->Destroy(true);
+		if (tileMain->GetChild("JLMContainer")) delete tileMain->GetChild("JLMContainer");
 		tileMain->AddTileFromTemplate("JLMContainer");
 		for (UInt32 i = 0; i < itemsMax; i++) tileMain->GetChild("JLMContainer")->AddTileFromTemplate("JLMInjected");
 	}

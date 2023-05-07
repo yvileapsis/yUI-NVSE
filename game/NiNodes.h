@@ -443,7 +443,7 @@ public:
 	~NiRefObject();
 
 	virtual void		Destructor(bool freeThis);	// 00
-	virtual void		Free(void);					// 01
+	virtual void		Free();					// 01
 
 //	void		** _vtbl;		// 000
 	UInt32		m_uiRefCount;	// 004 - name known
@@ -529,8 +529,8 @@ public:
 	NiTexture();
 	~NiTexture();
 
-	virtual UInt32	GetWidth(void) = 0;
-	virtual UInt32	GetHeight(void) = 0;
+	virtual UInt32	GetWidth() = 0;
+	virtual UInt32	GetHeight() = 0;
 
 	// 8
 	struct Str028
@@ -543,9 +543,9 @@ public:
 	{
 	public:
 		virtual void	Destroy(bool arg);
-		virtual UInt32	GetWidth(void);
-		virtual UInt32	GetHeight(void);
-		virtual void	Unk_03(void);
+		virtual UInt32	GetWidth();
+		virtual UInt32	GetHeight();
+		virtual void	Unk_03();
 	};
 
 	enum
@@ -591,9 +591,9 @@ public:
 	NiSourceTexture();
 	~NiSourceTexture();
 
-	virtual void	Unk_15(void);
-	virtual void	FreePixelData(void);
-	virtual bool	Unk_17(void);
+	virtual void	Unk_15();
+	virtual void	FreePixelData();
+	virtual bool	Unk_17();
 
 	UInt8		unk030;				// 030 - is static?
 	UInt8		unk031[3];			// 031
@@ -631,7 +631,7 @@ public:
 		UInt32	height;
 	};
 
-	virtual Str030 *	Unk_15(void);
+	virtual Str030 *	Unk_15();
 
 	Str030	* unk030;	// 030
 	UInt32	pad034;		// 034
@@ -826,26 +826,26 @@ public:
 	NiInterpolator();
 	~NiInterpolator();
 
-	virtual void	Unk_23(void);
-	virtual void	Unk_24(void);
-	virtual void	Unk_25(void);
-	virtual void	Unk_26(void);
-	virtual void	Unk_27(void);
-	virtual void	Unk_28(void);
-	virtual void	Unk_29(void);
-	virtual void	Unk_2A(void);
-	virtual void	Unk_2B(void);
-	virtual void	Unk_2C(void);
-	virtual void	Unk_2D(void);
-	virtual void	Unk_2E(void);
-	virtual void	Unk_2F(void);
-	virtual void	Unk_30(void);
-	virtual void	Unk_31(void);
-	virtual void	Unk_32(void);
-	virtual void	Unk_33(void);
-	virtual void	Unk_34(void);
-	virtual void	Unk_35(void);
-	virtual void	Unk_36(void);
+	virtual void	Unk_23();
+	virtual void	Unk_24();
+	virtual void	Unk_25();
+	virtual void	Unk_26();
+	virtual void	Unk_27();
+	virtual void	Unk_28();
+	virtual void	Unk_29();
+	virtual void	Unk_2A();
+	virtual void	Unk_2B();
+	virtual void	Unk_2C();
+	virtual void	Unk_2D();
+	virtual void	Unk_2E();
+	virtual void	Unk_2F();
+	virtual void	Unk_30();
+	virtual void	Unk_31();
+	virtual void	Unk_32();
+	virtual void	Unk_33();
+	virtual void	Unk_34();
+	virtual void	Unk_35();
+	virtual void	Unk_36();
 
 	float m_lastTime;
 
@@ -868,16 +868,16 @@ struct UpdateParams
 class NiTimeController : public NiObject
 {
 public:
-	/*8C*/virtual void		Unk_23(void);
-	/*90*/virtual void		Unk_24(void);
+	/*8C*/virtual void		Unk_23();
+	/*90*/virtual void		Unk_24();
 	/*94*/virtual void		Update(UpdateParams& updParams);
 	/*98*/virtual void		SetTarget(NiNode* pTarget);
-	/*9C*/virtual void		Unk_27(void);
-	/*A0*/virtual void		Unk_28(void);
-	/*A4*/virtual void		Unk_29(void);
-	/*A8*/virtual void		Unk_2A(void);
-	/*AC*/virtual void		Unk_2B(void);
-	/*B0*/virtual void		Unk_2C(void);
+	/*9C*/virtual void		Unk_27();
+	/*A0*/virtual void		Unk_28();
+	/*A4*/virtual void		Unk_29();
+	/*A8*/virtual void		Unk_2A();
+	/*AC*/virtual void		Unk_2B();
+	/*B0*/virtual void		Unk_2C();
 
 	UInt16				flags;				// 08
 	UInt16				unk0A;				// 0A
@@ -899,7 +899,7 @@ class NiDefaultAVObjectPalette;
 class NiControllerManager : public NiTimeController
 {
 public:
-	/*B4*/virtual void		Unk_2D(void);
+	/*B4*/virtual void		Unk_2D();
 
 	NiTArray<NiControllerSequence*>				sequences;		// 34
 	void* ptr44;			// 44
@@ -1127,9 +1127,9 @@ public:
 	~NiBinaryStream();
 
 	virtual void	Destructor(bool freeMemory);		// 00
-	virtual void	Unk_01(void);						// 04
+	virtual void	Unk_01();						// 04
 	virtual void	SeekCur(SInt32 delta);				// 08
-	virtual void	GetBufferSize(void);				// 0C
+	virtual void	GetBufferSize();				// 0C
 	virtual void	InitReadWriteProcs(bool useAlt);	// 10
 
 //	void	** m_vtbl;		// 000
@@ -1144,9 +1144,9 @@ public:
 	NiFile();
 	~NiFile();
 
-	virtual void	Seek(void);			// 14
-	virtual UInt32	GetFilename(void);	// 18
-	virtual void	Unk_07(void);		// 1C
+	virtual void	Seek();			// 14
+	virtual UInt32	GetFilename();	// 18
+	virtual void	Unk_07();		// 1C
 
 	UInt32	m_bufSize;	// 010
 	UInt32	m_unk014;	// 014 - Total read in buffer
@@ -1163,13 +1163,13 @@ public:
 	BSFile();
 	~BSFile();
 
-	virtual void	Reset(void);	// 20
-	virtual void	Unk_09(void);	// 24
-	virtual void	Unk_0A(void);	// 28
-	virtual void	Unk_0B(void);	// 2C
-	virtual void	Unk_0C(void);	// 30
-	virtual void	Read(void);		// 34
-	virtual void	Write(void);	// 38
+	virtual void	Reset();	// 20
+	virtual void	Unk_09();	// 24
+	virtual void	Unk_0A();	// 28
+	virtual void	Unk_0B();	// 2C
+	virtual void	Unk_0C();	// 30
+	virtual void	Read();		// 34
+	virtual void	Write();	// 38
 
 	UInt32		m_modeReadWriteAppend;	// 028
 	UInt8		m_good;					// 02C
@@ -1196,20 +1196,20 @@ public:
 //	~BSFile();
 //
 //	virtual void	Destructor(bool freeMemory);				// 00
-//	virtual void	Unk_01(void);								// 04
-//	virtual void	Unk_02(void);								// 08
-//	virtual void	Unk_03(void);								// 0C
-//	virtual void	Unk_04(void);								// 10
+//	virtual void	Unk_01();								// 04
+//	virtual void	Unk_02();								// 08
+//	virtual void	Unk_03();								// 0C
+//	virtual void	Unk_04();								// 10
 //	virtual void	DumpAttributes(NiTArray <char *> * dst);	// 14
-//	virtual UInt32	GetSize(void);								// 18
-//	virtual void	Unk_07(void);								// 1C
-//	virtual void	Unk_08(void);								// 20
-//	virtual void	Unk_09(void);								// 24
-//	virtual void	Unk_0A(void);								// 28
-//	virtual void	Unk_0B(void);								// 2C
-//	virtual void	Unk_0C(void);								// 30
-//	virtual void	Unk_Read(void);								// 34
-//	virtual void	Unk_Write(void);							// 38
+//	virtual UInt32	GetSize();								// 18
+//	virtual void	Unk_07();								// 1C
+//	virtual void	Unk_08();								// 20
+//	virtual void	Unk_09();								// 24
+//	virtual void	Unk_0A();								// 28
+//	virtual void	Unk_0B();								// 2C
+//	virtual void	Unk_0C();								// 30
+//	virtual void	Unk_Read();								// 34
+//	virtual void	Unk_Write();							// 38
 //
 ////	void	** m_vtbl;		// 000
 //	void	* m_readProc;	// 004 - function pointer

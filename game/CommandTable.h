@@ -229,25 +229,25 @@ public:
 	CommandTable();
 	~CommandTable();
 
-	static void	Init(void);
+	static void	Init();
 
 	void	Read(CommandInfo * start, CommandInfo * end);
 	void	Add(CommandInfo * info, CommandReturnType retnType = kRetnType_Default, UInt32 parentPluginOpcodeBase = 0);
 	void	PadTo(UInt32 id, CommandInfo * info = NULL);
 	bool	Replace(UInt32 opcodeToReplace, CommandInfo* replaceWith);
 
-	CommandInfo *	GetStart(void)	{ return &m_commands[0]; }
-	CommandInfo *	GetEnd(void)	{ return GetStart() + m_commands.size(); }
+	CommandInfo *	GetStart()	{ return &m_commands[0]; }
+	CommandInfo *	GetEnd()	{ return GetStart() + m_commands.size(); }
 	CommandInfo *	GetByName(const char * name);
 	CommandInfo *	GetByOpcode(UInt32 opcode);
 
 	void	SetBaseID(UInt32 id)	{ m_baseID = id; m_curID = id; }
-	UInt32	GetMaxID(void)			{ return m_baseID + m_commands.size(); }
+	UInt32	GetMaxID()			{ return m_baseID + m_commands.size(); }
 	void	SetCurID(UInt32 id)		{ m_curID = id; }
-	UInt32	GetCurID(void)			{ return m_curID; }
+	UInt32	GetCurID()			{ return m_curID; }
 
-	void	Dump(void);
-	void	DumpAlternateCommandNames(void);
+	void	Dump();
+	void	DumpAlternateCommandNames();
 	void	DumpCommandDocumentation(UInt32 startWithID = kNVSEOpcodeStart);
 
 	CommandReturnType	GetReturnType(const CommandInfo * cmd);
@@ -275,8 +275,8 @@ private:
 
 	std::vector<UInt32>	m_opcodesByRelease;	// maps an NVSE major version # to opcode of first command added to that release, beginning with v0008
 
-	void	RecordReleaseVersion(void);
-	void	RemoveDisabledPlugins(void);
+	void	RecordReleaseVersion();
+	void	RemoveDisabledPlugins();
 };
 
 extern CommandTable	g_consoleCommands;

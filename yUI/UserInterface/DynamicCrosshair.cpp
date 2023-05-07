@@ -1,7 +1,7 @@
 #include <main.h>
 
-#include <Menus.h>
-#include <GameSettings.h>
+#include <Menu.h>
+#include <Setting.h>
 #include <SimpleINILibrary.h>
 
 namespace UserInterface::DynamicCrosshair
@@ -83,15 +83,15 @@ namespace UserInterface::DynamicCrosshair
 	{
 		if (!enable || MenuMode()) return;
 
-		tileMain->SetFloat(tileMain->GetValue("_AlphaRC")->id, tileReticleCenter->GetChild("reticle_center")->GetFloat(kTileValue_alpha));
+		tileMain->Set(tileMain->GetValue("_AlphaRC")->id, tileReticleCenter->GetChild("reticle_center")->Get(kTileValue_alpha));
 
 		if (true && tileReticleCenter->GetChild("reticle_center")->children.Head()) { // TODO:: iHUDEditor
-			tileMain->SetFloat(kTileValue_red, tileReticleCenter->GetChild("reticle_center")->children.Head()->data->GetFloat(kTileValue_red));
-			tileMain->SetFloat(kTileValue_blue, tileReticleCenter->GetChild("reticle_center")->children.Head()->data->GetFloat(kTileValue_blue));
-			tileMain->SetFloat(kTileValue_green, tileReticleCenter->GetChild("reticle_center")->children.Head()->data->GetFloat(kTileValue_green));
+			tileMain->Set(kTileValue_red, tileReticleCenter->GetChild("reticle_center")->children.Head()->data->Get(kTileValue_red));
+			tileMain->Set(kTileValue_blue, tileReticleCenter->GetChild("reticle_center")->children.Head()->data->Get(kTileValue_blue));
+			tileMain->Set(kTileValue_green, tileReticleCenter->GetChild("reticle_center")->children.Head()->data->Get(kTileValue_green));
 		}
 
-		tileMain->SetFloat(kTileValue_systemcolor, tileReticleCenter->GetChild("reticle_center")->GetFloat(kTileValue_systemcolor));
+		tileMain->Set(kTileValue_systemcolor, tileReticleCenter->GetChild("reticle_center")->Get(kTileValue_systemcolor));
 
 		UInt32 mode;
 		if (!IsPlayerWeaponGood())				mode = modeHolstered;
@@ -99,7 +99,7 @@ namespace UserInterface::DynamicCrosshair
 		else if (g_player->UsingIronSights())	mode = g_player->isInThirdPerson ? modeSighting3rd : modeSighting1st;
 		else									mode = g_player->isInThirdPerson ? modeOut3rd : modeOut1st;
 
-		tileMain->SetFloat("_scope", g_HUDMainMenu->isUsingScope);
+		tileMain->Set("_scope", g_HUDMainMenu->isUsingScope);
 
 		UInt32 visibleReticle = 0;
 		UInt32 visibleDot = 0;
@@ -114,10 +114,10 @@ namespace UserInterface::DynamicCrosshair
 		else if (mode == kCrosshairDotSmall) { visibleCrosshair = !IsPlayerWeaponShotgun() ? 1 : 2; visibleDot = 1; }
 		else if (mode == kCrosshairDotBig) { visibleCrosshair = !IsPlayerWeaponShotgun() ? 1 : 2;	visibleDot = 2; }
 
-		tileMain->SetFloat("_visible", visibleDot || visibleCrosshair);
-		tileMain->SetFloat("_VisibleDot", visibleDot);
-		tileMain->SetFloat("_VisibleReticle", visibleCrosshair);
-		tileReticleCenter->GetChild("reticle_center")->SetFloat(kTileValue_visible, visibleReticle);
+		tileMain->Set("_visible", visibleDot || visibleCrosshair);
+		tileMain->Set("_VisibleDot", visibleDot);
+		tileMain->Set("_VisibleReticle", visibleCrosshair);
+		tileReticleCenter->GetChild("reticle_center")->Set(kTileValue_visible, visibleReticle);
 
 		Float64 totalSpread = 0.1;
 
@@ -136,12 +136,11 @@ namespace UserInterface::DynamicCrosshair
 
 		if (g_player->UsingIronSights())
 		{
-			Float64 fDefaultWorldFOV;
-			GetNumericIniSetting("fDefaultWorldFOV:Display", &fDefaultWorldFOV);
+			Float64 fDefaultWorldFOV = GetINISetting("fDefaultWorldFOV:Display")->GetAsFloat();
 			spreadTarget *= g_player->worldFOV / fDefaultWorldFOV;
 		}
 
-		tileMain->SetFloat("_Spread", UpdateCurrentSpread(spreadTarget));
+		tileMain->Set("_Spread", UpdateCurrentSpread(spreadTarget));
 	}
 
 	void HandleINI()
@@ -185,24 +184,23 @@ namespace UserInterface::DynamicCrosshair
 		}
 		mainLoop.emplace_back(MainLoop);
 
-		tileMain->SetFloat("_DynamicOffset", dynamic & 1);
-		tileMain->SetFloat("_DynamicLength", dynamic & 2);
+		tileMain->Set("_DynamicOffset", dynamic & 1);
+		tileMain->Set("_DynamicLength", dynamic & 2);
 
-		tileMain->SetFloat("_LengthMin", lengthMin);
-		tileMain->SetFloat("_LengthMax", lengthMax);
+		tileMain->Set("_LengthMin", lengthMin);
+		tileMain->Set("_LengthMax", lengthMax);
 
-		tileMain->SetFloat("_OffsetMin", offsetMin);
-		tileMain->SetFloat("_OffsetMax", offsetMax);
+		tileMain->Set("_OffsetMin", offsetMin);
+		tileMain->Set("_OffsetMax", offsetMax);
 
-		tileMain->SetFloat("_Width", width);
+		tileMain->Set("_Width", width);
 
-		tileMain->SetFloat("_Visible", 0);
-		tileReticleCenter->GetChild("reticle_center")->SetFloat(kTileValue_visible, 1);
+		tileMain->Set("_Visible", 0);
+		tileReticleCenter->GetChild("reticle_center")->Set(kTileValue_visible, 1);
 
 		if (distance == 0)
 		{
-			Float64 worldFOV = 0;
-			GetNumericIniSetting("fDefaultWorldFOV:Display", &worldFOV);
+			const Float64 worldFOV = GetINISetting("fDefaultWorldFOV:Display")->GetAsFloat();
 			distance = 0.2;
 			if (worldFOV <= 160) distance += 0.03 * (160 - worldFOV);
 			if (worldFOV <= 100) distance += 0.02 * (100 - worldFOV);

@@ -12,10 +12,7 @@ enum eEmotion {
 
 class ButtonIcon;
 
-typedef FontManager* (*_FontManager_GetSingleton)(void);
-const _FontManager_GetSingleton FontManager_GetSingleton = reinterpret_cast<_FontManager_GetSingleton>(0x011F33F8);
-
-typedef void (*_ShowMessageBox_Callback)(void);
+typedef void (*_ShowMessageBox_Callback)();
 extern const _ShowMessageBox_Callback ShowMessageBox_Callback;
 
 typedef bool (*_ShowMessageBox)(const char* message, UInt32 unk1, UInt32 unk2, _ShowMessageBox_Callback callback, UInt32 unk4, UInt32 unk5, float unk6, float unk7, ...);
@@ -32,6 +29,15 @@ typedef bool (*_QueueUIMessage)(const char* msg, UInt32 emotion, const char* dds
 extern const _QueueUIMessage QueueUIMessage;
 
 const UInt32 kMaxMessageLength = 0x4000;
+
+class bhkSimpleShapePhantom;
+
+struct PlayerCameraSphere
+{
+	bhkSimpleShapePhantom* unk000;
+	bhkSimpleShapePhantom* unk004;
+};
+
 
 // 584
 class InterfaceManager
@@ -187,8 +193,13 @@ public:
 	// set to 3 at 0x714E96, 0x714E20 - checked at 0x70B94E
 	// set to 4 at 0x714D5D, 0x715177 (CloseAllMenus)
 	// set to 5 at 0x70B972 - checked at 0x70BA84, 0x70CA14, 0x70CC7A
-	UInt32					unk010;				// 010
-	UInt32					unk014;				// 014
+	UInt8					byte010;
+	UInt8					byte011;
+	UInt8					statsMenuTab;
+	UInt8					inventoryMenuTab;
+	UInt8					byte14;
+	UInt8					mapMenuTab;
+	UInt8					gap16[2];
 	UInt32					pickLength;			// 018
 	UInt32					unk01C;				// 01C
 	UInt8					byte020;			// 020
@@ -197,30 +208,31 @@ public:
 	UInt8					byte023;			// 023
 	UInt32					unk024;				// 024
 	TileImage*				cursor;				// 028
-	float					flt02C;				// 02C
-	float					flt030;				// 030
-	float					flt034;				// 034
-	float					cursorX;			// 038
-	float					flt03C;				// 03C
-	float					cursorY;			// 040
-	float					mouseWheel;			// 044	-120.0 = down; 120.0 = up
-	float					flt048;				// 048
+	Float32					flt02C;				// 02C
+	Float32					flt030;				// 030
+	Float32					flt034;				// 034
+	Float32					cursorX;			// 038
+	Float32					flt03C;				// 03C
+	Float32					cursorY;			// 040
+	Float32					mouseWheel;			// 044	-120.0 = down; 120.0 = up
+	Float32					timeLeftClickHeld;	// 048 time in menus only
 	Tile*					draggedTile;		// 04C
-	int						unk050;				// 050
-	float					flt054;				// 054
-	float					flt058;				// 058
-	int						unk05C;				// 05C
-	int						unk060;				// 060
-	int						unk064;				// 064
-	UInt32					unk068[2];			// 068
+	SInt32					dragStartX;			// 050
+	Float32					dragOldX;				// 054
+	Float32					dragOldY;				// 058
+	SInt32					dragStartY;			// 05C
+	Float32					dragNewX;				// 060
+	Float32					dragNewY;				// 064
+	UInt32					unk068;				// 068
+	UInt32					unk06C;				// 06C
 	TList<TESObjectREFR>	selectableRefs;		// 070
 	UInt32					selectedRefIndex;	// 078
 	bool					debugText;			// 07C
-	UInt8					byte07D;			// 07D
+	UInt8					isMouseVisible;		// 07D
 	UInt8					byte07E;			// 07E
 	UInt8					byte07F;			// 07F
-	NiNode*					niNode080;			// 080
-	NiNode*					niNode084;			// 084
+	NiNode*					mainRootNode;			// 080
+	NiNode*					cursorRootNode;			// 084
 	UInt32					unk088;				// 088
 	void*					shaderAccum08C;		// 08C
 	void*					shaderAccum090;		// 090
@@ -231,11 +243,15 @@ public:
 	NiNode*					unk0A4;				// 0A4 saw Tile? seen NiNode
 	UInt32					unk0A8;				// 0A8
 	NiObject*				unk0AC;				// 0AC seen NiAlphaProperty
-	UInt32					unk0B0[3];			// 0B0
+	UInt8					byte0B0;
+	UInt8					byte0B1;
+	UInt16					wrd0B2;
+	UInt32					unk0B4;
+	Tile*					safeZone;
 	Tile*					activeTileAlt;		// 0BC
 	UInt32					unk0C0;				// 0C0
 	UInt32					unk0C4;				// 0C4
-	UInt8					byte0C8;			// 0C8
+	UInt8					shouldHideAllPipboyMenus;			// 0C8
 	UInt8					byte0C9;			// 0C9
 	UInt8					byte0CA;			// 0CA
 	UInt8					byte0CB;			// 0CB
@@ -243,13 +259,16 @@ public:
 	Menu*					activeMenu;			// 0D0
 	Tile*					tile0D4;			// 0D4
 	Menu*					menu0D8;			// 0D8
-	UInt32					unk0DC[2];			// 0DC
+	UInt8					unk0DC;
+	UInt8					IsFullHelp;
+	UInt16					unk0DE;
+	UInt32					unk0E0;
 	UInt8					msgBoxButton;		// 0E4 -1 if no button pressed
 	UInt8					byte0E5;			// 0E5
 	UInt8					byte0E6;			// 0E6
 	UInt8					byte0E7;			// 0E7
 	UInt32					unk0E8;				// 0E8
-	UInt8					byte0EC;			// 0EC
+	UInt8					isEmergencyTextureRelease;			// 0EC
 	UInt8					hasMouseMoved;		// 0ED
 	UInt8					byte0EE;			// 0EE
 	UInt8					byte0EF;			// 0EF
@@ -257,11 +276,12 @@ public:
 	UInt32					unk0F4;				// 0F4
 	UInt32					unk0F8;				// 0F8
 	TESObjectREFR*			crosshairRef;		// 0FC
-	UInt32					unk100[4];			// 100
+	TESObjectREFR*			telekinesisTarget;
+	NiPoint3				pt104;
 	UInt8					byte110;			// 110
 	UInt8					pad111[3];			// 111
 	UInt32					menuStack[10];		// 114
-	void*					ptr13C;				// 13C	Points to a struct, possibly. First member is *bhkSimpleShapePhantom
+	PlayerCameraSphere*		ptr13C;				// 13C	Points to a struct, possibly. First member is *bhkSimpleShapePhantom
 	UInt32					unk140;				// 140
 	UInt32					unk144;				// 144
 	UInt8					byte148;			// 148
@@ -272,30 +292,34 @@ public:
 	UInt32					currentKey;			// 150
 	UInt32					keyRepeatStartTime;	// 154
 	UInt32					lastKeyRepeatTime;	// 158
-	UInt32					unk15C[4];			// 15C
-	void*					renderedMenu;		// 16C
-	UInt8					byte170;			// 170
+	UInt32					unk15C;
+	UInt32					time160;
+	UInt32					ptr164;
+	UInt8					isRenderedMenuSet;
+	UInt8					gap169[3];
+	FORenderedMenu*			renderedMenu;		// 16C
+	UInt8					isMovedMouseInRenderedMenu;			// 170
 	UInt8					byte171;			// 171
 	UInt8					byte172;			// 172
 	UInt8					byte173;			// 173
 	FOPipboyManager*		pipboyManager;		// 174
 	Struct0178				unk178;				// 178
 	VATSHighlightData		vatsHighlightData;	// 1DC
-	float					scale4AC;			// 4AC
-	float					unk4B0;				// 4B0
+	Float32					menuScaledCursorPosX;			// 4AC
+	Float32					menuScaledCursorPosY;				// 4B0
 	UInt8					isRenderedMenuOrPipboyManager;		// 4B4
 	UInt8					byte4B5;			// 4B5
 	UInt8					byte4B6;			// 4B6
 	UInt8					byte4B7;			// 4B7
 	UInt32					queuedPipboyTabToSwitchTo;			// 4B8
 	UInt32					pipBoyMode;			// 4BC
-	void					(*onPipboyOpenCallback)(void);		// 4C0
-	UInt32					unk4C4[2];			// 4C4
-	UInt8					byte4CC;			// 4CC
-	UInt8					byte4CD;			// 4CD
+	void					(*onPipboyOpenCallback)();		// 4C0
+	TList<void>				list4C4;			// 4C4
+	UInt8					isDestroyAllMenus;			// 4CC
+	UInt8					preventLevelUpTillContainerOpened;			// 4CD
 	UInt8					pad4CE;				// 4CE
 	UInt8					pad4CF;				// 4CF
-	UInt32					unk4D0;				// 4D0
+	Float32					unk4D0;				// 4D0
 	Tutorials				help;				// 4D4
 
 	InterfaceManager();
@@ -305,6 +329,13 @@ public:
 
 	UInt32						GetTopVisibleMenuID();
 	Tile*						GetActiveTile();
+
+	char GetMessageBoxResult()
+	{
+		auto button = this->msgBoxButton;
+		this->msgBoxButton = -1;
+		return button;
+	};
 };
 static_assert(sizeof(InterfaceManager) == 0x580);
 static_assert(sizeof(InterfaceManager::Struct0178) == 0x64);
@@ -397,12 +428,42 @@ struct FontInfo {
 		UInt16	wrd006;	// 006	Init'd to 0x0FFFF
 	};	// 0008
 
-	struct FontData {
-		float	flt000;				// 000
-		UInt32	fontTextureCount;	// 004
-		UInt32	unk008;
-		char	unk00C[8][0x024];	// array of 8 Font Texture Name (expected in Textures\Fonts\*.tex)
+
+	// 3928
+	struct FontData
+	{
+		struct TexFileName
+		{
+			UInt32			unk00;
+			char			fileName[0x20];
+		};
+
+		struct CharDimensions
+		{
+			float			flt00;		// 0
+			float			flt04;		// 4
+			float			flt08;		// 8
+			float			flt0C;		// C
+			float			flt10;		// 10
+			float			flt14;		// 14
+			float			flt18;		// 18
+			float			flt1C;		// 1C
+			float			flt20;		// 20
+			float			width;		// 24
+			float			height;		// 28
+			float			flt2C;		// 2C
+			float			widthMod;	// 30
+			float			flt34;		// 34
+		//	totalWidth = width + widthMod
+		};
+		static_assert(sizeof(CharDimensions) == 0x38);
+
+		float			lineHeight;				// 0000
+		UInt32			numTextures;			// 0004
+		TexFileName		textures[8];			// 0008
+		CharDimensions	charDimensions[256];	// 0128
 	};
+	static_assert(sizeof(FontData) == 0x3928);
 
 	struct TextReplaced {
 		String	str000;	// 000	Init'd to ""
@@ -415,15 +476,15 @@ struct FontInfo {
 		UInt8	fill[3];
 	};	// 020
 
-	UInt16						unk000;			// 000	Init'd to 0, loaded successfully in OBSE (word bool ?)
-	UInt16						pad002;			// 002
-	char* path;			// 004	Init'd to arg2, passed to OpenBSFile
+	UInt8						isLoaded;		// 000	Init'd to 0, loaded successfully in OBSE (word bool ?)
+	UInt8						pad01[3];		// 001
+	char*						filePath;		// 004	Init'd to arg2, passed to OpenBSFile
 	UInt32						id;				// 008	1 based, up to 8 apparently
-	NiObject* unk00C[8];	// 00C	in OBSE: NiTexturingProperty			* textureProperty
+	NiObject*					unk00C[8];		// 00C	in OBSE: NiTexturingProperty			* textureProperty
 	float						unk02C;			// 02C	Those two values seem to be computed by looping through the characters in the font (max height/weight ?)
 	float						unk030;			// 030
 	UInt32						unk034;			// 038	in OBSE: NiD3DShaderConstantMapEntry	* unk34;
-	FontData* fontData;		// 038	Init'd to 0, might be the font content, at Unk004 we have the count of font texture
+	FontData*					fontData;		// 038	Init'd to 0, might be the font content, at Unk004 we have the count of font texture
 	Data03C						dat03C;			// 03C
 	BSSimpleArray<ButtonIcon>	unk044;			// 044
 
@@ -441,10 +502,10 @@ public:
 	// 3C
 
 
-	FontInfo* fontInfos[8];		// 00
+	FontInfo*			fontInfos[8];		// 00
 	UInt8				byte20;				// 20
 	UInt8				pad21[3];			// 21
-	FontInfo* extraFonts[80];	// 24
+	FontInfo*			extraFonts[80];		// 24
 
 	NiPoint3* GetStringDimensions(NiPoint3* outDims, const char* srcString, UInt32 fontID, Float32 wrapwidth = 0x7F7FFFFF, UInt32 startIdx = 0) { return ThisCall<NiPoint3*>(0xA1B020, this, outDims, srcString, fontID, wrapwidth, startIdx); };
 	NiPoint3* GetStringDimensions(const char* srcString, UInt32 fontID, Float32 wrapwidth = 0x7F7FFFFF, UInt32 startIdx = 0)
@@ -452,6 +513,8 @@ public:
 		NiPoint3 out;
 		return GetStringDimensions(&out, srcString, fontID, wrapwidth, startIdx);
 	}
+
+	std::string StringShorten(const std::string& str, const UInt32 font, const Float32 max) const;
 
 	static FontManager* GetSingleton() { return *reinterpret_cast<FontManager**>(0x11F33F8); };
 };
@@ -482,7 +545,6 @@ struct __declspec(align(4)) FontTextReplaced
 		wrapLines = 0;
 		length = 0;
 		newLineCharacter = 0;
-		lineWidths.Init();
 	}
 	;
 
@@ -502,7 +564,7 @@ static void(__thiscall* Font__CheckForVariablesInText)(FontInfo*, const char* in
 class DebugText
 {
 public:
-	virtual void    Unk_00(void);
+	virtual void    Unk_00();
 	virtual void    Unk_01(UInt32 arg1, UInt32 arg2);
 	virtual UInt32  Unk_02(UInt32 arg1, UInt32 arg2, UInt32 arg3, UInt32 arg4, UInt32 arg5, UInt32 arg6);
 	virtual UInt32  Unk_03(UInt32 arg1, UInt32 arg2, UInt32 arg3, UInt32 arg4);
@@ -520,7 +582,7 @@ public:
 		float           offsetX;    // 00
 		float           offsetY;    // 04
 		UInt32          alignment;  // 08
-		NiNode* node;       // 0C
+		NiNode*			node;       // 0C
 		String          text;       // 10
 		float           flt18;      // 18    Always -1.0
 		NiColorAlpha    color;      // 1C

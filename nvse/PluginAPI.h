@@ -51,7 +51,7 @@ struct NVSEInterface
 
 	// call during your Query or Load functions to get a PluginHandle uniquely identifying your plugin
 	// invalid if called at any other time, so call it once and save the result
-	PluginHandle	(*GetPluginHandle)(void);
+	PluginHandle	(*GetPluginHandle)();
 
 	// CommandReturnType enum defined in CommandTable.h
 	// does the same as RegisterCommand but includes return type; *required* for commands returning arrays
@@ -251,7 +251,7 @@ struct NVSEMessagingInterface
 *	TESForm*, a C string, a double-precision float, or an Array*; the latter allows for the creation 
 *	of multi-dimensional arrays.
 *
-*	The three "Create" functions accept a size, an array of Element values, the script from which
+*	The three "Creator" functions accept a size, an array of Element values, the script from which
 *	your command was invoked, and (for map-types) an array of Element keys of the appropriate type.
 *	The arrays of keys and values should be of the same size and ordered so that key[i] corresponds to
 *	value[i]. Pass a size of 0 to create an empty array. The creation methods return NULL if creation 
@@ -344,7 +344,7 @@ struct NVSEArrayVarInterface
 		TESForm*		Form() { return dataType == kType_Form ? form : NULL; }
 		const char*		String() { return dataType == kType_String ? str : NULL; }
 		Array*			Array() { return dataType == kType_Array ? arr : NULL; }
-		void			Reset() { if (dataType == kType_String) { FormHeapFree(str); dataType = kType_Invalid; str = NULL; } }
+		void			Reset() { if (dataType == kType_String) { GameHeapFree(str); dataType = kType_Invalid; str = NULL; } }
 
 	};
 
@@ -451,14 +451,14 @@ struct NVSECommandTableInterface
 	};
 
 	UInt32	version;
-	const CommandInfo*	(* Start)(void);
-	const CommandInfo*	(* End)(void);
+	const CommandInfo*	(* Start)();
+	const CommandInfo*	(* End)();
 	CommandInfo*		(* GetByOpcode)(UInt32 opcode);
 	CommandInfo*		(* GetByName)(const char* name);
 	UInt32				(* GetReturnType)(const CommandInfo* cmd);		// return type enum defined in CommandTable.h
 	UInt32				(* GetRequiredNVSEVersion)(const CommandInfo* cmd);
-	const PluginInfo*	(* GetParentPlugin)(const CommandInfo* cmd);	// returns a pointer to the PluginInfo of the NVSE plugin that adds the command, if any. returns NULL otherwise
-	const PluginInfo*	(* GetPluginInfoByName)(const char *pluginName);	// Returns a pointer to the PluginInfo of the NVSE plugin of the specified name; returns NULL is the plugin is not loaded.
+	PluginInfo*			(* GetParentPlugin)(const CommandInfo* cmd);	// returns a pointer to the PluginInfo of the NVSE plugin that adds the command, if any. returns NULL otherwise
+	PluginInfo*			(* GetPluginInfoByName)(const char *pluginName);	// Returns a pointer to the PluginInfo of the NVSE plugin of the specified name; returns NULL is the plugin is not loaded.
 };
 
 /**** script API docs **********************************************************
@@ -953,7 +953,7 @@ struct NVSELoggingInterface
 	// The path is relative to base game folder.
 	// If empty string (logPath[0] == 0), use the base game folder.
 	// xNVSE ensures this isn't passed as nullptr.
-	const wchar_t* logPath;
+	const char* (__fastcall* GetPluginLogPath)();
 };
 #endif
 
@@ -979,7 +979,7 @@ typedef bool (* _NVSEPlugin_Load)(const NVSEInterface * nvse);
  *	This is required to prevent conflicts between multiple plugins, as each
  *	command must be assigned a unique opcode.
  *	
- *	The base API is pretty simple. Create a project based on the
+ *	The base API is pretty simple. Creator a project based on the
  *	yUI project included with the NVSE source code, then define
  *	and export these functions:
  *	

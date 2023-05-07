@@ -1,11 +1,11 @@
 #include "dinput8.h"
-
-#include <cassert>
-
 #include "SafeWrite.h"
-#include <queue>
 
 #include "Utilities.h"
+
+#include <queue>
+#include <cassert>
+
 
 static const GUID GUID_SysMouse		= { 0x6F1D2B60, 0xD5A0, 0x11CF, { 0xBF,0xC7,0x44,0x45,0x53,0x54,0x00,0x00} };
 static const GUID GUID_SysKeyboard	= { 0x6F1D2B61, 0xD5A0, 0x11CF, { 0xBF,0xC7,0x44,0x45,0x53,0x54,0x00,0x00} };
@@ -35,14 +35,14 @@ public:
 		return m_device->QueryInterface(riid,ppvObj);
 	}
 
-	ULONG _stdcall AddRef(void)
+	ULONG _stdcall AddRef()
 	{
 		m_refs++;
 
 		return m_refs;
 	}
 
-	ULONG _stdcall Release(void)
+	ULONG _stdcall Release()
 	{
 		m_refs--;
 
@@ -63,8 +63,8 @@ public:
 	HRESULT _stdcall EnumObjects(LPDIENUMDEVICEOBJECTSCALLBACKA a,LPVOID b,DWORD c) { return m_device->EnumObjects(a,b,c); }
 	HRESULT _stdcall GetProperty(REFGUID a,DIPROPHEADER* b) { return m_device->GetProperty(a,b); }
 	HRESULT _stdcall SetProperty(REFGUID a,const DIPROPHEADER* b) { return m_device->SetProperty(a,b); }
-	HRESULT _stdcall Acquire(void) { return m_device->Acquire(); }
-	HRESULT _stdcall Unacquire(void) { return m_device->Unacquire(); }
+	HRESULT _stdcall Acquire() { return m_device->Acquire(); }
+	HRESULT _stdcall Unacquire() { return m_device->Unacquire(); }
 
 	HRESULT _stdcall GetDeviceState(DWORD outDataLen, LPVOID outData)
 	{
@@ -133,7 +133,7 @@ public:
 	HRESULT _stdcall SendForceFeedbackCommand(DWORD a) { return m_device->SendForceFeedbackCommand(a); }
 	HRESULT _stdcall EnumCreatedEffectObjects(LPDIENUMCREATEDEFFECTOBJECTSCALLBACK a,LPVOID b,DWORD c) { return m_device->EnumCreatedEffectObjects(a,b,c); }
 	HRESULT _stdcall Escape(LPDIEFFESCAPE a) { return m_device->Escape(a); }
-	HRESULT _stdcall Poll(void) { return m_device->Poll(); }
+	HRESULT _stdcall Poll() { return m_device->Poll(); }
 	HRESULT _stdcall SendDeviceData(DWORD a,LPCDIDEVICEOBJECTDATA b,LPDWORD c,DWORD d) { return m_device->SendDeviceData(a,b,c,d); }
 	HRESULT _stdcall EnumEffectsInFile(LPCSTR a,LPDIENUMEFFECTSINFILECALLBACK b,LPVOID c,DWORD d) { return m_device->EnumEffectsInFile(a,b,c,d); }
 	HRESULT _stdcall WriteEffectToFile(LPCSTR a,DWORD b,LPDIFILEEFFECT c,DWORD d) { return m_device->WriteEffectToFile(a,b,c,d); }
@@ -156,14 +156,14 @@ public:
 	/*** IUnknown methods ***/
 	HRESULT _stdcall QueryInterface (REFIID riid, LPVOID* ppvObj) { return m_realDInput->QueryInterface(riid, ppvObj); }
 
-	ULONG _stdcall AddRef(void)
+	ULONG _stdcall AddRef()
 	{
 		m_refs++;
 
 		return m_refs;
 	}
 
-	ULONG _stdcall Release(void)
+	ULONG _stdcall Release()
 	{
 		m_refs--;
 
@@ -502,7 +502,7 @@ m_averageFrameTime(0)
 		m_frameTimeHistory[i] = 0;
 }
 
-void FramerateTracker::Update(void)
+void FramerateTracker::Update()
 {
 	DWORD time = GetTickCount64();
 
@@ -534,4 +534,77 @@ void FramerateTracker::Update(void)
 		// report 0 frametime until primed
 		m_averageFrameTime = 0;
 	}
+}
+
+ControlName** g_keyNames = (ControlName**)0x011D52F0;
+ControlName** g_mouseButtonNames = (ControlName**)0x011D5240;
+ControlName** g_joystickNames = (ControlName**)0x011D51B0;
+ControlName** g_controllerNames = (ControlName**)0x011D5268;
+
+
+std::string GetStringForScancode(UInt32 keycode, UInt32 device)
+{
+	std::string keyName = "--";
+
+	if (!keycode) return keyName;
+
+	if (device & 1)
+	{
+		if (keycode > 220)
+		{
+			if (keycode == 221)
+				keyName = "Select";
+		}
+		else if (g_keyNames[keycode])
+			keyName = g_keyNames[keycode]->name;
+	}
+	if (device & 2)
+	{
+		if (255 <= keycode && keycode <= 263)
+		{
+			if (keycode == 255)
+				keycode = 256;
+			if (g_mouseButtonNames[keycode - 256])
+				keyName = g_mouseButtonNames[keycode - 256]->name;
+		}
+		else if (keycode == 264)
+			keyName = "WheelUp";
+		else if (keycode == 265)
+			keyName = "WheelDown";
+
+	}
+	if (device & 4)
+	{
+		if (g_joystickNames[keycode])
+			keyName = g_joystickNames[keycode]->name;
+	}
+	if (device & 8)
+	{
+		if (g_joystickNames[keycode])
+			keyName = g_joystickNames[keycode]->name;
+	}
+	return keyName;
+}
+
+std::unordered_map<UInt32, std::string> controllerButtons{
+	{0x20, "back"}, {0x40, "ls"}, {0x80, "rs"},
+	{0x100, "lb"}, {0x200, "rb"}, {0x1000, "a"},
+	{0x2000, "b"}, {0x4000, "x"}, {0x8000, "y"}
+};
+
+bool IsViableControllerString(UInt32 keycode)
+{
+	return controllerButtons.contains(keycode);
+}
+
+std::string GetControllerString(UInt32 keycode)
+{
+	if (controllerButtons.contains(keycode)) return "glow_general_button_" + controllerButtons[keycode] + ".dds";
+
+	if (keycode == 0x1) return "Up";
+	if (keycode == 0x2) return "Down";
+	if (keycode == 0x10) return "Start";
+	if (keycode == 0x400) return "Guide";
+
+	return "--";
 }

@@ -1,7 +1,7 @@
 #include <main.h>
-#include <Reference.h>
+#include <TESObjectREFR.h>
 #include <GameData.h>
-#include <Menus.h>
+#include <Menu.h>
 
 void InitSingletons()
 {
@@ -104,7 +104,7 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	DispatchEvent = g_eventInterface->DispatchEvent;
 
 	g_loggingInterface = static_cast<NVSELoggingInterface*>(nvse->QueryInterface(kInterface_LoggingInterface));
-	auto path = std::filesystem::path(g_loggingInterface->logPath);
+	auto path = std::filesystem::path(g_loggingInterface->GetPluginLogPath());
 	path += yUI_LOG;
 	Log::Init(path, yUI_STR);
 	

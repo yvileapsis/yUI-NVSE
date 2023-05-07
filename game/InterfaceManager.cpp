@@ -1,5 +1,5 @@
 #include <InterfaceManager.h>
-#include <Reference.h>
+#include <TESObjectREFR.h>
 #include <SafeWrite.h>
 
 const _QueueUIMessage QueueUIMessage = reinterpret_cast<_QueueUIMessage>(0x007052F0);	// Called from Cmd_AddSpell_Execute
@@ -15,27 +15,48 @@ void FontTextReplaced::GetVariableEscapedText(const char* input) { Font__CheckFo
 
 FontInfo* FontInfo::Load(const char* path, UInt32 ID)
 {
-	FontInfo* info = (FontInfo*)FormHeapAlloc(sizeof(FontInfo));
+	FontInfo* info = (FontInfo*)GameHeapAlloc(sizeof(FontInfo));
 	return (FontInfo*)ThisStdCall(0x00A12020, info, ID, path, 1);
 }
 
 bool FontInfo::GetName(char* out)
 {
-	UInt32 len = strlen(path);
+	UInt32 len = strlen(filePath);
 	len -= 4;					// '.fnt'
 	UInt32 start = len;
-	while (path[start - 1] != '\\') {
+	while (filePath[start - 1] != '\\') {
 		start--;
 	}
 
 	len -= start;
 
-	memcpy(out, path + start, len);
+	memcpy(out, filePath + start, len);
 	out[len] = 0;
 
 	return true;
 }
 
+std::string FontManager::StringShorten(const std::string& str, const UInt32 font, const Float32 max) const
+{
+	if (str.empty() || font < 1) return "";
+
+	const auto charDimensions = fontInfos[font - 1]->fontData->charDimensions;
+
+	const auto dotDims = charDimensions['.'];
+	const auto dotWidth = (dotDims.width + dotDims.widthMod + dotDims.flt2C) * 3.0;
+	Float64 accumulator = 0;
+	UInt32 length = 0;
+
+	for (const auto iterChar : str)
+	{
+		if (accumulator + dotWidth < max) length++;
+		if (accumulator >= max) return str.substr(0, length) + "...";
+		const auto charDims = charDimensions[iterChar];
+		// < 100 is a sanity check because cyrillic fonts for whatever reason have this value ruined
+		accumulator += charDims.width + charDims.flt2C + charDims.widthMod < 100 ? charDims.widthMod : 0;
+	}
+	return str;
+}
 
 void InterfaceManager::VATSHighlightData::AddRef(TESObjectREFR* ref)
 {
@@ -99,4 +120,9 @@ __declspec(naked) UInt32 InterfaceManager::GetTopVisibleMenuID()
 	done :
 		retn
 	}
+}
+
+Tile* InterfaceManager::GetActiveTile()
+{
+	return activeTile ? activeTile : activeTileAlt;
 }

@@ -1,10 +1,10 @@
-#include <Reference.h>
+#include <TESObjectREFR.h>
 #include <main.h>
 #include <SafeWrite.h>
 #include <SimpleINILibrary.h>
 
 #include <InventoryChanges.h>
-#include <GameRTTI.h>
+#include <RTTI.h>
 
 namespace Fix::ProjectileEffects
 {

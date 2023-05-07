@@ -1,5 +1,5 @@
 #pragma once
-#include <Menus.h>
+#include <Menu.h>
 
 namespace SortingIcons
 {
