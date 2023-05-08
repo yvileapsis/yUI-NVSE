@@ -227,7 +227,7 @@ namespace UserInterface::LootMenu
 
 				fst->Set("_Equip", snd->GetEquipped());
 
-				const auto& category = SortingIcons::Category::Get(snd->form->TryGetREFRParent());
+				const auto category = SortingIcons::Icon::Get(SortingIcons::Item::Get(snd->form->TryGetREFRParent()));
 				if (category->IsValid() && !category->filename.empty())
 				{
 					fst->Set("_Icon", true);

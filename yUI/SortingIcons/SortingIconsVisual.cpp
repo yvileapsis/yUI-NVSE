@@ -30,11 +30,17 @@ namespace SortingIcons::Icons
 		return true;
 	}
 
-	void InjectIconTile(const Category* category, Tile* tile)
+	void InjectIconTile(const Icon* category, Tile* tile)
 	{
 		if (!category->IsValid()) return;
 
-		const auto [tag, priority, xmltemplate, filename, texatlas, font, systemcolor] = *category;
+		const auto tag = category->tag;
+		const auto priority = category->priority;
+		const auto xmltemplate = category->xmltemplate;
+		const auto filename = category->filename;
+		const auto texatlas = category->texatlas;
+		const auto font = category->font;
+		const auto systemcolor = category->systemcolor;
 
 		if (filename.empty()) return;
 
@@ -82,7 +88,7 @@ namespace SortingIcons::Icons
 	void __fastcall InjectTileSetTileString(Tile* tile, const InventoryChanges* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate)
 	{
 		tile->Set(tilevalue, tileText, propagate);
-		if (entry && entry->form && TryGetTypeOfForm(entry->form)) InjectIconTile(Category::Get(entry->form), tile);
+		if (entry && entry->form && TryGetTypeOfForm(entry->form)) InjectIconTile(Icon::Get(Item::Get(entry->form)), tile);
 	}
 
 	void __fastcall TagImageSetStringValue(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate)
@@ -97,7 +103,7 @@ namespace SortingIcons::Icons
 			icon->Set(kTileValue_y, 8, propagate);
 		}
 
-		const auto category = Category::Get(entry->form);
+		const auto category = Icon::Get(Item::Get(entry->form));
 		tile->Set(tilevalue, category->IsValid() && !category->filename.empty() ? category->filename.c_str() : src, propagate);
 	}
 
@@ -114,7 +120,7 @@ namespace SortingIcons::Icons
 		tile->Set(kTileValue_x, compassRoseX + 3, propagate);
 		tile->Set(kTileValue_y, compassRoseY + 3, propagate);
 
-		const auto category = Category::Get(entry->form);
+		const auto category = Icon::Get(Item::Get(entry->form));
 		tile->Set(tilevalue, category->IsValid() && !category->filename.empty() ? category->filename.c_str() : src, propagate);
 	}
 
@@ -125,7 +131,7 @@ namespace SortingIcons::Icons
 
 		const auto ref = HUDMainMenu::GetSingleton()->crosshairRef;
 		const auto item = !ref ? nullptr : ref->baseForm;
-		const auto category = Category::Get(item);
+		const auto category = Icon::Get(Item::Get(item));
 
 		auto icon = tile->GetChild("ySIImage");
 		if (!icon) icon = tile->AddTileFromTemplate("ySIDefault");
