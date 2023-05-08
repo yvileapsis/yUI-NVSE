@@ -797,8 +797,8 @@ namespace SortingIcons::Sorting
 			const auto [tile1, entry1, byte1, pad1] = *item1;
 			const auto [tile2, entry2, byte2, pad2] = *item2;
 
-			const Object* tag1 = nullptr;
-			const Object* tag2 = nullptr;
+			Object* tag1 = nullptr;
+			Object* tag2 = nullptr;
 
 			if (entry1 && entry1->form)
 				if (const auto form1 = entry1->form->TryGetREFRParent())
@@ -811,17 +811,17 @@ namespace SortingIcons::Sorting
 
 			if (bCategories && !g_Keyrings.empty())
 			{
-				if (!tag1 && tile1)
+				if (!tag1 && !entry1)
 				{
-//					tag1 = Keyring::Get(tile1);
+					tag1 = Keyring::Get(tile1);
 				}
-				if (!tag2 && tile2)
+				if (!tag2 && !entry2)
 				{
-//					tag2 = Keyring::Get(tile2);
+					tag2 = Keyring::Get(tile2);
 				}
 			}
 
-			if (const auto cmp = tag1 <=> tag2; cmp != nullptr) return cmp._Value;
+			if (const auto cmp = Object::Compare(tag1, tag2); cmp != 0) return cmp;
 
 		}
 		return 0;

@@ -29,7 +29,12 @@ namespace SortingIcons
 
 		virtual bool IsValid() const { return true; };
 
-		bool operator<(const Object& rhs) const { return tag < rhs.tag; }
+		static signed char Compare(const Object* lhs, const Object* rhs)
+		{
+			if (!lhs) return -1;
+			if (!rhs) return 1;
+			return (lhs->tag <=> rhs->tag)._Value;
+		}
 	};
 
 	class Item : public Object
