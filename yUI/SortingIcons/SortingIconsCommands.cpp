@@ -56,7 +56,9 @@ namespace SortingIcons::Commands
 		if (!form) return true;
 		const auto tochange = std::string(src);
 		if (tochange == "tag" || tochange == "string") {
-//			Icon::Set(form, Item::Get(newstring));
+			for (const auto& iter : g_Items)
+				if (iter->tag == tochange)
+					Item::Set(form, iter.get());
 			*result = 1;
 		}
 		else if (tochange == "icon" || tochange == "filename") {
