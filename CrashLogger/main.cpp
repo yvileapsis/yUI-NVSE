@@ -4,6 +4,8 @@
 #include <Menu.h>
 
 #include "CrashLog.h"
+#include <format>
+#include <random>
 
 void InitSingletons()
 {
@@ -19,6 +21,7 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	{
 		InitSingletons();
 		//Log() << CrashLogger_VERSION_STR;
+		Log() << "";
 
 		for (const auto& i : deferredInit) i(); // call all deferred init functions
 	}
@@ -30,6 +33,59 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 		}
 		for (const auto& i : mainLoop) i(); // call all mainloop functions
 	}
+}
+
+std::vector<std::string> author{
+	"",
+	"",
+	"",
+	"Yvile's ",
+	"Yvile's ",
+	"Yvile's ",
+	"Yvile's Yvile's ",
+	"Yvile's Cobb's ",
+	"Yvileapsis' ",
+	"Yvileapsis' ",
+	"Yvileapsis' ",
+	"Yvileapsis' Cobb's ",
+	"Yvileapsis' Yvile's ",
+	"Joe Cobb's ",
+	"(Not Really) Cobb's ",
+	"Trooper's ",
+	"Pepe's ",
+};
+
+std::vector<std::string> names{
+	"Crash Logger",
+	"Crash Logger",
+	"Crash Logger",
+	"Crash Logger",
+	"Crash Logger",
+	"Crash Blogger",
+	"AAAAAAA IT CRASHED",
+	"Obsurdian Ls Logger",
+	"Bugthesda Ls Logger",
+	"Rash Clogger",
+};
+
+std::vector<std::string> edition{
+	"",
+	"",
+	"",
+	"",
+	"",
+	": Ultimate Edition",
+	" NVSE",
+	" (NVSE)",
+	" Tweaks",
+	" (April's Fools Edition)",
+};
+
+std::string GetName()
+{
+	std::random_device dev;
+	srand(dev());
+	return author[std::rand() % author.size()] + names[std::rand() % names.size()] + edition[std::rand() % edition.size()];
 }
 
 bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
@@ -64,7 +120,8 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 
 	}
 
-	Log() << FormatString("Yvile's Cobb Crash Logger Version %s. At %s", CrashLogger_VERSION_STR, std::to_string(std::chrono::system_clock::to_time_t(std::chrono::system_clock::now())).c_str());
+	Log() << GetName() + " version " + CrashLogger_VERSION_STR + " at " + std::format("{0:%F} {0:%T}", std::chrono::time_point(std::chrono::system_clock::now()));
+
 	Log() << ("If this file is empty, then your game didn't crash! :snig: \n");
 
 	CrashLogger::NVVtables::FillLabels();

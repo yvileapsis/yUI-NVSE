@@ -207,9 +207,7 @@ void ModConfigurationMenu::SaveModJSON(std::string mod)
 	j.clear();
 
 	for (const auto& setting : settingsMain.listBox.list)
-	{
 		setting->object->SaveJSON(reinterpret_cast<JSON&>(j));
-	}
 
 	i << j;
 	i.close();
@@ -224,18 +222,7 @@ void ModConfigurationMenu::LoadModJSON(std::string mod)
 	i >> j;
 
 	for (const auto& setting : settingsMain.listBox.list)
-	{
 		setting->object->LoadJSON(JSON(j));
-	}
-
-	/*
-	for (const auto& setting : setSettings)
-	{
-		std::vector<CMValue> vector;
-		for (const auto& iter : j[setting->GetID()])
-			vector.push_back(CMValue(JSON(iter)));
-		setting->SetValues(vector);
-	}*/
 }
 
 void CMSettingCategory::SaveJSON(JSON& elem)
@@ -243,7 +230,6 @@ void CMSettingCategory::SaveJSON(JSON& elem)
 	for (const auto setting : ModConfigurationMenu::GetSingleton()->GetSettingsForString(categoryID))
 		setting->SaveJSON(reinterpret_cast<JSON&>(elem[GetID()]));
 }
-
 
 void CMSettingCategory::LoadJSON(const JSON& elem)
 {
