@@ -28,7 +28,7 @@ namespace SortingIcons
 		Object(const Files::JSON& elem);
 
 		virtual bool IsValid() const { return true; };
-
+		virtual bool Satisfies(TESForm* form) const { return true; }
 		static signed char Compare(const Object* lhs, const Object* rhs)
 		{
 			if (!lhs) return -1;
@@ -51,7 +51,7 @@ namespace SortingIcons
 		Item(const Files::JSON& elem);
 
 		bool IsValid() const override;
-		virtual bool Satisfies(TESForm* form) const;
+		bool Satisfies(TESForm* form) const override;
 
 		static Item* Set(TESForm* form, Item* item);
 		static Item* Get(TESForm* form);
@@ -134,9 +134,11 @@ namespace SortingIcons
 
 		virtual bool IsKey() { return false; }
 		virtual bool IsInventory() { return false; }
+
 		bool SatisfiesForm(TESForm* form) const;
 		bool SatisfiesTag(std::string tag) const;
-		virtual bool Satisfies(TESForm* form) const;
+
+		bool Satisfies(TESForm* form) const override;
 	};
 
 	class Tab : public Category

@@ -453,9 +453,9 @@ namespace SortingIcons::Keyrings::Hook
 		}
 	}
 
+	// push additional arg to filter function
 	template<UInt32 retn> __declspec(naked) void ContainerEntryListBoxFilterPre()
 	{
-		// push additional arg to filter function
 		static const UInt32 retnAddr = retn;
 		__asm
 		{
@@ -468,19 +468,19 @@ namespace SortingIcons::Keyrings::Hook
 		}
 	}
 
+	// fix stack
 	template<UInt32 retn> __declspec(naked) void ContainerEntryListBoxFilterPost()
 	{
-		// fix stack
 		static const UInt32 retnAddr = retn;
 		__asm
 		{
 			add		esp, 4
 			test	al, al
 			jz		wah
-			mov[ebp - 0x24], 1
+			mov		[ebp - 0x24], 1
 			jmp		retnAddr
 		wah :
-			mov[ebp - 0x24], 0
+			mov		[ebp - 0x24], 0
 			jmp		retnAddr
 		}
 	}
@@ -797,8 +797,8 @@ namespace SortingIcons::Sorting
 			const auto [tile1, entry1, byte1, pad1] = *item1;
 			const auto [tile2, entry2, byte2, pad2] = *item2;
 
-			Object* tag1 = nullptr;
-			Object* tag2 = nullptr;
+			const Object* tag1 = nullptr;
+			const Object* tag2 = nullptr;
 
 			if (entry1 && entry1->form)
 				if (const auto form1 = entry1->form->TryGetREFRParent())
@@ -882,7 +882,6 @@ namespace SortingIcons::Sorting::Hook
 	template<UInt32 retn> __declspec(naked) void InventoryMenu()
 	{
 		static const auto CompareItems = reinterpret_cast<UInt32>(Sorting::CompareItems);
-		static const UInt32 InventoryChanges_GetFullName = 0x4BE2D0;
 		static const UInt32 retnAddr = retn;
 		_asm
 		{
