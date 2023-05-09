@@ -39,9 +39,9 @@ namespace SortingIcons::Commands
 		if (!form) return true;
 		const auto tochange = std::string(src);
 		if (tochange == "category" || tochange == "tag" || tochange == "string")
-			AssignString(PASS_COMMAND_ARGS, Category::Get(form)->tag.c_str());
+			AssignString(PASS_COMMAND_ARGS, Item::Get(form)->tag.c_str());
 		else if (tochange == "icon" || tochange == "filename")
-			AssignString(PASS_COMMAND_ARGS, Category::Get(form)->filename.c_str());
+			AssignString(PASS_COMMAND_ARGS, Icon::Get(Item::Get(form))->filename.c_str());
 		return true;
 	}
 
@@ -56,11 +56,13 @@ namespace SortingIcons::Commands
 		if (!form) return true;
 		const auto tochange = std::string(src);
 		if (tochange == "tag" || tochange == "string") {
-			Category::Get(newstring)->Set(form);
+			for (const auto& iter : g_Items)
+				if (iter->tag == tochange)
+					Item::Set(form, iter.get());
 			*result = 1;
 		}
 		else if (tochange == "icon" || tochange == "filename") {
-			Category::Get(form)->filename = std::string(newstring);
+//			Icon::Get(form)->filename = std::string(newstring);
 			*result = 1;
 		}
 		return true;

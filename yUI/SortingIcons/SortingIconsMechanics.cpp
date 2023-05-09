@@ -9,20 +9,26 @@
 
 namespace SortingIcons
 {
-	inline bool Item::Common::Satisfies(TESForm* form) const
-	{
-		if (!formIDs.empty() &&				!formIDs.contains(form->refID)) return false;
-		if (!formType.empty() &&			!formType.contains(form->typeID)) return false;
 
-		if (questItem.has_value() &&		questItem.value() != form->IsQuestItem2()) return false;
-		if (miscComponent.has_value() &&	miscComponent.value() != CraftingComponents::IsComponent(form)) return false;
-		if (miscProduct.has_value() &&		miscProduct.value() != CraftingComponents::IsProduct(form)) return false;
+	bool Item::Satisfies(TESForm* form) const
+	{
+		if (!formIDs.empty() && !formIDs.contains(form->refID)) return false;
+		if (!formType.empty() && !formType.contains(form->typeID)) return false;
+
+		if (questItem.has_value() && questItem.value() != form->IsQuestItem2()) return false;
+		if (miscComponent.has_value() && miscComponent.value() != CraftingComponents::IsComponent(form)) return false;
+		if (miscProduct.has_value() && miscProduct.value() != CraftingComponents::IsProduct(form)) return false;
 
 		return true;
 	}
 
-	inline bool Item::Weapon::Satisfies(TESObjectWEAP* weapon) const
+	bool Weapon::Satisfies(TESForm* form) const
 	{
+		if (!Item::Satisfies(form)) return false;
+		if (form->typeID != kFormType_TESObjectWEAP) return true;
+
+		const auto weapon = reinterpret_cast<TESObjectWEAP*>(form);
+
 		if (!skill.empty() && !skill.contains(weapon->weaponSkill)) return false;
 		if (!type.empty() && !type.contains(weapon->eWeaponType)) return false;
 		if (!handgrip.empty() && !handgrip.contains(weapon->HandGrip())) return false;
@@ -48,8 +54,13 @@ namespace SortingIcons
 		return true;
 	}
 
-	inline bool Item::Armor::Satisfies(TESObjectARMO* armor) const
+	bool Armor::Satisfies(TESForm* form) const
 	{
+		if (!Item::Satisfies(form)) return false;
+		if (form->typeID != kFormType_TESObjectARMO) return true;
+
+		const auto armor = reinterpret_cast<TESObjectARMO*>(form);
+
 		if (slotsMaskWL && (slotsMaskWL & armor->GetArmorValue(6)) != slotsMaskWL) return false;
 		if (slotsMaskBL && (slotsMaskBL & armor->GetArmorValue(6)) != 0) return false;
 		if (armorClass && armorClass != armor->GetArmorValue(1)) return false;
@@ -60,12 +71,16 @@ namespace SortingIcons
 		if (dr && dr > armor->armorRating) return false;
 //		if (armorChangesAV &&	armorChangesAV > armor->armorRating) continue;
 
-
 		return true;
 	}
 
-	inline bool Item::Aid::Satisfies(AlchemyItem* aid) const
+	bool Aid::Satisfies(TESForm* form) const
 	{
+		if (!Item::Satisfies(form)) return false;
+		if (form->typeID != kFormType_AlchemyItem) return true;
+
+		const auto aid = reinterpret_cast<AlchemyItem*>(form);
+
 		if (restoresAV && !aid->HasBaseEffectRestoresAV(restoresAV)) return false;
 		if (damagesAV && !aid->HasBaseEffectDamagesAV(damagesAV)) return false;
 		if (isAddictive && !aid->IsAddictive()) return false;
@@ -77,71 +92,123 @@ namespace SortingIcons
 		return true;
 	}
 
-	bool Item::Satisfies(TESForm* form) const
+	bool Item::IsValid() const
 	{
-		if (!common.Satisfies(form)) return false;
+		if (forms && formIDs.empty())
+		{
+			Log(logLevel >= Log::kWarning) << FormatString("JSON warning: Failed to find any forms for tag: '%6s', priority: '%03d'", tag.c_str(), priority);
+			return false;
+		}
 
-		if (form->typeID == kFormType_TESObjectWEAP && !weapon.Satisfies(reinterpret_cast<TESObjectWEAP*>(form))) return false;
-		if (form->typeID == kFormType_TESObjectARMO && !armor.Satisfies(reinterpret_cast<TESObjectARMO*>(form))) return false;
-		if (form->typeID == kFormType_AlchemyItem && !aid.Satisfies(reinterpret_cast<AlchemyItem*>(form))) return false;
+		std::string log = FormatString("JSON message: Tag: '%6s', priority: '%03d'", tag.c_str(), priority);
+
+		if (!formType.empty()) {
+			log += ", types: ";
+			UInt32 i = 0;
+			for (const auto iter : formType)
+			{
+				log += std::to_string(iter);
+				if (++i != formType.size()) log += ", ";
+			}
+		}
+		if (forms && !formIDs.empty())
+		{
+			log += ", forms:";
+			log += formIDs.size() == 1 ? " " : "\n";
+			UInt32 i = 0;
+			for (const auto iter : formIDs)
+			{
+				log += FormatString("%08X (%40s)", iter, TESForm::GetByID(iter)->GetName());
+				if (++i != formIDs.size()) log += i % 2 ? ", " : ",\n";
+			}
+		}
+		Log(logLevel >= Log::kMessage) << log;
 
 		return true;
 	}
 
-	std::unordered_map<std::string, Category*>	g_StringToCategory;
-
-	Category* Category::Set(const std::string tag)
+/*	bool Category::IsValid() const
 	{
-		return g_StringToCategory[tag] = this;
-	}
-
-	bool Category::IsValid() const
-	{
+		Log(logLevel >= Log::kMessage) << FormatString("Tag: '%6s', icon: '%s'", tag.c_str(), filename.c_str());
+		return true;
 		return categoryDefault;
 	}
+*/
+	std::unordered_map<TESForm*, Item*> g_FormToItem;
+	std::unordered_map<Tile*, Keyring*> g_TileToKey;
 
-	Category* Category::Get(const std::string tag)
+	std::unordered_map<Object*, Icon*> g_ObjectToIcon;
+
+	Item* Item::Set(TESForm* form, Item* item)
 	{
-		return g_StringToCategory[tag];
+		return g_FormToItem[form] = item;
 	}
 
-	Category* Category::Satisfies(TESForm* form)
+	Item* Item::Get(TESForm* form)
 	{
-		for (const auto& iter : g_Items) 
-			if (iter->Satisfies(form)) return Get(iter->tag);
-		return categoryDefault;
+		if (g_FormToItem.contains(form)) return g_FormToItem[form];
+
+		Item* assignedItem = nullptr;
+		for (const auto& item : g_Items) if (item->Satisfies(form)) return assignedItem = item.get();
+		return Set(form, assignedItem);
 	}
 
-	std::unordered_map<TESForm*, Category*> g_ItemToCategory;
-
-	Category* Category::Set(TESForm* form)
+	Keyring* Keyring::Set(Tile* tile, Keyring* key)
 	{
-		return g_ItemToCategory[form] = this;
+		return g_TileToKey[tile] = key;
 	}
 
-	Category* Category::Get(TESForm* form)
+	Keyring* Keyring::Get(Tile* tile)
 	{
-		return g_ItemToCategory.contains(form) ? g_ItemToCategory[form] : Satisfies(form)->Set(form);
+		if (g_TileToKey.contains(tile)) return g_TileToKey[tile];
+
+		Keyring* assignedItem = nullptr;
+//		for (const auto& item : g_Categories) if (item->IsKey()) return assignedItem = item.get();
+		return Set(tile, assignedItem);
 	}
 
-	bool Tab::Satisfies(TESForm* form) const
+	bool Category::SatisfiesForm(TESForm* form) const
 	{
-		if (!tabMisc)
-		{
-			if (!types.empty() && !types.contains(form->typeID)) return false;
-			if (const auto category = Category::Get(form); !categories.empty() && category->IsValid() &&
-				!categories.contains(category->tag)) return false;
-		}
-		else
-		{
-			if (!types.empty() && types.contains(form->typeID)) return false;
-			if (const auto category = Category::Get(form); !categories.empty() &&
-				category->IsValid() && categories.contains(category->tag)) return false;
-		}
+		if (types.empty()) return true;
+		return tabMisc ? !types.contains(form->typeID) : types.contains(form->typeID);
+	}
 
+	bool Category::SatisfiesTag(std::string tag) const
+	{
+		if (categories.empty()) return true;
+		return tabMisc ? !categories.contains(tag) : categories.contains(tag);
+	}
+
+	bool Category::Satisfies(TESForm* form) const
+	{
+		if (!SatisfiesForm(form)) return false;
+		const auto item = Item::Get(form);
+		if (!item) return false;
+		if (!SatisfiesTag(item->tag)) return false;
 		return true;
 	}
 
+	Icon* Icon::Set(Object* object, Icon* icon)
+	{
+		return g_ObjectToIcon[object] = icon;
+	}
+
+	Icon* Icon::Get(Object* object)
+	{
+		if (g_ObjectToIcon.contains(object)) return g_ObjectToIcon[object];
+
+		auto categoryNew = categoryDefault;
+
+		if (object)
+		{
+			const auto tag = object->tag;
+			for (const auto& category : g_Icons)
+				if (category->tag == tag)
+					categoryNew = category.get();
+		}
+
+		return Set(object, categoryNew);
+	}
 }
 
 namespace SortingIcons::Keyrings
@@ -149,7 +216,7 @@ namespace SortingIcons::Keyrings
 	Tab* openTab;
 	std::string stringStewie;
 
-	std::unordered_map<Tab*, UInt32> itemCountsForKeyrings;
+	std::unordered_map<Keyring*, UInt32> itemCountsForKeyrings;
 
 	bool update = false;
 
@@ -161,8 +228,8 @@ namespace SortingIcons::Keyrings
 	UInt32 __fastcall OpenKeyring(Tile* tile)
 	{
 		if (!tile) {}
-		else if (const auto val = tile->GetValue(kTileValue_user16))
-			openTab = g_StringToTabs[val->str];
+		else if (g_TileToKey.contains(tile))
+			openTab = g_StringToTabs[g_TileToKey[tile]->tag];
 		return *(UInt32*)0x011D9EB8;
 	}
 
@@ -176,7 +243,7 @@ namespace SortingIcons::Keyrings
 	{
 		const auto inventoryMenu = InventoryMenu::GetSingleton();
 		if (!update) for (const auto list = inventoryMenu->itemsList.list; const auto iter : list)
-			if (iter->tile && iter->tile->GetValue(kTileValue_user16)) { iter->tile->~Tile(); list.RemoveItem(iter); }
+			if (iter->tile && g_TileToKey.contains(iter->tile)) { g_TileToKey.erase(iter->tile); iter->tile->~Tile(); list.RemoveItem(iter); }
 
 		for (const auto& key : itemCountsForKeyrings | std::views::keys)
 		{
@@ -189,9 +256,10 @@ namespace SortingIcons::Keyrings
 			const auto listItem = inventoryMenu->itemsList.InsertAlt(nullptr, keyringname.c_str());
 			const auto tile = listItem->tile;
 			tile->Set(kTileValue_id, 30);
-			tile->Set(kTileValue_user16, key->tag);
+			g_TileToKey[tile] = key;
+//			tile->Set(kTileValue_user16, key->tag);
 			inventoryMenu->itemsList.SortAlt(listItem, reinterpret_cast<ListBox<InventoryChanges>::SortingFunction>(0x7824E0));
-			Icons::InjectIconTile(Category::Get(key->tag), tile);
+			Icons::InjectIconTile(Icon::Get(key), tile);
 		}
 
 		itemCountsForKeyrings.clear();
@@ -250,7 +318,7 @@ namespace SortingIcons::Keyrings
 
 		if (VanillaTypeFilter(entry)) return true;
 
-		return openTab && openTab->keyring ? !openTab->Satisfies(form) : KeyringHideKeys(entry);
+		return openTab && openTab->IsKey() ? !openTab->Satisfies(form) : KeyringHideKeys(entry);
 		/* TODO:
 			if (Categories::ItemGetCategory(entry)->category._Equal(openCategory)) {
 			if (stringStewie.empty() || stringStewie._Equal("_")) return false;
@@ -385,9 +453,9 @@ namespace SortingIcons::Keyrings::Hook
 		}
 	}
 
+	// push additional arg to filter function
 	template<UInt32 retn> __declspec(naked) void ContainerEntryListBoxFilterPre()
 	{
-		// push additional arg to filter function
 		static const UInt32 retnAddr = retn;
 		__asm
 		{
@@ -400,19 +468,19 @@ namespace SortingIcons::Keyrings::Hook
 		}
 	}
 
+	// fix stack
 	template<UInt32 retn> __declspec(naked) void ContainerEntryListBoxFilterPost()
 	{
-		// fix stack
 		static const UInt32 retnAddr = retn;
 		__asm
 		{
 			add		esp, 4
 			test	al, al
 			jz		wah
-			mov[ebp - 0x24], 1
+			mov		[ebp - 0x24], 1
 			jmp		retnAddr
 		wah :
-			mov[ebp - 0x24], 0
+			mov		[ebp - 0x24], 0
 			jmp		retnAddr
 		}
 	}
@@ -722,51 +790,54 @@ namespace SortingIcons::Tabs::Hook
 
 namespace SortingIcons::Sorting
 {
-	SInt32 CompareWithTags(const ListBoxItem<InventoryChanges>* unk1, const ListBoxItem<InventoryChanges>* unk2)
+	SInt32 CompareWithTags(const ListBoxItem<InventoryChanges>* item1, const ListBoxItem<InventoryChanges>* item2)
 	{
 		if (bSort)
 		{
-			const auto a1 = unk1->object;
-			const auto a2 = unk2->object;
-			const auto tile1 = unk1->tile;
-			const auto tile2 = unk2->tile;
+			const auto [tile1, entry1, byte1, pad1] = *item1;
+			const auto [tile2, entry2, byte2, pad2] = *item2;
 
-			std::string tag1, tag2;
+			const Object* tag1 = nullptr;
+			const Object* tag2 = nullptr;
 
-			if (a1 && a1->form)
-				if (const auto form1 = a1->form->TryGetREFRParent())
-					if (const auto category1 = Category::Get(form1)) 
-						tag1 = category1->tag;
-			if (a2 && a2->form)
-				if (const auto form2 = a2->form->TryGetREFRParent())
-					if (const auto category2 = Category::Get(form2))
-						tag2 = category2->tag;
+			if (entry1 && entry1->form)
+				if (const auto form1 = entry1->form->TryGetREFRParent())
+					if (const auto category1 = Item::Get(form1)) 
+						tag1 = category1;
+			if (entry2 && entry2->form)
+				if (const auto form2 = entry2->form->TryGetREFRParent())
+					if (const auto category2 = Item::Get(form2))
+						tag2 = category2;
 
 			if (bCategories && !g_Keyrings.empty())
 			{
-				if (tag1.empty() && tile1 && tile1->GetValue(kTileValue_user16)) tag1 = tile1->GetValue(kTileValue_user16)->str;
-				if (tag2.empty() && tile2 && tile2->GetValue(kTileValue_user16)) tag2 = tile2->GetValue(kTileValue_user16)->str;
+				if (!tag1 && !entry1)
+				{
+					tag1 = Keyring::Get(tile1);
+				}
+				if (!tag2 && !entry2)
+				{
+					tag2 = Keyring::Get(tile2);
+				}
 			}
 
-			if (const auto cmp = tag1 <=> tag2; cmp != nullptr) return cmp._Value;
+			if (const auto cmp = Object::Compare(tag1, tag2); cmp != 0) return cmp;
 
 		}
 		return 0;
 	}
 
-	SInt32 __fastcall CompareItems(const ListBoxItem<InventoryChanges>* unk1, const ListBoxItem<InventoryChanges>* unk2)
+	SInt32 __fastcall CompareItems(const ListBoxItem<InventoryChanges>* item1, const ListBoxItem<InventoryChanges>* item2, char* left, char* right)
 	{
-		const auto a1 = unk1->object;
-		const auto a2 = unk2->object;
-		const auto tile1 = unk1->tile;
-		const auto tile2 = unk2->tile;
+		const auto [tile1, entry1, byte1, pad1] = *item1;
+		const auto [tile2, entry2, byte2, pad2] = *item2;
 
 		TESForm* form1 = nullptr, *form2 = nullptr;
 
-		if (a1 && a1->form) form1 = a1->form->TryGetREFRParent();
-		if (a2 && a2->form) form2 = a2->form->TryGetREFRParent();
+		if (entry1 && entry1->form) form1 = entry1->form->TryGetREFRParent();
+		if (entry2 && entry2->form) form2 = entry2->form->TryGetREFRParent();
 
-		if (const auto cmp = CompareWithTags(unk1, unk2)) return cmp;
+		if (const auto cmp = CompareWithTags(item1, item2)) return cmp;
 
 		std::string name1, name2;
 
@@ -781,9 +852,9 @@ namespace SortingIcons::Sorting
 		if (!form1) return form2 ? -1 : 0;
 		if (!form2) return 1;
 		
-		if (const auto weaponMods = a2->GetWeaponMod() <=> a1->GetWeaponMod(); weaponMods != nullptr) return weaponMods._Value;
-		if (const auto condition = a2->GetHealthPercent() <=> a1->GetHealthPercent(); condition != nullptr) return condition._Value;
-		if (const auto equipped = a2->GetEquipped() <=> a1->GetEquipped(); equipped != nullptr) return equipped._Value;
+		if (const auto weaponMods = entry2->GetWeaponMod() <=> entry1->GetWeaponMod(); weaponMods != nullptr) return weaponMods._Value;
+		if (const auto condition = entry2->GetHealthPercent() <=> entry1->GetHealthPercent(); condition != nullptr) return condition._Value;
+		if (const auto equipped = entry2->GetEquipped() <=> entry1->GetEquipped(); equipped != nullptr) return equipped._Value;
 		if (const auto refID = form2->refID <=> form1->refID; refID != nullptr) return refID._Value;
 
 		return 0;
@@ -811,7 +882,6 @@ namespace SortingIcons::Sorting::Hook
 	template<UInt32 retn> __declspec(naked) void InventoryMenu()
 	{
 		static const auto CompareItems = reinterpret_cast<UInt32>(Sorting::CompareItems);
-		static const UInt32 InventoryChanges_GetFullName = 0x4BE2D0;
 		static const UInt32 retnAddr = retn;
 		_asm
 		{
@@ -827,9 +897,6 @@ namespace SortingIcons::Sorting::Hook
 			ret
 
 		got0 :
-			mov		edx, [ebp + 0xC]
-			mov		ecx, [edx + 0x4]
-			call	InventoryChanges_GetFullName
 			jmp		retnAddr
 		}
 	}
@@ -842,9 +909,9 @@ namespace SortingIcons::Patch
 	{
 		if (bEnable)
 		{
-			WriteRelJump(0x7824F6, Sorting::Hook::InventoryMenu<0x78251B>);
-			WriteRelJump(0x78250B, Sorting::Hook::InventoryMenu<0x78251B>);
-			WriteRelJump(0x782516, Sorting::Hook::InventoryMenu<0x78251B>);
+			WriteRelJump(0x7824F6, 0x782528);
+			WriteRelJump(0x78250B, 0x782528);
+			WriteRelJump(0x782528, Sorting::Hook::InventoryMenu<0x78260E>);
 
 			WriteRelJump(0x72F0ED, Sorting::Hook::BarterContainerMenu);
 			WriteRelJump(0x75D138, Sorting::Hook::BarterContainerMenu);
@@ -853,7 +920,7 @@ namespace SortingIcons::Patch
 		{
 			UndoSafeWrite(0x7824F6);
 			UndoSafeWrite(0x78250B);
-			UndoSafeWrite(0x782516);
+			UndoSafeWrite(0x782528);
 
 			UndoSafeWrite(0x72F0ED);
 			UndoSafeWrite(0x75D138);

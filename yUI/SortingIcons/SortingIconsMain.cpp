@@ -31,24 +31,24 @@ namespace SortingIcons
 	void ProcessEntries()
 	{
 		ra::sort(g_Items, [&](const std::unique_ptr<Item>& entry1, const std::unique_ptr<Item>& entry2) { return entry1->priority > entry2->priority; });
+		ra::sort(g_Icons, [&](const std::unique_ptr<Icon>& entry1, const std::unique_ptr<Icon>& entry2) { return entry1->priority > entry2->priority; });
 		ra::sort(g_Categories, [&](const std::unique_ptr<Category>& entry1, const std::unique_ptr<Category>& entry2) { return entry1->priority > entry2->priority; });
-		ra::sort(g_Tabs, [&](const std::unique_ptr<Tab>& entry1, const std::unique_ptr<Tab>& entry2) { return entry1->priority > entry2->priority; });
 
-		for (const auto& entry : g_Categories) {
+		for (const auto& entry : g_Icons) {
 //			if (!entry->name.empty()) g_Keyrings.emplace_back(entry);
 			if (entry->tag.empty())
 			{
 				categoryDefault = entry.get();
 				Log(logLevel > Log::kMessage) << "ySI: Default category is '" + entry->filename + "'";
 			}
-			entry->Set(entry->tag);
+//			Set(entry->tag, entry);
 		}
 
-		for (const auto& entry : g_Tabs)
+		for (const auto& entry : g_Categories)
 		{
-			if (entry->keyring) g_Keyrings.emplace_back(entry.get());
-			if (entry->inventory) g_Tabline.emplace_back(entry.get());
-			g_StringToTabs.emplace(entry->tag, entry.get());
+			if (entry->IsKey()) g_Keyrings.emplace_back((Keyring*)entry.get());
+			if (entry->IsInventory()) g_Tabline.emplace_back((Tab*)entry.get());
+			g_StringToTabs.emplace(entry->tag, (Tab*) entry.get());
 		}
 
 		ra::sort(g_Tabline, [&](const Tab* entry1, const Tab* entry2) { return entry1->tabPriority > entry2->tabPriority; });
