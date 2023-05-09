@@ -28,16 +28,6 @@ CMSettingCategory* CMSettingCategory::Default()
 	return this;
 }
 
-std::vector<CMValue> CMSettingCategory::GetValues()
-{
-	std::vector<CMValue> ret;
-	for (const auto iter : ModConfigurationMenu::GetSingleton()->GetSettingsForString(categoryID)) {
-		const auto values = iter->GetValues();
-		ret.insert(ret.end(), values.begin(), values.end());
-	}
-	return ret;
-}
-
 CMSettingCategory* CMSettingCategory::Click(Tile* tile)
 {
 	ModConfigurationMenu::GetSingleton()->DisplaySettings(categoryID);
@@ -547,18 +537,18 @@ void ModConfigurationMenu::ShowMenuFirstTime()
 
 void ModConfigurationMenu::SaveToJSON()
 {
+	SaveModJSON(*categoryHistory.rbegin());
 	for (const auto& iter : settingsMain.listBox.list)
 	{
-		SaveModJSON(iter->object);
 		iter->object->Display(iter->tile);
 	}
 }
 
 void ModConfigurationMenu::LoadFromJSON()
 {
+	LoadModJSON(*categoryHistory.rbegin());
 	for (const auto& iter : settingsMain.listBox.list)
 	{
-		LoadModJSON(iter->object);
 		iter->object->Display(iter->tile);
 	}
 }

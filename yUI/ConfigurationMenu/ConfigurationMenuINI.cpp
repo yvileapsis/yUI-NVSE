@@ -48,7 +48,7 @@ inline void WriteINIInternal(const std::filesystem::path& iniPath, const CMSetti
 	if (value.IsString())
 		ini.SetValue(setting.category.c_str(), setting.setting.c_str(), static_cast<std::string>(value).c_str());
 	else if (value.IsFloat()) 
-		ini.SetDoubleValue(setting.category.c_str(), setting.setting.c_str(), value);
+		ini.SetDoubleValue(setting.category.c_str(), setting.setting.c_str(), value.GetAsFloat());
 	else if (value.IsInteger())
 		ini.SetLongValue(setting.category.c_str(), setting.setting.c_str(), value);
 
