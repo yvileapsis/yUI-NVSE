@@ -131,20 +131,17 @@ public:
 
 	static TESObjectREFR*	Create(bool bTemp = false);
 
-	bool					GetDisabled();
-	ExtraContainerChanges*	GetOrCreateContainerChanges();
-	InventoryChangesList*	GetContainerChangesList();
 	SInt32					GetItemCount(TESForm* form) { return ThisCall<SInt32>(0x575610, this, form); };
 	void					AddItemAlt(TESForm* item, UInt32 count, float condition, bool doEquip);
 	bool					GetInventoryItems(UInt8 typeID);
 	TESObjectCELL*			GetParentCell() const { return parentCell; };
 	TESWorldSpace*			GetParentWorld() { return ThisCall<TESWorldSpace*>(0x575D70, this); };
-	bool __fastcall			GetInSameCellOrWorld(TESObjectREFR* target) const;
+	bool __fastcall			GetInSameCellOrWorld(const TESObjectREFR* target) const;
 	Float32 __vectorcall	GetDistance(TESObjectREFR* target);
 	Float32 __vectorcall	GetDistance2D(TESObjectREFR* target);
 	void					SetPos(NiPoint3& posVector);
 	void					SetAngle(NiPoint3& rotVector);
-	Float32					GetHeadingAngle(TESObjectREFR* target);
+	Float32					GetHeadingAngle(const TESObjectREFR* target);
 	bool					MoveToCell(TESForm* worldOrCell, NiPoint3& posVector);
 	void					DeleteReference();
 	TESObjectREFR*			GetMerchantContainer();

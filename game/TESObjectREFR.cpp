@@ -14,7 +14,6 @@
 static constexpr UInt32 s_TESObject_REFR_init						= 0x0055A2F0;	// TESObject_REFR initialization routine (first reference to s_TESObject_REFR_vtbl)
 static constexpr UInt32 s_TESObjectREFR__GetContainer				= 0x0055D310;	// First call in REFR::RemoveItem
 static constexpr UInt32 s_TESObjectREFR_Set3D						= 0x005702E0;	// void : (const char*)
-static constexpr UInt32 s_PlayerCharacter_GetCurrentQuestTargets	= 0x00952BA0;	// BuildedQuestObjectiveTargets* : ()
 static constexpr UInt32 s_PlayerCharacter_GenerateNiNode			= 0x0094E1D0; // Func0072
 static constexpr UInt32 kPlayerUpdate3Dpatch						= 0x0094EB7A;
 static constexpr UInt32 TESObjectREFR_Set3D							= 0x0094EB40;
@@ -404,24 +403,6 @@ bool TESObjectREFR::GetInventoryItems(InventoryItemsMap &invItems)
 	return !invItems.empty();
 }
 
-__declspec(naked) InventoryChangesList* TESObjectREFR::GetContainerChangesList()
-{
-	__asm
-	{
-		push	kExtraData_ContainerChanges
-		add		ecx, 0x44
-		call	BaseExtraList::GetByType
-		test	eax, eax
-		jz		done
-		mov		eax, [eax + 0xC]
-		test	eax, eax
-		jz		done
-		mov		eax, [eax]
-		done:
-		retn
-	}
-}
-
 __declspec(naked) float __vectorcall Point2Distance(const NiPoint3& pt1, const NiPoint3& pt2)
 {
 	__asm
@@ -452,62 +433,51 @@ __declspec(naked) float __vectorcall Point3Distance(const NiPoint3& pt1, const N
 	}
 }
 
-__declspec(naked) bool __fastcall TESObjectREFR::GetInSameCellOrWorld(TESObjectREFR *target) const
+bool __fastcall TESObjectREFR::GetInSameCellOrWorld(const TESObjectREFR *target) const
 {
-	__asm
+	const TESObjectCELL* parentCell = this->parentCell;
+	if (!parentCell)
 	{
-		mov		eax, [ecx+0x40]
-		test	eax, eax
-		jnz		hasCell1
-		push	edx
-		push	kExtraData_PersistentCell
-		add		ecx, 0x44
-		call	BaseExtraList::GetByType
-		pop		edx
-		test	eax, eax
-		jz		done
-		mov		eax, [eax+0xC]
-	hasCell1:
-		mov		ecx, [edx+0x40]
-		test	ecx, ecx
-		jnz		hasCell2
-		push	eax
-		push	kExtraData_PersistentCell
-		lea		ecx, [edx+0x44]
-		call	BaseExtraList::GetByType
-		pop		edx
-		test	eax, eax
-		jz		done
-		mov		ecx, [eax+0xC]
-		mov		eax, edx
-	hasCell2:
-		cmp		eax, ecx
-		jz		retnTrue
-		mov		eax, [eax+0xC0]
-		test	eax, eax
-		jz		done
-		cmp		eax, [ecx+0xC0]
-	retnTrue:
-		setz	al
-	done:
-		retn
+		const auto extraCell = (ExtraPersistentCell*) extraDataList.GetByType(kExtraData_PersistentCell);
+
+		if (!extraCell) return false;
+
+		parentCell = extraCell->persistentCell;
 	}
+
+	const TESObjectCELL* targetParentCell = target->parentCell;
+	if (!targetParentCell)
+	{
+		const auto extraCell = (ExtraPersistentCell*) target->extraDataList.GetByType(kExtraData_PersistentCell);
+
+		if (!extraCell) return false;
+
+		targetParentCell = extraCell->persistentCell;
+	}
+
+	if (parentCell == targetParentCell) return true;
+
+	if (!parentCell->worldSpace) return false;
+
+	if (parentCell->worldSpace == targetParentCell->worldSpace) return true;
+
+	return false;
 }
 
 float __vectorcall TESObjectREFR::GetDistance(TESObjectREFR* target)
 {
-	return this->GetInSameCellOrWorld(target) ? Point3Distance(*this->GetPos(), *target->GetPos()) : FLT_MAX;
+	return GetInSameCellOrWorld(target) ? Point3Distance(*GetPos(), *target->GetPos()) : FLT_MAX;
 }
 
 float __vectorcall TESObjectREFR::GetDistance2D(TESObjectREFR* target)
 {
-	return this->GetInSameCellOrWorld(target) ? Point2Distance(*this->GetPos(), *target->GetPos()) : FLT_MAX;
+	return GetInSameCellOrWorld(target) ? Point2Distance(*GetPos(), *target->GetPos()) : FLT_MAX;
 }
 
-Float32 TESObjectREFR::GetHeadingAngle(TESObjectREFR* target)
+Float32 TESObjectREFR::GetHeadingAngle(const TESObjectREFR* target)
 {
 	if (!target) return 0;
-	return this->rot.z - atan2(target->pos.x - this->pos.x, target->pos.y - this->pos.y) - 2 * std::numbers::pi;
+	return rot.z - atan2(target->pos.x - pos.x, target->pos.y - pos.y) - 2 * std::numbers::pi;
 }
 
 __declspec(naked) NiAVObject* __fastcall NiNode::GetBlockByName(const char *nameStr)	//	str of NiFixedString
@@ -599,17 +569,29 @@ __declspec(naked) NiNode* __fastcall NiNode::GetNode(const char *nodeName) const
 
 __declspec(naked) NiNode* TESObjectREFR::GetNiNode()
 {
+	/*
+	 *  result = this->renderState;
+  if ( !result )
+    return result;
+
+  result = (TESObjectREFR::RenderState *)result->niNode14;
+  if ( this->refID == 0x14 && !this->isInThirdPerson )
+    return (TESObjectREFR::RenderState *)this->node1stPerson;
+
+  return result;
+	 *
+	 */
 	__asm
 	{
-		mov		eax, [ecx + 0x64]
+		mov		eax, [ecx + 0x64] // renderstate
 		test	eax, eax
 		jz		done
-		mov		eax, [eax + 0x14]
-		cmp		dword ptr[ecx + 0xC], 0x14
+		mov		eax, [eax + 0x14]	// ninode0x14
+		cmp		dword ptr[ecx + 0xC], 0x14 // player
 		jnz		done
-		cmp		byte ptr[ecx + 0x64A], 0
+		cmp		byte ptr[ecx + 0x64A], 0 // isinthirdperson
 		jnz		done
-		mov		eax, [ecx + 0x694]
+		mov		eax, [ecx + 0x694] //third person node0
 	done:
 		retn
 	}
@@ -644,7 +626,7 @@ __declspec(naked) NiAVObject* __fastcall GetNifBlock2(TESObjectREFR *thisObj, UI
 	{
 		test	dl, dl
 		jz		notPlayer
-		cmp		dword ptr [ecx+0xC], 0x14
+		cmp		dword ptr [ecx+0xC], 0x14 // player
 		jnz		notPlayer
 		test	dl, 1
 		jz		get1stP
@@ -676,7 +658,7 @@ NiAVObject* TESObjectREFR::GetNifBlock(UInt32 pcNode, const char* blockName)
 	return GetNifBlock2(this, pcNode, blockName);
 }
 
-QuestObjectiveTargets*	PlayerCharacter::GetCurrentQuestObjectiveTargets() { return ThisStdCall<QuestObjectiveTargets*>(s_PlayerCharacter_GetCurrentQuestTargets, this); }
+QuestObjectiveTargets*	PlayerCharacter::GetCurrentQuestObjectiveTargets() { return ThisStdCall<QuestObjectiveTargets*>(0x00952BA0, this); }
 TESObjectREFR*			PlayerCharacter::GetPlacedMarkerOrTeleportLink() { return ThisStdCall<TESObjectREFR*>(0x77A400, this); }
 
 bool Explosion::CanStoreAmmo()

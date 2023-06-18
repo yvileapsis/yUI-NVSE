@@ -3,16 +3,15 @@
 #include <GameData.h>
 #include <Menu.h>
 
-#include "CrashLog.h"
+#include "CrashLogger.h"
+#include "namegen.h"
 #include <format>
-#include <random>
 
 void InitSingletons()
 {
 	g_player = PlayerCharacter::GetSingleton();
 	g_TESDataHandler = TESDataHandler::GetSingleton();
 	g_HUDMainMenu = HUDMainMenu::GetSingleton();
-
 }
 
 void MessageHandler(NVSEMessagingInterface::Message* msg)
@@ -33,59 +32,6 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 		}
 		for (const auto& i : mainLoop) i(); // call all mainloop functions
 	}
-}
-
-std::vector<std::string> author{
-	"",
-	"",
-	"",
-	"Yvile's ",
-	"Yvile's ",
-	"Yvile's ",
-	"Yvile's Yvile's ",
-	"Yvile's Cobb's ",
-	"Yvileapsis' ",
-	"Yvileapsis' ",
-	"Yvileapsis' ",
-	"Yvileapsis' Cobb's ",
-	"Yvileapsis' Yvile's ",
-	"Joe Cobb's ",
-	"(Not Really) Cobb's ",
-	"Trooper's ",
-	"Pepe's ",
-};
-
-std::vector<std::string> names{
-	"Crash Logger",
-	"Crash Logger",
-	"Crash Logger",
-	"Crash Logger",
-	"Crash Logger",
-	"Crash Blogger",
-	"AAAAAAA IT CRASHED",
-	"Obsurdian Ls Logger",
-	"Bugthesda Ls Logger",
-	"Rash Clogger",
-};
-
-std::vector<std::string> edition{
-	"",
-	"",
-	"",
-	"",
-	"",
-	": Ultimate Edition",
-	" NVSE",
-	" (NVSE)",
-	" Tweaks",
-	" (April's Fools Edition)",
-};
-
-std::string GetName()
-{
-	std::random_device dev;
-	srand(dev());
-	return author[std::rand() % author.size()] + names[std::rand() % names.size()] + edition[std::rand() % edition.size()];
 }
 
 bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)

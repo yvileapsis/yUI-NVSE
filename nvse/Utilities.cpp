@@ -1231,11 +1231,11 @@ __declspec(naked) bool IsConsoleOpen()
 {
 	__asm
 	{
-		mov		al, byte ptr ds : [0x11DEA2E]
+		mov		al, byte ptr ds : [0x11DEA2E] // console open
 		test	al, al
 		jz		done
 		mov		eax, fs : [0x2C]
-		mov		edx, ds : [0x126FD98]
+		mov		edx, ds : [0x126FD98] // some index
 		mov		eax, [eax + edx * 4]
 		test	eax, eax
 		jz		done

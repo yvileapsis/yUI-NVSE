@@ -73,7 +73,7 @@
     <ClCompile Include="..\game\TESObject.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="CrashLog.cpp" />
+    <ClCompile Include="CrashLogger.cpp" />
     <ClCompile Include="..\game\BaseFormComponent.cpp">
       <Filter>game</Filter>
     </ClCompile>
@@ -180,10 +180,11 @@
     <ClInclude Include="..\game\TESObject.h">
       <Filter>game</Filter>
     </ClInclude>
-    <ClInclude Include="CrashLog.h" />
+    <ClInclude Include="CrashLogger.h" />
     <ClInclude Include="..\game\BaseFormComponent.h">
       <Filter>game</Filter>
     </ClInclude>
+    <ClInclude Include="namegen.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />

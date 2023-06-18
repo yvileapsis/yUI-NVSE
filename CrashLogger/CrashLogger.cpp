@@ -1,10 +1,8 @@
 ﻿#include <main.h>
 
-#include "CrashLog.h"
+#include "CrashLogger.h"
 
 #include <DbgHelp.h>
-#include <map>
-#include <set>
 
 #include "GameEffects.h"
 #include "TESForm.h"
@@ -15,7 +13,7 @@
 #include "SafeWrite.h"
 #include "Setting.h"
 
-#define SYMOPT_EX_WINE_NATIVE_MODULES  1000
+#define SYMOPT_EX_WINE_NATIVE_MODULES 1000
 
 constexpr UInt32 ce_printStackCount = 256;
 

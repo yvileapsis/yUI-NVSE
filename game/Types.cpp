@@ -63,6 +63,8 @@ NiControllerSequence* NiControllerManager::FindSequence(const char* seqName)
 // jazz code
 __declspec(naked) bool NiControllerSequence::Play()
 {
+//	if (owner) owner->flags |= 0x8;
+//	offset = 0x0FF7FFFFF;
 	__asm
 	{
 		push	ecx
