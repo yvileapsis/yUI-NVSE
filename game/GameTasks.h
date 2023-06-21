@@ -70,6 +70,60 @@ public:
 	//	RefNiRefObject SetNiRefObject(NiRefObject* niRefObject);
 };
 
+
+// 5C8 (?)
+class NiStream
+{
+public:
+	virtual void	Destroy(bool doFree);
+	virtual void	Unk_01(void);
+	virtual void	Unk_02(void);
+	virtual void	Unk_03(void);
+	virtual void	Unk_04(void);
+	virtual void	Unk_05(void);
+	virtual void	Unk_06(void);
+	virtual void	Unk_07(void);
+	virtual void	Unk_08(void);
+	virtual void	Unk_09(void);
+	virtual void	Unk_0A(void);
+	virtual void	Unk_0B(void);
+	virtual void	Unk_0C(void);
+	virtual void	Unk_0D(void);
+	virtual void	Unk_0E(void);
+	virtual void	Unk_0F(void);
+	virtual void	Unk_10(void);
+	virtual void	Unk_11(void);
+	virtual void	Unk_12(void);
+	virtual void	Unk_13(void);
+	virtual void	Unk_14(void);
+	virtual void	Unk_15(void);
+	virtual void	Unk_16(void);
+	virtual void	Unk_17(void);
+
+	UInt32			unk004[50];
+	UInt32			field_1;
+	UInt32			field_2;
+	UInt32			field_3;
+	UInt32			version;		// 0xD8
+	UInt32			field_5;
+	char*			path;			// 0xE0
+	UInt32			field_7;
+	UInt32			field_8;
+	UInt32			field_9;
+	UInt32			unk008[130];
+	UInt32			unk00C[180];
+};
+static_assert(sizeof(NiStream) == 0x5C8);
+
+// 5D4 (?)
+class BSStream : public NiStream
+{
+public:
+	virtual void	Unk_18(void);
+
+	UInt32			unk5C8[3];		// 5C8
+};
+
 // 18
 class BSTask
 {
@@ -454,3 +508,4 @@ public:
 
 	void QueueReference(TESObjectREFR* refr, UInt32 arg1, bool ifInMainThread);
 };
+

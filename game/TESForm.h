@@ -1428,11 +1428,75 @@ public:
 };	// I am seeing a TList at 60, a map at 50 indexed by XY coord !!!, another map at B0, indexed by modInfo::Unklist elements
 static_assert(sizeof(TESWorldSpace) == 0xEC);
 
+class TESChildCell
+{
+public:
+	TESChildCell();
+	~TESChildCell();
+
+	// no virtual destructor
+	virtual TESObjectCELL* GetPersistentCell();		// 000
+
+	//	void	** vtbl;	// 00
+};
+static_assert(sizeof(TESChildCell) == 0x4);
+
 // TESObjectLAND (2C)
 class TESObjectLAND;
 
+struct NavMeshVertex;
+struct NavMeshTriangle;
+struct EdgeExtraInfo;
+struct NavMeshTriangleDoorPortal;
+struct NavMeshClosedDoorInfo;
+struct NavMeshPOVData;
+struct ObstacleUndoData;
+struct NavMeshStaticAvoidNode;
+
+class NavMeshInfoMap;
+
+struct NavMeshInfo;
+
+// 8C
+class ObstacleData : public NiRefObject
+{
+public:
+	UInt32						unk08;			// 08
+	NiRefObject*				object0C;		// 0C
+	UInt32						unk10[25];		// 10
+	UInt8						byte74;			// 74
+	UInt8						byte75[3];		// 75
+	BSSimpleArray<NavMeshInfo>	navMeshInfos;	// 78
+	NiRefObject*				object88;		// 88
+};
+
 // NavMesh (108)
-class NavMesh;
+class NavMesh : public TESForm
+{
+public:
+	virtual void		Unk_4E(void);
+
+	TESChildCell								childCell;			// 018
+	NiRefObject									refObject;			// 01C
+	TESObjectCELL*								parentCell;			// 024
+	BSSimpleArray<NavMeshVertex>				vertexArr;			// 028
+	BSSimpleArray<NavMeshTriangle>				triangleArr;		// 038
+	BSSimpleArray<EdgeExtraInfo>				edgeInfoArr;		// 048
+	BSSimpleArray<NavMeshTriangleDoorPortal>	doorPortalArr;		// 058
+	BSSimpleArray<NavMeshClosedDoorInfo>		closedDorrArr;		// 068
+	BSSimpleArray<UInt16>						unk078Arr;			// 078
+	NiTMapBase<UInt16, NavMeshPOVData*>			povDataMap;			// 088
+	BSSimpleArray<UInt16>						unk098Arr;			// 098
+	UInt32										unk0A8;				// 0A8
+	float										unk0AC[8];			// 0AC
+	BSSimpleArray<UInt16>*						arrPtr0CC;			// 0CC
+	BSSimpleArray<ObstacleUndoData>				obstacleUndoArr;	// 0D0
+	NiTMapBase<UInt16, ObstacleData*>*			obstacleDataMap;	// 0E0
+	BSSimpleArray<UInt16>						unk0E4Arr;			// 0E4
+	BSSimpleArray<NavMeshStaticAvoidNode>		avoidNodeArr;		// 0F4
+	UInt32*										ptr104;				// 104
+};
+static_assert(sizeof(NavMesh) == 0x108);
 
 struct VariableInfo
 {
@@ -2848,16 +2912,3 @@ struct FaceGenData
 	UInt32		count;		// 18
 	UInt32		size;		// 1C
 };
-
-class TESChildCell
-{
-public:
-	TESChildCell();
-	~TESChildCell();
-
-	// no virtual destructor
-	virtual TESObjectCELL* GetPersistentCell();		// 000
-
-	//	void	** vtbl;	// 00
-};
-static_assert(sizeof(TESChildCell) == 0x4);

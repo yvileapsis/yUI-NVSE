@@ -68,7 +68,7 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 
 	Log() << GetName() + " version " + CrashLogger_VERSION_STR + " at " + std::format("{0:%F} {0:%T}", std::chrono::time_point(std::chrono::system_clock::now()));
 
-	Log() << ("If this file is empty, then your game didn't crash! :snig: \n");
+	Log() << ("If this file is empty, then your game didn't crash or something went so wrong even crash logger was useless! :snig: \n");
 
 	CrashLogger::NVVtables::FillLabels();
 	CrashLogger::Apply();

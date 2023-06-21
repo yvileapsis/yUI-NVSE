@@ -1162,7 +1162,7 @@ struct NavMeshCloseDoorInfo
 };	// Alloc'd to 0x08
 
 struct NavMeshPOVData;
-struct ObstacleData;
+class ObstacleData;
 struct ObstacleUndoData;
 
 struct NavMeshStaticAvoidNode

@@ -17,6 +17,103 @@
 
 constexpr UInt32 ce_printStackCount = 256;
 
+namespace CrashLogger::PDBHandling
+{
+	std::string GetAddress(UInt32 eip)
+	{
+		return FormatString("0x%08X", eip);
+	}
+
+	std::string GetModule(UInt32 eip, HANDLE process)
+	{
+		IMAGEHLP_MODULE module = { 0 };
+		module.SizeOfStruct = sizeof(IMAGEHLP_MODULE);
+		if (!SymGetModuleInfo(process, eip, &module)) return "";
+
+		return module.ModuleName;
+	}
+
+	std::string GetModuleAddress(UInt32 ebp)
+	{
+		return FormatString("0x%08X", ebp);
+	}
+
+	std::string GetSymbol(UInt32 eip, HANDLE process)
+	{
+		char symbolBuffer[sizeof(IMAGEHLP_SYMBOL) + 255];
+		const auto symbol = (IMAGEHLP_SYMBOL*)symbolBuffer;
+
+		symbol->SizeOfStruct = sizeof(IMAGEHLP_SYMBOL);
+		symbol->MaxNameLength = 254;
+		DWORD offset = 0;
+
+		if (!SymGetSymFromAddr(process, eip, &offset, symbol)) return "";
+
+		const std::string functioName = symbol->Name;
+
+		return FormatString("%s+0x%0X", functioName.c_str(), offset);
+	}
+
+	std::string GetLine(UInt32 eip, HANDLE process)
+	{
+		char lineBuffer[sizeof(IMAGEHLP_LINE) + 255];
+		const auto line = (IMAGEHLP_LINE*)lineBuffer;
+		line->SizeOfStruct = sizeof(IMAGEHLP_LINE);
+
+		DWORD offset = 0;
+
+		if (!SymGetLineFromAddr(process, eip, &offset, line)) return "";
+
+		return FormatString("<%s:%d>", line->FileName, line->LineNumber);
+	}
+
+	std::string GetCalltraceFunction(UInt32 eip, UInt32 ebp, HANDLE process)
+	{
+		/*if (GetModuleFileName((HMODULE)frame.AddrPC.Offset, path, MAX_PATH)) {  //Do this work on non base addresses even on  Windows? Cal directly the LDR function?
+			   if (!SymLoadModule(process, NULL, path, NULL, 0, 0)) Log() << FormatString("Porcoddio %0X", GetLastError());
+		}*/
+
+		std::string begin = "(" + GetAddress(eip) + ") ==> ";
+
+		std::string middle;
+
+		if (const auto module = GetModule(eip, process); module.empty()) 
+			middle = FormatString("%20s (%s) : (Corrupt stack or heap?)", "-\\(°_o)/-", GetModuleAddress(ebp).c_str());
+		else if (const auto symbol = GetSymbol(eip, process); symbol.empty())
+			middle = FormatString("%20s (%s) : EntryPoint+0xFFFFFFFF", module.c_str(), GetModuleAddress(ebp).c_str());
+		else
+			middle = FormatString("%20s (%s) : %s", module.c_str(), GetModuleAddress(ebp).c_str(), symbol.c_str());
+
+		std::string end;
+
+		if (const auto line = GetLine(eip, process); !line.empty())
+		{
+			middle = FormatString("%-80s", middle.c_str());
+			end = " <== " + line;
+		} 
+
+		return begin + middle + end;
+	}
+
+	std::string GetSymbolForAddress(UInt32 address, HANDLE process)
+	{
+		std::string module;
+		if (module = GetModule(address, process); module.empty()) return "";
+
+		std::string symbol;
+		if (symbol = GetSymbol(address, process); symbol.empty()) return "";
+
+		std::string end;
+
+		if (const auto line = GetLine(address, process); !line.empty())
+		{
+			end = " <== " + line;
+		}
+
+		return FormatString("%20s : %-40s%s", module.c_str(), symbol.c_str(), end.c_str());
+	}
+}
+
 namespace CrashLogger::Handle
 {
 	typedef std::string (*_Handler)(void* ptr);
@@ -49,15 +146,21 @@ namespace CrashLogger::Handle
 		return FormatString("%08X (%s), BaseForm %08X (%s)", refr->refID, refr->GetName(),
 		                    refr->TryGetREFRParent()->refID, refr->TryGetREFRParent()->GetName());
 	}
+	std::string AsNavMesh(void* ptr) {
+		const auto navmesh = static_cast<NavMesh*>(ptr);
+		return FormatString("%08X (%s), Cell %08X (%s)", navmesh->refID, navmesh->GetName(),
+			navmesh->parentCell->refID, navmesh->parentCell->GetName());
+	}
+
 	std::string AsBaseProcess(void* ptr)
 	{
 		const auto process = static_cast<BaseProcess*>(ptr);
 		for (const auto iter : *TESForm::GetAll())
 		{
 			if (iter->typeID == kFormType_Character && static_cast<Character*>(iter)->baseProcess == process)
-				return FormatString("Form %08X (%s)", iter->refID, iter->GetName());
+				return FormatString("%08X (%s), BaseForm %08X (%s)", iter->refID, iter->GetName(), iter->TryGetREFRParent()->refID, iter->TryGetREFRParent()->GetName());
 			if (iter->typeID == kFormType_Creature && static_cast<Creature*>(iter)->baseProcess == process)
-				return FormatString("Form %08X (%s)", iter->refID, iter->GetName());
+				return FormatString("%08X (%s), BaseForm %08X (%s)", iter->refID, iter->GetName(), iter->TryGetREFRParent()->refID, iter->TryGetREFRParent()->GetName());
 		}
 		return "";
 	}
@@ -86,7 +189,6 @@ namespace CrashLogger::Handle
 
 	std::string AsNiObjectNET(void* ptr) { const auto object = static_cast<NiObjectNET*>(ptr); return FormatString("%s", object->m_pcName); }
 
-
 	std::string AsBSFile(void* ptr) { const auto file = static_cast<BSFile*>(ptr); return FormatString("%s", file->m_path); }
 
 	std::string AsTESModel(void* ptr) { const auto model = static_cast<TESModel*>(ptr); return FormatString("%s", model->nifPath.CStr()); }
@@ -94,6 +196,8 @@ namespace CrashLogger::Handle
 
 	std::string AsTESTexture(void* ptr) { const auto texture = static_cast<TESTexture*>(ptr); return FormatString("%s", texture->ddsPath.CStr()); }
 	std::string AsQueuedTexture(void* ptr) { const auto texture = static_cast<QueuedTexture*>(ptr); return FormatString("%s", texture->name); }
+
+	std::string AsNiStream(void* ptr) { const auto file = static_cast<NiStream*>(ptr); return FormatString("%s", file->path); }
 
 	std::string AsActiveEffect(void* ptr) { const auto effect = static_cast<ActiveEffect*>(ptr); return effect->enchantObject ? FormatString("Enchanted Object %08X (%s)", effect->enchantObject->refID, effect->enchantObject->GetName()) : ""; }
 
@@ -232,6 +336,9 @@ namespace CrashLogger::NVVtables
 		Push(0x1011858, nullptr, "AlchemyItem::Destructible");
 		Push(0x1011844, nullptr, "AlchemyItem::PickUpPutDownSounds");
 
+		Push(0x108C0D0, nullptr, "NiTPrimitiveArray<MobileObject*>");
+		Push(0x10C1760, nullptr, "LockFreeQueue<NiPointer<IOTask>>");
+		Push(0x101747C, nullptr, "LockFreeMap<TESObjectREFR*, NiPointer<QueuedReference>>");
 
 		Push(kVtbl_Menu, Handle::AsMenu);
 		Push(kVtbl_TutorialMenu);
@@ -291,8 +398,8 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_INIPrefSettingCollection);
 		Push(kVtbl_INISettingCollection);
 
+		Push(kVtbl_NavMesh, Handle::AsNavMesh);
 		Push(kVtbl_TESForm, Handle::AsTESForm);
-
 		Push(kVtbl_AlchemyItem);
 		Push(kVtbl_BGSConstructibleObject);
 		Push(kVtbl_BGSDebris);
@@ -316,7 +423,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_IngredientItem);
 		Push(kVtbl_MagicItemForm);
 		Push(kVtbl_MagicItemObject);
-		Push(kVtbl_NavMesh);
 		Push(kVtbl_Script);
 		Push(kVtbl_SpellItem);
 		Push(kVtbl_TESActorBase);
@@ -434,6 +540,10 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_NiAlphaProperty);
 		Push(kVtbl_NiCamera);
 
+		// NiStream
+		Push(kVtbl_NiStream, Handle::AsNiStream);
+		Push(kVtbl_BSStream);
+
 
 		// animations
 		Push(kVtbl_BSAnimGroupSequence, Handle::AsBSAnimGroupSequence);
@@ -443,6 +553,7 @@ namespace CrashLogger::NVVtables
 
 		// model
 		Push(kVtbl_BSFile, Handle::AsBSFile);
+		Push(kVtbl_ArchiveFile);
 		Push(kVtbl_TESModel, Handle::AsTESModel);
 		Push(kVtbl_QueuedModel, Handle::AsQueuedModel);
 
@@ -503,7 +614,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_AnimIdle);
 		Push(kVtbl_AnimationTaskData);
 		Push(kVtbl_Archive);
-		Push(kVtbl_ArchiveFile);
 		Push(kVtbl_ArrayOfTuplesImplementation);
 		Push(kVtbl_Atmosphere);
 		Push(kVtbl_AttachDistant3DTask);
@@ -679,7 +789,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_BSShaderProperty);
 		Push(kVtbl_BSShaderTextureSet);
 		Push(kVtbl_BSSplatterExtraData);
-		Push(kVtbl_BSStream);
 		Push(kVtbl_BSStripPSysData);
 		Push(kVtbl_BSStripParticleSystem);
 		Push(kVtbl_BSSysInfoSystemUtility);
@@ -1317,7 +1426,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_NiStandardAllocator);
 		Push(kVtbl_NiStaticGeometryGroup);
 		Push(kVtbl_NiStencilProperty);
-		Push(kVtbl_NiStream);
 		Push(kVtbl_NiStringExtraData);
 		Push(kVtbl_NiStringPalette);
 		Push(kVtbl_NiStringsExtraData);
@@ -2116,12 +2224,16 @@ namespace CrashLogger::NVVtables
 
 	std::string GetStringForVTBL(void* ptr, UInt32 vtbl)
 	{
-
 		for (const auto& iter : setOfLabels)
 			if (iter->Satisfies(ptr)) return iter->Get(ptr);
 
-		if (vtbl > 0x1000000 && vtbl < 0x1200000)
-			return FormatString("¯\\_(Ö)_/¯: 0x%08X", vtbl);
+
+		if (vtbl > 0xFE0000 && vtbl < 0x1200000)
+		{
+			return FormatString("-\\_(Ö)_/-: 0x%08X", vtbl);
+		}
+
+//		if (std::string one = PDBHandling::GetSymbolForAddress((UInt32)ptr, GetCurrentProcess()); !one.empty()) return "Function:" + one;
 
 		return "";
 	}
@@ -2176,6 +2288,7 @@ namespace CrashLogger::DereferenceCatcher
 
 namespace CrashLogger::Calltrace
 {
+
 	void Get(EXCEPTION_POINTERS* info, HANDLE process, HANDLE thread) {
 
 		Log() << FormatString("Exception %08X caught!", info->ExceptionRecord->ExceptionCode);
@@ -2185,10 +2298,10 @@ namespace CrashLogger::Calltrace
 		CONTEXT context = {};
 		memcpy(&context, info->ContextRecord, sizeof(CONTEXT));
 		SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_DEFERRED_LOADS | SYMOPT_UNDNAME | SYMOPT_ALLOW_ABSOLUTE_SYMBOLS);
-		//    SymSetExtendedOption((IMAGEHLP_EXTENDED_OPTIONS)SYMOPT_EX_WINE_NATIVE_MODULES, TRUE);
-		if (SymInitialize(process, NULL, TRUE) != TRUE) {
-			Log() << FormatString("Error initializing symbol store");
-		}
+
+//    SymSetExtendedOption((IMAGEHLP_EXTENDED_OPTIONS)SYMOPT_EX_WINE_NATIVE_MODULES, TRUE);
+		if (SymInitialize(process, NULL, TRUE) != TRUE) Log() << FormatString("Error initializing symbol store");
+
 		//    SymSetExtendedOption((IMAGEHLP_EXTENDED_OPTIONS)SYMOPT_EX_WINE_NATIVE_MODULES, TRUE);
 
 		STACKFRAME frame = {};
@@ -2206,47 +2319,8 @@ namespace CrashLogger::Calltrace
 			*/
 			if (frame.AddrPC.Offset == eip) break;
 			eip = frame.AddrPC.Offset;
+			Log() << PDBHandling::GetCalltraceFunction(frame.AddrPC.Offset, frame.AddrFrame.Offset, process);
 
-			/*if (GetModuleFileName((HMODULE)frame.AddrPC.Offset, path, MAX_PATH)) {  //Do this work on non base addresses even on  Windows? Cal directly the LDR function?
-				   if (!SymLoadModule(process, NULL, path, NULL, 0, 0)) Log() << FormatString("Porcoddio %0X", GetLastError());
-			}*/
-			IMAGEHLP_MODULE module = { 0 };
-			module.SizeOfStruct = sizeof(IMAGEHLP_MODULE);
-
-			BOOL moduleAv = SymGetModuleInfo(process, frame.AddrPC.Offset, &module);
-			std::string functioName;
-			char symbolBuffer[sizeof(IMAGEHLP_SYMBOL) + 255];
-			IMAGEHLP_SYMBOL* symbol = (IMAGEHLP_SYMBOL*)symbolBuffer;
-			symbol->SizeOfStruct = sizeof(IMAGEHLP_SYMBOL);
-			symbol->MaxNameLength = 254;
-			DWORD  offset = 0;
-			if (!moduleAv) {
-				//    Log() << FormatString("porcoddio2 %0X", GetLastError());
-				Log() << FormatString("0x%08X ==> %20s (0x%08X) : (Corrupt stack or heap?)", frame.AddrPC.Offset, "¯\\(°_o)/¯", frame.AddrFrame.Offset);
-				continue;
-			}
-
-			if (!SymGetSymFromAddr(process, frame.AddrPC.Offset, &offset, symbol)) {
-				//   Log() << FormatString("porcoddio1 %0X", GetLastError());
-				//WIne dbghelp and Windows dbghelp operate totally differently
-				Log() << FormatString("0x%08X ==> %20s (0x%08X) : %s+0x%0X ", frame.AddrPC.Offset, module.ModuleName, frame.AddrFrame.Offset, "EntryPoint", (UInt32)-1);
-				continue;
-			}
-
-
-			DWORD offset2 = 0;
-			char lineBuffer[sizeof(IMAGEHLP_LINE) + 255];
-			IMAGEHLP_LINE* line = (IMAGEHLP_LINE*)lineBuffer;
-			line->SizeOfStruct = sizeof(IMAGEHLP_LINE);
-
-			functioName = symbol->Name;
-
-			if (!SymGetLineFromAddr(process, frame.AddrPC.Offset, &offset2, line)) {
-				Log() << FormatString("0x%08X ==> %20s (0x%08X) : %s+0x%0X", frame.AddrPC.Offset, module.ModuleName, frame.AddrFrame.Offset, functioName.c_str(), offset);
-				continue;
-			}
-
-			Log() << FormatString("0x%08X ==> %-80s <== <%s:%d>", frame.AddrPC.Offset, FormatString("%20s (0x%08X) : %s+0x%0X", module.ModuleName, frame.AddrFrame.Offset, functioName.c_str(), offset).c_str(), line->FileName, line->LineNumber);
 		}
 	}
 
