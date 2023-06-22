@@ -1127,16 +1127,17 @@ public:
 	~NiBinaryStream();
 
 	virtual void	Destructor(bool freeMemory);		// 00
-	virtual void	Unk_01();						// 04
+	virtual void	Unk_01();							// 04
 	virtual void	SeekCur(SInt32 delta);				// 08
-	virtual void	GetBufferSize();				// 0C
+	virtual void	GetBufferSize();					// 0C
 	virtual void	InitReadWriteProcs(bool useAlt);	// 10
 
 //	void	** m_vtbl;		// 000
 	UInt32	m_offset;		// 004
-	void	* m_readProc;	// 008 - function pointer
-	void	* m_writeProc;	// 00C - function pointer
+	void*	m_readProc;		// 008 - function pointer
+	void*	m_writeProc;	// 00C - function pointer
 };
+static_assert(sizeof(NiBinaryStream) == 0x10);
 
 class NiFile: public NiBinaryStream
 {
@@ -1155,9 +1156,10 @@ public:
 	void*	m_buffer;	// 020
 	FILE*	m_File;		// 024
 };
+static_assert(sizeof(NiFile) == 0x28);
 
 // 158
-class BSFile: NiFile
+class BSFile : NiFile
 {
 public:
 	BSFile();
@@ -1186,55 +1188,24 @@ public:
 	UInt32		m_fileSize;				// 150
 	UInt32		m_unk154;				// 154
 };
+static_assert(sizeof(BSFile) == 0x158);
 
-//// derived from NiFile, which derives from NiBinaryStream
-//// 154
-//class BSFile
-//{
-//public:
-//	BSFile();
-//	~BSFile();
-//
-//	virtual void	Destructor(bool freeMemory);				// 00
-//	virtual void	Unk_01();								// 04
-//	virtual void	Unk_02();								// 08
-//	virtual void	Unk_03();								// 0C
-//	virtual void	Unk_04();								// 10
-//	virtual void	DumpAttributes(NiTArray <char *> * dst);	// 14
-//	virtual UInt32	GetSize();								// 18
-//	virtual void	Unk_07();								// 1C
-//	virtual void	Unk_08();								// 20
-//	virtual void	Unk_09();								// 24
-//	virtual void	Unk_0A();								// 28
-//	virtual void	Unk_0B();								// 2C
-//	virtual void	Unk_0C();								// 30
-//	virtual void	Unk_Read();								// 34
-//	virtual void	Unk_Write();							// 38
-//
-////	void	** m_vtbl;		// 000
-//	void	* m_readProc;	// 004 - function pointer
-//	void	* m_writeProc;	// 008 - function pointer
-//	UInt32	m_bufSize;		// 00C
-//	UInt32	m_unk010;		// 010 - init'd to m_bufSize
-//	UInt32	m_unk014;		// 014
-//	void	* m_buf;		// 018
-//	FILE	* m_file;		// 01C
-//	UInt32	m_writeAccess;	// 020
-//	UInt8	m_good;			// 024
-//	UInt8	m_pad025[3];	// 025
-//	UInt8	m_unk028;		// 028
-//	UInt8	m_pad029[3];	// 029
-//	UInt32	m_unk02C;		// 02C
-//	UInt32	m_pos;			// 030
-//	UInt32	m_unk034;		// 034
-//	UInt32	m_unk038;		// 038
-//	char	m_path[0x104];	// 03C
-//	UInt32	m_unk140;		// 140
-//	UInt32	m_unk144;		// 144
-//	UInt32	m_pos2;			// 148 - used if m_pos is 0xFFFFFFFF
-//	UInt32	m_unk14C;		// 14C
-//	UInt32	m_fileSize;		// 150
-//};
+struct ArchiveFile : BSFile
+{
+	UInt32 unk158;
+	UInt32 unk15C;
+};
+static_assert(sizeof(ArchiveFile) == 0x160);
+
+struct CompressedArchiveFile : ArchiveFile
+{
+	void* ptr160;
+	void* ptr164;
+	UInt32 streamLength;
+	UInt32 unk16C;
+	UInt32 streamOffset;
+	UInt32 unk174;
+};
 
 /**** misc non-NiObjects ****/
 

@@ -26,7 +26,7 @@ public:
 	Log(UInt32 logLevel = kError, UInt32 logDest = kLog) : logDest(logDest), logLevel(logLevel) {};
 	Log& operator<<(const std::string& str);
 
-	static void Init(const std::filesystem::path& path, const std::string& modName);
+	static void Init(const std::filesystem::path& path, const std::string& modName, const std::string& history = "");
 };
 
 void Dump(Tile* tile);

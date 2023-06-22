@@ -19,7 +19,6 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	if (msg->type == NVSEMessagingInterface::kMessage_DeferredInit)
 	{
 		InitSingletons();
-		//Log() << CrashLogger_VERSION_STR;
 		Log() << "";
 
 		for (const auto& i : deferredInit) i(); // call all deferred init functions
@@ -68,7 +67,7 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 
 	Log() << GetName() + " version " + CrashLogger_VERSION_STR + " at " + std::format("{0:%F} {0:%T}", std::chrono::time_point(std::chrono::system_clock::now()));
 
-	Log() << ("If this file is empty, then your game didn't crash or something went so wrong even crash logger was useless! :snig: \n");
+	Log() << "If this file is empty, then your game didn't crash or something went so wrong even crash logger was useless! :snig: \n";
 
 	CrashLogger::NVVtables::FillLabels();
 	CrashLogger::Apply();
@@ -118,7 +117,7 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	g_loggingInterface = static_cast<NVSELoggingInterface*>(nvse->QueryInterface(kInterface_LoggingInterface));
 	auto path = std::filesystem::path(g_loggingInterface->GetPluginLogPath());
 	path += CrashLogger_LOG;
-	Log::Init(path, CrashLogger_STR);
+	Log::Init(path, CrashLogger_STR, CrashLogger_FLD);
 
 	for (const auto& i : pluginLoad) i(); // call all plugin load functions
 

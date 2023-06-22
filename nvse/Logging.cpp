@@ -2,6 +2,7 @@
 
 #include <fstream>
 #include <vector>
+#include <format>
 
 #include <ConsoleManager.h>
 #include <BSExtraData.h>
@@ -30,19 +31,31 @@ public:
 	DebugLog() = default;
 	~DebugLog() { if (file) file.close(); }
 
-	void Create(LoggingFunction rhslogger, const std::filesystem::path& rhspath, const std::string& rhsmodString = "")
+	void Create(LoggingFunction rhslogger, const std::filesystem::path& rhspath, const std::string& logFolder = "", const std::string& rhsmodString = "")
 	{
+		if (!logFolder.empty() && exists(rhspath))
+		{
+			const std::string additional = logFolder + "/";
+			std::filesystem::create_directory(additional);
+
+			if (file_size(rhspath) > 0xFFF)
+			{
+				const auto lastmod = std::format(".{0:%F}-{0:%H}-{0:%M}-{0:%S}", floor<std::chrono::seconds>(last_write_time(rhspath)));
+
+				rename(rhspath, additional + rhspath.stem().string() + lastmod + rhspath.extension().string());
+			}
+		}
+
 		logger = rhslogger;
 		file = std::fstream(rhspath, std::fstream::out | std::fstream::trunc);
 		modString = rhsmodString;
-
 	}
 
 	void Create(UpdateFunction rhsupdate, const std::string& rhsmodString = "")
 	{
 		update = rhsupdate;
 		modString = rhsmodString;
-	};
+	}
 
 	void Message(const std::string& str, SInt32 deltaIndent = 0)
 	{
@@ -206,9 +219,9 @@ void DumpFontNames()
 }
 
 
-void Log::Init(const std::filesystem::path& path, const std::string& modName)
+void Log::Init(const std::filesystem::path& path, const std::string& modName, const std::string& history)
 {
-	file.Create(FileLoggerPrint, path);
+	file.Create(FileLoggerPrint, path, history);
 	console.Create(ConsoleLoggerUpdate, modName);
 }
 

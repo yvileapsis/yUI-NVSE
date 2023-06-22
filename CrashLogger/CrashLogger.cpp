@@ -73,7 +73,7 @@ namespace CrashLogger::PDBHandling
 			   if (!SymLoadModule(process, NULL, path, NULL, 0, 0)) Log() << FormatString("Porcoddio %0X", GetLastError());
 		}*/
 
-		std::string begin = "(" + GetAddress(eip) + ") ==> ";
+		std::string begin = GetAddress(eip) + " ==> ";
 
 		std::string middle;
 
@@ -146,6 +146,14 @@ namespace CrashLogger::Handle
 		return FormatString("%08X (%s), BaseForm %08X (%s)", refr->refID, refr->GetName(),
 		                    refr->TryGetREFRParent()->refID, refr->TryGetREFRParent()->GetName());
 	}
+
+	std::string AsQueuedReference(void* ptr)
+	{
+		const auto refr = static_cast<QueuedReference*>(ptr);
+		return FormatString("%08X (%s), BaseForm %08X (%s)", refr->refr->refID, refr->refr->GetName(),
+			refr->refr->TryGetREFRParent()->refID, refr->refr->TryGetREFRParent()->GetName());
+	}
+
 	std::string AsNavMesh(void* ptr) {
 		const auto navmesh = static_cast<NavMesh*>(ptr);
 		return FormatString("%08X (%s), Cell %08X (%s)", navmesh->refID, navmesh->GetName(),
@@ -295,7 +303,8 @@ namespace CrashLogger::NVVtables
 		Push(0x11F3374, Handle::AsUInt32, "TileValueIndirectTemp", Label::kType_Global);
 		Push(0x118FB0C, nullptr, "ShowWhoDetects", Label::kType_Global);
 		Push(0x1042C58, nullptr, "ShowWhoDetects", Label::kType_Global);
-		
+		Push(0x011F6238, nullptr, "HeapManager", Label::kType_Global);
+
 		Push(0x11846D4, nullptr, "Actor", Label::kType_RTTIClass, 0x8);
 		Push(0x1184920, nullptr, "MovingObject", Label::kType_RTTIClass, 0x8);
 		Push(0x11840C4, nullptr, "TESAmmo", Label::kType_RTTIClass, 0x8);
@@ -339,6 +348,7 @@ namespace CrashLogger::NVVtables
 		Push(0x108C0D0, nullptr, "NiTPrimitiveArray<MobileObject*>");
 		Push(0x10C1760, nullptr, "LockFreeQueue<NiPointer<IOTask>>");
 		Push(0x101747C, nullptr, "LockFreeMap<TESObjectREFR*, NiPointer<QueuedReference>>");
+
 
 		Push(kVtbl_Menu, Handle::AsMenu);
 		Push(kVtbl_TutorialMenu);
@@ -518,6 +528,12 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_GrenadeProjectile);
 		Push(kVtbl_MissileProjectile);
 
+		Push(kVtbl_QueuedReference, Handle::AsQueuedReference);
+		Push(kVtbl_QueuedCharacter);
+		Push(kVtbl_QueuedActor);
+		Push(kVtbl_QueuedCreature);
+		Push(kVtbl_QueuedPlayer);
+
 
 		Push(kVtbl_BaseProcess, Handle::AsBaseProcess);
 		Push(kVtbl_LowProcess);
@@ -547,13 +563,15 @@ namespace CrashLogger::NVVtables
 
 		// animations
 		Push(kVtbl_BSAnimGroupSequence, Handle::AsBSAnimGroupSequence);
-		Push(kVtbl_AnimSequenceBase, nullptr);
+		Push(kVtbl_AnimSequenceBase);
 		Push(kVtbl_AnimSequenceSingle, Handle::AsAnimSequenceSingle);
 		Push(kVtbl_AnimSequenceMultiple, Handle::AsAnimSequenceMultiple);
 
-		// model
 		Push(kVtbl_BSFile, Handle::AsBSFile);
 		Push(kVtbl_ArchiveFile);
+		Push(kVtbl_CompressedArchiveFile);
+
+		// model
 		Push(kVtbl_TESModel, Handle::AsTESModel);
 		Push(kVtbl_QueuedModel, Handle::AsQueuedModel);
 
@@ -920,7 +938,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_CombatProcedureUseCombatItem);
 		Push(kVtbl_CombatTargetMap);
 		Push(kVtbl_CombatThreatMap);
-		Push(kVtbl_CompressedArchiveFile);
 		Push(kVtbl_CstringArrayImplementation);
 		Push(kVtbl_DebugText);
 		Push(kVtbl_DebugTextExtraData);
@@ -1498,11 +1515,8 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_PrecipitationShaderProperty);
 		Push(kVtbl_ProjectileListener);
 
-		Push(kVtbl_QueuedActor);
 		Push(kVtbl_QueuedAnimIdle);
-		Push(kVtbl_QueuedCharacter);
 		Push(kVtbl_QueuedChildren);
-		Push(kVtbl_QueuedCreature);
 		Push(kVtbl_QueuedFaceGenFile);
 		Push(kVtbl_QueuedFile);
 		Push(kVtbl_QueuedFileEntry);
@@ -1512,8 +1526,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_QueuedKF);
 		Push(kVtbl_QueuedMagicItem);
 		Push(kVtbl_QueuedParents);
-		Push(kVtbl_QueuedPlayer);
-		Push(kVtbl_QueuedReference);
 		Push(kVtbl_QueuedReplacementKF);
 		Push(kVtbl_QueuedReplacementKFList);
 		Push(kVtbl_QueuedTree);
@@ -2383,20 +2395,8 @@ namespace CrashLogger::ModuleBases
 			info->moduleBase = moduleBase;
 			strcpy_s(info->name, 100, name);
 		}
-		Log() << FormatString(" - 0x%08X - 0x%08X: %s", (UInt32)moduleBase, (UInt32)moduleBase + (UInt32)moduleSize, name);
-		return TRUE;
-	}
-
-	BOOL CALLBACK EumerateModulesCallbackSym(PCSTR name, ULONG moduleBase, PVOID context) {
-		UserContext* info = (UserContext*)context;
-		IMAGEHLP_MODULE modu;
-		SymGetModuleInfo(GetCurrentProcess(), moduleBase, &modu);
-		if (info->eip >= (UInt32)moduleBase && info->eip <= (UInt32)moduleBase + modu.ImageSize) {
-			//			   Log() << FormatString("%0X %0X  %0X", (UInt32)moduleBase, info->eip, (UInt32)moduleBase + moduleSize);
-			info->moduleBase = moduleBase;
-			strcpy_s(info->name, 100, name);
-		}
-		Log() << FormatString(" - 0x%08X - 0x%08X: %s", (UInt32)moduleBase, (UInt32)moduleBase + modu.ImageSize, name);
+		const std::filesystem::path path = name;
+		Log() << FormatString("0x%08X - 0x%08X ==> %25s, %s", (UInt32)moduleBase, (UInt32)moduleBase + (UInt32)moduleSize, path.stem().generic_string().c_str(), path.generic_string().c_str());
 		return TRUE;
 	}
 
@@ -2407,7 +2407,6 @@ namespace CrashLogger::ModuleBases
 		Log() << FormatString("\nModule bases:");
 		UserContext infoUser = { eip,  0, (char*)calloc(sizeof(char), 100) };
 		EnumerateLoadedModules(processHandle, EumerateModulesCallback, &infoUser);
-		//        SymEnumerateModules(processHandle, EumerateModulesCallbackSym, &infoUser);
 		if (infoUser.moduleBase) {
 			Log() << FormatString("\nGAME CRASHED AT INSTRUCTION Base+0x%08X IN MODULE: %s", (infoUser.eip - infoUser.moduleBase), infoUser.name);
 			Log() << FormatString("Please note that this does not automatically mean that that module is responsible. \n"
