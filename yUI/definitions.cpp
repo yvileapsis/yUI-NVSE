@@ -19,7 +19,6 @@ INIT_MODULE(Fix::TablineSelected)
 INIT_MODULE(Fix::ReorderMCM)
 INIT_MODULE(Fix::ProjectileEffects)
 INIT_MODULE(Fix::TouchpadScrolling)
-INIT_MODULE(Fix::LocaleStrings)
 
 INIT_MODULE(Patch::RestoreFO3Spread)
 INIT_MODULE(Patch::ArmedUnarmed)
@@ -48,7 +47,6 @@ void Inits()
 //	Fix::ReorderMCM::Init();
 //	Fix::ProjectileEffects::Init();
 	Fix::TouchpadScrolling::Init();
-	Fix::LocaleStrings::Init();
 
 //	Patch::RestoreFO3Spread::Init();
 //	Patch::ArmedUnarmed::Init();
