@@ -353,6 +353,22 @@ public:
 };
 static_assert(sizeof(bhkRagdollController) == 0x0224);
 
+class PathingLocation
+{
+public:
+	void* vtbl;
+	NiPoint3 location;
+	UInt32 currentNavMeshInfo;
+	UInt32 navMeshInfo;
+	TESObjectCELL* cell;
+	TESWorldSpace* worldspace;
+	UInt32 unk020;
+	UInt16 unk024;
+	UInt8 flags026;
+	UInt8 gap027;
+};
+
+
 class ActorMover	// I need to call Func008
 {
 public:
@@ -370,7 +386,37 @@ public:
 		// bit 8 = run
 		// bit 7 = walk
 		// bit 0 = keep moving (Q)
+
+	UInt32 unk04;
+	UInt32 unk08;
+	UInt32 unk0C;
+	NiPoint3 overrideMovement;
+	void* pathingRequest;
+	void* pathingSolution;
+	void* pathHandler;
+	Actor* actor;
+	UInt32 unk2C;
+	void* pathingMsgQueue;
+	UInt32 movementFlags1;
+	UInt32 unk38;
+	UInt32 movementFlags2;
+	UInt32 unk40;
+	PathingLocation pathingLocation;
+	UInt32 unk6C;
+	UInt8 byte70;
+	UInt8 byte71;
+	UInt8 byte72;
+	UInt8 gap73;
+	UInt8 byte74;
+	UInt8 byte75;
+	UInt8 byte76;
+	UInt8 isOverrideMovement;
+	UInt32 unk78;
+	UInt32 unk7C;
+	UInt32 unk80;
+	UInt32 count84;
 };
+
 
 
 enum ActorValueCode

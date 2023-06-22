@@ -147,10 +147,16 @@ namespace CrashLogger::Handle
 		                    refr->TryGetREFRParent()->refID, refr->TryGetREFRParent()->GetName());
 	}
 
+	std::string AsActorMover(void* ptr) {
+		const auto mover = static_cast<ActorMover*>(ptr);
+		return !mover->actor ? "" : FormatString("%08X (%s), BaseForm %08X (%s)", mover->actor->refID, mover->actor->GetName(),
+		                                         mover->actor->TryGetREFRParent()->refID, mover->actor->TryGetREFRParent()->GetName());
+	}
+
 	std::string AsQueuedReference(void* ptr)
 	{
 		const auto refr = static_cast<QueuedReference*>(ptr);
-		return FormatString("%08X (%s), BaseForm %08X (%s)", refr->refr->refID, refr->refr->GetName(),
+		return !refr->refr ? "" : FormatString("%08X (%s), BaseForm %08X (%s)", refr->refr->refID, refr->refr->GetName(),
 			refr->refr->TryGetREFRParent()->refID, refr->refr->TryGetREFRParent()->GetName());
 	}
 
@@ -200,7 +206,13 @@ namespace CrashLogger::Handle
 	std::string AsBSFile(void* ptr) { const auto file = static_cast<BSFile*>(ptr); return FormatString("%s", file->m_path); }
 
 	std::string AsTESModel(void* ptr) { const auto model = static_cast<TESModel*>(ptr); return FormatString("%s", model->nifPath.CStr()); }
-	std::string AsQueuedModel(void* ptr) { const auto model = static_cast<QueuedModel*>(ptr); return FormatString("%s %s", model->model->path, model->tesModel->nifPath.CStr()); }
+	std::string AsQueuedModel(void* ptr) {
+		const auto model = static_cast<QueuedModel*>(ptr);
+		std::string output;
+		output += model->model ? std::string(model->model->path) + " " : "";
+		output += model->tesModel ? model->tesModel->nifPath.CStr() : "";
+		return output;
+	}
 
 	std::string AsTESTexture(void* ptr) { const auto texture = static_cast<TESTexture*>(ptr); return FormatString("%s", texture->ddsPath.CStr()); }
 	std::string AsQueuedTexture(void* ptr) { const auto texture = static_cast<QueuedTexture*>(ptr); return FormatString("%s", texture->name); }
@@ -216,6 +228,8 @@ namespace CrashLogger::Handle
 		ret += effect->script ? FormatString("Script %08X (%s)", effect->script->refID, effect->script->GetName()) : "";
 		return ret;
 	}
+
+	std::string AsQueuedKF(void* ptr) {	const auto model = static_cast<QueuedKF*>(ptr); return !model->kf ? "" : FormatString("%s", model->kf->path); }
 
 }
 namespace CrashLogger::NVVtables
@@ -534,6 +548,8 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_QueuedCreature);
 		Push(kVtbl_QueuedPlayer);
 
+		Push(kVtbl_ActorMover, Handle::AsActorMover);
+		Push(kVtbl_PlayerMover);
 
 		Push(kVtbl_BaseProcess, Handle::AsBaseProcess);
 		Push(kVtbl_LowProcess);
@@ -566,6 +582,9 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_AnimSequenceBase);
 		Push(kVtbl_AnimSequenceSingle, Handle::AsAnimSequenceSingle);
 		Push(kVtbl_AnimSequenceMultiple, Handle::AsAnimSequenceMultiple);
+
+		Push(kVtbl_QueuedKF, Handle::AsQueuedKF);
+		Push(kVtbl_QueuedAnimIdle);
 
 		Push(kVtbl_BSFile, Handle::AsBSFile);
 		Push(kVtbl_ArchiveFile);
@@ -621,7 +640,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_AILinearTaskThread);
 		Push(kVtbl_AITaskThread);
 		Push(kVtbl_AbstractHeap);
-		Push(kVtbl_ActorMover);
 		Push(kVtbl_ActorPackageData);
 		Push(kVtbl_ActorPathHandler);
 		Push(kVtbl_ActorPathingMessageQueue);
@@ -1507,7 +1525,7 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_PathingSearchRayCast);
 		Push(kVtbl_PathingSolution);
 		Push(kVtbl_PathingTaskData);
-		Push(kVtbl_PlayerMover);
+
 		Push(kVtbl_PointerArrayImplementation);
 		Push(kVtbl_PosGen);
 		Push(kVtbl_Precipitation);
@@ -1515,7 +1533,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_PrecipitationShaderProperty);
 		Push(kVtbl_ProjectileListener);
 
-		Push(kVtbl_QueuedAnimIdle);
 		Push(kVtbl_QueuedChildren);
 		Push(kVtbl_QueuedFaceGenFile);
 		Push(kVtbl_QueuedFile);
@@ -1523,7 +1540,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_QueuedFileLoad);
 		Push(kVtbl_QueuedHead);
 		Push(kVtbl_QueuedHelmet);
-		Push(kVtbl_QueuedKF);
 		Push(kVtbl_QueuedMagicItem);
 		Push(kVtbl_QueuedParents);
 		Push(kVtbl_QueuedReplacementKF);
