@@ -162,7 +162,6 @@
     <ClCompile Include="MiscFeatures\PatchB42InjectHideCrosshair.cpp">
       <Filter>features</Filter>
     </ClCompile>
-    <ClCompile Include="MiscFeatures\FixLocaleStrings.cpp" />
     <ClCompile Include="ConfigurationMenu\ConfigurationMenuBasic.cpp">
       <Filter>features\ConfigurationMenu</Filter>
     </ClCompile>
