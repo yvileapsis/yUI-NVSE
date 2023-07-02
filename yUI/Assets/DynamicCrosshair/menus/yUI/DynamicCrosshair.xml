@@ -14,7 +14,6 @@
 	<!-- set in code constantly -->
 	<_Spread> 0.0 </_Spread>
 	<_visible> 0 </_visible>
-	<_scope> 0 </_scope>
 	<!-- 			-->
 
 	<_Exists> 1 </_Exists>
@@ -43,18 +42,13 @@
 	</_Offset>
 
 	<_OffsetReticle> <copy src="me()" trait="_Offset"/> <max> 0 </max> </_OffsetReticle>
-	
-	<_OffsetCircle>
-		<copy src="me()" trait="_Offset"/>
-		<add> <copy src="me()" trait="_Length"/> <mul> 0.3333 </mul> </add>
-		<max> <copy src="me()" trait="_Length"/> <mul> 1.3333 </mul> </max>
-	</_OffsetCircle>
 
 	<_VisibleReticle> &false; </_VisibleReticle>
 	<_VisibleDot> &false; </_VisibleDot>
 	
 	<_VisibleCrosshair> <copy src="me()" trait="_VisibleReticle"/> <eq> 1 </eq> </_VisibleCrosshair>
-	<_VisibleCircle> <copy src="me()" trait="_VisibleReticle"/> <eq> 2 </eq> </_VisibleCircle>	
+	<_VisibleCrosshairAuto> <copy src="me()" trait="_VisibleReticle"/> <eq> 2 </eq> </_VisibleCrosshairAuto>
+	<_VisibleCrosshairCircle> <copy src="me()" trait="_VisibleReticle"/> <eq> 3 </eq> </_VisibleCrosshairCircle>	
 
 	<_VisibleDotSmall> <copy src="me()" trait="_VisibleDot"/> <eq> 1 </eq> </_VisibleDotSmall>
 	<_VisibleDotBig> <copy src="me()" trait="_VisibleDot"/> <eq> 2 </eq> </_VisibleDotBig>
@@ -88,11 +82,7 @@
 	
 	<visible>
 		<copy src="ReticleCenter" trait="visible"/>
-		<or src="AmmoTypeLabel" trait="visible"/>
-		<or src="ActionPoints" trait="visible"/>
-		<or src="HitPoints" trait="visible"/>
-		<or src="me()" trait="_scope"/>
-		<and src="me()" trait="_visible"/>
+		<or> <copy src="me()" trait="_visible"/> <and src="ActionPoints" trait="visible"/> </or>
 	</visible>
 
 	<image name="Dot">
@@ -129,11 +119,9 @@
 		<brightness> <copy src="parent()" trait="brightness"/> </brightness>
 	</image>
 
-	<rect name="Circle">
-		<visible> <copy src="parent()" trait="_VisibleCircle"/> </visible>
-		<_Length> <copy src="parent()" trait="_Length"/> </_Length>
-		<_OffsetCircle>	<copy src="parent()" trait="_OffsetCircle"/> </_OffsetCircle>
-		<_PromptSize> <copy src="parent()" trait="_PromptSize"/> </_PromptSize>
+	<rect name="Vanilla">
+		<visible> <copy src="parent()" trait="_VisibleVanilla"/> </visible>
+		<_Length> <copy src="parent()" trait="_Width"/> <mul> 6.0 </mul> </_Length>
 		<locus> &true; </locus>
 		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
 		<alpha> <copy src="parent()" trait="_Alpha"/> </alpha>
@@ -142,34 +130,12 @@
 		<blue> <copy src="parent()" trait="blue"/> </blue>
 		<brightness> <copy src="parent()" trait="brightness"/> </brightness>
 
-		<image name="Up">
-			<filename>Interface\JDC\JDCCircle.dds</filename>
-			<width> <copy src="parent()" trait="_Length"/> <mul> 2.6667 </mul> </width>
-			<height> <copy src="parent()" trait="_Length"/> <mul> 1.3333 </mul> </height>
+		<image name="Reticle">
+			<filename>Interface\JDC\JDCVanilla.dds</filename>
+			<width> <copy src="parent()" trait="_Length"/> </width>
+			<height> <copy src="parent()" trait="_Length"/> </height>
 			<x> <copy src="me()" trait="width"/> <div> -2 </div> </x>
-			<y> <copy> 0 </copy> <sub src="parent()" trait="_OffsetCircle"/> </y>
-			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx> 
-			<Rotateaxisy> <copy src="parent()" trait="_OffsetCircle"/> </Rotateaxisy>
-			<rotateangle> 0 </rotateangle>
-			<zoom> &scale; </zoom>
-			<depth> 1 </depth>
-			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
-			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
-			<red> <copy src="parent()" trait="red"/> </red>
-			<green> <copy src="parent()" trait="green"/> </green>
-			<blue> <copy src="parent()" trait="blue"/> </blue>
-			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
-		</image>
-		
-		<image name="Right">
-			<filename>Interface\JDC\JDCCircle.dds</filename>
-			<width> <copy src="parent()" trait="_Length"/> <mul> 2.6667 </mul> </width>
-			<height> <copy src="parent()" trait="_Length"/> <mul> 1.3333 </mul> </height>
-			<x>	<copy src="me()" trait="width"/> <div> -2 </div> </x>
-			<y> <copy> 0 </copy> <sub src="parent()" trait="_OffsetCircle"/> </y>
-			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx> 
-			<Rotateaxisy> <copy src="parent()" trait="_OffsetCircle"/> </Rotateaxisy>
-			<rotateangle> 1.570796 </rotateangle>
+			<y> <copy src="me()" trait="height"/> <div> -2 </div> </y>
 			<zoom> &scale; </zoom>
 			<depth> 1 </depth>
 			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
@@ -180,49 +146,11 @@
 			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
 		</image>
 
-		<image name="Down">
-			<filename>Interface\JDC\JDCCircle.dds</filename>
-			<width> <copy src="parent()" trait="_Length"/> <mul> 2.6667 </mul> </width>
-			<height> <copy src="parent()" trait="_Length"/> <mul> 1.3333 </mul> </height>
-			<x>	<copy src="me()" trait="width"/> <div> -2 </div> </x>
-			<y> <copy> 0 </copy> <sub src="parent()" trait="_OffsetCircle"/> </y>
-			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx> 
-			<Rotateaxisy> <copy src="parent()" trait="_OffsetCircle"/> </Rotateaxisy>
-			<rotateangle> 3.141593 </rotateangle>
-			<zoom> &scale; </zoom>
-			<depth> 1 </depth>
-			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
-			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
-			<red> <copy src="parent()" trait="red"/> </red>
-			<green> <copy src="parent()" trait="green"/> </green>
-			<blue> <copy src="parent()" trait="blue"/> </blue>
-			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
-		</image>
-		
-		<image name="Left">
-			<filename>Interface\JDC\JDCCircle.dds</filename>
-			<width> <copy src="parent()" trait="_Length"/> <mul> 2.6667 </mul> </width>
-			<height> <copy src="parent()" trait="_Length"/> <mul> 1.3333 </mul> </height>
-			<x>	<copy src="me()" trait="width"/> <div> -2 </div> </x>
-			<y> <copy> 0 </copy> <sub src="parent()" trait="_OffsetCircle"/> </y>
-			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx> 
-			<Rotateaxisy> <copy src="parent()" trait="_OffsetCircle"/> </Rotateaxisy>
-			<rotateangle> 4.712389 </rotateangle>
-			<zoom> &scale; </zoom>
-			<depth> 1 </depth>
-			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
-			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
-			<red> <copy src="parent()" trait="red"/> </red>
-			<green> <copy src="parent()" trait="green"/> </green>
-			<blue> <copy src="parent()" trait="blue"/> </blue>
-			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
-		</image>
-		
 		<image name="Prompt">
 			<visible> <copy src="justify_center_hotrect" trait="visible"/> </visible>
-			<filename>Interface\JDC\JDCCirclePrompt.dds</filename>
-			<width> <copy src="parent()" trait="_Length"/> <mul> 1.3333 </mul> </width>
-			<height> <copy src="parent()" trait="_Length"/> <mul> 1.3333 </mul> </height>
+			<filename>Interface\JDC\JDCVanillaPrompt.dds</filename>
+			<width> <copy src="parent()" trait="_Length"/> </width>
+			<height> <copy src="parent()" trait="_Length"/> </height>
 			<x> <copy src="me()" trait="width"/> <div> -2 </div> </x>
 			<y> <copy src="me()" trait="height"/> <div> -2 </div> </y>
 			<zoom> &scale; </zoom>
@@ -235,7 +163,7 @@
 			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
 		</image>
 	</rect>
-	
+
 	<rect name="Crosshair">
 		<visible> <copy src="parent()" trait="_VisibleCrosshair"/> </visible>
 		<_Width> <copy src="parent()" trait="_Width"/> </_Width>
@@ -407,9 +335,14 @@
 		</image>
 	</rect>
 
-	<rect name="Vanilla">
-		<visible> <copy src="parent()" trait="_VisibleVanilla"/> </visible>
-		<_Length> <copy src="parent()" trait="_Width"/> <mul> 6.0 </mul> </_Length>
+	<rect name="Crosshair">
+		<visible> <copy src="parent()" trait="_VisibleCrosshairAuto"/> </visible>
+		<_Width> <copy src="parent()" trait="_Width"/> </_Width>
+		<_Length> <copy src="parent()" trait="_Length"/> </_Length>
+		<_OffsetReticle> <copy src="parent()" trait="_OffsetReticle"/> </_OffsetReticle>
+		<_PromptSize> <copy src="parent()" trait="_Width"/> <mul> 3.0 </mul> </_PromptSize>
+		<_PromptOffsetVertical> <copy src="parent()" trait="_Width"/> <mul> 0.5 </mul> </_PromptOffsetVertical>
+		<_PromptOffsetHorizontal> <copy src="parent()" trait="_Width"/> <mul> 0.75 </mul> </_PromptOffsetHorizontal>
 		<locus> &true; </locus>
 		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
 		<alpha> <copy src="parent()" trait="_Alpha"/> </alpha>
@@ -417,13 +350,16 @@
 		<green> <copy src="parent()" trait="green"/> </green>
 		<blue> <copy src="parent()" trait="blue"/> </blue>
 		<brightness> <copy src="parent()" trait="brightness"/> </brightness>
-
-		<image name="Reticle">
-			<filename>Interface\JDC\JDCVanilla.dds</filename>
-			<width> <copy src="parent()" trait="_Length"/> </width>
+			
+		<image name="Down">
+			<filename>Interface\JDC\JDCDefault.dds</filename>
+			<width> <copy src="parent()" trait="_Width"/> </width>
 			<height> <copy src="parent()" trait="_Length"/> </height>
-			<x> <copy src="me()" trait="width"/> <div> -2 </div> </x>
-			<y> <copy src="me()" trait="height"/> <div> -2 </div> </y>
+			<x>	<copy src="me()" trait="width"/> <div> -2 </div> </x>
+			<y> <copy src="parent()" trait="_OffsetReticle"/> </y>
+			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx>
+			<Rotateaxisy> <copy> 0 </copy> <sub src="parent()" trait="_OffsetReticle"/> </Rotateaxisy>
+			<rotateangle> 0 </rotateangle>
 			<zoom> &scale; </zoom>
 			<depth> 1 </depth>
 			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
@@ -434,11 +370,183 @@
 			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
 		</image>
 
+		<image name="Right">
+			<filename>Interface\JDC\JDCDefault.dds</filename>
+			<width> <copy src="parent()" trait="_Width"/> </width>
+			<height> <copy src="parent()" trait="_Length"/> </height>
+			<x>	<copy src="me()" trait="width"/> <div> -2 </div> </x>
+			<y> <copy src="parent()" trait="_OffsetReticle"/> </y>
+			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx>
+			<Rotateaxisy> <copy> 0 </copy> <sub src="parent()" trait="_OffsetReticle"/> </Rotateaxisy>
+			<rotateangle> 1.570796 </rotateangle>
+			<zoom> &scale; </zoom>
+			<depth> 1 </depth>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</image>
+
+		<image name="Left">
+			<filename>Interface\JDC\JDCDefault.dds</filename>
+			<width> <copy src="parent()" trait="_Width"/> </width>
+			<height> <copy src="parent()" trait="_Length"/> </height>
+			<x>	<copy src="me()" trait="width"/> <div> -2 </div> </x>
+			<y> <copy src="parent()" trait="_OffsetReticle"/> </y>
+			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx>
+			<Rotateaxisy> <copy> 0 </copy> <sub src="parent()" trait="_OffsetReticle"/> </Rotateaxisy>
+			<rotateangle> 4.712389 </rotateangle>
+			<zoom> &scale; </zoom>
+			<depth> 1 </depth>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</image>
+
+		<image name="PromptDownRight">
+			<visible> <copy src="justify_center_hotrect" trait="visible"/> </visible>
+			<filename>Interface\JDC\JDCDefaultPrompt.dds</filename>
+			<width> <copy src="parent()" trait="_PromptSize"/> </width>
+			<height> <copy src="parent()" trait="_PromptSize"/> </height>
+			<x> <copy src="parent()" trait="_PromptOffsetHorizontal"/> <div> 2 </div> </x>
+			<y> <copy src="parent()" trait="_PromptOffsetVertical"/> <div> 2 </div> </y>
+			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx>
+			<Rotateaxisy> <copy src="me()" trait="height"/> <div> 2 </div> </Rotateaxisy>
+			<rotateangle> 3.141593 </rotateangle>
+			<zoom> &scale; </zoom>
+			<depth> 1 </depth>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</image>
+		
+		<image name="PromptDownLeft">
+			<visible> <copy src="justify_center_hotrect" trait="visible"/> </visible>
+			<filename>Interface\JDC\JDCDefaultPrompt.dds</filename>
+			<width> <copy src="parent()" trait="_PromptSize"/> </width>
+			<height> <copy src="parent()" trait="_PromptSize"/> </height>
+			<x>	<copy src="parent()" trait="_PromptOffsetHorizontal"/> <div> -2 </div> <sub src="me()" trait="width" /> </x>
+			<y>	<copy src="parent()" trait="_PromptOffsetVertical"/> <div> -2 </div> </y>
+			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx>
+			<Rotateaxisy> <copy src="me()" trait="height"/> <div> 2 </div> </Rotateaxisy>
+			<rotateangle> 1.570796 </rotateangle>
+			<zoom> &scale; </zoom>
+			<depth> 1 </depth>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</image>
+	</rect>
+	
+	<rect name="Circle">
+		<visible> <copy src="parent()" trait="_VisibleCrosshairCircle"/> </visible>
+		<_Length> <copy src="parent()" trait="_Length"/> </_Length>
+		<_OffsetCircle>	
+			<copy src="parent()" trait="_Offset"/>
+			<add> <copy src="parent()" trait="_Length"/> <mul> 0.3333 </mul> </add>
+			<max> <copy src="parent()" trait="_Length"/> <mul> 1.3333 </mul> </max>
+		</_OffsetCircle>
+		<_PromptSize> <copy src="parent()" trait="_PromptSize"/> </_PromptSize>
+		<locus> &true; </locus>
+		<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+		<alpha> <copy src="parent()" trait="_Alpha"/> </alpha>
+		<red> <copy src="parent()" trait="red"/> </red>
+		<green> <copy src="parent()" trait="green"/> </green>
+		<blue> <copy src="parent()" trait="blue"/> </blue>
+		<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+
+		<image name="Up">
+			<filename>Interface\JDC\JDCCircle.dds</filename>
+			<width> <copy src="parent()" trait="_Length"/> <mul> 2.6667 </mul> </width>
+			<height> <copy src="parent()" trait="_Length"/> <mul> 1.3333 </mul> </height>
+			<x> <copy src="me()" trait="width"/> <div> -2 </div> </x>
+			<y> <copy> 0 </copy> <sub src="parent()" trait="_OffsetCircle"/> </y>
+			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx> 
+			<Rotateaxisy> <copy src="parent()" trait="_OffsetCircle"/> </Rotateaxisy>
+			<rotateangle> 0 </rotateangle>
+			<zoom> &scale; </zoom>
+			<depth> 1 </depth>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</image>
+		
+		<image name="Right">
+			<filename>Interface\JDC\JDCCircle.dds</filename>
+			<width> <copy src="parent()" trait="_Length"/> <mul> 2.6667 </mul> </width>
+			<height> <copy src="parent()" trait="_Length"/> <mul> 1.3333 </mul> </height>
+			<x>	<copy src="me()" trait="width"/> <div> -2 </div> </x>
+			<y> <copy> 0 </copy> <sub src="parent()" trait="_OffsetCircle"/> </y>
+			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx> 
+			<Rotateaxisy> <copy src="parent()" trait="_OffsetCircle"/> </Rotateaxisy>
+			<rotateangle> 1.570796 </rotateangle>
+			<zoom> &scale; </zoom>
+			<depth> 1 </depth>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</image>
+
+		<image name="Down">
+			<filename>Interface\JDC\JDCCircle.dds</filename>
+			<width> <copy src="parent()" trait="_Length"/> <mul> 2.6667 </mul> </width>
+			<height> <copy src="parent()" trait="_Length"/> <mul> 1.3333 </mul> </height>
+			<x>	<copy src="me()" trait="width"/> <div> -2 </div> </x>
+			<y> <copy> 0 </copy> <sub src="parent()" trait="_OffsetCircle"/> </y>
+			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx> 
+			<Rotateaxisy> <copy src="parent()" trait="_OffsetCircle"/> </Rotateaxisy>
+			<rotateangle> 3.141593 </rotateangle>
+			<zoom> &scale; </zoom>
+			<depth> 1 </depth>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</image>
+		
+		<image name="Left">
+			<filename>Interface\JDC\JDCCircle.dds</filename>
+			<width> <copy src="parent()" trait="_Length"/> <mul> 2.6667 </mul> </width>
+			<height> <copy src="parent()" trait="_Length"/> <mul> 1.3333 </mul> </height>
+			<x>	<copy src="me()" trait="width"/> <div> -2 </div> </x>
+			<y> <copy> 0 </copy> <sub src="parent()" trait="_OffsetCircle"/> </y>
+			<Rotateaxisx> <copy src="me()" trait="width"/> <div> 2 </div> </Rotateaxisx> 
+			<Rotateaxisy> <copy src="parent()" trait="_OffsetCircle"/> </Rotateaxisy>
+			<rotateangle> 4.712389 </rotateangle>
+			<zoom> &scale; </zoom>
+			<depth> 1 </depth>
+			<systemcolor> <copy src="parent()" trait="systemcolor"/> </systemcolor>
+			<alpha> <copy src="parent()" trait="alpha"/> </alpha>
+			<red> <copy src="parent()" trait="red"/> </red>
+			<green> <copy src="parent()" trait="green"/> </green>
+			<blue> <copy src="parent()" trait="blue"/> </blue>
+			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
+		</image>
+		
 		<image name="Prompt">
 			<visible> <copy src="justify_center_hotrect" trait="visible"/> </visible>
-			<filename>Interface\JDC\JDCVanillaPrompt.dds</filename>
-			<width> <copy src="parent()" trait="_Length"/> </width>
-			<height> <copy src="parent()" trait="_Length"/> </height>
+			<filename>Interface\JDC\JDCCirclePrompt.dds</filename>
+			<width> <copy src="parent()" trait="_Length"/> <mul> 1.3333 </mul> </width>
+			<height> <copy src="parent()" trait="_Length"/> <mul> 1.3333 </mul> </height>
 			<x> <copy src="me()" trait="width"/> <div> -2 </div> </x>
 			<y> <copy src="me()" trait="height"/> <div> -2 </div> </y>
 			<zoom> &scale; </zoom>
@@ -451,5 +559,4 @@
 			<brightness> <copy src="parent()" trait="brightness"/> </brightness>
 		</image>
 	</rect>
-	
 </rect>
