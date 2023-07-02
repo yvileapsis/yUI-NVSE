@@ -1038,7 +1038,7 @@ public:
 	QuestObjectiveTargets*	GetCurrentQuestObjectiveTargets();
 	TESObjectREFR*			GetPlacedMarkerOrTeleportLink();
 	HighProcess*			GetHighProcess() { return reinterpret_cast<HighProcess*>(baseProcess); };
-	__forceinline bool		UsingIronSights() { return this->ironSightNode && this->baseProcess->IsWeaponOut() || this->baseProcess->IsAiming(); }
+	__forceinline bool		UsingIronSights() { return ironSightNode && baseProcess->IsWeaponOut() || baseProcess->IsAiming(); }
 };
 static_assert(sizeof(PlayerCharacter) == 0xE50);
 

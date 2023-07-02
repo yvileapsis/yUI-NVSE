@@ -56,7 +56,7 @@ namespace SortingIcons
 
 	void DeferredInit()
 	{
-		Log(logLevel >= Log::kMessage) << ("Loading files");
+		Log(logLevel >= Log::kMessage) << "Loading files for Sorting Icons";
 		const auto dir = GetCurPath() + R"(\Data\menus\ySI)";
 		const auto then = std::chrono::system_clock::now();
 		if (!std::filesystem::exists(dir)) Log(Log::kLog | logLevel) << dir + " does not exist.";

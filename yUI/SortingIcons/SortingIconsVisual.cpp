@@ -34,11 +34,11 @@ namespace SortingIcons::Icons
 	{
 		if (!category->IsValid()) return;
 
-		const auto tag = category->tag;
+		const auto& tag = category->tag;
 		const auto priority = category->priority;
-		const auto xmltemplate = category->xmltemplate;
-		const auto filename = category->filename;
-		const auto texatlas = category->texatlas;
+		const auto& xmltemplate = category->xmltemplate;
+		const auto& filename = category->filename;
+		const auto& texatlas = category->texatlas;
 		const auto font = category->font;
 		const auto systemcolor = category->systemcolor;
 
@@ -85,13 +85,13 @@ namespace SortingIcons::Icons
 		text->Set(kTileValue_wrapwidth, text->Get(kTileValue_wrapwidth) - width, false);
 	}
 
-	void __fastcall InjectTileSetTileString(Tile* tile, const InventoryChanges* entry, MenuItemEntryList* list, const eTileValue tilevalue, const char* tileText, bool propagate)
+	void __fastcall InjectTileSetTileString(Tile* tile, const InventoryChanges* entry, MenuItemEntryList* list, const TileValueIDs tilevalue, const char* tileText, bool propagate)
 	{
 		tile->Set(tilevalue, tileText, propagate);
 		if (entry && entry->form && TryGetTypeOfForm(entry->form)) InjectIconTile(Icon::Get(Item::Get(entry->form)), tile);
 	}
 
-	void __fastcall TagImageSetStringValue(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate)
+	void __fastcall TagImageSetStringValue(Tile* tile, InventoryChanges* entry, TileValueIDs tilevalue, char* src, char propagate)
 	{
 		if (!tile) return;
 //		if (g_Categories.empty()) return;
@@ -107,7 +107,7 @@ namespace SortingIcons::Icons
 		tile->Set(tilevalue, category->IsValid() && !category->filename.empty() ? category->filename.c_str() : src, propagate);
 	}
 
-	void __fastcall TagRoseSetStringValue(Tile* tile, InventoryChanges* entry, eTileValue tilevalue, char* src, char propagate)
+	void __fastcall TagRoseSetStringValue(Tile* tile, InventoryChanges* entry, TileValueIDs tilevalue, char* src, char propagate)
 	{
 		if (!tile) return;
 //		if (g_Categories.empty()) return;
@@ -125,9 +125,9 @@ namespace SortingIcons::Icons
 	}
 
 
-	void __fastcall TagPromptPropagateIntValue(Tile* tile, void* dummyedx, UInt32 a2, signed int a3)
+	void __fastcall TagPromptPropagateIntValue(Tile* tile, void* dummyedx, TileValueIDs id, signed int a3)
 	{
-		tile->Set(a2, a3, true);
+		tile->Set(id, a3, true);
 
 		const auto ref = HUDMainMenu::GetSingleton()->crosshairRef;
 		const auto item = !ref ? nullptr : ref->baseForm;

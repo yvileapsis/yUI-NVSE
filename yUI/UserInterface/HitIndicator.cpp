@@ -27,6 +27,7 @@ namespace UserInterface::HitIndicator
 	Float32		height			= 256.0;
 	Float32		width			= 256.0;
 	Float32		offset			= 0.0;
+
 	UInt32		modeHit			= kHitIndicatorNormal;
 	UInt32		modeDead		= kHitIndicatorNormal;
 	UInt32		modeKill		= kHitIndicatorOffset;
@@ -37,6 +38,7 @@ namespace UserInterface::HitIndicator
 	UInt32		modeExplosion	= kHitIndicatorShakeHoriz;
 	UInt32		modeNoAttacker	= kHitIndicatorHalfAlpha;
 	UInt32		modeNoDamage	= kHitIndicatorNothing;
+
 	bool		enableOut		= true;
 	bool		enableSighting	= true;
 	bool		enableScope		= true;
@@ -216,13 +218,16 @@ namespace UserInterface::HitIndicator
 
 	void MainLoopDoOnce()
 	{
-		tileMain = g_HUDMainMenu->tile->GetChild("JHI");
-		if (!tileMain)
+		if (enable && !tileMain)
 		{
-			g_HUDMainMenu->tile->InjectUIXML(R"(Data\menus\yUI\HitIndicator.xml)");
-			tileMain = g_HUDMainMenu->tile->GetChild("JHI");
+			tileMain = g_HUDMainMenu->tile->InjectUIXML(R"(Data\menus\yUI\HitIndicator.xml)");
+
+			if (!tileMain)
+			{
+				Log() << "HitIndicator.xml was not detected despite Hit Indicator being enabled! Hit Indicator will not function.";
+				return;
+			}
 		}
-		if (!tileMain) return;
 		RegisterEvent("JHI:Reset", 0, nullptr, 4);
 		SetEventHandler("JHI:Reset", Reset);
 		Reset();

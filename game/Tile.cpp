@@ -5,7 +5,7 @@
 
 NiTMapBase <const char*, int>* g_traitNameMap = reinterpret_cast<NiTMapBase<const char*, int>*>(0x011F32F4);
 
-Tile::Value* Tile::GetValue(const UInt32 typeID)
+Tile::Value* Tile::GetValue(const TileValueIDs id) const
 {
 	const auto data = values.data;
 	auto iterLeft = 0;
@@ -15,15 +15,15 @@ Tile::Value* Tile::GetValue(const UInt32 typeID)
 		const auto addr = (iterLeft + iterRight) >> 1;
 
 		Value* result = data[addr];
-		if (result->id == typeID) return result;
+		if (result->id == id) return result;
 
-		 result->id < typeID ? iterLeft = addr + 1 : iterRight = addr;
+		 result->id < id ? iterLeft = addr + 1 : iterRight = addr;
 	}
 
 	return nullptr;
 }
 
-Tile* Tile::GetNthChild(UInt32 index)
+Tile* Tile::GetNthChild(const UInt32 index)
 {
 	if (!children.Empty()) if (const auto node = children.GetNthChild(index); node) return node->data;
 	return nullptr;
@@ -56,7 +56,7 @@ Tile* Tile::GetComponent(const std::string& componentPath)
 	return child;
 }
 
-Tile* Tile::InjectUIXML(const std::filesystem::path& xmlPath, bool ignoreUIO)
+Tile* Tile::InjectUIXML(const std::filesystem::path& xmlPath, const bool ignoreUIO)
 {
 	if (ignoreUIO) 	// allow hot-reloading the menu even if UIO is installed
 	{
@@ -95,7 +95,7 @@ std::string Tile::GetFullPath()
 
 // not a one-way mapping, so we just return the first
 // also this is slow and sucks
-const char * Tile::TraitIDToName(int id)
+const char* Tile::TraitIDToName(const TileValueIDs id)
 {
 	for (const auto bucket : *g_traitNameMap)
 		if (bucket->data == id)
@@ -111,9 +111,9 @@ TileMenu* Tile::GetTileMenu()
 	return reinterpret_cast<TileMenu*>(tileMenu);
 }
 
-void Tile::PokeValue(UInt32 valueID)
+void Tile::PokeValue(const TileValueIDs id)
 {
-	const auto value = GetValue(valueID);
+	const auto value = GetValue(id);
 	if (!value) return;
 	const auto oldValue = value->num;
 	value->SetFloat(static_cast<Float32>(0x3F800000), 0);

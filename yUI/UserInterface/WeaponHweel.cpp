@@ -251,13 +251,16 @@ namespace UserInterface::WeaponHweel
 
 	void MainLoopDoOnce()
 	{
-		tileMain = g_HUDMainMenu->tile->GetChild("JWH");
 		if (!tileMain)
 		{
-			g_HUDMainMenu->tile->InjectUIXML(R"(Data\menus\yUI\WeaponHweel.xml)");
-			tileMain = g_HUDMainMenu->tile->GetChild("JWH");
+			tileMain = g_HUDMainMenu->tile->InjectUIXML(R"(Data\menus\yUI\WeaponHweel.xml)");
+
+			if (!tileMain)
+			{
+				Log() << "WeaponHweel.xml was not detected despite Weapon Hweel being enabled! Weapon Hweel will not function.";
+				return;
+			}
 		}
-		if (!tileMain) return;
 		RegisterEvent("JWH:Reset", 0, nullptr, 4);
 		SetEventHandler("JWH:Reset", Reset);
 		Reset();

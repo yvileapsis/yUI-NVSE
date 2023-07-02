@@ -206,13 +206,16 @@ namespace UserInterface::HitMarker
 
 	void MainLoopDoOnce()
 	{
-		tileMain = g_HUDMainMenu->tile->GetChild("JHM");
 		if (!tileMain)
 		{
-			g_HUDMainMenu->tile->InjectUIXML(R"(Data\menus\yUI\HitMarker.xml)");
-			tileMain = g_HUDMainMenu->tile->GetChild("JHM");
+			tileMain = g_HUDMainMenu->tile->InjectUIXML(R"(Data\menus\yUI\HitMarker.xml)");
+
+			if (!tileMain)
+			{
+				Log() << "HitMarker.xml was not detected despite Hit Marker being enabled! Hit Marker will not function.";
+				return;
+			}
 		}
-		if (!tileMain) return;
 		RegisterEvent("JHM:Reset", 0, nullptr, 4);
 		SetEventHandler("JHM:Reset", Reset);
 		Reset();

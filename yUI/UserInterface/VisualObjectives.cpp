@@ -99,7 +99,7 @@ namespace UserInterface::VisualObjectives
 		if (distanceMax >= 0 && distance > distanceMax) inDistance = false;
 		if (distanceMin >= 0 && distance < distanceMin) inDistance = false;
 
-		const bool inFocus = tile->Get("_InFocus");
+		const bool inFocus = static_cast<bool>(tile->Get("_InFocus"));
 
 		if (altColor) tile->Set("_Hostile", target->IsCrimeOrEnemy());
 
@@ -270,13 +270,16 @@ namespace UserInterface::VisualObjectives
 
 	void MainLoopDoOnce()
 	{
-		tileMain = g_HUDMainMenu->tile->GetChild("JVO");
 		if (!tileMain)
 		{
-			g_HUDMainMenu->tile->InjectUIXML(R"(Data\menus\yUI\VisualObjectives.xml)");
-			tileMain = g_HUDMainMenu->tile->GetChild("JVO");
+			tileMain = g_HUDMainMenu->tile->InjectUIXML(R"(Data\menus\yUI\VisualObjectives.xml)");
+
+			if (!tileMain)
+			{
+				Log() << "VisualObjectives.xml was not detected despite Visual Objectives being enabled! Visual Objectives will not function.";
+				return;
+			}
 		}
-		if (!tileMain) return;
 		RegisterEvent("JVO:Reset", 0, nullptr, 4);
 		SetEventHandler("JVO:Reset", Reset);
 		Reset();

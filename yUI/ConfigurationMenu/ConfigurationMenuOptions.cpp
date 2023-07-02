@@ -59,7 +59,7 @@ CMSettingSlider* CMSettingSlider::Display(Tile* tile)
 
 CMSettingFont* CMSettingFont::Display(Tile* tile)
 {
-	const auto fontMap = ModConfigurationMenu::GetSingleton()->fontMap;
+	const auto& fontMap = ModConfigurationMenu::GetSingleton()->fontMap;
 	const auto value = font.Read();
 	const auto valueY = fontY.Read();
 	const SInt32 id = value;
@@ -221,7 +221,7 @@ CMSettingSlider* CMSettingSlider::Drag(Float32 value)
 
 CMValue CMSettingFont::GetPrev(const CMValue& value)
 {
-	const auto fontMap = ModConfigurationMenu::GetSingleton()->fontMap;
+	const auto& fontMap = ModConfigurationMenu::GetSingleton()->fontMap;
 	if (fontMap.empty()) return value;
 	if (auto iter = fontMap.find(value); iter == fontMap.end() || --iter == fontMap.end())
 		return fontMap.rbegin()->first;
@@ -230,7 +230,7 @@ CMValue CMSettingFont::GetPrev(const CMValue& value)
 
 CMValue CMSettingFont::GetNext(const CMValue& value)
 {
-	const auto fontMap = ModConfigurationMenu::GetSingleton()->fontMap;
+	const auto& fontMap = ModConfigurationMenu::GetSingleton()->fontMap;
 	if (fontMap.empty()) return value;
 	if (auto iter = fontMap.find(value); iter == fontMap.end() || ++iter == fontMap.end())
 		return fontMap.begin()->first;
@@ -564,7 +564,6 @@ void ModConfigurationMenu::Back()
 	{
 		Close();
 		StartMenu::GetSingleton()->HandleUnclick(0, nullptr);
-		*(UInt8*)0x119F348 = 1;
 	}
 }
 
@@ -858,7 +857,7 @@ void ModConfigurationMenu::DisplaySettings(std::string id)
 
 	if (iter != categoryHistory.begin())
 	{
-		const auto id = *--iter; ++iter;
+		const auto& id = *--iter; ++iter;
 
 		const auto category = mapCategories.contains(id) ? mapCategories[id].get() : nullptr;
 
@@ -918,14 +917,12 @@ UInt16 InputField::GetLen()
 
 void InputField::UpdateCaretDisplay()
 {
-	static const UInt32 _CaretIndex = Tile::TraitNameToID("_CaretIndex");
-
 	std::string inputString;
 	inputString = GetText();
 	if (isActive)
 	{
 		inputString.insert(caretIndex, isCaretShown ? "|" : " ");
-		tile->Set(_CaretIndex, caretIndex);
+		tile->Set("_CaretIndex", caretIndex);
 	}
 	tile->Set(kTileValue_string, inputString);
 }

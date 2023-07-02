@@ -65,14 +65,14 @@ bool Menu::GetTemplateExists(const std::string& templateName) const
 	return false;
 }
 
-bool InventoryMenu::IsKeyringOpen()
+bool InventoryMenu::IsKeyringOpen() const
 {
-	return GetSingleton()->tile->Get(*(UInt32*)0x11D9EB8); // Trait_KeyringOpen
+	return tile->Get(static_cast<TileValueIDs>(*reinterpret_cast<UInt32*>(0x11D9EB8))); // Trait_KeyringOpen
 }
 
-bool DialogMenu::IsNPCTalking()
+bool DialogMenu::IsNPCTalking() const
 {
-	return tile->Get(*(UInt32*)0x11D9500); // g_dialogMenu_TraitShowingText
+	return tile->Get(static_cast<TileValueIDs>(*reinterpret_cast<UInt32*>(0x11D9500))); // g_dialogMenu_TraitShowingText
 }
 
 bool IsInStartMenu()

@@ -65,28 +65,28 @@ enum MenuSpecialKeyboardInputCode
 
 enum SpecialInputCode : UInt32
 {
-	kInputCode_Backspace = 0x80000000,
-	kInputCode_ArrowLeft = 0x80000001,
-	kInputCode_ArrowRight = 0x80000002,
-	kInputCode_ArrowUp = 0x80000003,
-	kInputCode_ArrowDown = 0x80000004,
-	kInputCode_Home = 0x80000005,
-	kInputCode_End = 0x80000006,
-	kInputCode_Delete = 0x80000007,
-	kInputCode_Enter = 0x80000008,
-	kInputCode_PageUp = 0x80000009,
-	kInputCode_PageDown = 0x8000000A
+	kInputCode_Backspace	= 0x80000000,
+	kInputCode_ArrowLeft	= 0x80000001,
+	kInputCode_ArrowRight	= 0x80000002,
+	kInputCode_ArrowUp		= 0x80000003,
+	kInputCode_ArrowDown	= 0x80000004,
+	kInputCode_Home			= 0x80000005,
+	kInputCode_End			= 0x80000006,
+	kInputCode_Delete		= 0x80000007,
+	kInputCode_Enter		= 0x80000008,
+	kInputCode_PageUp		= 0x80000009,
+	kInputCode_PageDown		= 0x8000000A
 };
 
 enum InventoryMenuHotkey
 {
-	Inv_HotKeyWheel = 0x5,
-	Inv_Equip = 0x6,
-	Inv_Drop = 0x7,
-	Inv_Repair = 0x8,
-	Inv_HotkeyButton = 0x9,
-	Inv_Cancel = 0xA,
-	Inv_ModMenu = 0x13,
+	Inv_HotKeyWheel		= 0x5,
+	Inv_Equip			= 0x6,
+	Inv_Drop			= 0x7,
+	Inv_Repair			= 0x8,
+	Inv_HotkeyButton	= 0x9,
+	Inv_Cancel			= 0xA,
+	Inv_ModMenu			= 0x13,
 };
 
 enum
@@ -403,7 +403,7 @@ public:
 
 		if (this->itemCount == 1)
 		{
-			const Float32 numVisibleItemsTrait = Tile::TraitNameToID("_number_of_visible_items");
+			const auto numVisibleItemsTrait = Tile::TraitNameToID("_number_of_visible_items");
 			if (this->parentTile->Get(numVisibleItemsTrait) > 0)
 			{
 				auto valPtr = ThisCall<Tile::Value*>(0xA00E90, this->parentTile, kTileValue_height);
@@ -483,10 +483,10 @@ public:
 	// 14
 	struct TemplateInstance
 	{
-		UInt32		unk00;		// 00
-		Float32		flt04;		// 04
-		String		tileName;	// 08
-		Tile*		tile;		// 10
+		UInt32					unk00;		// 00
+		Float32					flt04;		// 04
+		String					tileName;	// 08
+		Tile*					tile;		// 10
 	};
 	
 	// 14
@@ -497,25 +497,25 @@ public:
 		DList<TemplateInstance>	instances;		// 08
 	};
 	
-	TileMenu*			tile;				// 04
-	TList<TemplateData>	menuTemplates;		// 08
-	UInt32				unk10;				// 10
-	UInt32				unk14;				// 14	Same as id (20)
-	UInt32				unk18;				// 18
-	UInt8				byte1C;				// 1C
-	UInt8				byte1D;				// 1D
-	UInt8				byte1E;				// 1E
-	UInt8				byte1F;				// 1F
-	UInt32				id;					// 20
-	UInt32				visibilityState;	// 24 :: Initialised to 4
+	TileMenu*					tile;				// 04
+	TList<TemplateData>			menuTemplates;		// 08
+	UInt32						unk10;				// 10
+	UInt32						unk14;				// 14	Same as id (20)
+	UInt32						unk18;				// 18
+	UInt8						byte1C;				// 1C
+	UInt8						byte1D;				// 1D
+	UInt8						byte1E;				// 1E
+	UInt8						byte1F;				// 1F
+	UInt32						id;					// 20
+	UInt32						visibilityState;	// 24 :: Initialised to 4
 
-	Menu*					HandleMenuInput(UInt32 tileID, Tile* clickedTile);
-	__forceinline Tile*		AddTileFromTemplate(Tile* destTile, const char* templateName, UInt32 arg3 = 0)	{ return ThisCall<Tile*>(0xA1DDB0, this, destTile, templateName, arg3); }
-	bool					GetTemplateExists(const std::string& templateName) const;
+	Menu*						HandleMenuInput(UInt32 tileID, Tile* clickedTile);
+	__forceinline Tile*			AddTileFromTemplate(Tile* destTile, const char* templateName, UInt32 arg3 = 0)	{ return ThisCall<Tile*>(0xA1DDB0, this, destTile, templateName, arg3); }
+	bool						GetTemplateExists(const std::string& templateName) const;
 
 	__forceinline void			RegisterTile(Tile* tile, bool noAppendToMenuStack) { ThisCall(0xA1DC70, this, tile, noAppendToMenuStack); };
 	__forceinline void			Open(bool noFadeIn = false) { ThisCall(0xA1DC20, this, noFadeIn); }; // fade in
-	__forceinline void			Close() { tile->Set(6002, 1); ThisCall(0xA1D910, this); } // fade out
+	__forceinline void			Close() { tile->Set(kTileValue_fadeout, 1); ThisCall(0xA1D910, this); } // fade out
 
 
 	static bool					IsVisible(const UInt32 menuType);
@@ -912,76 +912,76 @@ public:
 		Tile* tile028[38];
 		struct
 		{
-			Tile3D* loading_nif;
-			TileText* loading_plateno_text2;
-			TileText* loading_info_text;
-			TileText* loading_currobj_text;
-			TileText* loading_stat1_label;
-			TileText* loading_stat1_val;
-			TileText* loading_stat2_label;
-			TileText* loading_stat2_val;
-			TileText* loading_stat3_label;
-			TileText* loading_stat3_val;
-			TileImage* loading_levelprog_meter;
-			Tile3D* loading_pinwheel;
-			TileImage* loading_world_image;
-			TileText* loading_plateno_text1;
-			TileText* loading_currobj_label;
-			TileText* loading_levelprog_label;
-			TileRect* loading_levelprog_rect;
-			TileText* loading_stat_label_rect;
-			TileRect* loading_stat_val_rect;
-			TileText* loading_stat4_label;
-			TileText* loading_stat4_val;
-			TileText* loading_stat5_label;
-			TileText* loading_stat5_val;
-			TileText* loading_stat6_label;
-			TileText* loading_stat6_val;
-			TileText* loading_stat7_label;
-			TileText* loading_stat7_val;
-			TileRect* loading_currobj_rect;
-			TileText* loading_levelprog_curlevel;
-			TileText* loading_levelprog_nextlevel;
-			TileText* loading_levelprog_char_marker;
-			TileRect* loading_stat_rect;
-			TileImage* loading_tile_slide_01;
-			TileImage* loading_tile_slide_02;
-			TileText* hidden_tip_text_01;
-			TileText* tip_text_02;
-			TileImage* tip_matte_01;
-			TileImage* tip_matte_02;
+			Tile3D*			loading_nif;
+			TileText*		loading_plateno_text2;
+			TileText*		loading_info_text;
+			TileText*		loading_currobj_text;
+			TileText*		loading_stat1_label;
+			TileText*		loading_stat1_val;
+			TileText*		loading_stat2_label;
+			TileText*		loading_stat2_val;
+			TileText*		loading_stat3_label;
+			TileText*		loading_stat3_val;
+			TileImage*		loading_levelprog_meter;
+			Tile3D*			loading_pinwheel;
+			TileImage*		loading_world_image;
+			TileText*		loading_plateno_text1;
+			TileText*		loading_currobj_label;
+			TileText*		loading_levelprog_label;
+			TileRect*		loading_levelprog_rect;
+			TileText*		loading_stat_label_rect;
+			TileRect*		loading_stat_val_rect;
+			TileText*		loading_stat4_label;
+			TileText*		loading_stat4_val;
+			TileText*		loading_stat5_label;
+			TileText*		loading_stat5_val;
+			TileText*		loading_stat6_label;
+			TileText*		loading_stat6_val;
+			TileText*		loading_stat7_label;
+			TileText*		loading_stat7_val;
+			TileRect*		loading_currobj_rect;
+			TileText*		loading_levelprog_curlevel;
+			TileText*		loading_levelprog_nextlevel;
+			TileText*		loading_levelprog_char_marker;
+			TileRect*		loading_stat_rect;
+			TileImage*		loading_tile_slide_01;
+			TileImage*		loading_tile_slide_02;
+			TileText*		hidden_tip_text_01;
+			TileText*		tip_text_02;
+			TileImage*		tip_matte_01;
+			TileImage*		tip_matte_02;
 		};
 	};
-	UInt32 minX;
-	UInt32 minY;
-	UInt32 maxX;
-	UInt32 maxY;
-	DList<Tile> statTiles;
-	DList<Tile> currObjTiles;
-	DList<Tile> levelProgTiles;
-	DList<Tile> hiddenTipTiles;
-	DList<Tile> tipTiles;
-	UInt32 miscStatArray[43];
-	String str1B8;
-	NiPoint4 backgroundColor;
-	TList<TESLoadScreen> loadScrList;
-	void* ptr1D8;
-	TESLoadScreen* loadScr1DC;
-	UInt32 nextUpdateTime;
-	UInt32 time1E4;
-	TESWorldSpace* worldspace;
-	UInt32 unk1E8;
-	UInt32 unk1EC;
-	Sound sound1F0;
-	Sound sound1FC;
-	void* srcTexture[4];
-	UInt32 unk21C;
-	UInt16 wrd220;
-	UInt16 flags;
-	LoadingMenu::TileDatas tileDatas[38];
-	UInt32 unk5B4;
-	UInt32 unk5B8;
-	UInt32 unk5BC;
+	UInt32					minX;
+	UInt32					minY;
+	UInt32					maxX;
+	UInt32					maxY;
+	DList<Tile>				statTiles;
+	DList<Tile>				currObjTiles;
+	DList<Tile>				levelProgTiles;
+	DList<Tile>				hiddenTipTiles;
+	DList<Tile>				tipTiles;
+	UInt32					miscStatArray[43];
+	String					str1B8;
+	NiPoint4				backgroundColor;
+	TList<TESLoadScreen>	loadScrList;
+	void*					ptr1D8;
+	TESLoadScreen*			loadScr1DC;
+	UInt32					nextUpdateTime;
+	UInt32					time1E4;
+	TESWorldSpace*			worldspace;
+	UInt32					unk1E8;
+	UInt32					unk1EC;
+	Sound					sound1F0;
+	Sound					sound1FC;
+	void*					srcTexture[4];
+	UInt32					unk21C;
+	UInt16					wrd220;
+	UInt16					flags;
+	TileDatas				tileDatas[38];
+	UInt32					unk5B4;
+	UInt32					unk5B8;
+	UInt32					unk5BC;
 
 	static LoadingMenu* GetSingleton() { return *reinterpret_cast<LoadingMenu**>(0x11DA0C0); };
 };
@@ -992,21 +992,21 @@ class CharGenMenu : public Menu
 	CharGenMenu();
 	~CharGenMenu();
 public:
-	UInt32 isTagSkills;
-	Tile* tile02C;
-	Tile* tile030;
-	Tile* tileActorValueIcon;
-	Tile* tileActorValueDescription;
-	Tile* tileNumSkills;
-	Tile* tileReset;
-	Tile* tileDone;
-	SInt32 currPoints;
-	SInt32 numPoints;
-	float listIndex;
-	UInt8 isModValues;
-	UInt8 showInitialTaggedSkills;
-	UInt8 gap056[2];
-	ListBox<UInt32> actorValues;
+	UInt32				isTagSkills;
+	Tile*				tile02C;
+	Tile*				tile030;
+	Tile*				tileActorValueIcon;
+	Tile*				tileActorValueDescription;
+	Tile*				tileNumSkills;
+	Tile*				tileReset;
+	Tile*				tileDone;
+	SInt32				currPoints;
+	SInt32				numPoints;
+	Float32				listIndex;
+	UInt8				isModValues;
+	UInt8				showInitialTaggedSkills;
+	UInt8				gap056[2];
+	ListBox<UInt32>		actorValues;
 
 	static CharGenMenu* GetSingleton() { return *reinterpret_cast<CharGenMenu**>(0x11D920C); };
 };
@@ -1030,9 +1030,9 @@ public:
 
 	struct AlchItemData
 	{
-		AlchemyItem* alchItem;
-		TileImage* tileImg;
-		void* dataPtr;
+		AlchemyItem*	alchItem;
+		TileImage*		tileImg;
+		void*			dataPtr;
 		bool			(*callback)(void* arg);
 	};
 
@@ -1059,86 +1059,86 @@ public:
 
 	struct StatusEffect
 	{
-		SpellItem* spellItem;
-		StatusDataList statusDataList;
-		NamedEffectsList namedEffectsList;
+		SpellItem*			spellItem;
+		StatusDataList		statusDataList;
+		NamedEffectsList	namedEffectsList;
 	};
 
 	AlchItemData					alchItemData[4];	// 028	0: Stimpak, 1: Rad-X, 2: RadAway, 3: Doctor's Bag
 	BSSimpleList<EffectSetting>		effectList;			// 068
-	StatusEffect* radEffects;
-	StatusEffect* h20effects;
-	StatusEffect* hungerEffects;
-	StatusEffect* sleepEffects;
+	StatusEffect*					radEffects;
+	StatusEffect*					h20effects;
+	StatusEffect*					hungerEffects;
+	StatusEffect*					sleepEffects;
 	BSSimpleList<StatusEffect>		statusEffList;		// 084
-	TileImage* tile090;			// 090
-	TileImage* tile094;			// 094
-	TileImage* tile098;			// 098
-	TileImage* tile09C;			// 09C
-	TileImage* tile0A0;			// 0A0
-	TileImage* tile0A4;			// 0A4
-	TileImage* tile0A8;			// 0A8
-	TileImage* tile0AC;			// 0AC
-	TileImage* tile0B0;			// 0B0
-	TileImage* tile0B4;			// 0B4
-	TileImage* tile0B8;			// 0B8
-	TileImage* tile0BC;			// 0BC
-	TileImage* tile0C0;			// 0C0
-	TileRect* tile0C4;			// 0C4
-	TileImage* tile0C8;			// 0C8
-	TileRect* tile0CC;			// 0CC
-	TileImage* tile0D0;			// 0D0
-	TileRect* tile0D4;			// 0D4
-	TileImage* tile0D8;			// 0D8
-	TileRect* tile0DC;			// 0DC
-	TileImage* tile0E0;			// 0E0
-	TileRect* tile0E4;			// 0E4
-	TileImage* tile0E8;			// 0E8
-	TileRect* tile0EC;			// 0EC
-	TileImage* tile0F0;			// 0F0
-	TileImage* tile0F4;			// 0F4
-	TileImage* tile0F8;			// 0F8
-	TileText* tile0FC;			// 0FC
-	TileImage* tile100;			// 100
-	TileImage* tile104;			// 104
-	TileImage* tile108;			// 108
-	TileImage* tile10C;			// 10C
-	TileImage* tile110;			// 110
-	TileImage* tile114;			// 114
-	TileImage* tile118;			// 118
-	TileText* tile11C;			// 11C
-	TileImage* tile120;			// 120
-	TileText* tile124;			// 124
-	TileText* tile128;			// 128
-	TileText* tile12C;			// 12C
-	TileRect* tile130;			// 130
-	TileRect* tile134;			// 134
-	TileRect* tile138;			// 138
-	TileRect* tile13C;			// 13C
-	TileText* tile140;			// 140
-	TileText* tile144;			// 144
-	TileImage* tile148;			// 148
-	TileImage* tile14C;			// 14C
-	TileText* tile150;			// 150
-	TileImage* tile154;			// 154
-	TileImage* tile158;			// 158
-	TileText* tile15C;			// 15C
-	TileImage* tile160;			// 160
-	TileImage* tile164;			// 164
-	TileImage* tile168;			// 168
-	TileImage* tile16C;			// 16C
-	TileImage* tile170;			// 170
-	TileImage* tile174;			// 174
-	TileImage* tile178;			// 178
-	TileImage* tile17C;			// 17C
+	TileImage*						tile090;			// 090
+	TileImage*						tile094;			// 094
+	TileImage*						tile098;			// 098
+	TileImage*						tile09C;			// 09C
+	TileImage*						tile0A0;			// 0A0
+	TileImage*						tile0A4;			// 0A4
+	TileImage*						tile0A8;			// 0A8
+	TileImage*						tile0AC;			// 0AC
+	TileImage*						tile0B0;			// 0B0
+	TileImage*						tile0B4;			// 0B4
+	TileImage*						tile0B8;			// 0B8
+	TileImage*						tile0BC;			// 0BC
+	TileImage*						tile0C0;			// 0C0
+	TileRect*						tile0C4;			// 0C4
+	TileImage*						tile0C8;			// 0C8
+	TileRect*						tile0CC;			// 0CC
+	TileImage*						tile0D0;			// 0D0
+	TileRect*						tile0D4;			// 0D4
+	TileImage*						tile0D8;			// 0D8
+	TileRect*						tile0DC;			// 0DC
+	TileImage*						tile0E0;			// 0E0
+	TileRect*						tile0E4;			// 0E4
+	TileImage*						tile0E8;			// 0E8
+	TileRect*						tile0EC;			// 0EC
+	TileImage*						tile0F0;			// 0F0
+	TileImage*						tile0F4;			// 0F4
+	TileImage*						tile0F8;			// 0F8
+	TileText*						tile0FC;			// 0FC
+	TileImage*						tile100;			// 100
+	TileImage*						tile104;			// 104
+	TileImage*						tile108;			// 108
+	TileImage*						tile10C;			// 10C
+	TileImage*						tile110;			// 110
+	TileImage*						tile114;			// 114
+	TileImage*						tile118;			// 118
+	TileText*						tile11C;			// 11C
+	TileImage*						tile120;			// 120
+	TileText*						tile124;			// 124
+	TileText*						tile128;			// 128
+	TileText*						tile12C;			// 12C
+	TileRect*						tile130;			// 130
+	TileRect*						tile134;			// 134
+	TileRect*						tile138;			// 138
+	TileRect*						tile13C;			// 13C
+	TileText*						tile140;			// 140
+	TileText*						tile144;			// 144
+	TileImage*						tile148;			// 148
+	TileImage*						tile14C;			// 14C
+	TileText*						tile150;			// 150
+	TileImage*						tile154;			// 154
+	TileImage*						tile158;			// 158
+	TileText*						tile15C;			// 15C
+	TileImage*						tile160;			// 160
+	TileImage*						tile164;			// 164
+	TileImage*						tile168;			// 168
+	TileImage*						tile16C;			// 16C
+	TileImage*						tile170;			// 170
+	TileImage*						tile174;			// 174
+	TileImage*						tile178;			// 178
+	TileImage*						tile17C;			// 17C
 	ListBox<ActorValueCode>			SPECIALList;		// 180
 	ListBox<ActorValueCode>			skillList;			// 1B0
 	ListBox<PerkRank>				perkRankList;		// 1E0
 	ListBox<MiscStatCode>			miscStatIDList;		// 210
 	ListBox<StatusEffect>			statusEffListBox;	// 240
 	ListBox<TESReputation>			reputationList;		// 270
-	UInt8 isInHealLimbSelectMode; // 2A0
-	UInt8 byte2A1[3];			  // 2A1
+	UInt8							isInHealLimbSelectMode; // 2A0
+	UInt8							byte2A1[3];			  // 2A1
 
 	bool ScrollNotes(MenuSpecialKeyboardInputCode direction, bool scaleScroll);
 
@@ -1173,17 +1173,17 @@ public:
 		CWM_Callout_Navigate = 0xF,
 	};
 
-	Tile* tiles[16];
-	Actor* companionRef;
-	UInt8 isIsFollowingLong;
-	UInt8 isFollowerSwitchAggressive;
-	UInt8 isCombatStyleRanged;
-	UInt8 isWaiting;
-	UInt32 lastSelectedTileID;
-	UInt8 talkToActorWhenClosingMenu;
-	UInt8 gap75[3];
-	UInt32 time78;
-	Sound sound7C;
+	Tile*	tiles[16];
+	Actor*	companionRef;
+	UInt8	isIsFollowingLong;
+	UInt8	isFollowerSwitchAggressive;
+	UInt8	isCombatStyleRanged;
+	UInt8	isWaiting;
+	UInt32	lastSelectedTileID;
+	UInt8	talkToActorWhenClosingMenu;
+	UInt8	gap75[3];
+	UInt32	time78;
+	Sound	sound7C;
 	static CompanionWheelMenu* GetSingleton() { return *reinterpret_cast<CompanionWheelMenu**>(0x11D92B8); };
 };
 static_assert(sizeof(CompanionWheelMenu) == 0x88);
@@ -1631,7 +1631,7 @@ public:
 	static InventoryMenu*		GetSingleton() { return *reinterpret_cast<InventoryMenu**>(0x11D9EA4); }
 	static UInt32				GetMenuID() { return 1002; }
 	static InventoryChanges*	GetSelection() { return *reinterpret_cast<InventoryChanges**>(0x11D9EA8); }
-	static bool					IsKeyringOpen();
+	bool						IsKeyringOpen() const;
 	static void					RestoreScrollPosition() { CdeclCall(0x7800C0); }
 	static bool					ShouldHideItem(InventoryChanges* entry) { return CdeclCall<bool>(0x782620, entry); }
 	static SInt32				CompareForSorting(const ListBoxItem<InventoryChanges>* a1, const ListBoxItem<InventoryChanges>* a2)
@@ -2533,7 +2533,7 @@ public:
 	char byte13A;				// 13A
 	char byte13B;				// 13B
 
-	bool IsNPCTalking();
+	bool IsNPCTalking() const;
 	static DialogMenu* GetSingleton() { return *reinterpret_cast<DialogMenu**>(0x11D9510); };
 };
 static_assert(sizeof(DialogMenu) == 0x13C);
@@ -2793,14 +2793,14 @@ public:
 			kSlider = 2
 		};
 
-		const char* templateName;					// 10
-		UInt32 currValue;							// 14
-		UInt32 defaultValue;						// 18
-		Type type;									// 1C
-		UInt32 numOptions;							// 20
-		UInt32 buttonWidth;							// 24
-		const char** currValueName;					// 28
-		void(__cdecl* onSelection)(UserOption*);	// 2C
+		const char*		templateName;				// 10
+		UInt32			currValue;					// 14
+		UInt32			defaultValue;				// 18
+		Type			type;						// 1C
+		UInt32			numOptions;					// 20
+		UInt32			buttonWidth;				// 24
+		const char**	currValueName;				// 28
+		void (__cdecl* onSelection)(UserOption*);	// 2C
 
 		UserOption(char* str, void (*_callback)(), WhichMenus flags, int type, int numOptions, int buttonWidth, char** optionNames)
 			: Option(str, _callback, flags)
@@ -2810,7 +2810,7 @@ public:
 
 		~UserOption() override {};
 
-		void UpdateVisibility() { ThisCall(0x7D4CE0, StartMenu::GetSingleton(), this, NULL); };
+		void UpdateVisibility() { ThisCall(0x7D4CE0, GetSingleton(), this, NULL); };
 	};
 
 	enum StartMenuFlags
@@ -2831,49 +2831,51 @@ public:
 		kDeleteSave = 0x2000,
 	};
 
-	TileImage* tile028;
-	TileImage* tile02C;
-	TileImage* tile030;
-	TileImage* tile034;
-	TileImage* tile038;
-	TileImage* tile03C;
-	TileImage* tile040;
-	TileImage* tile044;
-	TileText* tile048;
-	TileText* tile04C;
-	TileText* versionString;
-	TileImage* tileSaveImage;
-	TileText* tile058;
-	Tile3D* tile05C;
-	TileImage* tile060;
-	TileImage* tile064;
-	TileText* tileActionMappingDeviceName;
-	TileImage* tile06C;
-	TileText* tile070;
-	TileText* tile074;
-	TileText* tile078;
-	TileImage* tile07C;
-	TileText* tile080;
-	ListBox<Option> options084;
-	ListBox<Option> settingsSubMenu;
-	ListBox<Option> optionsNewGameMenu;
-	ListBox<Option> actionMappingOptions;
-	ListBox<int> listBox144;
-	ListBox<BGSSaveLoadFileEntry> savesList;
-	UInt32 unk1A4;
-	UInt32 flags;
-	float scrolledLoadedSavesHeight;
-	UInt32 unk1B0;
-	Option* brightnessSettingCallback;
-	NiSourceTexture* texture1B8;
-	UInt32 unk1BC;
-	TileImage* tile1C0;
-	TileImage* tile1C4;
-	UInt32 currentControlsDevice;
-	UInt32 unk1CC;
-	UInt32 unk1D0;
+	TileImage*						tileMainContainer;
+	TileImage*						tileSettingsContainer;
+	TileImage*						tileOptionsContainer;
+	TileImage*						tileMainTitle;
+	TileImage*						tileMainDefaultsButton;
+	TileImage*						tileMainBackButton;
+	TileImage*						tileSaveLoadContainer;
+	TileImage*						tileConfirmContainer;
+	TileText*						tileConfirmQuestion;
+	TileText*						tileMainPressStart;
+	TileText*						tileMainVersion;
+	TileImage*						tileSaveLoadScreenshot;
+	TileText*						tileSaveLoadPlayerName;
+	Tile3D*							tilePauseBackground;
+	TileImage*						tileDownloadsContainer;
+	TileImage*						tileMainDeviceButton;
+	TileText*						tileActionMappingDeviceName; // controls header
+	TileImage*						tileOptionsBrightnessGradient;
+	TileText*						tileSaveLoadPlayerLevel;
+	TileText*						tileSaveLoadPlaytime;
+	TileText*						tileConfirmWarning;
+	TileImage*						tileMainRedeemCodeButton;
+	TileText*						tileSaveLoadVersion;
+	ListBox<Option>					optionsMainContainer;
+	ListBox<Option>					settingsSubMenu;
+	ListBox<Option>					optionsNewGameMenu;
+	ListBox<Option>					actionMappingOptions;
+	ListBox<int>					downloadsContainer;
+	ListBox<BGSSaveLoadFileEntry>	savesList;
+	UInt32							unk1A4;
+	UInt32							flags;
+	Float32							scrolledLoadedSavesHeight;
+	UInt32							unk1B0;
+	Option*							brightnessSettingCallback;
+	NiSourceTexture*				texture1B8;
+	UInt32							unk1BC;
+	TileImage*						tile1C0;
+	TileImage*						tile1C4;
+	UInt32							currentControlsDevice;
+	UInt32							unk1CC;
+	UInt32							unk1D0;
 
 	static StartMenu* GetSingleton() { return *reinterpret_cast<StartMenu**>(0x11DAAC0); };
+
+	static bool IsActive() { return GetSingleton() && GetSingleton()->flags & kInStartMenu; }
 };
 static_assert(sizeof(StartMenu) == 0x1D4);
 
@@ -3120,24 +3122,24 @@ public:
 		kCloseMenu = 999  // (any value >= 2 could work)
 	};
 
-	UInt32 currentPage; // 0 for skills, 1 for perks
-	TileText* tileTitle;
-	TileImage* tileSkills;
-	TileImage* tilePerks;
-	TileImage* tileSelectionIcon;
-	TileText* tileSelectionText;
-	TileText* tilePointCounter;
-	TileImage* tileBtnReset;
-	TileImage* tileBtnContinue;
-	TileImage* tileBtnBack;
-	TileImage* tileStatsIconBadge;
-	UInt32 numAssignedSkillPoints;
-	UInt32 numAssignedPerks;
-	UInt32 numSkillPointsToAssign;
-	UInt32 numPerksToAssign;
-	ListBox<ActorValueCode> skillListBox;
-	ListBox<BGSPerk> perkListBox;
-	TList<BGSPerk> availablePerks; // perks to show in the perk listBox
+	UInt32						currentPage; // 0 for skills, 1 for perks
+	TileText*					tileTitle;
+	TileImage*					tileSkills;
+	TileImage*					tilePerks;
+	TileImage*					tileSelectionIcon;
+	TileText*					tileSelectionText;
+	TileText*					tilePointCounter;
+	TileImage*					tileBtnReset;
+	TileImage*					tileBtnContinue;
+	TileImage*					tileBtnBack;
+	TileImage*					tileStatsIconBadge;
+	UInt32						numAssignedSkillPoints;
+	UInt32						numAssignedPerks;
+	UInt32						numSkillPointsToAssign;
+	UInt32						numPerksToAssign;
+	ListBox<ActorValueCode>		skillListBox;
+	ListBox<BGSPerk>			perkListBox;
+	TList<BGSPerk>				availablePerks; // perks to show in the perk listBox
 
 	void SetCurrentPage(Pages newPage) { ThisCall(0x785830, this, newPage); }
 
@@ -3148,20 +3150,20 @@ static_assert(sizeof(LevelUpMenu) == 0xCC);
 
 struct VATSTargetBodyPartData
 {
-	NiPoint2 screenPos;
-	NiPoint3 relativePos;
-	NiPoint3 pos;
-	UInt32 bodyPartID;
-	float percentVisible;
-	float hitChance;
-	UInt8 isOnScreen;
-	UInt8 byte2D;
-	UInt8 shouldCalculateBodyPartVisibilityPercents;
-	UInt8 byte2F;
-	Tile* tile_body_part_percent;
-	float unk34;
-	UInt8 byte38;
-	UInt8 gap38[3];
+	NiPoint2	screenPos;
+	NiPoint3	relativePos;
+	NiPoint3	pos;
+	UInt32		bodyPartID;
+	Float32		percentVisible;
+	Float32		hitChance;
+	UInt8		isOnScreen;
+	UInt8		byte2D;
+	UInt8		shouldCalculateBodyPartVisibilityPercents;
+	UInt8		byte2F;
+	Tile*		tile_body_part_percent;
+	Float32		unk34;
+	UInt8		byte38;
+	UInt8		gap38[3];
 };
 
 

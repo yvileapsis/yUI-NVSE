@@ -94,6 +94,8 @@ ModConfigurationMenu::ModConfigurationMenu() : Menu()
 
 	// prevent Escape closing the whole start menu if Configuration Menu is open
 	*(UInt8*)0x119F348 = 0;
+
+	StartMenu::GetSingleton()->tileMainTitle->SetGradual(kTileValue_alpha, 255, 0, 0.25);
 }
 
 
@@ -102,6 +104,10 @@ void ModConfigurationMenu::Close()
 //	ShowMessageBox("You must restart the game for changes to be applied!", 0, 0, RestartGameWarningCallback, 0, 0x17, 0, 0, (char*)0x103934C, "Don't show this again", NULL); // OK
 
 	Menu::Close();
+
+	*(UInt8*)0x119F348 = 1;
+
+	StartMenu::GetSingleton()->tileMainTitle->SetGradual(kTileValue_alpha, 0, 255, 0.25);
 }
 
 // called by the game

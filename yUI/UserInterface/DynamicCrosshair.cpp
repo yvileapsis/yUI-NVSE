@@ -8,7 +8,7 @@ namespace UserInterface::DynamicCrosshair
 {
 	bool		enable			= false;
 
-	enum kFlags
+	enum Mode : UInt32
 	{
 		kNothing = 0,
 		kVanilla,
@@ -29,12 +29,12 @@ namespace UserInterface::DynamicCrosshair
 	Float32		offsetMin		= 0;
 	Float32		offsetMax		= 256;
 
-	UInt32		modeHolstered	= kVanilla;
-	UInt32		modeOut1st		= kCrosshair;
-	UInt32		modeOut3rd		= kCrosshair;
-	UInt32		modeSighting1st	= kDotBig;
-	UInt32		modeSighting3rd	= kDotBig;
-	UInt32		modeScope		= kNothing;
+	Mode		modeHolstered	= kVanilla;
+	Mode		modeOut1st		= kCrosshair;
+	Mode		modeOut3rd		= kCrosshair;
+	Mode		modeSighting1st	= kDotBig;
+	Mode		modeSighting3rd	= kDotBig;
+	Mode		modeScope		= kNothing;
 
 	bool		noNodeSighting	= true;
 	bool		shotgunAlt		= true;
@@ -81,9 +81,9 @@ namespace UserInterface::DynamicCrosshair
 
 	void MainLoop()
 	{
-		if (!enable || MenuMode()) return;
+		if (!enable || !tileMain || MenuMode()) return;
 
-		tileMain->Set(tileMain->GetValue("_AlphaRC")->id, tileReticleCenter->GetChild("reticle_center")->Get(kTileValue_alpha));
+		tileMain->Set("_AlphaRC", tileReticleCenter->GetChild("reticle_center")->Get(kTileValue_alpha));
 
 		if (true && tileReticleCenter->GetChild("reticle_center")->children.Head()) { // TODO:: iHUDEditor
 			tileMain->Set(kTileValue_red, tileReticleCenter->GetChild("reticle_center")->children.Head()->data->Get(kTileValue_red));
@@ -99,18 +99,16 @@ namespace UserInterface::DynamicCrosshair
 		else if (g_player->UsingIronSights())	mode = g_player->isInThirdPerson ? modeSighting3rd : modeSighting1st;
 		else									mode = g_player->isInThirdPerson ? modeOut3rd : modeOut1st;
 
-		tileMain->Set("_scope", g_HUDMainMenu->isUsingScope);
-
 		UInt32 visibleReticle = 0;
 		UInt32 visibleDot = 0;
 		UInt32 visibleCrosshair = 0;
 
 		if		(mode == kNothing) {}
-		else if (mode == kVanilla) visibleReticle = 1;
-		else if (mode == kDotSmall) visibleDot = 1;
-		else if (mode == kDotBig) visibleDot = 2;
-		else if (mode == kReticle) visibleDot = 3;
-		else if (mode == kCrosshair) visibleCrosshair = !IsPlayerWeaponShotgun() ? 1 : 2;
+		else if (mode == kVanilla)		visibleReticle = 1;
+		else if (mode == kDotSmall)		visibleDot = 1;
+		else if (mode == kDotBig)		visibleDot = 2;
+		else if (mode == kReticle)		visibleDot = 3;
+		else if (mode == kCrosshair)	visibleCrosshair = !IsPlayerWeaponShotgun() ? 1 : 2;
 		else if (mode == kCrosshairDotSmall) { visibleCrosshair = !IsPlayerWeaponShotgun() ? 1 : 2; visibleDot = 1; }
 		else if (mode == kCrosshairDotBig) { visibleCrosshair = !IsPlayerWeaponShotgun() ? 1 : 2;	visibleDot = 2; }
 
@@ -136,7 +134,7 @@ namespace UserInterface::DynamicCrosshair
 
 		if (g_player->UsingIronSights())
 		{
-			Float64 fDefaultWorldFOV = GetINISetting("fDefaultWorldFOV:Display")->GetAsFloat();
+			const Float64 fDefaultWorldFOV = GetINISetting("fDefaultWorldFOV:Display")->GetAsFloat();
 			spreadTarget *= g_player->worldFOV / fDefaultWorldFOV;
 		}
 
@@ -156,12 +154,12 @@ namespace UserInterface::DynamicCrosshair
 		dynamic			= ini.GetOrCreate("Dynamic Crosshair", "iDynamic", 1, nullptr);
 		shotgunAlt		= ini.GetOrCreate("Dynamic Crosshair", "bShotgunAlt", 1, nullptr);
 		noNodeSighting	= ini.GetOrCreate("Dynamic Crosshair", "bNoNodeSighting", 1, nullptr);
-		modeHolstered	= ini.GetOrCreate("Dynamic Crosshair", "iModeHolstered", 1, nullptr);
-		modeOut1st		= ini.GetOrCreate("Dynamic Crosshair", "iModeOut1st", 5, nullptr);
-		modeOut3rd		= ini.GetOrCreate("Dynamic Crosshair", "iModeOut3rd", 5, nullptr);
-		modeSighting1st	= ini.GetOrCreate("Dynamic Crosshair", "iModeSighting1st", 3, nullptr);
-		modeSighting3rd	= ini.GetOrCreate("Dynamic Crosshair", "iModeSighting3rd", 3, nullptr);
-		modeScope		= ini.GetOrCreate("Dynamic Crosshair", "iModeScope", 0, nullptr);
+		modeHolstered	= static_cast<Mode>(ini.GetOrCreate("Dynamic Crosshair", "iModeHolstered", 1, nullptr));
+		modeOut1st		= static_cast<Mode>(ini.GetOrCreate("Dynamic Crosshair", "iModeOut1st", 5, nullptr));
+		modeOut3rd		= static_cast<Mode>(ini.GetOrCreate("Dynamic Crosshair", "iModeOut3rd", 5, nullptr));
+		modeSighting1st	= static_cast<Mode>(ini.GetOrCreate("Dynamic Crosshair", "iModeSighting1st", 3, nullptr));
+		modeSighting3rd	= static_cast<Mode>(ini.GetOrCreate("Dynamic Crosshair", "iModeSighting3rd", 3, nullptr));
+		modeScope		= static_cast<Mode>(ini.GetOrCreate("Dynamic Crosshair", "iModeScope", 0, nullptr));
 		distance		= ini.GetOrCreate("Dynamic Crosshair", "fDistance", 0.0, nullptr);
 		speed			= ini.GetOrCreate("Dynamic Crosshair", "fSpeed", 0.25, nullptr);
 		lengthMax		= ini.GetOrCreate("Dynamic Crosshair", "fLengthMax", 72.0, nullptr);
@@ -210,12 +208,16 @@ namespace UserInterface::DynamicCrosshair
 
 	void MainLoopDoOnce()
 	{
-		if (!tileMain)
+		if (enable && !tileMain)
 		{
-			g_HUDMainMenu->tile->InjectUIXML(R"(Data\menus\yUI\DynamicCrosshair.xml)");
-			tileMain = g_HUDMainMenu->tile->GetChild("JDC");
+			tileMain = g_HUDMainMenu->tile->InjectUIXML(R"(Data\menus\yUI\DynamicCrosshair.xml)");
+
+			if (!tileMain)
+			{
+				Log() << "DynamicCrosshair.xml was not detected despite Dynamic Crosshair being enabled! Dynamic Crosshair will not function.";
+				return;
+			}
 		}
-		if (!tileMain) return;
 
 		tileReticleCenter = g_HUDMainMenu->tileReticleCenter;
 

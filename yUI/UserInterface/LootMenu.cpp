@@ -810,13 +810,16 @@ namespace UserInterface::LootMenu
 
 	void MainLoopDoOnce()
 	{
-		tileMain = g_HUDMainMenu->tile->GetChild("JLM");
 		if (!tileMain)
 		{
-			g_HUDMainMenu->tile->InjectUIXML(R"(Data\menus\yUI\LootMenu.xml)");
-			tileMain = g_HUDMainMenu->tile->GetChild("JLM");
+			tileMain = g_HUDMainMenu->tile->InjectUIXML(R"(Data\menus\yUI\LootMenu.xml)");
+
+			if (!tileMain)
+			{
+				Log() << "LootMenu.xml was not detected despite Loot Menu being enabled! Loot Menu will not function.";
+				return;
+			}
 		}
-		if (!tileMain) return;
 		RegisterEvent("JLM:Reset", 0, nullptr, 4);
 		SetEventHandler("JLM:Reset", Reset);
 		Reset();

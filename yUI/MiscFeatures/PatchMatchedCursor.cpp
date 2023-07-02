@@ -10,13 +10,13 @@ namespace Patch::MatchedCursor
 {
 	bool enable = false;
 
-	void __fastcall CursorTileSetStringValue(Tile* tile, void* dummyEDX, eTileValue tilevalue, char* src, char propagate)
+	void __fastcall CursorTileSetStringValue(Tile* tile, void* dummyEDX, TileValueIDs tilevalue, char* src, char propagate)
 	{
 		tile->Set(kTileValue_zoom, -1, propagate);
 		tile->Set(kTileValue_systemcolor, 1, propagate);
 	}
 
-	void __fastcall CursorTileSetIntValue(Tile* tile, void* dummyEDX, eTileValue tilevalue, int value)
+	void __fastcall CursorTileSetIntValue(Tile* tile, void* dummyEDX, TileValueIDs tilevalue, int value)
 	{
 		tile->Set(kTileValue_visible, value, true);
 		ThisCall(0xA0B350, InterfaceManager::GetSingleton()->cursor, 1, 0);
