@@ -177,6 +177,7 @@ public:
 
 	const char*				GetBaseFormFullName() { return ThisCall<const char*>(0x55D520, this); }
 	const char*				GetJIPName();
+	static TESObjectREFR*	FindReferenceFor3D(NiNode* node) { return CdeclCall<TESObjectREFR*>(0x56F930, node); }
 };
 static_assert(sizeof(TESObjectREFR) == 0x68);
 

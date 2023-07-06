@@ -203,6 +203,19 @@ namespace CrashLogger::Handle
 
 	std::string AsNiObjectNET(void* ptr) { const auto object = static_cast<NiObjectNET*>(ptr); return FormatString("%s", object->m_pcName); }
 
+	std::string AsNiNode(void* ptr)
+	{
+		const auto node = static_cast<NiNode*>(ptr);
+		std::string ret;
+		ret += node->m_pcName;
+		if (const auto ref = TESObjectREFR::FindReferenceFor3D(node))
+		{
+			if (!ret.empty()) ret += ", ";
+			ret += FormatString("%08X (%s), BaseForm %08X (%s)", ref->refID, ref->GetName(), ref->TryGetREFRParent()->refID, ref->TryGetREFRParent()->GetName());
+		}
+		return ret;
+	}
+
 	std::string AsBSFile(void* ptr) { const auto file = static_cast<BSFile*>(ptr); return FormatString("%s", file->m_path); }
 
 	std::string AsTESModel(void* ptr) { const auto model = static_cast<TESModel*>(ptr); return FormatString("%s", model->nifPath.CStr()); }
@@ -566,11 +579,404 @@ namespace CrashLogger::NVVtables
 
 		// Ni
 		Push(kVtbl_NiObjectNET, Handle::AsNiObjectNET);
-		Push(kVtbl_NiNode);
-		Push(kVtbl_BSFadeNode);
+
+
+		// NiProperty
 		Push(kVtbl_NiProperty);
+		Push(kVtbl_NiTexturingProperty);
+		Push(kVtbl_NiVertexColorProperty);
+		Push(kVtbl_NiWireframeProperty);
+		Push(kVtbl_NiZBufferProperty);
+		Push(kVtbl_NiMaterialProperty);
 		Push(kVtbl_NiAlphaProperty);
+		Push(kVtbl_NiStencilProperty);
+		Push(kVtbl_NiRendererSpecificProperty);
+		Push(kVtbl_NiShadeProperty);
+
+		Push(kVtbl_BSShaderProperty);
+		Push(kVtbl_SkyShaderProperty);
+		Push(kVtbl_ParticleShaderProperty);
+		Push(kVtbl_BSShaderLightingProperty);
+		Push(kVtbl_DistantLODShaderProperty);
+		Push(kVtbl_TallGrassShaderProperty);
+		Push(kVtbl_BSShaderPPLightingProperty);
+		Push(kVtbl_SpeedTreeShaderPPLightingProperty);
+		Push(kVtbl_SpeedTreeBranchShaderProperty);
+		Push(kVtbl_Lighting30ShaderProperty);
+		Push(kVtbl_HairShaderProperty);
+		Push(kVtbl_SpeedTreeShaderLightingProperty);
+		Push(kVtbl_SpeedTreeLeafShaderProperty);
+		Push(kVtbl_SpeedTreeFrondShaderProperty);
+		Push(kVtbl_GeometryDecalShaderProperty);
+		Push(kVtbl_PrecipitationShaderProperty);
+		Push(kVtbl_BoltShaderProperty);
+		Push(kVtbl_WaterShaderProperty);
+		Push(kVtbl_NiSpecularProperty);
+		Push(kVtbl_NiFogProperty);
+		Push(kVtbl_BSFogProperty);
+		Push(kVtbl_NiDitherProperty);
+
+		// unk
+		Push(kVtbl_SpeedTreeBillboardShaderProperty);
+		Push(kVtbl_TileShaderProperty);
+		Push(kVtbl_VolumetricFogShaderProperty);
+		Push(kVtbl_BSDistantTreeShaderProperty);
+		Push(kVtbl_BSShaderBloodSplatterProperty);
+		Push(kVtbl_BSShaderNoLighting);
+		Push(kVtbl_BSShaderNoLightingProperty);
+		Push(kVtbl_ExtraRefractionProperty);
+		Push(kVtbl_NiCullingProperty);
+		
+		// NiTexture
+		Push(kVtbl_NiTexture);
+		Push(kVtbl_NiDX9Direct3DTexture);
+		Push(kVtbl_NiSourceTexture);
+		Push(kVtbl_NiSourceCubeMap);
+		Push(kVtbl_NiRenderedTexture);
+		Push(kVtbl_NiRenderedCubeMap);
+
+		// NiAVObject
+		Push(kVtbl_NiAVObject);
+		Push(kVtbl_NiDynamicEffect);
+		Push(kVtbl_NiDirectionalLight);
+		Push(kVtbl_NiPointLight);
+		Push(kVtbl_NiSpotLight);
+		Push(kVtbl_NiAmbientLight);
+		Push(kVtbl_NiTextureEffect);
+
+		Push(kVtbl_NiNode, Handle::AsNiNode);
+		Push(kVtbl_SceneGraph);
+		Push(kVtbl_BSTempNodeManager);
+		Push(kVtbl_BSTempNode);
+		Push(kVtbl_BSCellNode);
+		Push(kVtbl_BSClearZNode);
+		Push(kVtbl_BSFadeNode);
+		Push(kVtbl_BSScissorNode);
+		Push(kVtbl_BSTimingNode);
+		Push(kVtbl_BSFaceGenNiNode);
+		Push(kVtbl_NiBillboardNode);
+		Push(kVtbl_NiSwitchNode);
+		Push(kVtbl_NiLODNode);
+		Push(kVtbl_NiBSLODNode);
+		Push(kVtbl_NiSortAdjustNode);
+		Push(kVtbl_NiBSPNode);
+		Push(kVtbl_ShadowSceneNode);
 		Push(kVtbl_NiCamera);
+		Push(kVtbl_BSCubeMapCamera);
+		Push(kVtbl_NiScreenSpaceCamera);
+
+		// NiGeometry
+		Push(kVtbl_NiGeometry, Handle::AsNiObjectNET);
+		Push(kVtbl_NiLines);
+		Push(kVtbl_NiTriBasedGeom);
+		Push(kVtbl_NiTriShape);
+		Push(kVtbl_BSScissorTriShape);
+		Push(kVtbl_NiScreenElements);
+		Push(kVtbl_NiScreenGeometry);
+		Push(kVtbl_TallGrassTriShape);
+		Push(kVtbl_NiTriStrips);
+		Push(kVtbl_TallGrassTriStrips);
+		Push(kVtbl_NiParticles);
+		Push(kVtbl_NiParticleSystem);
+		Push(kVtbl_NiParticleSystem);
+		Push(kVtbl_NiMeshParticleSystem);
+		Push(kVtbl_NiParticleMeshes);
+		Push(kVtbl_NiSequenceStreamHelper);
+
+		// NiRenderer
+		Push(kVtbl_NiRenderer);
+		Push(kVtbl_NiDX9Renderer);
+
+		// Misc
+		Push(kVtbl_NiPixelData);
+		Push(kVtbl_NiCollisionObject);
+		Push(kVtbl_NiCollisionData);
+		Push(kVtbl_bhkNiCollisionObject);
+		Push(kVtbl_bhkCollisionObject);
+		Push(kVtbl_bhkBlendCollisionObject);
+		Push(kVtbl_WeaponObject);
+		Push(kVtbl_bhkBlendCollisionObjectAddRotation);
+		Push(kVtbl_bhkPCollisionObject);
+		Push(kVtbl_bhkSPCollisionObject);
+
+		// Animations
+		// TODO:: figure out why the hell the source is wrong and parent of NiController is NiObject not NiObjectNET
+		Push(kVtbl_NiControllerSequence);
+
+		// NiTimeController
+		Push(kVtbl_NiTimeController);
+		Push(kVtbl_BSDoorHavokController);
+		Push(kVtbl_BSPlayerDistanceCheckController);
+		Push(kVtbl_NiD3DController);
+		Push(kVtbl_NiControllerManager);
+		Push(kVtbl_NiInterpController);
+		Push(kVtbl_NiSingleInterpController);
+		Push(kVtbl_NiTransformController);
+		Push(kVtbl_NiPSysModifierCtlr);
+		Push(kVtbl_NiPSysEmitterCtlr);
+		Push(kVtbl_NiPSysModifierBoolCtlr);
+		Push(kVtbl_NiPSysModifierActiveCtlr);
+		Push(kVtbl_NiPSysModifierFloatCtlr);
+		Push(kVtbl_NiPSysInitialRotSpeedVarCtlr);
+		Push(kVtbl_NiPSysInitialRotSpeedCtlr);
+		Push(kVtbl_NiPSysInitialRotAngleVarCtlr);
+		Push(kVtbl_NiPSysInitialRotAngleCtlr);
+		Push(kVtbl_NiPSysGravityStrengthCtlr);
+		Push(kVtbl_NiPSysFieldMaxDistanceCtlr);
+		Push(kVtbl_NiPSysFieldMagnitudeCtlr);
+		Push(kVtbl_NiPSysFieldAttenuationCtlr);
+		Push(kVtbl_NiPSysEmitterSpeedCtlr);
+		Push(kVtbl_NiPSysEmitterPlanarAngleVarCtlr);
+		Push(kVtbl_NiPSysEmitterPlanarAngleCtlr);
+		Push(kVtbl_NiPSysEmitterLifeSpanCtlr);
+		Push(kVtbl_NiPSysEmitterInitialRadiusCtlr);
+		Push(kVtbl_NiPSysEmitterDeclinationVarCtlr);
+		Push(kVtbl_NiPSysEmitterDeclinationCtlr);
+		Push(kVtbl_NiPSysAirFieldSpreadCtlr);
+		Push(kVtbl_NiPSysAirFieldInheritVelocityCtlr);
+		Push(kVtbl_NiPSysAirFieldAirFrictionCtlr);
+
+		Push(kVtbl_NiShader);
+
+/*
+ * 	NiObjectNET
+ *					NiFloatInterpController
+ *						NiFlipController
+ *						NiAlphaController
+ *						NiTextureTransformController
+ *						NiLightDimmerController
+ *					NiBoolInterpController
+ *						NiVisController
+ *					NiPoint3InterpController
+ *						NiMaterialColorController
+ *						NiLightColorController
+ *					NiExtraDataController
+ *						NiFloatsExtraDataPoint3Controller
+ *						NiFloatsExtraDataController
+ *						NiFloatExtraDataController
+ *						NiColorExtraDataController
+ *				NiMultiTargetTransformController
+ *				NiGeomMorpherController
+ *			bhkBlendController
+ *			bhkForceController
+ *			NiBSBoneLODController
+ *			NiUVController
+ *			NiPathController
+ *			NiLookAtController
+ *			NiKeyframeManager
+ *			NiBoneLODController
+ *			NiPSysUpdateCtlr
+ *			NiPSysResetOnLoopCtlr
+ *			NiFloatController
+ *				NiRollController
+ *		bhkRefObject
+ *			bhkSerializable
+ *				bhkWorld - NiRTTI has incorrect parent
+ *					bhkWorldM
+ *				bhkAction
+ *					bhkUnaryAction
+ *						bhkMouseSpringAction
+ *						bhkMotorAction
+ *					bhkBinaryAction
+ *						bhkSpringAction
+ *						bhkAngularDashpotAction
+ *						bhkDashpotAction
+ *				bhkWorldObject
+ *					bhkPhantom
+ *						bhkShapePhantom
+ *							bhkSimpleShapePhantom
+ *							bhkCachingShapePhantom
+ *						bhkAabbPhantom
+ *							bhkAvoidBox
+ *					bhkEntity
+ *						bhkRigidBody
+ *							bhkRigidBodyT
+ *				bhkConstraint
+ *					bhkLimitedHingeConstraint
+ *					bhkMalleableConstraint
+ *					bhkBreakableConstraint
+ *					bhkWheelConstraint
+ *					bhkStiffSpringConstraint
+ *					bhkRagdollConstraint
+ *					bhkPrismaticConstraint
+ *					bhkHingeConstraint
+ *					bhkBallAndSocketConstraint
+ *					bhkGenericConstraint
+ *						bhkFixedConstraint
+ *					bhkPointToPathConstraint
+ *					bhkPoweredHingeConstraint
+ *				bhkShape
+ *					bhkTransformShape
+ *					bhkSphereRepShape
+ *						bhkConvexShape
+ *							bhkSphereShape
+ *							bhkCapsuleShape
+ *							bhkBoxShape
+ *							bhkTriangleShape
+ *							bhkCylinderShape
+ *							bhkConvexVerticesShape
+ *								bhkCharControllerShape
+ *							bhkConvexTransformShape
+ *							bhkConvexSweepShape
+ *						bhkMultiSphereShape
+ *					bhkBvTreeShape
+ *						bhkTriSampledHeightFieldBvTreeShape
+ *						bhkMoppBvTreeShape
+ *					bhkShapeCollection
+ *						bhkListShape
+ *						bhkPackedNiTriStripsShape
+ *						bhkNiTriStripsShape
+ *					bhkHeightFieldShape
+ *						bhkPlaneShape
+ *				bhkCharacterProxy
+ *					bhkCharacterListenerArrow - no NiRTTI
+ *					bhkCharacterListenerSpell - no NiRTTI
+ *					bhkCharacterController - no NiRTTI
+ *		NiExtraData
+ *			TESObjectExtraData
+ *			BSFaceGenAnimationData
+ *			BSFaceGenModelExtraData
+ *			BSFaceGenBaseMorphExtraData
+ *			DebugTextExtraData
+ *			NiStringExtraData
+ *			NiFloatExtraData
+ *				FadeNodeMaxAlphaExtraData
+ *			BSFurnitureMarker
+ *			NiBinaryExtraData
+ *			BSBound
+ *			NiSCMExtraData
+ *			NiTextKeyExtraData
+ *			NiVertWeightsExtraData
+ *			bhkExtraData
+ *			PArrayPoint
+ *			NiIntegerExtraData
+ *				BSXFlags
+ *			NiFloatsExtraData
+ *			NiColorExtraData
+ *			NiVectorExtraData
+ *			NiSwitchStringExtraData
+ *			NiStringsExtraData
+ *			NiIntegersExtraData
+ *			NiBooleanExtraData
+ *		NiAdditionalGeometryData
+ *			BSPackedAdditionalGeometryData
+ *		NiGeometryData
+ *			NiLinesData
+ *			NiTriBasedGeomData
+ *				NiTriStripsData
+ *					NiTriStripsDynamicData
+ *				NiTriShapeData
+ *					NiScreenElementsData
+ *					NiTriShapeDynamicData
+ *					NiScreenGeometryData
+ *			NiParticlesData
+ *				NiPSysData
+ *					NiMeshPSysData
+ *				NiParticleMeshesData
+ *		NiTask
+ *			BSTECreateTask
+ *			NiParallelUpdateTaskManager::SignalTask
+ *			NiGeomMorpherUpdateTask
+ *			NiPSysUpdateTask
+ *		NiSkinInstance
+ *		NiSkinPartition
+ *		NiSkinData
+ *		NiRenderTargetGroup
+ *		Ni2DBuffer
+ *			NiDepthStencilBuffer
+ *		NiUVData
+ *		NiStringPalette
+ *		NiSequence
+ *		NiRotData
+ *		NiPosData
+ *		NiMorphData
+ *		NiTransformData
+ *		NiFloatData
+ *		NiColorData
+ *		NiBSplineData
+ *		NiBSplineBasisData
+ *		NiBoolData
+ *		NiTaskManager
+ *			NiParallelUpdateTaskManager
+ *		hkPackedNiTriStripsData
+ *		NiInterpolator
+ *			NiBlendInterpolator
+ *				NiBlendTransformInterpolator
+ *				NiBlendAccumTransformInterpolator
+ *				NiBlendFloatInterpolator
+ *				NiBlendQuaternionInterpolator
+ *				NiBlendPoint3Interpolator
+ *				NiBlendColorInterpolator
+ *				NiBlendBoolInterpolator
+ *			NiLookAtInterpolator
+ *			NiKeyBasedInterpolator
+ *				NiFloatInterpolator
+ *				NiTransformInterpolator
+ *				NiQuaternionInterpolator
+ *				NiPoint3Interpolator
+ *				NiPathInterpolator
+ *				NiColorInterpolator
+ *				NiBoolInterpolator
+ *					NiBoolTimelineInterpolator
+ *			NiBSplineInterpolator
+ *				NiBSplineTransformInterpolator
+ *					NiBSplineCompTransformInterpolator
+ *				NiBSplinePoint3Interpolator
+ *					NiBSplineCompPoint3Interpolator
+ *				NiBSplineFloatInterpolator
+ *					NiBSplineCompFloatInterpolator
+ *				NiBSplineColorInterpolator
+ *					NiBSplineCompColorInterpolator
+ *		NiAVObjectPalette
+ *			NiDefaultAVObjectPalette
+ *		BSReference
+ *		BSNodeReferences
+ *		NiPalette
+ *		NiLODData
+ *			NiRangeLODData
+ *			NiScreenLODData
+ *		NiPSysModifier
+ *			BSWindModifier
+ *			NiPSysMeshUpdateModifier
+ *			NiPSysRotationModifier
+ *			NiPSysEmitter
+ *				NiPSysMeshEmitter
+ *				NiPSysVolumeEmitter
+ *					NiPSysCylinderEmitter
+ *					NiPSysSphereEmitter
+ *					NiPSysBoxEmitter
+ *					BSPSysArrayEmitter
+ *			NiPSysGravityModifier
+ *			NiPSysSpawnModifier
+ *			BSParentVelocityModifier
+ *			NiPSysPositionModifier
+ *			NiPSysGrowFadeModifier
+ *			NiPSysDragModifier
+ *			NiPSysColorModifier
+ *			NiPSysColliderManager
+ *			NiPSysBoundUpdateModifier
+ *			NiPSysBombModifier
+ *			NiPSysAgeDeathModifier
+ *			NiPSysFieldModifier
+ *				NiPSysVortexFieldModifier
+ *				NiPSysTurbulenceFieldModifier
+ *				NiPSysRadialFieldModifier
+ *				NiPSysGravityFieldModifier
+ *				NiPSysDragFieldModifier
+ *				NiPSysAirFieldModifier
+ *		NiPSysEmitterCtlrData
+ *		NiAccumulator
+ *			NiBackToFrontAccumulator
+ *				NiAlphaAccumulator
+ *					BSShaderAccumulator
+ *		NiScreenPolygon
+ *		NiScreenTexture
+ *		NiPSysCollider
+ *			NiPSysSphericalCollider
+ *			NiPSysPlanarCollider
+ *
+		 */
+
 
 		// NiStream
 		Push(kVtbl_NiStream, Handle::AsNiStream);
@@ -749,7 +1155,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_BSDiscBootSystemUtility);
 		Push(kVtbl_BSDismemberSkinInstance);
 		Push(kVtbl_BSDistantTreeShader);
-		Push(kVtbl_BSDistantTreeShaderProperty);
 		Push(kVtbl_BSExtraData);
 		Push(kVtbl_BSFaceGenAnimationData);
 		Push(kVtbl_BSFaceGenBaseMorphExtraData);
@@ -769,7 +1174,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_BSFaceGenNiNode);
 		Push(kVtbl_BSFadeNodeCuller);
 		Push(kVtbl_BSFileCache);
-		Push(kVtbl_BSFogProperty);
 		Push(kVtbl_BSFrustumFOVController);
 		Push(kVtbl_BSFurnitureMarker);
 		Push(kVtbl_BSGameDataSystemUtility);
@@ -817,12 +1221,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_BSScissorTriShape);
 		Push(kVtbl_BSSearchPath);
 		Push(kVtbl_BSSegmentedTriShape);
-		Push(kVtbl_BSShaderBloodSplatterProperty);
-		Push(kVtbl_BSShaderLightingProperty);
-		Push(kVtbl_BSShaderNoLighting);
-		Push(kVtbl_BSShaderNoLightingProperty);
-		Push(kVtbl_BSShaderPPLightingProperty);
-		Push(kVtbl_BSShaderProperty);
 		Push(kVtbl_BSShaderTextureSet);
 		Push(kVtbl_BSSplatterExtraData);
 		Push(kVtbl_BSStripPSysData);
@@ -866,7 +1264,7 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_BeamShader);
 		Push(kVtbl_BlendSettingCollection);
 		Push(kVtbl_BoltShader);
-		Push(kVtbl_BoltShaderProperty);
+
 		Push(kVtbl_ByteArrayImplementation);
 		Push(kVtbl_CAsyncOutputPin);
 		Push(kVtbl_CAsyncReader);
@@ -962,7 +1360,7 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_DetailedActorPathHandler);
 		Push(kVtbl_DetectionTaskData);
 		Push(kVtbl_DistantLODShader);
-		Push(kVtbl_DistantLODShaderProperty);
+
 		Push(kVtbl_DoorInPathFilter);
 		Push(kVtbl_EffectItemList);
 		Push(kVtbl_ExteriorCellLoaderTask);
@@ -1067,8 +1465,8 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_ExtraRank);
 		Push(kVtbl_ExtraReferencePointer);
 		Push(kVtbl_ExtraReflectedRefs);
-		Push(kVtbl_ExtraReflectorRefs);
-		Push(kVtbl_ExtraRefractionProperty);
+
+
 		Push(kVtbl_ExtraRegionList);
 		Push(kVtbl_ExtraReservedMarkers);
 		Push(kVtbl_ExtraRoom);
@@ -1112,11 +1510,10 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_FindTriangleForLocationFilter);
 		Push(kVtbl_FutBinaryFileC);
 		Push(kVtbl_GeometryDecalShader);
-		Push(kVtbl_GeometryDecalShaderProperty);
+
 		Push(kVtbl_GridArray);
 		Push(kVtbl_GridCellArray);
 		Push(kVtbl_HairShader);
-		Push(kVtbl_HairShaderProperty);
 		Push(kVtbl_HavokError);
 		Push(kVtbl_HavokFileStreambufReader);
 		Push(kVtbl_HavokFileStreambufWriter);
@@ -1143,7 +1540,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_InterfacedClass);
 		Push(kVtbl_InteriorCellNewReferencesMap);
 		Push(kVtbl_Lighting30Shader);
-		Push(kVtbl_Lighting30ShaderProperty);
 		Push(kVtbl_LightingData);
 		Push(kVtbl_LipTask);
 		Push(kVtbl_ListBoxBase);
@@ -1180,7 +1576,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_NavMeshSearchSLPoint);
 
 		Push(kVtbl_Ni2DBuffer);
-		Push(kVtbl_NiAVObject);
 		Push(kVtbl_NiAVObjectPalette);
 		Push(kVtbl_NiAccumulator);
 		Push(kVtbl_NiAdditionalGeometryData);
@@ -1235,9 +1630,7 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_NiColorExtraDataController);
 		Push(kVtbl_NiColorInterpolator);
 		Push(kVtbl_NiControllerManager);
-		Push(kVtbl_NiControllerSequence);
 		Push(kVtbl_NiCullingProcess);
-		Push(kVtbl_NiCullingProperty);
 		Push(kVtbl_NiD3DDefaultShader);
 		Push(kVtbl_NiD3DGPUProgramCache);
 		Push(kVtbl_NiD3DGeometryGroupManager);
@@ -1285,7 +1678,7 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_NiDepthStencilBuffer);
 		Push(kVtbl_NiDevImageConverter);
 		Push(kVtbl_NiDirectionalLight);
-		Push(kVtbl_NiDitherProperty);
+
 		Push(kVtbl_NiDynamicEffect);
 		Push(kVtbl_NiDynamicGeometryGroup);
 		Push(kVtbl_NiExtraData);
@@ -1301,7 +1694,8 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_NiFloatsExtraData);
 		Push(kVtbl_NiFloatsExtraDataController);
 		Push(kVtbl_NiFloatsExtraDataPoint3Controller);
-		Push(kVtbl_NiFogProperty);
+
+
 		Push(kVtbl_NiFormArray);
 		Push(kVtbl_NiFragmentShaderInstanceDescriptor);
 		Push(kVtbl_NiGPUProgramCache);
@@ -1335,7 +1729,7 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_NiMaterial);
 		Push(kVtbl_NiMaterialColorController);
 		Push(kVtbl_NiMaterialLibrary);
-		Push(kVtbl_NiMaterialProperty);
+
 		Push(kVtbl_NiMaterialResource);
 		Push(kVtbl_NiMemStream);
 		Push(kVtbl_NiMeshPSysData);
@@ -1439,8 +1833,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_NiSearchPath);
 		Push(kVtbl_NiSequence);
 		Push(kVtbl_NiSequenceStreamHelper);
-		Push(kVtbl_NiShadeProperty);
-		Push(kVtbl_NiShader);
 		Push(kVtbl_NiShaderConstantMap);
 		Push(kVtbl_NiShaderConstantMapEntry);
 		Push(kVtbl_NiShaderDeclaration);
@@ -1454,13 +1846,14 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_NiSortAdjustNode);
 		Push(kVtbl_NiSourceCubeMap);
 		Push(kVtbl_NiSourceTexture);
-		Push(kVtbl_NiSpecularProperty);
+
 		Push(kVtbl_NiSphereBV);
 		Push(kVtbl_NiSphereTriIntersector);
 		Push(kVtbl_NiSpotLight);
 		Push(kVtbl_NiStandardAllocator);
 		Push(kVtbl_NiStaticGeometryGroup);
-		Push(kVtbl_NiStencilProperty);
+
+
 		Push(kVtbl_NiStringExtraData);
 		Push(kVtbl_NiStringPalette);
 		Push(kVtbl_NiStringsExtraData);
@@ -1472,7 +1865,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_NiTexture);
 		Push(kVtbl_NiTextureEffect);
 		Push(kVtbl_NiTextureTransformController);
-		Push(kVtbl_NiTexturingProperty);
 		Push(kVtbl_NiTimeController);
 		Push(kVtbl_NiTransformController);
 		Push(kVtbl_NiTransformData);
@@ -1491,9 +1883,7 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_NiUnsharedGeometryGroup);
 		Push(kVtbl_NiVectorExtraData);
 		Push(kVtbl_NiVertWeightsExtraData);
-		Push(kVtbl_NiVertexColorProperty);
 		Push(kVtbl_NiVisController);
-		Push(kVtbl_NiZBufferProperty);
 
 		Push(kVtbl_NonActorMagicCaster);
 		Push(kVtbl_NonActorMagicTarget);
@@ -1506,7 +1896,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_PackageUpdateTaskData);
 		Push(kVtbl_ParallaxShader);
 		Push(kVtbl_ParticleShader);
-		Push(kVtbl_ParticleShaderProperty);
 		Push(kVtbl_PathSmootherPOVSearch);
 		Push(kVtbl_PathingAvoidNodeArray);
 		Push(kVtbl_PathingCoverLocation);
@@ -1530,7 +1919,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_PosGen);
 		Push(kVtbl_Precipitation);
 		Push(kVtbl_PrecipitationShader);
-		Push(kVtbl_PrecipitationShaderProperty);
 		Push(kVtbl_ProjectileListener);
 
 		Push(kVtbl_QueuedChildren);
@@ -1561,16 +1949,10 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_SkinShader);
 		Push(kVtbl_Sky);
 		Push(kVtbl_SkyObject);
-		Push(kVtbl_SkyShaderProperty);
 		Push(kVtbl_SkyTask);
 		Push(kVtbl_SpecificItemCollector);
-		Push(kVtbl_SpeedTreeBillboardShaderProperty);
 		Push(kVtbl_SpeedTreeBranchShader);
-		Push(kVtbl_SpeedTreeBranchShaderProperty);
 		Push(kVtbl_SpeedTreeLeafShader);
-		Push(kVtbl_SpeedTreeLeafShaderProperty);
-		Push(kVtbl_SpeedTreeShaderLightingProperty);
-		Push(kVtbl_SpeedTreeShaderPPLightingProperty);
 		Push(kVtbl_Stars);
 		Push(kVtbl_StructArrayImplementation);
 		Push(kVtbl_Sun);
@@ -1635,12 +2017,10 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_TESWeightForm);
 		Push(kVtbl_TESWindListener);
 		Push(kVtbl_TallGrassShader);
-		Push(kVtbl_TallGrassShaderProperty);
 		Push(kVtbl_TargetEntry);
 		Push(kVtbl_TeleportDoorSearch);
 		Push(kVtbl_TileExtra);
 		Push(kVtbl_TileShader);
-		Push(kVtbl_TileShaderProperty);
 		Push(kVtbl_TopicInfoArray);
 		Push(kVtbl_TrapEntry);
 		Push(kVtbl_TrapTargetEntry);
@@ -1650,8 +2030,6 @@ namespace CrashLogger::NVVtables
 		Push(kVtbl_VecArrayImplementation);
 		Push(kVtbl_VirtualActorPathHandler);
 		Push(kVtbl_VolumetricFogShader);
-		Push(kVtbl_VolumetricFogShaderProperty);
-		Push(kVtbl_WaterShaderProperty);
 		Push(kVtbl_WaterTargetEntry);
 		Push(kVtbl_WaterZone);
 		Push(kVtbl_WeaponObject);
@@ -2412,7 +2790,14 @@ namespace CrashLogger::ModuleBases
 			strcpy_s(info->name, 100, name);
 		}
 		const std::filesystem::path path = name;
-		Log() << FormatString("0x%08X - 0x%08X ==> %25s, %s", (UInt32)moduleBase, (UInt32)moduleBase + (UInt32)moduleSize, path.stem().generic_string().c_str(), path.generic_string().c_str());
+		std::string version;
+		if (const auto info = g_commandInterface->GetPluginInfoByName(path.stem().generic_string().c_str()))
+		{
+			version += std::to_string(info->version);
+		}
+		Log() << (version.empty() ? FormatString("0x%08X - 0x%08X ==> %25s, %s", (UInt32)moduleBase, (UInt32)moduleBase + (UInt32)moduleSize, path.stem().generic_string().c_str(), path.generic_string().c_str())
+			: FormatString("0x%08X - 0x%08X ==> %25s, NVSE plugin version %s, %s", (UInt32)moduleBase, (UInt32)moduleBase + (UInt32)moduleSize, path.stem().generic_string().c_str(), version.c_str(), path.generic_string().c_str()));
+
 		return TRUE;
 	}
 
