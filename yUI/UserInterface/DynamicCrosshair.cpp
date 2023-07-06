@@ -20,6 +20,12 @@ namespace UserInterface::DynamicCrosshair
 		kCrosshairDotBig
 	};
 
+	enum Crosshair : UInt32
+	{
+		kNone = 0,
+
+	};
+
 	Float32		distance		= 0;
 	Float32		speed			= 0.25;
 
@@ -37,7 +43,7 @@ namespace UserInterface::DynamicCrosshair
 	Mode		modeScope		= kNothing;
 
 	bool		noNodeSighting	= true;
-	bool		shotgunAlt		= true;
+
 	UInt32		dynamic			= 1;
 
 
@@ -104,13 +110,13 @@ namespace UserInterface::DynamicCrosshair
 		UInt32 visibleCrosshair = 0;
 
 		if		(mode == kNothing) {}
-		else if (mode == kVanilla)		visibleReticle = 1;
-		else if (mode == kDotSmall)		visibleDot = 1;
-		else if (mode == kDotBig)		visibleDot = 2;
-		else if (mode == kReticle)		visibleDot = 3;
-		else if (mode == kCrosshair)	visibleCrosshair = !IsPlayerWeaponShotgun() ? 1 : 2;
-		else if (mode == kCrosshairDotSmall) { visibleCrosshair = !IsPlayerWeaponShotgun() ? 1 : 2; visibleDot = 1; }
-		else if (mode == kCrosshairDotBig) { visibleCrosshair = !IsPlayerWeaponShotgun() ? 1 : 2;	visibleDot = 2; }
+		else if (mode == kVanilla)				visibleReticle = 1;
+		else if (mode == kDotSmall)				visibleDot = 1;
+		else if (mode == kDotBig)				visibleDot = 2;
+		else if (mode == kReticle)				visibleDot = 3;
+		else if (mode == kCrosshair)			visibleCrosshair = !IsPlayerWeaponShotgun() ? 1 : 2;
+		else if (mode == kCrosshairDotSmall)	{ visibleCrosshair = !IsPlayerWeaponShotgun() ? 1 : 2; visibleDot = 1; }
+		else if (mode == kCrosshairDotBig)		{ visibleCrosshair = !IsPlayerWeaponShotgun() ? 1 : 2;	visibleDot = 2; }
 
 		tileMain->Set("_visible", visibleDot || visibleCrosshair);
 		tileMain->Set("_VisibleDot", visibleDot);
