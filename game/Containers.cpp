@@ -114,8 +114,7 @@ double String::Compare(const String& compareTo, bool caseSensitive)
 
 const char* String::CStr()
 {
-
-	return (m_data && m_dataLen) ? m_data : "";
+	return m_dataLen && m_data ? m_data : "";
 }
 
 void String::Init(UInt32 bufSize)

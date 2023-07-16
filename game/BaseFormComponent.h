@@ -1215,6 +1215,7 @@ enum ObjectVtbl
 	kVtbl_SymGen = 0x10A5A54,
 	kVtbl_BSFadeNode = 0x10A8F90,
 	kVtbl_DistantLODShaderProperty = 0x10ADAD0,
+	kVtbl_ShadowSceneNode = 0x10ADCF8,
 	kVtbl_TallGrassShaderProperty = 0x10ADEA8,
 	kVtbl_BSShaderPPLightingProperty = 0x10AE0D0,
 	kVtbl_WaterShaderProperty = 0x10AE438,

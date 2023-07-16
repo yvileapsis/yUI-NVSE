@@ -17,6 +17,19 @@
 
 constexpr UInt32 ce_printStackCount = 256;
 
+namespace CrashLogger::Dereference
+{
+	UInt32 Basic(const void* ptr) { return *(UInt32*)ptr; }
+
+	// this exists because dereferencing bad pointers produces really different win errors that can't be catched with try-catch
+	UInt32 Except(const void* ptr) { __try { return Basic(ptr); } __except (EXCEPTION_EXECUTE_HANDLER) { return 0; } }
+	UInt32 Except2(const void* ptr) { __try { return Except(ptr); } __except (EXCEPTION_CONTINUE_EXECUTION) { return 0; } }
+	UInt32 Except3(const void* ptr) { __try { return Except2(ptr); } __except (EXCEPTION_CONTINUE_SEARCH) { return 0; } }
+	UInt32 Catch(const void* ptr) { try { return Except3(ptr); } catch (...) { return 0; } }
+
+	UInt32 Safe(const void* ptr) { return Catch(ptr); }
+}
+
 namespace CrashLogger::PDBHandling
 {
 	std::string GetAddress(UInt32 eip)
@@ -118,7 +131,12 @@ namespace CrashLogger::Handle
 		return FormatString("0x%08X", **static_cast<UInt32**>(ptr));
 	}
 
-	std::string AsMenu(void* ptr) { return static_cast<Menu*>(ptr)->tile->GetFullPath(); }
+	std::string AsMenu(void* ptr)
+	{
+		const auto menu = static_cast<Menu*>(ptr);
+		return FormatString("MenuMode: %u, visible: %s, visibilityState: 0x%X", menu->id, menu->IsVisible() ? "true" : "false", menu->visibilityState);
+	}
+
 	std::string AsTile(void* ptr) { return static_cast<Tile*>(ptr)->GetFullPath(); }
 	std::string AsStartMenuOption(void* ptr) { return static_cast<StartMenu::Option*>(ptr)->displayString; }
 
@@ -240,6 +258,7 @@ namespace CrashLogger::Handle
 	std::string AsQueuedKF(void* ptr) {	const auto model = static_cast<QueuedKF*>(ptr); return !model->kf ? "" : FormatString("%s", model->kf->path); }
 
 }
+
 namespace CrashLogger::VirtualTables
 {
 	Handle::_Handler lastHandler = nullptr;
@@ -265,15 +284,9 @@ namespace CrashLogger::VirtualTables
 			lastHandler = function;
 		};
 		
-		bool Satisfies(void* ptr) const
+		bool Satisfies(const void* ptr) const
 		{
-			__try
-			{
-				return *static_cast<UInt32*>(ptr) >= address && *static_cast<UInt32*>(ptr) <= address + size;
-			}
-			__except (EXCEPTION_EXECUTE_HANDLER) {
-				return false;
-			}
+			return Dereference::Safe(ptr) >= address && Dereference::Safe(ptr) <= address + size;
 		}
 
 		static std::string GetTypeName(void* ptr)
@@ -285,7 +298,7 @@ namespace CrashLogger::VirtualTables
 		{
 			if (type == kType_RTTIClass) return "RTTI: ";
 			if (type == kType_Global) return "Global: ";
-			return "None: ";
+			return "";
 		}
 
 		static UInt32 Dereference(void* ptr)
@@ -302,7 +315,7 @@ namespace CrashLogger::VirtualTables
 		std::string Get(void* ptr) const
 		{
 			std::string name1 = name.empty() && type == kType_RTTIClass ? GetTypeName(ptr) : name;
-			if (name1.empty()) name1 = FormatString("0x%08X", Dereference(ptr));
+			if (name1.empty() && type != kType_None) name1 = FormatString("0x%08X", Dereference(ptr));
 
 			std::string details;
 			if (function) details = function(ptr);
@@ -371,7 +384,9 @@ namespace CrashLogger::VirtualTables
 		Push(0x10C1760, nullptr, "LockFreeQueue<NiPointer<IOTask>>");
 		Push(0x101747C, nullptr, "LockFreeMap<TESObjectREFR*, NiPointer<QueuedReference>>");
 
-
+		Push(0x1000000, nullptr, "", Label::kType_None); // integer that is often encountered
+		Push(0x11C0000, nullptr, "", Label::kType_None);
+		
 		Push(kVtbl_Menu, Handle::AsMenu);
 		Push(kVtbl_TutorialMenu);
 		Push(kVtbl_StatsMenu);
@@ -644,17 +659,17 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_BSTempNodeManager);
 //		Push(kVtbl_BSCellNode);
 		Push(kVtbl_BSClearZNode);
-		Push(kVtbl_BSFadeNode);
+		Push(kVtbl_BSFadeNode, nullptr, "BSFadeNode"); // missing RTTI name
 //		Push(kVtbl_BSScissorNode);
 //		Push(kVtbl_BSTimingNode);
-		Push(kVtbl_BSFaceGenNiNode);
+		Push(kVtbl_BSFaceGenNiNode, Handle::AsNiNode);
 		Push(kVtbl_NiBillboardNode);
 		Push(kVtbl_NiSwitchNode);
 		Push(kVtbl_NiLODNode);
 //		Push(kVtbl_NiBSLODNode);
 		Push(kVtbl_NiSortAdjustNode);
 		Push(kVtbl_NiBSPNode);
-//		Push(kVtbl_ShadowSceneNode); // 10ADCE0
+		Push(kVtbl_ShadowSceneNode); // 10ADCE0
 		Push(kVtbl_NiCamera);
 		Push(kVtbl_BSCubeMapCamera);
 		Push(kVtbl_NiScreenSpaceCamera);
@@ -2332,11 +2347,10 @@ namespace CrashLogger::VirtualTables
 		
 	}
 
-	std::string GetStringForVTBL(void* ptr, UInt32 vtbl)
+	std::string GetStringForLabel(void* ptr, UInt32 vtbl)
 	{
 		for (const auto& iter : setOfLabels)
 			if (iter->Satisfies(ptr)) return iter->Get(ptr);
-
 
 		if (vtbl > 0xFE0000 && vtbl < 0x1200000)
 		{
@@ -2347,52 +2361,30 @@ namespace CrashLogger::VirtualTables
 
 		return "";
 	}
-}
 
-namespace CrashLogger::DereferenceCatcher
-{
-	UInt32 Except(UInt32 ptr)
+	std::string Get(UInt32 ptr, UInt32 depth = 5)
 	{
-		__try { const UInt32 vtbl = *(UInt32*)ptr; return vtbl; }
-		__except (EXCEPTION_EXECUTE_HANDLER) { return 0; }
-	}
+		if (!ptr) return "";
 
-	UInt32 Catch(UInt32 ptr)
-	{
-		try { return Except(ptr); }
-		catch (...) { return 0; }
-	}
+		UInt32 vtbl;
 
-	std::string Do(UInt32 ptr, UInt32 depth = 5)
-	{
-		try
+		std::string full;
+
+		while (vtbl = Dereference::Safe((void*)ptr))
 		{
-			if (!ptr) return "";
+			if (std::string onetime = GetStringForLabel((void*)ptr, vtbl); !onetime.empty())
+				return full + onetime;
 
-			UInt32 vtbl;
+			if (depth == 0) break;
 
-			std::string full;
+			depth--;
 
-			while (vtbl = Catch(ptr))
-			{
-				if (std::string onetime = VirtualTables::GetStringForVTBL((void*)ptr, vtbl); !onetime.empty()) return full + onetime;
+			full += FormatString("NotVTable: 0x%08X; ", vtbl);
 
-				if (depth == 0) break;
-
-				depth--;
-
-				full += FormatString("NotVTable: 0x%08X; ", vtbl);
-
-				ptr = vtbl;
-			}
-
-			return "";
-
+			ptr = vtbl;
 		}
-		catch (...)
-		{
-			return "";
-		}
+
+		return "";
 	}
 }
 
@@ -2401,8 +2393,8 @@ namespace CrashLogger::Calltrace
 
 	void Get(EXCEPTION_POINTERS* info, HANDLE process, HANDLE thread) {
 
-		Log() << FormatString("Exception %08X caught!", info->ExceptionRecord->ExceptionCode);
-		Log() << FormatString("\nCalltrace: ");
+		Log() << FormatString("Exception %08X caught!\n", info->ExceptionRecord->ExceptionCode);
+		Log() << "Calltrace:";
 
 		DWORD machine = IMAGE_FILE_MACHINE_I386;
 		CONTEXT context = {};
@@ -2442,15 +2434,16 @@ namespace CrashLogger::Registry
 	{
 		Log() << FormatString("\nRegistry: ")
 			<< FormatString("REG |    VALUE   | DEREFERENCE INFO")
-			<< FormatString("eax | 0x%08X | ", info->ContextRecord->Eax) + DereferenceCatcher::Do(info->ContextRecord->Eax)
-			<< FormatString("ebx | 0x%08X | ", info->ContextRecord->Ebx) + DereferenceCatcher::Do(info->ContextRecord->Ebx)
-			<< FormatString("ecx | 0x%08X | ", info->ContextRecord->Ecx) + DereferenceCatcher::Do(info->ContextRecord->Ecx)
-			<< FormatString("edx | 0x%08X | ", info->ContextRecord->Edx) + DereferenceCatcher::Do(info->ContextRecord->Edx)
-			<< FormatString("edi | 0x%08X | ", info->ContextRecord->Edi) + DereferenceCatcher::Do(info->ContextRecord->Edi)
-			<< FormatString("esi | 0x%08X | ", info->ContextRecord->Esi) + DereferenceCatcher::Do(info->ContextRecord->Esi)
-			<< FormatString("ebp | 0x%08X | ", info->ContextRecord->Ebp) + DereferenceCatcher::Do(info->ContextRecord->Ebp)
-			<< FormatString("esp | 0x%08X | ", info->ContextRecord->Esp) + DereferenceCatcher::Do(info->ContextRecord->Esp)
-			<< FormatString("eip | 0x%08X | ", info->ContextRecord->Eip) + DereferenceCatcher::Do(info->ContextRecord->Eip);
+			<< FormatString("eax | 0x%08X | ", info->ContextRecord->Eax) + VirtualTables::Get(info->ContextRecord->Eax)
+			<< FormatString("ebx | 0x%08X | ", info->ContextRecord->Ebx) + VirtualTables::Get(info->ContextRecord->Ebx)
+			<< FormatString("ecx | 0x%08X | ", info->ContextRecord->Ecx) + VirtualTables::Get(info->ContextRecord->Ecx)
+			<< FormatString("edx | 0x%08X | ", info->ContextRecord->Edx) + VirtualTables::Get(info->ContextRecord->Edx)
+			<< FormatString("edi | 0x%08X | ", info->ContextRecord->Edi) + VirtualTables::Get(info->ContextRecord->Edi)
+			<< FormatString("esi | 0x%08X | ", info->ContextRecord->Esi) + VirtualTables::Get(info->ContextRecord->Esi)
+			<< FormatString("ebp | 0x%08X | ", info->ContextRecord->Ebp) + VirtualTables::Get(info->ContextRecord->Ebp)
+			<< FormatString("esp | 0x%08X | ", info->ContextRecord->Esp) + VirtualTables::Get(info->ContextRecord->Esp)
+			<< FormatString("eip | 0x%08X | ", info->ContextRecord->Eip) + VirtualTables::Get(info->ContextRecord->Eip)
+			<< "";
 	}
 }
 
@@ -2458,24 +2451,26 @@ namespace CrashLogger::Stack
 {
 	void Get(EXCEPTION_POINTERS* info)
 	{
-		Log() << FormatString("\nStack: ");
-		Log() << FormatString(" # |    VALUE   | DEREFERENCE INFO");
+		Log() << FormatString("Stack:")
+			<< FormatString(" # |    VALUE   | DEREFERENCE INFO");
 
 		const auto esp = reinterpret_cast<UInt32*>(info->ContextRecord->Esp);
 
-		for (unsigned int i = 0; i < ce_printStackCount; i += 1) {
+		for (unsigned int i = 0; i < 0xFF; i += 1) {
 
 			if (i <= 8)
 			{
-				Log() << FormatString("%2X | 0x%08X | %s", i, esp[i], DereferenceCatcher::Do(esp[i]).c_str());
+				Log() << FormatString("%2X | 0x%08X | ", i, esp[i]) + VirtualTables::Get(esp[i]);
 			}
 			else
 			{
-				std::string result = DereferenceCatcher::Do(esp[i], 0);
-				if (!result.empty()) Log() << FormatString("%2X | 0x%08X | %s", i, esp[i], result.c_str());
+				std::string result = VirtualTables::Get(esp[i]);
+				if (!result.empty()) Log() << FormatString("%2X | 0x%08X | ", i, esp[i]) + result;
 
 			}
 		}
+		// this allows me to see that crash log is incomplete
+		Log() << "";
 	}
 }
 
@@ -2510,21 +2505,25 @@ namespace CrashLogger::ModuleBases
 	{
 		const UInt32 eip = info->ContextRecord->Eip;
 
-		Log() << FormatString("\nModule bases:");
+		Log() << FormatString("Module bases:");
 		UserContext infoUser = { eip,  0, (char*)calloc(sizeof(char), 100) };
 		EnumerateLoadedModules(processHandle, EumerateModulesCallback, &infoUser);
+
+		Log() << "";
+
 		if (infoUser.moduleBase) {
-			Log() << FormatString("\nGAME CRASHED AT INSTRUCTION Base+0x%08X IN MODULE: %s", (infoUser.eip - infoUser.moduleBase), infoUser.name)
+			Log() << FormatString("GAME CRASHED AT INSTRUCTION Base+0x%08X IN MODULE: %s", (infoUser.eip - infoUser.moduleBase), infoUser.name)
 				<< "Please note that this does not automatically mean that that module is responsible. It may have been supplied bad data or"
 				<< "program state as the result of an issue in the base game or a different DLL.";
 		}
 		else {
-			Log() << FormatString("\nUNABLE TO IDENTIFY MODULE CONTAINING THE CRASH ADDRESS.")
+			Log() << FormatString("UNABLE TO IDENTIFY MODULE CONTAINING THE CRASH ADDRESS.")
 				<< "This can occur if the crashing instruction is located in the vanilla address space, but it can also occur if there are too many"
 				<< "DLLs for us to list, and if the crash occurred in one of their address spaces. Please note that even if the crash occurred"
 				<< "in vanilla code, that does not necessarily mean that it is a vanilla problem. The vanilla code may have been supplied bad data"
 				<< "or program state as the result of an issue in a loaded DLL.";
 		}
+		Log() << "";
 	}
 }
 

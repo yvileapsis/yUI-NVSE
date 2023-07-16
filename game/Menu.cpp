@@ -18,7 +18,7 @@ UInt8* menuVisibility = reinterpret_cast<UInt8*>(0x011F308F);
 NiTArray<TileMenu*>* tileMenuArray = reinterpret_cast<NiTArray<TileMenu*>*>(0x011F3508);
 // IF requires change of skeleton - and back to false when model updated
 bool Menu::IsVisible(const UInt32 menuType) { return menuType >= kMenuType_Min && menuType <= kMenuType_Max ? menuVisibility[menuType] : false; }
-bool Menu::IsVisible() const { return  menuVisibility[id]; }
+bool Menu::IsVisible() const { return IsVisible(id); }
 TileMenu* Menu::GetTileMenu(const UInt32 menuType) { return menuType >= kMenuType_Min && menuType <= kMenuType_Max ? tileMenuArray->Get(menuType - kMenuType_Min) : nullptr; }
 TileMenu* Menu::GetTileMenu() const { return tileMenuArray->Get(id - kMenuType_Min); }
 
