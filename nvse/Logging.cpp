@@ -57,7 +57,7 @@ public:
 		modString = rhsmodString;
 	}
 
-	void Message(const std::string& str, SInt32 deltaIndent = 0)
+	void Queue(const std::string& str, SInt32 deltaIndent = 0)
 	{
 		indent += deltaIndent;
 
@@ -65,7 +65,10 @@ public:
 		for (UInt32 i = 0; i < indent; i++) indentstr += '\t';
 
 		queuedMessages.emplace_back(indentstr + str);
+	}
 
+	void Flush()
+	{
 		if (!logger && update) logger = update();
 		if (logger)
 		{
@@ -74,9 +77,16 @@ public:
 		}
 	}
 
+	DebugLog& operator()()
+	{
+		Flush();
+		return *this;
+	}
+
 	DebugLog& operator<<(const std::string& str)
 	{
-		Message(str);
+		Queue(str);
+		Flush();
 		return *this;
 	}
 
@@ -215,7 +225,7 @@ void DumpFontNames()
 	FontInfo** fonts = FontManager::GetSingleton()->fontInfos;
 
 	for (UInt32 i = 0; i < FontArraySize; i++)
-		file.Message(FormatString("Font %d is named %s", i + 1, fonts[i]->filePath));
+		file << (FormatString("Font %d is named %s", i + 1, fonts[i]->filePath));
 }
 
 
@@ -231,6 +241,16 @@ Log& Log::operator<<(const std::string& str)
 	{
 		if (logDest & kLog) file << str;
 		if (logDest & kConsole) console << str;
+	}
+	return *this;
+}
+
+Log& Log::operator()()
+{
+	if (logLevel)
+	{
+		if (logDest & kLog) file();
+		if (logDest & kConsole) console();
 	}
 	return *this;
 }

@@ -14,12 +14,29 @@ void InitSingletons()
 	g_HUDMainMenu = HUDMainMenu::GetSingleton();
 }
 
+void FillPluginInfo(PluginInfo* info)
+{
+	info->infoVersion = PluginInfo::kInfoVersion;
+	info->name = "CrashLogger";
+	info->version = CrashLogger_VERSION * 100;
+}
+
+void InitLog(std::filesystem::path path = "")
+{
+	path += CrashLogger_LOG;
+	Log::Init(path, CrashLogger_STR, CrashLogger_FLD);
+
+	Log() << GetName() + " version " + CrashLogger_VERSION_STR + " at " + std::format("{0:%F} {0:%T}", std::chrono::time_point(std::chrono::system_clock::now()))
+		<< "If this file is empty, then your game didn't crash or something went so wrong even crash logger was useless! :snig:"
+		<< "Topmost stack module is NOT ALWAYS the crash reason! Exercise caution when speculating!\n";
+}
+
 void MessageHandler(NVSEMessagingInterface::Message* msg)
 {
 	if (msg->type == NVSEMessagingInterface::kMessage_DeferredInit)
 	{
 		InitSingletons();
-		Log() << "";
+		Log()();
 
 		for (const auto& i : deferredInit) i(); // call all deferred init functions
 	}
@@ -35,42 +52,34 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 
 bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 {
-	// fill out the info structure
-	info->infoVersion = PluginInfo::kInfoVersion;
-	info->name = "CrashLogger";
-	info->version = CrashLogger_VERSION * 100;
-
+	FillPluginInfo(info);
 	// version checks
 	if (nvse->isEditor) {
 		if (nvse->editorVersion < CS_VERSION_1_4_0_518)
 		{
-			Log(true, Log::kLog) << FormatString("CrashLogger: incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518);
+			Log() << FormatString("Incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518);
 			return false;
 		}
 	} else {
-		if (nvse->nvseVersion < PACKED_NVSE_VERSION) {
-			Log(true, Log::kLog) << FormatString("CrashLogger: NVSE version too old (got %X expected at least %X). Plugin will NOT load! Install the latest version here: https://github.com/xNVSE/NVSE/releases/", nvse->nvseVersion, PACKED_NVSE_VERSION);
-			return false;
-		}
+//		if (nvse->nvseVersion < PACKED_NVSE_VERSION) {
+//			Log() << FormatString("NVSE version too old (got %X expected at least %X). Plugin will NOT load! Install the latest version here: https://github.com/xNVSE/NVSE/releases/", nvse->nvseVersion, PACKED_NVSE_VERSION);
+//			return false;
+//		}
 
 		if (nvse->runtimeVersion < RUNTIME_VERSION_1_4_0_525) {
-			Log(true, Log::kLog) << FormatString("CrashLogger: incorrect runtime version (got %08X need at least %08X)", nvse->runtimeVersion, RUNTIME_VERSION_1_4_0_525);
+			Log() << FormatString("Incorrect runtime version (got %08X need at least %08X)", nvse->runtimeVersion, RUNTIME_VERSION_1_4_0_525);
 			return false;
 		}
 
 		if (nvse->isNogore) {
-			Log(true, Log::kLog) << FormatString("CrashLogger: NoGore is not supported");
+			Log() << FormatString("NoGore is not supported");
 			return false;
 		}
 
 	}
 
-	Log() << GetName() + " version " + CrashLogger_VERSION_STR + " at " + std::format("{0:%F} {0:%T}", std::chrono::time_point(std::chrono::system_clock::now()));
-
-	Log() << "If this file is empty, then your game didn't crash or something went so wrong even crash logger was useless! :snig: \n";
-
-	CrashLogger::NVVtables::FillLabels();
-	CrashLogger::Apply();
+	CrashLogger::VirtualTables::FillNVSELabels();
+	CrashLogger::ApplyNVSE();
 
 	return true;
 }
@@ -115,10 +124,81 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	DispatchEvent = g_eventInterface->DispatchEvent;
 
 	g_loggingInterface = static_cast<NVSELoggingInterface*>(nvse->QueryInterface(kInterface_LoggingInterface));
-	auto path = std::filesystem::path(g_loggingInterface->GetPluginLogPath());
-	path += CrashLogger_LOG;
-	Log::Init(path, CrashLogger_STR, CrashLogger_FLD);
+	InitLog(g_loggingInterface ? g_loggingInterface->GetPluginLogPath() : "");
 
+	for (const auto& i : pluginLoad) i(); // call all plugin load functions
+
+	return true;
+}
+
+bool FOSEPlugin_Query(const OBSEInterface* obse, PluginInfo* info)
+{
+	FillPluginInfo(info);
+
+	if (obse->isEditor) {
+	}
+	else {
+		if (obse->obseVersion < 1) {
+			Log() << FormatString("FOSE version too old (got %08X; expected at least %08X).", obse->obseVersion, 1);
+			return false;
+		}
+		if (obse->oblivionVersion != 0x01070030) {
+			Log() << FormatString("incorrect Fallout 3 version (got %08X; need %08X).", obse->oblivionVersion, 0x01070030);
+			return false;
+		}
+	}
+
+	CrashLogger::VirtualTables::FillFOSELabels();
+	CrashLogger::ApplyFOSE();
+
+	return true;
+}
+
+bool FOSEPlugin_Load(const OBSEInterface* obse)
+{
+	g_pluginHandle = obse->GetPluginHandle();
+
+	Inits();
+
+	if (obse->isEditor) return true;
+
+	InitLog();
+	for (const auto& i : pluginLoad) i(); // call all plugin load functions
+
+	return true;
+}
+
+bool OBSEPlugin_Query(const OBSEInterface* obse, PluginInfo* info)
+{
+	FillPluginInfo(info);
+
+	if (obse->isEditor) {
+	}
+	else {
+		if (obse->obseVersion < 21) {
+			Log() << FormatString("OBSE version too old (got %08X; expected at least %08X).", obse->obseVersion, 21);
+			return false;
+		}
+		if (obse->oblivionVersion != OBLIVION_VERSION_1_2_416) {
+			Log() << FormatString("incorrect Oblivion version (got %08X; need %08X).", obse->oblivionVersion, OBLIVION_VERSION_1_2_416);
+			return false;
+		}
+	}
+
+	CrashLogger::VirtualTables::FillOBSELabels();
+	CrashLogger::ApplyOBSE();
+
+	return true;
+}
+
+bool OBSEPlugin_Load(const OBSEInterface* obse) {
+	g_pluginHandle = obse->GetPluginHandle();
+
+	Inits();
+
+	if (obse->isEditor) return true;
+
+	InitLog();
 	for (const auto& i : pluginLoad) i(); // call all plugin load functions
 
 	return true;

@@ -23,8 +23,9 @@ public:
 		kBoth = kLog | kConsole
 	};
 
-	Log(UInt32 logLevel = kError, UInt32 logDest = kLog) : logDest(logDest), logLevel(logLevel) {};
+	Log(UInt32 logLevel = true, UInt32 logDest = kLog) : logDest(logDest), logLevel(logLevel) {};
 	Log& operator<<(const std::string& str);
+	Log& operator()();
 
 	static void Init(const std::filesystem::path& path, const std::string& modName, const std::string& history = "");
 };

@@ -1068,3 +1068,58 @@ inline _DispatchEvent				DispatchEvent;
 inline _CallFunctionAlt				CallFunctionAlt;
 inline _CompileScript				CompileScript;
 inline _CompileExpression			CompileExpression;
+
+
+
+struct FOSEInterface
+{
+	UInt32	foseVersion;
+	UInt32	runtimeVersion;
+	UInt32	editorVersion;
+	UInt32	isEditor;
+	bool	(* RegisterCommand)(CommandInfo * info);	// returns true for success, false for failure
+	void	(* SetOpcodeBase)(UInt32 opcode);
+	void *	(* QueryInterface)(UInt32 id);
+
+	// call during your Query or Load functions to get a PluginHandle uniquely identifying your plugin
+	// invalid if called at any other time, so call it once and save the result
+	PluginHandle	(* GetPluginHandle)(void);
+
+	// CommandReturnType enum defined in CommandTable.h
+	// does the same as RegisterCommand but includes return type; *required* for commands returning arrays
+	bool	(* RegisterTypedCommand)(CommandInfo * info, CommandReturnType retnType);
+	// returns a full path the the game directory
+	const char* (* GetRuntimeDirectory)();
+
+	// Allows checking for nogore edition
+	UInt32	isNogore;
+};
+
+struct OBSEInterface
+{
+	UInt32	obseVersion;
+	UInt32	oblivionVersion;
+	UInt32	editorVersion;
+	UInt32	isEditor;
+	bool	(* RegisterCommand)(CommandInfo * info);	// returns true for success, false for failure
+	void	(* SetOpcodeBase)(UInt32 opcode);
+	void *	(* QueryInterface)(UInt32 id);
+
+	// added in v0015, only call if obseVersion >= 15
+	// call during your Query or Load functions to get a PluginHandle uniquely identifying your plugin
+	// invalid if called at any other time, so call it once and save the result
+	PluginHandle	(* GetPluginHandle)(void);
+
+	// added v0018
+	// CommandReturnType enum defined in CommandTable.h
+	// does the same as RegisterCommand but includes return type; *required* for commands returning arrays
+	bool	(* RegisterTypedCommand)(CommandInfo * info, CommandReturnType retnType);
+	// returns a full path the the Oblivion directory
+	const char* (* GetOblivionDirectory)();
+
+	// added v0021
+	// returns true if a plugin with the given name is loaded
+	bool	(* GetPluginLoaded)(const char* pluginName);
+	// returns the version number of the plugin, or zero if it isn't loaded
+	UInt32	(* GetPluginVersion)(const char* pluginName);
+};

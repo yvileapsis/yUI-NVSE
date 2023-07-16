@@ -33,11 +33,6 @@ namespace CrashLogger::PDBHandling
 		return module.ModuleName;
 	}
 
-	std::string GetModuleAddress(UInt32 ebp)
-	{
-		return FormatString("0x%08X", ebp);
-	}
-
 	std::string GetSymbol(UInt32 eip, HANDLE process)
 	{
 		char symbolBuffer[sizeof(IMAGEHLP_SYMBOL) + 255];
@@ -78,11 +73,11 @@ namespace CrashLogger::PDBHandling
 		std::string middle;
 
 		if (const auto module = GetModule(eip, process); module.empty()) 
-			middle = FormatString("%20s (%s) : (Corrupt stack or heap?)", "-\\(°_o)/-", GetModuleAddress(ebp).c_str());
+			middle = FormatString("%20s (%s) : (Corrupt stack or heap?)", "-\\(°_o)/-", GetAddress(ebp).c_str());
 		else if (const auto symbol = GetSymbol(eip, process); symbol.empty())
-			middle = FormatString("%20s (%s) : EntryPoint+0xFFFFFFFF", module.c_str(), GetModuleAddress(ebp).c_str());
+			middle = FormatString("%20s (%s) : EntryPoint+0xFFFFFFFF", module.c_str(), GetAddress(ebp).c_str());
 		else
-			middle = FormatString("%20s (%s) : %s", module.c_str(), GetModuleAddress(ebp).c_str(), symbol.c_str());
+			middle = FormatString("%20s (%s) : %s", module.c_str(), GetAddress(ebp).c_str(), symbol.c_str());
 
 		std::string end;
 
@@ -245,7 +240,7 @@ namespace CrashLogger::Handle
 	std::string AsQueuedKF(void* ptr) {	const auto model = static_cast<QueuedKF*>(ptr); return !model->kf ? "" : FormatString("%s", model->kf->path); }
 
 }
-namespace CrashLogger::NVVtables
+namespace CrashLogger::VirtualTables
 {
 	Handle::_Handler lastHandler = nullptr;
 
@@ -323,7 +318,7 @@ namespace CrashLogger::NVVtables
 		setOfLabels.push_back(std::make_unique<Label>(std::forward<_Types>(args)...));
 	}
 
-	void FillLabels()
+	void FillNVSELabels()
 	{
 		Push(0x10F1EE0, nullptr, "TypeInfo", Label::kType_RTTIClass);
 
@@ -2327,6 +2322,16 @@ namespace CrashLogger::NVVtables
 
 	};
 
+	void FillFOSELabels()
+	{
+		
+	}
+
+	void FillOBSELabels()
+	{
+		
+	}
+
 	std::string GetStringForVTBL(void* ptr, UInt32 vtbl)
 	{
 		for (const auto& iter : setOfLabels)
@@ -2370,13 +2375,13 @@ namespace CrashLogger::DereferenceCatcher
 
 			while (vtbl = Catch(ptr))
 			{
-				if (std::string onetime = NVVtables::GetStringForVTBL((void*)ptr, vtbl); !onetime.empty()) return full + onetime;
+				if (std::string onetime = VirtualTables::GetStringForVTBL((void*)ptr, vtbl); !onetime.empty()) return full + onetime;
 
 				if (depth == 0) break;
 
 				depth--;
 
-				full += FormatString("NOT_VTBL: 0x%08X; ", vtbl);
+				full += FormatString("NotVTable: 0x%08X; ", vtbl);
 
 				ptr = vtbl;
 			}
@@ -2435,17 +2440,17 @@ namespace CrashLogger::Registry
 {
 	void Get(EXCEPTION_POINTERS* info)
 	{
-		Log() << FormatString("\nRegistry: ");
-		Log() << FormatString("REG |    VALUE   | DEREFERENCE INFO");
-		Log() << FormatString("%s | 0x%08X | %s ", "eax", info->ContextRecord->Eax, DereferenceCatcher::Do(info->ContextRecord->Eax).c_str());
-		Log() << FormatString("%s | 0x%08X | %s ", "ebx", info->ContextRecord->Ebx, DereferenceCatcher::Do(info->ContextRecord->Ebx).c_str());
-		Log() << FormatString("%s | 0x%08X | %s ", "ecx", info->ContextRecord->Ecx, DereferenceCatcher::Do(info->ContextRecord->Ecx).c_str());
-		Log() << FormatString("%s | 0x%08X | %s ", "edx", info->ContextRecord->Edx, DereferenceCatcher::Do(info->ContextRecord->Edx).c_str());
-		Log() << FormatString("%s | 0x%08X | %s ", "edi", info->ContextRecord->Edi, DereferenceCatcher::Do(info->ContextRecord->Edi).c_str());
-		Log() << FormatString("%s | 0x%08X | %s ", "esi", info->ContextRecord->Esi, DereferenceCatcher::Do(info->ContextRecord->Esi).c_str());
-		Log() << FormatString("%s | 0x%08X | %s ", "ebp", info->ContextRecord->Ebp, DereferenceCatcher::Do(info->ContextRecord->Ebp).c_str());
-		Log() << FormatString("%s | 0x%08X |", "esp", info->ContextRecord->Esp);
-		Log() << FormatString("%s | 0x%08X |", "eip", info->ContextRecord->Eip);
+		Log() << FormatString("\nRegistry: ")
+			<< FormatString("REG |    VALUE   | DEREFERENCE INFO")
+			<< FormatString("eax | 0x%08X | ", info->ContextRecord->Eax) + DereferenceCatcher::Do(info->ContextRecord->Eax)
+			<< FormatString("ebx | 0x%08X | ", info->ContextRecord->Ebx) + DereferenceCatcher::Do(info->ContextRecord->Ebx)
+			<< FormatString("ecx | 0x%08X | ", info->ContextRecord->Ecx) + DereferenceCatcher::Do(info->ContextRecord->Ecx)
+			<< FormatString("edx | 0x%08X | ", info->ContextRecord->Edx) + DereferenceCatcher::Do(info->ContextRecord->Edx)
+			<< FormatString("edi | 0x%08X | ", info->ContextRecord->Edi) + DereferenceCatcher::Do(info->ContextRecord->Edi)
+			<< FormatString("esi | 0x%08X | ", info->ContextRecord->Esi) + DereferenceCatcher::Do(info->ContextRecord->Esi)
+			<< FormatString("ebp | 0x%08X | ", info->ContextRecord->Ebp) + DereferenceCatcher::Do(info->ContextRecord->Ebp)
+			<< FormatString("esp | 0x%08X | ", info->ContextRecord->Esp) + DereferenceCatcher::Do(info->ContextRecord->Esp)
+			<< FormatString("eip | 0x%08X | ", info->ContextRecord->Eip) + DereferenceCatcher::Do(info->ContextRecord->Eip);
 	}
 }
 
@@ -2456,7 +2461,8 @@ namespace CrashLogger::Stack
 		Log() << FormatString("\nStack: ");
 		Log() << FormatString(" # |    VALUE   | DEREFERENCE INFO");
 
-		UInt32* esp = (UInt32*)info->ContextRecord->Esp;
+		const auto esp = reinterpret_cast<UInt32*>(info->ContextRecord->Esp);
+
 		for (unsigned int i = 0; i < ce_printStackCount; i += 1) {
 
 			if (i <= 8)
@@ -2508,19 +2514,16 @@ namespace CrashLogger::ModuleBases
 		UserContext infoUser = { eip,  0, (char*)calloc(sizeof(char), 100) };
 		EnumerateLoadedModules(processHandle, EumerateModulesCallback, &infoUser);
 		if (infoUser.moduleBase) {
-			Log() << FormatString("\nGAME CRASHED AT INSTRUCTION Base+0x%08X IN MODULE: %s", (infoUser.eip - infoUser.moduleBase), infoUser.name);
-			Log() << FormatString("Please note that this does not automatically mean that that module is responsible. \n"
-				"It may have been supplied bad data or program state as the result of an issue in \n"
-				"the base game or a different DLL.");
+			Log() << FormatString("\nGAME CRASHED AT INSTRUCTION Base+0x%08X IN MODULE: %s", (infoUser.eip - infoUser.moduleBase), infoUser.name)
+				<< "Please note that this does not automatically mean that that module is responsible. It may have been supplied bad data or"
+				<< "program state as the result of an issue in the base game or a different DLL.";
 		}
 		else {
-			Log() << FormatString("\nUNABLE TO IDENTIFY MODULE CONTAINING THE CRASH ADDRESS.");
-			Log() << FormatString("This can occur if the crashing instruction is located in the vanilla address space, \n"
-				"but it can also occur if there are too many DLLs for us to list, and if the crash \n"
-				"occurred in one of their address spaces. Please note that even if the crash occurred \n"
-				"in vanilla code, that does not necessarily mean that it is a vanilla problem. The \n"
-				"vanilla code may have been supplied bad data or program state as the result of an \n"
-				"issue in a loaded DLL.");
+			Log() << FormatString("\nUNABLE TO IDENTIFY MODULE CONTAINING THE CRASH ADDRESS.")
+				<< "This can occur if the crashing instruction is located in the vanilla address space, but it can also occur if there are too many"
+				<< "DLLs for us to list, and if the crash occurred in one of their address spaces. Please note that even if the crash occurred"
+				<< "in vanilla code, that does not necessarily mean that it is a vanilla problem. The vanilla code may have been supplied bad data"
+				<< "or program state as the result of an issue in a loaded DLL.";
 		}
 	}
 }
@@ -2565,14 +2568,22 @@ namespace CrashLogger
 		return nullptr;
 	}
 
-
-	void Apply() {
+	void ApplyNVSE()
+	{
 		s_originalFilter = SetUnhandledExceptionFilter(&Filter);
-		//
-		// Prevent disabling the filter:
-		//
 		SafeWrite32(0x00FDF180, (UInt32)&FakeSetUnhandledExceptionFilter);
+	}
 
-		// Oblivion: 0x00A281B4
-	};
+	// thanks Stewie
+	void ApplyFOSE()
+	{
+		s_originalFilter = SetUnhandledExceptionFilter(&Filter);
+		SafeWrite32(0x00D9B180, (UInt32)&FakeSetUnhandledExceptionFilter);
+	}
+
+	void ApplyOBSE()
+	{
+		s_originalFilter = SetUnhandledExceptionFilter(&Filter);
+		SafeWrite32(0x00A281B4, (UInt32)&FakeSetUnhandledExceptionFilter);
+	}
 };
