@@ -31,19 +31,15 @@ public:
 	DebugLog() = default;
 	~DebugLog() { if (file) file.close(); }
 
-	void Create(LoggingFunction rhslogger, const std::filesystem::path& rhspath, const std::string& logFolder = "", const std::string& rhsmodString = "")
+	void Create(LoggingFunction rhslogger, const std::filesystem::path& rhspath, const std::filesystem::path& logFolder = "", const std::string& rhsmodString = "")
 	{
-		if (!logFolder.empty() && exists(rhspath))
+		if (!logFolder.empty() && exists(rhspath) && (file_size(rhspath) > 0xFFF))
 		{
-			const std::string additional = logFolder + "/";
-			std::filesystem::create_directory(additional);
+			const auto lastmod = std::format(".{0:%F}-{0:%H}-{0:%M}-{0:%S}", floor<std::chrono::seconds>(last_write_time(rhspath)));
 
-			if (file_size(rhspath) > 0xFFF)
-			{
-				const auto lastmod = std::format(".{0:%F}-{0:%H}-{0:%M}-{0:%S}", floor<std::chrono::seconds>(last_write_time(rhspath)));
+			if (!exists(logFolder)) std::filesystem::create_directory(logFolder);
 
-				rename(rhspath, additional + rhspath.stem().string() + lastmod + rhspath.extension().string());
-			}
+			rename(rhspath, logFolder.string() + "\\" + rhspath.stem().string() + lastmod + rhspath.extension().string());
 		}
 
 		logger = rhslogger;
@@ -229,9 +225,9 @@ void DumpFontNames()
 }
 
 
-void Log::Init(const std::filesystem::path& path, const std::string& modName, const std::string& history)
+void Log::Init(const std::filesystem::path& path, const std::string& modName, const std::filesystem::path& folder)
 {
-	file.Create(FileLoggerPrint, path, history);
+	file.Create(FileLoggerPrint, path, folder);
 	console.Create(ConsoleLoggerUpdate, modName);
 }
 
