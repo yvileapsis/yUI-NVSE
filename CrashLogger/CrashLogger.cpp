@@ -2379,7 +2379,7 @@ namespace CrashLogger::VirtualTables
 
 			depth--;
 
-			full += FormatString("NotVTable: 0x%08X; ", vtbl);
+			full += FormatString("Pointer: 0x%08X; ", vtbl);
 
 			ptr = vtbl;
 		}
