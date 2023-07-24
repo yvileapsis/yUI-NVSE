@@ -36,10 +36,16 @@ public:
 		if (!logFolder.empty() && exists(rhspath) && (file_size(rhspath) > 0xFFF))
 		{
 			const auto lastmod = std::format(".{0:%F}-{0:%H}-{0:%M}-{0:%S}", floor<std::chrono::seconds>(last_write_time(rhspath)));
+			std::filesystem::path newPath = rhspath.parent_path().string() + "\\";
+			newPath += logFolder.string() + "\\";
 
-			if (!exists(logFolder)) std::filesystem::create_directory(logFolder);
+			if (!exists(newPath)) std::filesystem::create_directory(newPath);
 
-			rename(rhspath, logFolder.string() + "\\" + rhspath.stem().string() + lastmod + rhspath.extension().string());
+			newPath += rhspath.stem();
+			newPath += lastmod;
+			newPath += rhspath.extension();
+
+			rename(rhspath, newPath);
 		}
 
 		logger = rhslogger;
