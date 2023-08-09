@@ -2546,7 +2546,7 @@ namespace CrashLogger
 
 		ModuleBases::Get(info);
 
-		Log().Copy(CrashLogger_FLD);
+		Log() >> CrashLogger_FLD;
 
 		SymCleanup(GetCurrentProcess());
 	};

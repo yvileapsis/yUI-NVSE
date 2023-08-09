@@ -25,6 +25,7 @@ public:
 
 	Log(UInt32 logLevel = true, UInt32 logDest = kLog) : logDest(logDest), logLevel(logLevel) {};
 	Log& operator<<(const std::string& str);
+	Log& operator>>(const std::filesystem::path& path);
 	Log& operator()();
 
 	static void Init(const std::filesystem::path& path, const std::string& modName);

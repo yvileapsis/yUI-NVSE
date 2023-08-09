@@ -242,6 +242,12 @@ Log& Log::operator<<(const std::string& str)
 	return *this;
 }
 
+Log& Log::operator>>(const std::filesystem::path& path)
+{
+	Copy(path);
+	return *this;
+}
+
 Log& Log::operator()()
 {
 	if (logLevel)
