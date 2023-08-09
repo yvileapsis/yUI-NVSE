@@ -27,7 +27,7 @@ void InitLog(std::filesystem::path path = "")
 	Log::Init(path, CrashLogger_STR);
 
 	Log() << GetName() + " version " + CrashLogger_VERSION_STR + " at " + std::format("{0:%F} {0:%T}", std::chrono::time_point(std::chrono::system_clock::now()))
-		<< "If this file is empty, then your game didn't crash or something went so wrong even crash logger was useless! :snig:"
+		<< "If this file is empty, then your game didn't crash which is somewhat weird."
 		<< "Topmost stack module is NOT ALWAYS the crash reason! Exercise caution when speculating!\n";
 }
 
