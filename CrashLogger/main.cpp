@@ -24,7 +24,7 @@ void FillPluginInfo(PluginInfo* info)
 void InitLog(std::filesystem::path path = "")
 {
 	path += CrashLogger_LOG;
-	Log::Init(path, CrashLogger_STR, CrashLogger_FLD);
+	Log::Init(path, CrashLogger_STR);
 
 	Log() << GetName() + " version " + CrashLogger_VERSION_STR + " at " + std::format("{0:%F} {0:%T}", std::chrono::time_point(std::chrono::system_clock::now()))
 		<< "If this file is empty, then your game didn't crash or something went so wrong even crash logger was useless! :snig:"

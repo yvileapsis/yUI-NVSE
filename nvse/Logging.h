@@ -27,7 +27,8 @@ public:
 	Log& operator<<(const std::string& str);
 	Log& operator()();
 
-	static void Init(const std::filesystem::path& path, const std::string& modName, const std::filesystem::path& folder = "");
+	static void Init(const std::filesystem::path& path, const std::string& modName);
+	static void Copy(const std::filesystem::path& path);
 };
 
 void Dump(Tile* tile);

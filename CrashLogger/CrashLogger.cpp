@@ -13,6 +13,7 @@
 #include "SafeWrite.h"
 #include "Setting.h"
 
+
 #define SYMOPT_EX_WINE_NATIVE_MODULES 1000
 
 constexpr UInt32 ce_printStackCount = 256;
@@ -2347,6 +2348,7 @@ namespace CrashLogger::VirtualTables
 		
 	}
 
+
 	std::string GetStringForLabel(void* ptr, UInt32 vtbl)
 	{
 		for (const auto& iter : setOfLabels)
@@ -2391,7 +2393,10 @@ namespace CrashLogger::VirtualTables
 namespace CrashLogger::Calltrace
 {
 
-	void Get(EXCEPTION_POINTERS* info, HANDLE process, HANDLE thread) {
+	void Get(EXCEPTION_POINTERS* info) 
+	{
+		HANDLE  process = GetCurrentProcess();
+		HANDLE  thread = GetCurrentThread();
 
 		Log() << FormatString("Exception %08X caught!\n", info->ExceptionRecord->ExceptionCode);
 		Log() << "Calltrace:";
@@ -2451,8 +2456,7 @@ namespace CrashLogger::Stack
 {
 	void Get(EXCEPTION_POINTERS* info)
 	{
-		Log() << FormatString("Stack:")
-			<< FormatString(" # |    VALUE   | DEREFERENCE INFO");
+		Log() << "Stack:" << " # |    VALUE   | DEREFERENCE INFO";
 
 		const auto esp = reinterpret_cast<UInt32*>(info->ContextRecord->Esp);
 
@@ -2470,6 +2474,7 @@ namespace CrashLogger::Stack
 			}
 		}
 		// this allows me to see that crash log is incomplete
+		
 		Log() << "";
 	}
 }
@@ -2501,13 +2506,15 @@ namespace CrashLogger::ModuleBases
 		return TRUE;
 	}
 
-	void Get(EXCEPTION_POINTERS* info, HANDLE processHandle)
+	void Get(EXCEPTION_POINTERS* info)
 	{
+		HANDLE process = GetCurrentProcess();
+
 		const UInt32 eip = info->ContextRecord->Eip;
 
 		Log() << FormatString("Module bases:");
 		UserContext infoUser = { eip,  0, (char*)calloc(sizeof(char), 100) };
-		EnumerateLoadedModules(processHandle, EumerateModulesCallback, &infoUser);
+		EnumerateLoadedModules(process, EumerateModulesCallback, &infoUser);
 
 		Log() << "";
 
@@ -2530,19 +2537,18 @@ namespace CrashLogger::ModuleBases
 namespace CrashLogger
 {
 	void Get(EXCEPTION_POINTERS* info) {
-		HANDLE  processHandle = GetCurrentProcess();
-		HANDLE  threadHandle = GetCurrentThread();
 
-		 { Calltrace::Get(info, processHandle, threadHandle); }
+		Calltrace::Get(info);
 
-		 { Registry::Get(info); }
+		Registry::Get(info);
 
-		 __try { Stack::Get(info); }
-		 __except (EXCEPTION_EXECUTE_HANDLER) {}
+		Stack::Get(info);
 
-		 { ModuleBases::Get(info, processHandle); }
+		ModuleBases::Get(info);
 
-		SymCleanup(processHandle);
+		Log().Copy(CrashLogger_FLD);
+
+		SymCleanup(GetCurrentProcess());
 	};
 
 	static LPTOP_LEVEL_EXCEPTION_FILTER s_originalFilter = nullptr;
@@ -2557,6 +2563,7 @@ namespace CrashLogger
 			caught = true;
 			try { Get(info); }
 			catch (...) {};
+
 		}
 		if (s_originalFilter) s_originalFilter(info); // don't return
 		return !ignored ? EXCEPTION_CONTINUE_SEARCH : EXCEPTION_EXECUTE_HANDLER;
@@ -2586,3 +2593,4 @@ namespace CrashLogger
 		SafeWrite32(0x00A281B4, (UInt32)&FakeSetUnhandledExceptionFilter);
 	}
 };
+

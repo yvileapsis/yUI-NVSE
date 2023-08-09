@@ -22,6 +22,8 @@ class DebugLog
 	UpdateFunction		update = nullptr;
 
 	std::fstream		file;
+	std::filesystem::path path;
+
 	std::string			modString;
 
 	UInt32				indent = 0;
@@ -31,25 +33,11 @@ public:
 	DebugLog() = default;
 	~DebugLog() { if (file) file.close(); }
 
-	void Create(LoggingFunction rhslogger, const std::filesystem::path& rhspath, const std::filesystem::path& logFolder = "", const std::string& rhsmodString = "")
+	void Create(LoggingFunction rhslogger, const std::filesystem::path& rhspath, const std::string& rhsmodString = "")
 	{
-		if (!logFolder.empty() && exists(rhspath) && (file_size(rhspath) > 0xFFF))
-		{
-			const auto lastmod = std::format(".{0:%F}-{0:%H}-{0:%M}-{0:%S}", floor<std::chrono::seconds>(last_write_time(rhspath)));
-			std::filesystem::path newPath = rhspath.parent_path().string() + "\\";
-			newPath += logFolder.string() + "\\";
-
-			if (!exists(newPath)) std::filesystem::create_directory(newPath);
-
-			newPath += rhspath.stem();
-			newPath += lastmod;
-			newPath += rhspath.extension();
-
-			rename(rhspath, newPath);
-		}
-
 		logger = rhslogger;
 		file = std::fstream(rhspath, std::fstream::out | std::fstream::trunc);
+		path = rhspath;
 		modString = rhsmodString;
 	}
 
@@ -94,6 +82,8 @@ public:
 
 	DebugLog& operator++() { indent++; return *this; }
 	DebugLog& operator--() { indent--; return *this; }
+
+	void Copy(const std::filesystem::path& path);
 };
 
 inline DebugLog console;
@@ -231,10 +221,15 @@ void DumpFontNames()
 }
 
 
-void Log::Init(const std::filesystem::path& path, const std::string& modName, const std::filesystem::path& folder)
+void Log::Init(const std::filesystem::path& path, const std::string& modName)
 {
-	file.Create(FileLoggerPrint, path, folder);
+	file.Create(FileLoggerPrint, path);
 	console.Create(ConsoleLoggerUpdate, modName);
+}
+
+void Log::Copy(const std::filesystem::path& path) 
+{
+	file.Copy(path);
 }
 
 Log& Log::operator<<(const std::string& str)
@@ -274,3 +269,21 @@ void Debug_DumpTraits()
 			Log(FormatString("%08X (%s) %08X", pEvent->object, GetObjectClassName(pEvent->object), pEvent->eventMask));
 }
 */
+
+void DebugLog::Copy(const std::filesystem::path& logFolder)
+{
+	const auto lastmod = std::format(".{0:%F}-{0:%H}-{0:%M}-{0:%S}", floor<std::chrono::seconds>(std::chrono::time_point(std::chrono::system_clock::now())));
+	std::filesystem::path newPath = path.parent_path().string() + "\\";
+	newPath += logFolder.string() + "\\";
+	if (!exists(newPath)) std::filesystem::create_directory(newPath);
+	newPath += path.stem();
+	newPath += lastmod;
+	newPath += path.extension();
+
+	try {
+		std::filesystem::copy_file(path, newPath);
+	}
+	catch (std::filesystem::filesystem_error& e) {
+		Log() << "Could not copy sandbox/abc: " << e.what() << "\n";
+	}
+}
