@@ -2517,18 +2517,18 @@ namespace CrashLogger::ModuleBases
 		EnumerateLoadedModules(process, EumerateModulesCallback, &infoUser);
 
 		Log() << "";
-
 		if (infoUser.moduleBase) {
-			Log() << FormatString("GAME CRASHED AT INSTRUCTION Base+0x%08X IN MODULE: %s", (infoUser.eip - infoUser.moduleBase), infoUser.name)
-				<< "Please note that this does not automatically mean that that module is responsible. It may have been supplied bad data or"
-				<< "program state as the result of an issue in the base game or a different DLL.";
+			Log() << FormatString(" OMFG GAME CRASHED AGAIN!! Damn you Bethesda! Damn you Obdisian! I'm tired of this bullshit. AT INSTRUCTION Base+0x%08X IN MODULE: %s", (infoUser.eip - infoUser.moduleBase), infoUser.name)
+				<< "Please note that this probably means that plugin author forgot to make a check for a null ref or smth."
+				<< "Now go and upload the whole log to Nexus in the plugin comment section without using [spoiler] tag so everyone likes you.";
 		}
 		else {
-			Log() << FormatString("UNABLE TO IDENTIFY MODULE CONTAINING THE CRASH ADDRESS.")
-				<< "This can occur if the crashing instruction is located in the vanilla address space, but it can also occur if there are too many"
-				<< "DLLs for us to list, and if the crash occurred in one of their address spaces. Please note that even if the crash occurred"
-				<< "in vanilla code, that does not necessarily mean that it is a vanilla problem. The vanilla code may have been supplied bad data"
-				<< "or program state as the result of an issue in a loaded DLL.";
+			Log() << FormatString("I DON'T KNOW WHAT THE FUCK IS GOING ON!")
+				<< "This can occur if modded the game too much, stop using so many DLLs, application wasn't designed for so many hooks!!!"
+				<< "Please note that even if the crash occurred"
+				<< "in vanilla code, that probably means that Bethesda and Obsidian didn't find the time to test game properly and fucked something up so we have to fix their shit all over again.."
+				<< "You can report this to someone or simply shove it up your ass, no one's interested in your crash logs anyway.";
+	;
 		}
 		Log() << "";
 	}
