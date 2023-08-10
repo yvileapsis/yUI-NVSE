@@ -1,3 +1,6 @@
+//https://codereview.stackexchange.com/questions/238234/a-simple-multithreaded-filelogger-in-c
+//https://codereview.stackexchange.com/questions/256137/simple-multithreaded-filelogger-in-c
+
 #include <Logging.h>
 
 #include <fstream>
@@ -36,6 +39,7 @@ public:
 	void Create(LoggingFunction rhslogger, const std::filesystem::path& rhspath, const std::string& rhsmodString = "")
 	{
 		logger = rhslogger;
+		if (!exists(rhspath.parent_path())) std::filesystem::create_directory(rhspath.parent_path());
 		file = std::fstream(rhspath, std::fstream::out | std::fstream::trunc);
 		path = rhspath;
 		modString = rhsmodString;

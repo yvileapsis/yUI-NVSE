@@ -23,8 +23,12 @@ void FillPluginInfo(PluginInfo* info)
 
 void InitLog(std::filesystem::path path = "")
 {
-	path += CrashLogger_LOG;
-	Log::Init(path, CrashLogger_STR);
+	std::filesystem::path newPath = GetCurPath();
+	newPath += "\\";
+	newPath += path;
+	newPath += "\\";
+	newPath += CrashLogger_LOG;
+	Log::Init(newPath, CrashLogger_STR);
 
 	Log() << GetName() + " version " + CrashLogger_VERSION_STR + " at " + std::format("{0:%F} {0:%T}", std::chrono::time_point(std::chrono::system_clock::now()))
 		<< "If this file is empty, then your game didn't crash or something went so wrong even crash logger was useless! :snig:"
@@ -124,6 +128,7 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	DispatchEvent = g_eventInterface->DispatchEvent;
 
 	g_loggingInterface = static_cast<NVSELoggingInterface*>(nvse->QueryInterface(kInterface_LoggingInterface));
+
 	InitLog(g_loggingInterface ? g_loggingInterface->GetPluginLogPath() : "");
 
 	for (const auto& i : pluginLoad) i(); // call all plugin load functions
