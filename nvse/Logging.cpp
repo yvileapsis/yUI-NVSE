@@ -133,6 +133,7 @@ void DumpClass(void* theClassPtr, UInt32 nIntsToDump)
 	--file;
 }
 
+
 void Dump(Tile* tile)
 {
 	file << tile->name.m_data;
@@ -236,32 +237,58 @@ void Log::Copy(const std::filesystem::path& path)
 	file.Copy(path);
 }
 
-Log& Log::operator<<(const std::string& str)
-{
-	if (logLevel)
-	{
-		if (logDest & kLog) file << str;
-		if (logDest & kConsole) console << str;
-	}
-	return *this;
-}
-
 Log& Log::operator>>(const std::filesystem::path& path)
 {
 	Copy(path);
 	return *this;
 }
 
+std::vector<InternalFunction> queue;
+
 Log& Log::operator()()
 {
 	if (logLevel)
 	{
+		for (const auto& iter : queue) 
+		{
+			const auto str = iter(); 
+			if (logDest & kLog) file << str;
+			if (logDest & kConsole) console << str;
+		}
+		queue.clear();
 		if (logDest & kLog) file();
 		if (logDest & kConsole) console();
 	}
 	return *this;
 }
 
+Log& Log::operator<<(const Record& rec)
+{
+	if (logLevel) queue.push_back(rec);
+	return *this;
+}
+
+/*
+Log& operator<<(Log& log, Record rec)
+{
+	if (log.logLevel)
+	{
+		const auto& str = rec();
+		if (log.logDest & Log::kLog) file << str;
+		if (log.logDest & Log::kConsole) console << str;
+	}
+	return log;
+}
+*/
+
+/*
+auto make_B(auto&&... args) // since C++20
+{
+	std::function<void(decltype(args))>
+
+	return B(std::forward<decltype(args)>(args)...);
+}
+*/
 /*
 extern NiTMapBase<const char*, int>* g_traitNameMap;
 

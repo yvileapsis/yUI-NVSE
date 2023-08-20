@@ -2398,7 +2398,7 @@ namespace CrashLogger::Calltrace
 		HANDLE  process = GetCurrentProcess();
 		HANDLE  thread = GetCurrentThread();
 
-		Log() << FormatString("Exception %08X caught!\n", info->ExceptionRecord->ExceptionCode);
+		Log() << Record("Exception %08X caught!\n", info->ExceptionRecord->ExceptionCode);
 		Log() << "Calltrace:";
 
 		DWORD machine = IMAGE_FILE_MACHINE_I386;
@@ -2487,6 +2487,7 @@ namespace CrashLogger::ModuleBases
 		CHAR* name;
 	};
 
+
 	BOOL CALLBACK EumerateModulesCallback(PCSTR name, ULONG moduleBase, ULONG moduleSize, PVOID context) {
 		UserContext* info = (UserContext*)context;
 		if (info->eip >= (UInt32)moduleBase && info->eip <= (UInt32)moduleBase + (UInt32)moduleSize) {
@@ -2519,12 +2520,12 @@ namespace CrashLogger::ModuleBases
 		Log() << "";
 
 		if (infoUser.moduleBase) {
-			Log() << FormatString("GAME CRASHED AT INSTRUCTION Base+0x%08X IN MODULE: %s", (infoUser.eip - infoUser.moduleBase), infoUser.name)
+			Log() << ("GAME CRASHED AT INSTRUCTION Base+0x%08X IN MODULE: %s", (infoUser.eip - infoUser.moduleBase), infoUser.name)
 				<< "Please note that this does not automatically mean that that module is responsible. It may have been supplied bad data or"
 				<< "program state as the result of an issue in the base game or a different DLL.";
 		}
 		else {
-			Log() << FormatString("UNABLE TO IDENTIFY MODULE CONTAINING THE CRASH ADDRESS.")
+			Log() << ("UNABLE TO IDENTIFY MODULE CONTAINING THE CRASH ADDRESS.")
 				<< "This can occur if the crashing instruction is located in the vanilla address space, but it can also occur if there are too many"
 				<< "DLLs for us to list, and if the crash occurred in one of their address spaces. Please note that even if the crash occurred"
 				<< "in vanilla code, that does not necessarily mean that it is a vanilla problem. The vanilla code may have been supplied bad data"
@@ -2536,6 +2537,7 @@ namespace CrashLogger::ModuleBases
 
 namespace CrashLogger
 {
+
 	void Get(EXCEPTION_POINTERS* info) {
 
 		Calltrace::Get(info);
@@ -2545,6 +2547,10 @@ namespace CrashLogger
 		Stack::Get(info);
 
 		ModuleBases::Get(info);
+
+		Log() << Record("waw");
+
+		Log()();
 
 		Log() >> CrashLogger_FLD;
 
