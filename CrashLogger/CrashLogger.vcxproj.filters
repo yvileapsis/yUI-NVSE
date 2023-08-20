@@ -78,6 +78,7 @@
       <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="Labels.cpp" />
+    <ClCompile Include="DbgHelpCrate.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="definitions.h" />
@@ -186,6 +187,10 @@
       <Filter>game</Filter>
     </ClInclude>
     <ClInclude Include="namegen.h" />
+    <ClInclude Include="..\libraries\MPMCQueue.h">
+      <Filter>libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="DbgHelpCrate.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />

@@ -2,7 +2,7 @@
 
 #include "CrashLogger.h"
 
-#include <DbgHelp.h>
+//#include <DbgHelp.h>
 
 #include "GameEffects.h"
 #include "TESForm.h"
@@ -13,8 +13,33 @@
 #include "SafeWrite.h"
 #include "Setting.h"
 
-
 #define SYMOPT_EX_WINE_NATIVE_MODULES 1000
+
+typedef enum {
+	SymNone = 0,
+	SymCoff,
+	SymCv,
+	SymPdb,
+	SymExport,
+	SymDeferred,
+	SymSym,       // .sym file
+	SymDia,
+	SymVirtual,
+	NumSymTypes
+} SYM_TYPE;
+
+typedef struct _IMAGEHLP_MODULE {
+	DWORD    SizeOfStruct;           // set to sizeof(IMAGEHLP_MODULE)
+	DWORD    BaseOfImage;            // base load address of module
+	DWORD    ImageSize;              // virtual size of the loaded module
+	DWORD    TimeDateStamp;          // date/time stamp from pe header
+	DWORD    CheckSum;               // checksum from the pe header
+	DWORD    NumSyms;                // number of symbols in the symbol table
+	SYM_TYPE SymType;                // type of symbols loaded
+	CHAR     ModuleName[32];         // module name
+	CHAR     ImageName[256];         // image name
+	CHAR     LoadedImageName[256];   // symbol file name
+} IMAGEHLP_MODULE, * PIMAGEHLP_MODULE;
 
 constexpr UInt32 ce_printStackCount = 256;
 
@@ -42,7 +67,7 @@ namespace CrashLogger::PDBHandling
 	{
 		IMAGEHLP_MODULE module = { 0 };
 		module.SizeOfStruct = sizeof(IMAGEHLP_MODULE);
-		if (!SymGetModuleInfo(process, eip, &module)) return "";
+!		if (!SymGetModuleInfo(process, eip, &module)) return "";
 
 		return module.ModuleName;
 	}
@@ -56,7 +81,7 @@ namespace CrashLogger::PDBHandling
 		symbol->MaxNameLength = 254;
 		DWORD offset = 0;
 
-		if (!SymGetSymFromAddr(process, eip, &offset, symbol)) return "";
+!		if (!SymGetSymFromAddr(process, eip, &offset, symbol)) return "";
 
 		const std::string functioName = symbol->Name;
 
@@ -71,7 +96,7 @@ namespace CrashLogger::PDBHandling
 
 		DWORD offset = 0;
 
-		if (!SymGetLineFromAddr(process, eip, &offset, line)) return "";
+!		if (!SymGetLineFromAddr(process, eip, &offset, line)) return "";
 
 		return FormatString("<%s:%d>", line->FileName, line->LineNumber);
 	}
@@ -2404,10 +2429,10 @@ namespace CrashLogger::Calltrace
 		DWORD machine = IMAGE_FILE_MACHINE_I386;
 		CONTEXT context = {};
 		memcpy(&context, info->ContextRecord, sizeof(CONTEXT));
-		SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_DEFERRED_LOADS | SYMOPT_UNDNAME | SYMOPT_ALLOW_ABSOLUTE_SYMBOLS);
+!		SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_DEFERRED_LOADS | SYMOPT_UNDNAME | SYMOPT_ALLOW_ABSOLUTE_SYMBOLS);
 
 //    SymSetExtendedOption((IMAGEHLP_EXTENDED_OPTIONS)SYMOPT_EX_WINE_NATIVE_MODULES, TRUE);
-		if (SymInitialize(process, NULL, TRUE) != TRUE) Log() << FormatString("Error initializing symbol store");
+!		if (SymInitialize(process, NULL, TRUE) != TRUE) Log() << FormatString("Error initializing symbol store");
 
 		//    SymSetExtendedOption((IMAGEHLP_EXTENDED_OPTIONS)SYMOPT_EX_WINE_NATIVE_MODULES, TRUE);
 
@@ -2419,7 +2444,7 @@ namespace CrashLogger::Calltrace
 		frame.AddrStack.Offset = info->ContextRecord->Esp;
 		frame.AddrStack.Mode = AddrModeFlat;
 		DWORD eip = 0;
-		while (StackWalk(machine, process, thread, &frame, &context, NULL, SymFunctionTableAccess, SymGetModuleBase, NULL)) {
+!		while (StackWalk(machine, process, thread, &frame, &context, NULL, SymFunctionTableAccess, SymGetModuleBase, NULL)) {
 			/*
 		Using  a PDB for OBSE from VS2019 is causing the frame to repeat, but apparently only if WINEDEBUG=+dbghelp isn't setted. Is this a wine issue?
 		When this happen winedbg show only the first line (this happens with the first frame only probably, even if there are more frames shown when using WINEDEBUG=+dbghelp )
@@ -2515,7 +2540,7 @@ namespace CrashLogger::ModuleBases
 
 		Log() << FormatString("Module bases:");
 		UserContext infoUser = { eip,  0, (char*)calloc(sizeof(char), 100) };
-		EnumerateLoadedModules(process, EumerateModulesCallback, &infoUser);
+!		EnumerateLoadedModules(process, EumerateModulesCallback, &infoUser);
 
 		Log() << "";
 
@@ -2548,13 +2573,11 @@ namespace CrashLogger
 
 		ModuleBases::Get(info);
 
-		Log() << Record("waw");
-
 		Log()();
 
 		Log() >> CrashLogger_FLD;
 
-		SymCleanup(GetCurrentProcess());
+!		SymCleanup(GetCurrentProcess());
 	};
 
 	static LPTOP_LEVEL_EXCEPTION_FILTER s_originalFilter = nullptr;
