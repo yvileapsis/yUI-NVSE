@@ -12,34 +12,9 @@
 #include "TESObjectREFR.h"
 #include "SafeWrite.h"
 #include "Setting.h"
+#include <DbgHelpCrate.h>
 
 #define SYMOPT_EX_WINE_NATIVE_MODULES 1000
-
-typedef enum {
-	SymNone = 0,
-	SymCoff,
-	SymCv,
-	SymPdb,
-	SymExport,
-	SymDeferred,
-	SymSym,       // .sym file
-	SymDia,
-	SymVirtual,
-	NumSymTypes
-} SYM_TYPE;
-
-typedef struct _IMAGEHLP_MODULE {
-	DWORD    SizeOfStruct;           // set to sizeof(IMAGEHLP_MODULE)
-	DWORD    BaseOfImage;            // base load address of module
-	DWORD    ImageSize;              // virtual size of the loaded module
-	DWORD    TimeDateStamp;          // date/time stamp from pe header
-	DWORD    CheckSum;               // checksum from the pe header
-	DWORD    NumSyms;                // number of symbols in the symbol table
-	SYM_TYPE SymType;                // type of symbols loaded
-	CHAR     ModuleName[32];         // module name
-	CHAR     ImageName[256];         // image name
-	CHAR     LoadedImageName[256];   // symbol file name
-} IMAGEHLP_MODULE, * PIMAGEHLP_MODULE;
 
 constexpr UInt32 ce_printStackCount = 256;
 
@@ -67,7 +42,7 @@ namespace CrashLogger::PDBHandling
 	{
 		IMAGEHLP_MODULE module = { 0 };
 		module.SizeOfStruct = sizeof(IMAGEHLP_MODULE);
-!		if (!SymGetModuleInfo(process, eip, &module)) return "";
+		if (!Safe_SymGetModuleInfo(process, eip, &module)) return "";
 
 		return module.ModuleName;
 	}
@@ -81,8 +56,8 @@ namespace CrashLogger::PDBHandling
 		symbol->MaxNameLength = 254;
 		DWORD offset = 0;
 
-!		if (!SymGetSymFromAddr(process, eip, &offset, symbol)) return "";
-
+		if (!Safe_SymGetSymFromAddr(process, eip, &offset, symbol)) return "";
+		
 		const std::string functioName = symbol->Name;
 
 		return FormatString("%s+0x%0X", functioName.c_str(), offset);
@@ -96,7 +71,7 @@ namespace CrashLogger::PDBHandling
 
 		DWORD offset = 0;
 
-!		if (!SymGetLineFromAddr(process, eip, &offset, line)) return "";
+		if (!Safe_SymGetLineFromAddr(process, eip, &offset, line)) return "";
 
 		return FormatString("<%s:%d>", line->FileName, line->LineNumber);
 	}
@@ -2420,8 +2395,8 @@ namespace CrashLogger::Calltrace
 
 	void Get(EXCEPTION_POINTERS* info) 
 	{
-		HANDLE  process = GetCurrentProcess();
-		HANDLE  thread = GetCurrentThread();
+		HANDLE process = GetCurrentProcess();
+		HANDLE thread = GetCurrentThread();
 
 		Log() << Record("Exception %08X caught!\n", info->ExceptionRecord->ExceptionCode);
 		Log() << "Calltrace:";
@@ -2429,10 +2404,12 @@ namespace CrashLogger::Calltrace
 		DWORD machine = IMAGE_FILE_MACHINE_I386;
 		CONTEXT context = {};
 		memcpy(&context, info->ContextRecord, sizeof(CONTEXT));
-!		SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_DEFERRED_LOADS | SYMOPT_UNDNAME | SYMOPT_ALLOW_ABSOLUTE_SYMBOLS);
+
+		Safe_SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_DEFERRED_LOADS | SYMOPT_UNDNAME | SYMOPT_ALLOW_ABSOLUTE_SYMBOLS);
 
 //    SymSetExtendedOption((IMAGEHLP_EXTENDED_OPTIONS)SYMOPT_EX_WINE_NATIVE_MODULES, TRUE);
-!		if (SymInitialize(process, NULL, TRUE) != TRUE) Log() << FormatString("Error initializing symbol store");
+		if (!Safe_SymInitialize(process, NULL, true))
+			Log() << FormatString("Error initializing symbol store");
 
 		//    SymSetExtendedOption((IMAGEHLP_EXTENDED_OPTIONS)SYMOPT_EX_WINE_NATIVE_MODULES, TRUE);
 
@@ -2444,7 +2421,8 @@ namespace CrashLogger::Calltrace
 		frame.AddrStack.Offset = info->ContextRecord->Esp;
 		frame.AddrStack.Mode = AddrModeFlat;
 		DWORD eip = 0;
-!		while (StackWalk(machine, process, thread, &frame, &context, NULL, SymFunctionTableAccess, SymGetModuleBase, NULL)) {
+
+		while (Safe_StackWalk(machine, process, thread, &frame, &context, NULL, Safe_SymFunctionTableAccess, Safe_SymGetModuleBase, NULL)) {
 			/*
 		Using  a PDB for OBSE from VS2019 is causing the frame to repeat, but apparently only if WINEDEBUG=+dbghelp isn't setted. Is this a wine issue?
 		When this happen winedbg show only the first line (this happens with the first frame only probably, even if there are more frames shown when using WINEDEBUG=+dbghelp )
@@ -2452,7 +2430,6 @@ namespace CrashLogger::Calltrace
 			if (frame.AddrPC.Offset == eip) break;
 			eip = frame.AddrPC.Offset;
 			Log() << PDBHandling::GetCalltraceFunction(frame.AddrPC.Offset, frame.AddrFrame.Offset, process);
-
 		}
 	}
 
@@ -2540,7 +2517,7 @@ namespace CrashLogger::ModuleBases
 
 		Log() << FormatString("Module bases:");
 		UserContext infoUser = { eip,  0, (char*)calloc(sizeof(char), 100) };
-!		EnumerateLoadedModules(process, EumerateModulesCallback, &infoUser);
+!		Safe_EnumerateLoadedModules(process, EumerateModulesCallback, &infoUser);
 
 		Log() << "";
 
@@ -2566,10 +2543,13 @@ namespace CrashLogger
 	void Get(EXCEPTION_POINTERS* info) {
 
 		Calltrace::Get(info);
+		Log()();
 
 		Registry::Get(info);
+		Log()();
 
 		Stack::Get(info);
+		Log()();
 
 		ModuleBases::Get(info);
 
@@ -2577,7 +2557,7 @@ namespace CrashLogger
 
 		Log() >> CrashLogger_FLD;
 
-!		SymCleanup(GetCurrentProcess());
+!		Safe_SymCleanup(GetCurrentProcess());
 	};
 
 	static LPTOP_LEVEL_EXCEPTION_FILTER s_originalFilter = nullptr;
@@ -2622,4 +2602,3 @@ namespace CrashLogger
 		SafeWrite32(0x00A281B4, (UInt32)&FakeSetUnhandledExceptionFilter);
 	}
 };
-
