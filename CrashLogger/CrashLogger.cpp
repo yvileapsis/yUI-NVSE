@@ -2398,7 +2398,7 @@ namespace CrashLogger::Calltrace
 		HANDLE process = GetCurrentProcess();
 		HANDLE thread = GetCurrentThread();
 
-		Log() << Record("Exception %08X caught!\n", info->ExceptionRecord->ExceptionCode);
+		Log() << std::format("Exception {:08X} caught!\n", info->ExceptionRecord->ExceptionCode);
 		Log() << "Calltrace:";
 
 		DWORD machine = IMAGE_FILE_MACHINE_I386;
@@ -2439,17 +2439,17 @@ namespace CrashLogger::Registry
 {
 	void Get(EXCEPTION_POINTERS* info)
 	{
-		Log() << FormatString("\nRegistry: ")
-			<< FormatString("REG |    VALUE   | DEREFERENCE INFO")
-			<< FormatString("eax | 0x%08X | ", info->ContextRecord->Eax) + VirtualTables::Get(info->ContextRecord->Eax)
-			<< FormatString("ebx | 0x%08X | ", info->ContextRecord->Ebx) + VirtualTables::Get(info->ContextRecord->Ebx)
-			<< FormatString("ecx | 0x%08X | ", info->ContextRecord->Ecx) + VirtualTables::Get(info->ContextRecord->Ecx)
-			<< FormatString("edx | 0x%08X | ", info->ContextRecord->Edx) + VirtualTables::Get(info->ContextRecord->Edx)
-			<< FormatString("edi | 0x%08X | ", info->ContextRecord->Edi) + VirtualTables::Get(info->ContextRecord->Edi)
-			<< FormatString("esi | 0x%08X | ", info->ContextRecord->Esi) + VirtualTables::Get(info->ContextRecord->Esi)
-			<< FormatString("ebp | 0x%08X | ", info->ContextRecord->Ebp) + VirtualTables::Get(info->ContextRecord->Ebp)
-			<< FormatString("esp | 0x%08X | ", info->ContextRecord->Esp) + VirtualTables::Get(info->ContextRecord->Esp)
-			<< FormatString("eip | 0x%08X | ", info->ContextRecord->Eip) + VirtualTables::Get(info->ContextRecord->Eip)
+		Log() << FormatString("Registry: \n")
+			<< FormatString("REG |    VALUE   | DEREFERENCE INFO\n")
+			<< FormatString("eax | 0x%08X | ", info->ContextRecord->Eax) + VirtualTables::Get(info->ContextRecord->Eax) << "\n"
+			<< FormatString("ebx | 0x%08X | ", info->ContextRecord->Ebx) + VirtualTables::Get(info->ContextRecord->Ebx) << "\n"
+			<< FormatString("ecx | 0x%08X | ", info->ContextRecord->Ecx) + VirtualTables::Get(info->ContextRecord->Ecx) << "\n"
+			<< FormatString("edx | 0x%08X | ", info->ContextRecord->Edx) + VirtualTables::Get(info->ContextRecord->Edx) << "\n"
+			<< FormatString("edi | 0x%08X | ", info->ContextRecord->Edi) + VirtualTables::Get(info->ContextRecord->Edi) << "\n"
+			<< FormatString("esi | 0x%08X | ", info->ContextRecord->Esi) + VirtualTables::Get(info->ContextRecord->Esi) << "\n"
+			<< FormatString("ebp | 0x%08X | ", info->ContextRecord->Ebp) + VirtualTables::Get(info->ContextRecord->Ebp) << "\n"
+			<< FormatString("esp | 0x%08X | ", info->ContextRecord->Esp) + VirtualTables::Get(info->ContextRecord->Esp) << "\n"
+			<< FormatString("eip | 0x%08X | ", info->ContextRecord->Eip) + VirtualTables::Get(info->ContextRecord->Eip) << "\n"
 			<< "";
 	}
 }
@@ -2466,7 +2466,7 @@ namespace CrashLogger::Stack
 
 			if (i <= 8)
 			{
-				Log() << FormatString("%2X | 0x%08X | ", i, esp[i]) + VirtualTables::Get(esp[i]);
+				Log() << FormatString("%2X | 0x%08X | ", i, esp[i]) + VirtualTables::Get(esp[i]) << "\n";
 			}
 			else
 			{
@@ -2517,7 +2517,7 @@ namespace CrashLogger::ModuleBases
 
 		Log() << FormatString("Module bases:");
 		UserContext infoUser = { eip,  0, (char*)calloc(sizeof(char), 100) };
-!		Safe_EnumerateLoadedModules(process, EumerateModulesCallback, &infoUser);
+		Safe_EnumerateLoadedModules(process, EumerateModulesCallback, &infoUser);
 
 		Log() << "";
 
@@ -2543,21 +2543,16 @@ namespace CrashLogger
 	void Get(EXCEPTION_POINTERS* info) {
 
 		Calltrace::Get(info);
-		Log()();
 
 		Registry::Get(info);
-		Log()();
 
 		Stack::Get(info);
-		Log()();
 
 		ModuleBases::Get(info);
 
-		Log()();
+		Logger::Copy();
 
-		Log() >> CrashLogger_FLD;
-
-!		Safe_SymCleanup(GetCurrentProcess());
+		Safe_SymCleanup(GetCurrentProcess());
 	};
 
 	static LPTOP_LEVEL_EXCEPTION_FILTER s_originalFilter = nullptr;

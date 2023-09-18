@@ -39,6 +39,7 @@ public:
 		} else {
 			Log() << ("Cannot find the specified function in DbgHelp.dll");
 		}
+		return 0;
 	}
 
 	// Wrapper template for the API functions
@@ -55,6 +56,7 @@ public:
 		} else {
 			Log() << ("Cannot find the specified function in DbgHelp.dll");
 		}
+		return 0;
 	}
 
 private:

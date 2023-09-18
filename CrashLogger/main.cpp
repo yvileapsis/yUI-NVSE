@@ -6,6 +6,7 @@
 #include "CrashLogger.h"
 #include "namegen.h"
 #include <format>
+#include <iostream>
 
 void InitSingletons()
 {
@@ -23,16 +24,21 @@ void FillPluginInfo(PluginInfo* info)
 
 void InitLog(std::filesystem::path path = "")
 {
-	std::filesystem::path newPath = GetCurPath();
-	newPath += "\\";
-	newPath += path;
-	newPath += "\\";
-	newPath += CrashLogger_LOG;
-	Log::Init(newPath, CrashLogger_STR);
+	std::filesystem::path logPath = GetCurPath();
+	logPath /= path;
+	logPath /= CrashLogger_LOG;
 
-	Log() << GetName() + " version " + CrashLogger_VERSION_STR + " at " + std::format("{0:%F} {0:%T}", std::chrono::time_point(std::chrono::system_clock::now()))
-		<< "If this file is empty, then your game didn't crash or something went so wrong even crash logger was useless! :snig:"
-		<< "Topmost stack module is NOT ALWAYS the crash reason! Exercise caution when speculating!\n";
+	std::filesystem::path logFolderPath = GetCurPath();
+	logFolderPath /= path;
+	logFolderPath /= CrashLogger_FLD;
+	logFolderPath /= CrashLogger_LOG;
+
+	Logger::AddDestinations(logPath, LogLevel::Warning);
+	Logger::PrepareCopy(logPath, logFolderPath);
+
+	Log() << GetName() + " version " + CrashLogger_VERSION_STR + " at " + std::format("{0:%F} {0:%T}", std::chrono::time_point(std::chrono::system_clock::now())) << std::endl
+		<< "If this file is empty, then your game didn't crash or something went so wrong even crash logger was useless! :snig:" << std::endl
+		<< "Topmost stack module is NOT ALWAYS the crash reason! Exercise caution when speculating!" << std::endl;
 }
 
 void MessageHandler(NVSEMessagingInterface::Message* msg)
@@ -40,7 +46,7 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	if (msg->type == NVSEMessagingInterface::kMessage_DeferredInit)
 	{
 		InitSingletons();
-		Log()();
+		Logger::Play();
 
 		for (const auto& i : deferredInit) i(); // call all deferred init functions
 	}

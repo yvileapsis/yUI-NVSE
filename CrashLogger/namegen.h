@@ -48,6 +48,10 @@ inline std::vector<std::string> edition{
 	"",
 	"",
 	"",
+	"",
+	"",
+	"",
+	"",
 	": Ultimate Edition",
 	" NVSE",
 	" (NVSE)",
@@ -59,6 +63,7 @@ inline std::vector<std::string> edition{
 	" (Trochili Edition)",
 	" (Skill Issue Edition)",
 	" (Works On My Machine Edition)"
+	" (I'd Rather Be Playing Starfield Edition)",
 };
 
 std::string GetName()

@@ -1,63 +1,58 @@
 #pragma once
 #include <filesystem>
 #include <string>
-#include <functional>
 
-class Record;
-class Log;
-
-std::string FormatString(const char* fmt, ...);
-
-typedef std::function<std::string()> InternalFunction;
-
-class Record : public InternalFunction
-{
-public:
-	template<typename... Args> Record(const char* str, Args&&... args)
-	: InternalFunction(std::bind_front(FormatString, str, std::forward<Args>(args)...))
-//	: InternalFunction([&, str]() { return FormatString(str, std::forward<Args>(args)...); })
-	{}
-
-	Record(std::string str) : InternalFunction([=]() { return str; }) {};
-
-	//	friend Log& operator<<(const Log& log, Record rec);
-
-	friend Log;
+enum class LogLevel {
+	Info, Warning, Error
 };
 
-class Log
+static std::string convertLevel(LogLevel level) {
+	switch (level) {
+	case LogLevel::Info:
+		return "Info";
+	case LogLevel::Warning:
+		return "Warning";
+	case LogLevel::Error:
+		return "Error";
+	default:
+		return "";
+	}
+}
+
+namespace Logger
 {
+	// LoggerManager starts paused so that printout can be started after all sub-loggers are initialized
+	void Play();
+	// Log to LoggerManager
+	void LogToManager(const std::string& message, LogLevel level);
+	// Add a new destination to LoggerManager
+	void AddDestinations(const std::filesystem::path& log, LogLevel logLevel);
+	// Prepare for copying file
+	void PrepareCopy(const std::filesystem::path& in, const std::filesystem::path& out);
+	// Copy all prepared files
+	void Copy();
+}
+
+class Log {
 public:
-	UInt32 logDest;
-	UInt32 logLevel;
+	inline Log() : logLevel(LogLevel::Error) {}
+	inline Log(LogLevel level) : logLevel(level) {}
+	inline Log(UInt32 one, UInt32 two) : logLevel(static_cast<LogLevel>(two)) {}
 
-	enum
-	{
-		kError = 1,
-		kWarning = 2,
-		kMessage = 3
-	};
+	template <typename T>
+	inline Log& operator<<(const T &value) {
+		buffer << value;
+		return *this;
+	}
 
-	enum
-	{
-		kNone = 0,
-		kLog = 1,
-		kConsole = 2,
-		kBoth = kLog | kConsole
-	};
+	inline Log& operator<<(std::ostream &(*func)(std::ostream &)) {
+		buffer << func;
+		return *this;
+	}
 
-	Log(UInt32 logLevel = true, UInt32 logDest = kLog) : logDest(logDest), logLevel(logLevel) {};
-//	Log& operator<<(const std::string& str);
-	Log& operator>>(const std::filesystem::path& path);
-	Log& operator()();
+	inline ~Log() { Logger::LogToManager(buffer.str(), logLevel); };
 
-	Log& operator<<(const Record& rec);
-
-
-	static void Init(const std::filesystem::path& path, const std::string& modName);
-	static void Copy(const std::filesystem::path& path);
-
-	friend Record;
+private:
+	LogLevel logLevel;
+	std::stringstream buffer;
 };
-
-void Dump(Tile* tile);
