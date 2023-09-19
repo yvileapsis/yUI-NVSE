@@ -112,7 +112,7 @@ double String::Compare(const String& compareTo, bool caseSensitive)
 	return comp;
 }
 
-const char* String::CStr()
+const char* String::CStr() const
 {
 	return m_dataLen && m_data ? m_data : "";
 }

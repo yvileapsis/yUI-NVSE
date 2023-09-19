@@ -80,7 +80,7 @@ Tile* Tile::AddTileFromTemplate(const char* templateName, const char* altName)
 	return tile;
 }
 
-std::string Tile::GetFullPath()
+std::string Tile::GetFullPath() const
 {
 	auto tileMenu = this;
 

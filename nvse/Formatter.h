@@ -1,88 +1,176 @@
+#include <format>
+
+#include "Setting.h"
+#include "GameEffects.h"
+#include "TESForm.h"
+#include "GameTasks.h"
+#include "Tile.h"
+#include "Menu.h"
+#include "TESObjectREFR.h"
+#include <Tile.h>
+#include <Menu.h>
+
+#define FORMAT_CLASS(CLASS)											\
+template <>															\
+struct std::formatter<CLASS> {										\
+	constexpr auto parse(format_parse_context &ctx) {				\
+		return ctx.begin();											\
+	}																\
+	template <typename FormatContext>								\
+	auto format(const CLASS& custom_obj, FormatContext &ctx) {		\
+		std::stringstream ss;										\
+		ss << custom_obj;											\
+		return format_to(ctx.out(), "{}", ss.str());				\
+	}																\
+};																	\
+
+#define FORMAT_CLASS_AND_DERIVED(CLASS)								\
+template <std::derived_from<CLASS> Derived>							\
+struct std::formatter<Derived> {									\
+	constexpr auto parse(format_parse_context &ctx) {				\
+		return ctx.begin();											\
+	}																\
+	template <typename FormatContext>								\
+	auto format(const Derived& custom_obj, FormatContext &ctx) {	\
+		std::stringstream ss;										\
+		ss << custom_obj;											\
+		return format_to(ctx.out(), "{}", ss.str());				\
+	}																\
+};																	\
+
+std::ostream &operator<<(std::ostream &os, const Tile& obj) { os << "Path: " << obj.GetFullPath(); return os; }
+std::ostream &operator<<(std::ostream &os, const Menu& obj) 
+{
+	os << std::format("MenuMode: {:d}, visible: {:b}, visibilityState: 0x{:X}", obj.id, obj.IsVisible(), obj.visibilityState);
+	return os; 
+}
+std::ostream &operator<<(std::ostream &os, const StartMenu::Option& obj) { os << obj.displayString; return os; }
+
+std::ostream &operator<<(std::ostream &os, const Setting& obj) 
+{ 
+	os << obj.name << ": ";
+	if (obj.GetType() == Setting::kSetting_String)
+		os << obj.GetAsString();
+	else 
+		os << std::to_string(obj.GetAsFloat());
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const TESForm& obj) { os << std::format("{:08X} ({})", obj.refID, obj.GetName()); return os; }
+std::ostream& operator<<(std::ostream& os, const TESObjectREFR& obj) { os << (const TESForm&)obj << ", Baseform " << obj.TryGetREFRParent(); return os; }
+
+std::ostream& operator<<(std::ostream& os, const ActorMover& obj) { if (obj.actor) os << (const TESObjectREFR&)obj.actor; return os; }
+std::ostream& operator<<(std::ostream& os, const QueuedReference& obj) { if (obj.refr) os << (const TESObjectREFR&)obj.refr; return os; }
+
+std::ostream& operator<<(std::ostream& os, const NavMesh& obj) { os << (const TESForm&)obj << ", Cell " << (const TESForm&)obj.parentCell; return os; }
+
+std::ostream& operator<<(std::ostream& os, const BaseProcess& obj)
+{
+	for (const auto iter : *TESForm::GetAll())
+		if ((iter->typeID == kFormType_Creature || iter->typeID == kFormType_Character) && static_cast<Character*>(iter)->baseProcess == &obj)
+			os << (const TESObjectREFR&)iter;
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const BSAnimGroupSequence& obj)
+{
+	os << std::format("{}, {}, AnimGroup {:04X}", obj.sequenceName, obj.accumRootName, obj.animGroup->groupID);
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const AnimSequenceSingle& obj)
+{
+	os << (const BSAnimGroupSequence&)obj.anim;
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const AnimSequenceMultiple& obj)
+{
+	for (const auto iter : *obj.anims)
+		os << (const BSAnimGroupSequence&)iter << "; ";
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const NiObjectNET& obj) { os << std::format(R"(Name: "{}")", obj.m_pcName); return os; }
+
+std::ostream& operator<<(std::ostream& os, const NiNode& obj)
+{
+	os << (const NiObjectNET&)obj;
+	if (const auto ref = TESObjectREFR::FindReferenceFor3D(&obj))
+		os << ", " << (const TESObjectREFR&)ref;
+	return os; 
+}
+
+std::ostream& operator<<(std::ostream& os, const BSFile& obj) { os << std::format("Path: {}", obj.m_path); return os; }
+std::ostream& operator<<(std::ostream& os, const TESModel& obj) { os << std::format("Path: {}", obj.nifPath.CStr()); return os; }
+
+std::ostream& operator<<(std::ostream& os, const QueuedModel& obj) 
+{
+	if (obj.model)
+		os << "Path: " << obj.model->path << " ";
+	if (obj.tesModel)
+		os << (TESModel&)obj.tesModel;
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const TESTexture& obj) { os << std::format("Path: {}", obj.ddsPath.CStr()); return os; }
+std::ostream& operator<<(std::ostream& os, const QueuedTexture& obj) { os << std::format("Path: {}", obj.name); return os; }
+std::ostream& operator<<(std::ostream& os, const NiStream& obj) { os << std::format("Path: {}", obj.path); return os; }
+
+std::ostream& operator<<(std::ostream& os, const ActiveEffect& obj)
+{
+	if (obj.enchantObject)
+		os << "Enchanted Object: " << (const TESForm&)obj.enchantObject;
+	return os; 
+}
+
+std::ostream& operator<<(std::ostream& os, const ScriptEffect& obj)
+{
+	os << (const ActiveEffect&)obj << " ";
+	if (obj.script)
+		os << "Script: " << (const TESForm&)obj.script;
+	return os; 
+}
+
+std::ostream& operator<<(std::ostream& os, const QueuedKF& obj)
+{
+	if (obj.kf)
+		os << "Path: " << obj.kf->path;
+	return os; 
+}
+
+FORMAT_CLASS(Tile)
+FORMAT_CLASS(Menu)
+FORMAT_CLASS(StartMenu::Option)
+FORMAT_CLASS(Setting)
+
+FORMAT_CLASS(TESForm)
+FORMAT_CLASS(TESObjectREFR)
+
+FORMAT_CLASS(ActorMover)
+FORMAT_CLASS(QueuedReference)
+
+FORMAT_CLASS(NavMesh)
+FORMAT_CLASS(BaseProcess);
+
+FORMAT_CLASS(BSAnimGroupSequence);
+FORMAT_CLASS(AnimSequenceSingle);
+FORMAT_CLASS(AnimSequenceMultiple);
+FORMAT_CLASS(NiObjectNET);
+
+FORMAT_CLASS(NiNode);
+FORMAT_CLASS(BSFile);
+FORMAT_CLASS(TESModel);
+FORMAT_CLASS(QueuedModel);
+FORMAT_CLASS(TESTexture);
+FORMAT_CLASS(QueuedTexture);
+FORMAT_CLASS(NiStream);
+
+FORMAT_CLASS(ActiveEffect);
+FORMAT_CLASS(ScriptEffect);
+FORMAT_CLASS(QueuedKF);
+
 #if 0
-
-
-// Now, the LoggerStream class can be used with the updated LoggerManager class, and you can create as many LoggerStream instances as needed, specifying different log levels for each. Each LoggerStream sends log messages to the LoggerManager, which processes them according to the defined behavior.
-// can you show me an example of std format
-// Sure, std::format is a C++20 feature that provides type-safe and extensible string formatting. Here's an example of how to use std::format:
-
-#include <iostream>
-#include <format>
-
-int main() {
-	int int_value = 42;
-	double double_value = 3.14159;
-	std::string str_value = "Hello, world!";
-
-	// Format a string with variables
-	std::string formatted_string = std::format("An int value: {}\nA double value: {:.2f}\nA string value: {}\n",
-		int_value, double_value, str_value);
-
-	std::cout << formatted_string;
-
-	return 0;
-}
-//In this example, we use the std::format function to format a string using placeholders {}. The variables are passed after the formatting string, and their values will be used to replace the placeholders. You can also add various formatting options, like specifying the number of decimal places for a floating-point value with :.2f.
-
-// This approach provides better safety compared to using printf, as the type of the arguments is checked at compile-time, significantly reducing the chances of runtime errors due to type mismatches.
-
-// To use std::format in a project, you need a C++20-compatible compiler and project settings that enable C++20 features.
-// how would I go about implementing formatting for a custom class I have so I could print it to LoggerStream in one line
-// To implement formatting for a custom class, you can customize the std::formatter class for your custom class. This allows you to use std::format to print it with LoggerStream in a more fluent way.
-
-// Assume you have a class CustomClass:
-
-class CustomClass {
-public:
-	CustomClass(const std::string &name, int value)
-		: name(name), value(value) {}
-
-private:
-	std::string name;
-	int value;
-
-	// Define a custom formatter for this class
-	friend std::ostream &operator<<(std::ostream &os, const CustomClass &obj) {
-		os << "CustomClass{name: " << obj.name << ", value: " << obj.value << "}";
-		return os;
-	}
-};
-//Now, define the format function for CustomClass:
-
-#include <format>
-
-template <>
-struct std::formatter<CustomClass> {
-	constexpr auto parse(format_parse_context &ctx) {
-		return ctx.begin();
-	}
-
-	template <typename FormatContext>
-	auto format(const CustomClass &custom_obj, FormatContext &ctx) {
-		std::stringstream ss;
-		ss << custom_obj;
-		return format_to(ctx.out(), "{}", ss.str());
-	}
-};
-//This provides a custom implementation of std::formatter for CustomClass using its operator<< function.
-
-//Finally, you can use std::format with your CustomClass and LoggerStream:
-
-int main() {
-	LoggerManager loggerManager;
-	// ... (Add destinations and set up loggerManager)
-
-	LoggerStream infoStream(loggerManager, LogLevel::Info);
-
-	CustomClass myObj("Object1", 42);
-	infoStream << std::format("The state of my custom object: {}\n", myObj);
-
-	// Give worker thread some time to finish processing
-	std::this_thread::sleep_for(std::chrono::seconds(1));
-
-	return 0;
-}
-// Now your CustomClass object can be formatted in a single line using std::format and sent to the LoggerStream.
-
 
 void DumpClass(void* theClassPtr, UInt32 nIntsToDump)
 {
@@ -207,73 +295,6 @@ void DumpFontNames()
 		file << (FormatString("Font %d is named %s", i + 1, fonts[i]->filePath));
 }
 
-
-/*
-
-void Log::Init(const std::filesystem::path& path, const std::string& modName)
-{
-file.Create(FileLoggerPrint, path);
-console.Create(ConsoleLoggerUpdate, modName);
-}
-
-void Log::Copy(const std::filesystem::path& path) 
-{
-file.Copy(path);
-}
-
-Log& Log::operator>>(const std::filesystem::path& path)
-{
-Copy(path);
-return *this;
-}
-
-std::vector<InternalFunction> queue;
-
-Log& Log::operator()()
-{
-if (logLevel)
-{
-for (const auto& iter : queue) 
-{
-const auto str = iter(); 
-if (logDest & kLog) file << str;
-if (logDest & kConsole) console << str;
-}
-queue.clear();
-if (logDest & kLog) file();
-if (logDest & kConsole) console();
-}
-return *this;
-}
-
-Log& Log::operator<<(const Record& rec)
-{
-if (logLevel) queue.push_back(rec);
-return *this;
-}
-*/
-
-/*
-Log& operator<<(Log& log, Record rec)
-{
-if (log.logLevel)
-{
-const auto& str = rec();
-if (log.logDest & Log::kLog) file << str;
-if (log.logDest & Log::kConsole) console << str;
-}
-return log;
-}
-*/
-
-/*
-auto make_B(auto&&... args) // since C++20
-{
-std::function<void(decltype(args))>
-
-return B(std::forward<decltype(args)>(args)...);
-}
-*/
 /*
 extern NiTMapBase<const char*, int>* g_traitNameMap;
 

@@ -1,18 +1,9 @@
 ﻿#include <main.h>
 
-#include "CrashLogger.h"
-
-//#include <DbgHelp.h>
-
-#include "GameEffects.h"
-#include "TESForm.h"
-#include "GameTasks.h"
-#include "Tile.h"
-#include "Menu.h"
-#include "TESObjectREFR.h"
-#include "SafeWrite.h"
-#include "Setting.h"
+#include <CrashLogger.h>
 #include <DbgHelpCrate.h>
+#include <Formatter.h>
+#include <SafeWrite.h>
 
 #define SYMOPT_EX_WINE_NATIVE_MODULES 1000
 
@@ -119,7 +110,7 @@ namespace CrashLogger::PDBHandling
 			end = " <== " + line;
 		}
 
-		return FormatString("%20s : %-40s%s", module.c_str(), symbol.c_str(), end.c_str());
+		return std::format("{:>20} : {:<40}{}", module, symbol, end);
 	}
 }
 
@@ -127,137 +118,9 @@ namespace CrashLogger::Handle
 {
 	typedef std::string (*_Handler)(void* ptr);
 
-	std::string AsUInt32(void* ptr)
-	{
-		return FormatString("0x%08X", **static_cast<UInt32**>(ptr));
-	}
+	std::string AsUInt32(void* ptr) { return std::format("{:#08X}", **static_cast<UInt32**>(ptr)); }
 
-	std::string AsMenu(void* ptr)
-	{
-		const auto menu = static_cast<Menu*>(ptr);
-		return FormatString("MenuMode: %u, visible: %s, visibilityState: 0x%X", menu->id, menu->IsVisible() ? "true" : "false", menu->visibilityState);
-	}
-
-	std::string AsTile(void* ptr) { return static_cast<Tile*>(ptr)->GetFullPath(); }
-	std::string AsStartMenuOption(void* ptr) { return static_cast<StartMenu::Option*>(ptr)->displayString; }
-
-	std::string AsSetting(void* ptr)
-	{
-		const auto setting = static_cast<Setting*>(ptr);
-
-		std::string ret = setting->name;
-
-		if (setting->GetType() == Setting::kSetting_String)
-			ret += " " + setting->GetAsString();
-		else
-			ret += " " + std::to_string(setting->GetAsFloat());
-
-		return ret;
-	}
-
-	std::string AsTESForm(void* ptr) { const auto form = static_cast<TESForm*>(ptr); return FormatString("%08X (%s)", form->refID, form->GetName()); }
-	std::string AsTESObjectREFR(void* ptr) { const auto refr = static_cast<TESObjectREFR*>(ptr);
-		return FormatString("%08X (%s), BaseForm %08X (%s)", refr->refID, refr->GetName(),
-		                    refr->TryGetREFRParent()->refID, refr->TryGetREFRParent()->GetName());
-	}
-
-	std::string AsActorMover(void* ptr) {
-		const auto mover = static_cast<ActorMover*>(ptr);
-		return !mover->actor ? "" : FormatString("%08X (%s), BaseForm %08X (%s)", mover->actor->refID, mover->actor->GetName(),
-		                                         mover->actor->TryGetREFRParent()->refID, mover->actor->TryGetREFRParent()->GetName());
-	}
-
-	std::string AsQueuedReference(void* ptr)
-	{
-		const auto refr = static_cast<QueuedReference*>(ptr);
-		return !refr->refr ? "" : FormatString("%08X (%s), BaseForm %08X (%s)", refr->refr->refID, refr->refr->GetName(),
-			refr->refr->TryGetREFRParent()->refID, refr->refr->TryGetREFRParent()->GetName());
-	}
-
-	std::string AsNavMesh(void* ptr) {
-		const auto navmesh = static_cast<NavMesh*>(ptr);
-		return FormatString("%08X (%s), Cell %08X (%s)", navmesh->refID, navmesh->GetName(),
-			navmesh->parentCell->refID, navmesh->parentCell->GetName());
-	}
-
-	std::string AsBaseProcess(void* ptr)
-	{
-		const auto process = static_cast<BaseProcess*>(ptr);
-		for (const auto iter : *TESForm::GetAll())
-		{
-			if (iter->typeID == kFormType_Character && static_cast<Character*>(iter)->baseProcess == process)
-				return FormatString("%08X (%s), BaseForm %08X (%s)", iter->refID, iter->GetName(), iter->TryGetREFRParent()->refID, iter->TryGetREFRParent()->GetName());
-			if (iter->typeID == kFormType_Creature && static_cast<Creature*>(iter)->baseProcess == process)
-				return FormatString("%08X (%s), BaseForm %08X (%s)", iter->refID, iter->GetName(), iter->TryGetREFRParent()->refID, iter->TryGetREFRParent()->GetName());
-		}
-		return "";
-	}
-
-	std::string AsBSAnimGroupSequence(void* ptr)
-	{
-		const auto sequence = static_cast<BSAnimGroupSequence*>(ptr);
-		return FormatString("%s, %s, AnimGroup %04X", sequence->sequenceName, sequence->accumRootName,
-		                    sequence->animGroup->groupID);
-	}
-	std::string AsAnimSequenceSingle(void* ptr)
-	{
-		const auto sequence = static_cast<AnimSequenceSingle*>(ptr);
-		return FormatString("%s, %s, AnimGroup %04X", sequence->anim->sequenceName, sequence->anim->accumRootName,
-		                    sequence->anim->animGroup->groupID);
-	}
-
-	std::string AsAnimSequenceMultiple(void* ptr)
-	{
-		const auto sequence = static_cast<AnimSequenceMultiple*>(ptr);
-		std::string ret;
-		for (const auto iter : *sequence->anims)
-			ret += FormatString("%s, %s, AnimGroup %04X; ", iter->sequenceName, iter->accumRootName, iter->animGroup->groupID);
-		return ret;
-	}
-
-	std::string AsNiObjectNET(void* ptr) { const auto object = static_cast<NiObjectNET*>(ptr); return FormatString("%s", object->m_pcName); }
-
-	std::string AsNiNode(void* ptr)
-	{
-		const auto node = static_cast<NiNode*>(ptr);
-		std::string ret;
-		ret += node->m_pcName;
-		if (const auto ref = TESObjectREFR::FindReferenceFor3D(node))
-		{
-			if (!ret.empty()) ret += ", ";
-			ret += FormatString("%08X (%s), BaseForm %08X (%s)", ref->refID, ref->GetName(), ref->TryGetREFRParent()->refID, ref->TryGetREFRParent()->GetName());
-		}
-		return ret;
-	}
-
-	std::string AsBSFile(void* ptr) { const auto file = static_cast<BSFile*>(ptr); return FormatString("%s", file->m_path); }
-
-	std::string AsTESModel(void* ptr) { const auto model = static_cast<TESModel*>(ptr); return FormatString("%s", model->nifPath.CStr()); }
-	std::string AsQueuedModel(void* ptr) {
-		const auto model = static_cast<QueuedModel*>(ptr);
-		std::string output;
-		output += model->model ? std::string(model->model->path) + " " : "";
-		output += model->tesModel ? model->tesModel->nifPath.CStr() : "";
-		return output;
-	}
-
-	std::string AsTESTexture(void* ptr) { const auto texture = static_cast<TESTexture*>(ptr); return FormatString("%s", texture->ddsPath.CStr()); }
-	std::string AsQueuedTexture(void* ptr) { const auto texture = static_cast<QueuedTexture*>(ptr); return FormatString("%s", texture->name); }
-
-	std::string AsNiStream(void* ptr) { const auto file = static_cast<NiStream*>(ptr); return FormatString("%s", file->path); }
-
-	std::string AsActiveEffect(void* ptr) { const auto effect = static_cast<ActiveEffect*>(ptr); return effect->enchantObject ? FormatString("Enchanted Object %08X (%s)", effect->enchantObject->refID, effect->enchantObject->GetName()) : ""; }
-
-	std::string AsScriptEffect(void* ptr) {
-		const auto effect = static_cast<ScriptEffect*>(ptr);
-		std::string ret;
-		ret += effect->enchantObject ? FormatString("Enchanted Object %08X (%s) ", effect->enchantObject->refID, effect->enchantObject->GetName()) : "";
-		ret += effect->script ? FormatString("Script %08X (%s)", effect->script->refID, effect->script->GetName()) : "";
-		return ret;
-	}
-
-	std::string AsQueuedKF(void* ptr) {	const auto model = static_cast<QueuedKF*>(ptr); return !model->kf ? "" : FormatString("%s", model->kf->path); }
-
+	template<typename T> std::string As(void* ptr) { return std::format("{}", *static_cast<T*>(ptr)); }
 }
 
 namespace CrashLogger::VirtualTables
@@ -388,7 +251,7 @@ namespace CrashLogger::VirtualTables
 		Push(0x1000000, nullptr, "", Label::kType_None); // integer that is often encountered
 		Push(0x11C0000, nullptr, "", Label::kType_None);
 		
-		Push(kVtbl_Menu, Handle::AsMenu);
+		Push(kVtbl_Menu, Handle::As<Menu>);
 		Push(kVtbl_TutorialMenu);
 		Push(kVtbl_StatsMenu);
 		Push(kVtbl_TextEditMenu);
@@ -430,7 +293,7 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_TraitSelectMenu);
 		Push(kVtbl_TutorialMenu);
 
-		Push(kVtbl_Tile, Handle::AsTile);
+		Push(kVtbl_Tile, Handle::As<Tile>);
 		Push(kVtbl_TileMenu);
 		Push(kVtbl_TileRect);
 		Push(kVtbl_TileImage);
@@ -438,16 +301,16 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_TileText);
 		Push(kVtbl_Tile3D);
 
-		Push(kVtbl_StartMenuOption, Handle::AsStartMenuOption, "StartMenu::Option");
-		Push(kVtbl_StartMenuUserOption, Handle::AsStartMenuOption, "StartMenu::UserOption");
+		Push(kVtbl_StartMenuOption, Handle::As<StartMenu::Option>, "StartMenu::Option");
+		Push(kVtbl_StartMenuUserOption, Handle::As<StartMenu::Option>, "StartMenu::UserOption");
 
-		Push(kVtbl_Setting, Handle::AsSetting);
+		Push(kVtbl_Setting, Handle::As<Setting>);
 		Push(kVtbl_GameSettingCollection, nullptr);
 		Push(kVtbl_INIPrefSettingCollection);
 		Push(kVtbl_INISettingCollection);
 
-		Push(kVtbl_NavMesh, Handle::AsNavMesh);
-		Push(kVtbl_TESForm, Handle::AsTESForm);
+		Push(kVtbl_NavMesh, Handle::As<NavMesh>);
+		Push(kVtbl_TESForm, Handle::As<TESForm>);
 		Push(kVtbl_AlchemyItem);
 		Push(kVtbl_BGSConstructibleObject);
 		Push(kVtbl_BGSDebris);
@@ -551,7 +414,7 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_SpectatorPackage);
 		Push(kVtbl_TrespassPackage);
 
-		Push(kVtbl_TESObjectREFR, Handle::AsTESObjectREFR);
+		Push(kVtbl_TESObjectREFR, Handle::As<TESObjectREFR>);
 		Push(kVtbl_MobileObject);
 		Push(kVtbl_Actor);
 		Push(kVtbl_Creature);
@@ -566,16 +429,16 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_GrenadeProjectile);
 		Push(kVtbl_MissileProjectile);
 
-		Push(kVtbl_QueuedReference, Handle::AsQueuedReference);
+		Push(kVtbl_QueuedReference, Handle::As<QueuedReference>);
 		Push(kVtbl_QueuedCharacter);
 		Push(kVtbl_QueuedActor);
 		Push(kVtbl_QueuedCreature);
 		Push(kVtbl_QueuedPlayer);
 
-		Push(kVtbl_ActorMover, Handle::AsActorMover);
+		Push(kVtbl_ActorMover, Handle::As<ActorMover>);
 		Push(kVtbl_PlayerMover);
 
-		Push(kVtbl_BaseProcess, Handle::AsBaseProcess);
+		Push(kVtbl_BaseProcess, Handle::As<BaseProcess>);
 		Push(kVtbl_LowProcess);
 		Push(kVtbl_MiddleLowProcess);
 		Push(kVtbl_MiddleHighProcess);
@@ -583,13 +446,13 @@ namespace CrashLogger::VirtualTables
 
 
 
-		Push(kVtbl_TESTexture, Handle::AsTESTexture);
+		Push(kVtbl_TESTexture, Handle::As<TESTexture>);
 		Push(kVtbl_TESIcon);
-		Push(kVtbl_QueuedTexture, Handle::AsQueuedTexture);
+		Push(kVtbl_QueuedTexture, Handle::As<QueuedTexture>);
 
 
 		// Ni
-		Push(kVtbl_NiObjectNET, Handle::AsNiObjectNET);
+		Push(kVtbl_NiObjectNET, Handle::As<NiObjectNET>);
 
 		// NiProperty
 		Push(kVtbl_NiProperty);
@@ -654,7 +517,7 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_NiAmbientLight);
 		Push(kVtbl_NiTextureEffect);
 
-		Push(kVtbl_NiNode, Handle::AsNiNode);
+		Push(kVtbl_NiNode, Handle::As<NiNode>);
 		Push(kVtbl_SceneGraph);
 		Push(kVtbl_BSTempNode);
 		Push(kVtbl_BSTempNodeManager);
@@ -663,7 +526,7 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_BSFadeNode, nullptr, "BSFadeNode"); // missing RTTI name
 //		Push(kVtbl_BSScissorNode);
 //		Push(kVtbl_BSTimingNode);
-		Push(kVtbl_BSFaceGenNiNode, Handle::AsNiNode);
+		Push(kVtbl_BSFaceGenNiNode, Handle::As<NiNode>);
 		Push(kVtbl_NiBillboardNode);
 		Push(kVtbl_NiSwitchNode);
 		Push(kVtbl_NiLODNode);
@@ -676,7 +539,7 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_NiScreenSpaceCamera);
 
 		// NiGeometry
-		Push(kVtbl_NiGeometry, Handle::AsNiObjectNET);
+		Push(kVtbl_NiGeometry, Handle::As<NiObjectNET>);
 		Push(kVtbl_NiLines);
 		Push(kVtbl_NiTriBasedGeom);
 		Push(kVtbl_NiTriShape);
@@ -989,30 +852,30 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_NiShader, nullptr);
 
 		// NiStream
-		Push(kVtbl_NiStream, Handle::AsNiStream);
+		Push(kVtbl_NiStream, Handle::As<NiStream>);
 		Push(kVtbl_BSStream);
 
 
 		// animations
-		Push(kVtbl_BSAnimGroupSequence, Handle::AsBSAnimGroupSequence);
+		Push(kVtbl_BSAnimGroupSequence, Handle::As<BSAnimGroupSequence>);
 		Push(kVtbl_AnimSequenceBase);
-		Push(kVtbl_AnimSequenceSingle, Handle::AsAnimSequenceSingle);
-		Push(kVtbl_AnimSequenceMultiple, Handle::AsAnimSequenceMultiple);
+		Push(kVtbl_AnimSequenceSingle, Handle::As<AnimSequenceSingle>);
+		Push(kVtbl_AnimSequenceMultiple, Handle::As<AnimSequenceMultiple>);
 
-		Push(kVtbl_QueuedKF, Handle::AsQueuedKF);
+		Push(kVtbl_QueuedKF, Handle::As<QueuedKF>);
 		Push(kVtbl_QueuedAnimIdle);
 
-		Push(kVtbl_BSFile, Handle::AsBSFile);
+		Push(kVtbl_BSFile, Handle::As<BSFile>);
 		Push(kVtbl_ArchiveFile);
 		Push(kVtbl_CompressedArchiveFile);
 
 		// model
-		Push(kVtbl_TESModel, Handle::AsTESModel);
-		Push(kVtbl_QueuedModel, Handle::AsQueuedModel);
+		Push(kVtbl_TESModel, Handle::As<TESModel>);
+		Push(kVtbl_QueuedModel, Handle::As<QueuedModel>);
 
 		// effects
-		Push(kVtbl_ScriptEffect, Handle::AsScriptEffect);
-		Push(kVtbl_ActiveEffect, Handle::AsActiveEffect);
+		Push(kVtbl_ScriptEffect, Handle::As<ScriptEffect>);
+		Push(kVtbl_ActiveEffect, Handle::As<ActiveEffect>);
 		Push(kVtbl_AbsorbEffect);
 		Push(kVtbl_AssociatedItemEffect);
 		Push(kVtbl_BoundItemEffect);

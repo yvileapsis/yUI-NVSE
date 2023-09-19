@@ -376,7 +376,7 @@ public:
 
 	Tile*								GetByTraitName(const char* traitName) { return CdeclCall<Tile*>(0xA08B20, this, traitName); };
 
-	std::string							GetFullPath();
+	std::string							GetFullPath() const;
 
 	bool								PlayTileSound(TileValueIDs id = kTileValue_clicksound) { return ThisCall<char>(0xA0B110, this, id); }
 };

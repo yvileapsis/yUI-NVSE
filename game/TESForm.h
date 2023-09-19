@@ -159,7 +159,7 @@ public:
 
 	TList<ModInfo>	mods;
 
-	TESForm*					TryGetREFRParent();
+	TESForm*					TryGetREFRParent() const;
 	TESFullName*				GetFullName();
 	const char*					GetTheName();
 	bool						IsCloned() const { return this->modIndex == 0xFF; }

@@ -14,12 +14,12 @@ static const ActorValueInfo** ActorValueInfoPointerArray = (const ActorValueInfo
 static const _GetActorValueInfo GetActorValueInfo = (_GetActorValueInfo)0x00066E920;	// See GetActorValueName
 BGSDefaultObjectManager ** g_defaultObjectManager = (BGSDefaultObjectManager**)0x011CA80C;
 
-TESForm* TESForm::TryGetREFRParent()
+TESForm* TESForm::TryGetREFRParent() const
 {
 	auto result = this;
 	if (const auto refr = DYNAMIC_CAST(this, TESForm, TESObjectREFR); refr && refr->baseForm)
 		result = refr->baseForm;
-	return result;
+	return const_cast<TESForm*>(result);
 }
 
 TESFullName* TESForm::GetFullName()
