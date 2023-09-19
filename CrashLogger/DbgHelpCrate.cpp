@@ -17,15 +17,6 @@ public:
 		return instance;
 	}
 
-	// Unload the DbgHelp library
-	~DbgHelpWrapper() {
-		if (dbghelp_dll) {
-			FreeLibrary(dbghelp_dll);
-		}
-
-		std::filesystem::remove(dll_path);
-	}
-
 	// Wrapper template for the API functions
 	template<typename RetType, typename... Args>
 	static RetType CallFunction(const char* func_name, Args&... args) {
@@ -91,6 +82,16 @@ private:
 
 		dll_path = temp_dbghelp_path;
 	}
+
+	// Unload the DbgHelp library
+	~DbgHelpWrapper() {
+		if (dbghelp_dll) {
+			FreeLibrary(dbghelp_dll);
+		}
+
+		std::filesystem::remove(dll_path);
+	}
+
 	DbgHelpWrapper(const DbgHelpWrapper&) = delete;
 	DbgHelpWrapper& operator=(const DbgHelpWrapper&) = delete;
 

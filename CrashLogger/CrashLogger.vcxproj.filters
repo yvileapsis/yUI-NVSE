@@ -191,6 +191,9 @@
       <Filter>libraries</Filter>
     </ClInclude>
     <ClInclude Include="DbgHelpCrate.h" />
+    <ClInclude Include="..\nvse\Formatter.h">
+      <Filter>nvse</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
