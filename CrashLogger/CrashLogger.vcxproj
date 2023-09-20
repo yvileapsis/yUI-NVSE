@@ -178,7 +178,6 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\CrashLogger\nvse\p
     <ClInclude Include="..\game\NiNodes.h" />
     <ClInclude Include="..\game\NiObjects.h" />
     <ClInclude Include="..\game\NiTypes.h" />
-    <ClInclude Include="..\libraries\MPMCQueue.h" />
     <ClInclude Include="..\nvse\Formatter.h" />
     <ClInclude Include="..\nvse\Logging.h" />
     <ClInclude Include="..\game\TESObject.h" />

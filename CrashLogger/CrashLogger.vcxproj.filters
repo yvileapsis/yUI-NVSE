@@ -187,9 +187,6 @@
       <Filter>game</Filter>
     </ClInclude>
     <ClInclude Include="namegen.h" />
-    <ClInclude Include="..\libraries\MPMCQueue.h">
-      <Filter>libraries</Filter>
-    </ClInclude>
     <ClInclude Include="DbgHelpCrate.h" />
     <ClInclude Include="..\nvse\Formatter.h">
       <Filter>nvse</Filter>
