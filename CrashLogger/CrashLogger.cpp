@@ -1,32 +1,112 @@
 ﻿#include <main.h>
+#include <Formatter.h>
 
+#include <SafeWrite.h>
 #include <CrashLogger.h>
 #include <DbgHelpCrate.h>
-#include <Formatter.h>
-#include <SafeWrite.h>
+#include <set>
 
 #define SYMOPT_EX_WINE_NATIVE_MODULES 1000
 
 constexpr UInt32 ce_printStackCount = 256;
 
-namespace CrashLogger::Dereference
+namespace CrashLogger
 {
-	UInt32 Basic(const void* ptr) { return *(UInt32*)ptr; }
+	template<typename T>
+	class Dereference {
+		intptr_t pointer;
+		std::size_t size;
 
-	// this exists because dereferencing bad pointers produces really different win errors that can't be catched with try-catch
-	UInt32 Except(const void* ptr) { __try { return Basic(ptr); } __except (EXCEPTION_EXECUTE_HANDLER) { return 0; } }
-	UInt32 Except2(const void* ptr) { __try { return Except(ptr); } __except (EXCEPTION_CONTINUE_EXECUTION) { return 0; } }
-	UInt32 Except3(const void* ptr) { __try { return Except2(ptr); } __except (EXCEPTION_CONTINUE_SEARCH) { return 0; } }
-	UInt32 Catch(const void* ptr) { try { return Except3(ptr); } catch (...) { return 0; } }
+	public:
+		Dereference(intptr_t pointer, std::size_t size) : pointer(pointer), size(size) {}
 
-	UInt32 Safe(const void* ptr) { return Catch(ptr); }
+		Dereference(intptr_t pointer) : pointer(pointer), size(sizeof(T)) {}
+		Dereference(const void* pointer) : pointer((intptr_t) pointer), size(sizeof(T)) {}
+
+		operator bool()
+		{
+			return IsValidPointer();
+		}
+
+		operator T* () {
+			if (IsValidPointer()) {
+				return reinterpret_cast<T*>(pointer);
+			}
+
+			throw std::runtime_error("Bad dereference");
+		}
+
+		T* operator->() {
+			if (IsValidPointer()) {
+				return reinterpret_cast<T*>(pointer);
+			}
+
+			throw std::runtime_error("Bad dereference");
+		}
+
+	private:
+		bool IsValidAddress() const
+		{
+			MEMORY_BASIC_INFORMATION mbi;
+			if (::VirtualQuery((void*)pointer, &mbi, sizeof(mbi)))
+			{
+				if (mbi.State != MEM_COMMIT) return false;
+
+				DWORD mask = (PAGE_READONLY | PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY);
+				if ((mbi.Protect & mask) == 0) return false;
+
+				if (mbi.Protect & PAGE_GUARD) return false;
+				if (mbi.Protect & PAGE_NOACCESS) return false;
+
+				if (size_t(mbi.RegionSize) < size) return false;
+
+				return true;
+			}
+			return false;
+		}
+
+		bool AttemptDereference() const 
+		{
+			__try {
+				// Attempt to read the address as a UInt32
+				volatile UInt32 temp = *reinterpret_cast<const volatile UInt32*>(pointer);
+				return true;
+			}
+			__except (EXCEPTION_EXECUTE_HANDLER) {
+				return false;
+			}
+		}
+
+		bool IsVtableValid() const
+		{
+//			if (vtables_.find(vtable) == vtables_.end()) return false;
+
+			UInt32 vtable = *reinterpret_cast<UInt32*>(pointer);
+
+			if (vtable > 0xFE0000 && vtable < 0x1200000)
+				return true;
+
+			return false;
+		}
+
+		bool IsValidPointer() const 
+		{
+			if (!IsValidAddress()) return false;
+
+			if (!AttemptDereference()) return false;
+
+			if (!IsVtableValid()) return false;
+
+			return true;
+		}
+	};
 }
 
 namespace CrashLogger::PDBHandling
 {
 	std::string GetAddress(UInt32 eip)
 	{
-		return FormatString("0x%08X", eip);
+		return std::format("0x{:08X}", eip);
 	}
 
 	std::string GetModule(UInt32 eip, HANDLE process)
@@ -51,7 +131,7 @@ namespace CrashLogger::PDBHandling
 		
 		const std::string functioName = symbol->Name;
 
-		return FormatString("%s+0x%0X", functioName.c_str(), offset);
+		return std::format("{}+0x{:0X}", functioName, offset);
 	}
 
 	std::string GetLine(UInt32 eip, HANDLE process)
@@ -64,7 +144,7 @@ namespace CrashLogger::PDBHandling
 
 		if (!Safe_SymGetLineFromAddr(process, eip, &offset, line)) return "";
 
-		return FormatString("<%s:%d>", line->FileName, line->LineNumber);
+		return std::format("<{}:{:d}>", line->FileName, line->LineNumber);
 	}
 
 	std::string GetCalltraceFunction(UInt32 eip, UInt32 ebp, HANDLE process)
@@ -78,17 +158,17 @@ namespace CrashLogger::PDBHandling
 		std::string middle;
 
 		if (const auto module = GetModule(eip, process); module.empty()) 
-			middle = FormatString("%20s (%s) : (Corrupt stack or heap?)", "-\\(°_o)/-", GetAddress(ebp).c_str());
+			middle = std::format("{:20s} ({}) : (Corrupt stack or heap?)", "-\\(°_o)/-", GetAddress(ebp));
 		else if (const auto symbol = GetSymbol(eip, process); symbol.empty())
-			middle = FormatString("%20s (%s) : EntryPoint+0xFFFFFFFF", module.c_str(), GetAddress(ebp).c_str());
+			middle = std::format("{:20s} ({}) : EntryPoint+0xFFFFFFFF", module, GetAddress(ebp));
 		else
-			middle = FormatString("%20s (%s) : %s", module.c_str(), GetAddress(ebp).c_str(), symbol.c_str());
+			middle = std::format("{:20s} ({}) : {}", module, GetAddress(ebp), symbol);
 
 		std::string end;
 
 		if (const auto line = GetLine(eip, process); !line.empty())
 		{
-			middle = FormatString("%-80s", middle.c_str());
+			middle = std::format("{:<80s}", middle);
 			end = " <== " + line;
 		} 
 
@@ -120,7 +200,11 @@ namespace CrashLogger::Handle
 
 	std::string AsUInt32(void* ptr) { return std::format("{:#08X}", **static_cast<UInt32**>(ptr)); }
 
-	template<typename T> std::string As(void* ptr) { return std::format("{}", *static_cast<T*>(ptr)); }
+	template<typename T> std::string As(void* ptr) { 
+		if (auto sanitized = Dereference<T>((UInt32) ptr))
+			return std::format("{}", *sanitized);
+		return "";
+	}
 }
 
 namespace CrashLogger::VirtualTables
@@ -150,12 +234,12 @@ namespace CrashLogger::VirtualTables
 		
 		bool Satisfies(const void* ptr) const
 		{
-			return Dereference::Safe(ptr) >= address && Dereference::Safe(ptr) <= address + size;
+			return *Dereference<UInt32>(ptr) >= address && *Dereference<UInt32>(ptr) <= address + size;
 		}
 
 		static std::string GetTypeName(void* ptr)
 		{
-			return printTypeName(ptr);
+			return GetObjectClassName(ptr);
 		}
 
 		[[nodiscard]] std::string GetLabelName() const
@@ -165,21 +249,10 @@ namespace CrashLogger::VirtualTables
 			return "";
 		}
 
-		static UInt32 Dereference(void* ptr)
-		{
-			__try
-			{
-				return *static_cast<UInt32*>(ptr);
-			}
-			__except (EXCEPTION_EXECUTE_HANDLER) {
-				return 0;
-			}
-		}
-
 		std::string Get(void* ptr) const
 		{
 			std::string name1 = name.empty() && type == kType_RTTIClass ? GetTypeName(ptr) : name;
-			if (name1.empty() && type != kType_None) name1 = FormatString("0x%08X", Dereference(ptr));
+			if (name1.empty() && type != kType_None) name1 = std::format("0x{:08X}", *Dereference<UInt32>((UInt32)ptr));
 
 			std::string details;
 			if (function) details = function(ptr);
@@ -2218,9 +2291,7 @@ namespace CrashLogger::VirtualTables
 			if (iter->Satisfies(ptr)) return iter->Get(ptr);
 
 		if (vtbl > 0xFE0000 && vtbl < 0x1200000)
-		{
-			return FormatString("-\\_(Ö)_/-: 0x%08X", vtbl);
-		}
+			return std::format("-\\_(Ö)_/-: 0x{:08X}", vtbl);
 
 //		if (std::string one = PDBHandling::GetSymbolForAddress((UInt32)ptr, GetCurrentProcess()); !one.empty()) return "Function:" + one;
 
@@ -2235,7 +2306,7 @@ namespace CrashLogger::VirtualTables
 
 		std::string full;
 
-		while (vtbl = Dereference::Safe((void*)ptr))
+		while (vtbl = Dereference<UInt32>(ptr) ? *(UInt32*)ptr : 0)
 		{
 			if (std::string onetime = GetStringForLabel((void*)ptr, vtbl); !onetime.empty())
 				return full + onetime;
@@ -2244,11 +2315,13 @@ namespace CrashLogger::VirtualTables
 
 			depth--;
 
-			full += FormatString("Pointer: 0x%08X; ", vtbl);
+			full += std::format("Pointer: 0x{:08X}; ", vtbl);
 
 			ptr = vtbl;
 		}
-
+		// 70E943 
+		// 0D2E7379
+		// 0D2E7369
 		return "";
 	}
 }
@@ -2272,7 +2345,7 @@ namespace CrashLogger::Calltrace
 
 //    SymSetExtendedOption((IMAGEHLP_EXTENDED_OPTIONS)SYMOPT_EX_WINE_NATIVE_MODULES, TRUE);
 		if (!Safe_SymInitialize(process, NULL, true))
-			Log() << FormatString("Error initializing symbol store");
+			Log() << "Error initializing symbol store";
 
 		//    SymSetExtendedOption((IMAGEHLP_EXTENDED_OPTIONS)SYMOPT_EX_WINE_NATIVE_MODULES, TRUE);
 
@@ -2294,6 +2367,8 @@ namespace CrashLogger::Calltrace
 			eip = frame.AddrPC.Offset;
 			Log() << PDBHandling::GetCalltraceFunction(frame.AddrPC.Offset, frame.AddrFrame.Offset, process);
 		}
+
+		Log();
 	}
 
 }
@@ -2302,18 +2377,17 @@ namespace CrashLogger::Registry
 {
 	void Get(EXCEPTION_POINTERS* info)
 	{
-		Log() << FormatString("Registry: \n")
-			<< FormatString("REG |    VALUE   | DEREFERENCE INFO\n")
-			<< FormatString("eax | 0x%08X | ", info->ContextRecord->Eax) + VirtualTables::Get(info->ContextRecord->Eax) << "\n"
-			<< FormatString("ebx | 0x%08X | ", info->ContextRecord->Ebx) + VirtualTables::Get(info->ContextRecord->Ebx) << "\n"
-			<< FormatString("ecx | 0x%08X | ", info->ContextRecord->Ecx) + VirtualTables::Get(info->ContextRecord->Ecx) << "\n"
-			<< FormatString("edx | 0x%08X | ", info->ContextRecord->Edx) + VirtualTables::Get(info->ContextRecord->Edx) << "\n"
-			<< FormatString("edi | 0x%08X | ", info->ContextRecord->Edi) + VirtualTables::Get(info->ContextRecord->Edi) << "\n"
-			<< FormatString("esi | 0x%08X | ", info->ContextRecord->Esi) + VirtualTables::Get(info->ContextRecord->Esi) << "\n"
-			<< FormatString("ebp | 0x%08X | ", info->ContextRecord->Ebp) + VirtualTables::Get(info->ContextRecord->Ebp) << "\n"
-			<< FormatString("esp | 0x%08X | ", info->ContextRecord->Esp) + VirtualTables::Get(info->ContextRecord->Esp) << "\n"
-			<< FormatString("eip | 0x%08X | ", info->ContextRecord->Eip) + VirtualTables::Get(info->ContextRecord->Eip) << "\n"
-			<< "";
+		Log() << "Registry:" << std::endl
+			<< ("REG |    VALUE   | DEREFERENCE INFO") << std::endl
+			<< std::format("eax | 0x{:08X} | {}", info->ContextRecord->Eax, VirtualTables::Get(info->ContextRecord->Eax)) << std::endl
+			<< std::format("ebx | 0x{:08X} | {}", info->ContextRecord->Ebx, VirtualTables::Get(info->ContextRecord->Ebx)) << std::endl
+			<< std::format("ecx | 0x{:08X} | {}", info->ContextRecord->Ecx, VirtualTables::Get(info->ContextRecord->Ecx)) << std::endl
+			<< std::format("edx | 0x{:08X} | {}", info->ContextRecord->Edx, VirtualTables::Get(info->ContextRecord->Edx)) << std::endl
+			<< std::format("edi | 0x{:08X} | {}", info->ContextRecord->Edi, VirtualTables::Get(info->ContextRecord->Edi)) << std::endl
+			<< std::format("esi | 0x{:08X} | {}", info->ContextRecord->Esi, VirtualTables::Get(info->ContextRecord->Esi)) << std::endl
+			<< std::format("ebp | 0x{:08X} | {}", info->ContextRecord->Ebp, VirtualTables::Get(info->ContextRecord->Ebp)) << std::endl
+			<< std::format("esp | 0x{:08X} | {}", info->ContextRecord->Esp, VirtualTables::Get(info->ContextRecord->Esp)) << std::endl
+			<< std::format("eip | 0x{:08X} | {}", info->ContextRecord->Eip, VirtualTables::Get(info->ContextRecord->Eip)) << std::endl;
 	}
 }
 
@@ -2321,26 +2395,17 @@ namespace CrashLogger::Stack
 {
 	void Get(EXCEPTION_POINTERS* info)
 	{
-		Log() << "Stack:" << " # |    VALUE   | DEREFERENCE INFO";
+		Log() << "Stack:" << std::endl << " # |    VALUE   | DEREFERENCE INFO";
 
 		const auto esp = reinterpret_cast<UInt32*>(info->ContextRecord->Esp);
 
-		for (unsigned int i = 0; i < 0xFF; i += 1) {
-
+		for (unsigned int i = 0; i < 0xFF; i++)
 			if (i <= 8)
-			{
-				Log() << FormatString("%2X | 0x%08X | ", i, esp[i]) + VirtualTables::Get(esp[i]) << "\n";
-			}
-			else
-			{
-				std::string result = VirtualTables::Get(esp[i]);
-				if (!result.empty()) Log() << FormatString("%2X | 0x%08X | ", i, esp[i]) + result;
+				Log() << std::format("{:2X} | 0x{:08X} | {}", i, esp[i], VirtualTables::Get(esp[i]));
+			else if (std::string result = VirtualTables::Get(esp[i]); !result.empty())
+				Log() << std::format("{:2X} | 0x{:08X} | {}", i, esp[i], result);
 
-			}
-		}
-		// this allows me to see that crash log is incomplete
-		
-		Log() << "";
+		Log();
 	}
 }
 
@@ -2352,6 +2417,19 @@ namespace CrashLogger::ModuleBases
 		CHAR* name;
 	};
 
+	struct Module
+	{
+		UInt32 moduleBase;
+		UInt32 moduleEnd;
+		std::filesystem::path path;
+
+		bool operator<(const Module& other) const {
+			if (path < other.path) return true;
+			return false;
+		};
+	};
+
+	std::set<Module> enumeratedModules;
 
 	BOOL CALLBACK EumerateModulesCallback(PCSTR name, ULONG moduleBase, ULONG moduleSize, PVOID context) {
 		UserContext* info = (UserContext*)context;
@@ -2360,16 +2438,33 @@ namespace CrashLogger::ModuleBases
 			info->moduleBase = moduleBase;
 			strcpy_s(info->name, 100, name);
 		}
-		const std::filesystem::path path = name;
-		std::string version;
-		if (const auto info = g_commandInterface->GetPluginInfoByName(path.stem().generic_string().c_str()))
-		{
-			version += std::to_string(info->version);
-		}
-		Log() << (version.empty() ? FormatString("0x%08X - 0x%08X ==> %25s, %s", (UInt32)moduleBase, (UInt32)moduleBase + (UInt32)moduleSize, path.stem().generic_string().c_str(), path.generic_string().c_str())
-			: FormatString("0x%08X - 0x%08X ==> %25s, NVSE plugin version %s, %s", (UInt32)moduleBase, (UInt32)moduleBase + (UInt32)moduleSize, path.stem().generic_string().c_str(), version.c_str(), path.generic_string().c_str()));
+
+		enumeratedModules.emplace((UInt32)moduleBase, (UInt32)moduleBase + (UInt32)moduleSize, std::string(name));
 
 		return TRUE;
+	}
+
+	std::unordered_map<std::string, std::string> pluginNames = {
+		{"hot_reload_editor", "hot_reload"},
+		{"ilsfix", "ILS Fix"},
+		{"improved_console", "Improved Console"},
+		{"ImprovedLightingShaders", "Improved Lighting Shaders for FNV"},
+		{"jip_nvse", "JIP LN NVSE"},
+		{"johnnyguitar", "JohnnyGuitarNVSE"},
+		{"MCM", "MCM Extensions"},
+		{"mod_limit_fix", "Mod Limit Fix"},
+		{"nvse_console_clipboard", "Console Clipboard"},
+		{"nvse_stewie_tweaks", "lStewieAl's Tweaks"},
+		{"ShowOffNVSE", "ShowOffNVSE Plugin"},
+		{"supNVSE", "SUP NVSE Plugin"},
+		{"ui_organizer", "UI Organizer Plugin"},
+	};
+
+	std::string GetPluginNameForFileName(std::string name)
+	{
+		if (pluginNames.contains(name))
+			return pluginNames[name];
+		return name;
 	}
 
 	void Get(EXCEPTION_POINTERS* info)
@@ -2378,25 +2473,36 @@ namespace CrashLogger::ModuleBases
 
 		const UInt32 eip = info->ContextRecord->Eip;
 
-		Log() << FormatString("Module bases:");
 		UserContext infoUser = { eip,  0, (char*)calloc(sizeof(char), 100) };
+
 		Safe_EnumerateLoadedModules(process, EumerateModulesCallback, &infoUser);
-
-		Log() << "";
-
-		if (infoUser.moduleBase) {
-			Log() << ("GAME CRASHED AT INSTRUCTION Base+0x%08X IN MODULE: %s", (infoUser.eip - infoUser.moduleBase), infoUser.name)
-				<< "Please note that this does not automatically mean that that module is responsible. It may have been supplied bad data or"
+	
+		if (infoUser.moduleBase)
+			Log() << std::format("GAME CRASHED AT INSTRUCTION Base+0x{:08X} IN MODULE: {}", (infoUser.eip - infoUser.moduleBase), infoUser.name) << std::endl
+				<< "Please note that this does not automatically mean that that module is responsible. It may have been supplied bad data or" << std::endl
 				<< "program state as the result of an issue in the base game or a different DLL.";
-		}
-		else {
-			Log() << ("UNABLE TO IDENTIFY MODULE CONTAINING THE CRASH ADDRESS.")
-				<< "This can occur if the crashing instruction is located in the vanilla address space, but it can also occur if there are too many"
-				<< "DLLs for us to list, and if the crash occurred in one of their address spaces. Please note that even if the crash occurred"
-				<< "in vanilla code, that does not necessarily mean that it is a vanilla problem. The vanilla code may have been supplied bad data"
+		else
+			Log() << "UNABLE TO IDENTIFY MODULE CONTAINING THE CRASH ADDRESS." << std::endl
+				<< "This can occur if the crashing instruction is located in the vanilla address space, but it can also occur if there are too many" << std::endl
+				<< "DLLs for us to list, and if the crash occurred in one of their address spaces. Please note that even if the crash occurred" << std::endl
+				<< "in vanilla code, that does not necessarily mean that it is a vanilla problem. The vanilla code may have been supplied bad data" << std::endl
 				<< "or program state as the result of an issue in a loaded DLL.";
+
+		Log();
+
+		Log() << "Module bases:";
+		for (const auto& [moduleBase, moduleEnd, path] : enumeratedModules)
+		{
+			std::string version;
+
+			if (const auto info = g_commandInterface->GetPluginInfoByName(GetPluginNameForFileName(path.stem().generic_string()).c_str()))
+				version = std::format("NVSE plugin version: {:>4d}, ", info->version);
+
+			Log() << std::format("0x{:08X} - 0x{:08X} ==> {:25s}{:>30s}{}", moduleBase, moduleEnd, path.stem().generic_string() + ",", version, path.generic_string());
+
 		}
-		Log() << "";
+
+		Log();
 	}
 }
 
@@ -2407,11 +2513,11 @@ namespace CrashLogger
 
 		Calltrace::Get(info);
 
+		ModuleBases::Get(info);
+
 		Registry::Get(info);
 
 		Stack::Get(info);
-
-		ModuleBases::Get(info);
 
 		Logger::Copy();
 

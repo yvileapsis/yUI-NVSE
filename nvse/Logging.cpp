@@ -23,12 +23,27 @@ public:
 		return instance;
 	}
 
+	LoggerManager() : start(false), stop(false)
+	{
+	}
+
+	~LoggerManager()
+	{
+		{
+			//			std::unique_lock<std::mutex> lock(mutex);
+			//			stop = true;
+			condition.notify_one();
+		}
+		worker.join();
+	}
+
 	void play()
 	{
 		start = true;
+		worker = std::thread([this] { processQueue(); });
 	}
 
-	void addDestination(const std::string& id, LogLevel level, const std::function<void(const std::string&, LogLevel)>& destFunc)
+	void addDestination(const std::string& id, const std::function<void(const std::string&, LogLevel)>& destFunc)
 	{
 		std::unique_lock<std::mutex> lock(destMutex);
 		destinations[id] = destFunc;
@@ -60,20 +75,6 @@ private:
 	bool start;
 	bool stop;
 
-	LoggerManager() : start(false), stop(false)
-	{
-		worker = std::thread([this] { processQueue(); });
-	}
-
-	~LoggerManager()
-	{
-		{
-//			std::unique_lock<std::mutex> lock(mutex);
-//			stop = true;
-			condition.notify_one();
-		}
-		worker.join();
-	}
 	void processQueue()
 	{
 		while (!stop || !logQueue.empty())
@@ -114,15 +115,15 @@ namespace Logger
 	{
 		if (!exists(log.parent_path())) std::filesystem::create_directory(log.parent_path());
 
-		LoggerManager::GetSingleton().addDestination("file", LogLevel::Info, [log, &logLevel](const std::string& msg, LogLevel level)
+		LoggerManager::GetSingleton().addDestination("file", [log, logLevel](const std::string& msg, LogLevel level)
 			{
 				static std::fstream logFile(log, std::fstream::out | std::fstream::trunc);
 
-//				if (level >= logLevel)
+				if (level >= logLevel && level != LogLevel::Console)
 					logFile << msg << std::endl;
 			});
 
-		LoggerManager::GetSingleton().addDestination("console", LogLevel::Info, [](const std::string& msg, LogLevel level)
+		LoggerManager::GetSingleton().addDestination("console", [](const std::string& msg, LogLevel level)
 			{
 				if (level >= LogLevel::Error)
 					ConsoleManager::GetSingleton()->Print(msg.c_str(), nullptr);

@@ -1,4 +1,4 @@
-#include <main.h>
+﻿#include <main.h>
 #include <TESObjectREFR.h>
 #include <GameData.h>
 #include <Menu.h>
@@ -33,10 +33,12 @@ void InitLog(std::filesystem::path path = "")
 	logFolderPath /= CrashLogger_FLD;
 	logFolderPath /= CrashLogger_LOG;
 
-	Logger::AddDestinations(logPath, LogLevel::Warning);
+	Logger::AddDestinations(logPath, LogLevel::Info);
 	Logger::PrepareCopy(logPath, logFolderPath);
 
-	Log() << GetName() + " version " + CrashLogger_VERSION_STR + " at " + std::format("{0:%F} {0:%T}", std::chrono::time_point(std::chrono::system_clock::now())) << std::endl
+	Log(LogLevel::Console) << CrashLogger_STR << ": " << CrashLogger_VERSION_STR;
+
+	Log(LogLevel::Warning) << GetName() + " version " + CrashLogger_VERSION_STR + " at " + std::format("{0:%F} {0:%T}", std::chrono::time_point(std::chrono::system_clock::now())) << std::endl 
 		<< "If this file is empty, then your game didn't crash or something went so wrong even crash logger was useless! :snig:" << std::endl
 		<< "Topmost stack module is NOT ALWAYS the crash reason! Exercise caution when speculating!" << std::endl;
 }
@@ -67,7 +69,7 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 	if (nvse->isEditor) {
 		if (nvse->editorVersion < CS_VERSION_1_4_0_518)
 		{
-			Log() << FormatString("Incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518);
+			Log() << std::format("Incorrect editor version (got {:08X} need at least {:08X})", nvse->editorVersion, CS_VERSION_1_4_0_518);
 			return false;
 		}
 	} else {
@@ -77,12 +79,12 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 //		}
 
 		if (nvse->runtimeVersion < RUNTIME_VERSION_1_4_0_525) {
-			Log() << FormatString("Incorrect runtime version (got %08X need at least %08X)", nvse->runtimeVersion, RUNTIME_VERSION_1_4_0_525);
+			Log() << std::format("Incorrect runtime version (got {:08X} need at least {:08X})", nvse->runtimeVersion, RUNTIME_VERSION_1_4_0_525);
 			return false;
 		}
 
 		if (nvse->isNogore) {
-			Log() << FormatString("NoGore is not supported");
+			Log() << "NoGore is not supported";
 			return false;
 		}
 
@@ -150,11 +152,11 @@ bool FOSEPlugin_Query(const OBSEInterface* obse, PluginInfo* info)
 	}
 	else {
 		if (obse->obseVersion < 1) {
-			Log() << FormatString("FOSE version too old (got %08X; expected at least %08X).", obse->obseVersion, 1);
+			Log() << std::format("FOSE version too old (got {:08X}; expected at least {:08X}).", obse->obseVersion, 1);
 			return false;
 		}
 		if (obse->oblivionVersion != 0x01070030) {
-			Log() << FormatString("incorrect Fallout 3 version (got %08X; need %08X).", obse->oblivionVersion, 0x01070030);
+			Log() << std::format("incorrect Fallout 3 version (got {:08X}; need {:08X}).", obse->oblivionVersion, 0x01070030);
 			return false;
 		}
 	}
@@ -187,11 +189,11 @@ bool OBSEPlugin_Query(const OBSEInterface* obse, PluginInfo* info)
 	}
 	else {
 		if (obse->obseVersion < 21) {
-			Log() << FormatString("OBSE version too old (got %08X; expected at least %08X).", obse->obseVersion, 21);
+			Log() << std::format("OBSE version too old (got {:08X}; expected at least {:08X}).", obse->obseVersion, 21);
 			return false;
 		}
 		if (obse->oblivionVersion != OBLIVION_VERSION_1_2_416) {
-			Log() << FormatString("incorrect Oblivion version (got %08X; need %08X).", obse->oblivionVersion, OBLIVION_VERSION_1_2_416);
+			Log() << std::format("incorrect Oblivion version (got {:08X}; need {:08X}).", obse->oblivionVersion, OBLIVION_VERSION_1_2_416);
 			return false;
 		}
 	}

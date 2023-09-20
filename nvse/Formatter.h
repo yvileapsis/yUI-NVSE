@@ -3,12 +3,10 @@
 #include "Setting.h"
 #include "GameEffects.h"
 #include "TESForm.h"
+#include "TESObjectREFR.h"
 #include "GameTasks.h"
 #include "Tile.h"
 #include "Menu.h"
-#include "TESObjectREFR.h"
-#include <Tile.h>
-#include <Menu.h>
 
 #define FORMAT_CLASS(CLASS)											\
 template <>															\
@@ -171,6 +169,15 @@ FORMAT_CLASS(ScriptEffect);
 FORMAT_CLASS(QueuedKF);
 
 #if 0
+
+void DumpAnimGroups()
+{
+	for (UInt32 i = 0; i < TESAnimGroup::kAnimGroup_Max; i++) {
+		Log() << (std::format("%d,%s", i, s_animGroupInfos[i].name));
+		//if (!_stricmp(s_animGroupInfos[i].name, "JumpLandRight"))
+		//	break;
+	}
+}
 
 void DumpClass(void* theClassPtr, UInt32 nIntsToDump)
 {

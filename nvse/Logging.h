@@ -3,7 +3,7 @@
 #include <string>
 
 enum class LogLevel {
-	Info, Warning, Error
+	Info, Warning, Error, Console
 };
 
 static std::string convertLevel(LogLevel level) {
@@ -14,6 +14,8 @@ static std::string convertLevel(LogLevel level) {
 		return "Warning";
 	case LogLevel::Error:
 		return "Error";
+	case LogLevel::Console:
+		return "Console";
 	default:
 		return "";
 	}
@@ -35,7 +37,7 @@ namespace Logger
 
 class Log {
 public:
-	inline Log() : logLevel(LogLevel::Error) {}
+	inline Log() : logLevel(LogLevel::Info) {}
 	inline Log(LogLevel level) : logLevel(level) {}
 	inline Log(UInt32 one, UInt32 two) : logLevel(static_cast<LogLevel>(two)) {}
 

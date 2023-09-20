@@ -43,15 +43,6 @@ UInt32 TESAnimGroup::AnimGroupForString(const char* groupName)
 	return kAnimGroup_Max;
 }
 
-void DumpAnimGroups()
-{
-	for (UInt32 i = 0; i < TESAnimGroup::kAnimGroup_Max; i++) {
-		Log() << (FormatString("%d,%s", i, s_animGroupInfos[i].name));
-		//if (!_stricmp(s_animGroupInfos[i].name, "JumpLandRight"))
-		//	break;
-	}
-}
-
 OSInputGlobals** g_inputGlobals = reinterpret_cast<OSInputGlobals**>(0x11F35CC);
 
 NiControllerSequence* NiControllerManager::FindSequence(const char* seqName)

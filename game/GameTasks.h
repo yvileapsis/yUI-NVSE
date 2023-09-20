@@ -129,10 +129,10 @@ class BSTask
 {
 public:
 	virtual void Destroy(bool doFree);
-	virtual void Run() = 0;
-	virtual void Unk_02() = 0;
+	virtual void Run();
+	virtual void Unk_02();
 	virtual void Unk_03(UInt32 arg0, UInt32 arg1);						// doesNothing
-	virtual bool GetDebugDescription(char* outDesc, UInt32 * arg1) = 0;	// return 0
+	virtual bool GetDebugDescription(char* outDesc, UInt32 * arg1);		// return 0
 
 	// void		** vtbl
 	
@@ -262,7 +262,7 @@ public:
 	QueuedFileEntry();
 	~QueuedFileEntry();
 
-	virtual bool Unk_0B() = 0;
+	virtual bool Unk_0B();
 
 	char	* name;		// 028
 	BSAData	* bsaData;	// 02C
