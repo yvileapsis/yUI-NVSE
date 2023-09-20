@@ -76,7 +76,7 @@ struct RTTILocator
 #pragma warning (pop)
 
 // use the RTTI information to return an object's class name
-const char * GetObjectClassName(void * objBase)
+const char* GetObjectClassNameInternal(void * objBase)
 {
 	const char	* result = "<no rtti>";
 
@@ -87,16 +87,15 @@ const char * GetObjectClassName(void * objBase)
 		RTTILocator	* rtti = vtbl[-1];
 		RTTIType	* type = rtti->type;
 
-		// starts with ,?
+		// starts with .?AV
 		if((type->name[0] == '.') && (type->name[1] == '?'))
 		{
 			// is at most 100 chars long
 			for(UInt32 i = 0; i < 100; i++)
 			{
-				if(type->name[i] == 0)
+				if (type->name[i] == 0)
 				{
-					// remove the .?AV
-					result = type->name + 4;
+					result = type->name;
 					break;
 				}
 			}
@@ -110,6 +109,19 @@ const char * GetObjectClassName(void * objBase)
 	return result;
 }
 
+std::string GetObjectClassName(void* object) {
+	try {
+		std::string name = GetObjectClassNameInternal(object);
+
+		// Starts with .?AV, ends with @@
+		return name.substr(4, name.size() - 6);
+	}
+	catch (const std::exception& e) {
+		return "";
+	}
+}
+
+
 static std::filesystem::path s_falloutDirectory;
 
 const std::filesystem::path& GetFalloutDirectory()
@@ -122,7 +134,7 @@ const std::filesystem::path& GetFalloutDirectory()
 
 	if (!falloutPathLength || falloutPathLength >= sizeof falloutPathBuf)
 	{
-		Log() << (FormatString("couldn't find fallout path (len = %d, err = %08X)", falloutPathLength, GetLastError()));
+		Log() << (std::format("couldn't find fallout path (len = {:d}, err = {:08X})", falloutPathLength, GetLastError()));
 		return s_falloutDirectory;
 	}
 
@@ -622,16 +634,6 @@ void ShowRuntimeError(Script* script, const char* fmt, ...)
 	Log() << errorHeader;
 
 	va_end(args);
-}
-
-std::string FormatString(const char* fmt, ...)
-{
-	va_list args;
-	va_start(args, fmt);
-
-	char msg[0x400];
-	vsprintf_s(msg, 0x400, fmt, args);
-	return msg;
 }
 
 std::vector<void*> GetCallStack(int i)

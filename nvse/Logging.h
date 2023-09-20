@@ -2,34 +2,59 @@
 #include <filesystem>
 #include <string>
 
-class Log
-{
-	UInt32 logDest;
-	UInt32 logLevel;
-public:
-
-	enum
-	{
-		kError = 1,
-		kWarning = 2,
-		kMessage = 3
-	};
-
-	enum
-	{
-		kNone = 0,
-		kLog = 1,
-		kConsole = 2,
-		kBoth = kLog | kConsole
-	};
-
-	Log(UInt32 logLevel = true, UInt32 logDest = kLog) : logDest(logDest), logLevel(logLevel) {};
-	Log& operator<<(const std::string& str);
-	Log& operator>>(const std::filesystem::path& path);
-	Log& operator()();
-
-	static void Init(const std::filesystem::path& path, const std::string& modName);
-	static void Copy(const std::filesystem::path& path);
+enum class LogLevel {
+	Info, Warning, Error, Console
 };
 
-void Dump(Tile* tile);
+static std::string convertLevel(LogLevel level) {
+	switch (level) {
+	case LogLevel::Info:
+		return "Info";
+	case LogLevel::Warning:
+		return "Warning";
+	case LogLevel::Error:
+		return "Error";
+	case LogLevel::Console:
+		return "Console";
+	default:
+		return "";
+	}
+}
+
+namespace Logger
+{
+	// LoggerManager starts paused so that printout can be started after all sub-loggers are initialized
+	void Play();
+	// Log to LoggerManager
+	void LogToManager(const std::string& message, LogLevel level);
+	// Add a new destination to LoggerManager
+	void AddDestinations(const std::filesystem::path& log, LogLevel logLevel);
+	// Prepare for copying file
+	void PrepareCopy(const std::filesystem::path& in, const std::filesystem::path& out);
+	// Copy all prepared files
+	void Copy();
+}
+
+class Log {
+public:
+	inline Log() : logLevel(LogLevel::Info) {}
+	inline Log(LogLevel level) : logLevel(level) {}
+	inline Log(UInt32 one, UInt32 two) : logLevel(static_cast<LogLevel>(two)) {}
+
+	template <typename T>
+	inline Log& operator<<(const T &value) {
+		buffer << value;
+		return *this;
+	}
+
+	inline Log& operator<<(std::ostream &(*func)(std::ostream &)) {
+		buffer << func;
+		return *this;
+	}
+
+	inline ~Log() { Logger::LogToManager(buffer.str(), logLevel); };
+
+private:
+	LogLevel logLevel;
+	std::stringstream buffer;
+};

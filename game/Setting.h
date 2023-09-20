@@ -33,9 +33,9 @@ public:
 	Info		data;				// 04
 	char		* name;				// 08
 
-	UInt32 GetType();
-	std::string GetAsString();
-	Float32 GetAsFloat();
+	UInt32 GetType() const;
+	std::string GetAsString() const;
+	Float32 GetAsFloat() const;
 	bool Set(double newVal);
 	bool Set(const char* str);
 };

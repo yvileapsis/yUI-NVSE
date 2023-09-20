@@ -90,7 +90,7 @@ __forceinline void* GameHeapAlloc(UInt32 size) { return ThisStdCall<void*>(0xAA3
 template <typename t> __forceinline t* GameHeapAlloc(UInt32 size) { return ThisStdCall<t*>(0xAA3E40, (void*)0x11F6238, size); }
 template <typename t> __forceinline void GameHeapFree(t* ptr) { ThisStdCall(0xAA4060, (t*)0x11F6238, ptr); }
 
-const char * GetObjectClassName(void * obj);
+std::string GetObjectClassName(void * obj);
 const std::filesystem::path& GetFalloutDirectory();
 std::string GetNVSEConfigOption(const char * section, const char * key);
 bool GetNVSEConfigOption_UInt32(const char * section, const char * key, UInt32 * dataOut);
@@ -217,8 +217,6 @@ void ShowErrorMessageBox(const char* message);
 void ShowRuntimeError(Script* script, const char* fmt, ...);
 
 const char* GetModName(const TESForm* script);
-
-std::string FormatString(const char* fmt, ...);
 
 std::vector<void*> GetCallStack(int i);
 

@@ -18,7 +18,7 @@ public:
 	bool		Append(const char* toAppend);
 	double		Compare(const String& compareTo, bool caseSensitive = false);
 
-	const char* CStr();
+	const char* CStr() const;
 
 	void		AppendChar(char toAppend);
 	void		InsertChar(char toInsert, UInt32 index);

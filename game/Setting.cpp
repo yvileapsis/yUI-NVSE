@@ -1,6 +1,6 @@
 #include "Setting.h"
 
-UInt32 Setting::GetType()
+UInt32 Setting::GetType() const
 {
 	if (!name) return kSetting_Other;
 
@@ -26,7 +26,7 @@ UInt32 Setting::GetType()
 	}
 }
 
-Float32 Setting::GetAsFloat()
+Float32 Setting::GetAsFloat() const
 {
 	switch (GetType())
 	{
@@ -39,7 +39,7 @@ Float32 Setting::GetAsFloat()
 	}
 }
 
-std::string Setting::GetAsString()
+std::string Setting::GetAsString() const
 {
 	if (GetType() == kSetting_String) return data.str;
 	return "";
