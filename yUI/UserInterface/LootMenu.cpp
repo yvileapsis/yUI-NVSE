@@ -16,7 +16,7 @@ namespace UserInterface::LootMenu
 
 	bool		enable			= false;
 
-	UInt32		logLevel		= 3;
+	LogLevel		logLevel		= LogLevel::Error;
 
 	enum kActions
 	{
@@ -458,7 +458,7 @@ namespace UserInterface::LootMenu
 			}
 
 			tileMain->Set("_WeightVisible", 1);
-			tileMain->Set("_Weight", FormatString("%.0f/%.0f", weight, weightmax));
+			tileMain->Set("_Weight", std::format("{:.0f}/{:.0f}", weight, weightmax));
 
 			if (!weightAltColor) return;
 
@@ -642,7 +642,7 @@ namespace UserInterface::LootMenu
 	void HandleJSON()
 	{
 		const auto dir = GetCurPath() + R"(\Data\menus\yUI)";
-		if (!std::filesystem::exists(dir)) Log(Log::kLog | logLevel) << (dir + " does not exist.");
+		if (!std::filesystem::exists(dir)) Log() << (dir + " does not exist.");
 		else for (const auto& iter : std::filesystem::directory_iterator(dir))
 			if (iter.is_directory()) Log(logLevel) << iter.path().string() + " found";
 			else if (iter.path().extension().string() == ".json")
@@ -658,7 +658,7 @@ namespace UserInterface::LootMenu
 				catch (nlohmann::json::exception& e)
 				{
 					Log(logLevel) << ("The JSON is incorrectly formatted! It will not be applied.");
-					Log(logLevel) << (FormatString("JSON error: %s\n", e.what()));
+					Log(logLevel) << std::format("JSON error: {}", e.what());
 				}
 			}
 	}

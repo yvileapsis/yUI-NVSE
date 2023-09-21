@@ -96,11 +96,11 @@ namespace SortingIcons
 	{
 		if (forms && formIDs.empty())
 		{
-			Log(logLevel >= Log::kWarning) << FormatString("JSON warning: Failed to find any forms for tag: '%6s', priority: '%03d'", tag.c_str(), priority);
+			Log(LogLevel::Warning) << std::format("JSON warning: Failed to find any forms for tag: '{:6s}', priority: '{:03d}'", tag.c_str(), priority);
 			return false;
 		}
 
-		std::string log = FormatString("JSON message: Tag: '%6s', priority: '%03d'", tag.c_str(), priority);
+		std::string log = std::format("JSON message: Tag: '{:6s}', priority: '{:03d}'", tag, priority);
 
 		if (!formType.empty()) {
 			log += ", types: ";
@@ -118,11 +118,11 @@ namespace SortingIcons
 			UInt32 i = 0;
 			for (const auto iter : formIDs)
 			{
-				log += FormatString("%08X (%40s)", iter, TESForm::GetByID(iter)->GetName());
+				log += std::format("{:08X} ({:40s})", iter, TESForm::GetByID(iter)->GetName());
 				if (++i != formIDs.size()) log += i % 2 ? ", " : ",\n";
 			}
 		}
-		Log(logLevel >= Log::kMessage) << log;
+		Log(logLevel) << log;
 
 		return true;
 	}
@@ -847,15 +847,15 @@ namespace SortingIcons::Sorting
 		if (name1.empty() && tile1->GetValue(kTileValue_string)) name1 = tile1->GetValue(kTileValue_string)->str;
 		if (name2.empty() && tile2->GetValue(kTileValue_string)) name2 = tile2->GetValue(kTileValue_string)->str;
 
-		if (const auto cmp = name1 <=> name2; cmp != nullptr) return cmp._Value;
+		if (const auto cmp = name1 <=> name2; cmp != 0) return cmp._Value;
 
 		if (!form1) return form2 ? -1 : 0;
 		if (!form2) return 1;
 		
-		if (const auto weaponMods = entry2->GetWeaponMod() <=> entry1->GetWeaponMod(); weaponMods != nullptr) return weaponMods._Value;
-		if (const auto condition = entry2->GetHealthPercent() <=> entry1->GetHealthPercent(); condition != nullptr) return condition._Value;
-		if (const auto equipped = entry2->GetEquipped() <=> entry1->GetEquipped(); equipped != nullptr) return equipped._Value;
-		if (const auto refID = form2->refID <=> form1->refID; refID != nullptr) return refID._Value;
+		if (const auto weaponMods = entry2->GetWeaponMod() <=> entry1->GetWeaponMod(); weaponMods != 0) return weaponMods._Value;
+		if (const auto condition = entry2->GetHealthPercent() <=> entry1->GetHealthPercent(); condition != 0) return condition._Value;
+		if (const auto equipped = entry2->GetEquipped() <=> entry1->GetEquipped(); equipped != 0) return equipped._Value;
+		if (const auto refID = form2->refID <=> form1->refID; refID != 0) return refID._Value;
 
 		return 0;
 	}

@@ -53,17 +53,6 @@ void ConsoleManager::AppendToSentHistory(const char* str)
 	this->inputHistory.Append(textNode);
 }
 
-void PrintConsole(const char* fmt, ...)
-{
-	if (const auto mgr = ConsoleManager::GetSingleton())
-	{
-		va_list	args;
-		va_start(args, fmt);
-		mgr->Print(fmt, args);
-		va_end(args);
-	}
-}
-
 bool* bEchoConsole = reinterpret_cast<bool*>(0x011F158C);
 
 bool GetConsoleEcho()

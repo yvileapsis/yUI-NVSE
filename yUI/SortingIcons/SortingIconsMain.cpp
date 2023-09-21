@@ -16,7 +16,7 @@ namespace SortingIcons
 
 		enable = ini.GetOrCreate("General", "bSortingIcons", true, "; enable 'Sorting and Icons' feature. If required files are not found this will do nothing.");
 
-		logLevel = ini.GetOrCreate("Sorting and Icons", "iDebug", 3, "; debug output for Sorting and Icons, useful for developers");
+		logLevel = (LogLevel) ini.GetOrCreate("Sorting and Icons", "iDebug", 3, "; debug output for Sorting and Icons, useful for developers");
 
 		bSort = ini.GetOrCreate("Sorting and Icons", "bSortInventory", 1, "; sort inventory according to tag names supplied in .json");
 		bCategories = ini.GetOrCreate("Sorting and Icons", "bEnableCategories", 1, "; enable keyring-like clickable categories (this destroys vanilla keyring, so you have to have .json files supplying a new keyring category, i.e. ySI.json)");
@@ -39,7 +39,7 @@ namespace SortingIcons
 			if (entry->tag.empty())
 			{
 				categoryDefault = entry.get();
-				Log(logLevel > Log::kMessage) << "ySI: Default category is '" + entry->filename + "'";
+				Log(logLevel) << "ySI: Default category is '" + entry->filename + "'";
 			}
 //			Set(entry->tag, entry);
 		}
@@ -56,18 +56,18 @@ namespace SortingIcons
 
 	void DeferredInit()
 	{
-		Log(logLevel >= Log::kMessage) << "Loading files for Sorting Icons";
+		Log(logLevel) << "Loading files for Sorting Icons";
 		const auto dir = GetCurPath() + R"(\Data\menus\ySI)";
 		const auto then = std::chrono::system_clock::now();
-		if (!std::filesystem::exists(dir)) Log(Log::kLog | logLevel) << dir + " does not exist.";
+		if (!std::filesystem::exists(dir)) Log() << dir + " does not exist.";
 		else for (const auto& iter : std::filesystem::directory_iterator(dir))
-			if (iter.is_directory()) Log(logLevel >= Log::kMessage) << iter.path().string() + " found";
+			if (iter.is_directory()) Log(logLevel) << iter.path().string() + " found";
 			else if (iter.path().extension().string() == ".json") Files::HandleJSON(iter.path());
 			else if (iter.path().extension().string() == ".xml") Files::HandleXML(iter.path());
 		ProcessEntries();
 		const auto now = std::chrono::system_clock::now();
 		const auto diff = std::chrono::duration_cast<std::chrono::milliseconds>(now - then);
-		Log(logLevel >= Log::kMessage) << FormatString("Loaded items, categories and tabs in %d ms", diff.count());
+		Log(logLevel) << std::format("Loaded items, categories and tabs in {:d} ms", diff.count());
 	}
 
 	extern void Init()

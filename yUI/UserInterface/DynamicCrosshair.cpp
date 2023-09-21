@@ -46,7 +46,7 @@ namespace UserInterface::DynamicCrosshair
 
 	UInt32		dynamic			= 1;
 
-
+	UInt32		shotgunAlt		= 1;
 
 	Tile*		tileMain			= nullptr;
 	Tile*		tileReticleCenter	= nullptr;

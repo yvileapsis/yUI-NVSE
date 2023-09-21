@@ -28,7 +28,7 @@ namespace Logger
 	// Log to LoggerManager
 	void LogToManager(const std::string& message, LogLevel level);
 	// Add a new destination to LoggerManager
-	void AddDestinations(const std::filesystem::path& log, LogLevel logLevel);
+	void AddDestinations(const std::filesystem::path& log, const std::string& prefix, LogLevel logLevel);
 	// Prepare for copying file
 	void PrepareCopy(const std::filesystem::path& in, const std::filesystem::path& out);
 	// Copy all prepared files

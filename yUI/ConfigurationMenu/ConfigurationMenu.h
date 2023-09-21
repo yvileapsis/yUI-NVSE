@@ -18,7 +18,7 @@ class CMTag;
 class CMSetting;
 class ModConfigurationMenu;
 
-inline UInt32 g_LogLevel = 3;
+inline LogLevel g_LogLevel = LogLevel::Error;
 inline UInt32 g_saveValue = 1;
 
 // TODO: reimplement this last part of stewie code

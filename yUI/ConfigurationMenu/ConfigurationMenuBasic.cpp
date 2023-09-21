@@ -46,14 +46,13 @@ ModConfigurationMenu* ModConfigurationMenu::ReloadMenu()
 
 	if (!menu || menu != tile->GetParentMenu())
 	{
-		Log(g_LogLevel >= Log::kError, Log::kBoth) << "Configuration Menu: Failed Init!";
+		Log(g_LogLevel) << "Configuration Menu: Failed Init!";
 		return nullptr;
 	}
 
 	if (menu->GetID() != MENU_ID)
 	{
-		Log(g_LogLevel >= Log::kError, Log::kBoth) << FormatString(
-			"Configuration Menu: Expected <class> %d </class>, found class '%d!'", MENU_ID, menu->GetID());
+		Log(g_LogLevel) << std::format("Configuration Menu: Expected <class> {:d} </class>, found class '{:d}!'", MENU_ID, menu->GetID());
 		delete menu;
 		return nullptr;
 	}
@@ -63,7 +62,7 @@ ModConfigurationMenu* ModConfigurationMenu::ReloadMenu()
 	if (!menu->HasTiles())
 	{
 		menu->Close();
-		Log(g_LogLevel >= Log::kError, Log::kBoth) << "Configuration Menu: Expected tiles missing!";
+		Log(g_LogLevel) << "Configuration Menu: Expected tiles missing!";
 		return nullptr;
 	}
 

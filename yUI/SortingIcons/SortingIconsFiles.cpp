@@ -15,13 +15,13 @@ __forceinline std::vector<TESForm*> GetFormsFromElement(const nlohmann::basic_js
 	std::string log;
 	if (!form.is_array()) {
 		if (const auto val = TESForm::GetByID(modName.c_str(), form.get<std::string>().c_str())) forms.push_back(val);
-		else log += FormatString("%6s, ", form.get<std::string>().c_str());
+		else log += std::format("{:6s}, ", form.get<std::string>());
 	}
 	else for (const auto& i : form) {
 		if (const auto val = TESForm::GetByID(modName.c_str(), i.get<std::string>().c_str())) forms.push_back(val);
-		else log += FormatString("%6s, ", i.get<std::string>().c_str());
+		else log += std::format("{:6s}, ", i.get<std::string>());
 	}
-	if (!log.empty()) Log(logLevel >= Log::kWarning) << "JSON warning: Failed to find form, mod: " + modName + ", forms: " + log;
+	if (!log.empty()) Log(logLevel) << "JSON warning: Failed to find form, mod: " + modName + ", forms: " + log;
 	return forms;
 }
 
@@ -196,7 +196,7 @@ void Files::HandleXML(const std::filesystem::path& path)
 
 void Files::HandleJSON(const std::filesystem::path& path)
 {
-	Log(logLevel >= Log::kMessage) << "\nJSON message: reading  " + path.string();
+	Log(logLevel) << "\nJSON message: reading  " + path.string();
 	try
 	{
 		std::ifstream i(path);
@@ -207,15 +207,15 @@ void Files::HandleJSON(const std::filesystem::path& path)
 		if (j.contains("items")) items = j["items"];
 		else if (j.contains("tags")) items = j["tags"]; // legacy
 
-		if (!items.is_array()) Log(logLevel >= Log::kMessage) << "JSON message: ySI item array not detected in " + path.string();
+		if (!items.is_array()) Log(logLevel) << "JSON message: ySI item array not detected in " + path.string();
 		else for (const auto& elem : items) if (!elem.is_object())
 		{
-			Log(logLevel >= Log::kError) << "JSON error: Expected object";
+			Log(logLevel) << "JSON error: Expected object";
 			return;
 		}
 		else if (!elem.contains("tag") || !elem.contains("priority"))
 		{
-			Log(logLevel >= Log::kWarning) << "JSON error: Expected tag and priority";
+			Log(logLevel) << "JSON error: Expected tag and priority";
 			return;
 		}
 		else
@@ -239,15 +239,15 @@ void Files::HandleJSON(const std::filesystem::path& path)
 		if (j.contains("categories")) categories = j["categories"];
 		else if (j.contains("icons")) categories = j["icons"]; // legacy
 
-		if (!categories.is_array()) Log(logLevel >= Log::kMessage) << "JSON message: ySI category array not detected in " + path.string();
+		if (!categories.is_array()) Log(logLevel) << "JSON message: ySI category array not detected in " + path.string();
 		else for (const auto& elem : categories) if (!elem.is_object())
 		{
-			Log(logLevel >= Log::kError) << "JSON error: Expected object";
+			Log(logLevel) << "JSON error: Expected object";
 			return;
 		}
 		else if (!elem.contains("tag") || !elem.contains("priority"))
 		{
-			Log(logLevel >= Log::kWarning) << "JSON error: Expected tag and priority";
+			Log(logLevel) << "JSON error: Expected tag and priority";
 			return;
 		}
 		else
@@ -260,15 +260,15 @@ void Files::HandleJSON(const std::filesystem::path& path)
 
 		if (j.contains("tabs")) tabs = j["tabs"];
 
-		if (!tabs.is_array()) Log(logLevel >= Log::kMessage) << "JSON message: ySI tabs array not detected in " + path.string();
+		if (!tabs.is_array()) Log(logLevel) << "JSON message: ySI tabs array not detected in " + path.string();
 		else for (const auto& elem : tabs) if (!elem.is_object())
 		{
-			Log(logLevel >= Log::kError) << "JSON error: Expected object";
+			Log(logLevel) << "JSON error: Expected object";
 			return;
 		}
 		else if (!elem.contains("tag") || !elem.contains("priority"))
 		{
-			Log(logLevel >= Log::kWarning) << "JSON error: Expected tag and priority";
+			Log(logLevel) << "JSON error: Expected tag and priority";
 			return;
 		}
 		else
@@ -283,7 +283,7 @@ void Files::HandleJSON(const std::filesystem::path& path)
 	}
 	catch (nlohmann::json::exception& e)
 	{
-		Log(logLevel >= Log::kError) << "JSON error: JSON file is incorrectly formatted! It will not be applied. " + path.string();
-		Log(logLevel >= Log::kError) << FormatString("JSON error: %s\n", e.what());
+		Log(logLevel) << "JSON error: JSON file is incorrectly formatted! It will not be applied. " + path.string();
+		Log(logLevel) << std::format("JSON error: {}", e.what());
 	}
 }

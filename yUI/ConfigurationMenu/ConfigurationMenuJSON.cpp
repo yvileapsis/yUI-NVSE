@@ -185,7 +185,7 @@ void ModConfigurationMenu::ReadJSON(const std::filesystem::path& path)
 	catch (nlohmann::json::exception& e)
 	{
 		Log() << "JSON error: JSON file is incorrectly formatted! It will not be applied. " + path.string();
-		Log() << FormatString("JSON error: %s\n", e.what());
+		Log() << std::format("JSON error: {}\n", e.what());
 	}
 }
 

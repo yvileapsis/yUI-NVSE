@@ -33,10 +33,10 @@ void InitLog(std::filesystem::path path = "")
 	logFolderPath /= CrashLogger_FLD;
 	logFolderPath /= CrashLogger_LOG;
 
-	Logger::AddDestinations(logPath, LogLevel::Info);
+	Logger::AddDestinations(logPath, CrashLogger_STR, LogLevel::Info);
 	Logger::PrepareCopy(logPath, logFolderPath);
 
-	Log(LogLevel::Console) << CrashLogger_STR << ": " << CrashLogger_VERSION_STR;
+	Log(LogLevel::Console) << CrashLogger_VERSION_STR;
 
 	Log(LogLevel::Warning) << GetName() + " version " + CrashLogger_VERSION_STR + " at " + std::format("{0:%F} {0:%T}", std::chrono::time_point(std::chrono::system_clock::now())) << std::endl 
 		<< "If this file is empty, then your game didn't crash or something went so wrong even crash logger was useless! :snig:" << std::endl

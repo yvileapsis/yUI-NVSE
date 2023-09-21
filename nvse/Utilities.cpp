@@ -116,7 +116,7 @@ std::string GetObjectClassName(void* object) {
 		// Starts with .?AV, ends with @@
 		return name.substr(4, name.size() - 6);
 	}
-	catch (const std::exception& e) {
+	catch (...) {
 		return "";
 	}
 }
@@ -447,15 +447,6 @@ const char GetSeparatorChar(Script * script)
 std::string GetSeparatorChars(Script * script)
 {
 	return IsConsoleMode() ? script && script->modIndex != 0xFF ? "|" : "@" : "|";
-}
-
-void Console_Print_Long(const std::string& str)
-{
-	UInt32 numLines = str.length() / 500;
-	for (UInt32 i = 0; i < numLines; i++)
-		PrintConsole("%s ...", str.substr(i*500, 500).c_str());
-
-	PrintConsole("%s", str.substr(numLines*500, str.length() - numLines*500).c_str());
 }
 
 #endif

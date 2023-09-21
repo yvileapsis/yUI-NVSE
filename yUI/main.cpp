@@ -10,13 +10,23 @@ void InitSingletons()
 	g_HUDMainMenu = HUDMainMenu::GetSingleton();
 }
 
+void InitLog(std::filesystem::path path = "")
+{
+	std::filesystem::path logPath = GetCurPath();
+	logPath /= path;
+	logPath /= yUI_LOG;
+
+	Logger::AddDestinations(logPath, yUI_STR, LogLevel::Info);
+
+	Log(LogLevel::Console) << yUI_VERSION_STR;
+}
+
 void MessageHandler(NVSEMessagingInterface::Message* msg)
 {
 	if (msg->type == NVSEMessagingInterface::kMessage_DeferredInit)
 	{
 		InitSingletons();
-
-		Log(true, Log::kBoth) << yUI_VERSION_STR;
+		Logger::Play();
 
 		for (const auto& i : deferredInit) i(); // call all deferred init functions
 	}
@@ -42,22 +52,22 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 	if (nvse->isEditor) {
 		if (nvse->editorVersion < CS_VERSION_1_4_0_518)
 		{
-			Log(true, Log::kLog) << FormatString("yUI: incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518);
+			Log() << std::format("yUI: incorrect editor version (got {:08X} need at least {:08X})", nvse->editorVersion, CS_VERSION_1_4_0_518);
 			return false;
 		}
 	} else {
 		if (nvse->nvseVersion < PACKED_NVSE_VERSION) {
-			Log(true, Log::kLog) << FormatString("yUI: NVSE version too old (got %X expected at least %X). Plugin will NOT load! Install the latest version here: https://github.com/xNVSE/NVSE/releases/", nvse->nvseVersion, PACKED_NVSE_VERSION);
+			Log() << std::format("yUI: NVSE version too old (got {:X} expected at least {:X}). Plugin will NOT load! Install the latest version here: https://github.com/xNVSE/NVSE/releases/", nvse->nvseVersion, PACKED_NVSE_VERSION);
 			return false;
 		}
 
 		if (nvse->runtimeVersion < RUNTIME_VERSION_1_4_0_525) {
-			Log(true, Log::kLog) << FormatString("yUI: incorrect runtime version (got %08X need at least %08X)", nvse->runtimeVersion, RUNTIME_VERSION_1_4_0_525);
+			Log() << std::format("yUI: incorrect runtime version (got {:08X} need at least {:08X})", nvse->runtimeVersion, RUNTIME_VERSION_1_4_0_525);
 			return false;
 		}
 
 		if (nvse->isNogore) {
-			Log(true, Log::kLog) << FormatString("yUI: NoGore is not supported");
+			Log() << "yUI: NoGore is not supported";
 			return false;
 		}
 	}
@@ -104,10 +114,9 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	DispatchEvent = g_eventInterface->DispatchEvent;
 
 	g_loggingInterface = static_cast<NVSELoggingInterface*>(nvse->QueryInterface(kInterface_LoggingInterface));
-	auto path = std::filesystem::path(g_loggingInterface->GetPluginLogPath());
-	path += yUI_LOG;
-	Log::Init(path, yUI_STR);
-	
+
+	InitLog(g_loggingInterface ? g_loggingInterface->GetPluginLogPath() : "");
+
 	for (const auto& i : pluginLoad) i(); // call all plugin load functions
 
 	return true;

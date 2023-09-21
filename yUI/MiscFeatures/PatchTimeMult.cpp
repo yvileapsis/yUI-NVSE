@@ -80,12 +80,12 @@ namespace Patch::TimeMult
 			if (wah(iter, cmdSGTM) == 1)
 			{
 				specialMods.emplace(iter->modIndex);
-				Log() << FormatString("Found SGTM use in mod: %02X (%50s), form: %08X (%50s)", iter->modIndex, GetModName(
+				Log() << std::format("Found SGTM use in mod: {:02X} ({:50s}), form: {:08X} ({:50s})", iter->modIndex, GetModName(
 					                      iter), iter->refID, iter->GetName());
 			}
 			else if (wah(iter, cmdSGTM) == -1)
 			{
-				Log() << FormatString("Found FATAL FAILURE AND DISAPPOINTMENT use in mod: %02X (%50s), form: %08X (%50s) (to be a bit more serious for a second, this script record is bugged, please look into it)", iter->modIndex, GetModName(
+				Log() << std::format("Found FATAL FAILURE AND DISAPPOINTMENT use in mod: {:02X} ({:50s}), form: {:08X} ({:50s}) (to be a bit more serious for a second, this script record is bugged, please look into it)", iter->modIndex, GetModName(
 					                      iter), iter->refID, iter->GetName());
 			}
 		}
@@ -152,8 +152,8 @@ namespace Patch::TimeMult
 		BSAudioManager::GetSingleton()->ignoreTimescale = changeTime;
 
 		if (IsConsoleOpen()) {
-			PrintConsole("Global Time Multiplier >> '%0.2f'", g_timeMult);
-			PrintConsole("Local Time Multiplier >> '%0.2f'", localMults.contains(mod) ? localMults[mod] : 1.0);
+			ConsoleManager::GetSingleton() << std::format("Global Time Multiplier >> '{:0.2f}'", g_timeMult);
+			ConsoleManager::GetSingleton() << std::format(" Local Time Multiplier >> '{:0.2f}'", localMults.contains(mod) ? localMults[mod] : 1.0);
 		}
 		*result = 1;
 		return true;
@@ -177,8 +177,8 @@ namespace Patch::TimeMult
 		}
 
 		if (IsConsoleOpen()) {
-			PrintConsole("Global Time Multiplier >> '%0.2f'", g_timeMult);
-			PrintConsole("Local Time Multiplier >> '%0.2f'", localMults.contains(mod) ? localMults[mod] : 1.0);
+			ConsoleManager::GetSingleton() << std::format("Global Time Multiplier >> '{:0.2f}'", g_timeMult);
+			ConsoleManager::GetSingleton() << std::format(" Local Time Multiplier >> '{:0.2f}'", localMults.contains(mod) ? localMults[mod] : 1.0);
 		}
 
 		return true;

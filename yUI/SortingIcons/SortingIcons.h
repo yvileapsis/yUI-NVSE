@@ -6,7 +6,7 @@ namespace SortingIcons
 	class Tab;
 	inline int enable = 0;
 
-	inline int logLevel = Log::kMessage;
+	inline LogLevel logLevel = LogLevel::Info;
 
 	inline int bSort			= 1;
 	inline int bIcons			= 1;
