@@ -112,13 +112,13 @@ namespace Logger
 			{
 				static std::fstream logFile(log, std::fstream::out | std::fstream::trunc);
 
-				if (level >= logLevel && level != LogLevel::Console)
+				if ((level & LogLevel::File) && (level & logLevel & LogLevel::MessageLevel))
 					logFile << msg << std::endl;
 			});
 
-		LoggerManager::GetSingleton().addDestination("console", [prefix](const std::string& msg, LogLevel level)
+		LoggerManager::GetSingleton().addDestination("console", [prefix, logLevel](const std::string& msg, LogLevel level)
 			{
-				if (level >= LogLevel::Error)
+				if ((level & LogLevel::Console) && (level & logLevel & LogLevel::MessageLevel))
 					ConsoleManager::GetSingleton() << prefix + ": " + msg;
 			});
 	}

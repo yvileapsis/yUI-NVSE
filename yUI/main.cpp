@@ -16,7 +16,7 @@ void InitLog(std::filesystem::path path = "")
 	logPath /= path;
 	logPath /= yUI_LOG;
 
-	Logger::AddDestinations(logPath, yUI_STR, LogLevel::Info);
+	Logger::AddDestinations(logPath, yUI_STR, LogLevel::MessageLevel);
 
 	Log(LogLevel::Console) << yUI_VERSION_STR;
 }

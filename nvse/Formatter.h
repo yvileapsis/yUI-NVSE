@@ -8,6 +8,8 @@
 #include "Tile.h"
 #include "Menu.h"
 
+#include <set>
+
 #define FORMAT_CLASS(CLASS)											\
 template <>															\
 struct std::formatter<CLASS> {										\
@@ -122,11 +124,25 @@ std::ostream& operator<<(std::ostream& os, const ActiveEffect& obj)
 	return os; 
 }
 
+std::set<Script*> crashedScripts;
+
+std::ostream& operator<<(std::ostream& os, const Script& obj)
+{
+	os << (const TESForm&)obj;
+	if (obj.data && std::string(obj.GetName()).empty())
+		if (!crashedScripts.contains(const_cast<Script*>(&obj)))
+		{
+			crashedScripts.emplace(const_cast<Script*>(&obj));
+			os << ", Source: " << DecompileScriptToFolder("UnknownScript" + std::to_string(crashedScripts.size()), const_cast<Script*>(&obj), "gek", "Crash Logger");
+		}
+	return os; 
+}
+
 std::ostream& operator<<(std::ostream& os, const ScriptEffect& obj)
 {
 	os << (const ActiveEffect&)obj << " ";
 	if (obj.script)
-		os << "Script: " << (const TESForm&)obj.script;
+		os << "Script: " << (const Script* &)obj.script;
 	return os; 
 }
 
@@ -165,6 +181,7 @@ FORMAT_CLASS(QueuedTexture);
 FORMAT_CLASS(NiStream);
 
 FORMAT_CLASS(ActiveEffect);
+FORMAT_CLASS(Script);
 FORMAT_CLASS(ScriptEffect);
 FORMAT_CLASS(QueuedKF);
 

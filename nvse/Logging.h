@@ -2,24 +2,17 @@
 #include <filesystem>
 #include <string>
 
-enum class LogLevel {
-	Info, Warning, Error, Console
-};
+enum LogLevel {
+	None		= 0,
+	File		= 1 << 0x0,
+	Console		= 1 << 0x1,
+	Info		= 1 << 0x2,
+	Warning		= 1 << 0x3,
+	Error		= 1 << 0x4,
 
-static std::string convertLevel(LogLevel level) {
-	switch (level) {
-	case LogLevel::Info:
-		return "Info";
-	case LogLevel::Warning:
-		return "Warning";
-	case LogLevel::Error:
-		return "Error";
-	case LogLevel::Console:
-		return "Console";
-	default:
-		return "";
-	}
-}
+	Destination = File | Console,
+	MessageLevel = Info | Warning | Error
+};
 
 namespace Logger
 {
@@ -37,9 +30,14 @@ namespace Logger
 
 class Log {
 public:
-	inline Log() : logLevel(LogLevel::Info) {}
-	inline Log(LogLevel level) : logLevel(level) {}
-	inline Log(UInt32 one, UInt32 two) : logLevel(static_cast<LogLevel>(two)) {}
+	inline Log(UInt32 level = LogLevel::None)
+	{
+		if (!(level & LogLevel::Destination))
+			level |= LogLevel::File;
+		if (!(level & LogLevel::MessageLevel))
+			level |= LogLevel::Warning;
+		logLevel = (LogLevel)level;
+	}
 
 	template <typename T>
 	inline Log& operator<<(const T &value) {

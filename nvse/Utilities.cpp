@@ -1258,3 +1258,27 @@ char* ConvertLiteralPercents(char* srcPtr)
 	*endPtr = 0;
 	return endPtr;
 }
+
+#include <PluginAPI.h>
+
+std::string DecompileScriptToFolder(const std::string& scriptName, Script* script, const std::string& fileExtension, const std::string_view& modName)
+{
+	char buffer[0x1000];
+	if (!DecompileScript(script, 0, buffer, sizeof(buffer)))
+		return std::format("Script {} is not compiled", scriptName);
+
+	std::filesystem::path dirName = "DecompiledScripts";
+	if (!std::filesystem::exists(dirName))
+		std::filesystem::create_directory(dirName);
+
+	dirName /= modName;
+
+	if (!std::filesystem::exists(dirName))
+		std::filesystem::create_directory(dirName);
+
+	dirName /= scriptName + '.' + fileExtension;
+
+	std::ofstream os(dirName);
+	os << buffer;
+	return std::format("Decompiled script to '{}'", dirName.string());
+}

@@ -528,3 +528,5 @@ inline int GetCharsTillSpace(const char* text, UInt32 offset)
 
 	return numChars;
 }
+
+std::string DecompileScriptToFolder(const std::string& scriptName, Script* script, const std::string& fileExtension, const std::string_view& modName);

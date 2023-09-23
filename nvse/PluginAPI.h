@@ -1034,6 +1034,8 @@ typedef void				(*EventHandler)(TESObjectREFR* thisObj, void* parameters);
 typedef bool				(*_ExtractArgsEx)(COMMAND_ARGS_EX, ...);
 typedef bool				(*_ExtractFormatStringArgs)(UInt32 fmtStringPos, char* buffer, COMMAND_ARGS_EX, UInt32 maxParams, ...);
 typedef bool				(*_HasScriptCommand)(Script* script, CommandInfo* info, CommandInfo* eventBlock);
+typedef bool				(*_DecompileScript)(Script* script, SInt32 lineNumber, char* buffer, UInt32 bufferSize);
+
 typedef CommandInfo*		(*_GetByOpcode)(UInt32 opcode);
 typedef const char*			(*_GetStringVar)(UInt32 var);
 typedef void				(*_SetStringVar)(UInt32, const char*);
@@ -1052,6 +1054,7 @@ typedef	void				(*_SetNativeHandlerFunctionValue)(NVSEArrayVarInterface::Element
 inline _ExtractArgsEx				ExtractArgsEx;
 inline _ExtractFormatStringArgs		ExtractFormatStringArgs;
 inline _HasScriptCommand			HasScriptCommand;
+inline _DecompileScript				DecompileScript;
 inline _GetByOpcode					GetByOpcode;
 inline _GetStringVar				GetStringVar;
 inline _SetStringVar				SetStringVar;

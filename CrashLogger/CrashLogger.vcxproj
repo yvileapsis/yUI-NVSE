@@ -148,7 +148,7 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\CrashLogger\nvse\p
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="DbgHelpCrate.cpp" />
+    <ClCompile Include="DbgHelpWrap.cpp" />
     <ClCompile Include="Labels.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -189,7 +189,7 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\CrashLogger\nvse\p
     <ClInclude Include="..\libraries\json.h" />
     <ClInclude Include="..\libraries\SimpleINILibrary.h" />
     <ClInclude Include="CrashLogger.h" />
-    <ClInclude Include="DbgHelpCrate.h" />
+    <ClInclude Include="DbgHelpWrap.h" />
     <ClInclude Include="definitions.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="namegen.h" />

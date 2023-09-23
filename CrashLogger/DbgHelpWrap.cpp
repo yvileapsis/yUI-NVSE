@@ -1,12 +1,14 @@
+#include <DbgHelpWrap.h>
+
 #include <windows.h>
-#include <dbghelp.h>
 #include <mutex>
 #include <functional>
 #include <stdexcept>
 #include <iostream>
 #include <filesystem>
-#include <map>
+
 #include <Logging.h>
+#include <map>
 
 // Class representing the DbgHelp library
 class DbgHelpWrapper {
@@ -78,14 +80,16 @@ private:
 		wcscat_s(temp_dbghelp_path, L"nvse_dbghelp.dll");
 
 		if (!CopyFileW(dbghelp_path, temp_dbghelp_path, FALSE)) {
-			Log() << ("Cannot create a copy of DbgHelp.dll");
-			return;
+			Log() << "Cannot create a copy of DbgHelp.dll";
+
+			// better continue with some dbghelp than with none!
+			wcscpy_s(temp_dbghelp_path, dbghelp_path);
 		}
 
 		dbghelp_dll = LoadLibraryW(temp_dbghelp_path);
 		if (!dbghelp_dll) {
 			std::filesystem::remove(temp_dbghelp_path);
-			Log() << ("Cannot load DbgHelp.dll");
+			Log() << "Cannot load DbgHelp.dll";
 			return;
 		}
 

@@ -3,7 +3,7 @@
 
 #include <SafeWrite.h>
 #include <CrashLogger.h>
-#include <DbgHelpCrate.h>
+#include <DbgHelpWrap.h>
 #include <set>
 
 #define SYMOPT_EX_WINE_NATIVE_MODULES 1000
@@ -194,22 +194,20 @@ namespace CrashLogger::PDBHandling
 	}
 }
 
-namespace CrashLogger::Handle
+namespace CrashLogger::VirtualTables
 {
-	typedef std::string (*_Handler)(void* ptr);
-
+	typedef std::string (*FormattingHandler)(void* ptr);
+	
 	std::string AsUInt32(void* ptr) { return std::format("{:#08X}", **static_cast<UInt32**>(ptr)); }
 
-	template<typename T> std::string As(void* ptr) { 
-		if (auto sanitized = Dereference<T>((UInt32) ptr))
+	template<typename T> std::string As(void* ptr)
+	{
+		if (auto sanitized = Dereference<T>((UInt32)ptr))
 			return std::format("{}", *sanitized);
 		return "";
 	}
-}
 
-namespace CrashLogger::VirtualTables
-{
-	Handle::_Handler lastHandler = nullptr;
+	FormattingHandler lastHandler = nullptr;
 
 	class Label {
 	public:
@@ -223,10 +221,10 @@ namespace CrashLogger::VirtualTables
 
 		UInt32 address;
 		UInt32 size;
-		Handle::_Handler function;
+		VirtualTables::FormattingHandler function;
 		std::string name;
 
-		Label(UInt32 address, Handle::_Handler function = lastHandler, std::string name = "", Type type = kType_RTTIClass, UInt32 size = 4)
+		Label(UInt32 address, VirtualTables::FormattingHandler function = lastHandler, std::string name = "", Type type = kType_RTTIClass, UInt32 size = 4)
 			: type(type), address(address), size(size), function(function), name(std::move(name))
 		{
 			lastHandler = function;
@@ -272,7 +270,7 @@ namespace CrashLogger::VirtualTables
 	{
 		Push(0x10F1EE0, nullptr, "TypeInfo", Label::kType_RTTIClass);
 
-		Push(0x11F3374, Handle::AsUInt32, "TileValueIndirectTemp", Label::kType_Global);
+		Push(0x11F3374, VirtualTables::AsUInt32, "TileValueIndirectTemp", Label::kType_Global);
 		Push(0x118FB0C, nullptr, "ShowWhoDetects", Label::kType_Global);
 		Push(0x1042C58, nullptr, "ShowWhoDetects", Label::kType_Global);
 		Push(0x011F6238, nullptr, "HeapManager", Label::kType_Global);
@@ -324,7 +322,7 @@ namespace CrashLogger::VirtualTables
 		Push(0x1000000, nullptr, "", Label::kType_None); // integer that is often encountered
 		Push(0x11C0000, nullptr, "", Label::kType_None);
 		
-		Push(kVtbl_Menu, Handle::As<Menu>);
+		Push(kVtbl_Menu, As<Menu>);
 		Push(kVtbl_TutorialMenu);
 		Push(kVtbl_StatsMenu);
 		Push(kVtbl_TextEditMenu);
@@ -366,7 +364,7 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_TraitSelectMenu);
 		Push(kVtbl_TutorialMenu);
 
-		Push(kVtbl_Tile, Handle::As<Tile>);
+		Push(kVtbl_Tile, As<Tile>);
 		Push(kVtbl_TileMenu);
 		Push(kVtbl_TileRect);
 		Push(kVtbl_TileImage);
@@ -374,16 +372,16 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_TileText);
 		Push(kVtbl_Tile3D);
 
-		Push(kVtbl_StartMenuOption, Handle::As<StartMenu::Option>, "StartMenu::Option");
-		Push(kVtbl_StartMenuUserOption, Handle::As<StartMenu::Option>, "StartMenu::UserOption");
+		Push(kVtbl_StartMenuOption, As<StartMenu::Option>, "StartMenu::Option");
+		Push(kVtbl_StartMenuUserOption, As<StartMenu::Option>, "StartMenu::UserOption");
 
-		Push(kVtbl_Setting, Handle::As<Setting>);
+		Push(kVtbl_Setting, As<Setting>);
 		Push(kVtbl_GameSettingCollection, nullptr);
 		Push(kVtbl_INIPrefSettingCollection);
 		Push(kVtbl_INISettingCollection);
 
-		Push(kVtbl_NavMesh, Handle::As<NavMesh>);
-		Push(kVtbl_TESForm, Handle::As<TESForm>);
+		Push(kVtbl_NavMesh, As<NavMesh>);
+		Push(kVtbl_TESForm, As<TESForm>);
 		Push(kVtbl_AlchemyItem);
 		Push(kVtbl_BGSConstructibleObject);
 		Push(kVtbl_BGSDebris);
@@ -407,8 +405,8 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_IngredientItem);
 		Push(kVtbl_MagicItemForm);
 		Push(kVtbl_MagicItemObject);
-		Push(kVtbl_Script);
-		Push(kVtbl_SpellItem);
+		Push(kVtbl_Script, As<Script>);
+		Push(kVtbl_SpellItem, As<TESForm>);
 		Push(kVtbl_TESActorBase);
 		Push(kVtbl_TESAmmo);
 		Push(kVtbl_TESAmmoEffect);
@@ -487,7 +485,7 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_SpectatorPackage);
 		Push(kVtbl_TrespassPackage);
 
-		Push(kVtbl_TESObjectREFR, Handle::As<TESObjectREFR>);
+		Push(kVtbl_TESObjectREFR, As<TESObjectREFR>);
 		Push(kVtbl_MobileObject);
 		Push(kVtbl_Actor);
 		Push(kVtbl_Creature);
@@ -502,16 +500,16 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_GrenadeProjectile);
 		Push(kVtbl_MissileProjectile);
 
-		Push(kVtbl_QueuedReference, Handle::As<QueuedReference>);
+		Push(kVtbl_QueuedReference, As<QueuedReference>);
 		Push(kVtbl_QueuedCharacter);
 		Push(kVtbl_QueuedActor);
 		Push(kVtbl_QueuedCreature);
 		Push(kVtbl_QueuedPlayer);
 
-		Push(kVtbl_ActorMover, Handle::As<ActorMover>);
+		Push(kVtbl_ActorMover, As<ActorMover>);
 		Push(kVtbl_PlayerMover);
 
-		Push(kVtbl_BaseProcess, Handle::As<BaseProcess>);
+		Push(kVtbl_BaseProcess, As<BaseProcess>);
 		Push(kVtbl_LowProcess);
 		Push(kVtbl_MiddleLowProcess);
 		Push(kVtbl_MiddleHighProcess);
@@ -519,13 +517,13 @@ namespace CrashLogger::VirtualTables
 
 
 
-		Push(kVtbl_TESTexture, Handle::As<TESTexture>);
+		Push(kVtbl_TESTexture, As<TESTexture>);
 		Push(kVtbl_TESIcon);
-		Push(kVtbl_QueuedTexture, Handle::As<QueuedTexture>);
+		Push(kVtbl_QueuedTexture, As<QueuedTexture>);
 
 
 		// Ni
-		Push(kVtbl_NiObjectNET, Handle::As<NiObjectNET>);
+		Push(kVtbl_NiObjectNET, As<NiObjectNET>);
 
 		// NiProperty
 		Push(kVtbl_NiProperty);
@@ -590,7 +588,7 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_NiAmbientLight);
 		Push(kVtbl_NiTextureEffect);
 
-		Push(kVtbl_NiNode, Handle::As<NiNode>);
+		Push(kVtbl_NiNode, As<NiNode>);
 		Push(kVtbl_SceneGraph);
 		Push(kVtbl_BSTempNode);
 		Push(kVtbl_BSTempNodeManager);
@@ -599,7 +597,7 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_BSFadeNode, nullptr, "BSFadeNode"); // missing RTTI name
 //		Push(kVtbl_BSScissorNode);
 //		Push(kVtbl_BSTimingNode);
-		Push(kVtbl_BSFaceGenNiNode, Handle::As<NiNode>);
+		Push(kVtbl_BSFaceGenNiNode, As<NiNode>);
 		Push(kVtbl_NiBillboardNode);
 		Push(kVtbl_NiSwitchNode);
 		Push(kVtbl_NiLODNode);
@@ -612,7 +610,7 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_NiScreenSpaceCamera);
 
 		// NiGeometry
-		Push(kVtbl_NiGeometry, Handle::As<NiObjectNET>);
+		Push(kVtbl_NiGeometry, As<NiObjectNET>);
 		Push(kVtbl_NiLines);
 		Push(kVtbl_NiTriBasedGeom);
 		Push(kVtbl_NiTriShape);
@@ -925,30 +923,30 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_NiShader, nullptr);
 
 		// NiStream
-		Push(kVtbl_NiStream, Handle::As<NiStream>);
+		Push(kVtbl_NiStream, As<NiStream>);
 		Push(kVtbl_BSStream);
 
 
 		// animations
-		Push(kVtbl_BSAnimGroupSequence, Handle::As<BSAnimGroupSequence>);
+		Push(kVtbl_BSAnimGroupSequence, As<BSAnimGroupSequence>);
 		Push(kVtbl_AnimSequenceBase);
-		Push(kVtbl_AnimSequenceSingle, Handle::As<AnimSequenceSingle>);
-		Push(kVtbl_AnimSequenceMultiple, Handle::As<AnimSequenceMultiple>);
+		Push(kVtbl_AnimSequenceSingle, As<AnimSequenceSingle>);
+		Push(kVtbl_AnimSequenceMultiple, As<AnimSequenceMultiple>);
 
-		Push(kVtbl_QueuedKF, Handle::As<QueuedKF>);
+		Push(kVtbl_QueuedKF, As<QueuedKF>);
 		Push(kVtbl_QueuedAnimIdle);
 
-		Push(kVtbl_BSFile, Handle::As<BSFile>);
+		Push(kVtbl_BSFile, As<BSFile>);
 		Push(kVtbl_ArchiveFile);
 		Push(kVtbl_CompressedArchiveFile);
 
 		// model
-		Push(kVtbl_TESModel, Handle::As<TESModel>);
-		Push(kVtbl_QueuedModel, Handle::As<QueuedModel>);
+		Push(kVtbl_TESModel, As<TESModel>);
+		Push(kVtbl_QueuedModel, As<QueuedModel>);
 
 		// effects
-		Push(kVtbl_ScriptEffect, Handle::As<ScriptEffect>);
-		Push(kVtbl_ActiveEffect, Handle::As<ActiveEffect>);
+		Push(kVtbl_ScriptEffect, As<ScriptEffect>);
+		Push(kVtbl_ActiveEffect, As<ActiveEffect>);
 		Push(kVtbl_AbsorbEffect);
 		Push(kVtbl_AssociatedItemEffect);
 		Push(kVtbl_BoundItemEffect);
