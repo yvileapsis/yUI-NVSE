@@ -77,7 +77,6 @@
     <ClCompile Include="..\game\BaseFormComponent.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="Labels.cpp" />
     <ClCompile Include="DbgHelpWrap.cpp" />
   </ItemGroup>
   <ItemGroup>

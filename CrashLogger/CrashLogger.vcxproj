@@ -149,7 +149,6 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\CrashLogger\nvse\p
       </ForcedIncludeFiles>
     </ClCompile>
     <ClCompile Include="DbgHelpWrap.cpp" />
-    <ClCompile Include="Labels.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
