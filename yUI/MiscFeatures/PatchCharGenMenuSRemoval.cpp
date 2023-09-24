@@ -22,7 +22,7 @@ namespace Patch::CharGenMenuSRemoval
 
 	void HandleINIs()
 	{
-		const auto iniPath = GetCurPath() + yUI_INI;
+		const auto iniPath = GetCurPath() / yUI_INI;
 		CSimpleIniA ini;
 		ini.SetUnicode();
 

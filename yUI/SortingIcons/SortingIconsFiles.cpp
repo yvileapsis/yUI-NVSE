@@ -15,11 +15,11 @@ __forceinline std::vector<TESForm*> GetFormsFromElement(const nlohmann::basic_js
 	std::string log;
 	if (!form.is_array()) {
 		if (const auto val = TESForm::GetByID(modName.c_str(), form.get<std::string>().c_str())) forms.push_back(val);
-		else log += std::format("{:6s}, ", form.get<std::string>());
+		else log += (!log.empty() ? ", " : "") + std::format("{:6s}", form.get<std::string>());
 	}
 	else for (const auto& i : form) {
 		if (const auto val = TESForm::GetByID(modName.c_str(), i.get<std::string>().c_str())) forms.push_back(val);
-		else log += std::format("{:6s}, ", i.get<std::string>());
+		else log += (!log.empty() ? ", " : "") + std::format("{:6s}", i.get<std::string>());
 	}
 	if (!log.empty()) Log(logLevel) << "JSON warning: Failed to find form, mod: " + modName + ", forms: " + log;
 	return forms;

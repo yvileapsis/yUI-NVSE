@@ -28,6 +28,8 @@ public:
 class CMMCMItem
 {
 public:
+	UInt8 id = 0;
+
 	bool enable = false;
 	std::string prefix;
 	std::string suffix;
@@ -144,6 +146,7 @@ void SetMCMInternal(UInt32 child, UInt32 grandchild, std::string src, Float64 va
 	if (child == 1 && grandchild >= 1)
 	{
 		g_activeSetting = grandchild - 1;
+		items[g_activeMod][g_activeSetting].id = g_activeSetting;
 		if (src == "_Enable")			items[g_activeMod][g_activeSetting].enable = val;
 		if (src == "_Type")				items[g_activeMod][g_activeSetting].type = std::trunc(val);
 		if (src == "_Value")			items[g_activeMod][g_activeSetting].value = val;
@@ -155,6 +158,7 @@ void SetMCMInternalString(UInt32 child, UInt32 grandchild, std::string src, std:
 	if (child == 1 && grandchild >= 1)
 	{
 		g_activeSetting = grandchild - 1;
+		items[g_activeMod][g_activeSetting].id = g_activeSetting;
 		if (src == "_Title")			items[g_activeMod][g_activeSetting].title = val;
 		if (src == "value/*:1/string")	items[g_activeMod][g_activeSetting].valueAlt = val;
 		if (src == "_textOn")			items[g_activeMod][g_activeSetting].textON = val;
@@ -274,11 +278,15 @@ CMSettingCategory::CMSettingCategory(const CMMCMMod& mod)
 CMSettingChoice::CMSettingChoice(const CMMCMMod& mod, const CMMCMItem& item) : CMSetting(mod, item)
 {
 	setting = IO();
+	setting.mcm.modID = mod.modID;
+	setting.mcm.option = item.id;
 }
 
 CMSettingSlider::CMSettingSlider(const CMMCMMod& mod, const CMMCMItem& item) : CMSetting(mod, item)
 {
 	setting = IO();
+	setting.mcm.modID = mod.modID;
+	setting.mcm.option = item.id;
 }
 
 CMSettingControl::CMSettingControl(const CMMCMMod& mod, const CMMCMItem& item) : CMSetting(mod, item)
@@ -299,7 +307,7 @@ void ModConfigurationMenu::ReadMCM()
 	}
 
 	for (const auto& [mod, val] : items)
-	for (const auto& item : val | std::views::values)
+	for (const auto& [id, item] : val)
 	{
 		if (item.enable == 0) continue;
 
@@ -314,7 +322,7 @@ void ModConfigurationMenu::ReadMCM()
 		case CMMCMItem::kChoice:
 		case CMMCMItem::kOnOff:
 		case CMMCMItem::kOnOffCustom:
-		case CMMCMItem::kTick:		setting = std::make_unique<CMSettingChoice>(mods[mod], item); break;
+		case CMMCMItem::kTick:			setting = std::make_unique<CMSettingChoice>(mods[mod], item); break;
 
 		case CMMCMItem::kSlider:		setting = std::make_unique<CMSettingSlider>(mods[mod], item); break;
 
@@ -384,3 +392,13 @@ void WriteMCMHooks()
 
 }
 
+std::optional<CMValue> CMSetting::IO::ReadMCM()
+{
+	return (SInt32) items[mcm.modID][mcm.option].value;
+	return std::optional<CMValue>();
+}
+
+void CMSetting::IO::WriteMCM(const CMValue& value) const
+{
+	items[mcm.modID][mcm.option].value = value;
+}

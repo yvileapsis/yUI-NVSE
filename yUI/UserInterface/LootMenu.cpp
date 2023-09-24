@@ -641,8 +641,8 @@ namespace UserInterface::LootMenu
 
 	void HandleJSON()
 	{
-		const auto dir = GetCurPath() + R"(\Data\menus\yUI)";
-		if (!std::filesystem::exists(dir)) Log() << (dir + " does not exist.");
+		const auto dir = GetCurPath() / R"(Data\menus\yUI)";
+		if (!std::filesystem::exists(dir)) Log() << dir << " does not exist.";
 		else for (const auto& iter : std::filesystem::directory_iterator(dir))
 			if (iter.is_directory()) Log(logLevel) << iter.path().string() + " found";
 			else if (iter.path().extension().string() == ".json")
@@ -665,7 +665,7 @@ namespace UserInterface::LootMenu
 
 	void HandleINI()
 	{
-		const auto iniPath = GetCurPath() + yUI_INI;
+		const auto iniPath = GetCurPath() / yUI_INI;
 		CSimpleIniA ini;
 		ini.SetUnicode();
 
@@ -816,9 +816,10 @@ namespace UserInterface::LootMenu
 
 			if (!tileMain)
 			{
-				Log() << "LootMenu.xml was not detected despite Loot Menu being enabled! Loot Menu will not function.";
+				Log() << "LootMenu.xml was not detected despite 'Loot Menu' being enabled! 'Loot Menu' will not function.";
 				return;
 			}
+			Log() << "'Loot Menu' module enabled";
 		}
 		RegisterEvent("JLM:Reset", 0, nullptr, 4);
 		SetEventHandler("JLM:Reset", Reset);

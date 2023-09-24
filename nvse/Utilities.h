@@ -498,7 +498,7 @@ StackVector<T*, Size> Filter(S& s, F&& f)
 }
 
 std::string UTF8toANSI(const std::string& str);
-std::string GetCurPath();
+std::filesystem::path GetCurPath();
 bool IsConsoleOpen();
 __forceinline bool MenuMode() { return CdeclCall<bool>(0x702360); }
 

@@ -11,7 +11,7 @@ namespace SortingIcons
 		CSimpleIniA ini;
 		ini.SetUnicode();
 
-		const auto iniPath = GetCurPath() + yUI_INI;
+		const auto iniPath = GetCurPath() / yUI_INI;
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
 		enable = ini.GetOrCreate("General", "bSortingIcons", true, "; enable 'Sorting and Icons' feature. If required files are not found this will do nothing.");
@@ -57,9 +57,9 @@ namespace SortingIcons
 	void DeferredInit()
 	{
 		Log(logLevel) << "Loading files for Sorting Icons";
-		const auto dir = GetCurPath() + R"(\Data\menus\ySI)";
+		const auto dir = GetCurPath() / R"(Data\menus\ySI)";
 		const auto then = std::chrono::system_clock::now();
-		if (!std::filesystem::exists(dir)) Log() << dir + " does not exist.";
+		if (!std::filesystem::exists(dir)) Log() << dir << " does not exist.";
 		else for (const auto& iter : std::filesystem::directory_iterator(dir))
 			if (iter.is_directory()) Log(logLevel) << iter.path().string() + " found";
 			else if (iter.path().extension().string() == ".json") Files::HandleJSON(iter.path());

@@ -16,7 +16,7 @@ namespace Patch::RestoreFO3Spread
 		CSimpleIniA ini;
 		ini.SetUnicode();
 
-		const auto iniPath = GetCurPath() + yUI_INI;
+		const auto iniPath = GetCurPath() / yUI_INI;
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
 		g_AlterSpread = ini.GetOrCreate("General", "iAlterSpread", 1, "; restore gamesettings controlling the spread value on weapon forms.");

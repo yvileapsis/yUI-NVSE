@@ -158,7 +158,7 @@ namespace UserInterface::HitIndicator
 	
 	void HandleINI()
 	{
-		const auto iniPath = GetCurPath() + yUI_INI;
+		const auto iniPath = GetCurPath() / yUI_INI;
 		CSimpleIniA ini;
 		ini.SetUnicode();
 
@@ -224,9 +224,10 @@ namespace UserInterface::HitIndicator
 
 			if (!tileMain)
 			{
-				Log() << "HitIndicator.xml was not detected despite Hit Indicator being enabled! Hit Indicator will not function.";
+				Log() << "HitIndicator.xml was not detected despite 'Hit Indicator' being enabled! 'Hit Indicator' will not function.";
 				return;
 			}
+			Log() << "'Hit Indicator' module enabled";
 		}
 		RegisterEvent("JHI:Reset", 0, nullptr, 4);
 		SetEventHandler("JHI:Reset", Reset);

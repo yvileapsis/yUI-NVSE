@@ -52,7 +52,7 @@ namespace UserInterface::WeaponHweel
 
 	void HandleINI()
 	{
-		const auto iniPath = GetCurPath() + yUI_INI;
+		const auto iniPath = GetCurPath() / yUI_INI;
 		CSimpleIniA ini;
 		ini.SetUnicode();
 
@@ -257,9 +257,10 @@ namespace UserInterface::WeaponHweel
 
 			if (!tileMain)
 			{
-				Log() << "WeaponHweel.xml was not detected despite Weapon Hweel being enabled! Weapon Hweel will not function.";
+				Log() << "WeaponHweel.xml was not detected despite 'Weapon Hweel' being enabled! 'Weapon Hweel' will not function.";
 				return;
 			}
+			Log() << "'Weapon Hweel' module enabled";
 		}
 		RegisterEvent("JWH:Reset", 0, nullptr, 4);
 		SetEventHandler("JWH:Reset", Reset);

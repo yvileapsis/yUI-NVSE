@@ -520,7 +520,7 @@ void ModConfigurationMenu::ShowMenuFirstTime()
 		tagDefault = mapTags["!All"].get();
 	}
 
-	ReadJSONForPath(GetCurPath() + R"(\Data\menus\ConfigurationMenu\)");
+	ReadJSONForPath(GetCurPath() / R"(Data/menus/ConfigurationMenu/)");
 	ReadMCM();
 
 	DisplaySettings("");

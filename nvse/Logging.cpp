@@ -104,7 +104,7 @@ namespace Logger
 		LoggerManager::GetSingleton().log(message, level);
 	}
 
-	void AddDestinations(const std::filesystem::path& log, const std::string& prefix, LogLevel logLevel)
+	void AddDestinations(const std::filesystem::path& log, const std::string& prefix, UInt32 logLevel)
 	{
 		if (!exists(log.parent_path())) std::filesystem::create_directory(log.parent_path());
 
@@ -112,13 +112,13 @@ namespace Logger
 			{
 				static std::fstream logFile(log, std::fstream::out | std::fstream::trunc);
 
-				if ((level & LogLevel::File) && (level & logLevel & LogLevel::MessageLevel))
+				if (level & logLevel & LogLevel::File)
 					logFile << msg << std::endl;
 			});
 
-		LoggerManager::GetSingleton().addDestination("console", [prefix, logLevel](const std::string& msg, LogLevel level)
+		LoggerManager::GetSingleton().addDestination("console", [prefix](const std::string& msg, LogLevel level)
 			{
-				if ((level & LogLevel::Console) && (level & logLevel & LogLevel::MessageLevel))
+				if ((level & LogLevel::Console))
 					ConsoleManager::GetSingleton() << prefix + ": " + msg;
 			});
 	}
@@ -145,7 +145,7 @@ namespace Logger
 
 			try {
 				std::filesystem::copy_file(in, newOut);
-				Log() << "Copied " << in.string() << " to " << newOut;
+				Log() << "Copied " << in << " to " << newOut;
 			}
 			catch (std::filesystem::filesystem_error& e) {
 				Log() << "Could not copy sandbox/abc: " << e.what() << "\n";

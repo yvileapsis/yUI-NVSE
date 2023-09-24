@@ -238,12 +238,15 @@ public:
 
 		class MCM
 		{
+		public:
 			UInt8 modID;
 			UInt8 tab;
 			UInt8 option;
 		};
 
 		INI ini;
+
+		MCM mcm;
 
 		std::string xml;
 
@@ -272,6 +275,9 @@ public:
 
 		std::optional<CMValue> ReadGlobal();
 		void WriteGlobal(const CMValue& value) const;
+
+		std::optional<CMValue> ReadMCM();
+		void WriteMCM(const CMValue& value) const;
 
 		CMValue Read();
 		void Write(const CMValue& value) const;

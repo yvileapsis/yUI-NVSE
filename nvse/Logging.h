@@ -4,14 +4,12 @@
 
 enum LogLevel {
 	None		= 0,
-	File		= 1 << 0x0,
-	Console		= 1 << 0x1,
-	Info		= 1 << 0x2,
-	Warning		= 1 << 0x3,
-	Error		= 1 << 0x4,
+	Info		= 1 << 0x1,
+	Warning		= 1 << 0x2,
+	Error		= 1 << 0x3,
+	Console		= 1 << 0x4,
 
-	Destination = File | Console,
-	MessageLevel = Info | Warning | Error
+	File = Info | Warning | Error
 };
 
 namespace Logger
@@ -21,7 +19,7 @@ namespace Logger
 	// Log to LoggerManager
 	void LogToManager(const std::string& message, LogLevel level);
 	// Add a new destination to LoggerManager
-	void AddDestinations(const std::filesystem::path& log, const std::string& prefix, LogLevel logLevel);
+	void AddDestinations(const std::filesystem::path& log, const std::string& prefix, UInt32 logLevel);
 	// Prepare for copying file
 	void PrepareCopy(const std::filesystem::path& in, const std::filesystem::path& out);
 	// Copy all prepared files
@@ -30,14 +28,7 @@ namespace Logger
 
 class Log {
 public:
-	inline Log(UInt32 level = LogLevel::None)
-	{
-		if (!(level & LogLevel::Destination))
-			level |= LogLevel::File;
-		if (!(level & LogLevel::MessageLevel))
-			level |= LogLevel::Warning;
-		logLevel = (LogLevel)level;
-	}
+	inline Log(UInt32 level = LogLevel::Warning) : logLevel((LogLevel)level) {};
 
 	template <typename T>
 	inline Log& operator<<(const T &value) {
@@ -51,6 +42,8 @@ public:
 	}
 
 	inline ~Log() { Logger::LogToManager(buffer.str(), logLevel); };
+
+	bool empty() { return buffer.tellp() == 0; }
 
 private:
 	LogLevel logLevel;

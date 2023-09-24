@@ -1,6 +1,7 @@
 #include "ConfigurationMenu.h"
 
 #include "json.h"
+#include <InterfaceManager.h>
 
 class JSON : public nlohmann::basic_json<> { friend nlohmann::basic_json<>; };
 
@@ -201,7 +202,7 @@ void ModConfigurationMenu::ReadJSONForPath(const std::filesystem::path& path)
 void ModConfigurationMenu::SaveModJSON(std::string mod)
 {
 	nlohmann::basic_json<> j{};
-	const std::filesystem::path& path = GetCurPath() + R"(\Data\Config\ConfigurationMenu\)" + mod + ".json";
+	const std::filesystem::path& path = GetCurPath() / R"(Data/Config/ConfigurationMenu)" / (mod + ".json");
 	std::ofstream i(path);
 
 	j.clear();
@@ -211,12 +212,16 @@ void ModConfigurationMenu::SaveModJSON(std::string mod)
 
 	i << j;
 	i.close();
+
+//	std::string message = "Saved to ";
+//	message += path.string();
+//	QueueUIMessage(message.c_str(), 0, nullptr, nullptr, 2, 1);
 }
 
 void ModConfigurationMenu::LoadModJSON(std::string mod)
 {
 	nlohmann::basic_json<> j;
-	const std::filesystem::path& path = GetCurPath() + R"(\Data\Config\ConfigurationMenu\)" + mod + ".json";
+	const std::filesystem::path& path = GetCurPath() / R"(Data/Config/ConfigurationMenu)" / (mod + ".json");
 	std::ifstream i(path);
 
 	i >> j;

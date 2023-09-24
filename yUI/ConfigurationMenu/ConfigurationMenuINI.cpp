@@ -173,6 +173,7 @@ CMValue CMSetting::IO::Read()
 	if (const auto global =			ReadGlobal()) return global.value();
 	if (const auto gameSetting =	ReadGameSetting()) return gameSetting.value();
 	if (const auto gameINI =		ReadGameINI()) return gameINI.value();
+	if (const auto mcm =			ReadMCM()) return mcm.value();
 	return defaultValue;
 }
 
@@ -185,6 +186,7 @@ void CMSetting::IO::Write(const CMValue& value) const
 	WriteGlobal(value);
 	WriteGameSetting(value);
 	WriteGameINI(value);
+	WriteMCM(value);
 }
 
 void CMSetting::IO::Default()

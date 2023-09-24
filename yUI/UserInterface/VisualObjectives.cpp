@@ -202,7 +202,7 @@ namespace UserInterface::VisualObjectives
 
 	void HandleINI()
 	{
-		const auto iniPath = GetCurPath() + yUI_INI;
+		const auto iniPath = GetCurPath() / yUI_INI;
 		CSimpleIniA ini;
 		ini.SetUnicode();
 
@@ -276,9 +276,10 @@ namespace UserInterface::VisualObjectives
 
 			if (!tileMain)
 			{
-				Log() << "VisualObjectives.xml was not detected despite Visual Objectives being enabled! Visual Objectives will not function.";
+				Log() << "VisualObjectives.xml was not detected despite 'Visual Objectives' being enabled! 'Visual Objectives' will not function.";
 				return;
 			}
+			Log() << "'Visual Objectives' module enabled";
 		}
 		RegisterEvent("JVO:Reset", 0, nullptr, 4);
 		SetEventHandler("JVO:Reset", Reset);

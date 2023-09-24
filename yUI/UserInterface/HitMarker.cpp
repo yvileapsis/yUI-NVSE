@@ -145,7 +145,7 @@ namespace UserInterface::HitMarker
 	
 	void HandleINI()
 	{
-		const auto iniPath = GetCurPath() + yUI_INI;
+		const auto iniPath = GetCurPath() / yUI_INI;
 		CSimpleIniA ini;
 		ini.SetUnicode();
 
@@ -212,9 +212,10 @@ namespace UserInterface::HitMarker
 
 			if (!tileMain)
 			{
-				Log() << "HitMarker.xml was not detected despite Hit Marker being enabled! Hit Marker will not function.";
+				Log() << "HitMarker.xml was not detected despite 'Hit Marker' being enabled! 'Hit Marker' will not function.";
 				return;
 			}
+			Log() << "'Hit Marker' module enabled";
 		}
 		RegisterEvent("JHM:Reset", 0, nullptr, 4);
 		SetEventHandler("JHM:Reset", Reset);

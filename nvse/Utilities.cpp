@@ -1068,7 +1068,7 @@ __declspec(naked) UInt32 __fastcall StrHashCI(const char* inKey)
 	}
 }
 
-std::string GetCurPath()
+std::filesystem::path GetCurPath()
 {
 	char buffer[MAX_PATH] = { 0 };
 	GetModuleFileName(nullptr, buffer, MAX_PATH);

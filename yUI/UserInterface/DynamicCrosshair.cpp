@@ -149,10 +149,10 @@ namespace UserInterface::DynamicCrosshair
 
 	void HandleINI()
 	{
-		const auto iniPath = GetCurPath() + yUI_INI;
+		const auto iniPath = GetCurPath() / yUI_INI;
+
 		CSimpleIniA ini;
 		ini.SetUnicode();
-
 
 		if (ini.LoadFile(iniPath.c_str()) == SI_FILE) return;
 
@@ -186,6 +186,7 @@ namespace UserInterface::DynamicCrosshair
 			std::erase(mainLoop, MainLoop);
 			return;
 		}
+
 		mainLoop.emplace_back(MainLoop);
 
 		tileMain->Set("_DynamicOffset", dynamic & 1);
@@ -220,10 +221,13 @@ namespace UserInterface::DynamicCrosshair
 
 			if (!tileMain)
 			{
-				Log() << "DynamicCrosshair.xml was not detected despite Dynamic Crosshair being enabled! Dynamic Crosshair will not function.";
+				Log() << "DynamicCrosshair.xml was not detected despite 'Dynamic Crosshair' being enabled! 'Dynamic Crosshair' will not function.";
 				return;
 			}
+
+			Log() << "'Dynamic Crosshair' module enabled";
 		}
+		
 
 		tileReticleCenter = g_HUDMainMenu->tileReticleCenter;
 

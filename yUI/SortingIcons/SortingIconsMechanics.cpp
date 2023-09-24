@@ -96,7 +96,7 @@ namespace SortingIcons
 	{
 		if (forms && formIDs.empty())
 		{
-			Log(LogLevel::Warning) << std::format("JSON warning: Failed to find any forms for tag: '{:6s}', priority: '{:03d}'", tag.c_str(), priority);
+			Log(LogLevel::Warning) << std::format("JSON warning: Failed to find any forms for tag: '{:6s}', priority: '{:03d}'", tag, priority);
 			return false;
 		}
 
@@ -118,7 +118,7 @@ namespace SortingIcons
 			UInt32 i = 0;
 			for (const auto iter : formIDs)
 			{
-				log += std::format("{:08X} ({:40s})", iter, TESForm::GetByID(iter)->GetName());
+				log += std::format("{:08X} {:40s}", iter, "(" + std::string(TESForm::GetByID(iter)->GetName()) + ")");
 				if (++i != formIDs.size()) log += i % 2 ? ", " : ",\n";
 			}
 		}
