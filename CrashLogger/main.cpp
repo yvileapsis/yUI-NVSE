@@ -33,7 +33,7 @@ void InitLog(std::filesystem::path path = "")
 	logFolderPath /= CrashLogger_FLD;
 	logFolderPath /= CrashLogger_LOG;
 
-	Logger::AddDestinations(logPath, CrashLogger_STR, LogLevel::MessageLevel);
+	Logger::AddDestinations(logPath, CrashLogger_STR, LogLevel::Info | LogLevel::Warning | LogLevel::Error);
 	Logger::PrepareCopy(logPath, logFolderPath);
 
 	Log(LogLevel::Console) << CrashLogger_VERSION_STR;

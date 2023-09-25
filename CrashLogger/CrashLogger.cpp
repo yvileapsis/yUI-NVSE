@@ -118,6 +118,15 @@ namespace CrashLogger::PDBHandling
 		return module.ModuleName;
 	}
 
+	UInt32 GetModuleBase(UInt32 eip, HANDLE process)
+	{
+		IMAGEHLP_MODULE module = { 0 };
+		module.SizeOfStruct = sizeof(IMAGEHLP_MODULE);
+		if (!Safe_SymGetModuleInfo(process, eip, &module)) return 0;
+
+		return module.BaseOfImage;
+	}
+
 	std::string GetSymbol(UInt32 eip, HANDLE process)
 	{
 		char symbolBuffer[sizeof(IMAGEHLP_SYMBOL) + 255];
@@ -152,8 +161,10 @@ namespace CrashLogger::PDBHandling
 		/*if (GetModuleFileName((HMODULE)frame.AddrPC.Offset, path, MAX_PATH)) {  //Do this work on non base addresses even on  Windows? Cal directly the LDR function?
 			   if (!SymLoadModule(process, NULL, path, NULL, 0, 0)) Log() << FormatString("Porcoddio %0X", GetLastError());
 		}*/
+		
+		const auto moduleBase = GetModuleBase(eip, process);
 
-		std::string begin = GetAddress(eip) + " ==> ";
+		std::string begin = std::format("0x{:08X} (0x{:08X}) ==> ", eip, (moduleBase != 0x00400000) ? eip - moduleBase + 0x10000000 : eip);
 
 		std::string middle;
 
