@@ -32,8 +32,8 @@ void MessageHandler(NVSEMessagingInterface::Message* msg)
 	}
 	else if (msg->type == NVSEMessagingInterface::kMessage_MainGameLoop)
 	{
-		if (!iMainLoopDoOnce && !MenuMode()) {
-			iMainLoopDoOnce++;
+		if (!bMainLoopDoOnce && !MenuMode()) {
+			bMainLoopDoOnce = true;
 			for (const auto& i : mainLoopDoOnce) i(); // call all do once functions
 		}
 		for (const auto& i : mainLoop) i(); // call all mainloop functions

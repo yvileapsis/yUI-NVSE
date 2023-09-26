@@ -9,12 +9,6 @@
 bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS);
 bool Cmd_SetyCMFloat_Execute(COMMAND_ARGS);
 
-UInt8 g_activeMod		= 0;
-UInt8 g_activeSetting	= 0;
-bool g_Reset			= false;
-bool g_NewValue			= false;
-bool g_ShowScale		= false;
-bool g_DefaultScale		= false;
 
 class CMMCMMod
 {
@@ -65,10 +59,96 @@ public:
 	std::string textOFF;
 	std::string textON;
 
+	bool IsValid()
+	{
+		
+	}
+
 };
 
 std::unordered_map<UInt8, CMMCMMod> mods;
 std::unordered_map<UInt8, std::unordered_map<UInt8, CMMCMItem>> items;
+
+class MCMWrapper
+{
+public:
+	static MCMWrapper& GetSingleton()
+	{
+		static MCMWrapper instance;
+		return instance;
+	}
+
+	MCMWrapper() {};
+	~MCMWrapper() {};
+
+	UInt8 activeMod		= 0;
+	UInt8 activeTab		= 0;
+	UInt8 activeSetting	= 0;
+
+	bool reset			= true;
+	bool newValue		= false;
+	bool showScale		= false;
+	bool defaultScale	= false;
+
+	void MainLoop()
+	{
+		
+	}
+
+	Float64 GetInternal(UInt32 child, UInt32 grandchild, std::string src)
+	{
+		if (child == 0 && grandchild == 0)
+		{
+			if (src == "_ActiveMod")	return activeMod;
+			if (src == "_Reset")		return reset;
+			if (src == "_NewValue")		return newValue;
+			if (src == "_ShowScale")	return showScale;
+			if (src == "_DefaultScale")	return defaultScale;
+		}
+
+		return 0;
+	}
+
+
+	void SetInternal(UInt32 child, UInt32 grandchild, std::string src, Float64 val)
+	{
+		if (child == 0 && grandchild == 0)
+		{
+			if (src == "_ActiveMod")	activeMod = val;
+			if (src == "_Reset")		reset = val;
+			if (src == "_NewValue")		newValue = val;
+			if (src == "_ShowScale")	showScale = val;
+			if (src == "_DefaultScale")	defaultScale = val;
+		}
+
+		if (child == 1 && grandchild == 0)
+		{
+			if (src == "_columns")			mods[activeMod].columns = val;
+		}
+
+		if (child == 1 && grandchild >= 1)
+		{
+			activeSetting = grandchild - 1;
+			items[activeMod][activeSetting].id = activeSetting;
+			if (src == "_Enable")			items[activeMod][activeSetting].enable = val;
+			if (src == "_Type")				items[activeMod][activeSetting].type = std::trunc(val);
+			if (src == "_Value")			items[activeMod][activeSetting].value = val;
+		}
+	}
+	
+	void SetInternalString(UInt32 child, UInt32 grandchild, std::string src, std::string val)
+	{
+		if (child == 1 && grandchild >= 1)
+		{
+			activeSetting = grandchild - 1;
+			items[activeMod][activeSetting].id = activeSetting;
+			if (src == "_Title")			items[activeMod][activeSetting].title = val;
+			if (src == "value/*:1/string")	items[activeMod][activeSetting].valueAlt = val;
+			if (src == "_textOn")			items[activeMod][activeSetting].textON = val;
+			if (src == "_textOff")			items[activeMod][activeSetting].textOFF = val;
+		}
+	}
+};
 
 std::string MCMPath(UInt32 child, UInt32 grandchild, std::string src)
 {
@@ -118,54 +198,6 @@ std::string MCMPath(UInt32 child, UInt32 grandchild, std::string src)
 	return path;
 }
 
-Float64 GetMCMInternal(UInt32 child, UInt32 grandchild, std::string src)
-{
-	if (child == 0 && grandchild == 0)
-	{
-		if (src == "_ActiveMod")	return g_activeMod;
-		if (src == "_Reset")		return g_Reset;
-	}
-
-	return 0;
-}
-
-
-void SetMCMInternal(UInt32 child, UInt32 grandchild, std::string src, Float64 val)
-{
-	if (child == 0 && grandchild == 0)
-	{
-//		if (src == "_ActiveMod")	return g_activeMod;
-		if (src == "_Reset")		g_Reset = val;
-	}
-
-	if (child == 1 && grandchild == 0)
-	{
-		if (src == "_columns")			mods[g_activeMod].columns = val;
-	}
-
-	if (child == 1 && grandchild >= 1)
-	{
-		g_activeSetting = grandchild - 1;
-		items[g_activeMod][g_activeSetting].id = g_activeSetting;
-		if (src == "_Enable")			items[g_activeMod][g_activeSetting].enable = val;
-		if (src == "_Type")				items[g_activeMod][g_activeSetting].type = std::trunc(val);
-		if (src == "_Value")			items[g_activeMod][g_activeSetting].value = val;
-	}
-}
-
-void SetMCMInternalString(UInt32 child, UInt32 grandchild, std::string src, std::string val)
-{
-	if (child == 1 && grandchild >= 1)
-	{
-		g_activeSetting = grandchild - 1;
-		items[g_activeMod][g_activeSetting].id = g_activeSetting;
-		if (src == "_Title")			items[g_activeMod][g_activeSetting].title = val;
-		if (src == "value/*:1/string")	items[g_activeMod][g_activeSetting].valueAlt = val;
-		if (src == "_textOn")			items[g_activeMod][g_activeSetting].textON = val;
-		if (src == "_textOff")			items[g_activeMod][g_activeSetting].textOFF = val;
-	}
-}
-
 bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS)
 {
 	*result = -999;
@@ -176,7 +208,7 @@ bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS)
 //	std::string path = MCMPath(child, grandchild, src);
 //	if (const auto val = StringToTilePath(path)) *result = val->num;
 
-	*result = GetMCMInternal(child, grandchild, src);
+	*result = MCMWrapper::GetSingleton().GetInternal(child, grandchild, src);
 
 	return true;
 }
@@ -190,7 +222,7 @@ bool Cmd_SetyCMFloat_Execute(COMMAND_ARGS)
 	float value = 0;
 	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &child, &grandchild, &src, &value)) return true;
 
-	SetMCMInternal(child, grandchild, src, value);
+	MCMWrapper::GetSingleton().SetInternal(child, grandchild, src, value);
 
 	/*
 	std::string path = MCMPath(child, grandchild, src);
@@ -227,7 +259,7 @@ bool Cmd_SetyCMString_Execute(COMMAND_ARGS)
 	char buffer[0x80];
 	if (!ExtractFormatStringArgs(3, buffer, EXTRACT_ARGS_EX, SetyCMStringParams, &child, &grandchild, &src)) return true;
 
-	SetMCMInternalString(child, grandchild, src, buffer);
+	MCMWrapper::GetSingleton().SetInternalString(child, grandchild, src, buffer);
 
 	/*
 	std::string path = MCMPath(child, grandchild, src);
