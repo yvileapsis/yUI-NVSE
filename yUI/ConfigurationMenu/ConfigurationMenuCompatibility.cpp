@@ -44,31 +44,34 @@ public:
 		kRGB = 9,
 	};
 
-	Float64 value = 0;
+	std::optional<Float64> value;
 	std::string valueAlt;
 
 	UInt32 type = kNone;
 
-	UInt32 altFont = 0;
-	UInt32 brightness = 255;
-	UInt32 hightlight = 0;
-	UInt32 indent = 0;
-	UInt32 rgb = 0;
-	UInt32 rbgalt = 0;
+	std::optional<UInt32> altFont;
+	std::optional<UInt32> brightness;
+	std::optional<UInt32> hightlight;
+	std::optional<UInt32> indent;
+	std::optional<UInt32> rgb;
+	std::optional<UInt32> rbgalt;
 
 	std::string textOFF;
 	std::string textON;
 
 	std::unordered_map<UInt8, std::string> choices;
 
-	Float64 min;
-	Float64 max;
-	Float64 delta;
-	UInt32 decimal;
+	struct Slider
+	{
+		std::optional<Float64> min;
+		std::optional<Float64> max;
+		std::optional<Float64> delta;
+		std::optional<UInt32> decimal;
+	};
 
-	Float64 defaultval;
+	Slider slider;
 
-	Float64 currentValue;
+	std::optional<Float64> defaultval;
 
 	bool IsValid() const
 	{
@@ -81,8 +84,7 @@ public:
 		}
 		else if (type == kSlider)
 		{
-			if (max == 0 && min == 0 || delta == 0) return false;
-		
+			if (!slider.min.has_value() || !slider.max.has_value() || !slider.delta.has_value()) return false;
 		}
 		else if (type == kControl) {}
 		else if (type == kOnOff) {}
@@ -126,27 +128,24 @@ public:
 	std::string sliderTitle;
 
 	std::list<UInt8> listSlider;
+	std::list<UInt8> listChoice;
 
-	UInt8 sliderAddress = 0;
-
-	void MainLoop()
+	void UpdateInternal()
 	{
 		if (listSlider.size())
 		{
 			if (showScale == 0)
 			{
-				sliderAddress = listSlider.front();
-				activeSetting = sliderAddress;
+				activeSetting = listSlider.front();
 				ShowScale();
 			}
 			if (showScale == 2)
 			{
-				if (items[activeMod][sliderAddress].IsValid()) { 
+				if (items[activeMod][activeSetting].IsValid()) { 
 					ShowScale(0); 
 					listSlider.pop_front();
 				}
 			}
-
 		}
 	}
 
@@ -162,6 +161,8 @@ public:
 			if (src == "_DefaultScale")	return defaultScale;
 		}
 
+		UpdateInternal();
+
 		return 0;
 	}
 
@@ -170,25 +171,24 @@ public:
 	{
 		if (child == 0 && grandchild == 0)
 		{
-			if (src == "_ActiveMod")	activeMod = val;
-			if (src == "_ActiveOption")	activeSetting = val;
-			if (src == "_Reset")		Reset(val);
-			if (src == "_NewValue")		newValue = val;
-			if (src == "_ShowScale")	ShowScale(val);
-			if (src == "_DefaultScale")	defaultScale = val;
+			if (src == "_ActiveMod")		activeMod = val;
+			if (src == "_ActiveOption")		activeSetting = val;
+			if (src == "_Reset")			Reset(val);
+			if (src == "_NewValue")			newValue = val;
+			if (src == "_ShowScale")		ShowScale(val);
+			if (src == "_DefaultScale")		defaultScale = val;
 
-			MainLoop();
+			if (src == "_Value")			items[activeMod][activeSetting].value = val;
 
-			if (src == "_Value")			
-				items[activeMod][sliderAddress].currentValue = val;
-			if (src == "_ValueDecimal")		
-				items[activeMod][sliderAddress].decimal = val;
-			if (src == "_ValueIncrement")	
-				items[activeMod][sliderAddress].delta = val;
-			if (src == "_ValueMax")			
-				items[activeMod][sliderAddress].max = val;
-			if (src == "_ValueMin")			
-				items[activeMod][sliderAddress].min = val;
+
+			if (src == "_ValueDecimal")
+				items[activeMod][activeSetting].slider.decimal = val;
+			if (src == "_ValueIncrement")
+				items[activeMod][activeSetting].slider.delta = val; 
+			if (src == "_ValueMax")
+				items[activeMod][activeSetting].slider.max = val;
+			if (src == "_ValueMin")
+				items[activeMod][activeSetting].slider.min = val;
 		}
 
 		if (child == 1 && grandchild == 0)
@@ -202,14 +202,19 @@ public:
 			items[activeMod][activeSetting].id = activeSetting;
 			if (src == "_Enable")			items[activeMod][activeSetting].enable = val;
 			if (src == "_Type") {
-				items[activeMod][activeSetting].type = std::trunc(val); 
-				if (std::trunc(val) == CMMCMItem::kSlider)
-				{
-					listSlider.push_back(activeSetting);
-				}
+				const UInt32 type = std::trunc(val);
+				
+				items[activeMod][activeSetting].type = type; 
+
+				if (type == CMMCMItem::kSlider)				listSlider.push_back(activeSetting);
+				else if (type == CMMCMItem::kChoice)		listChoice.push_back(activeSetting);
+				else if (type == CMMCMItem::kThreeSliders)	listSlider.push_back(activeSetting);
+				else if (type == CMMCMItem::kRGB)			listSlider.push_back(activeSetting);
 			}
 			if (src == "_Value")			items[activeMod][activeSetting].value = val;
 		}
+
+		UpdateInternal();
 	}
 	
 	void SetInternalString(UInt32 child, UInt32 grandchild, std::string src, std::string val)
@@ -219,7 +224,16 @@ public:
 			activeSetting = grandchild;
 			items[activeMod][activeSetting].id = activeSetting;
 			if (src == "_Title")			items[activeMod][activeSetting].title = val;
-			if (src == "value/*:1/string")	items[activeMod][activeSetting].valueAlt = val;
+			if (src == "value/*:1/string")
+			{
+				items[activeMod][activeSetting].valueAlt = val;
+				if (!items[activeMod][activeSetting].value.has_value())
+				{
+					if (Float64 value = std::stod(val); value) items[activeMod][activeSetting].value = value;
+					else if (items[activeMod][activeSetting].slider.max.has_value())
+						items[activeMod][activeSetting].value = items[activeMod][activeSetting].slider.max.value();
+				}
+			}
 			if (src == "_textOn")			items[activeMod][activeSetting].textON = val;
 			if (src == "_textOff")			items[activeMod][activeSetting].textOFF = val;
 		}
@@ -228,6 +242,8 @@ public:
 		{
 			if (src == "_Title")	sliderTitle = val;
 		}
+
+		UpdateInternal();
 	}
 
 	void Reset(const UInt32 val = true)
@@ -237,7 +253,6 @@ public:
 
 	void ShowScale(const UInt32 val = true)
 	{
-		if (!val) sliderAddress = 0;
 		showScale = val;
 	}
 };
@@ -245,49 +260,49 @@ public:
 std::string MCMPath(UInt32 child, UInt32 grandchild, std::string src)
 {
 
-	std::string path = "StartMenu/MCM/";
+	std::filesystem::path path = "StartMenu/MCM";
 	if (child == 0)
 	{
 	}
 	else if (child == 1) {
-		path += "MCM_Options/";
+		path /= "MCM_Options";
 		if (grandchild != 0) {
-			path += "Option" + std::to_string(grandchild) + "/";
+			path /= "Option" + std::to_string(grandchild);
 		}
 	}
 	else if (child == 2) {
-		path += "MCM_Scale/";
+		path /= "MCM_Scale";
 	}
 	else if (child == 3) {
-		path += "MCM_List/";
+		path /= "MCM_List";
 		if (grandchild != 0) {
-			path += "Item" + std::to_string(grandchild) + "/";
+			path /= "Item" + std::to_string(grandchild);
 		}
 	}
 	else if (child == 4) {
-		path += "MCM_Trigger/";
+		path /= "MCM_Trigger";
 	}
 	else if (child == 5) {
-		path += "MCM_ModList/";
+		path /= "MCM_ModList";
 		if (grandchild == 0) {}
 		else if (grandchild <= 23) {
-			path += "Mod" + std::to_string(grandchild) + "/";
+			path /= "Mod" + std::to_string(grandchild);
 		}
 		else {
-			path += "SubMenu" + std::to_string(grandchild - 23) + "/";
+			path /= "SubMenu" + std::to_string(grandchild - 23);
 		}
 	}
 	else if (child == 9) {
-		path += "MCM_Info/";
+		path /= "MCM_Info";
 	}
 	else if (child == 15) {
-		path += "MCM_Input/";
+		path /= "MCM_Input";
 	}
 	else if (child == 17) {
-		path += "MCM_Images/";
+		path /= "MCM_Images";
 	}
-	path += std::string(src);
-	return path;
+	path /= std::string(src);
+	return path.string();
 }
 
 bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS)
@@ -311,7 +326,7 @@ bool Cmd_SetyCMFloat_Execute(COMMAND_ARGS)
 	char src[0x100] = "\0";
 	SInt64 child = 0;
 	SInt64 grandchild = 0;
-	float value = 0;
+	Float32 value = 0;
 	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &child, &grandchild, &src, &value)) return true;
 
 	MCMWrapper::GetSingleton().SetInternal(child, grandchild, src, value);
@@ -429,9 +444,12 @@ CMSettingSlider::CMSettingSlider(const CMMCMMod& mod, const CMMCMItem& item) : C
 {
 	setting = IO();
 
-	max = item.max;
-	min = item.min;
-	delta = item.delta;
+	if (item.slider.max.has_value())
+		max = item.slider.max.value();
+	if (item.slider.min.has_value())
+		min = item.slider.min.value();
+	if (item.slider.delta.has_value())
+		delta = item.slider.delta.value();
 
 	setting.mcm.modID = mod.modID;
 	setting.mcm.option = item.id;
@@ -449,14 +467,6 @@ bool start2 = false;
 
 void ModConfigurationMenu::ReadMCM()
 {
-
-//	if (doonce2 >= 2) return;
-
-	for (const auto& [mod, val] : items)
-		for (const auto& [id, item] : val)
-		{
-//			if (!item.IsValid()) return;
-		}
 
 	if (!start2) return;
 
@@ -509,8 +519,6 @@ BGSListForm* modList;
 bool doonce = false;
 void MainLoop()
 {
-	MCMWrapper::GetSingleton().MainLoop();
-
 	if (MenuMode()) return;
 	
 
@@ -568,11 +576,15 @@ void WriteMCMHooks()
 
 std::optional<CMValue> CMSetting::IO::ReadMCM()
 {
-	return (SInt32) items[mcm.modID][mcm.option].value;
+	if (items[mcm.modID][mcm.option].value.has_value())
+		return (Float64)items[mcm.modID][mcm.option].value.value();
+	else
+		return (Float64)0;
+
 	return std::optional<CMValue>();
 }
 
 void CMSetting::IO::WriteMCM(const CMValue& value) const
 {
-	items[mcm.modID][mcm.option].value = value;
+	items[mcm.modID][mcm.option].value = value.GetAsFloat();
 }

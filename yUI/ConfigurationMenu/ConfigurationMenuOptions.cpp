@@ -207,12 +207,12 @@ CMSettingSlider* CMSettingSlider::ClickValue(Tile* tile, UInt32 option)
 
 CMSettingSlider* CMSettingSlider::Drag(Float32 value)
 {
-	const UInt32 forceTruncating = value * (max - min) / delta.GetAsFloat();
+	const UInt32 forceTruncating = std::round(value * (max.GetAsFloat() - min.GetAsFloat()) / delta.GetAsFloat());
 
 	CMValue newValue;
 
-	if (delta.IsFloat()) newValue.Set(static_cast<Float32>(forceTruncating) * delta.GetAsFloat());
-	else newValue.Set(static_cast<SInt64>(forceTruncating * delta.GetAsInteger()));
+	if (delta.IsFloat()) newValue.Set((Float64) min + static_cast<CMValue>(forceTruncating * delta.GetAsFloat()));
+	else newValue.Set((SInt64) min + static_cast<CMValue>(forceTruncating * delta.GetAsInteger()));
 
 	setting.Write(newValue);
 
