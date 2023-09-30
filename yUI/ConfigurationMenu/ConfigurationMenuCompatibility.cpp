@@ -6,10 +6,6 @@
 #include "ConfigurationMenu.h"
 #include "GameData.h"
 
-bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS);
-bool Cmd_SetyCMFloat_Execute(COMMAND_ARGS);
-
-
 class CMMCMMod
 {
 public:
@@ -59,7 +55,7 @@ public:
 	std::string textOFF;
 	std::string textON;
 
-	std::unordered_map<UInt8, std::string> choices;
+	std::unordered_map<UInt8, std::pair<bool, std::string>> choices;
 
 	struct Slider
 	{
@@ -124,11 +120,20 @@ public:
 	UInt8 newValue		= 0;
 	UInt8 showScale		= 0;
 	UInt8 defaultScale	= 0;
+	UInt8 showList		= 0;
+
+	UInt8 mouseover		= 0;
+
 
 	std::string sliderTitle;
 
+	std::string listTitle;
+
 	std::list<UInt8> listSlider;
+	std::list<UInt8> listScaleDefault;
 	std::list<UInt8> listChoice;
+	std::list<UInt8> listMouseover;
+
 
 	void UpdateInternal()
 	{
@@ -139,7 +144,7 @@ public:
 				activeSetting = listSlider.front();
 				ShowScale();
 			}
-			if (showScale == 2)
+			else if (showScale == 2)
 			{
 				if (items[activeMod][activeSetting].IsValid()) { 
 					ShowScale(0); 
@@ -147,48 +152,68 @@ public:
 				}
 			}
 		}
-	}
-
-	Float64 GetInternal(UInt32 child, UInt32 grandchild, std::string src)
-	{
-		if (child == 0 && grandchild == 0)
+		else if (listChoice.size())
 		{
-			if (src == "_ActiveMod")	return activeMod;
-			if (src == "_ActiveOption")	return activeSetting;
-			if (src == "_Reset")		return reset;
-			if (src == "_NewValue")		return newValue;
-			if (src == "_ShowScale")	return showScale;
-			if (src == "_DefaultScale")	return defaultScale;
+			if (showList == 0)
+			{
+				activeSetting = listChoice.front();
+				ShowList();
+			}
+			else if (showList == 2)
+			{
+				if (items[activeMod][activeSetting].IsValid()) { 
+					ShowScale(0); 
+					listChoice.pop_front();
+				} 
+			}
 		}
 
+	}
+
+	Float64 GetInternal(UInt32 child, UInt32 grandchild, std::string string)
+	{
+		const auto& src = ToLower(std::move(string));
+
 		UpdateInternal();
+
+		if (child == 0 && grandchild == 0)
+		{
+			if (src == "_activemod")	return activeMod;
+			if (src == "_activeoption")	return activeSetting;
+			if (src == "_reset")		return reset;
+			if (src == "_newvalue")		return newValue;
+			if (src == "_showscale")	return showScale;
+			if (src == "_defaultscale")	return defaultScale;
+		}
 
 		return 0;
 	}
 
 
-	void SetInternal(UInt32 child, UInt32 grandchild, std::string src, Float64 val)
+	void SetInternal(UInt32 child, UInt32 grandchild, std::string string, Float64 val)
 	{
+		const auto& src = ToLower(std::move(string));
+
 		if (child == 0 && grandchild == 0)
 		{
-			if (src == "_ActiveMod")		activeMod = val;
-			if (src == "_ActiveOption")		activeSetting = val;
-			if (src == "_Reset")			Reset(val);
-			if (src == "_NewValue")			newValue = val;
-			if (src == "_ShowScale")		ShowScale(val);
-			if (src == "_DefaultScale")		defaultScale = val;
+			if (src == "_activemod")		activeMod = val;
+			if (src == "_activeoption")		activeSetting = val;
+			if (src == "_reset")			Reset(val);
+			if (src == "_newvalue")			newValue = val;
+			if (src == "_showscale")		ShowScale(val);
+			if (src == "_defaultscale")		defaultScale = val;
 
-			if (src == "_Value")			items[activeMod][activeSetting].value = val;
+			if (src == "_value")			items[activeMod][activeSetting].value = val;
 
 
-			if (src == "_ValueDecimal")
-				items[activeMod][activeSetting].slider.decimal = val;
-			if (src == "_ValueIncrement")
-				items[activeMod][activeSetting].slider.delta = val; 
-			if (src == "_ValueMax")
-				items[activeMod][activeSetting].slider.max = val;
-			if (src == "_ValueMin")
-				items[activeMod][activeSetting].slider.min = val;
+			// slider
+			if (src == "_valuedecimal")		items[activeMod][activeSetting].slider.decimal = val;
+			if (src == "_valueincrement")	items[activeMod][activeSetting].slider.delta = val; 
+			if (src == "_valuemax")			items[activeMod][activeSetting].slider.max = val;
+			if (src == "_valuemin")			items[activeMod][activeSetting].slider.min = val;
+
+			// choice
+
 		}
 
 		if (child == 1 && grandchild == 0)
@@ -200,8 +225,8 @@ public:
 		{
 			activeSetting = grandchild;
 			items[activeMod][activeSetting].id = activeSetting;
-			if (src == "_Enable")			items[activeMod][activeSetting].enable = val;
-			if (src == "_Type") {
+			if (src == "_enable")			items[activeMod][activeSetting].enable = val;
+			if (src == "_type") {
 				const UInt32 type = std::trunc(val);
 				
 				items[activeMod][activeSetting].type = type; 
@@ -211,50 +236,66 @@ public:
 				else if (type == CMMCMItem::kThreeSliders)	listSlider.push_back(activeSetting);
 				else if (type == CMMCMItem::kRGB)			listSlider.push_back(activeSetting);
 			}
-			if (src == "_Value")			items[activeMod][activeSetting].value = val;
+			if (src == "_value")			items[activeMod][activeSetting].value = val;
+		}
+
+		if (child == 3 && grandchild >= 1)
+		{
+			if (src == "_enable")	items[activeMod][activeSetting].choices[grandchild].first = true;
 		}
 
 		UpdateInternal();
 	}
 	
-	void SetInternalString(UInt32 child, UInt32 grandchild, std::string src, std::string val)
+	void SetInternalString(UInt32 child, UInt32 grandchild, std::string string, std::string val)
 	{
+		const auto& src = ToLower(std::move(string));
+
 		if (child == 1 && grandchild >= 1)
 		{
 			activeSetting = grandchild;
 			items[activeMod][activeSetting].id = activeSetting;
-			if (src == "_Title")			items[activeMod][activeSetting].title = val;
+			if (src == "_title")			items[activeMod][activeSetting].title = val;
 			if (src == "value/*:1/string")
 			{
 				items[activeMod][activeSetting].valueAlt = val;
 				if (!items[activeMod][activeSetting].value.has_value())
 				{
-					if (Float64 value = std::stod(val); value) items[activeMod][activeSetting].value = value;
-					else if (items[activeMod][activeSetting].slider.max.has_value())
-						items[activeMod][activeSetting].value = items[activeMod][activeSetting].slider.max.value();
+					try {
+						Float64 value = std::stod(val);
+						items[activeMod][activeSetting].value = value;
+					}
+					catch (...) {
+						if (items[activeMod][activeSetting].slider.max.has_value())
+							items[activeMod][activeSetting].value = items[activeMod][activeSetting].slider.max.value();
+					}
 				}
 			}
-			if (src == "_textOn")			items[activeMod][activeSetting].textON = val;
-			if (src == "_textOff")			items[activeMod][activeSetting].textOFF = val;
+			if (src == "_texton")			items[activeMod][activeSetting].textON = val;
+			if (src == "_textoff")			items[activeMod][activeSetting].textOFF = val;
 		}
 
 		if (child == 2 && grandchild == 0)
 		{
-			if (src == "_Title")	sliderTitle = val;
+			if (src == "_title")	sliderTitle = val;
+		}
+
+		if (child == 3 && grandchild == 0)
+		{
+			if (src == "_title")	listTitle = val;
+		}
+
+		if (child == 3 && grandchild >= 1)
+		{
+			if (src == "text/string")	items[activeMod][activeSetting].choices[grandchild].second = val;
 		}
 
 		UpdateInternal();
 	}
 
-	void Reset(const UInt32 val = true)
-	{
-		reset = val;
-	}
-
-	void ShowScale(const UInt32 val = true)
-	{
-		showScale = val;
-	}
+	void Reset(const UInt32 val = true) { reset = val; }
+	void ShowScale(const UInt32 val = true) { showScale = val; }
+	void ShowList(const UInt32 val = true) { showList = val; }
 };
 
 std::string MCMPath(UInt32 child, UInt32 grandchild, std::string src)
@@ -305,95 +346,6 @@ std::string MCMPath(UInt32 child, UInt32 grandchild, std::string src)
 	return path.string();
 }
 
-bool Cmd_GetyCMFloat_Execute(COMMAND_ARGS)
-{
-	*result = -999;
-	char src[0x100] = "\0";
-	SInt64 child = 0;
-	SInt64 grandchild = 0;
-	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &child, &grandchild, &src)) return true;
-//	std::string path = MCMPath(child, grandchild, src);
-//	if (const auto val = StringToTilePath(path)) *result = val->num;
-
-	*result = MCMWrapper::GetSingleton().GetInternal(child, grandchild, src);
-
-	return true;
-}
-
-bool Cmd_SetyCMFloat_Execute(COMMAND_ARGS)
-{
-	*result = 0;
-	char src[0x100] = "\0";
-	SInt64 child = 0;
-	SInt64 grandchild = 0;
-	Float32 value = 0;
-	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &child, &grandchild, &src, &value)) return true;
-
-	MCMWrapper::GetSingleton().SetInternal(child, grandchild, src, value);
-
-	/*
-	std::string path = MCMPath(child, grandchild, src);
-	if (const auto val = StringToTilePath(path)) {
-		*result = 1;
-		val->parent->Set(val->id, value);
-	}*/
-
-	return true;
-}
-
-bool Cmd_GetyCMString_Execute(COMMAND_ARGS)
-{
-	*result = -999;
-	char src[0x100] = "\0";
-	SInt64 child = 0;
-	SInt64 grandchild = 0;
-	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &child, &grandchild, &src)) return true;
-
-	/*
-	std::string path = MCMPath(child, grandchild, src);
-	if (const auto val = StringToTilePath(path)) AssignString(PASS_COMMAND_ARGS, val->str);*/
-
-	return true;
-}
-
-UInt32 SetyCMStringParams;
-bool Cmd_SetyCMString_Execute(COMMAND_ARGS)
-{
-	*result = 0;
-	char src[0x100] = "\0";
-	SInt64 child = 0;
-	SInt64 grandchild = 0;
-	char buffer[0x80];
-	if (!ExtractFormatStringArgs(3, buffer, EXTRACT_ARGS_EX, SetyCMStringParams, &child, &grandchild, &src)) return true;
-
-	MCMWrapper::GetSingleton().SetInternalString(child, grandchild, src, buffer);
-
-	/*
-	std::string path = MCMPath(child, grandchild, src);
-	if (const auto val = StringToTilePath(path)) {
-		*result = 1;
-		val->parent->Set(val->id, buffer);
-	}*/
-
-	return true;
-}
-
-bool Cmd_SetUIFloat_Execute(COMMAND_ARGS)
-{
-	*result = 0;
-	char src[0x100] = "\0";
-	float value = 0;
-	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &src, &value)) return true;
-
-	/*
-	if (const auto val = StringToTilePath(src)) {
-		*result = 1;
-		val->parent->Set(val->id, value);
-	}*/
-
-	return true;
-}
-
 CMCategory::CMCategory(const CMMCMMod& mod)
 {
 	id = mod.id;
@@ -433,7 +385,13 @@ CMSettingChoice::CMSettingChoice(const CMMCMMod& mod, const CMMCMItem& item) : C
 	}
 	else if (item.type == CMMCMItem::kChoice)
 	{
-
+		for (const auto& iter : item.choices)
+		{
+			const auto id = iter.first;
+			const auto shouldShow = iter.second.first;
+			const auto& str = iter.second.second;
+			if (shouldShow) choice.emplace((CMValue)(SInt32)id, str);
+		}
 	}
 
 	setting.mcm.modID = mod.modID;
@@ -463,13 +421,9 @@ CMSettingControl::CMSettingControl(const CMMCMMod& mod, const CMMCMItem& item) :
 }
 
 UInt8 doonce2 = 0;
-bool start2 = false;
 
 void ModConfigurationMenu::ReadMCM()
 {
-
-	if (!start2) return;
-
 	for (const auto& mod : mods | std::views::values)
 	{
 		const auto tag = CMCategory(mod);
@@ -539,39 +493,10 @@ void MainLoop()
 		mods.emplace(mod.modID, mod);
 	}
 
-	MCMWrapper::GetSingleton().activeMod = g_TESDataHandler->LookupModByName("FOVSlider.esp")->modIndex;
+	MCMWrapper::GetSingleton().activeMod = g_TESDataHandler->LookupModByName("MCM Example Menu.esp")->modIndex;
 	MCMWrapper::GetSingleton().Reset();
 
 //	ModConfigurationMenu::GetSingleton()->ReadMCM();
-
-	start2 = true;
-}
-
-void WriteMCMHooks()
-{
-	/*
-		RegisterCommand GetModINISetting (21C0)
-		RegisterCommand SetModINISetting (21C1)
-		RegisterCommand GetMCMFloat (21C2)
-		RegisterCommand SetMCMFloat (21C3)
-		RegisterCommand SetMCMString (21C4)
-		RegisterCommand SetMCMFloatMass (21C5)
-		RegisterCommand SetMCMStringMass (21C6)
-		RegisterCommand SetMCMModList (21C7)
-		RegisterCommand GetMCMListWidth (21C8)
-	 */
-
-
-	g_commandInterface->GetByOpcode(0x21C2)->execute = Cmd_GetyCMFloat_Execute;
-	g_commandInterface->GetByOpcode(0x21C3)->execute = Cmd_SetyCMFloat_Execute;
-	g_commandInterface->GetByOpcode(0x21C4)->execute = Cmd_SetyCMString_Execute;
-	SetyCMStringParams = g_commandInterface->GetByOpcode(0x21C4)->numParams;
-
-//	g_commandInterface->GetByOpcode(5284)->execute = g_commandInterface->GetByOpcode(5663)->execute;
-//	g_commandInterface->GetByOpcode(5285)->execute = g_commandInterface->GetByOpcode(5664)->execute;
-//	g_commandInterface->GetByOpcode(5286)->execute = g_commandInterface->GetByOpcode(5665)->execute;
-//	g_commandInterface->GetByOpcode(5346)->execute = g_commandInterface->GetByOpcode(5665)->execute;
-
 }
 
 std::optional<CMValue> CMSetting::IO::ReadMCM()
@@ -587,4 +512,276 @@ std::optional<CMValue> CMSetting::IO::ReadMCM()
 void CMSetting::IO::WriteMCM(const CMValue& value) const
 {
 	items[mcm.modID][mcm.option].value = value.GetAsFloat();
+}
+
+namespace Cmd
+{
+	enum Opcode
+	{
+		// nvse
+		kGetUIFloat = 0x14A4,
+		kSetUIFloat = 0x14A5,
+		kSetUIString = 0x14A6,
+		kSetUIStringEx = 0x14E2,
+		
+		// xnvse
+		kGetUIFloatAlt = 0x161F,
+		kSetUIFloatAlt = 0x1620,
+		kSetUIStringAlt = 0x1621,
+
+		// mcm
+		kGetMCMFloat = 0x21C2,
+		kSetMCMFloat = 0x21C3,
+		kSetMCMString = 0x21C4,
+
+		kGetModINISetting = 0x21C0,
+		kSetModINISetting = 0x21C1,
+		kSetMCMFloatMass = 0x21C5,
+		kSetMCMStringMass = 0x21C6,
+		kSetMCMModList = 0x21C7,
+		kGetMCMListWidth = 0x21C8,
+
+		// jip ln
+		kGetString = 0x2639
+	};
+
+	bool GetyCMFloat_Execute(COMMAND_ARGS)
+	{
+		*result = -999;
+		char src[0x200] = "\0";
+		SInt64 child = 0;
+		SInt64 grandchild = 0;
+		if (!ExtractArgsEx(EXTRACT_ARGS_EX, &child, &grandchild, &src)) return true;
+		*result = MCMWrapper::GetSingleton().GetInternal(child, grandchild, src);
+		return true;
+	}
+
+	bool SetyCMFloat_Execute(COMMAND_ARGS)
+	{
+		*result = 0;
+		char src[0x200] = "\0";
+		SInt64 child = 0;
+		SInt64 grandchild = 0;
+		Float32 value = 0;
+		if (!ExtractArgsEx(EXTRACT_ARGS_EX, &child, &grandchild, &src, &value)) return true;
+		MCMWrapper::GetSingleton().SetInternal(child, grandchild, src, value);
+		return true;
+	}
+
+	bool GetyCMString_Execute(COMMAND_ARGS)
+	{
+		char src[0x200] = "\0";
+		SInt64 child = 0;
+		SInt64 grandchild = 0;
+		if (!ExtractArgsEx(EXTRACT_ARGS_EX, &child, &grandchild, &src)) return true;
+//		*result = MCMWrapper::GetSingleton().GetInternalString(child, grandchild, src);
+		return true;
+	}
+
+	UInt32 SetyCMStringParams;
+	bool SetyCMString_Execute(COMMAND_ARGS)
+	{
+		*result = 0;
+		char src[0x200] = "\0";
+		SInt64 child = 0;
+		SInt64 grandchild = 0;
+		char buffer[0x200];
+		if (!ExtractFormatStringArgs(3, buffer, EXTRACT_ARGS_EX, SetyCMStringParams, &child, &grandchild, &src)) return true;
+		MCMWrapper::GetSingleton().SetInternalString(child, grandchild, src, buffer);
+		return true;
+	}
+
+	bool (*GetUIFloatAlt_Execute)(COMMAND_ARGS);
+	bool (*SetUIFloatAlt_Execute)(COMMAND_ARGS);
+	bool (*SetUIStringAlt_Execute)(COMMAND_ARGS);
+
+	bool GetUIFloat_Execute(COMMAND_ARGS)
+	{
+		*result = -999;
+		char src[0x200] = "\0";
+		if (!ExtractArgsEx(EXTRACT_ARGS_EX, &src)) return true;
+
+		if (std::strncmp(src, "StartMenu/MCM/", 14)) return GetUIFloatAlt_Execute(PASS_COMMAND_ARGS);
+
+		auto string = std::string(src);
+
+		string = string.substr(14, string.size());
+
+		UInt32 child = 0;
+		UInt32 grandchild = 0;
+
+		auto numPos = string.find_first_of("*:");
+		auto slashPos = string.find_first_of('/');
+
+		if (numPos != -1 && slashPos != -1)
+		{
+			child = std::stoi(string.substr(numPos + 2, slashPos));
+
+			string = string.substr(slashPos + 1, string.size());
+
+			numPos = string.find_first_of("*:");
+			slashPos = string.find_first_of('/');
+
+			if (numPos != -1 && slashPos != -1)
+			{
+				grandchild = std::stoi(string.substr(numPos + 2, slashPos));
+
+				string = string.substr(slashPos + 1, string.size());
+			}
+		}
+
+		*result = MCMWrapper::GetSingleton().GetInternal(child, grandchild, string);
+
+		return true;
+	}
+
+
+	bool SetUIFloat_Execute(COMMAND_ARGS)
+	{
+		*result = -999;
+		char src[0x200] = "\0";
+		float value = 0;
+		if (!ExtractArgsEx(EXTRACT_ARGS_EX, &src, &value)) return true;
+		
+		if (std::strncmp(src, "StartMenu/MCM/", 14)) return SetUIFloatAlt_Execute(PASS_COMMAND_ARGS);
+
+		auto string = std::string(src);
+
+		string = string.substr(14, string.size());
+
+		UInt32 child = 0;
+		UInt32 grandchild = 0;
+
+		auto numPos = string.find_first_of("*:");
+		auto slashPos = string.find_first_of('/');
+
+		if (numPos != -1 && slashPos != -1)
+		{
+			child = std::stoi(string.substr(numPos + 2, slashPos));
+
+			string = string.substr(slashPos + 1, string.size());
+
+			numPos = string.find_first_of("*:");
+			slashPos = string.find_first_of('/');
+
+			if (numPos != -1 && slashPos != -1)
+			{
+				grandchild = std::stoi(string.substr(numPos + 2, slashPos));
+
+				string = string.substr(slashPos + 1, string.size());
+			}
+		}
+
+		MCMWrapper::GetSingleton().SetInternal(child, grandchild, string, value);
+
+		return true;
+	}
+
+	bool SetUIString_Execute(COMMAND_ARGS)
+	{
+		*result = 0;
+		char src[0x200] = "\0";
+		char buffer[0x200] = "\0";
+		if (!ExtractArgsEx(EXTRACT_ARGS_EX, &src, &buffer)) return true;
+
+		if (std::strncmp(src, "StartMenu/MCM/", 14)) return SetUIStringAlt_Execute(PASS_COMMAND_ARGS);
+
+		auto string = std::string(src);
+
+		string = string.substr(14, string.size());
+
+		UInt32 child = 0;
+		UInt32 grandchild = 0;
+
+		auto numPos = string.find_first_of("*:");
+		auto slashPos = string.find_first_of('/');
+
+		if (numPos != -1 && slashPos != -1)
+		{
+			child = std::stoi(string.substr(numPos + 2, slashPos));
+
+			string = string.substr(slashPos + 1, string.size());
+
+			numPos = string.find_first_of("*:");
+			slashPos = string.find_first_of('/');
+
+			if (numPos != -1 && slashPos != -1)
+			{
+				grandchild = std::stoi(string.substr(numPos + 2, slashPos));
+
+				string = string.substr(slashPos + 1, string.size());
+			}
+		}
+
+		MCMWrapper::GetSingleton().SetInternalString(child, grandchild, string, buffer);
+
+		return true;
+	}
+
+	UInt32 SetUIStringParams;
+	bool SetUIStringEx_Execute(COMMAND_ARGS)
+	{
+		*result = 0;
+		char src[0x200] = "\0";
+		char buffer[0x200];
+		if (!ExtractFormatStringArgs(1, buffer, EXTRACT_ARGS_EX, SetUIStringParams, &src)) return true;
+
+		if (std::strncmp(src, "StartMenu/MCM/", 14)) return SetUIStringAlt_Execute(PASS_COMMAND_ARGS);
+
+		auto string = std::string(src);
+
+		string = string.substr(14, string.size());
+
+		UInt32 child = 0;
+		UInt32 grandchild = 0;
+
+		auto numPos = string.find_first_of("*:");
+		auto slashPos = string.find_first_of('/');
+
+		if (numPos != -1 && slashPos != -1)
+		{
+			child = std::stoi(string.substr(numPos + 2, slashPos));
+
+			string = string.substr(slashPos + 1, string.size());
+
+			numPos = string.find_first_of("*:");
+			slashPos = string.find_first_of('/');
+
+			if (numPos != -1 && slashPos != -1)
+			{
+				grandchild = std::stoi(string.substr(numPos + 2, slashPos));
+
+				string = string.substr(slashPos + 1, string.size());
+			}
+		}
+
+		MCMWrapper::GetSingleton().SetInternalString(child, grandchild, string, buffer);
+
+		return true;
+	}
+
+	void WriteHooks()
+	{
+		g_commandInterface->GetByOpcode(kGetMCMFloat)->execute = GetyCMFloat_Execute;
+		g_commandInterface->GetByOpcode(kSetMCMFloat)->execute = SetyCMFloat_Execute;
+		g_commandInterface->GetByOpcode(kSetMCMString)->execute = SetyCMString_Execute;
+		SetyCMStringParams = g_commandInterface->GetByOpcode(kSetMCMString)->numParams;
+
+		GetUIFloatAlt_Execute = g_commandInterface->GetByOpcode(kGetUIFloatAlt)->execute;
+		g_commandInterface->GetByOpcode(kGetUIFloat)->execute = GetUIFloat_Execute;
+
+		SetUIFloatAlt_Execute = g_commandInterface->GetByOpcode(kSetUIFloatAlt)->execute;
+		g_commandInterface->GetByOpcode(kSetUIFloat)->execute = SetUIFloat_Execute;
+
+		SetUIStringAlt_Execute = g_commandInterface->GetByOpcode(kSetUIStringAlt)->execute;
+		g_commandInterface->GetByOpcode(kSetUIString)->execute = SetUIString_Execute;
+		g_commandInterface->GetByOpcode(kSetUIStringEx)->execute = SetUIStringEx_Execute;
+		SetUIStringParams = g_commandInterface->GetByOpcode(kSetUIStringEx)->numParams;
+	}
+}
+
+
+void WriteMCMHooks()
+{
+	Cmd::WriteHooks();
 }
