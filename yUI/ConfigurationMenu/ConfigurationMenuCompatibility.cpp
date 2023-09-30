@@ -170,10 +170,8 @@ public:
 
 	}
 
-	Float64 GetInternal(UInt32 child, UInt32 grandchild, std::string string)
+	Float64 GetInternal(UInt32 child, UInt32 grandchild, const std::string& src)
 	{
-		const auto& src = ToLower(std::move(string));
-
 		UpdateInternal();
 
 		if (child == 0 && grandchild == 0)
@@ -190,10 +188,8 @@ public:
 	}
 
 
-	void SetInternal(UInt32 child, UInt32 grandchild, std::string string, Float64 val)
+	void SetInternal(UInt32 child, UInt32 grandchild, const std::string& src, Float64 val)
 	{
-		const auto& src = ToLower(std::move(string));
-
 		if (child == 0 && grandchild == 0)
 		{
 			if (src == "_activemod")		activeMod = val;
@@ -247,10 +243,8 @@ public:
 		UpdateInternal();
 	}
 	
-	void SetInternalString(UInt32 child, UInt32 grandchild, std::string string, std::string val)
+	void SetInternalString(UInt32 child, UInt32 grandchild, const std::string& src, std::string val)
 	{
-		const auto& src = ToLower(std::move(string));
-
 		if (child == 1 && grandchild >= 1)
 		{
 			activeSetting = grandchild;
@@ -470,6 +464,8 @@ void ModConfigurationMenu::ReadMCM()
 
 BGSListForm* modList;
 
+//BGSListForm modListNew{};
+
 bool doonce = false;
 void MainLoop()
 {
@@ -601,9 +597,9 @@ namespace Cmd
 		char src[0x200] = "\0";
 		if (!ExtractArgsEx(EXTRACT_ARGS_EX, &src)) return true;
 
-		if (std::strncmp(src, "StartMenu/MCM/", 14)) return GetUIFloatAlt_Execute(PASS_COMMAND_ARGS);
+		std::string string = ToLower(src);
 
-		auto string = std::string(src);
+		if (std::strncmp(string.c_str(), "startmenu/mcm/", 14)) return GetUIFloatAlt_Execute(PASS_COMMAND_ARGS);
 
 		string = string.substr(14, string.size());
 
@@ -643,10 +639,10 @@ namespace Cmd
 		float value = 0;
 		if (!ExtractArgsEx(EXTRACT_ARGS_EX, &src, &value)) return true;
 		
-		if (std::strncmp(src, "StartMenu/MCM/", 14)) return SetUIFloatAlt_Execute(PASS_COMMAND_ARGS);
+		std::string string = ToLower(src);
 
-		auto string = std::string(src);
-
+		if (std::strncmp(string.c_str(), "startmenu/mcm/", 14)) return SetUIFloatAlt_Execute(PASS_COMMAND_ARGS);
+		
 		string = string.substr(14, string.size());
 
 		UInt32 child = 0;
@@ -684,9 +680,9 @@ namespace Cmd
 		char buffer[0x200] = "\0";
 		if (!ExtractArgsEx(EXTRACT_ARGS_EX, &src, &buffer)) return true;
 
-		if (std::strncmp(src, "StartMenu/MCM/", 14)) return SetUIStringAlt_Execute(PASS_COMMAND_ARGS);
+		std::string string = ToLower(src);
 
-		auto string = std::string(src);
+		if (std::strncmp(string.c_str(), "startmenu/mcm/", 14))  return SetUIStringAlt_Execute(PASS_COMMAND_ARGS);
 
 		string = string.substr(14, string.size());
 
@@ -726,9 +722,9 @@ namespace Cmd
 		char buffer[0x200];
 		if (!ExtractFormatStringArgs(1, buffer, EXTRACT_ARGS_EX, SetUIStringParams, &src)) return true;
 
-		if (std::strncmp(src, "StartMenu/MCM/", 14)) return SetUIStringAlt_Execute(PASS_COMMAND_ARGS);
+		std::string string = ToLower(src);
 
-		auto string = std::string(src);
+		if (std::strncmp(string.c_str(), "startmenu/mcm/", 14)) return SetUIStringAlt_Execute(PASS_COMMAND_ARGS);
 
 		string = string.substr(14, string.size());
 
