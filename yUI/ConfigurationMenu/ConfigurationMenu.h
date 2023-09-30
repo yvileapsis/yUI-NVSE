@@ -141,6 +141,18 @@ public:
 		if (IsInteger() && right.IsInteger()) return GetAsInteger() - right.GetAsInteger();
 		return GetAsFloat() - right.GetAsFloat();
 	}
+
+	bool operator<(const CMValue& right) const
+	{
+		if (IsInteger() && right.IsInteger()) return GetAsInteger() < right.GetAsInteger();
+		return GetAsFloat() < right.GetAsFloat();
+	}
+
+	bool operator>(const CMValue& right) const
+	{
+		if (IsInteger() && right.IsInteger()) return GetAsInteger() > right.GetAsInteger();
+		return GetAsFloat() > right.GetAsFloat();
+	}
 };
 
 class CMObject

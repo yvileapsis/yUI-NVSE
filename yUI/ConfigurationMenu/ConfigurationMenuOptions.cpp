@@ -50,7 +50,7 @@ CMSettingChoice* CMSettingChoice::Display(Tile* tile)
 CMSettingSlider* CMSettingSlider::Display(Tile* tile)
 {
 	const auto value = setting.Read();
-	const Float64 percent = (Float64) value / (Float64) max;
+	const Float64 percent = (Float64) (value - min) / (Float64) (max - min);
 	tile->Set(kTileValue_user0, 20 * percent);
 	tile->Set(kTileValue_user3, 20);
 
@@ -211,8 +211,10 @@ CMSettingSlider* CMSettingSlider::Drag(Float32 value)
 
 	CMValue newValue;
 
-	if (delta.IsFloat()) newValue.Set((Float64) min + static_cast<CMValue>(forceTruncating * delta.GetAsFloat()));
-	else newValue.Set((SInt64) min + static_cast<CMValue>(forceTruncating * delta.GetAsInteger()));
+	if (delta.IsFloat()) 
+		newValue.Set((Float64) min + forceTruncating * delta.GetAsFloat());
+	else 
+		newValue.Set((SInt64) min + forceTruncating * delta.GetAsInteger());
 
 	setting.Write(newValue);
 
