@@ -548,7 +548,7 @@ namespace Cmd
 		SInt64 child = 0;
 		SInt64 grandchild = 0;
 		if (!ExtractArgsEx(EXTRACT_ARGS_EX, &child, &grandchild, &src)) return true;
-		*result = MCMWrapper::GetSingleton().GetInternal(child, grandchild, src);
+		*result = MCMWrapper::GetSingleton().GetInternal(child, grandchild, ToLower(src));
 		return true;
 	}
 
@@ -560,7 +560,7 @@ namespace Cmd
 		SInt64 grandchild = 0;
 		Float32 value = 0;
 		if (!ExtractArgsEx(EXTRACT_ARGS_EX, &child, &grandchild, &src, &value)) return true;
-		MCMWrapper::GetSingleton().SetInternal(child, grandchild, src, value);
+		MCMWrapper::GetSingleton().SetInternal(child, grandchild, ToLower(src), value);
 		return true;
 	}
 
@@ -583,7 +583,7 @@ namespace Cmd
 		SInt64 grandchild = 0;
 		char buffer[0x200];
 		if (!ExtractFormatStringArgs(3, buffer, EXTRACT_ARGS_EX, SetyCMStringParams, &child, &grandchild, &src)) return true;
-		MCMWrapper::GetSingleton().SetInternalString(child, grandchild, src, buffer);
+		MCMWrapper::GetSingleton().SetInternalString(child, grandchild, ToLower(src), buffer);
 		return true;
 	}
 
