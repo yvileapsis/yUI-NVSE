@@ -41,7 +41,12 @@ struct std::formatter<Derived> {									\
 std::ostream &operator<<(std::ostream &os, const Tile& obj) { os << "Path: " << obj.GetFullPath(); return os; }
 std::ostream &operator<<(std::ostream &os, const Menu& obj) 
 {
-	os << std::format("MenuMode: {:d}, visible: {:b}, visibilityState: 0x{:X}", obj.id, obj.IsVisible(), obj.visibilityState);
+	os << std::format("MenuMode: {:d}", obj.id);
+	os << std::format(", visible: {:b}", obj.IsVisible());
+	os << std::format(", visibilityState : 0x{:X}", obj.visibilityState);
+	std::stringstream ss;
+	ss << ", TileMenu: " << (const Tile&) *obj.tile;
+	os << ss.str();
 	return os; 
 }
 std::ostream &operator<<(std::ostream &os, const StartMenu::Option& obj) { os << obj.displayString; return os; }
@@ -56,13 +61,32 @@ std::ostream &operator<<(std::ostream &os, const Setting& obj)
 	return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const TESForm& obj) { os << std::format("{:08X} ({})", obj.refID, obj.GetName()); return os; }
-std::ostream& operator<<(std::ostream& os, const TESObjectREFR& obj) { os << (const TESForm&)obj << ", Baseform " << obj.TryGetREFRParent(); return os; }
+std::ostream& operator<<(std::ostream& os, const TESForm& obj) 
+{ 
+	os << std::format("{:08X}", obj.refID);
+	os << std::format(" ({})", obj.GetName());
+	return os; 
+}
+std::ostream& operator<<(std::ostream& os, const TESObjectREFR& obj)
+{
+	os << (const TESForm&)obj;
+	std::stringstream ss;
+	ss << ", Baseform " << obj.TryGetREFRParent();
+	os << ss.str();
+	return os;
+}
 
 std::ostream& operator<<(std::ostream& os, const ActorMover& obj) { if (obj.actor) os << (const TESObjectREFR&)obj.actor; return os; }
 std::ostream& operator<<(std::ostream& os, const QueuedReference& obj) { if (obj.refr) os << (const TESObjectREFR&)obj.refr; return os; }
 
-std::ostream& operator<<(std::ostream& os, const NavMesh& obj) { os << (const TESForm&)obj << ", Cell " << (const TESForm&)obj.parentCell; return os; }
+std::ostream& operator<<(std::ostream& os, const NavMesh& obj)
+{
+	os << (const TESForm&)obj;
+	std::stringstream ss;
+	ss << ", Cell " << (const TESForm&)obj.parentCell;
+	os << ss.str();
+	return os;
+}
 
 std::ostream& operator<<(std::ostream& os, const BaseProcess& obj)
 {
@@ -142,7 +166,11 @@ std::ostream& operator<<(std::ostream& os, const ScriptEffect& obj)
 {
 	os << (const ActiveEffect&)obj << " ";
 	if (obj.script)
-		os << "Script: " << (const Script* &)obj.script;
+	{
+		std::stringstream ss;
+		ss << "Script: " << (const Script* &)obj.script;
+		os << ss.str();
+	}
 	return os; 
 }
 

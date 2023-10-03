@@ -164,7 +164,7 @@ namespace CrashLogger::PDBHandling
 		
 		const auto moduleBase = GetModuleBase(eip, process);
 
-		std::string begin = std::format("0x{:08X} (0x{:08X}) ==> ", eip, (moduleBase != 0x00400000) ? eip - moduleBase + 0x10000000 : eip);
+		std::string begin = std::format("0x{:08X} ==> ", (moduleBase != 0x00400000) ? eip - moduleBase + 0x10000000 : eip);
 
 		std::string middle;
 
@@ -207,15 +207,34 @@ namespace CrashLogger::PDBHandling
 
 namespace CrashLogger::VirtualTables
 {
-	typedef std::string (*FormattingHandler)(void* ptr);
+	typedef void (*FormattingHandler)(void* ptr, std::string& buffer);
 	
-	std::string AsUInt32(void* ptr) { return std::format("{:#08X}", **static_cast<UInt32**>(ptr)); }
+	void AsUInt32(void* ptr, std::string& buffer) { buffer += std::format("{:#08X}", **static_cast<UInt32**>(ptr)); }
 
-	template<typename T> std::string As(void* ptr)
+	template<typename T> std::ostream& AsInternal(std::ostream& os, void* ptr)
 	{
 		if (auto sanitized = Dereference<T>((UInt32)ptr))
-			return std::format("{}", *sanitized);
-		return "";
+			os << *sanitized;
+		return os;
+	}
+
+	template<typename T> std::ostream& AsSEH(std::ostream& os, void* ptr)
+	{
+		__try {
+			AsInternal<T>(os, ptr);
+		}
+		__except (1) {
+			if (os.rdbuf()->in_avail()) os << ", ";
+			os << "failed to format";
+		}
+		return os;
+	}
+
+	template<typename T> void As(void* ptr, std::string& buffer)
+	{
+		std::stringstream ss;
+		AsSEH<T>(ss, ptr);
+		if (!ss.str().empty()) buffer += ": " + ss.str();
 	}
 
 	FormattingHandler lastHandler = nullptr;
@@ -258,16 +277,16 @@ namespace CrashLogger::VirtualTables
 			return "";
 		}
 
-		std::string Get(void* ptr) const
+		void Get(void* ptr, std::string& buffer) const
 		{
+			buffer.clear();
+			buffer += GetLabelName();
+
 			std::string name1 = name.empty() && type == kType_RTTIClass ? GetTypeName(ptr) : name;
 			if (name1.empty() && type != kType_None) name1 = std::format("0x{:08X}", *Dereference<UInt32>((UInt32)ptr));
+			buffer += name1;
 
-			std::string details;
-			if (function) details = function(ptr);
-			if (!details.empty()) details = ": " + details;
-		
-			return GetLabelName() + name1 + details;
+			if (function) function(ptr, buffer);
 		}
 	};
 
@@ -2294,17 +2313,34 @@ namespace CrashLogger::VirtualTables
 	}
 
 
-	std::string GetStringForLabel(void* ptr, UInt32 vtbl)
+	void GetStringForLabelInternal(void* ptr, UInt32 vtbl, std::string& buffer)
 	{
 		for (const auto& iter : setOfLabels)
-			if (iter->Satisfies(ptr)) return iter->Get(ptr);
+			if (iter->Satisfies(ptr)) { iter->Get(ptr, buffer); return; }
 
 		if (vtbl > 0xFE0000 && vtbl < 0x1200000)
-			return std::format("-\\_(Ö)_/-: 0x{:08X}", vtbl);
+			buffer = std::format("-\\_(Ö)_/-: 0x{:08X}", vtbl);
 
 //		if (std::string one = PDBHandling::GetSymbolForAddress((UInt32)ptr, GetCurrentProcess()); !one.empty()) return "Function:" + one;
+	}
 
-		return "";
+	void GetStringForLabelSEH(void* ptr, UInt32 vtbl, std::string& buffer)
+	{
+		__try
+		{
+			GetStringForLabelInternal(ptr, vtbl, buffer);
+		}
+		__except (1)
+		{
+			buffer += ", failed to format";
+		}
+	}
+
+	std::string GetStringForLabel(void* ptr, UInt32 vtbl)
+	{
+		std::string buffer;
+		GetStringForLabelInternal(ptr, vtbl, buffer);
+		return buffer;
 	}
 
 	std::string Get(UInt32 ptr, UInt32 depth = 5)
@@ -2402,18 +2438,31 @@ namespace CrashLogger::Registry
 
 namespace CrashLogger::Stack
 {
+	UInt32 GetESPi(UInt32* esp, UInt32 i)
+	{
+		__try
+		{
+			return esp[i];
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER)
+		{
+			return 0;
+		}
+	}
+
 	void Get(EXCEPTION_POINTERS* info)
 	{
 		Log() << "Stack:" << std::endl << " # |    VALUE   | DEREFERENCE INFO";
 
 		const auto esp = reinterpret_cast<UInt32*>(info->ContextRecord->Esp);
 
-		for (unsigned int i = 0; i < 0xFF; i++)
+		for (unsigned int i = 0; i < 0x100; i++) {
+			const auto espi = GetESPi(esp, i);
 			if (i <= 8)
-				Log() << std::format("{:2X} | 0x{:08X} | {}", i, esp[i], VirtualTables::Get(esp[i]));
-			else if (std::string result = VirtualTables::Get(esp[i]); !result.empty())
-				Log() << std::format("{:2X} | 0x{:08X} | {}", i, esp[i], result);
-
+				Log() << std::format("{:2X} | 0x{:08X} | {}", i, espi, VirtualTables::Get(espi));
+			else if (std::string result = VirtualTables::Get(espi); !result.empty())
+				Log() << std::format("{:2X} | 0x{:08X} | {}", i, espi, result);
+		}
 		Log();
 	}
 }
@@ -2522,11 +2571,11 @@ namespace CrashLogger
 
 		Calltrace::Get(info);
 
-		ModuleBases::Get(info);
-
 		Registry::Get(info);
 
 		Stack::Get(info);
+
+		ModuleBases::Get(info);
 
 		Logger::Copy();
 
