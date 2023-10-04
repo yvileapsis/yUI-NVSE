@@ -1,5 +1,5 @@
 #define CrashLogger_VERSION 4.3
-#define CrashLogger_VERSION_STR "4.3 beta 2"
+#define CrashLogger_VERSION_STR "4.3"
 #define CrashLogger_STR "CrashLogger"
 #define CrashLogger_LOG "CrashLogger.log"
 #define CrashLogger_FLD "Crash Logs"
