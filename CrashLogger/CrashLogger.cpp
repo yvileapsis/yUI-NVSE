@@ -2516,6 +2516,9 @@ namespace CrashLogger::ModuleBases
 		{"ShowOffNVSE", "ShowOffNVSE Plugin"},
 		{"supNVSE", "SUP NVSE Plugin"},
 		{"ui_organizer", "UI Organizer Plugin"},
+		{"EngineOptimizations", "Engine Optimizations"},
+		{"DynamicReflections", "Dynamic Reflections"},
+		{"Alpha Fixes", "Fallout Alpha Rendering Tweaks"}
 	};
 
 	std::string GetPluginNameForFileName(std::string name)
@@ -2535,19 +2538,6 @@ namespace CrashLogger::ModuleBases
 
 		Safe_EnumerateLoadedModules(process, EumerateModulesCallback, &infoUser);
 	
-		if (infoUser.moduleBase)
-			Log() << std::format("GAME CRASHED AT INSTRUCTION Base+0x{:08X} IN MODULE: {}", (infoUser.eip - infoUser.moduleBase), infoUser.name) << std::endl
-				<< "Please note that this does not automatically mean that that module is responsible. It may have been supplied bad data or" << std::endl
-				<< "program state as the result of an issue in the base game or a different DLL.";
-		else
-			Log() << "UNABLE TO IDENTIFY MODULE CONTAINING THE CRASH ADDRESS." << std::endl
-				<< "This can occur if the crashing instruction is located in the vanilla address space, but it can also occur if there are too many" << std::endl
-				<< "DLLs for us to list, and if the crash occurred in one of their address spaces. Please note that even if the crash occurred" << std::endl
-				<< "in vanilla code, that does not necessarily mean that it is a vanilla problem. The vanilla code may have been supplied bad data" << std::endl
-				<< "or program state as the result of an issue in a loaded DLL.";
-
-		Log();
-
 		Log() << "Module bases:";
 		for (const auto& [moduleBase, moduleEnd, path] : enumeratedModules)
 		{
@@ -2559,6 +2549,19 @@ namespace CrashLogger::ModuleBases
 			Log() << std::format("0x{:08X} - 0x{:08X} ==> {:25s}{:>30s}{}", moduleBase, moduleEnd, path.stem().generic_string() + ",", version, path.generic_string());
 
 		}
+
+		Log();
+
+		if (infoUser.moduleBase)
+			Log() << std::format("GAME CRASHED AT INSTRUCTION Base+0x{:08X} IN MODULE: {}", (infoUser.eip - infoUser.moduleBase), infoUser.name) << std::endl
+			<< "Please note that this does not automatically mean that that module is responsible. It may have been supplied bad data or" << std::endl
+			<< "program state as the result of an issue in the base game or a different DLL.";
+		else
+			Log() << "UNABLE TO IDENTIFY MODULE CONTAINING THE CRASH ADDRESS." << std::endl
+			<< "This can occur if the crashing instruction is located in the vanilla address space, but it can also occur if there are too many" << std::endl
+			<< "DLLs for us to list, and if the crash occurred in one of their address spaces. Please note that even if the crash occurred" << std::endl
+			<< "in vanilla code, that does not necessarily mean that it is a vanilla problem. The vanilla code may have been supplied bad data" << std::endl
+			<< "or program state as the result of an issue in a loaded DLL.";
 
 		Log();
 	}
