@@ -129,14 +129,14 @@ namespace CrashLogger::PDBHandling
 
 	std::string GetSymbol(UInt32 eip, HANDLE process)
 	{
-		char symbolBuffer[sizeof(IMAGEHLP_SYMBOL) + 255];
-		const auto symbol = (IMAGEHLP_SYMBOL*)symbolBuffer;
+		char symbolBuffer[sizeof(SYMBOL_INFO) + 255];
+		const auto symbol = (SYMBOL_INFO*)symbolBuffer;
 
-		symbol->SizeOfStruct = sizeof(IMAGEHLP_SYMBOL);
-		symbol->MaxNameLength = 254;
-		DWORD offset = 0;
+		symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
+		symbol->MaxNameLen = 254;
+		DWORD64 offset = 0;
 
-		if (!Safe_SymGetSymFromAddr(process, eip, &offset, symbol)) return "";
+		if (!Safe_SymFromAddr(process, eip, &offset, symbol)) return "";
 		
 		const std::string functioName = symbol->Name;
 
@@ -203,6 +203,26 @@ namespace CrashLogger::PDBHandling
 
 		return std::format("{:>20} : {:<40}{}", module, symbol, end);
 	}
+
+	std::string& GetClassNameGetSymbol(void* object, std::string& buffer)
+	{
+		buffer = GetSymbol(*((UInt32*)object), GetCurrentProcess());
+		return buffer;
+	}
+
+	std::string& GetClassNameSEH(void* object, std::string& buffer)
+	{
+		__try { GetClassNameGetSymbol(object, buffer); }
+		__except (1) {}
+		return buffer;
+	}
+
+	std::string GetClassNameA(void* object) 
+	{
+		std::string name;
+		GetClassNameSEH(object, name);
+		return name.substr(0, name.find("::`vftable'"));
+	}
 }
 
 namespace CrashLogger::VirtualTables
@@ -243,7 +263,7 @@ namespace CrashLogger::VirtualTables
 	public:
 		enum Type : UInt8 {
 			kType_None = 0,
-			kType_RTTIClass = 1,
+			kType_Class = 1,
 			kType_Global = 2,
 		};
 
@@ -254,7 +274,7 @@ namespace CrashLogger::VirtualTables
 		VirtualTables::FormattingHandler function;
 		std::string name;
 
-		Label(UInt32 address, VirtualTables::FormattingHandler function = lastHandler, std::string name = "", Type type = kType_RTTIClass, UInt32 size = 4)
+		Label(UInt32 address, VirtualTables::FormattingHandler function = lastHandler, std::string name = "", Type type = kType_Class, UInt32 size = 4)
 			: type(type), address(address), size(size), function(function), name(std::move(name))
 		{
 			lastHandler = function;
@@ -267,22 +287,21 @@ namespace CrashLogger::VirtualTables
 
 		static std::string GetTypeName(void* ptr)
 		{
-			return GetObjectClassName(ptr);
+			return CrashLogger::PDBHandling::GetClassName(ptr);
 		}
 
 		[[nodiscard]] std::string GetLabelName() const
 		{
-			if (type == kType_RTTIClass) return "RTTI: ";
+			if (type == kType_Class) return "Class: ";
 			if (type == kType_Global) return "Global: ";
 			return "";
 		}
 
 		void Get(void* ptr, std::string& buffer) const
 		{
-			buffer.clear();
 			buffer += GetLabelName();
 
-			std::string name1 = name.empty() && type == kType_RTTIClass ? GetTypeName(ptr) : name;
+			std::string name1 = name.empty() && type == kType_Class ? GetTypeName(ptr) : name;
 			if (name1.empty() && type != kType_None) name1 = std::format("0x{:08X}", *Dereference<UInt32>((UInt32)ptr));
 			buffer += name1;
 
@@ -298,56 +317,12 @@ namespace CrashLogger::VirtualTables
 
 	void FillNVSELabels()
 	{
-		Push(0x10F1EE0, nullptr, "TypeInfo", Label::kType_RTTIClass);
+		Push(0x10F1EE0, nullptr, "TypeInfo", Label::kType_Class);
 
 		Push(0x11F3374, VirtualTables::AsUInt32, "TileValueIndirectTemp", Label::kType_Global);
 		Push(0x118FB0C, nullptr, "ShowWhoDetects", Label::kType_Global);
 		Push(0x1042C58, nullptr, "ShowWhoDetects", Label::kType_Global);
 		Push(0x011F6238, nullptr, "HeapManager", Label::kType_Global);
-
-		Push(0x11846D4, nullptr, "Actor", Label::kType_RTTIClass, 0x8);
-		Push(0x1184920, nullptr, "MovingObject", Label::kType_RTTIClass, 0x8);
-		Push(0x11840C4, nullptr, "TESAmmo", Label::kType_RTTIClass, 0x8);
-		
-
-		Push(0x1094D9C, nullptr, "Tile::MenuStringMap");
-		Push(0x10472CC, nullptr, "BSSimpleArray<const char*>", Label::kType_RTTIClass,0x8);
-		Push(0x106EDEC, nullptr, "BSSimpleArray<Tile::Value*>");
-		Push(0x106CC64, nullptr, "BSSimpleArray<Float32>", Label::kType_RTTIClass, 0x8);
-		Push(0x10C1740, nullptr, "BSTaskManagerThread<SInt64>");
-		Push(0x1094E7C, nullptr, "NiTPointerMap<Tile::Value*; Tile::Reaction*>");
-
-		Push(0x01082F04, nullptr, "BSTCommonScrapHeapMessageQueue<BSPackedTask>");
-
-		Push(0x104A284, nullptr, "TESNPC::TESActorBase");
-		Push(0x104A270, nullptr, "TESNPC::Container");
-		Push(0x104A25C, nullptr, "TESNPC::TouchSpell");
-		Push(0x104A23C, nullptr, "TESNPC::SpellList");
-		Push(0x104A21C, nullptr, "TESNPC::AI");
-		Push(0x104A204, nullptr, "TESNPC::Health");
-		Push(0x104A1F0, nullptr, "TESNPC::Attributes");
-		Push(0x104A1DC, nullptr, "TESNPC::Animation");
-		Push(0x104A1C8, nullptr, "TESNPC::FullName");
-		Push(0x104A1A4, nullptr, "TESNPC::Model");
-		Push(0x104A190, nullptr, "TESNPC::Scriptable");
-		Push(0x104A160, nullptr, "TESNPC::AVOwner");
-		Push(0x104A14C, nullptr, "TESNPC::Destructible");
-		Push(0x104A138, nullptr, "TESNPC::Race");
-
-		Push(0x101191C, nullptr, "AlchemyItem::MagicItem");
-		Push(0x1011900, nullptr, "AlchemyItem::MagicItem::TList");
-		Push(0x10118DC, nullptr, "AlchemyItem::Model");
-		Push(0x10118BC, nullptr, "AlchemyItem::Icon");
-		Push(0x10118A8, nullptr, "AlchemyItem::MessageIcon");
-		Push(0x1011894, nullptr, "AlchemyItem::Scriptable");
-		Push(0x1011880, nullptr, "AlchemyItem::Weight");
-		Push(0x101186C, nullptr, "AlchemyItem::EquipType");
-		Push(0x1011858, nullptr, "AlchemyItem::Destructible");
-		Push(0x1011844, nullptr, "AlchemyItem::PickUpPutDownSounds");
-
-		Push(0x108C0D0, nullptr, "NiTPrimitiveArray<MobileObject*>");
-		Push(0x10C1760, nullptr, "LockFreeQueue<NiPointer<IOTask>>");
-		Push(0x101747C, nullptr, "LockFreeMap<TESObjectREFR*, NiPointer<QueuedReference>>");
 
 		Push(0x1000000, nullptr, "", Label::kType_None); // integer that is often encountered
 		Push(0x11C0000, nullptr, "", Label::kType_None);
@@ -2315,11 +2290,22 @@ namespace CrashLogger::VirtualTables
 
 	void GetStringForLabelInternal(void* ptr, UInt32 vtbl, std::string& buffer)
 	{
-		for (const auto& iter : setOfLabels)
-			if (iter->Satisfies(ptr)) { iter->Get(ptr, buffer); return; }
+		for (const auto& iter : setOfLabels) if (iter->Satisfies(ptr)) 
+		{ 
+			buffer += std::format("0x{:08X} | ", vtbl);
+			iter->Get(ptr, buffer); 
+			return; 
+		}
 
-		if (vtbl > 0xFE0000 && vtbl < 0x1200000)
-			buffer = std::format("-\\_(Ö)_/-: 0x{:08X}", vtbl);
+//		if (vtbl > 0xD9B000) // fo3
+		if (vtbl > 0xFDF000  && vtbl < 0x1200000) // fonv
+		{
+			if (const auto& name = PDBHandling::GetClassNameA((void*)ptr); !name.empty())
+			{
+				buffer += std::format("0x{:08X} | RTTI: ", vtbl);
+				buffer += name;
+			}
+		}
 
 //		if (std::string one = PDBHandling::GetSymbolForAddress((UInt32)ptr, GetCurrentProcess()); !one.empty()) return "Function:" + one;
 	}
@@ -2543,7 +2529,7 @@ namespace CrashLogger::ModuleBases
 		{
 			std::string version;
 
-			if (const auto info = g_commandInterface->GetPluginInfoByName(GetPluginNameForFileName(path.stem().generic_string()).c_str()))
+			if (g_commandInterface) if (const auto info = g_commandInterface->GetPluginInfoByName(GetPluginNameForFileName(path.stem().generic_string()).c_str()))
 				version = std::format("NVSE plugin version: {:>4d}, ", info->version);
 
 			Log() << std::format("0x{:08X} - 0x{:08X} ==> {:25s}{:>30s}{}", moduleBase, moduleEnd, path.stem().generic_string() + ",", version, path.generic_string());

@@ -24,3 +24,4 @@ BOOL __stdcall  Safe_EnumerateLoadedModules(_In_ HANDLE hProcess, _In_ PENUMLOAD
 BOOL __stdcall Safe_SymGetModuleInfo(_In_ HANDLE hProcess, _In_ DWORD dwAddr, _Out_ PIMAGEHLP_MODULE ModuleInfo);
 BOOL __stdcall Safe_SymGetSymFromAddr(_In_ HANDLE hProcess, _In_ DWORD dwAddr, _Out_opt_ PDWORD pdwDisplacement, _Inout_ PIMAGEHLP_SYMBOL Symbol);
 PVOID __stdcall Safe_SymFunctionTableAccess(_In_ HANDLE hProcess, _In_ DWORD AddrBase);
+DWORD __stdcall Safe_UnDecorateSymbolName(_In_ PCSTR name, _Out_writes_(maxStringLength) PSTR outputString, _In_ DWORD maxStringLength, _In_ DWORD flags);

@@ -25,25 +25,25 @@ void FillPluginInfo(PluginInfo* info)
 void InitLog(std::filesystem::path path = "")
 {
 	std::filesystem::path logPath = GetCurPath();
-	logPath /= path;
+	if (!path.empty()) logPath /= path;
 	logPath /= CrashLogger_LOG;
 
 	std::filesystem::path logFolderPath = GetCurPath();
-	logFolderPath /= path;
+	if (!path.empty()) logFolderPath /= path;
 	logFolderPath /= CrashLogger_FLD;
 	logFolderPath /= CrashLogger_LOG;
 
 	Logger::AddDestinations(logPath, CrashLogger_STR, LogLevel::File);
 	Logger::PrepareCopy(logPath, logFolderPath);
 
-	Log(LogLevel::Console) << CrashLogger_VERSION_STR;
+//	Log(LogLevel::Console) << CrashLogger_VERSION_STR;
 
 	Log(LogLevel::Warning) << GetName() + " version " + CrashLogger_VERSION_STR + " at " + std::format("{0:%F} {0:%T}", std::chrono::time_point(std::chrono::system_clock::now())) << std::endl 
 		<< "If this file is empty, then your game didn't crash or something went so wrong even crash logger was useless! :snig:" << std::endl
 		<< "Topmost stack module is NOT ALWAYS the crash reason! Exercise caution when speculating!" << std::endl;
 }
 
-void MessageHandler(NVSEMessagingInterface::Message* msg)
+void NVSEMessageHandler(NVSEMessagingInterface::Message* msg)
 {
 	if (msg->type == NVSEMessagingInterface::kMessage_DeferredInit)
 	{
@@ -101,7 +101,7 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	g_pluginHandle = nvse->GetPluginHandle();
 	g_nvseInterface = const_cast<NVSEInterface*>(nvse);
 	g_messagingInterface = static_cast<NVSEMessagingInterface*>(nvse->QueryInterface(kInterface_Messaging));
-	g_messagingInterface->RegisterListener(g_pluginHandle, "NVSE", MessageHandler);
+	g_messagingInterface->RegisterListener(g_pluginHandle, "NVSE", NVSEMessageHandler);
 
 	Inits();
 
@@ -168,15 +168,29 @@ bool FOSEPlugin_Query(const OBSEInterface* obse, PluginInfo* info)
 	return true;
 }
 
-bool FOSEPlugin_Load(const OBSEInterface* obse)
+void FOSEMessageHandler(FOSEMessagingInterface::Message* msg)
 {
-	g_pluginHandle = obse->GetPluginHandle();
+	if (msg->type == FOSEMessagingInterface::kMessage_PostLoad)
+	{
+		Logger::Play();
+
+		for (const auto& i : deferredInit) i(); // call all deferred init functions
+	}
+}
+
+
+bool FOSEPlugin_Load(const FOSEInterface* fose)
+{
+	g_pluginHandle = fose->GetPluginHandle();
+	const auto messagingInterface = static_cast<FOSEMessagingInterface*>(fose->QueryInterface(4));
+	messagingInterface->RegisterListener(g_pluginHandle, "FOSE", FOSEMessageHandler);
 
 	Inits();
 
-	if (obse->isEditor) return true;
+	if (fose->isEditor) return true;
 
 	InitLog();
+
 	for (const auto& i : pluginLoad) i(); // call all plugin load functions
 
 	return true;
@@ -205,14 +219,17 @@ bool OBSEPlugin_Query(const OBSEInterface* obse, PluginInfo* info)
 	return true;
 }
 
-bool OBSEPlugin_Load(const OBSEInterface* obse) {
+bool OBSEPlugin_Load(const OBSEInterface* obse) 
+{
 	g_pluginHandle = obse->GetPluginHandle();
-
+	g_messagingInterface = static_cast<NVSEMessagingInterface*>(obse->QueryInterface(kInterface_Messaging));
+	g_messagingInterface->RegisterListener(g_pluginHandle, "OBSE", NVSEMessageHandler);
 	Inits();
 
 	if (obse->isEditor) return true;
 
 	InitLog();
+
 	for (const auto& i : pluginLoad) i(); // call all plugin load functions
 
 	return true;

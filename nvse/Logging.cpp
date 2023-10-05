@@ -119,7 +119,8 @@ namespace Logger
 		LoggerManager::GetSingleton().addDestination("console", [prefix](const std::string& msg, LogLevel level)
 			{
 				if ((level & LogLevel::Console))
-					ConsoleManager::GetSingleton() << prefix + ": " + msg;
+					if (const auto console = ConsoleManager::GetSingleton())
+						console << prefix + ": " + msg;
 			});
 	}
 
