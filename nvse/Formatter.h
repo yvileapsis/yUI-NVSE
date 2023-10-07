@@ -45,7 +45,7 @@ std::ostream &operator<<(std::ostream &os, const Menu& obj)
 	os << std::format(", visible: {:b}", obj.IsVisible());
 	os << std::format(", visibilityState : 0x{:X}", obj.visibilityState);
 	std::stringstream ss;
-	ss << ", TileMenu: " << (const Tile&) *obj.tile;
+	ss << ", TileMenu: " << (const Tile&) obj.tile;
 	os << ss.str();
 	return os; 
 }
@@ -91,7 +91,8 @@ std::ostream& operator<<(std::ostream& os, const NavMesh& obj)
 std::ostream& operator<<(std::ostream& os, const BaseProcess& obj)
 {
 	for (const auto iter : *TESForm::GetAll())
-		if ((iter->typeID == kFormType_Creature || iter->typeID == kFormType_Character) && static_cast<Character*>(iter)->baseProcess == &obj)
+		if ((iter->typeID == kFormType_Creature && static_cast<Creature*>(iter)->baseProcess == &obj) 
+			|| (iter->typeID == kFormType_Character && static_cast<Character*>(iter)->baseProcess == &obj))
 			os << (const TESObjectREFR&)iter;
 	return os;
 }
