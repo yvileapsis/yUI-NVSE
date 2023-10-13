@@ -150,6 +150,7 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\CrashLogger\nvse\p
     </ClCompile>
     <ClCompile Include="DbgHelpWrap.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PatchNameThreads.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\game\BaseFormComponent.h" />

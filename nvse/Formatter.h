@@ -115,7 +115,15 @@ std::ostream& operator<<(std::ostream& os, const AnimSequenceMultiple& obj)
 	return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const NiObjectNET& obj) { os << std::format(R"(Name: "{}")", obj.m_pcName); return os; }
+std::ostream& operator<<(std::ostream& os, const NiObjectNET& obj) 
+{
+	for (UInt32 i = 0; i < MAX_PATH; i++) if (obj.m_pcName[i] == 0)
+	{
+		os << std::format(R"(Name: "{}")", obj.m_pcName); 
+		break;
+	}
+	return os; 
+}
 
 std::ostream& operator<<(std::ostream& os, const NiNode& obj)
 {
@@ -125,21 +133,49 @@ std::ostream& operator<<(std::ostream& os, const NiNode& obj)
 	return os; 
 }
 
-std::ostream& operator<<(std::ostream& os, const BSFile& obj) { os << std::format("Path: {}", obj.m_path); return os; }
+std::ostream& operator<<(std::ostream& os, const BSFile& obj) 
+{ 
+	for (UInt32 i = 0; i < MAX_PATH; i++) if (obj.m_path[i] == 0)
+	{
+		os << std::format("Path: {}", obj.m_path);
+		break;
+	}
+	return os;
+}
 std::ostream& operator<<(std::ostream& os, const TESModel& obj) { os << std::format("Path: {}", obj.nifPath.CStr()); return os; }
 
 std::ostream& operator<<(std::ostream& os, const QueuedModel& obj) 
 {
 	if (obj.model)
-		os << "Path: " << obj.model->path << " ";
+		for (UInt32 i = 0; i < MAX_PATH; i++) if (obj.model->path[i] == 0)
+		{
+			os << "Path: " << obj.model->path << " ";
+			break;
+		}
 	if (obj.tesModel)
 		os << (TESModel&)obj.tesModel;
 	return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const TESTexture& obj) { os << std::format("Path: {}", obj.ddsPath.CStr()); return os; }
-std::ostream& operator<<(std::ostream& os, const QueuedTexture& obj) { os << std::format("Path: {}", obj.name); return os; }
-std::ostream& operator<<(std::ostream& os, const NiStream& obj) { os << std::format("Path: {}", obj.path); return os; }
+std::ostream& operator<<(std::ostream& os, const QueuedTexture& obj) 
+{
+	for (UInt32 i = 0; i < MAX_PATH; i++) if (obj.name[i] == 0)
+	{
+		os << std::format("Path: {}", obj.name); 
+		break;
+	}
+	return os; 
+}
+std::ostream& operator<<(std::ostream& os, const NiStream& obj) 
+{
+	for (UInt32 i = 0; i < MAX_PATH; i++) if (obj.path[i] == 0)
+	{
+		os << std::format("Path: {}", obj.path); 
+		break;
+	}
+	return os; 
+}
 
 std::ostream& operator<<(std::ostream& os, const ActiveEffect& obj)
 {
@@ -168,7 +204,7 @@ std::ostream& operator<<(std::ostream& os, const ScriptEffect& obj)
 	if (obj.script)
 	{
 		std::stringstream ss;
-		ss << "Script: " << (const Script* &)obj.script;
+		ss << "Script: " << (const Script&)obj.script;
 		os << ss.str();
 	}
 	return os; 
@@ -177,7 +213,11 @@ std::ostream& operator<<(std::ostream& os, const ScriptEffect& obj)
 std::ostream& operator<<(std::ostream& os, const QueuedKF& obj)
 {
 	if (obj.kf)
-		os << "Path: " << obj.kf->path;
+		for (UInt32 i = 0; i < MAX_PATH; i++) if (obj.kf->path[i] == 0)
+		{
+			os << "Path: " << obj.kf->path;
+			break;
+		}
 	return os; 
 }
 

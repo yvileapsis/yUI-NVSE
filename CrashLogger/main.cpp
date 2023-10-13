@@ -185,8 +185,6 @@ bool FOSEPlugin_Load(const FOSEInterface* fose)
 	const auto messagingInterface = static_cast<FOSEMessagingInterface*>(fose->QueryInterface(4));
 	messagingInterface->RegisterListener(g_pluginHandle, "FOSE", FOSEMessageHandler);
 
-	Inits();
-
 	if (fose->isEditor) return true;
 
 	InitLog();
@@ -224,7 +222,6 @@ bool OBSEPlugin_Load(const OBSEInterface* obse)
 	g_pluginHandle = obse->GetPluginHandle();
 	g_messagingInterface = static_cast<NVSEMessagingInterface*>(obse->QueryInterface(kInterface_Messaging));
 	g_messagingInterface->RegisterListener(g_pluginHandle, "OBSE", NVSEMessageHandler);
-	Inits();
 
 	if (obse->isEditor) return true;
 

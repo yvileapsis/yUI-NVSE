@@ -210,20 +210,85 @@ namespace CrashLogger::PDBHandling
 		return buffer;
 	}
 
-	std::string& GetClassNameSEH(void* object, std::string& buffer)
+	std::string& GetClassNameFromPDBSEH(void* object, std::string& buffer)
 	{
 		__try { GetClassNameGetSymbol(object, buffer); }
 		__except (1) {}
 		return buffer;
 	}
 
-	std::string GetClassNameA(void* object) 
+	std::string GetClassNameFromPDB(void* object) 
 	{
 		std::string name;
-		GetClassNameSEH(object, name);
+		GetClassNameFromPDBSEH(object, name);
 		return name.substr(0, name.find("::`vftable'"));
 	}
-}
+
+	struct RTTIType
+	{
+		void*	typeInfo;
+		UInt32	pad;
+		char	name[0];
+	};
+
+	struct RTTILocator
+	{
+		UInt32		sig, offset, cdOffset;
+		RTTIType	* type;
+	};
+
+	// use the RTTI information to return an object's class name
+	const char* GetObjectClassNameInternal2(void * objBase)
+	{
+		const char	* result = "";
+
+		__try
+		{
+			void		** obj = (void **)objBase;
+			RTTILocator	** vtbl = (RTTILocator **)obj[0];
+			RTTILocator	* rtti = vtbl[-1];
+			RTTIType	* type = rtti->type;
+
+			// starts with .?AV
+			if((type->name[0] == '.') && (type->name[1] == '?'))
+			{
+				// is at most MAX_PATH chars long
+				for (UInt32 i = 0; i < MAX_PATH; i++) if (type->name[i] == 0)
+				{
+					result = type->name;
+					break;
+				}
+			}
+		}
+		__except(EXCEPTION_EXECUTE_HANDLER)
+		{
+			// return the default
+		}
+
+		return result;
+	}
+
+	std::string GetClassNameFromRTTI(void* object)
+	{
+		std::string name = GetObjectClassNameInternal2(object);
+
+		// Starts with .?AV, ends with @@
+//		return name.substr(4, name.size() - 6);
+
+		char buffer[MAX_PATH];
+		Safe_UnDecorateSymbolName(name.substr(1, name.size() - 1).c_str(), buffer, MAX_PATH, UNDNAME_NO_ARGUMENTS);
+		name = buffer;
+
+		return name.substr(6, name.size() - 6);
+	}
+
+	std::string GetClassNameFromPDBOrRTTI(void* object) 
+	{
+		if (const auto str = GetClassNameFromRTTI(object); !str.empty()) return str;
+		return GetClassNameFromPDB(object);
+		//if (const auto str = GetClassNameFromPDB(object); !str.contains("0x")) return str;
+	}
+};
 
 namespace CrashLogger::VirtualTables
 {
@@ -287,7 +352,7 @@ namespace CrashLogger::VirtualTables
 
 		static std::string GetTypeName(void* ptr)
 		{
-			return CrashLogger::PDBHandling::GetClassName(ptr);
+			return CrashLogger::PDBHandling::GetClassNameFromPDBOrRTTI(ptr);
 		}
 
 		[[nodiscard]] std::string GetLabelName() const
@@ -2300,9 +2365,9 @@ namespace CrashLogger::VirtualTables
 //		if (vtbl > 0xD9B000) // fo3
 		if (vtbl > 0xFDF000  && vtbl < 0x1200000) // fonv
 		{
-			if (const auto& name = PDBHandling::GetClassNameA((void*)ptr); !name.empty())
+			if (const auto& name = PDBHandling::GetClassNameFromPDBOrRTTI((void*)ptr); !name.empty())
 			{
-				buffer += std::format("0x{:08X} | RTTI: ", vtbl);
+				buffer += std::format("0x{:08X} | Unhandled: ", vtbl);
 				buffer += name;
 			}
 		}
@@ -2366,6 +2431,18 @@ namespace CrashLogger::Calltrace
 		HANDLE thread = GetCurrentThread();
 
 		Log() << std::format("Exception {:08X} caught!\n", info->ExceptionRecord->ExceptionCode);
+		
+		wchar_t* pThreadName = NULL;
+		HRESULT hr = GetThreadDescription(thread, &pThreadName);
+		std::wstring wThreadName(pThreadName);
+		std::string threadName;
+		std::transform(wThreadName.begin(), wThreadName.end(), std::back_inserter(threadName), [] (wchar_t c) {
+			return (char)c;
+		});
+		LocalFree(pThreadName);
+
+		Log() << "Thread: " << threadName << std::endl;
+
 		Log() << "Calltrace:";
 
 		DWORD machine = IMAGE_FILE_MACHINE_I386;
