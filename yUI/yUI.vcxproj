@@ -154,7 +154,6 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClCompile Include="main.cpp" />
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="MiscFeatures\FixDroppedItems.cpp" />
-    <ClCompile Include="MiscFeatures\FixProjectileEffects.cpp" />
     <ClCompile Include="MiscFeatures\FixTablineSelected.cpp" />
     <ClCompile Include="MiscFeatures\FixTouchpadScrolling.cpp" />
     <ClCompile Include="MiscFeatures\FixReorderMCM.cpp" />

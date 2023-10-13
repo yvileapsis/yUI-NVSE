@@ -113,9 +113,6 @@
     <ClCompile Include="..\game\TESObject.cpp">
       <Filter>game</Filter>
     </ClCompile>
-    <ClCompile Include="MiscFeatures\FixProjectileEffects.cpp">
-      <Filter>features</Filter>
-    </ClCompile>
     <ClCompile Include="MiscFeatures\FixReorderMCM.cpp">
       <Filter>features</Filter>
     </ClCompile>
