@@ -41,7 +41,12 @@ struct std::formatter<Derived> {									\
 std::ostream &operator<<(std::ostream &os, const Tile& obj) { os << "Path: " << obj.GetFullPath(); return os; }
 std::ostream &operator<<(std::ostream &os, const Menu& obj) 
 {
-	os << std::format("MenuMode: {:d}, visible: {:b}, visibilityState: 0x{:X}", obj.id, obj.IsVisible(), obj.visibilityState);
+	os << std::format("MenuMode: {:d}", obj.id);
+	os << std::format(", visible: {:b}", obj.IsVisible());
+	os << std::format(", visibilityState : 0x{:X}", obj.visibilityState);
+	std::stringstream ss;
+	ss << ", TileMenu: " << (const Tile&) obj.tile;
+	os << ss.str();
 	return os; 
 }
 std::ostream &operator<<(std::ostream &os, const StartMenu::Option& obj) { os << obj.displayString; return os; }
@@ -56,18 +61,38 @@ std::ostream &operator<<(std::ostream &os, const Setting& obj)
 	return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const TESForm& obj) { os << std::format("{:08X} ({})", obj.refID, obj.GetName()); return os; }
-std::ostream& operator<<(std::ostream& os, const TESObjectREFR& obj) { os << (const TESForm&)obj << ", Baseform " << obj.TryGetREFRParent(); return os; }
+std::ostream& operator<<(std::ostream& os, const TESForm& obj) 
+{ 
+	os << std::format("{:08X}", obj.refID);
+	os << std::format(" ({})", obj.GetName());
+	return os; 
+}
+std::ostream& operator<<(std::ostream& os, const TESObjectREFR& obj)
+{
+	os << (const TESForm&)obj;
+	std::stringstream ss;
+	ss << ", Baseform " << obj.TryGetREFRParent();
+	os << ss.str();
+	return os;
+}
 
 std::ostream& operator<<(std::ostream& os, const ActorMover& obj) { if (obj.actor) os << (const TESObjectREFR&)obj.actor; return os; }
 std::ostream& operator<<(std::ostream& os, const QueuedReference& obj) { if (obj.refr) os << (const TESObjectREFR&)obj.refr; return os; }
 
-std::ostream& operator<<(std::ostream& os, const NavMesh& obj) { os << (const TESForm&)obj << ", Cell " << (const TESForm&)obj.parentCell; return os; }
+std::ostream& operator<<(std::ostream& os, const NavMesh& obj)
+{
+	os << (const TESForm&)obj;
+	std::stringstream ss;
+	ss << ", Cell " << (const TESForm&)obj.parentCell;
+	os << ss.str();
+	return os;
+}
 
 std::ostream& operator<<(std::ostream& os, const BaseProcess& obj)
 {
 	for (const auto iter : *TESForm::GetAll())
-		if ((iter->typeID == kFormType_Creature || iter->typeID == kFormType_Character) && static_cast<Character*>(iter)->baseProcess == &obj)
+		if ((iter->typeID == kFormType_Creature && static_cast<Creature*>(iter)->baseProcess == &obj) 
+			|| (iter->typeID == kFormType_Character && static_cast<Character*>(iter)->baseProcess == &obj))
 			os << (const TESObjectREFR&)iter;
 	return os;
 }
@@ -91,7 +116,15 @@ std::ostream& operator<<(std::ostream& os, const AnimSequenceMultiple& obj)
 	return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const NiObjectNET& obj) { os << std::format(R"(Name: "{}")", obj.m_pcName); return os; }
+std::ostream& operator<<(std::ostream& os, const NiObjectNET& obj) 
+{
+	for (UInt32 i = 0; i < MAX_PATH; i++) if (obj.m_pcName[i] == 0)
+	{
+		os << std::format(R"(Name: "{}")", obj.m_pcName); 
+		break;
+	}
+	return os; 
+}
 
 std::ostream& operator<<(std::ostream& os, const NiNode& obj)
 {
@@ -101,21 +134,49 @@ std::ostream& operator<<(std::ostream& os, const NiNode& obj)
 	return os; 
 }
 
-std::ostream& operator<<(std::ostream& os, const BSFile& obj) { os << std::format("Path: {}", obj.m_path); return os; }
+std::ostream& operator<<(std::ostream& os, const BSFile& obj) 
+{ 
+	for (UInt32 i = 0; i < MAX_PATH; i++) if (obj.m_path[i] == 0)
+	{
+		os << std::format("Path: {}", obj.m_path);
+		break;
+	}
+	return os;
+}
 std::ostream& operator<<(std::ostream& os, const TESModel& obj) { os << std::format("Path: {}", obj.nifPath.CStr()); return os; }
 
 std::ostream& operator<<(std::ostream& os, const QueuedModel& obj) 
 {
 	if (obj.model)
-		os << "Path: " << obj.model->path << " ";
+		for (UInt32 i = 0; i < MAX_PATH; i++) if (obj.model->path[i] == 0)
+		{
+			os << "Path: " << obj.model->path << " ";
+			break;
+		}
 	if (obj.tesModel)
 		os << (TESModel&)obj.tesModel;
 	return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const TESTexture& obj) { os << std::format("Path: {}", obj.ddsPath.CStr()); return os; }
-std::ostream& operator<<(std::ostream& os, const QueuedTexture& obj) { os << std::format("Path: {}", obj.name); return os; }
-std::ostream& operator<<(std::ostream& os, const NiStream& obj) { os << std::format("Path: {}", obj.path); return os; }
+std::ostream& operator<<(std::ostream& os, const QueuedTexture& obj) 
+{
+	for (UInt32 i = 0; i < MAX_PATH; i++) if (obj.name[i] == 0)
+	{
+		os << std::format("Path: {}", obj.name); 
+		break;
+	}
+	return os; 
+}
+std::ostream& operator<<(std::ostream& os, const NiStream& obj) 
+{
+	for (UInt32 i = 0; i < MAX_PATH; i++) if (obj.path[i] == 0)
+	{
+		os << std::format("Path: {}", obj.path); 
+		break;
+	}
+	return os; 
+}
 
 std::ostream& operator<<(std::ostream& os, const ActiveEffect& obj)
 {
@@ -142,14 +203,22 @@ std::ostream& operator<<(std::ostream& os, const ScriptEffect& obj)
 {
 	os << (const ActiveEffect&)obj << " ";
 	if (obj.script)
-		os << "Script: " << (const Script* &)obj.script;
+	{
+		std::stringstream ss;
+		ss << "Script: " << (const Script&)obj.script;
+		os << ss.str();
+	}
 	return os; 
 }
 
 std::ostream& operator<<(std::ostream& os, const QueuedKF& obj)
 {
 	if (obj.kf)
-		os << "Path: " << obj.kf->path;
+		for (UInt32 i = 0; i < MAX_PATH; i++) if (obj.kf->path[i] == 0)
+		{
+			os << "Path: " << obj.kf->path;
+			break;
+		}
 	return os; 
 }
 

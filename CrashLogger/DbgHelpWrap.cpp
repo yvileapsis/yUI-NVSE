@@ -210,3 +210,7 @@ BOOL __stdcall Safe_SymGetSymFromAddr(_In_ HANDLE hProcess, _In_ DWORD dwAddr, _
 PVOID __stdcall Safe_SymFunctionTableAccess(_In_ HANDLE hProcess, _In_ DWORD AddrBase) {
 	return DbgHelpWrapper::CallFunction<PVOID, HANDLE, DWORD>("SymFunctionTableAccess", hProcess, AddrBase);
 }
+
+DWORD __stdcall Safe_UnDecorateSymbolName(_In_ PCSTR name, _Out_writes_(maxStringLength) PSTR outputString, _In_ DWORD maxStringLength, _In_ DWORD flags) {
+	return DbgHelpWrapper::CallFunction<DWORD, PCSTR, PSTR, DWORD, DWORD>("UnDecorateSymbolName", name, outputString, maxStringLength, flags);
+}

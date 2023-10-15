@@ -17,7 +17,6 @@ INIT_MODULE(UserInterface::WeaponHweel)
 INIT_MODULE(Fix::DroppedItems)
 INIT_MODULE(Fix::TablineSelected)
 INIT_MODULE(Fix::ReorderMCM)
-INIT_MODULE(Fix::ProjectileEffects)
 INIT_MODULE(Fix::TouchpadScrolling)
 
 INIT_MODULE(Patch::RestoreFO3Spread)
@@ -45,7 +44,6 @@ void Inits()
 	Fix::DroppedItems::Init();
 	Fix::TablineSelected::Init();
 //	Fix::ReorderMCM::Init();
-//	Fix::ProjectileEffects::Init();
 	Fix::TouchpadScrolling::Init();
 
 //	Patch::RestoreFO3Spread::Init();

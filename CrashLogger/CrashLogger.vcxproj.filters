@@ -78,6 +78,7 @@
       <Filter>game</Filter>
     </ClCompile>
     <ClCompile Include="DbgHelpWrap.cpp" />
+    <ClCompile Include="PatchNameThreads.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="definitions.h" />

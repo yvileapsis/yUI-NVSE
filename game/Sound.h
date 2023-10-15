@@ -400,11 +400,15 @@ static_assert(sizeof(BSWin32Audio) == 0xA4);
 class BSThread
 {
 public:
-	virtual void	Destroy(bool doFree);
-	virtual void	Unk_01();
+	virtual void Destroy(bool bDoFree);
+	virtual bool ThreadProc();
 
-	LPCRITICAL_SECTION	cs;			// 04
-	UInt32				unk08[10];	// 08
+	_RTL_CRITICAL_SECTION criticalsection;
+	HANDLE createdThread;
+	HANDLE creatorThread;
+	UInt32 threadID;
+	UInt32 creatorThreadID;
+	bool bIsInitialised;
 };
 
 // 9C

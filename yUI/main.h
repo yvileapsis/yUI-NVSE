@@ -22,7 +22,7 @@ inline ActorValueOwner*				g_playerAVOwner			= nullptr;
 inline TESDataHandler*				g_TESDataHandler		= nullptr;
 inline HUDMainMenu*					g_HUDMainMenu			= nullptr;
 
-inline int iMainLoopDoOnce = 0;
+inline static bool bMainLoopDoOnce = false;
 
 inline std::vector<void(*)()>		pluginLoad;
 inline std::vector<void(*)()>		deferredInit;
