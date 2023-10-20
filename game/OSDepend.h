@@ -4,7 +4,7 @@
 #define DIRECTSOUND_VERSION 0x0800
 #include <dinput.h>
 //#include <dsound.h>
-#include <utilities.h>
+#include <Utilities.hpp>
 
 // 1C00 (1.0) / 1C04 (1.1)
 struct OSInputGlobals

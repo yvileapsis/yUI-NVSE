@@ -1,299 +1,11 @@
-﻿#include <main.h>
-#include <Formatter.h>
-
-#include <SafeWrite.h>
-#include <CrashLogger.h>
-#include <DbgHelpWrap.h>
-#include <set>
-
-#define SYMOPT_EX_WINE_NATIVE_MODULES 1000
-
-constexpr UInt32 ce_printStackCount = 256;
-
-namespace CrashLogger
-{
-	template<typename T>
-	class Dereference {
-		intptr_t pointer;
-		std::size_t size;
-
-	public:
-		Dereference(intptr_t pointer, std::size_t size) : pointer(pointer), size(size) {}
-
-		Dereference(intptr_t pointer) : pointer(pointer), size(sizeof(T)) {}
-		Dereference(const void* pointer) : pointer((intptr_t) pointer), size(sizeof(T)) {}
-
-		operator bool()
-		{
-			return IsValidPointer();
-		}
-
-		operator T* () {
-			if (IsValidPointer()) {
-				return reinterpret_cast<T*>(pointer);
-			}
-
-			throw std::runtime_error("Bad dereference");
-		}
-
-		T* operator->() {
-			if (IsValidPointer()) {
-				return reinterpret_cast<T*>(pointer);
-			}
-
-			throw std::runtime_error("Bad dereference");
-		}
-
-	private:
-		bool IsValidAddress() const
-		{
-			MEMORY_BASIC_INFORMATION mbi;
-			if (::VirtualQuery((void*)pointer, &mbi, sizeof(mbi)))
-			{
-				if (mbi.State != MEM_COMMIT) return false;
-
-				DWORD mask = (PAGE_READONLY | PAGE_READWRITE | PAGE_WRITECOPY | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY);
-				if ((mbi.Protect & mask) == 0) return false;
-
-				if (mbi.Protect & PAGE_GUARD) return false;
-				if (mbi.Protect & PAGE_NOACCESS) return false;
-
-				if (size_t(mbi.RegionSize) < size) return false;
-
-				return true;
-			}
-			return false;
-		}
-
-		bool AttemptDereference() const 
-		{
-			__try {
-				// Attempt to read the address as a UInt32
-				volatile UInt32 temp = *reinterpret_cast<const volatile UInt32*>(pointer);
-				return true;
-			}
-			__except (EXCEPTION_EXECUTE_HANDLER) {
-				return false;
-			}
-		}
-
-		bool IsVtableValid() const
-		{
-//			if (vtables_.find(vtable) == vtables_.end()) return false;
-
-			UInt32 vtable = *reinterpret_cast<UInt32*>(pointer);
-
-			if (vtable > 0xFE0000 && vtable < 0x1200000)
-				return true;
-
-			return false;
-		}
-
-		bool IsValidPointer() const 
-		{
-			if (!IsValidAddress()) return false;
-
-			if (!AttemptDereference()) return false;
-
-			if (!IsVtableValid()) return false;
-
-			return true;
-		}
-	};
-}
-
-namespace CrashLogger::PDBHandling
-{
-	std::string GetAddress(UInt32 eip)
-	{
-		return std::format("0x{:08X}", eip);
-	}
-
-	std::string GetModule(UInt32 eip, HANDLE process)
-	{
-		IMAGEHLP_MODULE module = { 0 };
-		module.SizeOfStruct = sizeof(IMAGEHLP_MODULE);
-		if (!Safe_SymGetModuleInfo(process, eip, &module)) return "";
-
-		return module.ModuleName;
-	}
-
-	UInt32 GetModuleBase(UInt32 eip, HANDLE process)
-	{
-		IMAGEHLP_MODULE module = { 0 };
-		module.SizeOfStruct = sizeof(IMAGEHLP_MODULE);
-		if (!Safe_SymGetModuleInfo(process, eip, &module)) return 0;
-
-		return module.BaseOfImage;
-	}
-
-	std::string GetSymbol(UInt32 eip, HANDLE process)
-	{
-		char symbolBuffer[sizeof(SYMBOL_INFO) + 255];
-		const auto symbol = (SYMBOL_INFO*)symbolBuffer;
-
-		symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
-		symbol->MaxNameLen = 254;
-		DWORD64 offset = 0;
-
-		if (!Safe_SymFromAddr(process, eip, &offset, symbol)) return "";
-		
-		const std::string functioName = symbol->Name;
-
-		return std::format("{}+0x{:0X}", functioName, offset);
-	}
-
-	std::string GetLine(UInt32 eip, HANDLE process)
-	{
-		char lineBuffer[sizeof(IMAGEHLP_LINE) + 255];
-		const auto line = (IMAGEHLP_LINE*)lineBuffer;
-		line->SizeOfStruct = sizeof(IMAGEHLP_LINE);
-
-		DWORD offset = 0;
-
-		if (!Safe_SymGetLineFromAddr(process, eip, &offset, line)) return "";
-
-		return std::format("<{}:{:d}>", line->FileName, line->LineNumber);
-	}
-
-	std::string GetCalltraceFunction(UInt32 eip, UInt32 ebp, HANDLE process)
-	{
-		/*if (GetModuleFileName((HMODULE)frame.AddrPC.Offset, path, MAX_PATH)) {  //Do this work on non base addresses even on  Windows? Cal directly the LDR function?
-			   if (!SymLoadModule(process, NULL, path, NULL, 0, 0)) Log() << FormatString("Porcoddio %0X", GetLastError());
-		}*/
-		
-		const auto moduleBase = GetModuleBase(eip, process);
-
-		std::string begin = std::format("0x{:08X} ==> ", (moduleBase != 0x00400000) ? eip - moduleBase + 0x10000000 : eip);
-
-		std::string middle;
-
-		if (const auto module = GetModule(eip, process); module.empty()) 
-			middle = std::format("{:20s} ({}) : (Corrupt stack or heap?)", "-\\(°_o)/-", GetAddress(ebp));
-		else if (const auto symbol = GetSymbol(eip, process); symbol.empty())
-			middle = std::format("{:20s} ({}) : EntryPoint+0xFFFFFFFF", module, GetAddress(ebp));
-		else
-			middle = std::format("{:20s} ({}) : {}", module, GetAddress(ebp), symbol);
-
-		std::string end;
-
-		if (const auto line = GetLine(eip, process); !line.empty())
-		{
-			middle = std::format("{:<80s}", middle);
-			end = " <== " + line;
-		} 
-
-		return begin + middle + end;
-	}
-
-	std::string GetSymbolForAddress(UInt32 address, HANDLE process)
-	{
-		std::string module;
-		if (module = GetModule(address, process); module.empty()) return "";
-
-		std::string symbol;
-		if (symbol = GetSymbol(address, process); symbol.empty()) return "";
-
-		std::string end;
-
-		if (const auto line = GetLine(address, process); !line.empty())
-		{
-			end = " <== " + line;
-		}
-
-		return std::format("{:>20} : {:<40}{}", module, symbol, end);
-	}
-
-	std::string& GetClassNameGetSymbol(void* object, std::string& buffer)
-	{
-		buffer = GetSymbol(*((UInt32*)object), GetCurrentProcess());
-		return buffer;
-	}
-
-	std::string& GetClassNameFromPDBSEH(void* object, std::string& buffer)
-	{
-		__try { GetClassNameGetSymbol(object, buffer); }
-		__except (1) {}
-		return buffer;
-	}
-
-	std::string GetClassNameFromPDB(void* object) 
-	{
-		std::string name;
-		GetClassNameFromPDBSEH(object, name);
-		return name.substr(0, name.find("::`vftable'"));
-	}
-
-	struct RTTIType
-	{
-		void*	typeInfo;
-		UInt32	pad;
-		char	name[0];
-	};
-
-	struct RTTILocator
-	{
-		UInt32		sig, offset, cdOffset;
-		RTTIType	* type;
-	};
-
-	// use the RTTI information to return an object's class name
-	const char* GetObjectClassNameInternal2(void * objBase)
-	{
-		const char	* result = "";
-
-		__try
-		{
-			void		** obj = (void **)objBase;
-			RTTILocator	** vtbl = (RTTILocator **)obj[0];
-			RTTILocator	* rtti = vtbl[-1];
-			RTTIType	* type = rtti->type;
-
-			// starts with .?AV
-			if((type->name[0] == '.') && (type->name[1] == '?'))
-			{
-				// is at most MAX_PATH chars long
-				for (UInt32 i = 0; i < MAX_PATH; i++) if (type->name[i] == 0)
-				{
-					result = type->name;
-					break;
-				}
-			}
-		}
-		__except(EXCEPTION_EXECUTE_HANDLER)
-		{
-			// return the default
-		}
-
-		return result;
-	}
-
-	std::string GetClassNameFromRTTI(void* object)
-	{
-		std::string name = GetObjectClassNameInternal2(object);
-
-		// Starts with .?AV, ends with @@
-//		return name.substr(4, name.size() - 6);
-
-		char buffer[MAX_PATH];
-		Safe_UnDecorateSymbolName(name.substr(1, name.size() - 1).c_str(), buffer, MAX_PATH, UNDNAME_NO_ARGUMENTS);
-		name = buffer;
-
-		return name.substr(6, name.size() - 6);
-	}
-
-	std::string GetClassNameFromPDBOrRTTI(void* object) 
-	{
-		if (const auto str = GetClassNameFromRTTI(object); !str.empty()) return str;
-		return GetClassNameFromPDB(object);
-		//if (const auto str = GetClassNameFromPDB(object); !str.contains("0x")) return str;
-	}
-};
-
-namespace CrashLogger::VirtualTables
+#pragma once
+#include <CrashLogger.hpp>
+#include <Formatter.hpp>
+
+namespace CrashLogger::Labels
 {
 	typedef void (*FormattingHandler)(void* ptr, std::string& buffer);
-	
+
 	void AsUInt32(void* ptr, std::string& buffer) { buffer += std::format("{:#08X}", **static_cast<UInt32**>(ptr)); }
 
 	template<typename T> std::ostream& AsInternal(std::ostream& os, void* ptr)
@@ -305,10 +17,10 @@ namespace CrashLogger::VirtualTables
 
 	template<typename T> std::ostream& AsSEH(std::ostream& os, void* ptr)
 	{
-		__try {
+		try {
 			AsInternal<T>(os, ptr);
 		}
-		__except (1) {
+		catch (...) {
 			if (os.rdbuf()->in_avail()) os << ", ";
 			os << "failed to format";
 		}
@@ -336,23 +48,27 @@ namespace CrashLogger::VirtualTables
 
 		UInt32 address;
 		UInt32 size;
-		VirtualTables::FormattingHandler function;
+		FormattingHandler function;
 		std::string name;
 
-		Label(UInt32 address, VirtualTables::FormattingHandler function = lastHandler, std::string name = "", Type type = kType_Class, UInt32 size = 4)
+		Label(UInt32 address, FormattingHandler function = lastHandler, std::string name = "", Type type = kType_Class, UInt32 size = 4)
 			: type(type), address(address), size(size), function(function), name(std::move(name))
 		{
 			lastHandler = function;
 		};
-		
-		bool Satisfies(const void* ptr) const
+
+		bool Satisfies(void* ptr) const
+		try { 
+			return *reinterpret_cast<UInt32*>(ptr) >= address && *reinterpret_cast<UInt32*>(ptr) <= address + size; 
+		}
+		catch (...)
 		{
-			return *Dereference<UInt32>(ptr) >= address && *Dereference<UInt32>(ptr) <= address + size;
+			return false;
 		}
 
 		static std::string GetTypeName(void* ptr)
 		{
-			return CrashLogger::PDBHandling::GetClassNameFromPDBOrRTTI(ptr);
+			return PDB::GetClassNameFromRTTIorPDB(ptr);
 		}
 
 		[[nodiscard]] std::string GetLabelName() const
@@ -362,20 +78,23 @@ namespace CrashLogger::VirtualTables
 			return "";
 		}
 
-		void Get(void* ptr, std::string& buffer) const
+		void Get(void* object, std::string& buffer) const
 		{
+			if (type == kType_None) return;
+
+			buffer += std::format("0x{:08X} ==> ", *(UInt32*)object);
+
 			buffer += GetLabelName();
 
-			std::string name1 = name.empty() && type == kType_Class ? GetTypeName(ptr) : name;
-			if (name1.empty() && type != kType_None) name1 = std::format("0x{:08X}", *Dereference<UInt32>((UInt32)ptr));
+			std::string name1 = name.empty() && type == kType_Class ? GetTypeName(object) : name;
 			buffer += name1;
 
-			if (function) function(ptr, buffer);
+			if (function) function(object, buffer);
 		}
 	};
 
 	std::vector<std::unique_ptr<Label>> setOfLabels;
-	
+
 	template <class... _Types> void Push(_Types... args) {
 		setOfLabels.push_back(std::make_unique<Label>(std::forward<_Types>(args)...));
 	}
@@ -383,15 +102,16 @@ namespace CrashLogger::VirtualTables
 	void FillNVSELabels()
 	{
 		Push(0x10F1EE0, nullptr, "TypeInfo", Label::kType_Class);
+		Push(0x10B9D28, nullptr, "TileShaderProperty", Label::kType_Class);
 
-		Push(0x11F3374, VirtualTables::AsUInt32, "TileValueIndirectTemp", Label::kType_Global);
+		Push(0x11F3374, AsUInt32, "TileValueIndirectTemp", Label::kType_Global);
 		Push(0x118FB0C, nullptr, "ShowWhoDetects", Label::kType_Global);
 		Push(0x1042C58, nullptr, "ShowWhoDetects", Label::kType_Global);
 		Push(0x011F6238, nullptr, "HeapManager", Label::kType_Global);
 
 		Push(0x1000000, nullptr, "", Label::kType_None); // integer that is often encountered
 		Push(0x11C0000, nullptr, "", Label::kType_None);
-		
+
 		Push(kVtbl_Menu, As<Menu>);
 		Push(kVtbl_TutorialMenu);
 		Push(kVtbl_StatsMenu);
@@ -599,12 +319,12 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_NiProperty);
 		Push(kVtbl_NiTexturingProperty);
 		Push(kVtbl_NiVertexColorProperty);
-//		Push(kVtbl_NiWireframeProperty);
+		//		Push(kVtbl_NiWireframeProperty);
 		Push(kVtbl_NiZBufferProperty);
 		Push(kVtbl_NiMaterialProperty);
 		Push(kVtbl_NiAlphaProperty);
 		Push(kVtbl_NiStencilProperty);
-//		Push(kVtbl_NiRendererSpecificProperty);
+		//		Push(kVtbl_NiRendererSpecificProperty);
 		Push(kVtbl_NiShadeProperty);
 
 		Push(kVtbl_BSShaderProperty);
@@ -620,7 +340,7 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_HairShaderProperty);
 		Push(kVtbl_SpeedTreeShaderLightingProperty);
 		Push(kVtbl_SpeedTreeLeafShaderProperty);
-//		Push(kVtbl_SpeedTreeFrondShaderProperty);
+		//		Push(kVtbl_SpeedTreeFrondShaderProperty);
 		Push(kVtbl_GeometryDecalShaderProperty);
 		Push(kVtbl_PrecipitationShaderProperty);
 		Push(kVtbl_BoltShaderProperty);
@@ -640,10 +360,10 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_BSShaderNoLightingProperty);
 		Push(kVtbl_ExtraRefractionProperty);
 		Push(kVtbl_NiCullingProperty);
-		
+
 		// NiTexture
 		Push(kVtbl_NiTexture);
-//		Push(kVtbl_NiDX9Direct3DTexture);
+		//		Push(kVtbl_NiDX9Direct3DTexture);
 		Push(kVtbl_NiSourceTexture);
 		Push(kVtbl_NiSourceCubeMap);
 		Push(kVtbl_NiRenderedTexture);
@@ -662,16 +382,16 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_SceneGraph);
 		Push(kVtbl_BSTempNode);
 		Push(kVtbl_BSTempNodeManager);
-//		Push(kVtbl_BSCellNode);
+		//		Push(kVtbl_BSCellNode);
 		Push(kVtbl_BSClearZNode);
 		Push(kVtbl_BSFadeNode, nullptr, "BSFadeNode"); // missing RTTI name
-//		Push(kVtbl_BSScissorNode);
-//		Push(kVtbl_BSTimingNode);
+		//		Push(kVtbl_BSScissorNode);
+		//		Push(kVtbl_BSTimingNode);
 		Push(kVtbl_BSFaceGenNiNode, As<NiNode>);
 		Push(kVtbl_NiBillboardNode);
 		Push(kVtbl_NiSwitchNode);
 		Push(kVtbl_NiLODNode);
-//		Push(kVtbl_NiBSLODNode);
+		//		Push(kVtbl_NiBSLODNode);
 		Push(kVtbl_NiSortAdjustNode);
 		Push(kVtbl_NiBSPNode);
 		Push(kVtbl_ShadowSceneNode); // 10ADCE0
@@ -687,9 +407,9 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_BSScissorTriShape);
 		Push(kVtbl_NiScreenElements);
 		Push(kVtbl_NiScreenGeometry);
-//		Push(kVtbl_TallGrassTriShape);
+		//		Push(kVtbl_TallGrassTriShape);
 		Push(kVtbl_NiTriStrips);
-//		Push(kVtbl_TallGrassTriStrips);
+		//		Push(kVtbl_TallGrassTriStrips);
 		Push(kVtbl_NiParticles);
 		Push(kVtbl_NiParticleSystem);
 		Push(kVtbl_NiMeshParticleSystem);
@@ -718,9 +438,9 @@ namespace CrashLogger::VirtualTables
 
 		// NiTimeController
 		Push(kVtbl_NiTimeController);
-//		Push(kVtbl_BSDoorHavokController);
+		//		Push(kVtbl_BSDoorHavokController);
 		Push(kVtbl_BSPlayerDistanceCheckController);
-//		Push(kVtbl_NiD3DController);
+		//		Push(kVtbl_NiD3DController);
 		Push(kVtbl_NiControllerManager);
 		Push(kVtbl_NiInterpController);
 		Push(kVtbl_NiSingleInterpController);
@@ -798,7 +518,7 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_bhkSimpleShapePhantom);
 		Push(kVtbl_bhkCachingShapePhantom);
 		Push(kVtbl_bhkAabbPhantom);
-//		Push(kVtbl_bhkAvoidBox);
+		//		Push(kVtbl_bhkAvoidBox);
 		Push(kVtbl_bhkEntity);
 		Push(kVtbl_bhkRigidBody);
 		Push(kVtbl_bhkRigidBodyT);
@@ -814,8 +534,8 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_bhkBallAndSocketConstraint);
 		Push(kVtbl_bhkGenericConstraint);
 		Push(kVtbl_bhkFixedConstraint);
-//		Push(kVtbl_bhkPointToPathConstraint);
-//		Push(kVtbl_bhkPoweredHingeConstraint);
+		//		Push(kVtbl_bhkPointToPathConstraint);
+		//		Push(kVtbl_bhkPoweredHingeConstraint);
 
 		Push(kVtbl_bhkShape);
 		Push(kVtbl_bhkTransformShape);
@@ -846,14 +566,14 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_bhkCharacterController);
 
 		Push(kVtbl_NiExtraData);
-//		Push(kVtbl_TESObjectExtraData);
+		//		Push(kVtbl_TESObjectExtraData);
 		Push(kVtbl_BSFaceGenAnimationData);
 		Push(kVtbl_BSFaceGenModelExtraData);
 		Push(kVtbl_BSFaceGenBaseMorphExtraData);
 		Push(kVtbl_DebugTextExtraData);
 		Push(kVtbl_NiStringExtraData);
 		Push(kVtbl_NiFloatExtraData);
-//		Push(kVtbl_FadeNodeMaxAlphaExtraData);
+		//		Push(kVtbl_FadeNodeMaxAlphaExtraData);
 		Push(kVtbl_BSFurnitureMarker);
 		Push(kVtbl_NiBinaryExtraData);
 		Push(kVtbl_BSBound);
@@ -888,8 +608,8 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_NiParticleMeshesData);
 
 		Push(kVtbl_NiTask);
-//		Push(kVtbl_BSTECreateTask);
-//		Push(kVtbl_NiParallelUpdateTaskManager::SignalTask);
+		//		Push(kVtbl_BSTECreateTask);
+		//		Push(kVtbl_NiParallelUpdateTaskManager::SignalTask);
 		Push(kVtbl_NiGeomMorpherUpdateTask);
 		Push(kVtbl_NiPSysUpdateTask);
 		Push(kVtbl_NiSkinInstance);
@@ -910,8 +630,8 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_NiBSplineData);
 		Push(kVtbl_NiBSplineBasisData);
 		Push(kVtbl_NiBoolData);
-//		Push(kVtbl_NiTaskManager);
-//		Push(kVtbl_NiParallelUpdateTaskManager);
+		//		Push(kVtbl_NiTaskManager);
+		//		Push(kVtbl_NiParallelUpdateTaskManager);
 		Push(kVtbl_hkPackedNiTriStripsData);
 		Push(kVtbl_NiInterpolator);
 		Push(kVtbl_NiBlendInterpolator);
@@ -983,7 +703,7 @@ namespace CrashLogger::VirtualTables
 		Push(kVtbl_NiAccumulator);
 		Push(kVtbl_NiBackToFrontAccumulator);
 		Push(kVtbl_NiAlphaAccumulator);
-//		Push(kVtbl_BSShaderAccumulator);
+		//		Push(kVtbl_BSShaderAccumulator);
 		Push(kVtbl_NiScreenPolygon);
 		Push(kVtbl_NiScreenTexture);
 		Push(kVtbl_NiPSysCollider);
@@ -2344,349 +2064,44 @@ namespace CrashLogger::VirtualTables
 
 	void FillFOSELabels()
 	{
-		
+
 	}
 
 	void FillOBSELabels()
 	{
-		
+
 	}
 
-
-	void GetStringForLabelInternal(void* ptr, UInt32 vtbl, std::string& buffer)
+	void FillLabels()
 	{
-		for (const auto& iter : setOfLabels) if (iter->Satisfies(ptr)) 
+		if (g_currentGame == kFalloutNewVegas)
+			FillNVSELabels();
+		else if (g_currentGame == kFallout3) 	// thanks Stewie
+			FillFOSELabels();
+		else if (g_currentGame == kOblivion)
+			FillOBSELabels();
+	}
+
+	bool fillLables = false;
+
+	extern bool GetStringForLabel(void** object, std::string& buffer)
+	try 
+	{
+		if (!fillLables)
+		{
+			FillLabels();
+			fillLables = true;
+		}
+		for (const auto& iter : setOfLabels) if (iter->Satisfies(object)) 
 		{ 
-			buffer += std::format("0x{:08X} | ", vtbl);
-			iter->Get(ptr, buffer); 
-			return; 
+			iter->Get(object, buffer); 
+			return true; 
 		}
-
-//		if (vtbl > 0xD9B000) // fo3
-		if (vtbl > 0xFDF000  && vtbl < 0x1200000) // fonv
-		{
-			if (const auto& name = PDBHandling::GetClassNameFromPDBOrRTTI((void*)ptr); !name.empty())
-			{
-				buffer += std::format("0x{:08X} | Unhandled: ", vtbl);
-				buffer += name;
-			}
-		}
-
-//		if (std::string one = PDBHandling::GetSymbolForAddress((UInt32)ptr, GetCurrentProcess()); !one.empty()) return "Function:" + one;
+		return false;
 	}
-
-	void GetStringForLabelSEH(void* ptr, UInt32 vtbl, std::string& buffer)
-	{
-		__try
-		{
-			GetStringForLabelInternal(ptr, vtbl, buffer);
-		}
-		__except (1)
-		{
-			buffer += ", failed to format";
-		}
-	}
-
-	std::string GetStringForLabel(void* ptr, UInt32 vtbl)
-	{
-		std::string buffer;
-		GetStringForLabelInternal(ptr, vtbl, buffer);
-		return buffer;
-	}
-
-	std::string Get(UInt32 ptr, UInt32 depth = 5)
-	{
-		if (!ptr) return "";
-
-		UInt32 vtbl;
-
-		std::string full;
-
-		while (vtbl = Dereference<UInt32>(ptr) ? *(UInt32*)ptr : 0)
-		{
-			if (std::string onetime = GetStringForLabel((void*)ptr, vtbl); !onetime.empty())
-				return full + onetime;
-
-			if (depth == 0) break;
-
-			depth--;
-
-			full += std::format("Pointer: 0x{:08X}; ", vtbl);
-
-			ptr = vtbl;
-		}
-		// 70E943 
-		// 0D2E7379
-		// 0D2E7369
-		return "";
+	catch (...) { 
+		if (!buffer.empty()) buffer += ", ";
+		buffer += "failed to get string for label";
+		return true;
 	}
 }
-
-namespace CrashLogger::Calltrace
-{
-
-	void Get(EXCEPTION_POINTERS* info) 
-	{
-		HANDLE process = GetCurrentProcess();
-		HANDLE thread = GetCurrentThread();
-
-		Log() << std::format("Exception {:08X} caught!\n", info->ExceptionRecord->ExceptionCode);
-		
-		wchar_t* pThreadName = NULL;
-		HRESULT hr = GetThreadDescription(thread, &pThreadName);
-		std::wstring wThreadName(pThreadName);
-		std::string threadName;
-		std::transform(wThreadName.begin(), wThreadName.end(), std::back_inserter(threadName), [] (wchar_t c) {
-			return (char)c;
-		});
-		LocalFree(pThreadName);
-
-		Log() << "Thread: " << threadName << std::endl;
-
-		Log() << "Calltrace:";
-
-		DWORD machine = IMAGE_FILE_MACHINE_I386;
-		CONTEXT context = {};
-		memcpy(&context, info->ContextRecord, sizeof(CONTEXT));
-
-		Safe_SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_DEFERRED_LOADS | SYMOPT_UNDNAME | SYMOPT_ALLOW_ABSOLUTE_SYMBOLS);
-
-//    SymSetExtendedOption((IMAGEHLP_EXTENDED_OPTIONS)SYMOPT_EX_WINE_NATIVE_MODULES, TRUE);
-		if (!Safe_SymInitialize(process, NULL, true))
-			Log() << "Error initializing symbol store";
-
-		//    SymSetExtendedOption((IMAGEHLP_EXTENDED_OPTIONS)SYMOPT_EX_WINE_NATIVE_MODULES, TRUE);
-
-		STACKFRAME frame = {};
-		frame.AddrPC.Offset = info->ContextRecord->Eip;
-		frame.AddrPC.Mode = AddrModeFlat;
-		frame.AddrFrame.Offset = info->ContextRecord->Ebp;
-		frame.AddrFrame.Mode = AddrModeFlat;
-		frame.AddrStack.Offset = info->ContextRecord->Esp;
-		frame.AddrStack.Mode = AddrModeFlat;
-		DWORD eip = 0;
-
-		while (Safe_StackWalk(machine, process, thread, &frame, &context, NULL, Safe_SymFunctionTableAccess, Safe_SymGetModuleBase, NULL)) {
-			/*
-		Using  a PDB for OBSE from VS2019 is causing the frame to repeat, but apparently only if WINEDEBUG=+dbghelp isn't setted. Is this a wine issue?
-		When this happen winedbg show only the first line (this happens with the first frame only probably, even if there are more frames shown when using WINEDEBUG=+dbghelp )
-			*/
-			if (frame.AddrPC.Offset == eip) break;
-			eip = frame.AddrPC.Offset;
-			Log() << PDBHandling::GetCalltraceFunction(frame.AddrPC.Offset, frame.AddrFrame.Offset, process);
-		}
-
-		Log();
-	}
-
-}
-
-namespace CrashLogger::Registry
-{
-	void Get(EXCEPTION_POINTERS* info)
-	{
-		Log() << "Registry:" << std::endl
-			<< ("REG |    VALUE   | DEREFERENCE INFO") << std::endl
-			<< std::format("eax | 0x{:08X} | {}", info->ContextRecord->Eax, VirtualTables::Get(info->ContextRecord->Eax)) << std::endl
-			<< std::format("ebx | 0x{:08X} | {}", info->ContextRecord->Ebx, VirtualTables::Get(info->ContextRecord->Ebx)) << std::endl
-			<< std::format("ecx | 0x{:08X} | {}", info->ContextRecord->Ecx, VirtualTables::Get(info->ContextRecord->Ecx)) << std::endl
-			<< std::format("edx | 0x{:08X} | {}", info->ContextRecord->Edx, VirtualTables::Get(info->ContextRecord->Edx)) << std::endl
-			<< std::format("edi | 0x{:08X} | {}", info->ContextRecord->Edi, VirtualTables::Get(info->ContextRecord->Edi)) << std::endl
-			<< std::format("esi | 0x{:08X} | {}", info->ContextRecord->Esi, VirtualTables::Get(info->ContextRecord->Esi)) << std::endl
-			<< std::format("ebp | 0x{:08X} | {}", info->ContextRecord->Ebp, VirtualTables::Get(info->ContextRecord->Ebp)) << std::endl
-			<< std::format("esp | 0x{:08X} | {}", info->ContextRecord->Esp, VirtualTables::Get(info->ContextRecord->Esp)) << std::endl
-			<< std::format("eip | 0x{:08X} | {}", info->ContextRecord->Eip, VirtualTables::Get(info->ContextRecord->Eip)) << std::endl;
-	}
-}
-
-namespace CrashLogger::Stack
-{
-	UInt32 GetESPi(UInt32* esp, UInt32 i)
-	{
-		__try
-		{
-			return esp[i];
-		}
-		__except (EXCEPTION_EXECUTE_HANDLER)
-		{
-			return 0;
-		}
-	}
-
-	void Get(EXCEPTION_POINTERS* info)
-	{
-		Log() << "Stack:" << std::endl << " # |    VALUE   | DEREFERENCE INFO";
-
-		const auto esp = reinterpret_cast<UInt32*>(info->ContextRecord->Esp);
-
-		for (unsigned int i = 0; i < 0x100; i++) {
-			const auto espi = GetESPi(esp, i);
-			if (i <= 8)
-				Log() << std::format("{:2X} | 0x{:08X} | {}", i, espi, VirtualTables::Get(espi));
-			else if (std::string result = VirtualTables::Get(espi); !result.empty())
-				Log() << std::format("{:2X} | 0x{:08X} | {}", i, espi, result);
-		}
-		Log();
-	}
-}
-
-namespace CrashLogger::ModuleBases
-{
-	struct UserContext {
-		UInt32 eip;
-		UInt32 moduleBase;
-		CHAR* name;
-	};
-
-	struct Module
-	{
-		UInt32 moduleBase;
-		UInt32 moduleEnd;
-		std::filesystem::path path;
-
-		bool operator<(const Module& other) const {
-			if (path < other.path) return true;
-			return false;
-		};
-	};
-
-	std::set<Module> enumeratedModules;
-
-	BOOL CALLBACK EumerateModulesCallback(PCSTR name, ULONG moduleBase, ULONG moduleSize, PVOID context) {
-		UserContext* info = (UserContext*)context;
-		if (info->eip >= (UInt32)moduleBase && info->eip <= (UInt32)moduleBase + (UInt32)moduleSize) {
-			//Log() << FormatString("%0X %0X  %0X", (UInt32)moduleBase, info->eip, (UInt32)moduleBase + (UInt32) moduleSize);
-			info->moduleBase = moduleBase;
-			strcpy_s(info->name, 100, name);
-		}
-
-		enumeratedModules.emplace((UInt32)moduleBase, (UInt32)moduleBase + (UInt32)moduleSize, std::string(name));
-
-		return TRUE;
-	}
-
-	std::unordered_map<std::string, std::string> pluginNames = {
-		{"hot_reload_editor", "hot_reload"},
-		{"ilsfix", "ILS Fix"},
-		{"improved_console", "Improved Console"},
-		{"ImprovedLightingShaders", "Improved Lighting Shaders for FNV"},
-		{"jip_nvse", "JIP LN NVSE"},
-		{"johnnyguitar", "JohnnyGuitarNVSE"},
-		{"MCM", "MCM Extensions"},
-		{"mod_limit_fix", "Mod Limit Fix"},
-		{"nvse_console_clipboard", "Console Clipboard"},
-		{"nvse_stewie_tweaks", "lStewieAl's Tweaks"},
-		{"ShowOffNVSE", "ShowOffNVSE Plugin"},
-		{"supNVSE", "SUP NVSE Plugin"},
-		{"ui_organizer", "UI Organizer Plugin"},
-		{"EngineOptimizations", "Engine Optimizations"},
-		{"DynamicReflections", "Dynamic Reflections"},
-		{"Alpha Fixes", "Fallout Alpha Rendering Tweaks"}
-	};
-
-	std::string GetPluginNameForFileName(std::string name)
-	{
-		if (pluginNames.contains(name))
-			return pluginNames[name];
-		return name;
-	}
-
-	void Get(EXCEPTION_POINTERS* info)
-	{
-		HANDLE process = GetCurrentProcess();
-
-		const UInt32 eip = info->ContextRecord->Eip;
-
-		UserContext infoUser = { eip,  0, (char*)calloc(sizeof(char), 100) };
-
-		Safe_EnumerateLoadedModules(process, EumerateModulesCallback, &infoUser);
-	
-		Log() << "Module bases:";
-		for (const auto& [moduleBase, moduleEnd, path] : enumeratedModules)
-		{
-			std::string version;
-
-			if (g_commandInterface) if (const auto info = g_commandInterface->GetPluginInfoByName(GetPluginNameForFileName(path.stem().generic_string()).c_str()))
-				version = std::format("NVSE plugin version: {:>4d}, ", info->version);
-
-			Log() << std::format("0x{:08X} - 0x{:08X} ==> {:25s}{:>30s}{}", moduleBase, moduleEnd, path.stem().generic_string() + ",", version, path.generic_string());
-
-		}
-
-		Log();
-
-		if (infoUser.moduleBase)
-			Log() << std::format("GAME CRASHED AT INSTRUCTION Base+0x{:08X} IN MODULE: {}", (infoUser.eip - infoUser.moduleBase), infoUser.name) << std::endl
-			<< "Please note that this does not automatically mean that that module is responsible. It may have been supplied bad data or" << std::endl
-			<< "program state as the result of an issue in the base game or a different DLL.";
-		else
-			Log() << "UNABLE TO IDENTIFY MODULE CONTAINING THE CRASH ADDRESS." << std::endl
-			<< "This can occur if the crashing instruction is located in the vanilla address space, but it can also occur if there are too many" << std::endl
-			<< "DLLs for us to list, and if the crash occurred in one of their address spaces. Please note that even if the crash occurred" << std::endl
-			<< "in vanilla code, that does not necessarily mean that it is a vanilla problem. The vanilla code may have been supplied bad data" << std::endl
-			<< "or program state as the result of an issue in a loaded DLL.";
-
-		Log();
-	}
-}
-
-namespace CrashLogger
-{
-
-	void Get(EXCEPTION_POINTERS* info) {
-
-		Calltrace::Get(info);
-
-		Registry::Get(info);
-
-		Stack::Get(info);
-
-		ModuleBases::Get(info);
-
-		Logger::Copy();
-
-		Safe_SymCleanup(GetCurrentProcess());
-	};
-
-	static LPTOP_LEVEL_EXCEPTION_FILTER s_originalFilter = nullptr;
-
-	LONG WINAPI Filter(EXCEPTION_POINTERS* info) {
-		static bool caught = false;
-		bool ignored = false;
-		//
-		if (caught) ignored = true;
-		else
-		{
-			caught = true;
-			try { Get(info); }
-			catch (...) {};
-
-		}
-		if (s_originalFilter) s_originalFilter(info); // don't return
-		return !ignored ? EXCEPTION_CONTINUE_SEARCH : EXCEPTION_EXECUTE_HANDLER;
-	};
-
-	LPTOP_LEVEL_EXCEPTION_FILTER WINAPI FakeSetUnhandledExceptionFilter(__in LPTOP_LEVEL_EXCEPTION_FILTER lpTopLevelExceptionFilter) {
-		s_originalFilter = lpTopLevelExceptionFilter;
-		return nullptr;
-	}
-
-	void ApplyNVSE()
-	{
-		s_originalFilter = SetUnhandledExceptionFilter(&Filter);
-		SafeWrite32(0x00FDF180, (UInt32)&FakeSetUnhandledExceptionFilter);
-	}
-
-	// thanks Stewie
-	void ApplyFOSE()
-	{
-		s_originalFilter = SetUnhandledExceptionFilter(&Filter);
-		SafeWrite32(0x00D9B180, (UInt32)&FakeSetUnhandledExceptionFilter);
-	}
-
-	void ApplyOBSE()
-	{
-		s_originalFilter = SetUnhandledExceptionFilter(&Filter);
-		SafeWrite32(0x00A281B4, (UInt32)&FakeSetUnhandledExceptionFilter);
-	}
-};

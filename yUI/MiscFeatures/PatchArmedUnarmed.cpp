@@ -2,7 +2,7 @@
 #include <BaseProcess.h>
 #include <RTTI.h>
 
-#include <SafeWrite.h>
+#include <Safewrite.hpp>
 #include <SimpleINILibrary.h>
 
 #include "TESForm.h"

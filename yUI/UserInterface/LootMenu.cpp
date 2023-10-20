@@ -3,7 +3,7 @@
 #include <SimpleINILibrary.h>
 #include <json.h>
 
-#include <dinput8.h>
+#include <dinput8.hpp>
 
 #include <Menu.h>
 #include <GameData.h>

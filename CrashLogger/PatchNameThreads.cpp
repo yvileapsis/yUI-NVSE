@@ -1,8 +1,8 @@
 #pragma once
 
-#include <main.h>
+#include <main.hpp>
 #include <Sound.h>
-#include <SafeWrite.h>
+#include <Safewrite.hpp>
 
 // all credit goes to WallSoGB
 namespace Patch::NameThreads
@@ -47,6 +47,7 @@ namespace Patch::NameThreads
 
 	extern void Init()
 	{
-        Patch();
+        if (g_currentGame == kFalloutNewVegas)
+            Patch();
 	}
 }

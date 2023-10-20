@@ -294,7 +294,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\SafeWrite.h"
+				RelativePath="..\nvse\Safewrite.hpp"
 				>
 			</File>
 			<File
@@ -302,7 +302,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\Utilities.h"
+				RelativePath="..\nvse\Utilities.hpp"
 				>
 			</File>
 		</Filter>

@@ -2,7 +2,7 @@
 #include <Setting.h>
 #include <BaseProcess.h>
 
-#include <SafeWrite.h>
+#include <Safewrite.hpp>
 #include <SimpleINILibrary.h>
 
 #include "TESObjectREFR.h"

@@ -1,5 +1,5 @@
 #pragma once
-#include <PluginAPI.h>
+#include <PluginAPI.hpp>
 
 #include <string>
 #include <vector>

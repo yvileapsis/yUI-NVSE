@@ -1,6 +1,6 @@
 #pragma once
 #include <containers.h>
-#include <Utilities.h>
+#include <Utilities.hpp>
 #include <TESForm.h>
 
 struct InventoryChanges

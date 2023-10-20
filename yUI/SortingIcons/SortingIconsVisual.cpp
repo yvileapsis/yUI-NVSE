@@ -4,7 +4,7 @@
 
 #include <InterfaceManager.h>
 
-#include <SafeWrite.h>
+#include <Safewrite.hpp>
 
 namespace SortingIcons::Icons
 {

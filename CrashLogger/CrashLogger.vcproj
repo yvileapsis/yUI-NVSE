@@ -50,7 +50,7 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
-				ForcedIncludeFiles="nvse/prefix.h"
+				ForcedIncludeFiles="nvse/prefix.hpp"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -127,7 +127,7 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
-				ForcedIncludeFiles="nvse/prefix.h"
+				ForcedIncludeFiles="nvse/prefix.hpp"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -294,7 +294,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\SafeWrite.h"
+				RelativePath="..\nvse\Safewrite.hpp"
 				>
 			</File>
 			<File
@@ -302,7 +302,7 @@
 				>
 			</File>
 			<File
-				RelativePath="..\nvse\Utilities.h"
+				RelativePath="..\nvse\Utilities.hpp"
 				>
 			</File>
 		</Filter>

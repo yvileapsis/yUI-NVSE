@@ -1,6 +1,6 @@
 #pragma once
 #include <Containers.h>
-#include <Utilities.h>
+#include <Utilities.hpp>
 
 bool IsConsoleMode();
 bool GetConsoleEcho();

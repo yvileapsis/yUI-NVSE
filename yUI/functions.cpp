@@ -3,7 +3,7 @@
 
 #include <unordered_set>
 
-#include "dinput8.h"
+#include "dinput8.hpp"
 #include "GameData.h"
 #include "Menu.h"
 
@@ -195,7 +195,7 @@ __declspec(naked) void funpatch()
 #if 0
 
 #include <patches.h>
-#include <SafeWrite.h>
+#include <Safewrite.hpp>
 #include <functions.h>
 
 

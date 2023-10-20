@@ -1,4 +1,4 @@
-#include <DbgHelpWrap.h>
+#include <DbgHelpWrap.hpp>
 
 #include <windows.h>
 #include <mutex>
@@ -7,8 +7,9 @@
 #include <iostream>
 #include <filesystem>
 
-#include <Logging.h>
+#include <Logging.hpp>
 #include <map>
+#include <format>
 
 // Class representing the DbgHelp library
 class DbgHelpWrapper {
@@ -61,6 +62,7 @@ public:
 		return 0;
 	}
 
+	static bool GetLoaded() { return !GetSingleton().dll_path.empty(); }
 private:
 	HMODULE dbghelp_dll;
 	std::filesystem::path dll_path;
@@ -80,7 +82,7 @@ private:
 		wcscat_s(temp_dbghelp_path, L"nvse_dbghelp.dll");
 
 		if (!CopyFileW(dbghelp_path, temp_dbghelp_path, FALSE)) {
-			Log() << "Cannot create a copy of DbgHelp.dll";
+			Log() << std::format("Cannot create a copy of DbgHelp.dll, error: 0x{:08X}", GetLastError());
 
 			// better continue with some dbghelp than with none!
 			wcscpy_s(temp_dbghelp_path, dbghelp_path);
@@ -89,7 +91,7 @@ private:
 		dbghelp_dll = LoadLibraryW(temp_dbghelp_path);
 		if (!dbghelp_dll) {
 			std::filesystem::remove(temp_dbghelp_path);
-			Log() << "Cannot load DbgHelp.dll";
+			Log() << std::format("Cannot load DbgHelp.dll, error: 0x{:08X}", GetLastError());
 			return;
 		}
 
@@ -120,97 +122,143 @@ private:
 };
 
 BOOL __stdcall  Safe_SymInitializeW(HANDLE hProcess, PCWSTR UserSearchPath, BOOL fInvadeProcess) {
-	return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, PCWSTR, BOOL>("SymInitializeW", hProcess, UserSearchPath, fInvadeProcess);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, PCWSTR, BOOL>("SymInitializeW", hProcess, UserSearchPath, fInvadeProcess);
+	return SymInitializeW(hProcess, UserSearchPath, fInvadeProcess);
 }
 
-BOOL __stdcall  Safe_SymGetSearchPathW(HANDLE hProcess, PCWSTR SearchPath, DWORD SearchPathLength) {
-	return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, PCWSTR, DWORD>("SymGetSearchPathW", hProcess, SearchPath, SearchPathLength);
+BOOL __stdcall  Safe_SymGetSearchPathW(HANDLE hProcess, PWSTR sSearchPath, DWORD SearchPathLength) {
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, PWSTR, DWORD>("SymGetSearchPathW", hProcess, sSearchPath, SearchPathLength);
+	return SymGetSearchPathW(hProcess, sSearchPath, SearchPathLength);
 }
 
 BOOL __stdcall  Safe_SymSetSearchPathW(HANDLE hProcess, PCWSTR SearchPath) {
-	return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, PCWSTR>("SymSetSearchPathW", hProcess, SearchPath);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, PCWSTR>("SymSetSearchPathW", hProcess, SearchPath);
+	return SymSetSearchPathW(hProcess, SearchPath);
 }
 
 BOOL __stdcall  Safe_SymRefreshModuleList(HANDLE hProcess) {
-	return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE>("SymRefreshModuleList", hProcess);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE>("SymRefreshModuleList", hProcess);
 }
 
 BOOL __stdcall  Safe_StackWalk64(_In_ DWORD MachineType,_In_ HANDLE hProcess,_In_ HANDLE hThread,_Inout_ LPSTACKFRAME64 StackFrame,_Inout_ PVOID ContextRecord,_In_opt_ PREAD_PROCESS_MEMORY_ROUTINE64 ReadMemoryRoutine,_In_opt_ PFUNCTION_TABLE_ACCESS_ROUTINE64 FunctionTableAccessRoutine,_In_opt_ PGET_MODULE_BASE_ROUTINE64 GetModuleBaseRoutine,_In_opt_ PTRANSLATE_ADDRESS_ROUTINE64 TranslateAddress) {
-	return DbgHelpWrapper::CallFunctionSafe<BOOL, DWORD, HANDLE, HANDLE, LPSTACKFRAME64, PVOID, PREAD_PROCESS_MEMORY_ROUTINE64, PFUNCTION_TABLE_ACCESS_ROUTINE64, PGET_MODULE_BASE_ROUTINE64, PTRANSLATE_ADDRESS_ROUTINE64>("StackWalk64", MachineType, hProcess, hThread, StackFrame, ContextRecord, ReadMemoryRoutine, FunctionTableAccessRoutine, GetModuleBaseRoutine, TranslateAddress);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunctionSafe<BOOL, DWORD, HANDLE, HANDLE, LPSTACKFRAME64, PVOID, PREAD_PROCESS_MEMORY_ROUTINE64, PFUNCTION_TABLE_ACCESS_ROUTINE64, PGET_MODULE_BASE_ROUTINE64, PTRANSLATE_ADDRESS_ROUTINE64>("StackWalk64", MachineType, hProcess, hThread, StackFrame, ContextRecord, ReadMemoryRoutine, FunctionTableAccessRoutine, GetModuleBaseRoutine, TranslateAddress);
+	return StackWalk64(MachineType, hProcess, hThread, StackFrame, ContextRecord, ReadMemoryRoutine, FunctionTableAccessRoutine, GetModuleBaseRoutine, TranslateAddress);
 }
 
 BOOL __stdcall  Safe_StackWalk(_In_ DWORD MachineType, _In_ HANDLE hProcess, _In_ HANDLE hThread, _Inout_ LPSTACKFRAME StackFrame, _Inout_ PVOID ContextRecord, _In_opt_ PREAD_PROCESS_MEMORY_ROUTINE ReadMemoryRoutine, _In_opt_ PFUNCTION_TABLE_ACCESS_ROUTINE FunctionTableAccessRoutine, _In_opt_ PGET_MODULE_BASE_ROUTINE GetModuleBaseRoutine, _In_opt_ PTRANSLATE_ADDRESS_ROUTINE	 TranslateAddress) {
-	return DbgHelpWrapper::CallFunctionSafe<BOOL, DWORD, HANDLE, HANDLE, LPSTACKFRAME, PVOID, PREAD_PROCESS_MEMORY_ROUTINE, PFUNCTION_TABLE_ACCESS_ROUTINE, PGET_MODULE_BASE_ROUTINE, PTRANSLATE_ADDRESS_ROUTINE>("StackWalk", MachineType, hProcess, hThread, StackFrame, ContextRecord, ReadMemoryRoutine, FunctionTableAccessRoutine, GetModuleBaseRoutine, TranslateAddress);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunctionSafe<BOOL, DWORD, HANDLE, HANDLE, LPSTACKFRAME, PVOID, PREAD_PROCESS_MEMORY_ROUTINE, PFUNCTION_TABLE_ACCESS_ROUTINE, PGET_MODULE_BASE_ROUTINE, PTRANSLATE_ADDRESS_ROUTINE>("StackWalk", MachineType, hProcess, hThread, StackFrame, ContextRecord, ReadMemoryRoutine, FunctionTableAccessRoutine, GetModuleBaseRoutine, TranslateAddress);
+	return StackWalk(MachineType, hProcess, hThread, StackFrame, ContextRecord, ReadMemoryRoutine, FunctionTableAccessRoutine, GetModuleBaseRoutine, TranslateAddress);
 }
 
 DWORD __stdcall  Safe_SymSetOptions(DWORD SymOptions) {
-	return DbgHelpWrapper::CallFunctionSafe<DWORD, DWORD>("SymSetOptions", SymOptions);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunctionSafe<DWORD, DWORD>("SymSetOptions", SymOptions);
+	return SymSetOptions(SymOptions);
 }
 
 DWORD __stdcall  Safe_SymGetModuleBase(_In_ HANDLE hProcess, _In_ DWORD dwAddr) {
-	return DbgHelpWrapper::CallFunction<DWORD, HANDLE, DWORD>("SymGetModuleBase", hProcess, dwAddr);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunction<DWORD, HANDLE, DWORD>("SymGetModuleBase", hProcess, dwAddr);
+	return SymGetModuleBase(hProcess, dwAddr);
 }
 
 DWORD64 __stdcall  Safe_SymGetModuleBase64(_In_ HANDLE hProcess, _In_ DWORD dwAddr) {
-	return DbgHelpWrapper::CallFunctionSafe<DWORD64, HANDLE, DWORD>("SymGetModuleBase64", hProcess, dwAddr);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunctionSafe<DWORD64, HANDLE, DWORD>("SymGetModuleBase64", hProcess, dwAddr);
+	return SymGetModuleBase64(hProcess, dwAddr);
 }
 
 BOOL __stdcall  Safe_SymGetLineFromAddr(_In_ HANDLE hProcess, _In_ DWORD dwAddr, _Out_ PDWORD pdwDisplacement, _Out_ PIMAGEHLP_LINE Line) {
-	return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, DWORD, PDWORD, PIMAGEHLP_LINE>("SymGetLineFromAddr", hProcess, dwAddr, pdwDisplacement, Line);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, DWORD, PDWORD, PIMAGEHLP_LINE>("SymGetLineFromAddr", hProcess, dwAddr, pdwDisplacement, Line);
+	return SymGetLineFromAddr(hProcess, dwAddr, pdwDisplacement, Line);
 }
 
 BOOL __stdcall  Safe_SymGetLineFromAddr64(_In_ HANDLE hProcess, _In_ DWORD64 qwAddr, _Out_ PDWORD pdwDisplacement, _Out_ PIMAGEHLP_LINE64 Line64) {
-	return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, DWORD64, PDWORD, PIMAGEHLP_LINE64>("SymGetLineFromAddr64", hProcess, qwAddr, pdwDisplacement, Line64);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, DWORD64, PDWORD, PIMAGEHLP_LINE64>("SymGetLineFromAddr64", hProcess, qwAddr, pdwDisplacement, Line64);
+	return SymGetLineFromAddr64(hProcess, qwAddr, pdwDisplacement, Line64);
 }
 
 BOOL __stdcall  Safe_SymUnloadModule(_In_ HANDLE hProcess, _In_ DWORD BaseOfDll) {
-	return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, DWORD>("SymUnloadModule", hProcess, BaseOfDll);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, DWORD>("SymUnloadModule", hProcess, BaseOfDll);
+	return SymUnloadModule(hProcess, BaseOfDll);
 }
 
 BOOL __stdcall  Safe_SymUnloadModule64(_In_ HANDLE hProcess, _In_ DWORD64 BaseOfDll) {
-	return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, DWORD64>("SymUnloadModule64", hProcess, BaseOfDll);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, DWORD64>("SymUnloadModule64", hProcess, BaseOfDll);
+	return SymUnloadModule64(hProcess, BaseOfDll);
 }
 
 BOOL __stdcall  Safe_SymGetTypeInfo(_In_ HANDLE hProcess, _In_ DWORD64 ModBase, _In_ ULONG TypeId, _In_  IMAGEHLP_SYMBOL_TYPE_INFO GetType, _Out_ PVOID pInfo) {
-	return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, DWORD64, ULONG, IMAGEHLP_SYMBOL_TYPE_INFO, PVOID>("SymGetTypeInfo", hProcess, ModBase, TypeId, GetType, pInfo);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, DWORD64, ULONG, IMAGEHLP_SYMBOL_TYPE_INFO, PVOID>("SymGetTypeInfo", hProcess, ModBase, TypeId, GetType, pInfo);
+	return SymGetTypeInfo(hProcess, ModBase, TypeId, GetType, pInfo);
 }
 
 BOOL __stdcall  Safe_SymFromAddr(_In_ HANDLE hProcess, _In_ DWORD64 Address, _Out_opt_ PDWORD64 Displacement, _Inout_ PSYMBOL_INFO Symbol) {
-	return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, DWORD64, PDWORD64, PSYMBOL_INFO>("SymFromAddr", hProcess, Address, Displacement, Symbol);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, DWORD64, PDWORD64, PSYMBOL_INFO>("SymFromAddr", hProcess, Address, Displacement, Symbol);
+	return SymFromAddr(hProcess, Address, Displacement, Symbol);
 }
 
 BOOL __stdcall  Safe_SymInitialize(_In_ HANDLE hProcess, _In_opt_ PCSTR UserSearchPath, _In_ BOOL fInvadeProcess) {
-	return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, PCSTR, BOOL>("SymInitialize", hProcess, UserSearchPath, fInvadeProcess);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, PCSTR, BOOL>("SymInitialize", hProcess, UserSearchPath, fInvadeProcess);
+	return SymInitialize(hProcess, UserSearchPath, fInvadeProcess);
 }
 
 BOOL __stdcall  Safe_SymCleanup(_In_ HANDLE hProcess){
-	return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE>("SymCleanup", hProcess);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE>("SymCleanup", hProcess);
+	return SymCleanup(hProcess);
 }
 
 DWORD __stdcall  Safe_SymLoadModule(_In_ HANDLE hProcess, _In_opt_ HANDLE hFile, _In_opt_ PCSTR ImageName, _In_opt_ PCSTR ModuleName, _In_ DWORD BaseOfDll, _In_ DWORD SizeOfDll) {
-	return DbgHelpWrapper::CallFunctionSafe<DWORD, HANDLE, HANDLE, PCSTR, PCSTR, DWORD, DWORD>("SymLoadModule", hProcess, hFile, ImageName, ModuleName, BaseOfDll, SizeOfDll);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunctionSafe<DWORD, HANDLE, HANDLE, PCSTR, PCSTR, DWORD, DWORD>("SymLoadModule", hProcess, hFile, ImageName, ModuleName, BaseOfDll, SizeOfDll);
+	return SymLoadModule(hProcess, hFile, ImageName, ModuleName, BaseOfDll, SizeOfDll);
 }
 
 DWORD64 __stdcall  Safe_SymLoadModule64(_In_ HANDLE hProcess, _In_opt_ HANDLE hFile, _In_opt_ PCSTR ImageName, _In_opt_ PCSTR ModuleName, _In_ DWORD64 BaseOfDll, _In_ DWORD SizeOfDll) {
-	return DbgHelpWrapper::CallFunctionSafe<DWORD64, HANDLE, HANDLE, PCSTR, PCSTR, DWORD64, DWORD>("SymLoadModule", hProcess, hFile, ImageName, ModuleName, BaseOfDll, SizeOfDll);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunctionSafe<DWORD64, HANDLE, HANDLE, PCSTR, PCSTR, DWORD64, DWORD>("SymLoadModule", hProcess, hFile, ImageName, ModuleName, BaseOfDll, SizeOfDll);
 }
 
 BOOL __stdcall  Safe_EnumerateLoadedModules(_In_ HANDLE hProcess, _In_ PENUMLOADED_MODULES_CALLBACK EnumLoadedModulesCallback, _In_opt_ PVOID UserContext) {
-	return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, PENUMLOADED_MODULES_CALLBACK, PVOID>("EnumerateLoadedModules", hProcess, EnumLoadedModulesCallback, UserContext);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, PENUMLOADED_MODULES_CALLBACK, PVOID>("EnumerateLoadedModules", hProcess, EnumLoadedModulesCallback, UserContext);
+	return EnumerateLoadedModules(hProcess, EnumLoadedModulesCallback, UserContext);
 }
 
 BOOL __stdcall Safe_SymGetModuleInfo(_In_ HANDLE hProcess, _In_ DWORD dwAddr, _Out_ PIMAGEHLP_MODULE ModuleInfo) {
-	return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, DWORD, PIMAGEHLP_MODULE>("SymGetModuleInfo", hProcess, dwAddr, ModuleInfo);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, DWORD, PIMAGEHLP_MODULE>("SymGetModuleInfo", hProcess, dwAddr, ModuleInfo);
+	return SymGetModuleInfo(hProcess, dwAddr, ModuleInfo);
 }
 
 BOOL __stdcall Safe_SymGetSymFromAddr(_In_ HANDLE hProcess, _In_ DWORD dwAddr, _Out_opt_ PDWORD pdwDisplacement, _Inout_ PIMAGEHLP_SYMBOL Symbol) {
-	return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, DWORD, PDWORD, PIMAGEHLP_SYMBOL>("SymGetSymFromAddr", hProcess, dwAddr, pdwDisplacement, Symbol);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunctionSafe<BOOL, HANDLE, DWORD, PDWORD, PIMAGEHLP_SYMBOL>("SymGetSymFromAddr", hProcess, dwAddr, pdwDisplacement, Symbol);
+	return SymGetSymFromAddr(hProcess, dwAddr, pdwDisplacement, Symbol);
 }
 
 PVOID __stdcall Safe_SymFunctionTableAccess(_In_ HANDLE hProcess, _In_ DWORD AddrBase) {
-	return DbgHelpWrapper::CallFunction<PVOID, HANDLE, DWORD>("SymFunctionTableAccess", hProcess, AddrBase);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunction<PVOID, HANDLE, DWORD>("SymFunctionTableAccess", hProcess, AddrBase);
+	return SymFunctionTableAccess(hProcess, AddrBase);
 }
 
 DWORD __stdcall Safe_UnDecorateSymbolName(_In_ PCSTR name, _Out_writes_(maxStringLength) PSTR outputString, _In_ DWORD maxStringLength, _In_ DWORD flags) {
-	return DbgHelpWrapper::CallFunction<DWORD, PCSTR, PSTR, DWORD, DWORD>("UnDecorateSymbolName", name, outputString, maxStringLength, flags);
+	if (DbgHelpWrapper::GetLoaded())
+		return DbgHelpWrapper::CallFunction<DWORD, PCSTR, PSTR, DWORD, DWORD>("UnDecorateSymbolName", name, outputString, maxStringLength, flags);
+	return UnDecorateSymbolName(name, outputString, maxStringLength, flags);
 }

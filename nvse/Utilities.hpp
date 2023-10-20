@@ -16,7 +16,7 @@
 #include <functional>
 
 #include <intrin.h>
-#include <Logging.h>
+#include <Logging.hpp>
 
 // thread-safe template versions of ThisStdCall()
 template <typename T_Ret = UInt32, typename ...Args>

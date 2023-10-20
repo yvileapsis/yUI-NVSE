@@ -3,7 +3,7 @@
 #include <SimpleINILibrary.h>
 
 #include <functions.h>
-#include <SafeWrite.h>
+#include <Safewrite.hpp>
 
 namespace Fix::TouchpadScrolling
 {

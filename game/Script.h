@@ -1,5 +1,5 @@
 #pragma once
-#include "Utilities.h"
+#include "Utilities.hpp"
 #include "TESForm.h"
 
 struct ScriptEventList;

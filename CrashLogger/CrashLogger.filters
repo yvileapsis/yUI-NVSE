@@ -110,10 +110,10 @@
     <ClCompile Include="..\game\GameUI.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClInclude Include="..\nvse\SafeWrite.h">
+    <ClInclude Include="..\nvse\Safewrite.hpp">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\nvse\Utilities.h">
+    <ClInclude Include="..\nvse\Utilities.hpp">
       <Filter>nvse</Filter>
     </ClInclude>
     <ClInclude Include="..\game\CommandTable.h">

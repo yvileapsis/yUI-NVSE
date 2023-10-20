@@ -1,7 +1,7 @@
 #include <main.h>
 #include <InterfaceManager.h>
 #include <Tile.h>
-#include <SafeWrite.h>
+#include <Safewrite.hpp>
 
 #include <SimpleINILibrary.h>
 

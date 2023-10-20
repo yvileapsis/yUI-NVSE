@@ -64,9 +64,10 @@
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <ForcedIncludeFiles>nvse/prefix.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles>nvse/prefix.hpp;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <BuildStlModules>false</BuildStlModules>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
@@ -94,9 +95,10 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\CrashLogger\nvse\p
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
-      <ForcedIncludeFiles>nvse/prefix.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
+      <ForcedIncludeFiles>nvse/prefix.hpp;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <BuildStlModules>false</BuildStlModules>
+      <ExceptionHandling>Async</ExceptionHandling>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
@@ -140,7 +142,10 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\CrashLogger\nvse\p
     <ClCompile Include="..\nvse\Logging.cpp" />
     <ClCompile Include="..\nvse\SafeWrite.cpp" />
     <ClCompile Include="..\nvse\Utilities.cpp" />
-    <ClCompile Include="CrashLogger.cpp" />
+    <ClCompile Include="CrashLoggerCalltrace.cpp" />
+    <ClCompile Include="CrashLoggerExceptionHandler.cpp" />
+    <ClCompile Include="CrashLoggerModules.cpp" />
+    <ClCompile Include="CrashLoggerRegistryStack.cpp" />
     <ClCompile Include="definitions.cpp" />
     <ClCompile Include="dllmain.c">
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -151,6 +156,7 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\CrashLogger\nvse\p
     <ClCompile Include="DbgHelpWrap.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PatchNameThreads.cpp" />
+    <ClCompile Include="CrashLoggerLabels.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\game\BaseFormComponent.h" />
@@ -178,21 +184,21 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\CrashLogger\nvse\p
     <ClInclude Include="..\game\NiNodes.h" />
     <ClInclude Include="..\game\NiObjects.h" />
     <ClInclude Include="..\game\NiTypes.h" />
-    <ClInclude Include="..\nvse\Formatter.h" />
-    <ClInclude Include="..\nvse\Logging.h" />
+    <ClInclude Include="..\nvse\Formatter.hpp" />
+    <ClInclude Include="..\nvse\Logging.hpp" />
     <ClInclude Include="..\game\TESObject.h" />
-    <ClInclude Include="..\nvse\PluginAPI.h" />
-    <ClInclude Include="..\nvse\prefix.h" />
-    <ClInclude Include="..\nvse\SafeWrite.h" />
-    <ClInclude Include="..\nvse\Utilities.h" />
-    <ClInclude Include="..\nvse\dinput8.h" />
+    <ClInclude Include="..\nvse\PluginAPI.hpp" />
+    <ClInclude Include="..\nvse\prefix.hpp" />
+    <ClInclude Include="..\nvse\Safewrite.hpp" />
+    <ClInclude Include="..\nvse\Utilities.hpp" />
+    <ClInclude Include="..\nvse\dinput8.hpp" />
     <ClInclude Include="..\libraries\json.h" />
     <ClInclude Include="..\libraries\SimpleINILibrary.h" />
-    <ClInclude Include="CrashLogger.h" />
-    <ClInclude Include="DbgHelpWrap.h" />
-    <ClInclude Include="definitions.h" />
-    <ClInclude Include="main.h" />
-    <ClInclude Include="namegen.h" />
+    <ClInclude Include="CrashLogger.hpp" />
+    <ClInclude Include="DbgHelpWrap.hpp" />
+    <ClInclude Include="definitions.hpp" />
+    <ClInclude Include="main.hpp" />
+    <ClInclude Include="namegen.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />

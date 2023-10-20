@@ -1,6 +1,6 @@
 #pragma once
 #include <NiObjects.h>
-#include <Utilities.h>
+#include <Utilities.hpp>
 
 struct ChunkAndFormType {
 	UInt32		chunkType;	// ie 

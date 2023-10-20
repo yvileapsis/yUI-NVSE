@@ -1,7 +1,7 @@
-#include "dinput8.h"
-#include "SafeWrite.h"
+#include "dinput8.hpp"
+#include "Safewrite.hpp"
 
-#include "Utilities.h"
+#include "Utilities.hpp"
 
 #include <queue>
 #include <cassert>
