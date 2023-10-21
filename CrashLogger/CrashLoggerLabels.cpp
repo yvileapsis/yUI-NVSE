@@ -417,11 +417,11 @@ namespace CrashLogger::Labels
 		Push(kVtbl_NiSequenceStreamHelper);
 
 		// NiRenderer
-		Push(kVtbl_NiRenderer);
+		Push(kVtbl_NiRenderer, nullptr);
 		Push(kVtbl_NiDX9Renderer);
 
 		// Misc
-		Push(kVtbl_NiPixelData);
+		Push(kVtbl_NiPixelData, As<NiObjectNET>);
 		Push(kVtbl_NiCollisionObject);
 		Push(kVtbl_NiCollisionData);
 		Push(kVtbl_bhkNiCollisionObject);
