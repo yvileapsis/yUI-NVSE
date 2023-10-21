@@ -1,5 +1,5 @@
 #include <NiNodes.h>
-#include <Utilities.h>
+#include <Utilities.hpp>
 
 void TextureFormat::InitFromD3DFMT(UInt32 fmt)
 {

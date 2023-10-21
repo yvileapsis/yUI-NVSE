@@ -176,22 +176,22 @@
     <ClInclude Include="..\libraries\json.h">
       <Filter>libraries</Filter>
     </ClInclude>
-    <ClInclude Include="..\nvse\SafeWrite.h">
+    <ClInclude Include="..\nvse\Safewrite.hpp">
       <Filter>nvse</Filter>
     </ClInclude>
     <ClInclude Include="..\nvse\prefix.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\nvse\PluginAPI.h">
+    <ClInclude Include="..\nvse\PluginAPI.hpp">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\nvse\dinput8.h">
+    <ClInclude Include="..\nvse\dinput8.hpp">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\nvse\Utilities.h">
+    <ClInclude Include="..\nvse\Utilities.hpp">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\nvse\Logging.h">
+    <ClInclude Include="..\nvse\Logging.hpp">
       <Filter>nvse</Filter>
     </ClInclude>
     <ClInclude Include="ConfigurationMenu\ConfigurationMenu.h">

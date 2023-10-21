@@ -1,12 +1,12 @@
 #pragma once
-#include <PluginAPI.h>
-#include <definitions.h>
+#include <PluginAPI.hpp>
+#include <definitions.hpp>
 
 #include <deque>
 
 inline PluginHandle					g_pluginHandle			= kPluginHandle_Invalid;
 
-inline NVSEInterface*				g_nvseInterface			= nullptr;
+inline SEInterface*					g_seInterface			= nullptr;
 inline NVSEStringVarInterface*		g_stringInterface		= nullptr;
 inline NVSEArrayVarInterface*		g_arrayInterface		= nullptr;
 inline NVSEMessagingInterface*		g_messagingInterface	= nullptr;
@@ -22,7 +22,17 @@ inline ActorValueOwner*				g_playerAVOwner			= nullptr;
 inline TESDataHandler*				g_TESDataHandler		= nullptr;
 inline HUDMainMenu*					g_HUDMainMenu			= nullptr;
 
-inline int iMainLoopDoOnce = 0;
+inline bool bMainLoopDoOnce = false;
+
+enum CurrentGame
+{
+	kDefault			= 0,
+	kOblivion			= 'TESO',
+	kFallout3			= 'FO3',
+	kFalloutNewVegas	= 'FONV',
+};
+
+inline CurrentGame					g_currentGame;
 
 inline std::vector<void(*)()>		pluginLoad;
 inline std::vector<void(*)()>		deferredInit;

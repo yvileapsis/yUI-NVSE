@@ -2,7 +2,7 @@
 #include <NiNodes.h>
 #include <OSDepend.h>
 
-#include "Utilities.h"
+#include "Utilities.hpp"
 
 struct Semaphore
 {

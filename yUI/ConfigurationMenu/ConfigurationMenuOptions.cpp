@@ -1,10 +1,10 @@
 #include "ConfigurationMenu.h"
 
-#include "dinput8.h"
+#include "dinput8.hpp"
 #include "functions.h"
 #include "Setting.h"
 #include "InterfaceManager.h"
-#include "SafeWrite.h"
+#include "Safewrite.hpp"
 
 
 /*

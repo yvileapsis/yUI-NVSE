@@ -1,7 +1,7 @@
 #pragma once
 #include <Containers.h>
 #include <NiTypes.h>
-#include <Utilities.h>
+#include <Utilities.hpp>
 
 // 254
 class BSSoundInfo

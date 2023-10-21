@@ -1,4 +1,4 @@
-#include <Utilities.h>
+#include <Utilities.hpp>
 
 #include "ConsoleManager.h"
 #include "InterfaceManager.h"
@@ -1014,7 +1014,7 @@ char* ConvertLiteralPercents(char* srcPtr)
 	return endPtr;
 }
 
-#include <PluginAPI.h>
+#include <PluginAPI.hpp>
 
 std::string DecompileScriptToFolder(const std::string& scriptName, Script* script, const std::string& fileExtension, const std::string_view& modName)
 {

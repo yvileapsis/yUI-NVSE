@@ -1,7 +1,7 @@
 #include <Tile.h>
 #include <Menu.h>
 
-#include "SafeWrite.h"
+#include "Safewrite.hpp"
 
 NiTMapBase <const char*, int>* g_traitNameMap = reinterpret_cast<NiTMapBase<const char*, int>*>(0x011F32F4);
 

@@ -5,7 +5,7 @@
 #include <SimpleINILibrary.h>
 
 #include "functions.h"
-#include "dinput8.h"
+#include "dinput8.hpp"
 #include "RTTI.h"
 
 namespace UserInterface::WeaponHweel

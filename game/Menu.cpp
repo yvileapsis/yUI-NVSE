@@ -1,7 +1,7 @@
-#include <Utilities.h>
+#include <Utilities.hpp>
 #include <Menu.h>
 #include <TESObjectREFR.h>
-#include <SafeWrite.h>
+#include <Safewrite.hpp>
 
 static UInt8*	g_bUpdatePlayerModel		= (UInt8*)0x011C5CB4;	// this is set to true when player confirms change of race in RaceSexMenu -
 

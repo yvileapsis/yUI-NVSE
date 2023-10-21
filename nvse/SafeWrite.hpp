@@ -1,5 +1,5 @@
 #pragma once
-#include <prefix.h>
+#include <prefix.hpp>
 
 // These are used for 10h aligning segments in ASM code (massive performance gain, particularly with loops).
 #define EMIT(bt) __asm _emit bt

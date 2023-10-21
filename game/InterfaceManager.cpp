@@ -1,6 +1,6 @@
 #include <InterfaceManager.h>
 #include <TESObjectREFR.h>
-#include <SafeWrite.h>
+#include <Safewrite.hpp>
 
 const _QueueUIMessage QueueUIMessage = reinterpret_cast<_QueueUIMessage>(0x007052F0);	// Called from Cmd_AddSpell_Execute
 

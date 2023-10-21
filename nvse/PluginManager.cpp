@@ -3,7 +3,7 @@
 //#include "common/IDirectoryIterator.h"
 #include "ParamInfos.h"
 #include "GameAPI.h"
-#include "Utilities.h"
+#include "Utilities.hpp"
 
 #ifdef RUNTIME
 #include "Core_Serialization.h"

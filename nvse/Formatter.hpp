@@ -45,7 +45,7 @@ std::ostream &operator<<(std::ostream &os, const Menu& obj)
 	os << std::format(", visible: {:b}", obj.IsVisible());
 	os << std::format(", visibilityState : 0x{:X}", obj.visibilityState);
 	std::stringstream ss;
-	ss << ", TileMenu: " << (const Tile&) obj.tile;
+	ss << ", TileMenu: " << (const Tile&) *obj.tile;
 	os << ss.str();
 	return os; 
 }
@@ -71,7 +71,7 @@ std::ostream& operator<<(std::ostream& os, const TESObjectREFR& obj)
 {
 	os << (const TESForm&)obj;
 	std::stringstream ss;
-	ss << ", Baseform " << obj.TryGetREFRParent();
+	ss << ", Baseform " << (const TESForm&)*obj.TryGetREFRParent();
 	os << ss.str();
 	return os;
 }
@@ -83,7 +83,7 @@ std::ostream& operator<<(std::ostream& os, const NavMesh& obj)
 {
 	os << (const TESForm&)obj;
 	std::stringstream ss;
-	ss << ", Cell " << (const TESForm&)obj.parentCell;
+	ss << ", Cell " << (const TESForm&)*obj.parentCell;
 	os << ss.str();
 	return os;
 }
@@ -93,7 +93,7 @@ std::ostream& operator<<(std::ostream& os, const BaseProcess& obj)
 	for (const auto iter : *TESForm::GetAll())
 		if ((iter->typeID == kFormType_Creature && static_cast<Creature*>(iter)->baseProcess == &obj) 
 			|| (iter->typeID == kFormType_Character && static_cast<Character*>(iter)->baseProcess == &obj))
-			os << (const TESObjectREFR&)iter;
+			os << (const TESObjectREFR&)*iter;
 	return os;
 }
 
@@ -105,7 +105,7 @@ std::ostream& operator<<(std::ostream& os, const BSAnimGroupSequence& obj)
 
 std::ostream& operator<<(std::ostream& os, const AnimSequenceSingle& obj)
 {
-	os << (const BSAnimGroupSequence&)obj.anim;
+	os << (const BSAnimGroupSequence&)*obj.anim;
 	return os;
 }
 
@@ -130,7 +130,7 @@ std::ostream& operator<<(std::ostream& os, const NiNode& obj)
 {
 	os << (const NiObjectNET&)obj;
 	if (const auto ref = TESObjectREFR::FindReferenceFor3D(&obj))
-		os << ", " << (const TESObjectREFR&)ref;
+		os << ", " << (const TESObjectREFR&)*ref;
 	return os; 
 }
 
@@ -154,7 +154,7 @@ std::ostream& operator<<(std::ostream& os, const QueuedModel& obj)
 			break;
 		}
 	if (obj.tesModel)
-		os << (TESModel&)obj.tesModel;
+		os << (TESModel&)*obj.tesModel;
 	return os;
 }
 
@@ -181,7 +181,7 @@ std::ostream& operator<<(std::ostream& os, const NiStream& obj)
 std::ostream& operator<<(std::ostream& os, const ActiveEffect& obj)
 {
 	if (obj.enchantObject)
-		os << "Enchanted Object: " << (const TESForm&)obj.enchantObject;
+		os << "Enchanted Object: " << (const TESForm&)*obj.enchantObject;
 	return os; 
 }
 
@@ -205,7 +205,7 @@ std::ostream& operator<<(std::ostream& os, const ScriptEffect& obj)
 	if (obj.script)
 	{
 		std::stringstream ss;
-		ss << "Script: " << (const Script&)obj.script;
+		ss << "Script: " << (const Script&)*obj.script;
 		os << ss.str();
 	}
 	return os; 

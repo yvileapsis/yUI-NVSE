@@ -3,7 +3,7 @@
 #include <RTTI.h>
 #include <InventoryChanges.h>
 #include <GameTasks.h>
-#include <SafeWrite.h>
+#include <Safewrite.hpp>
 #include <NiObjects.h>
 #include <unordered_set>
 

@@ -2,7 +2,7 @@
 
 #include <main.h>
 #include <TESObjectREFR.h>
-#include <PluginAPI.h>
+#include <PluginAPI.hpp>
 
 namespace SortingIcons::Commands
 {

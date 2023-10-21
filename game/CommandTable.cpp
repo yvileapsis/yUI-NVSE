@@ -1,5 +1,5 @@
 #include "CommandTable.h"
-#include "SafeWrite.h"
+#include "Safewrite.hpp"
 #include "GameAPI.h"
 #include "GameData.h"
 #include "Objects.h"
@@ -11,7 +11,7 @@
 #include "GameSettings.h"
 #include "GameUI.h"
 #include <string>
-#include "Utilities.h"
+#include "Utilities.hpp"
 #include "PluginManager.h"
 #include "NiNodes.h"
 #include <stdexcept>

@@ -1,6 +1,6 @@
 #include "main.h"
 
-#include "SafeWrite.h"
+#include "Safewrite.hpp"
 #include "ConfigurationMenu.h"
 
 namespace ConfigurationMenu
