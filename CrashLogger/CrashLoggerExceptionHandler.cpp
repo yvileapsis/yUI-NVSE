@@ -150,6 +150,8 @@ namespace CrashLogger
 
 		Stack::Get(info);
 
+		Memory::Get(info);
+
 		Modules::Get(info);
 
 		Logger::Copy();
