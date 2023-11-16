@@ -99,6 +99,7 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\CrashLogger\nvse\p
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <BuildStlModules>false</BuildStlModules>
       <ExceptionHandling>Async</ExceptionHandling>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
