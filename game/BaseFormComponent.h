@@ -1264,6 +1264,8 @@ enum ObjectVtbl
 	kVtbl_SpeedTreeBranchShader = 0x10BC070,
 	kVtbl_DistantLODShader = 0x10BC260,
 	kVtbl_BSCubeMapCamera = 0x10BC470,
+	kVtbl_TallGrassTriShape = 0x10BCC90,
+	kVtbl_TallGrassTriStrips = 0x10BCDC8,
 	kVtbl_NiParticleSystem = 0x10BD44C,
 	kVtbl_NiPSysEmitterCtlr = 0x10BD594,
 	kVtbl_NiPSysMeshEmitter = 0x10BD7FC,

@@ -134,6 +134,12 @@ std::ostream& operator<<(std::ostream& os, const NiNode& obj)
 	return os; 
 }
 
+std::ostream& operator<<(std::ostream& os, const NiExtraData& obj)
+{
+	os << std::format(R"(Name: "{}")", obj.m_kName.CStr());
+	return os; 
+}
+
 std::ostream& operator<<(std::ostream& os, const BSFile& obj) 
 { 
 	for (UInt32 i = 0; i < MAX_PATH; i++) if (obj.m_path[i] == 0)
@@ -242,6 +248,7 @@ FORMAT_CLASS(AnimSequenceMultiple);
 FORMAT_CLASS(NiObjectNET);
 
 FORMAT_CLASS(NiNode);
+FORMAT_CLASS(NiExtraData);
 FORMAT_CLASS(BSFile);
 FORMAT_CLASS(TESModel);
 FORMAT_CLASS(QueuedModel);
