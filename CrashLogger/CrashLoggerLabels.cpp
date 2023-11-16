@@ -379,37 +379,42 @@ namespace CrashLogger::Labels
 		Push(kVtbl_NiTextureEffect);
 
 		Push(kVtbl_NiNode, As<NiNode>);
+		Push(kVtbl_BSNiNode);
+		Push(kVtbl_BSBlastNode);
+		Push(kVtbl_BSDebrisNode);
+		Push(kVtbl_BSMultiBoundNode);
+		Push(kVtbl_BSOrderedNode);
+		Push(kVtbl_BSPortalSharedNode);
+		Push(kVtbl_BSRangeNode);
+		Push(kVtbl_BSTreeNode);
+		Push(kVtbl_BSValueNode);
 		Push(kVtbl_SceneGraph);
 		Push(kVtbl_BSTempNode);
 		Push(kVtbl_BSTempNodeManager);
-		//		Push(kVtbl_BSCellNode);
 		Push(kVtbl_BSClearZNode);
-		Push(kVtbl_BSFadeNode, nullptr, "BSFadeNode"); // missing RTTI name
-		//		Push(kVtbl_BSScissorNode);
-		//		Push(kVtbl_BSTimingNode);
+		Push(kVtbl_BSFadeNode, As<NiNode>, "BSFadeNode"); // missing RTTI name
 		Push(kVtbl_BSFaceGenNiNode, As<NiNode>);
 		Push(kVtbl_NiBillboardNode);
 		Push(kVtbl_NiSwitchNode);
 		Push(kVtbl_NiLODNode);
-		//		Push(kVtbl_NiBSLODNode);
 		Push(kVtbl_NiSortAdjustNode);
 		Push(kVtbl_NiBSPNode);
 		Push(kVtbl_ShadowSceneNode); // 10ADCE0
-		Push(kVtbl_NiCamera);
-		Push(kVtbl_BSCubeMapCamera);
-		Push(kVtbl_NiScreenSpaceCamera);
 
 		// NiGeometry
 		Push(kVtbl_NiGeometry, As<NiObjectNET>);
+		Push(kVtbl_NiCamera);
+		Push(kVtbl_BSCubeMapCamera);
+		Push(kVtbl_NiScreenSpaceCamera);
 		Push(kVtbl_NiLines);
 		Push(kVtbl_NiTriBasedGeom);
 		Push(kVtbl_NiTriShape);
 		Push(kVtbl_BSScissorTriShape);
 		Push(kVtbl_NiScreenElements);
 		Push(kVtbl_NiScreenGeometry);
-		//		Push(kVtbl_TallGrassTriShape);
+		Push(kVtbl_TallGrassTriShape);
+		Push(kVtbl_TallGrassTriStrips);
 		Push(kVtbl_NiTriStrips);
-		//		Push(kVtbl_TallGrassTriStrips);
 		Push(kVtbl_NiParticles);
 		Push(kVtbl_NiParticleSystem);
 		Push(kVtbl_NiMeshParticleSystem);
@@ -433,7 +438,6 @@ namespace CrashLogger::Labels
 		Push(kVtbl_bhkSPCollisionObject);
 
 		// Animations
-		// TODO:: figure out why the hell the source is wrong and parent of NiController is NiObject not NiObjectNET
 		Push(kVtbl_NiControllerSequence);
 
 		// NiTimeController
@@ -565,7 +569,7 @@ namespace CrashLogger::Labels
 		Push(kVtbl_bhkCharacterListenerSpell);
 		Push(kVtbl_bhkCharacterController);
 
-		Push(kVtbl_NiExtraData);
+		Push(kVtbl_NiExtraData, As<NiExtraData>);
 		//		Push(kVtbl_TESObjectExtraData);
 		Push(kVtbl_BSFaceGenAnimationData);
 		Push(kVtbl_BSFaceGenModelExtraData);
@@ -591,7 +595,9 @@ namespace CrashLogger::Labels
 		Push(kVtbl_NiStringsExtraData);
 		Push(kVtbl_NiIntegersExtraData);
 		Push(kVtbl_NiBooleanExtraData);
-		Push(kVtbl_NiAdditionalGeometryData);
+
+		// Geometry data
+		Push(kVtbl_NiAdditionalGeometryData, nullptr);
 		Push(kVtbl_BSPackedAdditionalGeometryData);
 		Push(kVtbl_NiGeometryData);
 		Push(kVtbl_NiLinesData);
@@ -607,7 +613,7 @@ namespace CrashLogger::Labels
 		Push(kVtbl_NiMeshPSysData);
 		Push(kVtbl_NiParticleMeshesData);
 
-		Push(kVtbl_NiTask);
+		Push(kVtbl_NiTask, nullptr);
 		//		Push(kVtbl_BSTECreateTask);
 		//		Push(kVtbl_NiParallelUpdateTaskManager::SignalTask);
 		Push(kVtbl_NiGeomMorpherUpdateTask);
@@ -874,14 +880,14 @@ namespace CrashLogger::Labels
 		Push(kVtbl_BSAudioManager);
 		Push(kVtbl_BSAudioManagerThread);
 		Push(kVtbl_BSBatchRenderer);
-		Push(kVtbl_BSBlastNode);
+
 		Push(kVtbl_BSBlendTreadTransfInterpolator);
 		Push(kVtbl_BSCacheDriveSystemUtility);
 		Push(kVtbl_BSCoreMessage);
 		Push(kVtbl_BSCullingProcess);
 		Push(kVtbl_BSCustomSplatterExtraData);
 		Push(kVtbl_BSDamageStage);
-		Push(kVtbl_BSDebrisNode);
+
 		Push(kVtbl_BSDecalPlacementVectorExtraData);
 		Push(kVtbl_BSDiscBootSystemUtility);
 		Push(kVtbl_BSDismemberSkinInstance);
@@ -913,16 +919,13 @@ namespace CrashLogger::Labels
 		Push(kVtbl_BSMultiBound);
 		Push(kVtbl_BSMultiBoundAABB);
 		Push(kVtbl_BSMultiBoundCapsule);
-		Push(kVtbl_BSMultiBoundNode);
 		Push(kVtbl_BSMultiBoundOBB);
 		Push(kVtbl_BSMultiBoundRoom);
 		Push(kVtbl_BSMultiBoundShape);
 		Push(kVtbl_BSMultiBoundSphere);
 		Push(kVtbl_BSMultiTargetTreadTransfController);
 		Push(kVtbl_BSNiAllocator);
-		Push(kVtbl_BSNiNode);
 		Push(kVtbl_BSOcclusionPlane);
-		Push(kVtbl_BSOrderedNode);
 		Push(kVtbl_BSPSysMultiTargetEmitterCtlr);
 		Push(kVtbl_BSPSysSimpleColorModifier);
 		Push(kVtbl_BSPSysStripUpdateModifier);
@@ -930,8 +933,7 @@ namespace CrashLogger::Labels
 		Push(kVtbl_BSParticleSystemManager);
 		Push(kVtbl_BSPortal);
 		Push(kVtbl_BSPortalGraph);
-		Push(kVtbl_BSPortalSharedNode);
-		Push(kVtbl_BSRangeNode);
+
 		Push(kVtbl_BSRefractionFirePeriodController);
 		Push(kVtbl_BSRefractionStrengthController);
 		Push(kVtbl_BSResizableTriShape);
@@ -963,8 +965,6 @@ namespace CrashLogger::Labels
 		Push(kVtbl_BSThread);
 		Push(kVtbl_BSTreadTransfInterpolator);
 		Push(kVtbl_BSTreeModel);
-		Push(kVtbl_BSTreeNode);
-		Push(kVtbl_BSValueNode);
 		Push(kVtbl_BSWArray);
 		Push(kVtbl_BSWin32Audio);
 		Push(kVtbl_BSWin32AudioListener);
