@@ -18,16 +18,16 @@ namespace CrashLogger::Memory
 	std::string FormatSize(SIZE_T size) {
 		std::string result;
 		if (size < 1024) {
-			result = std::format("{:d} B", size);
+			result = std::format("{:>6d} B", size);
 		}
 		else if (size < 1024 * 1024) {
-			result = std::format("{:.2f} KB", ConvertToKB(size));
+			result = std::format("{:>6.2f} KB", ConvertToKB(size));
 		}
 		else if (size < 1024 * 1024 * 1024) {
-			result = std::format("{:.2f} MB", ConvertToMB(size));
+			result = std::format("{:>6.2f} MB", ConvertToMB(size));
 		}
 		else {
-			result = std::format("{:.2f} GB", ConvertToGB(size));
+			result = std::format("{:>6.2f} GB", ConvertToGB(size));
 		}
 		return result;
 	}
