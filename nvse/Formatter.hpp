@@ -99,7 +99,7 @@ std::ostream& operator<<(std::ostream& os, const BaseProcess& obj)
 
 std::ostream& operator<<(std::ostream& os, const BSAnimGroupSequence& obj)
 {
-	os << std::format("{}, {}, AnimGroup {:04X}", obj.sequenceName, obj.accumRootName, obj.animGroup->groupID);
+	os << SanitizeString(std::format("{}, {}, AnimGroup {:04X}", obj.sequenceName, obj.accumRootName, obj.animGroup->groupID));
 	return os;
 }
 
@@ -118,11 +118,8 @@ std::ostream& operator<<(std::ostream& os, const AnimSequenceMultiple& obj)
 
 std::ostream& operator<<(std::ostream& os, const NiObjectNET& obj) 
 {
-	for (UInt32 i = 0; i < MAX_PATH; i++) if (obj.m_pcName[i] == 0)
-	{
-		os << std::format(R"(Name: "{}")", obj.m_pcName); 
-		break;
-	}
+	os << SanitizeString(std::format(R"(Name: "{}")", obj.m_pcName)); 
+
 	return os; 
 }
 
@@ -136,29 +133,25 @@ std::ostream& operator<<(std::ostream& os, const NiNode& obj)
 
 std::ostream& operator<<(std::ostream& os, const NiExtraData& obj)
 {
-	os << std::format(R"(Name: "{}")", obj.m_kName.CStr());
+	os << SanitizeString(std::format(R"(Name: "{}")", obj.m_kName.CStr()));
 	return os; 
 }
 
 std::ostream& operator<<(std::ostream& os, const BSFile& obj) 
 { 
-	for (UInt32 i = 0; i < MAX_PATH; i++) if (obj.m_path[i] == 0)
-	{
-		os << std::format("Path: {}", obj.m_path);
-		break;
-	}
+	os << SanitizeString(std::format("Path: {}", obj.m_path));
 	return os;
 }
-std::ostream& operator<<(std::ostream& os, const TESModel& obj) { os << std::format("Path: {}", obj.nifPath.CStr()); return os; }
+std::ostream& operator<<(std::ostream& os, const TESModel& obj)
+{
+	os << SanitizeString(std::format("Path: {}", obj.nifPath.CStr())); 
+	return os; 
+}
 
 std::ostream& operator<<(std::ostream& os, const QueuedModel& obj) 
 {
 	if (obj.model)
-		for (UInt32 i = 0; i < MAX_PATH; i++) if (obj.model->path[i] == 0)
-		{
-			os << "Path: " << obj.model->path << " ";
-			break;
-		}
+		os << SanitizeString("Path: " + std::string(obj.model->path) + " ");
 	if (obj.tesModel)
 		os << (TESModel&)*obj.tesModel;
 	return os;
@@ -167,20 +160,12 @@ std::ostream& operator<<(std::ostream& os, const QueuedModel& obj)
 std::ostream& operator<<(std::ostream& os, const TESTexture& obj) { os << std::format("Path: {}", obj.ddsPath.CStr()); return os; }
 std::ostream& operator<<(std::ostream& os, const QueuedTexture& obj) 
 {
-	for (UInt32 i = 0; i < MAX_PATH; i++) if (obj.name[i] == 0)
-	{
-		os << std::format("Path: {}", obj.name); 
-		break;
-	}
+	os << SanitizeString(std::format("Path: {}", obj.name)); 
 	return os; 
 }
 std::ostream& operator<<(std::ostream& os, const NiStream& obj) 
 {
-	for (UInt32 i = 0; i < MAX_PATH; i++) if (obj.path[i] == 0)
-	{
-		os << std::format("Path: {}", obj.path); 
-		break;
-	}
+	os << SanitizeString(std::format("Path: {}", obj.path)); 
 	return os; 
 }
 
@@ -212,19 +197,14 @@ std::ostream& operator<<(std::ostream& os, const ScriptEffect& obj)
 	{
 		std::stringstream ss;
 		ss << "Script: " << (const Script&)*obj.script;
-		os << ss.str();
+		os << SanitizeString(ss.str());
 	}
 	return os; 
 }
 
 std::ostream& operator<<(std::ostream& os, const QueuedKF& obj)
 {
-	if (obj.kf)
-		for (UInt32 i = 0; i < MAX_PATH; i++) if (obj.kf->path[i] == 0)
-		{
-			os << "Path: " << obj.kf->path;
-			break;
-		}
+	if (obj.kf) os << SanitizeString("Path: " + std::string(obj.kf->path));
 	return os; 
 }
 

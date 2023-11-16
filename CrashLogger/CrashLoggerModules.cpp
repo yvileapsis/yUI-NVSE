@@ -79,7 +79,7 @@ namespace CrashLogger::Modules
 			if (g_commandInterface) if (const auto info = g_commandInterface->GetPluginInfoByName(GetPluginNameForFileName(path.stem().generic_string()).c_str()))
 				version = std::format("NVSE plugin version: {:>4d}, ", info->version);
 
-			Log() << std::format("0x{:08X} - 0x{:08X} ==> {:25s}{:>30s}{}", moduleBase, moduleEnd, path.stem().generic_string() + ",", version, path.generic_string());
+			Log() << std::format("0x{:08X} - 0x{:08X} ==> {:25s}{:>30s}{}", moduleBase, moduleEnd, path.stem().generic_string() + ",", version, SanitizeString(path.generic_string()));
 
 		}
 

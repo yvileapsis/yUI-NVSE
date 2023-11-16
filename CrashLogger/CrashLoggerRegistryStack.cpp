@@ -43,6 +43,7 @@ namespace CrashLogger::Stack
 			return 0xD9B000;
 		else if (g_currentGame == kOblivion)
 			return 0x0;
+		return 0;
 	}
 
 	bool GetStringForRTTIorPDB(void** object, std::string& buffer)
@@ -57,7 +58,7 @@ namespace CrashLogger::Stack
 		}
 		return false;
 	}
-	catch (...) {}
+	catch (...) { return false; }
 
 	// taken out of CrashLoggerSSE
 	bool GetAsString(void** object, std::string& buffer)
@@ -83,7 +84,7 @@ namespace CrashLogger::Stack
 		
 			if (len == 0 || len >= max || len < 3) return false;
 
-			buffer += std::format(R"(0x{:08X} ==> String: "{}")", *(UInt32*)object, std::string(str));
+			buffer += std::format(R"(0x{:08X} ==> String: "{}")", *(UInt32*)object, SanitizeString(str));
 			return true;
 		} catch (...) {
 			return false;
@@ -111,7 +112,7 @@ namespace CrashLogger::Stack
 		UInt32 deref = 0;
 		do
 		{
-			if (GetStringForLabel(object, buffer)) return buffer;
+			if (GetStringForLabel(object, buffer)) return SanitizeString(buffer.c_str());
 			deref = Dereference<UInt32>(object);
 			buffer += std::format("0x{:08X} ==> ", deref);
 			object = (void**)deref;

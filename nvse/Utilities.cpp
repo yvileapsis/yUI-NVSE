@@ -1037,3 +1037,57 @@ std::string DecompileScriptToFolder(const std::string& scriptName, Script* scrip
 	os << buffer;
 	return std::format("Decompiled script to '{}'", dirName.string());
 }
+
+std::string& SanitizeStringBySize(std::string& str)
+{
+	for (UInt32 i = 0; i < MAX_PATH; i++) if (str[i] == 0) 
+		return str;
+	str = "";
+	return str;
+}
+
+std::string& SanitizeStringFromBadData(std::string& str)
+{
+	str.erase(std::remove_if(str.begin(), str.end(), [](char c) { return !(c >= 0 && c <= 0x128); }), str.end());
+
+	std::replace_if(str.begin(), str.end(), [](char c) { return c == '\n' || c == '\r' || c == '\0' || c == '\v'; }, ' ');
+
+	return str;
+}
+
+std::string pcName;
+std::string userName;
+
+std::string& SanitizeStringFromUserInfo(std::string& str)
+{
+	[[unlikely]]
+	if (pcName.empty())
+	{
+		TCHAR infoBuf[MAX_PATH];
+		DWORD bufCharCount = MAX_PATH;
+		if (GetComputerName(infoBuf, &bufCharCount)) pcName = infoBuf;
+	}
+
+	[[unlikely]]
+	if (userName.empty())
+	{
+		TCHAR infoBuf[MAX_PATH];
+		DWORD bufCharCount = MAX_PATH;
+		if (GetUserName(infoBuf, &bufCharCount)) userName = infoBuf;
+	}
+
+	while (str.find(pcName) != -1) str.replace(str.find(pcName), pcName.size(), pcName.size(), '*');
+
+	while (str.find(userName) != -1) str.replace(str.find(userName), userName.size(), userName.size(), '*');
+
+	return str;
+}
+
+const std::string& SanitizeString(std::string&& str) 
+{
+	SanitizeStringBySize(str);
+	SanitizeStringFromBadData(str);
+	SanitizeStringFromUserInfo(str);
+
+	return str;
+}
