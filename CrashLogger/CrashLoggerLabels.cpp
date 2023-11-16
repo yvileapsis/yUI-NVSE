@@ -565,7 +565,7 @@ namespace CrashLogger::Labels
 		Push(kVtbl_bhkCharacterListenerSpell);
 		Push(kVtbl_bhkCharacterController);
 
-		Push(kVtbl_NiExtraData);
+		Push(kVtbl_NiExtraData, As<NiExtraData>);
 		//		Push(kVtbl_TESObjectExtraData);
 		Push(kVtbl_BSFaceGenAnimationData);
 		Push(kVtbl_BSFaceGenModelExtraData);
@@ -591,7 +591,9 @@ namespace CrashLogger::Labels
 		Push(kVtbl_NiStringsExtraData);
 		Push(kVtbl_NiIntegersExtraData);
 		Push(kVtbl_NiBooleanExtraData);
-		Push(kVtbl_NiAdditionalGeometryData);
+
+		// Geometry data
+		Push(kVtbl_NiAdditionalGeometryData, nullptr);
 		Push(kVtbl_BSPackedAdditionalGeometryData);
 		Push(kVtbl_NiGeometryData);
 		Push(kVtbl_NiLinesData);
@@ -607,7 +609,7 @@ namespace CrashLogger::Labels
 		Push(kVtbl_NiMeshPSysData);
 		Push(kVtbl_NiParticleMeshesData);
 
-		Push(kVtbl_NiTask);
+		Push(kVtbl_NiTask, nullptr);
 		//		Push(kVtbl_BSTECreateTask);
 		//		Push(kVtbl_NiParallelUpdateTaskManager::SignalTask);
 		Push(kVtbl_NiGeomMorpherUpdateTask);
