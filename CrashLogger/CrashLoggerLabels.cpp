@@ -407,9 +407,9 @@ namespace CrashLogger::Labels
 		Push(kVtbl_BSScissorTriShape);
 		Push(kVtbl_NiScreenElements);
 		Push(kVtbl_NiScreenGeometry);
-		//		Push(kVtbl_TallGrassTriShape);
+		Push(kVtbl_TallGrassTriShape);
+		Push(kVtbl_TallGrassTriStrips);
 		Push(kVtbl_NiTriStrips);
-		//		Push(kVtbl_TallGrassTriStrips);
 		Push(kVtbl_NiParticles);
 		Push(kVtbl_NiParticleSystem);
 		Push(kVtbl_NiMeshParticleSystem);
