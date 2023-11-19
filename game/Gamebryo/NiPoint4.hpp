@@ -1,8 +1,9 @@
 #pragma once
 
 #include "NiRect.hpp"
+#include "NiPoint3.hpp"
 
-class NiPoint4 {
+class NiPoint4 : public NiMemObject {
 public:
 	union {
 		struct {

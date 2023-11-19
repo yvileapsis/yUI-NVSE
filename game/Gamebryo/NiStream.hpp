@@ -24,7 +24,7 @@ class NiStream {
 public:
 	NiStream();
 
-	enum EnumrrorMessages
+	enum ErrorMessages
 	{
 		STREAM_OKAY = 0x0,
 		FILE_NOT_LOADED = 0x1,

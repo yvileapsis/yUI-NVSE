@@ -25,6 +25,8 @@ public:
 
 	~NiPoint3() { };
 
+	float operator[] (unsigned int ui) const { return f[ui]; };
+
 	bool operator== (const NiPoint3& pt) const { return x == pt.x && y == pt.y && z == pt.z; }
 	bool operator!= (const NiPoint3& pt) const { return !(*this == pt); }
 

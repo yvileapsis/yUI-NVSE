@@ -12,9 +12,7 @@ public:
 		m_quad(_mm_setr_ps(a_x, a_y, a_z, a_w))
 	{}
 
-	hkVector4(const hkVector4& a_rhs) :
-		m_quad(a_rhs.m_quad)
-	{}
+	hkVector4(const hkVector4& a_rhs) : m_quad(a_rhs.m_quad) {}
 
 	hkVector4(const NiPoint3& a_point) :
 		m_quad(_mm_setr_ps(a_point.x, a_point.y, a_point.z, 0.0f))

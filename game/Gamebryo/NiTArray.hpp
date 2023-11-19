@@ -238,10 +238,14 @@ public:
 
 template <class T_Data> 
 class NiTObjectArray : public NiTArray<T_Data, NiTNewInterface<T_Data>> {
+public:
+	NiTObjectArray(UInt32 uiMaxSize = 0, UInt32 uiGrowBy = 1) : NiTArray<T_Data, NiTNewInterface<T_Data>>(uiMaxSize, uiGrowBy) {};
 };
 
 template <class T_Data> 
 class NiTPrimitiveArray : public NiTArray<T_Data, NiTMallocInterface<T_Data>> {
+public:
+	NiTPrimitiveArray(UInt32 uiMaxSize = 0, UInt32 uiGrowBy = 1) : NiTArray<T_Data, NiTMallocInterface<T_Data>>(uiMaxSize, uiGrowBy) {};
 };
 
 ASSERT_SIZE(NiTObjectArray<void*>, 0x10);

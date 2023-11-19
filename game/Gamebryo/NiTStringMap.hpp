@@ -9,7 +9,7 @@ public:
 	NiTStringTemplateMap();
 	~NiTStringTemplateMap();
 
-	virtual void*	pkDestructor(bool doFree);								// 000
+	virtual void* Destructor(bool doFree);								// 000
 	virtual UInt32 KeyToHashIndex(const char* pcKey);				// 004
 	virtual bool IsKeysEqual(const char* pcKey1, const char* pcKey2);	// 008
 	virtual void SetValue(NiTMapItem<const char*, T_Data>* pkItem, const char* pcKey, T_Data val);	// 00C
@@ -23,9 +23,9 @@ public:
 template <class T_Data>
 class NiTStringMap : public NiTStringTemplateMap<NiTMap<const char*, T_Data>, T_Data> {
 };
-static_assert(sizeof(NiTStringMap<UInt32>) == 0x14);
+STATIC_ASSERT(sizeof(NiTStringMap<UInt32>) == 0x14);
 
 template <class T_Data>
 class NiTStringPointerMap : public NiTStringTemplateMap<NiTPointerMap<const char*, T_Data>, T_Data> {
 };
-static_assert(sizeof(NiTStringPointerMap<UInt32>) == 0x14);
+STATIC_ASSERT(sizeof(NiTStringPointerMap<UInt32>) == 0x14);

@@ -1,8 +1,8 @@
 #pragma once
+
 #include "NiViewport.hpp"
 
-template <class T> class NiRect
-{
+template <class T> class NiRect {
 public:
 	NiRect(T left = T(0), T right = T(0), T top = T(0), T bottom = T(0))
 	{

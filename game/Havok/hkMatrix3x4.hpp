@@ -4,7 +4,7 @@ class alignas(16) hkMatrix3x4 {
 public:
 	float	cr[3][4];
 
-	hkMatrix3x4() {}
+	hkMatrix3x4() { memset(cr, 0, sizeof(cr)); }
 	hkMatrix3x4(float m00, float m10, float m20, float m01, float m11, float m21, float m02, float m12, float m22)
 	{
 		cr[0][0] = m00; cr[0][1] = m10; cr[0][2] = m20;

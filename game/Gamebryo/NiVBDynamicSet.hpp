@@ -1,7 +1,8 @@
 #pragma once
-;
-class NiVBDynamicSet
-{
+
+#include "Defines.hpp"
+
+class NiVBDynamicSet {
 public:
 	UInt32 m_uiIndex;
 	UInt32 m_uiFVF;

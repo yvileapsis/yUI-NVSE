@@ -2,7 +2,7 @@
 
 class hkBaseObject {
 public:
-	virtual void Destroy(bool);
+	virtual ~hkBaseObject();
 };
 
 ASSERT_SIZE(hkBaseObject, 0x4);

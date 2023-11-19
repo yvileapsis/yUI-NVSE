@@ -46,6 +46,7 @@ public:
 	static NiD3DRenderer* GetRenderer();
 	static UInt32 GetMaxTextureBlendStages();
 	void SetRenderState(D3DRENDERSTATETYPE auiRenderState, UInt32 auiValue, bool abSave = true);
+	void SetBlendRenderState(UInt32 uiSrcBlend, UInt32 uiDestcBlend);
 	void RemoveRenderState(UInt32 uiRenderState);
 
 	void SetName(const char* apcName);

@@ -65,6 +65,8 @@ public:
 	NiColorA* GetColors();
 	NiPoint2* GetTextures();
 
+	UInt16 GetVertCount() const;
+
 	UInt16 GetTextureSets();
 	NiPoint2* GetTextureSet(UInt16 ausSet);
 
