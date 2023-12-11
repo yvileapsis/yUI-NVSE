@@ -40,6 +40,10 @@ void InitLog(std::filesystem::path path = "")
 	Log(LogLevel::Warning) << GetName() + " version " + CrashLogger_VERSION_STR + " at " + std::format("{0:%F} {0:%T}", std::chrono::time_point(std::chrono::system_clock::now())) << std::endl 
 		<< "If this file is empty, then your game didn't crash or something went so wrong even crash logger was useless! :snig:" << std::endl
 		<< "Topmost stack module is NOT ALWAYS the crash reason! Exercise caution when speculating!" << std::endl;
+
+	if (GetModuleHandle("nvac.dll")) {
+		Log(LogLevel::Warning) << "NVAC detected! The log will be incorrect!\nPlease remove NVAC to let the game crash properly!\n";
+	}
 }
 
 void NVSEMessageHandler(NVSEMessagingInterface::Message* msg)
