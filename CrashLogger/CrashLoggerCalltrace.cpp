@@ -72,8 +72,16 @@ namespace CrashLogger::Calltrace
 
 		Safe_SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_DEFERRED_LOADS | SYMOPT_UNDNAME | SYMOPT_ALLOW_ABSOLUTE_SYMBOLS);
 
+		char workingDirectory[MAX_PATH];
+		char symbolPath[MAX_PATH];
+		char altSymbolPath[MAX_PATH];
+		GetCurrentDirectory(MAX_PATH, workingDirectory);
+		GetEnvironmentVariable("_NT_SYMBOL_PATH", symbolPath, MAX_PATH);
+		GetEnvironmentVariable("_NT_ALTERNATE_SYMBOL_PATH ", altSymbolPath, MAX_PATH);
+		std::string lookPath = std::format("{};{}\\Data\\NVSE\\Plugins;{};{}", workingDirectory, workingDirectory, symbolPath, altSymbolPath);
+
 		//	SymSetExtendedOption((IMAGEHLP_EXTENDED_OPTIONS)SYMOPT_EX_WINE_NATIVE_MODULES, TRUE);
-		if (!Safe_SymInitialize(process, NULL, true))
+		if (!Safe_SymInitialize(process, lookPath.c_str(), true))
 			Log() << "Error initializing symbol store";
 
 		//	SymSetExtendedOption((IMAGEHLP_EXTENDED_OPTIONS)SYMOPT_EX_WINE_NATIVE_MODULES, TRUE);
