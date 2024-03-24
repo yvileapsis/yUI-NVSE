@@ -1,7 +1,9 @@
 ﻿#include <main.hpp>
-#include <TESObjectREFR.h>
-#include <GameData.h>
-#include <Menu.h>
+#include <TESObjectREFR.hpp>
+#include <PlayerCharacter.hpp>
+#include <TESDataHandler.hpp>
+#include <HUDMainMenu.hpp>
+#include <Menu.hpp>
 
 #include "namegen.hpp"
 #include <format>
@@ -32,17 +34,17 @@ void InitLog(std::filesystem::path path = "")
 	logFolderPath /= CrashLogger_FLD;
 	logFolderPath /= CrashLogger_LOG;
 
-	Logger::AddDestinations(logPath, CrashLogger_STR, LogLevel::File);
+	Logger::AddDestinations(logPath, CrashLogger_STR, LogLevel::LogFile);
 	Logger::PrepareCopy(logPath, logFolderPath);
 
 //	Log(LogLevel::Console) << CrashLogger_VERSION_STR;
 
-	Log(LogLevel::Warning) << GetName() + " version " + CrashLogger_VERSION_STR + " at " + std::format("{0:%F} {0:%T}", std::chrono::time_point(std::chrono::system_clock::now())) << std::endl 
+	Log(LogLevel::LogWarning) << GetName() + " version " + CrashLogger_VERSION_STR + " at " + std::format("{0:%F} {0:%T}", std::chrono::time_point(std::chrono::system_clock::now())) << std::endl 
 		<< "If this file is empty, then your game didn't crash or something went so wrong even crash logger was useless! :snig:" << std::endl
 		<< "Topmost stack module is NOT ALWAYS the crash reason! Exercise caution when speculating!" << std::endl;
 
 	if (GetModuleHandle("nvac.dll")) {
-		Log(LogLevel::Warning) << "NVAC detected! The log will be incorrect!\nPlease remove NVAC to let the game crash properly!\n";
+		Log(LogLevel::LogWarning) << "NVAC detected! The log will be incorrect!\nPlease remove NVAC to let the game crash properly!\n";
 	}
 }
 

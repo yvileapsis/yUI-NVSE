@@ -1,13 +1,17 @@
 #include <Utilities.hpp>
 
-#include "ConsoleManager.h"
-#include "InterfaceManager.h"
-#include "GameData.h"
-#include "Script.h"
+#include "ConsoleManager.hpp"
+// TODO: script inside tesscript
+#include "TESScript.hpp"
+#include "Script.hpp"
+#include "InterfaceManager.hpp"
+#include "TESScript.hpp"
+#include "TESDataHandler.hpp"
 
 #include <cstdlib>
 #include <utility>
 
+/*
 ScopedLock::ScopedLock(CriticalSection& critSection) : m_critSection(critSection)
 {
 	m_critSection.Enter();
@@ -58,6 +62,7 @@ void SpinLock::Leave()
 	if (owningThread && !--enterCount)
 		owningThread = 0;
 }
+*/
 
 static std::filesystem::path s_falloutDirectory;
 
@@ -185,6 +190,25 @@ UInt32 Tokenizer::PrevToken(std::string& outStr)
 }
 
 #if RUNTIME
+
+// TODO: remove jazz code
+__declspec(naked) bool IsConsoleMode()
+{
+	__asm
+	{
+		mov		al, byte ptr ds : [0x11DEA2E]
+		test	al, al
+		jz		done
+		mov		eax, dword ptr ds : [0x126FD98]
+		mov		edx, fs : [0x2C]
+		mov		eax, [edx + eax * 4]
+		test	eax, eax
+		jz		done
+		mov		al, [eax + 0x268]
+		done :
+		retn
+	}
+}
 
 const char GetSeparatorChar(Script * script)
 {
@@ -342,44 +366,6 @@ const char* GetModName(const TESForm* script)
 			modName = "Unknown";
 	}
 	return modName;
-}
-
-void ShowRuntimeError(Script* script, const char* fmt, ...)
-{
-	if (!script) return;
-	
-	va_list args;
-	va_start(args, fmt);
-
-	char errorMsg[0x800];
-	vsprintf_s(errorMsg, sizeof(errorMsg), fmt, args);
-	
-	char errorHeader[0x900];
-	const auto* modName = GetModName(script);
-	
-	const auto* scriptName = script ? script->GetName() : nullptr; // JohnnyGuitarNVSE allows this
-	if (scriptName && strlen(scriptName) != 0)
-	{
-		sprintf_s(errorHeader, sizeof(errorHeader), "Error in script %08X (%s) in mod %s\n%s", script ? script->refID : 0, scriptName, modName, errorMsg);
-	}
-	else
-	{
-		sprintf_s(errorHeader, sizeof(errorHeader), "Error in script %08X in mod %s\n%s", script ? script->refID : 0, modName, errorMsg);
-	}
-
-	g_warnedScripts.insert(script->refID);
-	
-	if (g_warnedScripts.find(script->refID) != g_warnedScripts.end())
-	{
-		char message[512];
-		snprintf(message, sizeof(message), "%s: kNVSE error (see console print)", GetModName(script));
-		if (!IsConsoleMode())
-			QueueUIMessage(message, 0, reinterpret_cast<const char*>(0x1049638), nullptr, 2.5F, false);
-	}
-
-	Log() << errorHeader;
-
-	va_end(args);
 }
 
 std::vector<void*> GetCallStack(int i)

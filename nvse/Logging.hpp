@@ -3,13 +3,13 @@
 #include <string>
 
 enum LogLevel {
-	None		= 0,
-	Info		= 1 << 0x1,
-	Warning		= 1 << 0x2,
-	Error		= 1 << 0x3,
-	Console		= 1 << 0x4,
+	LogNone		= 0,
+	LogInfo		= 1 << 0x1,
+	LogWarning		= 1 << 0x2,
+	LogError		= 1 << 0x3,
+	LogConsole		= 1 << 0x4,
 
-	File = Info | Warning | Error
+	LogFile = LogInfo | LogWarning | LogError
 };
 
 namespace Logger
@@ -28,7 +28,7 @@ namespace Logger
 
 class Log {
 public:
-	inline Log(UInt32 level = LogLevel::Warning) : logLevel((LogLevel)level) {};
+	inline Log(UInt32 level = LogLevel::LogWarning) : logLevel((LogLevel)level) {};
 
 	template <typename T>
 	inline Log& operator<<(const T &value) {

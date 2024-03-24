@@ -1,5 +1,5 @@
 #pragma once
-#include <CommandTable.h>
+#include <CommandTable.hpp>
 #include <Utilities.hpp>
 
 namespace PluginAPI { class ArrayAPI; }

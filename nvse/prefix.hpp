@@ -439,7 +439,6 @@ struct ExtraLockData;
 struct ExtraMapMarkerData;
 struct FontInfo;
 struct InventoryRef;
-struct ModInfo;
 struct ParamInfo;
 struct PluginInfo;
 struct PosAndCell;

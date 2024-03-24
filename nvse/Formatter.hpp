@@ -1,12 +1,10 @@
 #include <format>
 
-#include "Setting.h"
-#include "GameEffects.h"
-#include "TESForm.h"
-#include "TESObjectREFR.h"
-#include "GameTasks.h"
-#include "Tile.h"
-#include "Menu.h"
+#include "Setting.hpp"
+#include "TESForm.hpp"
+#include "TESObjectREFR.hpp"
+#include "Tile.hpp"
+#include "Menu.hpp"
 
 #include <set>
 
@@ -38,6 +36,7 @@ struct std::formatter<Derived> {									\
 	}																\
 };																	\
 
+/*
 std::ostream &operator<<(std::ostream &os, const Tile& obj) { os << "Path: " << obj.GetFullPath(); return os; }
 std::ostream &operator<<(std::ostream &os, const Menu& obj) 
 {
@@ -240,7 +239,7 @@ FORMAT_CLASS(ActiveEffect);
 FORMAT_CLASS(Script);
 FORMAT_CLASS(ScriptEffect);
 FORMAT_CLASS(QueuedKF);
-
+*/
 #if 0
 
 void DumpAnimGroups()

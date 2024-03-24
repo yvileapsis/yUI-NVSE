@@ -1,8 +1,8 @@
 #pragma once
 
 #include <main.hpp>
-#include <Sound.h>
 #include <Safewrite.hpp>
+#include <BSThread.hpp>
 
 // all credit goes to WallSoGB
 namespace Patch::NameThreads
@@ -31,7 +31,7 @@ namespace Patch::NameThreads
 	void __fastcall CreateAndResumeThread_Hook(BSThread* apThis, void*, SIZE_T dwStackSize, const char* apName, bool abSuspended) 
 	{
 		ThisStdCall(0xAA6430, apThis, dwStackSize, apName, abSuspended);
-		SetThreadName(apThis->createdThread, apName);
+		SetThreadName(apThis->hCreatedThread, apName);
 	}
 
 	void Patch()

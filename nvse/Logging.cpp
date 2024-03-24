@@ -12,7 +12,7 @@
 #include <string>
 #include <thread>
 
-#include <ConsoleManager.h>
+#include <game/Bethesda/ConsoleManager.hpp>
 
 class LoggerManager {
 public:
@@ -112,15 +112,17 @@ namespace Logger
 			{
 				static std::fstream logFile(log, std::fstream::out | std::fstream::trunc);
 
-				if (level & logLevel & LogLevel::File)
+				if (level & logLevel & LogLevel::LogFile)
 					logFile << msg << std::endl;
 			});
 
 		LoggerManager::GetSingleton().addDestination("console", [prefix](const std::string& msg, LogLevel level)
 			{
-				if ((level & LogLevel::Console))
-					if (const auto console = ConsoleManager::GetSingleton())
-						console << prefix + ": " + msg;
+				if ((level & LogLevel::LogConsole))
+//					if (const auto console = ConsoleManager::GetSingleton())
+						;
+// TODO: fix console
+//						console << prefix + ": " + msg;
 			});
 	}
 
