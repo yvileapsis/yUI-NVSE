@@ -83,11 +83,15 @@ const std::filesystem::path& GetFalloutDirectory()
 	if (lastSlash != std::string::npos)	// if we don't find a slash something is VERY WRONG
 	{
 		s_falloutDirectory = falloutPath.substr(0, lastSlash + 1);
+#if _DEBUG
 		Log() << ("fallout root = " + s_falloutDirectory.generic_string());
+#endif
 	}
 	else
 	{
+#if _DEBUG
 		Log() << ("no slash in fallout path? (" + falloutPath + ")");
+#endif
 	}
 
 	return s_falloutDirectory;

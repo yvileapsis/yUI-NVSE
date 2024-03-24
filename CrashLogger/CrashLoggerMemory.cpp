@@ -35,33 +35,19 @@ namespace CrashLogger::Memory
 	extern void Get(EXCEPTION_POINTERS* info)
 	try 
 	{	
-		PROCESS_MEMORY_COUNTERS pmc;
+
 	
 		const auto hProcess = GetCurrentProcess();
 
-		SIZE_T lpMinimumWorkingSetSize;
-		SIZE_T lpMaximumWorkingSetSize;
-		DWORD flags;
-
 		Log() << "Memory:";
 
-		if (GetProcessWorkingSetSizeEx(hProcess, &lpMinimumWorkingSetSize, &lpMaximumWorkingSetSize, &flags))
-		{
-			Log() << std::format("MinimumWorkingSetSize:      {}", FormatSize(lpMinimumWorkingSetSize));
-			Log() << std::format("MaximumWorkingSetSize:      {}", FormatSize(lpMaximumWorkingSetSize));
-		}
+		PROCESS_MEMORY_COUNTERS_EX2 pmc = {};
+		pmc.cb = sizeof(pmc);
 
-		if ( GetProcessMemoryInfo( hProcess, &pmc, sizeof(pmc)) )
+		if ( GetProcessMemoryInfo( hProcess, (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc)) )
 		{
-			Log() << std::format("PeakWorkingSetSize:         {}", FormatSize(pmc.PeakWorkingSetSize));
-			Log() << std::format("WorkingSetSize:             {}", FormatSize(pmc.WorkingSetSize));
-			Log() << std::format("QuotaPeakPagedPoolUsage:    {}", FormatSize(pmc.QuotaPeakPagedPoolUsage));
-			Log() << std::format("QuotaPagedPoolUsage:        {}", FormatSize(pmc.QuotaPagedPoolUsage));
-			Log() << std::format("QuotaPeakNonPagedPoolUsage: {}", FormatSize(pmc.QuotaPeakNonPagedPoolUsage));
-			Log() << std::format("QuotaNonPagedPoolUsage:     {}", FormatSize(pmc.QuotaNonPagedPoolUsage));
-			Log() << std::format("PageFaultCount:             {}", FormatSize(pmc.PageFaultCount));
-			Log() << std::format("PagefileUsage:              {}", FormatSize(pmc.PagefileUsage));
-			Log() << std::format("PeakPagefileUsage:          {}", FormatSize(pmc.PeakPagefileUsage));
+			Log() << std::format("Physical Usage: {:10}", FormatSize(pmc.WorkingSetSize));
+			Log() << std::format("Virtual  Usage: {:10}", FormatSize(pmc.PrivateUsage));
 		}
 
 		Log();

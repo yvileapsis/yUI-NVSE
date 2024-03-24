@@ -146,6 +146,7 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\CrashLogger\nvse\p
     <ClCompile Include="CrashLoggerCalltrace.cpp" />
     <ClCompile Include="CrashLoggerExceptionHandler.cpp" />
     <ClCompile Include="CrashLoggerMemory.cpp" />
+    <ClCompile Include="CrashLoggerMods.cpp" />
     <ClCompile Include="CrashLoggerModules.cpp" />
     <ClCompile Include="CrashLoggerRegistryStack.cpp" />
     <ClCompile Include="definitions.cpp" />

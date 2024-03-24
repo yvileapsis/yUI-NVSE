@@ -7,6 +7,7 @@
 #include "GameTasks.h"
 #include "Tile.h"
 #include "Menu.h"
+#include "GameData.h"
 
 #include <set>
 
@@ -63,16 +64,44 @@ std::ostream &operator<<(std::ostream &os, const Setting& obj)
 
 std::ostream& operator<<(std::ostream& os, const TESForm& obj) 
 { 
-	os << std::format("{:08X}", obj.refID);
-	os << std::format(" ({})", obj.GetName());
+	UInt32 refID = obj.refID;
+	UInt32 modIndex = (obj.refID >> 24) & 0xFF;
+
+	bool isScript = obj.typeID == kFormType_Script;
+	bool isTemp = modIndex == 0xFF;
+	std::string modName;
+	const char* refName = obj.GetName();
+	if (isTemp) {
+		if (!refName)
+			modName = "Temp Form";
+		else
+			modName = isScript ? "Scriptrunner" : "Temp Form";
+	}
+	else {
+		ModInfo* sourceMod = obj.mods.GetFirstItem();
+		ModInfo* lastMod = obj.mods.GetLastItem();
+
+		if (sourceMod == lastMod) {
+			modName = std::format("Plugin: {}", sourceMod->name);
+		}
+		else {
+			modName = std::format("Plugin: {}, Last modified by: {}", sourceMod->name, lastMod->name);
+		}
+	}
+	os << std::format("{:08X} - Name: \"{}\" - {}", refID, refName, modName.c_str());
+
+
 	return os; 
 }
 std::ostream& operator<<(std::ostream& os, const TESObjectREFR& obj)
 {
 	os << (const TESForm&)obj;
-	std::stringstream ss;
-	ss << ", Baseform " << (const TESForm&)*obj.TryGetREFRParent();
-	os << ss.str();
+	TESForm* baseForm = obj.TryGetREFRParent();
+	if (baseForm) {
+		std::stringstream ss;
+		ss << "| Baseform " << baseForm;
+		os << ss.str();
+	}
 	return os;
 }
 
@@ -82,9 +111,11 @@ std::ostream& operator<<(std::ostream& os, const QueuedReference& obj) { if (obj
 std::ostream& operator<<(std::ostream& os, const NavMesh& obj)
 {
 	os << (const TESForm&)obj;
-	std::stringstream ss;
-	ss << ", Cell " << (const TESForm&)*obj.parentCell;
-	os << ss.str();
+	if (obj.parentCell) {
+		std::stringstream ss;
+		ss << ", Cell " << (const TESForm&)*obj.parentCell;
+		os << ss.str();
+	}
 	return os;
 }
 
@@ -118,7 +149,8 @@ std::ostream& operator<<(std::ostream& os, const AnimSequenceMultiple& obj)
 
 std::ostream& operator<<(std::ostream& os, const NiObjectNET& obj) 
 {
-	os << SanitizeString(std::format(R"(Name: "{}")", obj.m_pcName)); 
+	if (obj.m_pcName)
+		os << SanitizeString(std::format(R"(Name: "{}")", obj.m_pcName)); 
 
 	return os; 
 }
@@ -133,18 +165,18 @@ std::ostream& operator<<(std::ostream& os, const NiNode& obj)
 
 std::ostream& operator<<(std::ostream& os, const NiExtraData& obj)
 {
-	os << SanitizeString(std::format(R"(Name: "{}")", obj.m_kName.CStr()));
+	os << SanitizeString(std::format("Name: \"{}\"", obj.m_kName.CStr()));
 	return os; 
 }
 
 std::ostream& operator<<(std::ostream& os, const BSFile& obj) 
 { 
-	os << SanitizeString(std::format("Path: {}", obj.m_path));
+	os << SanitizeString(std::format("Path: \"{}\"", obj.m_path));
 	return os;
 }
 std::ostream& operator<<(std::ostream& os, const TESModel& obj)
 {
-	os << SanitizeString(std::format("Path: {}", obj.nifPath.CStr())); 
+	os << SanitizeString(std::format("Path: \"{}\"", obj.nifPath.CStr())); 
 	return os; 
 }
 
@@ -157,15 +189,15 @@ std::ostream& operator<<(std::ostream& os, const QueuedModel& obj)
 	return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const TESTexture& obj) { os << std::format("Path: {}", obj.ddsPath.CStr()); return os; }
+std::ostream& operator<<(std::ostream& os, const TESTexture& obj) { os << std::format("Path: \"{}\"", obj.ddsPath.CStr()); return os; }
 std::ostream& operator<<(std::ostream& os, const QueuedTexture& obj) 
 {
-	os << SanitizeString(std::format("Path: {}", obj.name)); 
+	os << SanitizeString(std::format("Path: \"{}\"", obj.name)); 
 	return os; 
 }
 std::ostream& operator<<(std::ostream& os, const NiStream& obj) 
 {
-	os << SanitizeString(std::format("Path: {}", obj.path)); 
+	os << SanitizeString(std::format("Path: \"{}\"", obj.path)); 
 	return os; 
 }
 
@@ -204,7 +236,7 @@ std::ostream& operator<<(std::ostream& os, const ScriptEffect& obj)
 
 std::ostream& operator<<(std::ostream& os, const QueuedKF& obj)
 {
-	if (obj.kf) os << SanitizeString("Path: " + std::string(obj.kf->path));
+	if (obj.kf) os << SanitizeString("Path: \"" + std::string(obj.kf->path) + "\"");
 	return os; 
 }
 
