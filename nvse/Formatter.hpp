@@ -36,6 +36,7 @@ struct std::formatter<Derived> {									\
 	}																\
 };																	\
 
+// TODO: fix formatter
 /*
 std::ostream &operator<<(std::ostream &os, const Tile& obj) { os << "Path: " << obj.GetFullPath(); return os; }
 std::ostream &operator<<(std::ostream &os, const Menu& obj) 
