@@ -1,5 +1,4 @@
 #pragma once
-
 #include "BSExtraData.hpp"
 
 class ExtraHotkey : public BSExtraData {
@@ -11,3 +10,4 @@ public:
 
 	static ExtraHotkey* Create();
 };
+static_assert(sizeof(ExtraHotkey) == 0x10);

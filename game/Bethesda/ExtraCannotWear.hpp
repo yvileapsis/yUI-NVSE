@@ -1,5 +1,4 @@
 #pragma once
-
 #include "BSExtraData.hpp"
 
 //	Seen used as ForceEquip ! Unused as forceUnequip (bug?)
@@ -10,3 +9,4 @@ public:
 
 	static ExtraCannotWear* Create();
 };
+static_assert(sizeof(ExtraCannotWear) == 0x0C);

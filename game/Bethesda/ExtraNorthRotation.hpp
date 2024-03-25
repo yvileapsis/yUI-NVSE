@@ -1,13 +1,12 @@
 #pragma once
-
 #include "BSExtraData.hpp"
 
+// 0x10
 class ExtraNorthRotation : public BSExtraData {
 public:
 	ExtraNorthRotation();
 	virtual ~ExtraNorthRotation();
 
-	float fNorthRot;
+	Float32 fNorthRot;
 };
-
-ASSERT_SIZE(ExtraNorthRotation, 0x10);
+static_assert(sizeof(ExtraNorthRotation) == 0x10);

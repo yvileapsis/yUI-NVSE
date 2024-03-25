@@ -11,5 +11,4 @@ public:
 
 	TESObjectCELL* persistentCell;	// 0C
 };
-
-ASSERT_SIZE(ExtraPersistentCell, 0x10);
+static_assert(sizeof(ExtraPersistentCell) == 0x10);

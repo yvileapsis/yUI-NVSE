@@ -1,13 +1,13 @@
 #pragma once
-
 #include "BSExtraData.hpp"
-#include "TESObjectREFR.hpp"
+#include "BSSimpleList.hpp"
 
-class ExtraDroppedItemList : public BSExtraData {
+class TESObjectREFR;
+
+// 0x14
+class ExtraDroppedItemList : public BSExtraData
+{
 public:
-	EXTRADATATYPE(DROPPEDITEMLIST);
-
-	BSSimpleList<TESObjectREFR*> kDroppedItems;
+	BSSimpleList<TESObjectREFR*> kDroppedItemList;
 };
-
-ASSERT_SIZE(ExtraDroppedItemList, 0x14);
+static_assert(sizeof(ExtraDroppedItemList) == 0x14);

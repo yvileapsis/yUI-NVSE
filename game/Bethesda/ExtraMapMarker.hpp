@@ -5,7 +5,6 @@
 
 class TESForm;
 
-// Provided by "Luthien Anarion"
 class ExtraMapMarker : BSExtraData {
 public:
 	ExtraMapMarker();
@@ -13,13 +12,13 @@ public:
 
 	enum
 	{
-		kFlag_Visible = 1 << 0,        // shown on the world map
-		kFlag_CanTravel = 1 << 1,        // visited, can fast-travel to it
-		kFlag_Hidden = 1 << 2,        // does not appear with Explorer perk
+		kFlag_Visible = 1 << 0,		// shown on the world map
+		kFlag_CanTravel = 1 << 1,		// visited, can fast-travel to it
+		kFlag_Hidden = 1 << 2,		// does not appear with Explorer perk
 	};
 	enum
 	{
-		kType_None = 0,                // this determines the icon on the world map
+		kType_None = 0,				// this determines the icon on the world map
 		kType_City,
 		kType_Settlement,
 		kType_Encampment,
@@ -36,14 +35,14 @@ public:
 		kType_Vault,
 	};
 
-	struct MarkerData
+	struct Data
 	{
-		TESFullName fullName;            // not all markers have this
+		TESFullName fullName;			// not all markers have this
 		UInt16 flags;
 		UInt16 type;
-		TESForm* reputation;            // not all markers have this
+		TESForm* reputation;			// not all markers have this
 	};
-	MarkerData* data;
+	Data* pkData;
 
 	// flag member functions
 	bool IsVisible() { return (data->flags & kFlag_Visible) == kFlag_Visible; }
@@ -53,3 +52,4 @@ public:
 	void SetCanTravel(bool travel) { data->flags = (travel) ? (data->flags | kFlag_CanTravel) : (data->flags & ~kFlag_CanTravel); }
 	void SetHidden(bool hidden) { data->flags = (hidden) ? (data->flags | kFlag_Hidden) : (data->flags & ~kFlag_Hidden); }
 };
+static_assert(sizeof(ExtraMapMarker) == 0x10);
