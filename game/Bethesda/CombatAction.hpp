@@ -6,9 +6,9 @@ class CombatController;
 
 class CombatAction {
 public:
-	virtual void	IsApplicable(void);
+	virtual void	IsApplicable();
 	virtual void	AddProcedureToController(CombatController* combatCtrl, void* a2);
-	virtual void	Unk_02(void);
+	virtual void	Unk_02();
 	virtual void	GetCost(CombatController* combatCtrl, int a2);
 
 	tList<void>		list04;		// 04
