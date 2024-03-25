@@ -5,90 +5,102 @@
 #include "NiSourceTexture.hpp"
 #include "NiColor.hpp"
 #include "NiCamera.hpp"
-#include "SceneGraph.hpp"
-#include "NiPointLight.hpp"
-#include "ShadowSceneNode.hpp"
-#include "BSShaderAccumulator.hpp"
-
+;
+class SceneGraph;
 class TileMenu;
+class ShadowSceneNode;
+class NiPointLight;
+class BSShaderAccumulator;
 
-class FORenderedMenu {
+class FORenderedMenu
+{
 public:
-	virtual				~FORenderedMenu();
-	virtual void		Unk_01();
-	virtual BSFadeNode*	GetMenuRoot();
-	virtual void		Render();
-	virtual void		Unk_04();
-	virtual void		Update();
-	virtual void		Unk_06();
-	virtual void		Unk_07();
-	virtual void		Unk_08();
-	virtual void		Init();
-	virtual void		ResetNifs();
-	virtual void		Unk_0B();
-	virtual void		OnMenuOpen();
-	virtual void		OnMenuClose();
-	virtual void		HandleStaticEffect(float);
-	virtual void		HandleVerticalHoldEffect(float);
-	virtual void		HandleShudderEffect(float);
-	virtual void		HandlePulseEffect(float);
-	virtual void		HandleScreenLightEffec(float);
-	virtual void		HandleScanlines(float);
-	virtual void		Unk_14();
 
-	NiTriShapePtr			spScreenGeometry;
-	BSFadeNodePtr			spMenuRoot;
-	NiScreenElementsPtr		spScreenElements;
-	NiTexturePtr			spSrcTexture;
-	SceneGraphPtr			spSceneGraph;
-	TileMenu*				pTileMenu;
-	NiPointLightPtr			spMenuLight;
-	ShadowSceneNodePtr		spShadowScene;
-	NiCameraPtr				spCamera;
-	bool					bIsInitialized;
+	FORenderedMenu();
+
+	virtual ~FORenderedMenu();
+	virtual void	Unk_01();
+	virtual BSFadeNode* GetMenuRoot();
+	virtual void	Render();
+	virtual void	Unk_04();
+	virtual void	Update();
+	virtual void	Unk_06();
+	virtual void	Unk_07();
+	virtual void	Unk_08();
+	virtual void	Init();
+	virtual void	ResetNifs();
+	virtual void	Unk_0B();
+	virtual void	OnMenuOpen();
+	virtual void	OnMenuClose();
+	virtual void	HandleStaticEffect(Float32 msPassed);
+	virtual void	HandleVerticalHoldEffect(Float32 msPassed);
+	virtual void	HandleShudderEffect(Float32 msPassed);
+	virtual void	Unk_11(Float32 msPassed);
+	virtual void	Unk_12(Float32 msPassed);
+	virtual void	HandleScanlines(Float32 msPassed);
+	virtual void	Unk_14();
+
+	NiPointer<NiTriShape>		spScreenGeometry;
+	NiPointer<BSFadeNode>		spMenuRoot;
+	NiScreenElements*			pScreenElements;
+	NiPointer<NiSourceTexture>	spSrcTexture;
+	SceneGraph*					pkSceneGraph;
+	TileMenu*					pkTileMenu;
+	NiPointer<NiPointLight>		spMenuLight;
+	ShadowSceneNode*			pkShadowScene;
+	NiPointer<NiCameraPtr>		spCamera;
+
+	UInt8					bIsInitialized;
 	UInt8					byte029;
 	UInt8					byte02A;
 	UInt8					gap02B;
 	NiColor					kScreenLightColor;
-	float					fScreenLightBaseIntensity;
-	float					unk03C;
-	float					fBlurRadius;
-	float					fBlurIntensity;
-	float					fScanlineFrequency;
+	Float32					fScreenLightBaseIntensity;
+	Float32					unk03C;
+	Float32					fBlurRadius;
+	Float32					fBlurIntensity;
+	Float32					fScanlineFrequency;
 	UInt8					byte04C;
 	UInt8					bIsShowStaticEffect;
-	float					fStaticEffectStartTime;
-	float					fBurstDuration;
-	float					fBurstIntensity2;
-	float					fBurstIntensity;
-	bool					bIsShowVerticalHoldEffect;
-	float					fVerticalHoldStartTime;
-	float					fVerticalHoldDuration;
-	float					fVerticalHoldSpeed;
-	float					fUnk070;
-	UInt8					bIsShowShudderHoldEffect;
-	float					fShudderHoldStartTime;
-	float					fShudderHoldDuration;
-	float					fShudderHoldIntensity;
-	float					fShudderHoldFrequency;
-	float					fUnk088;
-	float					fPulseBrightenIntensity;
-	float					fPulseRadiusIntensity;
+	UInt8					gap04E[2];
+	Float32					fStaticEffectStartTime;
+	Float32					fBurstDuration;
+	Float32					fBurstIntensity2;
+	Float32					fBurstIntensity;
+	UInt8					cIsShowVerticalHoldEffect;
+	UInt8					gap061[3];
+	Float32					fVerticalHoldStartTime;
+	Float32					fVerticalHoldDuration;
+	Float32					fVerticalHoldSpeed;
+	Float32					unk070;
+	UInt8					ucIsShowShudderHoldEffect;
+	UInt8					gap075[3];
+	Float32					fShudderHoldStartTime;
+	Float32					fShudderHoldDuration;
+	Float32					fshudderHoldIntensity;
+	Float32					fShudderHoldFrequency;
+	Float32					unk088;
+	Float32					fPulseBrightenIntensity;
+	Float32					fPulseRadiusIntensity;
 	UInt8					byte094;
-	bool					bIsScanlineEffect;
-	float					fScanLineStartTime;
-	float					fInterval09C;
-	float					fDistortDuration;
-	float					fNextScanlineTime;
-	NiPoint4				kTileColor;
-	UInt8					bIsRenderedMenuOrPipboyOpen;
+	UInt8					bIsScanlineEffect;
+	UInt8					gap096[2];
+	Float32					fScanLineStartTime;
+	Float32					fInterval09C;
+	UInt32					fDistortDuration;
+	Float32					fNextScanlineTime;
+	NiColorA				kTileColor;
+	UInt8					ucIsRenderedMenuOrPipboyOpen;
 	UInt8					byte0B9;
-	NiTexturePtr			spScanlineTexture;
-	NiPoint4				kTileColor2;
+	UInt8					gap0BA[2];
+	UInt32					uiScanlineTexture;
+	NiColorA				kTileColor2;
 	bool					bIsQuantityMenuShown;
 	bool					bIsTutorialMenuShown;
 	bool					bIsMessageMenuShown;
-	BSShaderAccumulatorPtr  spShaderAccumulator;
+	UInt8					gap0D3;
+
+	BSShaderAccumulator* pkShaderAccumulator;
 
 	void SetTexture(NiTexture* apTexture);
 	NiCamera* GetCamera();
@@ -97,5 +109,4 @@ public:
 	static bool __fastcall CreateMenuLightEx(FORenderedMenu* apThis, void*, const char* apName, ShadowSceneNode* apScene);
 	void ClearLight();
 };
-
-ASSERT_SIZE(FORenderedMenu, 0xD8);
+static_assert(sizeof(FORenderedMenu) == 0xD8);

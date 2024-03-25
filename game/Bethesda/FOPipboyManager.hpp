@@ -1,10 +1,12 @@
 #pragma once
-
 #include "FORenderedMenu.hpp"
 #include "BSSoundHandle.hpp"
 
 class FOPipboyManager : public FORenderedMenu {
 public:
+	FOPipboyManager();
+	~FOPipboyManager();
+
 	NiNode* pipboyScreenNode0D8;
 	NiNode* node_0DC;
 	NiTriStrips* unk0C0;
@@ -38,5 +40,4 @@ public:
 
 	NiNode* GetPipboyLightGlow(UInt32 auiIndex);
 };
-
-ASSERT_SIZE(FOPipboyManager, 0x170);
+static_assert(sizeof(FOPipboyManager) == 0x170);
