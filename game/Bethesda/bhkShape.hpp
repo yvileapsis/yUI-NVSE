@@ -1,11 +1,10 @@
 #pragma once
-
 #include "bhkSerializable.hpp"
 #include "NiColor.hpp"
 
 class bhkShapeCollection;
 
-enum iMaterialType {
+enum EnumMaterialType {
 	iMaterialType_Stone = 0x0,
 	iMaterialType_Cloth = 0x1,
 	iMaterialType_Dirt = 0x2,
@@ -56,6 +55,6 @@ public:
 	virtual void DestroyDisplayGeometry();																				// 54
 	virtual void BuildDisplayFromhkGeometry(NiNode* apNode, void* apGeometry, NiColor* apColor, const char* apName);	// 55
 
-	iMaterialType eMaterialType;
+	EnumMaterialType eMaterialType;
 };
 

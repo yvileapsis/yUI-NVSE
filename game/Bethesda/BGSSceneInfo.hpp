@@ -1,5 +1,4 @@
 #pragma once
-
 #include "MemoryManager.hpp"
 #include "NiNode.hpp"
 #include "BSString.hpp"

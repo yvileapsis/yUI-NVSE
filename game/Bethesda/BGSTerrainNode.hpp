@@ -10,6 +10,7 @@ struct BGSDistantObjectBlock;
 
 class BGSTerrainManager;
 
+// 0x60
 struct BGSTerrainNode {
 	union Coordinate {
 		UInt32 xy;
@@ -21,17 +22,17 @@ struct BGSTerrainNode {
 
 	BGSTerrainManager*		pManager;
 	UInt32					uiLODLevel;
-	Coordinate				sBaseCellCoords;
+	Coordinate				kBaseCellCoords;
 	bool					bIsLvlMaxOrLower;
 	UInt8					byte0D;
 	UInt8					byte0E;
 	UInt8					byte0F;
-	BGSTerrainChunk*		pTerrainChunk;
-	BGSDistantObjectBlock*	pObjectBlock;
-	BGSDistantTreeBlock*	pTreeBlock;
+	BGSTerrainChunk*		pkTerrainChunk;
+	BGSDistantObjectBlock*	pkObjectBlock;
+	BGSDistantTreeBlock*	pkTreeBlock;
 	UInt32					ukn1C;
-	BGSTerrainNode*			pChildren[4];
-	BGSTerrainNode*			pParent;
+	BGSTerrainNode*			pkChildren[4];
+	BGSTerrainNode*			pkParent;
 	NiPoint3				pos34;
 	float					fDist;
 	float					fSplitDist;
@@ -60,5 +61,4 @@ struct BGSTerrainNode {
 
 	BGSDistantTreeBlock* GetDistantTreeBlock(NiPoint3* apPos);
 };
-
-ASSERT_SIZE(BGSTerrainNode, 0x60);
+static_assert(sizeof(BGSTerrainNode) == 0x60);
