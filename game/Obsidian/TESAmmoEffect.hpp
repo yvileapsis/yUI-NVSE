@@ -1,13 +1,13 @@
 #pragma once
-
 #include "TESForm.hpp"
 
+// 0x30
 class TESAmmoEffect : public TESForm {
 public:
 	TESAmmoEffect();
 	~TESAmmoEffect();
 
-	enum
+	enum EnumType : UInt32
 	{
 		kEffectType_DamageMod = 0,
 		kEffectType_DRMod = 1,
@@ -17,17 +17,16 @@ public:
 		kEffectType_FatigueMod = 5,
 	};
 
-	enum
+	enum EnumOperation : UInt32
 	{
 		kOperation_Add = 0,
 		kOperation_Multiply = 1,
 		kOperation_Subtract = 2,
 	};
 
-	TESFullName		fullName;	// 018
-	UInt32			type;		// 024
-	UInt32			operation;	// 028
-	float			value;		// 02C
+	TESFullName		kFullName;	// 018
+	EnumType		eType;		// 024
+	EnumOperation	eOperation;	// 028
+	Float32			fValue;		// 02C
 };
-
-ASSERT_SIZE(TESAmmoEffect, 0x30);
+static_assert(sizeof(TESAmmoEffect) == 0x30);
