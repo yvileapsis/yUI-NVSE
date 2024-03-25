@@ -1,25 +1,28 @@
 #pragma once
-
 #include "BSSimpleArray.hpp"
+#include "NiColor.hpp"
 #include "NiNode.hpp"
+#include "NiPoint2.hpp"
+#include "NiPoint3.hpp"
 #include "NiTriShape.hpp"
 
-class BGSAutoWater {
+// 0x40
+class BGSAutoWater
+{
 public:
-	BSSimpleArray<NiPoint3>*	pPointArray;
-	BSSimpleArray<UInt16>*		pShortArray;
-	BSSimpleArray<UInt16>*		pShortArray1;
-	NiPoint3*					pVertex;
+	BSSimpleArray<NiPoint3>*	pkPointArray;
+	BSSimpleArray<UInt16>*		pkShortArray;
+	BSSimpleArray<UInt16>*		pkShortArray1;
+	NiPoint3			*		pkVertex;
 	UInt32						uiTriangleList;
-	NiPoint3*					pNormal;
-	NiPoint2*					pTexture;
-	NiColorA*					pColor;
+	NiPoint3*					pkNormal;
+	NiPoint2*					pkTexture;
+	NiColorA*					pkColor;
 	DWORD						dword20;
 	UInt32						uiVertCount;
 	UInt32						uiTriangleCount;
-	NiNodePtr					spRootNode;
-	NiTriShapePtr				spShape;
+	NiPointer<NiNode>			spRootNode;
+	NiPointer<NiTriShape>		spShape;
 	NiPoint3					kPoint;
 };
-
-ASSERT_SIZE(BGSAutoWater, 0x40);
+static_assert(sizeof(BGSAutoWater) == 0x40);

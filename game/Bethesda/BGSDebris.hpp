@@ -1,13 +1,15 @@
 #pragma once
-
 #include "TESForm.hpp"
 #include "BGSPreloadable.hpp"
 
-class BGSDebris : public TESForm, public BGSPreloadable {
+// 24
+class BGSDebris :
+	public TESForm,
+	public BGSPreloadable
+{
 	BGSDebris();
 	virtual ~BGSDebris();
 
 	BSSimpleList<void*> kUnkList;
 };
-
-ASSERT_SIZE(BGSDebris, 0x24);
+static_assert(sizeof(BGSDebris) == 0x24);

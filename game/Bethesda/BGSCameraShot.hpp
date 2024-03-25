@@ -1,5 +1,4 @@
 #pragma once
-
 #include "TESForm.hpp"
 #include "TESModel.hpp"
 #include "TESImageSpaceModifiableForm.hpp"
@@ -8,7 +7,12 @@
 class TESImageSpaceModifier;
 class NiRefObject;
 
-class BGSCameraShot : public TESForm, public TESModel, public TESImageSpaceModifiableForm {
+// 0x78
+class BGSCameraShot :
+	public TESForm,
+	public TESModel,
+	public TESImageSpaceModifiableForm
+{
 	BGSCameraShot();
 	~BGSCameraShot();
 
@@ -16,14 +20,14 @@ class BGSCameraShot : public TESForm, public TESModel, public TESImageSpaceModif
 
 	enum Action;
 
-	enum Target : SInt32
+	enum EnumTarget : SInt32
 	{
 		kTargetAttacker = 0x0,
 		kTargetProjectile = 0x1,
 		kTargetTarget = 0x2,
 	};
 
-	enum Flags : SInt32
+	enum EnumFlags : SInt32
 	{
 		kPositionFollowsLocation = 0x1,
 		kPositionFollowsTarget = 0x2,
@@ -33,16 +37,17 @@ class BGSCameraShot : public TESForm, public TESModel, public TESImageSpaceModif
 		kStartAtTimeZero = 0x20,
 	};
 
-	Action			kAction;
-	Location		kLocation;
-	Target			kTarget;
-	Flags			uiFlags;
-	float			unk048;
-	float			unk04C;
-	float			fGlobalTimeMult;
-	float			unk054;
-	float			unk058;
-	float			unk05C;
+
+	Action			eAction;
+	Location		eLocation;
+	EnumTarget		eTarget;
+	EnumFlags		eFlags;
+	Float32			unk048;
+	Float32			unk04C;
+	Float32			fGlobalTimeMult;
+	Float32			unk054;
+	Float32			unk058;
+	Float32			unk05C;
 	NiAVObjectPtr	spLocationNode;
 	NiAVObjectPtr	spTargetNode;
 	TESObjectREFR*	pReference;
@@ -53,5 +58,4 @@ class BGSCameraShot : public TESForm, public TESModel, public TESImageSpaceModif
 	UInt8			byte076;
 	UInt8			gap077;
 };
-
-ASSERT_SIZE(BGSCameraShot, 0x78);
+static_assert(sizeof(BGSCameraShot) == 0x78);

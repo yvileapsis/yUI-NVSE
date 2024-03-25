@@ -1,5 +1,4 @@
 #pragma once
-
 #include "TESForm.hpp"
 
 const char kDefaultObjectNames[34][28] = {	// 0x0118C360 is an array of struct: { char * Name, UInt8 kFormType , UInt8 pad[3] }
@@ -39,7 +38,9 @@ const char kDefaultObjectNames[34][28] = {	// 0x0118C360 is an array of struct: 
 	  "Cateye Mobile Effect (NYI)"
 };
 
-class BGSDefaultObjectManager : public TESForm {
+// 0xA0
+class BGSDefaultObjectManager : public TESForm
+{
 public:
 	BGSDefaultObjectManager();
 	~BGSDefaultObjectManager();
@@ -52,42 +53,43 @@ public:
 
 	typedef TESForm* FormArray[kDefaultObject_Max];
 
-	struct FormStruct {
-		TESForm* Stimpak;
-		TESForm* SuperStimpak;
-		TESForm* RadX;
-		TESForm* RadAway;
-		TESForm* Morphine;
-		TESForm* PerkParalysis;
-		TESForm* PlayerFaction;
-		TESForm* MysteriousStranger;
-		TESForm* MysteriousStrangerFaction;
-		TESForm* DefaultMusic;
-		TESForm* BattleMusic;
-		TESForm* DefaultDeath;
-		TESForm* SuccessMusic;
-		TESForm* LevelUpMusic;
-		TESForm* PlayerVoiceMale;
-		TESForm* PlayerVoiceMaleChild;
-		TESForm* PlayerVoiceFemale;
-		TESForm* PlayerVoiceFemaleChild;
-		TESForm* EatPackageDefaultFood;
-		TESForm* EveryActorAbility;
-		TESForm* DrugWearOffImageSpace;
+	struct FormStruct 
+	{
+		TESForm*	pkStimpak;
+		TESForm*	pkSuperStimpak;
+		TESForm*	pkRadX;
+		TESForm*	pkRadAway;
+		TESForm*	pkMorphine;
+		TESForm*	pkPerkParalysis;
+		TESForm*	pkPlayerFaction;
+		TESForm*	pkMysteriousStranger;
+		TESForm*	pkMysteriousStrangerFaction;
+		TESForm*	pkDefaultMusic;
+		TESForm*	pkBattleMusic;
+		TESForm*	pkDefaultDeath;
+		TESForm*	pkSuccessMusic;
+		TESForm*	pkLevelUpMusic;
+		TESForm*	pkPlayerVoiceMale;
+		TESForm*	pkPlayerVoiceMaleChild;
+		TESForm*	pkPlayerVoiceFemale;
+		TESForm*	pkPlayerVoiceFemaleChild;
+		TESForm*	pkEatPackageDefaultFood;
+		TESForm*	pkEveryActorAbility;
+		TESForm*	pkDrugWearOffImageSpace;
 		// FNV
-		TESForm* DoctorsBag;
-		TESForm* MissFortuneNPC;
-		TESForm* MissFortuneFaction;
-		TESForm* MeltdownExplosion;
-		TESForm* UnarmedForwardPA;
-		TESForm* UnarmedBackwardPA;
-		TESForm* UnarmedLeftPA;
-		TESForm* UnarmedRightPA;
-		TESForm* UnarmedCrouchPA;
-		TESForm* UnarmedCounterPA;
-		TESForm* SpotterEffect;
-		TESForm* ItemDetectedEffect;
-		TESForm* CateyeMobileEffectNYI;
+		TESForm*	pkDoctorsBag;
+		TESForm*	pkMissFortuneNPC;
+		TESForm*	pkMissFortuneFaction;
+		TESForm*	pkMeltdownExplosion;
+		TESForm*	pkUnarmedForwardPA;
+		TESForm*	pkUnarmedBackwardPA;
+		TESForm*	pkUnarmedLeftPA;
+		TESForm*	pkUnarmedRightPA;
+		TESForm*	pkUnarmedCrouchPA;
+		TESForm*	pkUnarmedCounterPA;
+		TESForm*	pkSpotterEffect;
+		TESForm*	pkItemDetectedEffect;
+		TESForm*	pkCateyeMobileEffectNYI;
 	};
 
 	union DefaultObjects {
@@ -95,7 +97,6 @@ public:
 		FormArray	asArray;
 	};
 
-	DefaultObjects	defaultObjects;	// 018
+	DefaultObjects	kDefaultObjects;	// 018
 };
-
-ASSERT_SIZE(BGSDefaultObjectManager, 0xA0);
+static_assert(sizeof(BGSDefaultObjectManager) == 0xA0);

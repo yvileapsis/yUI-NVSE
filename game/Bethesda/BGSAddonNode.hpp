@@ -1,24 +1,28 @@
 #pragma once
-
 #include "TESBoundObject.hpp"
 #include "TESModelTextureSwap.hpp"
+#include "Defines.hpp"
 
 class TESSound;
 
-class BGSAddonNode : public TESBoundObject, public TESModelTextureSwap {
+// 0x60
+class BGSAddonNode :
+	public TESBoundObject,
+	public TESModelTextureSwap
+{
 public:
 	BGSAddonNode();
 	virtual ~BGSAddonNode();
 
-	struct AddonData {
-		UInt16		usMasterParticleCap;
-		Bitfield8	ucFlags;
+	struct AddonData
+	{
+		UInt16	usMasterParticleCap;
+		Bitfield8 eFlags;
 	};
 
 	UInt32		uiIndex;
-	TESSound*	pSound;
+	TESSound*	pkSound;
 	AddonData	kData;
 	UInt32		uiMasterParticleLock;
 };
-
-ASSERT_SIZE(BGSAddonNode, 0x60);
+static_assert(sizeof(BGSAddonNode) == 0x60);

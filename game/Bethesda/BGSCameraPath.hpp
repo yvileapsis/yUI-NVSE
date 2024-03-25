@@ -1,15 +1,16 @@
 #pragma once
-
 #include "TESForm.hpp"
 
-class BGSCameraPath : public TESForm {
+// 0x38
+class BGSCameraPath : public TESForm
+{
 public:
-	BSSimpleList<int> bssimplelist_int18;
-	BSSimpleList<int> bssimplelist_int20;
-	char unk28;
-	int unk2C;
-	int unk30;
-	int unk34;
+	BSSimpleList<void*> list18;
+	BSSimpleList<void*> pkCameraShots;
+	UInt8				ucFlags;
+	UInt8				gap29[3];
+	UInt32				uiNiFormArray;
+	BGSCameraPath*		pkParentCameraPath;
+	BGSCameraPath*		pkPreviousSiblingCameraPath;
 };
-
-ASSERT_SIZE(BGSCameraPath, 0x38);
+static_assert(sizeof(BGSCameraPath) == 0x38);

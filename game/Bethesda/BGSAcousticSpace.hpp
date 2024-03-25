@@ -1,25 +1,25 @@
 #pragma once
-
 #include "TESBoundObject.hpp"
 
 class TESSound;
 class TESRegion;
 
-class BGSAcousticSpace : public TESBoundObject {
+// 0x54
+class BGSAcousticSpace : public TESBoundObject
+{
 public:
 	BGSAcousticSpace();
 	~BGSAcousticSpace();
 
-	UInt8 isInterior;
-	UInt8 pad31[3];
-	TESSound* pDawnSound;
-	TESSound* pNoonSound;
-	TESSound* pDuskSound;
-	TESSound* pNightSound;
-	TESSound* pWallaSound;
-	TESRegion* region;
-	UInt32 environmentType;
-	UInt32 wallaTriggerCount;
+	UInt8		bIsInterior;
+	UInt8		pad31[3];
+	TESSound*	pkDawnSound;
+	TESSound*	pkNoonSound;
+	TESSound*	pkDuskSound;
+	TESSound*	pkNightSound;
+	TESSound*	pkWallaSound;
+	TESRegion*	pkRegion;
+	UInt32		uiEnvironmentType;
+	UInt32		uiWallaTriggerCount;
 };
-
-ASSERT_SIZE(BGSAcousticSpace, 0x54);
+static_assert(sizeof(BGSAcousticSpace) == 0x54);

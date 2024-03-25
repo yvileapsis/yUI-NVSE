@@ -1,5 +1,4 @@
 #pragma once
-
 #include "TESForm.hpp"
 #include "TESModel.hpp"
 #include "BGSPreloadable.hpp"
@@ -7,7 +6,12 @@
 class BGSBodyPart;
 class BGSRagdoll;
 
-class BGSBodyPartData : public TESForm {
+// 0x74
+class BGSBodyPartData :
+	public TESForm,
+	public TESModel,
+	public BGSPreloadable 
+{
 public:
 	BGSBodyPartData();
 	~BGSBodyPartData();
@@ -31,10 +35,7 @@ public:
 		eBodyPart_Weapon,
 	};
 
-	TESModel		model;				// 018
-	BGSPreloadable	preloadable;		// 030
-	BGSBodyPart* bodyParts[15];		// 034
-	BGSRagdoll* ragDoll;			// 070
+	BGSBodyPart*	pkBodyParts[15];	// 034
+	BGSRagdoll*		pkRagDoll;			// 070
 };
-
-ASSERT_SIZE(BGSBodyPartData, 0x74);
+static_assert(sizeof(BGSBodyPartData) == 0x74);
