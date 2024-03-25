@@ -1,20 +1,20 @@
 #pragma once
-
 #include "BSSimpleList.hpp"
 
 class TESWeather;
 class TESGlobal;
 
+// 0xC
 struct WeatherEntry {
-	TESWeather* pWeather;
-	UInt32 uiChance;
-	TESGlobal* pChanceVar;
+	TESWeather*	pkWeather;
+	UInt32		uiChance;
+	TESGlobal*	pkChanceVar;
 
-	void Set(TESWeather* pWtr, UInt32 pChn, TESGlobal* pGlb)
+	void Set(TESWeather* apWtr, UInt32 apChn, TESGlobal* apGlb)
 	{
-		pWeather = pWtr;
-		uiChance = pChn;
-		pChanceVar = pGlb;
+		pkWeather = apWtr;
+		uiChance = apChn;
+		pkChanceVar = apGlb;
 	}
 };
-typedef BSSimpleList<WeatherEntry*> TESWeatherList;
+static_assert(sizeof(WeatherEntry) == 0xC);

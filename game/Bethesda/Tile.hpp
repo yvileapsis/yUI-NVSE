@@ -1,154 +1,29 @@
 #pragma once
-
 #include "NiNode.hpp"
 #include "BSSimpleArray.hpp"
 #include "BSString.hpp"
 #include "BSSimpleList.hpp"
 #include "NiTList.hpp"
 
-// 38+
-class Tile
+//	Tile			
+//		TileRect		3C	ID=385
+//			TileMenu	40	ID=389
+//		TileImage		48	ID=386
+//			RadialTile		ID=38C but answer as TileImage !
+//		TileText		4C	ID=387
+//		Tile3D			50	ID=388
+//	Close by:
+//		HotRect	ID=38A
+//		Window	ID=38B
+
+class NiColorAlpha;
+class Menu;
+
+// 0x38
+class Tile : public NiTList<Tile*>
 {
 public:
-	Tile();
-
-	enum eTileValue {
-		kTileValue_x = 0x0FA1,
-		kTileValue_y,
-		kTileValue_visible,
-		kTileValue_class,
-		kTileValue_clipwindow = 0x0FA6,
-		kTileValue_stackingtype,
-		kTileValue_locus,
-		kTileValue_alpha,
-		kTileValue_id,
-		kTileValue_disablefade,
-		kTileValue_listindex,
-		kTileValue_depth,
-		kTileValue_clips,
-		kTileValue_target,
-		kTileValue_height,
-		kTileValue_width,
-		kTileValue_red,
-		kTileValue_green,
-		kTileValue_blue,
-		kTileValue_tile,
-		kTileValue_childcount,
-		kTileValue_child_count = kTileValue_childcount,
-		kTileValue_justify,
-		kTileValue_zoom,
-		kTileValue_font,
-		kTileValue_wrapwidth,
-		kTileValue_wraplimit,
-		kTileValue_wraplines,
-		kTileValue_pagenum,
-		kTileValue_ishtml,
-		kTileValue_cropoffsety,
-		kTileValue_cropy = kTileValue_cropoffsety,
-		kTileValue_cropoffsetx,
-		kTileValue_cropx = kTileValue_cropoffsetx,
-		kTileValue_menufade,
-		kTileValue_explorefade,
-		kTileValue_mouseover,
-		kTileValue_string,
-		kTileValue_shiftclicked,
-		kTileValue_clicked = 0x0FC7,
-		kTileValue_clicksound = 0x0FCB,
-		kTileValue_filename,
-		kTileValue_filewidth,
-		kTileValue_fileheight,
-		kTileValue_repeatvertical,
-		kTileValue_repeathorizontal,
-		kTileValue_animation = 0x0FD2,
-		kTileValue_linecount = 0x0DD4,
-		kTileValue_pagecount,
-		kTileValue_xdefault,
-		kTileValue_xup,
-		kTileValue_xdown,
-		kTileValue_xleft,
-		kTileValue_xright,
-		kTileValue_xbuttona = 0x0FDD,
-		kTileValue_xbuttonb,
-		kTileValue_xbuttonx,
-		kTileValue_xbuttony,
-		kTileValue_xbuttonlt,
-		kTileValue_xbuttonrt,
-		kTileValue_xbuttonlb,
-		kTileValue_xbuttonrb,
-		kTileValue_xbuttonstart = 0x0FE7,
-		kTileValue_mouseoversound,
-		kTileValue_draggable,
-		kTileValue_dragstartx,
-		kTileValue_dragstarty,
-		kTileValue_dragoffsetx,
-		kTileValue_dragoffsety,
-		kTileValue_dragdeltax,
-		kTileValue_dragdeltay,
-		kTileValue_dragx,
-		kTileValue_dragy,
-		kTileValue_wheelable,
-		kTileValue_wheelmoved,
-		kTileValue_systemcolor,
-		kTileValue_brightness,
-		kTileValue_linegap = 0x0FF7,
-		kTileValue_resolutionconverter,
-		kTileValue_texatlas,
-		kTileValue_rotateangle,
-		kTileValue_rotateaxisx,
-		kTileValue_rotateaxisy,
-
-		kTileValue_user0 = 0x01004,
-		kTileValue_user1,
-		kTileValue_user2,
-		kTileValue_user3,
-		kTileValue_user4,
-		kTileValue_user5,
-		kTileValue_user6,
-		kTileValue_user7,
-		kTileValue_user8,
-		kTileValue_user9,
-		kTileValue_user10,
-		kTileValue_user11,
-		kTileValue_user12,
-		kTileValue_user13,
-		kTileValue_user14,
-		kTileValue_user15,
-		kTileValue_user16,
-
-		kTileValue_max
-	};
-
-	enum eTileID {
-		kTileID_rect = 0x0385,
-		kTileID_image,
-		kTileID_text,
-		kTileID_3D,
-		kTileID_nif = kTileID_3D,
-		kTileID_menu,
-
-		// Not a Tile descendend
-		kTileID_hotrect,
-		kTileID_window,
-		// This one descend from TileImage
-		kTileID_radial,
-
-		kTileID_max
-	};
-
-	virtual					~Tile();
-	virtual void			Init(Tile* parent, const char* name, Tile* replacedChild);
-	virtual NiNode*			CalcNode(void);
-	virtual UInt32			GetType(void);		// returns one of kTileValue_XXX
-	virtual const char*		GetTypeStr(void);	// 4-byte id
-	virtual bool			Unk_05(UInt32 arg0, UInt32 arg1);
-	virtual UInt32			Unk_06(UInt32 arg0, UInt32 arg1, UInt32 arg2);
-	virtual void			Unk_07(void);
-	virtual UInt32			Unk_08(void);
-	virtual void			Unk_09(UInt32 arg0, UInt32 arg1, UInt32 arg2);
-
-	struct Value;
-
-	enum ActionType
+	enum EnumActionType : UInt32
 	{
 		kAction_copy = 0x7D0,
 		kAction_add,
@@ -178,6 +53,165 @@ public:
 		kAction_end,
 	};
 
+	enum EnumID : UInt32
+	{
+		kID_rect = 0x0385,
+		kID_image,
+		kID_text,
+		kID_3D,
+		kID_nif = kID_3D,
+		kID_menu,
+
+		// Not a Tile descendend
+		kID_hotrect,
+		kID_window,
+		// This one descend from TileImage
+		kID_radial,
+
+		kID_max,
+
+		kID_template = 0x3E7,
+
+		kID_value = 0xBB9,
+		kID_name = 0xBBA,
+		kID_src = 0xBBB,
+		kID_trait = 0xBBC,
+	};
+
+	enum EnumValue : UInt32 
+	{
+		kValue_x = 0x0FA1,
+		kValue_y,
+		kValue_visible,
+		kValue_class,
+		kValue_clipwindow = 0x0FA6,
+		kValue_stackingtype,
+		kValue_locus,
+		kValue_alpha,
+		kValue_id,
+		kValue_disablefade,
+		kValue_listindex,
+		kValue_depth,
+		kValue_clips,
+		kValue_target,
+		kValue_height,
+		kValue_width,
+		kValue_red,
+		kValue_green,
+		kValue_blue,
+		kValue_tile,
+		kValue_childcount,
+		kValue_child_count = kValue_childcount,
+		kValue_justify,
+		kValue_zoom,
+		kValue_font,
+		kValue_wrapwidth,
+		kValue_wraplimit,
+		kValue_wraplines,
+		kValue_pagenum,
+		kValue_ishtml,
+		kValue_cropoffsety,
+		kValue_cropy = kValue_cropoffsety,
+		kValue_cropoffsetx,
+		kValue_cropx = kValue_cropoffsetx,
+		kValue_menufade,
+		kValue_explorefade,
+		kValue_mouseover,
+		kValue_string,
+		kValue_shiftclicked,
+		kValue_clicked = 0x0FC7,
+		kValue_clicksound = 0x0FCB,
+		kValue_filename,
+		kValue_filewidth,
+		kValue_fileheight,
+		kValue_repeatvertical,
+		kValue_repeathorizontal,
+		kValue_animation = 0x0FD2,
+		kValue_linecount = 0x0DD4,
+		kValue_pagecount,
+		kValue_xdefault,
+		kValue_xup,
+		kValue_xdown,
+		kValue_xleft,
+		kValue_xright,
+		kValue_xbuttona = 0x0FDD,
+		kValue_xbuttonb,
+		kValue_xbuttonx,
+		kValue_xbuttony,
+		kValue_xbuttonlt,
+		kValue_xbuttonrt,
+		kValue_xbuttonlb,
+		kValue_xbuttonrb,
+		kValue_xbuttonstart = 0x0FE7,
+		kValue_mouseoversound,
+		kValue_draggable,
+		kValue_dragstartx,
+		kValue_dragstarty,
+		kValue_dragoffsetx,
+		kValue_dragoffsety,
+		kValue_dragdeltax,
+		kValue_dragdeltay,
+		kValue_dragx,
+		kValue_dragy,
+		kValue_wheelable,
+		kValue_wheelmoved,
+		kValue_systemcolor,
+		kValue_brightness,
+		kValue_linegap = 0x0FF7,
+		kValue_resolutionconverter,
+		kValue_texatlas,
+		kValue_rotateangle,
+		kValue_rotateaxisx,
+		kValue_rotateaxisy,
+
+		kValue_user0 = 0x01004,
+		kValue_user1,
+		kValue_user2,
+		kValue_user3,
+		kValue_user4,
+		kValue_user5,
+		kValue_user6,
+		kValue_user7,
+		kValue_user8,
+		kValue_user9,
+		kValue_user10,
+		kValue_user11,
+		kValue_user12,
+		kValue_user13,
+		kValue_user14,
+		kValue_user15,
+		kValue_user16,
+
+		kValue_max,
+
+		kValue_parent	= 5001,
+		kValue_self		= 5002,
+		kValue_unk1		= 5004,
+		kValue_child	= 5005,
+		kValue_root		= 5006,
+		kValue_globals	= 5007,
+		kValue_unk2		= 5008,
+		kValue_grandparent = 5009,
+		kValue_tilemenu = 5010,
+
+		kValue_fadeout = 0x1772,
+	};
+
+
+	Tile();
+	virtual								~Tile();
+	virtual void						Init(Tile* parent, const char* name, Tile* replacedChild);
+	virtual NiNode*						CalcNode();
+	virtual UInt32						GetType();		// returns one of kTileValue_XXX
+	virtual const char*					GetTypeName();	// 4-byte id i.e. 'TILE'
+	virtual bool						OverRadialTile(Float32 x, Float32 y);
+	virtual UInt32						InitMenu(UInt32 valueID, Float32 Float32Value, const char* strValue);
+	virtual void						RecursiveHandleImageFilenameChange();
+	virtual const char*					GetShaderProperty();
+	virtual void						SetShaderPropertyColorAlpha(NiNode* a1, Float32 alpha, NiColorAlpha* arg2);
+
+	struct Value;
+
 	// 0C
 	class Action
 	{
@@ -185,11 +219,11 @@ public:
 		Action();
 		~Action();
 
-		virtual float	GetFloat();
-		virtual Value* GetValue();
+		virtual Float32	GetFloat();
+		virtual Value*	GetValue();
 
-		UInt32		type;		// 04
-		Action* next;		// 08
+		EnumActionType		eActionType;		// 04
+		Action*				pkNextAction;		// 08
 	};
 
 	// 10
@@ -199,7 +233,7 @@ public:
 		RefValueAction();
 		~RefValueAction();
 
-		Value* tileVal;	// 0C
+		Value* pkTileValue;	// 0C
 	};
 
 	// 10
@@ -209,43 +243,63 @@ public:
 		FloatAction();
 		~FloatAction();
 
-		float		value;		// 0C
+		Float32		fValue;		// 0C
 	};
 
 	// 14
 	struct Value
 	{
-		UInt32		id;			// 00
-		Tile* parent;	// 04
-		float		num;		// 08
-		char* str;		// 0C
-		Action* action;	// 10
+		EnumValue		eID;				// 00
+		Tile*			pkParentTile;		// 04
+		Float32			fNumericalValue;	// 08
+		char*			pcStringValue;		// 0C
+		Action*			pkActionValue;		// 10
+
+		__forceinline void Refresh(bool string) { ThisCall<void>(0xA09410, this, string); };
+		__forceinline void SetFloat(Float32 flt, char chr) { ThisCall<void>(0xA0A270, this, flt, chr); }
+		__forceinline void SetString(const char* str, char chr) { ThisCall<void>(0xA0A300, this, str, chr); }
 	};
 
-	NiTList<Tile*>				kChildren;	// 04
-	BSSimpleArray <Value*>		kValues;		// 10
-	BSStringT					strName;
-	Tile*						pParent;
-	NiNode*						pNiNode;
-	UInt32						uiFlags;
-	UInt8						unk34;
-	bool						bShouldPaintRed;
+	BSSimpleArray<Value*>		kValues;			// 10
+	BSStringT<char>				kName;				// 20
+	Tile*						pkParent;			// 28
+	NiNode*						pkNode;				// 2C
+	UInt32						uiFlags;			// 30
+	UInt8						ucUpdateDeferred;	// 34
+	UInt8						ucShouldPaintRed;	// 35
+	UInt8						pad35[2];			// 36
 
-	static UInt32	TraitNameToID(const char* traitName);
-	Value* GetValue(UInt32 typeID);
-	Value* GetValueName(const char* valueName);
-	Tile* GetChild(const char* childName);
-	Tile* GetComponent(const char* componentTile, const char** trait);
-	Tile* GetComponentTile(const char* componentTile);
-	Value* GetComponentValue(const char* componentPath);
+	__forceinline static EnumValue		TraitNameToID(const char* traitName) { return CdeclCall<EnumValue>(0x00A01860, traitName); }
 
-	Tile* GetChildAlt(const char* childName);
-	Value* GetComponentValueAlt(const char* componentPath);
+	__forceinline Value*		Get(const EnumValue aeID) const { return ThisCall<Value*>(0xA01000, const_cast<Tile*>(this), aeID);};
+	__forceinline Value*		Get(const char* valueName) const { return Get(TraitNameToID(valueName)); }
 
-	void SetValue(UInt32 auiID, const char* apString, bool abPropagate);
-	void SetValue(UInt32 auiID, float afValue, bool abPropagate);
+	// 0xA012D0 without critical section
+	__forceinline void			Set(const EnumValue aeID, const Float32 afValue, const bool abPropagate = true)
+	{ ThisCall<Value*>(0xA01000, this, aeID)->SetFloat(afValue, abPropagate); }
+	__forceinline void			Set(const char* apcID, const Float32 afValue, const bool abPropagate = true)
+	{ Set(TraitNameToID(apcID), afValue, abPropagate); }
 
-	std::string GetQualifiedName();
+	// 0xA0137F without critical section
+	__forceinline void			SetString(const EnumValue aeID, const char* apcValue, const bool abPropagate = true)
+	{ ThisCall<Value*>(0xA01000, this, aeID)->SetString(apcValue, abPropagate); }
+	__forceinline void			SetString(const char* apcID, const char* apcValue, const bool abPropagate = true)
+	{ SetString(TraitNameToID(apcID), apcValue, abPropagate); }
+
+	__forceinline void			SetGradual(const EnumValue aeID, const Float32 afStartValue, const Float32 afEndValue, const Float32 afSeconds, const UInt32 uiChangeMode = 0)
+	{ ThisCall(0xA07C60, this, aeID, afStartValue, afEndValue, afSeconds, uiChangeMode); }
+	__forceinline void			SetGradual(const char* apcID, const Float32 afStartValue, const Float32 afEndValue, const Float32 afSeconds, const UInt32 uiChangeMode = 0)
+	{ SetGradual(TraitNameToID(apcID), afStartValue, afEndValue, afSeconds, uiChangeMode); }
+
+	__forceinline Menu*		GetParentMenu() { return ThisCall<Menu*>(0xA03C90, this); };
+
+	__forceinline void		HandleChange(const EnumValue id) { ThisCall<void>(0xA074D0, this, id); }
+	__forceinline Tile*		GetChildByID(const EnumValue id) { return ThisCall<Tile*>(0xA03EB0, this, id); }; // THANKS STEWIE
+	__forceinline Tile*		GetChildByName(const char* name) { return ThisCall<Tile*>(0xA03DA0, this, name); };
+	__forceinline Tile*		GetChildByTraitName(const char* traitName) { return CdeclCall<Tile*>(0xA08B20, this, traitName); };
+
+	bool					PlayTileSound(EnumValue id = kValue_clicksound) { return ThisCall<char>(0xA0B110, this, id); }
+	Tile*					ReadXML(const char* apcXMLPath) { return ThisCall<Tile*>(0xA01B00, this, apcXMLPath); };
+
 };
-
-ASSERT_SIZE(Tile, 0x38);
+static_assert(sizeof(Tile) == 0x38);

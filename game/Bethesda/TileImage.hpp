@@ -1,16 +1,16 @@
 #pragma once
-
 #include "Tile.hpp"
 
-class NiTexture;
 class TileShaderProperty;
 
-class TileImage : public Tile {
+// 0x48
+class TileImage : public Tile
+{
 public:
-	float							flt038;
-	NiPointer<NiTexture>			spTexture;
-	NiPointer<TileShaderProperty>	spShaderProp;
-	UInt8							byt044;
+	Float32				flt038;		// 38
+	RefNiObject			unk03C;		// 3C nirefobject
+	TileShaderProperty* shaderProp;		// 40 nireftobject
+	UInt8				byt044;		// 44
+	UInt8				fill[3];	// 45-47
 };
-
-ASSERT_SIZE(TileImage, 0x48);
+static_assert(sizeof(TileImage) == 0x48);

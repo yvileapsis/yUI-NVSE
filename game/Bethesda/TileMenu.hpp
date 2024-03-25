@@ -1,12 +1,10 @@
 #pragma once
-
 #include "TileRect.hpp"
 
-class Menu;
-
-class TileMenu : public TileRect {
+// 40
+class TileMenu : public TileRect
+{
 public:
-	Menu* menu;
+	Menu*	pkParentMenu;	// 3C - confirmed
 };
-
-ASSERT_SIZE(TileMenu, 0x40);
+static_assert(sizeof(TileMenu) == 0x40);

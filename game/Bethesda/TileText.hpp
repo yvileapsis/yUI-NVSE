@@ -1,9 +1,10 @@
 #pragma once
-
 #include "Tile.hpp"
 
-class TileText : public Tile {
+// 0x38
+class TileText : public Tile
+{
 public:
-};
 
-ASSERT_SIZE(TileText, 0x38);
+};
+static_assert(sizeof(TileText) == 0x38);

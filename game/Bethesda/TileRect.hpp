@@ -1,10 +1,10 @@
 #pragma once
-
 #include "Tile.hpp"
 
-class TileRect : public Tile {
+// 3C
+class TileRect : public Tile
+{
 public:
-	UInt32	unk38;
+	UInt32	unk38;	// 38
 };
-
-ASSERT_SIZE(TileRect, 0x3C);
+static_assert(sizeof(TileRect) == 0x3C);
