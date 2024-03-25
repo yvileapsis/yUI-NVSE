@@ -1,13 +1,15 @@
 #pragma once
-
 #include "BGSEntryPointFunctionData.hpp"
 
 class TESLevItem;
 
-class BGSEntryPointFunctionDataLeveledList : public BGSEntryPointFunctionData {
+// 0x8
+class BGSEntryPointFunctionDataLeveledList : public BGSEntryPointFunctionData 
+{
 public:
 	BGSEntryPointFunctionDataLeveledList();
 	~BGSEntryPointFunctionDataLeveledList();
 
-	TESLevItem* leveledList;		// 04
+	TESLevItem* pkLeveledList;		// 04
 };
+static_assert(sizeof(BGSEntryPointFunctionDataLeveledList) == 0x8);

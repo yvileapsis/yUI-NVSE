@@ -1,5 +1,4 @@
 #pragma once
-
 #include "QueuedFileEntry.hpp"
 #include "NiGeometry.hpp"
 #include "BSMultiBoundNode.hpp"
@@ -9,6 +8,7 @@ class TESWorldSpace;
 
 NiSmartPointer(BGSDistantObjectBlockLoadTask);
 
+// 0x58
 class BGSDistantObjectBlockLoadTask : public QueuedFileEntry {
 public:
 	bool					bQueuedTextures;
@@ -39,5 +39,4 @@ public:
 
 	static void __fastcall RunEx(BGSDistantObjectBlockLoadTask* apThis);
 };
-
-ASSERT_SIZE(BGSDistantObjectBlockLoadTask, 0x58)
+static_assert(sizeof(BGSDistantObjectBlockLoadTask) == 0x58);

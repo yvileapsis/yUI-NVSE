@@ -1,11 +1,13 @@
 #pragma once
-
 #include "BaseFormComponent.hpp"
 
-class BGSEquipType : public BaseFormComponent {
+// 0x8
+class BGSEquipType : public BaseFormComponent
+{
 public:
 	BGSEquipType();
 	~BGSEquipType();
 
-	UInt32	equipType;	// 08
+	UInt32	uiEquipType;
 };
+static_assert(sizeof(BGSEquipType) == 0x8);

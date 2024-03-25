@@ -576,9 +576,6 @@
     <ClInclude Include="..\game\Bethesda\TESAmmo.hpp">
       <Filter>game\Bethesda</Filter>
     </ClInclude>
-    <ClInclude Include="..\game\Bethesda\TESAmmoEffect.hpp">
-      <Filter>game\Bethesda</Filter>
-    </ClInclude>
     <ClInclude Include="..\game\Bethesda\TESAnimation.hpp">
       <Filter>game\Bethesda</Filter>
     </ClInclude>
@@ -3549,6 +3546,309 @@
     <ClInclude Include="..\game\MiscUtils.hpp">
       <Filter>game</Filter>
     </ClInclude>
+    <ClInclude Include="..\game\Bethesda\algs.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\RepairMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\RepairServicesMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ScriptEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ShieldEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SleepWaitMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SPECIALBookMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\StatsMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SummonCreatureEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SunDamageEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TelekinesisEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Tile3D.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TileExtra.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TurnUndeadEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ValueAndConditionsEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ValueModifierEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\VampirismEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\VATSMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraSound.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraTalkingActor.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\FORenderedMenuRaceSex.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\FrenzyEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\GradualSetFloat.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\HackingMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\InventoryMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\InvisibilityEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\LevelUpMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\LightEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\LimbConditionEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ListBox.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\LockEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\LockPickMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MapMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NavMeshArray.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NightEyeEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NonActorMagicCaster.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NonActorMagicTarget.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\OpenEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ParalysisEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ProcessManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\QuantityMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\RaceSexMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\RadialTile.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ReanimateEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\RecipeMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BarterMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BookMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSRenderPass.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSShaderPPLightingProperty_Passes_2x.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\CalmEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ChameleonEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\CharGenMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\CommandCreatureEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\CommandEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\CommandHumanoidEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\CompanionWheelMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ComputersMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ConcussionEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ContainerMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Creature.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\CureEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DarknessEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DebugText.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DemoralizeEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DetectLifeEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DialogMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DisintegrateArmorEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DisintegrateWeaponEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DispelEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\EffectShaderProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraActivateRef.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraAshPileRef.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraLinkedRef.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraLinkedRefChildren.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraPoison.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\AbsorbEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\AssociatedItemEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\BGSDehydrationStage.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\BGSHungerStage.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\BGSSleepDeprevationStage.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\BlackJackMenu.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\CaravanMenu.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\ItemModMenu.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\LoveTesterMenu.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\MediaLocationController.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\MediaSet.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\RouletteMenu.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\SlotMachineMenu.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESAmmoEffect.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESCaravanCard.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESCaravanDeck.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESCaravanMoney.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESCasino.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESCasinoChips.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESChallenge.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESLoadScreenType.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESObjectIMOD.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESRecipe.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESRecipeCategory.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESReputation.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TraitMenu.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
@@ -3574,6 +3874,9 @@
     </Filter>
     <Filter Include="game\Havok">
       <UniqueIdentifier>{a1ad50b8-234a-4ed2-8dce-e912e0c629b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="game\Obsidian">
+      <UniqueIdentifier>{be04948c-6034-4c15-b3fb-e9b165fcf92d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
