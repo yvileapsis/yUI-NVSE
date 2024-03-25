@@ -1,14 +1,12 @@
 #pragma once
-
 #include "MobileObjectTaskletData.hpp"
 
 class Actor;
 
-// Unused
+// 0x38 Unused
 class AnimationTaskData : public MobileObjectTaskletData {
 public:
 
 	static void __fastcall ExecuteTaskEx(AnimationTaskData* apThis, void*, Actor* apActor);
 };
-
-ASSERT_SIZE(AnimationTaskData, 0x38);
+static_assert(sizeof(AnimationTaskData) == 0x38);

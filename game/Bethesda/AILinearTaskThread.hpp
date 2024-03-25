@@ -1,11 +1,11 @@
 #pragma once
-
 #include "BSLinearTaskThread.hpp"
 
+// 0x78
 class AILinearTaskThread : public BSLinearTaskThread {
 public:
 	void(__cdecl* function)();
-	UInt32 memRouter; // hkMemoryRouterx
+	UInt32 unk50;
 	UInt32 unk54;
 	UInt32 unk58;
 	UInt32 unk5C;
@@ -16,5 +16,4 @@ public:
 	UInt32 unk70;
 	UInt32 unk74;
 };
-
-ASSERT_SIZE(AILinearTaskThread, 0x78);
+static_assert(sizeof(AILinearTaskThread) == 0x78);

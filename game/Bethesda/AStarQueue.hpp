@@ -4,6 +4,6 @@ class AStarNode;
 
 class AStarQueue {
 public:
-	float fMaxFitness;
-	AStarNode* Buckets[20];
+	Float32		fMaxFitness;
+	AStarNode*	Buckets[20];
 };

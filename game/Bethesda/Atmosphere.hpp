@@ -1,18 +1,18 @@
 #pragma once
-
 #include "SkyObject.hpp"
 
 class BSFogProperty;
 
-class Atmosphere : public SkyObject {
+// 0x1C
+class Atmosphere : public SkyObject
+{
 public:
 	virtual void		Init(NiNode* niNode, void* _fogProp);
 
-	NiNodePtr					spAtmosphere;
+	NiPointer<NiNode>			spAtmosphere;
 	NiPointer<BSFogProperty>	spFog;
-	NiNodePtr					spSkyQuadNode;
-	NiRefObjectPtr				spSkyQuad;
+	NiPointer<NiNode>			spSkyQuadNode;
+	NiPointer<NiRefObject>		spSkyQuad;
 	bool						bUpdateFogDistance;
 };
-
-ASSERT_SIZE(Atmosphere, 0x1Cu);
+static_assert(sizeof(Atmosphere) == 0x1Cu);

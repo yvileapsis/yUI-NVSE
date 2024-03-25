@@ -1,9 +1,9 @@
 #pragma once
-
 #include "BSArchive.hpp"
 #include "ArchiveFile.hpp"
-#include "BSSimpleList.hpp"
 #include "NiRefObject.hpp"
+#include "BSFileEntry.hpp"
+#include "BSSimpleList.hpp"
 #include "NiCriticalSection.hpp"
 
 enum ARCHIVE_TYPE {
@@ -42,31 +42,31 @@ struct ArchiveTypeExtension {
 
 NiSmartPointer(Archive);
 
-class Archive : public BSFile, public NiRefObject {
+// 0x1D0
+class Archive : public BSFile
+{
 public:
-	Archive(const char* apArchiveName, UInt32 auiBufferSize, bool abSecondaryArchive, bool abInvalidateOtherArchives);
-	~Archive();
-
+	NiRefObject			kRefObject;
 	BSArchive			kArchive;
-	time_t				ulArchiveFileTime;
+	FILETIME			kArchiveFileTime;
 	UInt32				uiFileNameArrayOffset;
 	UInt32				uiLastDirectoryIndex;
 	UInt32				uiLastFileIndex;
 	CRITICAL_SECTION	kArchiveCriticalSection;
-	Bitfield8			ucArchiveFlags;
-	char*				pDirectoryStringArray;
+	UInt8				cArchiveFlags;
+	const char*			pDirectoryStringArray;
 	UInt32*				pDirectoryStringOffsets;
-	char*				pFileNameStringArray;
+	const char*			pFileNameStringArray;
 	UInt32**			pFileNameStringOffsets;
 	UInt32				uiID;
 	UInt32				unk6C;
 
 	enum Flags {
-		DISABLED				= 1 << 0,
-		PRIMARY					= 1 << 2,
-		SECONDARY				= 1 << 3,
-		HAS_DIRECTORY_STRINGS	= 1 << 4,
-		HAS_FILE_STRINGS		= 1 << 5,
+		DISABLED = 1 << 0,
+		PRIMARY = 1 << 2,
+		SECONDARY = 1 << 3,
+		HAS_DIRECTORY_STRINGS = 1 << 4,
+		HAS_FILE_STRINGS = 1 << 5,
 	};
 
 	static UInt32* const uiCount;
@@ -110,8 +110,7 @@ public:
 	const char* GetDirectoryString(UInt32 auiDirectoryIndex);
 	const char* GetFileNameForFileEntry(BSFileEntry* apFileEntry);
 };
-
-ASSERT_SIZE(Archive, 0x1D0);
+static_assert(sizeof(Archive) == 0x1D0);
 
 typedef BSSimpleList<ArchivePtr> ArchiveList;
 
@@ -139,12 +138,13 @@ public:
 	static Archive* __cdecl OpenArchive(const char* apArchiveName, UInt16 aiForceArchiveType, bool abInvalidateOtherArchives);
 
 	static bool __cdecl FindFile(const char* apFileName, ARCHIVE_TYPE aiArchiveType);
-	 
+
 	static ArchiveFile* __cdecl GetFile(const char* apFileName, UInt32 aiBufferSize, ARCHIVE_TYPE aeArchiveType);
 	static ArchiveFile* __cdecl GetArchiveFile(const char* apFileName, UInt32 aiBufferSize, ARCHIVE_TYPE aeArchiveType);
 	static BSFileEntry* __cdecl GetFileEntryForFile(ARCHIVE_TYPE_INDEX aeArchiveTypeIndex, BSHash& arDirectoryHash, BSHash& arFileNameHash, const char* apFileName);
 
 	static bool __cdecl WildCardMatch(char* apSearchName, BSHash* apHash);
+
 
 	static ARCHIVE_TYPE __cdecl GetArchiveTypeFromFileName(const char* apFileName);
 	static ARCHIVE_TYPE __cdecl GetArchiveTypeFromFileExtension(const char* apExtension);
@@ -152,7 +152,9 @@ public:
 	static bool __cdecl GetFileNameForSmallestFileInDirectory(const char* apDirectory, char* apFileName, ARCHIVE_TYPE aeArchiveType);
 	static bool __cdecl GetRandomFileNameForDirectory(const char* apDirectory, char* apFileName, ARCHIVE_TYPE aeArchiveType);
 
+
 	static const char* __cdecl TrimFileName(const char* apFileName);
+
 
 	static inline void Lock() {
 		pCriticalSection->Lock();

@@ -1,31 +1,32 @@
 #pragma once
-
 #include "PathingLocation.hpp"
-#include "ActorPathingMessageQueue.hpp"
-#include "PathingRequest.hpp"
-#include "PathingSolution.hpp"
 
+class PathingRequest;
+class PathingSolution;
 class DetailedActorPathHandler;
+class ActorPathingMessageQueue;
 
-class ActorMover {
+// 0x88
+class ActorMover
+{
 public:
 	ActorMover();
 	
 	virtual				~ActorMover();
-	virtual void		SetMovementFlag(UInt16);
+	virtual void		Unk_01();
 	virtual void		ClearMovementFlag();
-	virtual void		SetMovementFlags(UInt16 movementFlags);
+	virtual void		SetMovementFlags(UInt16 ausMovementFlags);
 	virtual void		Unk_04();
 	virtual void		Unk_05();
-	virtual void		HandleTurnAnimationTimer(float timePassed);
+	virtual void		HandleTurnAnimationTimer(Float32 afTimePassed);
 	virtual void		Unk_07();
 	virtual UInt32		GetMovementFlags();
-	virtual void		GetOverrideMovementVector();
-	virtual void		SaveGame();
-	virtual void		LoadGame();
+	virtual void		Unk_09();
+	virtual void		Unk_0A();
+	virtual void		Unk_0B();
 	virtual void		Unk_0C();
 	virtual void		Unk_0D();
-	virtual void		Reset();
+	virtual void		Unk_0E();
 
 	enum MovementFlags {
 		kMoveFlag_Forward		= 0x1,
@@ -45,34 +46,33 @@ public:
 		kMoveFlag_Slide			= 0x8000,
 	};
 
-
-	NiPoint3						kPt04;							
-	NiPoint3						kOverrideMovement;				
-	PathingRequestPtr				spPathingRequest;			
-	PathingSolutionPtr				spPathingSolution;
-	DetailedActorPathHandler*		pPathHandler;	
-	Actor*							pActor;							
-	UInt32							uiDoorRefIDForPathing;				
-	ActorPathingMessageQueuePtr		spPathingMsgQueue;
-	UInt32							uiMovementFlags1;
-	UInt32							unk38;							
-	UInt32							uiMovementFlags2;
-	UInt16							wrd40;							
-	UInt16							wrd42;							
-	PathingLocation					kPathingLocation;		
-	UInt32							unk6C;							
-	bool							bPathingFailed;
-	UInt8							byte71;							
-	UInt8							byte72;							
-	UInt8							byte73;							
-	bool							bIsWaitingOnPath;
-	UInt8							byte75;							
-	UInt8							byte76;							
-	bool							bIsOverrideMovement;				
-	UInt8							byte78;							
-	UInt32							uiTime7C;							
-	UInt32							uiTime80;							
-	UInt32							uiCount84;							
+	NiPoint3			pt04;						// 04
+	NiPoint3			kOverrideMovement;			// 10
+	PathingRequest*		pkPathingRequest;			// 1C
+	PathingSolution*	pkPathingSolution;			// 20
+	DetailedActorPathHandler* pkPathHandler;		// 24
+	Actor*				pkActor;					// 28
+	UInt32				uiDoorRefIDForPathing;		// 2C
+	ActorPathingMessageQueue* spkPathingMsgQueue;	// 30
+	UInt32				uiMovementFlags1;			// 34
+	UInt32				unk38;						// 38
+	UInt32				uiMovementFlags2;			// 3C
+	UInt16				wrd40;						// 40
+	UInt16				wrd42;						// 42
+	PathingLocation		kPathingLocation;			// 44
+	UInt32				unk6C;						// 6C
+	UInt8				bPathingFailed;				// 70
+	UInt8				byte71;						// 71
+	UInt8				byte72;						// 72
+	UInt8				byte73;						// 73
+	UInt8				bIsWaitingOnPath;			// 74
+	UInt8				byte75;						// 75
+	UInt8				byte76;						// 76
+	UInt8				bIsOverrideMovement;		// 77
+	UInt8				byte78;						// 78
+	UInt8				gap79[3];					// 79
+	UInt32				time7C;						// 7C
+	UInt32				time80;						// 80
+	UInt32				count84;					// 84
 };
-
-ASSERT_SIZE(ActorMover, 0x88);
+static_assert(sizeof(ActorMover) == 0x88);

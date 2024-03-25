@@ -1,10 +1,9 @@
 #pragma once
-
 #include "AITaskThread.hpp"
 
+// 0x10
 struct AITaskThreadManager {
-	AITaskThread* pThreads[3];
-	UInt32 uiTaskCount;
+	AITaskThread*	pThreads[3];
+	UInt32			uiTaskCount;
 };
-
-ASSERT_SIZE(AITaskThreadManager, 0x10);
+static_assert(sizeof(AITaskThreadManager) == 0x10);

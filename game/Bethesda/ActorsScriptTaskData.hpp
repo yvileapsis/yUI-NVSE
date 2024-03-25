@@ -1,10 +1,9 @@
 #pragma once
-
 #include "MobileObjectTaskletData.hpp"
 
 class Actor;
 
-// Unused
+// 0x40
 class ActorsScriptTaskData : public MobileObjectTaskletData {
 public:
 	UInt32 unk38;
@@ -12,5 +11,4 @@ public:
 
 	static void __fastcall ExecuteTaskEx(ActorsScriptTaskData* apThis, void*, Actor* apActor);
 };
-
-ASSERT_SIZE(ActorsScriptTaskData, 0x40);
+static_assert(sizeof(ActorsScriptTaskData) == 0x40);
