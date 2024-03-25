@@ -9,25 +9,26 @@ class TESQuest;
 
 struct DialogueResponse {
 	BSStringT			responseText;	// 000
-	UInt32			emotionType;	// 008
-	SInt32			emotionValue;	// 00C
+	UInt32				emotionType;	// 008
+	SInt32				emotionValue;	// 00C
 	BSStringT			voiceFileName;	// 010
-	TESIdleForm* speakerIdle;	// 018	idle
-	TESIdleForm* listenerIdle;	// 01C	idle
-	TESSound* sound;			// 020
-	UInt32			unk024;			// 024	uninitialized, unused in xEdit
-	UInt32			unk028;			// 028
+	TESIdleForm*		speakerIdle;	// 018	idle
+	TESIdleForm*		listenerIdle;	// 01C	idle
+	TESSound*			sound;			// 020
+	UInt32				unk024;			// 024	uninitialized, unused in xEdit
+	UInt32				unk028;			// 028
 };
 
 struct DialogueItem {
 	BSSimpleList<DialogueResponse>	responses;				// 000
-	DialogueResponse* currentResponse;	// 008
-	TESTopicInfo* currentTopicInfo;	// 00C
-	TESTopic* currentTopic;		// 010
-	TESQuest* currentQuest;		// 014
-	TESForm* currentSpeaker;		// 018
+	DialogueResponse*				currentResponse;	// 008
+	TESTopicInfo*					currentTopicInfo;	// 00C
+	TESTopic*						currentTopic;		// 010
+	TESQuest*						currentQuest;		// 014
+	TESForm*						currentSpeaker;		// 018
 };
 
+// 0D0
 class DialoguePackage : public TESPackage {
 public:
 	DialoguePackage();
@@ -41,21 +42,21 @@ public:
 	};	//	00C
 
 	Data0080	data0080;		// 080
-	TESTopic* topic;		// 08C
-	float		flt090;			// 090
-	Character* speaker;		// 094
+	TESTopic*	topic;		// 08C
+	Float32		flt090;			// 090
+	Character*	speaker;		// 094
 	UInt8		unk098;			// 098
 	UInt8		unk099;			// 098
 	UInt8		unk09A;			// 098
 	UInt8		unk09B;			// 098
-	TESForm* unk09C;		// 09C
+	TESForm*	unk09C;		// 09C
 	UInt32		unk0A0;			// 0A0
-	void* unk0A4;			// 0A4	list of Dialogue Item and Dialogue Response, plus current item and current response
+	void*		unk0A4;			// 0A4	list of Dialogue Item and Dialogue Response, plus current item and current response
 	UInt32		unk0A8;			// 0A8
 	UInt32		unk0AC;			// 0AC
-	Character* subject;		// 0B0
-	Character* target;		// 0B4
-	TESForm* unk0B8;		// 0B8
+	Character*	subject;		// 0B0
+	Character*	target;		// 0B4
+	TESForm*	unk0B8;		// 0B8
 	UInt8		unk0BC;			// 0BC
 	UInt8		unk0BD;			// 0BD
 	UInt8		unk0BE;			// 0BE

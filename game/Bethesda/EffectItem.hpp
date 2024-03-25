@@ -1,9 +1,11 @@
 #pragma once
 
 #include "BSString.hpp"
+#include "BSSimpleList.hpp"
 #include "TESCondition.hpp"
 #include "EffectSetting.hpp"
 
+// 0x24
 class EffectItem {
 public:
 	EffectItem();
@@ -18,11 +20,11 @@ public:
 
 	struct ScriptEffectInfo
 	{
-		UInt32 scriptRefID;
-		UInt32 school;
-		BSStringT effectName;
-		UInt32 visualEffectCode;
-		UInt32 isHostile;
+		UInt32		uiScriptRefID;
+		UInt32		uiSchool;
+		BSStringT	kEffectName;
+		UInt32		uiVisualEffectCode;
+		UInt32		uiIsHostile;
 
 		void SetName(const char* name);
 		void SetSchool(UInt32 school);
@@ -37,13 +39,13 @@ public:
 	};
 
 	// mising flags
-	UInt32	magnitude;			// 00	used as a float
-	UInt32	area;				// 09
-	UInt32	duration;			// 08
-	UInt32	range;				// 0C
-	UInt32	actorValueOrOther;	// 10
-	EffectSetting* setting;	// 14
-	float	cost;				// 18 on autocalc items this seems to be the cost
+	UInt32			uiMagnitude;			// 00	used as a float
+	UInt32			uiArea;				// 09
+	UInt32			uiDuration;			// 08
+	UInt32			uiRange;				// 0C
+	UInt32			uiActorValueOrOther;	// 10
+	EffectSetting*	pSetting;	// 14
+	Float32			fCost;				// 18 on autocalc items this seems to be the cost
 	TESCondition	conditions;			// 1C
 
 	//bool HasActorValue() const;
@@ -75,23 +77,26 @@ public:
 	//void ModDuration(float modBy);
 	//void SetRange(UInt32 range);
 	//bool IsHostile() const;
+	__forceinline int	GetSkillCode() { return ThisCall<signed int>(0x403EA0, this); };
 };
+static_assert(sizeof(EffectItem) == 0x24);
 
-ASSERT_SIZE(EffectItem, 0x24);
-
+// 0x10
 class EffectItemList : public BSSimpleList<EffectItem*> {
 public:
 	EffectItemList();
 	~EffectItemList();
 
-	UInt32	unk00C;
+	UInt32	unk00C;	// 00C
 
 	virtual void Unk_00();
 	virtual void Unk_01();
 	virtual void CopyFromBase();
 	virtual void Unk_03();
-	virtual void Unk_04();
+	virtual void Unk_04(); // ret5
 
+	EffectItem* ItemAt(UInt32 whichItem);
+	UInt32		CountItems() const;
 	const char* GetNthEIName(UInt32 whichEffect) const;
 
 	//	bool HasNonHostileItem() const;
@@ -101,5 +106,4 @@ public:
 	//	UInt32 CopyItemFrom(EffectItemList& fromList, UInt32 whichItem);
 	//	bool RemoveItem(UInt32 whichItem);
 };
-
-ASSERT_SIZE(EffectItemList, 0x10);
+static_assert(sizeof(EffectItemList) == 0x10);

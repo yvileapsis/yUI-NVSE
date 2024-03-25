@@ -16,8 +16,8 @@ public:
 
 
 	void*				pScriptContext;
-	NiTList<BSStringT>	lPrintedLines;
-	NiTList<BSStringT>	lInputHistory;
+	NiTList<BSStringT<char>> lPrintedLines;
+	NiTList<BSStringT<char>> lInputHistory;
 	UInt32				uiHistoryIndex;
 	UInt32				uiUnk020;
 	UInt32				uiPrintedCount;
