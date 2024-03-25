@@ -1,11 +1,11 @@
 #pragma once
-
 #include "TESBoundObject.hpp"
 
-class TESBoundAnimObject : public TESBoundObject {
+// 0x30
+class TESBoundAnimObject : public TESBoundObject
+{
 public:
 	TESBoundAnimObject();
-	~TESBoundAnimObject();
+	~TESBoundAnimObject() override;
 };
-
-ASSERT_SIZE(TESBoundAnimObject, 0x30);
+static_assert(sizeof(TESBoundAnimObject) == 0x30);

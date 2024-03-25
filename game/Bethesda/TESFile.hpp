@@ -1,5 +1,4 @@
 #pragma once
-
 #include "BSSimpleList.hpp"
 #include "BSString.hpp"
 #include "BSFile.hpp"
@@ -14,19 +13,13 @@ struct ChunkAndFormType {
 };
 
 #if RUNTIME
-static const UInt32 _ModInfo_GetNextChunk = 0x004726B0; // args: none retn: UInt32 subrecordType (third call in TESObjectARMO_LoadForm)
-static const UInt32 _ModInfo_GetChunkData = 0x00472890;	// args: void* buf, UInt32 bufSize retn: bool readSucceeded (fifth call in TESObjectARMO_LoadForm)
-static const UInt32 _ModInfo_Read32 = 0x004727F0;	// args: void* buf retn: void (find 'LPER', then next call, still in TESObjectARMO_LoadForm)
-static const UInt32 _ModInfo_HasMoreSubrecords = 0x004726F0;	// Last call before "looping" to GetNextChunk in TESObjectARMO_LoadForm.
-static const UInt32 _ModInfo_InitializeForm = 0x00472F60;	// args: TESForm* retn: void (second call in TESObjectARMO_LoadForm)
-
 // addresses of static ModInfo members holding type info about currently loading form
 static UInt32* s_ModInfo_CurrentChunkTypeCode = (UInt32*)0x011C54F4;
 static UInt32* s_ModInfo_CurrentFormTypeEnum = (UInt32*)0x011C54F0;
 // in last call (SetStaticFieldsAndGetFormTypeEnum) of first call (ModInfo__GetFormInfoTypeID) from _ModInfo_InitializeForm
-		//		s_ModInfo_CurrentChunkTypeCode is first cmp
-		//		s_ModInfo_CurrentChunkTypeEnum is next mov
-static const ChunkAndFormType* s_ModInfo_ChunkAndFormTypes = (const ChunkAndFormType*)0x01187008;	// Array used in the loop in SetStaticFieldsAndGetFormTypeEnum, starts under dd offset aNone
+//		s_ModInfo_CurrentChunkTypeCode is first cmp
+//		s_ModInfo_CurrentChunkTypeEnum is next mov
+static ChunkAndFormType* s_ModInfo_ChunkAndFormTypes = (ChunkAndFormType*)0x01187008;	// Array used in the loop in SetStaticFieldsAndGetFormTypeEnum, starts under dd offset aNone
 #endif
 
 struct ChunkHeader {
@@ -34,7 +27,9 @@ struct ChunkHeader {
 	UInt16	size : 2;
 };
 
-class TESFile {
+// 0x42C
+class TESFile 
+{
 public:
 	TESFile();
 	~TESFile();
@@ -48,7 +43,7 @@ public:
 		UInt32		formID;				// 0C											FormID
 		UInt32		unk10;				// 10											Version Control Info 1
 		UInt16		formVersion;		// 14 always initialized to 0F on SaveForm.		Form Version
-		UInt16		unk16;				// 16                                           Version Control Info 2
+		UInt16		unk16;				// 16										   Version Control Info 2
 	};
 
 	// 18 info about current group of form
@@ -60,7 +55,7 @@ public:
 		UInt32		groupType;			// 0C forms, dialog, cell...					Type
 		UInt32		unk10;				// 10											Stamp
 		UInt16		unk14;				// 14											Part of Unknown
-		UInt16		unk16;				// 16                                           Part of Unknown
+		UInt16		unk16;				// 16										   Part of Unknown
 	};
 
 	struct FileHeader	// File header in FNVEdit Signature 'HEDR'
@@ -856,8 +851,8 @@ public:
 	UInt32								unk404;
 	UInt32								unk408;
 	UInt8								modIndex;
-	BSStringT							author;
-	BSStringT							description;
+	BSStringT<char>						author;
+	BSStringT<char>						description;
 	void*								pDecompressedFormBuffer;
 	UInt32								iDecompressedFormBufferSize;
 	bool								maybeShouldBeReloaded;
@@ -867,8 +862,5 @@ public:
 	bool IsLoaded() const { return true; }
 	const char* GetName() const { return m_Filename; }
 };
-
-ASSERT_SIZE(WIN32_FIND_DATA, 0x140);
-ASSERT_SIZE(TESFile, 0x42C);
-
-typedef TESFile ModInfo;
+static_assert(sizeof(WIN32_FIND_DATA) == 0x140);
+static_assert(sizeof(TESFile) == 0x42C);

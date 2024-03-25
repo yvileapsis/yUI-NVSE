@@ -1,14 +1,14 @@
 #pragma once
-
 #include "BaseFormComponent.hpp"
+// Complete
 
+// 0x8
 class TESWeightForm : public BaseFormComponent {
 public:
 	TESWeightForm();
 	~TESWeightForm();
 
-	float	fWeight;		// 004
+	Float32		fWeight;		// 004
 	// 008
 };
-
-ASSERT_SIZE(TESWeightForm, 0x8);
+static_assert(sizeof(TESWeightForm) == 0x8);

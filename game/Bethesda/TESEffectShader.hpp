@@ -7,7 +7,9 @@
 
 class BGSDebris;
 
-class TESEffectShader : public TESForm {
+// 0x170
+class TESEffectShader : public TESForm
+{
 public:
 	TESEffectShader();
 	~TESEffectShader();

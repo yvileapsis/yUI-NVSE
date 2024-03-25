@@ -1,20 +1,20 @@
 #pragma once
-
 #include "TESObjectREFR.hpp"
 #include "BaseProcess.hpp"
 
-class MobileObject : public TESObjectREFR {
+// 0x88
+class MobileObject : public TESObjectREFR
+{
 public:
 	MobileObject();
-	virtual ~MobileObject();
-
-	virtual bool			MovetoHigh();		// 090
-	virtual bool			MoveToLow();
-	virtual bool			MoveToMiddleLow();
-	virtual bool			MovetoMiddleHigh();
+	~MobileObject() override;
+	virtual void			MovetoHigh(); // 0x90
+	virtual void			MoveToLow();
+	virtual void			MoveToMiddleLow();
+	virtual void			MovetoMiddleHigh();
 	virtual void			Move(float, NiPoint3, int);
 	virtual void			Jump();
-	virtual void			Unk_96();
+	virtual void			nullsub_96();
 	virtual void			Process();
 	virtual void			UpdateProcessLevel();
 	virtual void			Unk_99();
@@ -50,7 +50,7 @@ public:
 	virtual void			SetEmotionValue(UInt32);
 	virtual void			SetCharControllerSize(float afSize);
 	virtual void			Unk_B9();
-	virtual void			Unk_BA();
+	virtual void			IsLifeStateDying();
 	virtual void			Unk_BB();
 	virtual void			ToggleCollisionDebug(bool abShow);
 	virtual void			Unk_BD();
@@ -58,28 +58,25 @@ public:
 	virtual void			Unk_BF();
 	virtual TESSound*		GetActivatorCloseSound(void*, void*);
 
-	BaseProcess*	pBaseProcess;	// 068
-	TESObjectREFR*	pActivatorRef;
-	TESObjectREFR*	unk70;
-	float			unk74;
-	float			unk78;
-	UInt8			unk7C;
-	UInt8			unk7D;
-	UInt8			unk7E;
-	UInt8			unk7F;
-	UInt8			unk80;
-	bool			bTalkingThroughActivator;
-	bool			bChangingProcess;
-	UInt8			unk83;
-	bool			bSoundCallbackSet;
-	UInt8			unk85;
-	Bitfield8		ucExtraInfoGeneralTopicDataElementFlags;
-	UInt8			unk87;
-
+	BaseProcess*		pkBaseProcess;						// 068
+	TESObjectREFR*		pkActivatorRef;
+	Actor*				pkConversationActor;				// 070 -
+	Float32				nextHeadTrackUpdateTimer;			// 074 - loaded
+	Float32				voiceTimer;							// 078 - loaded
+	UInt8				unk07C;								// 07C - loaded
+	UInt8				unk07D;								// 07D - loaded
+	UInt8				unk07E;								// 07E - loaded
+	UInt8				unk07F;								// 07F - loaded
+	bool				bTalkingThroughActivator;
+	bool				bChangingProcess;
+	UInt8				unk083;								// 083 -	bool bSoundCallBackSet;
+	UInt8				unk085;								// 085 - loaded
+	UInt8				ucExtraInfoGeneralTopicDataElementFlags;		// 086 - loaded
+	UInt8				unk087;								// 087	Init'd to the inverse of NoLowLevelProcessing
+	
 	bool IsTalkingThroughActivator() const { return bTalkingThroughActivator; };
-	TESObjectREFR* GetActivatorRef() const { return pActivatorRef; };
+	TESObjectREFR* GetActivatorRef() const { return pkActivatorRef; };
 
 	void RemoveStaleSayOncePerDayTopics();
 };
-ASSERT_OFFSET(MobileObject, pBaseProcess, 0x068);
-ASSERT_SIZE(MobileObject, 0x088);
+static_assert(sizeof(MobileObject) == 0x88);

@@ -11,15 +11,15 @@ static double remap(float new_min, float new_max, float old_min, float old_max, 
 }
 
 // 0x4E44F0
-static void fClamp(float& apOut, float afMin, float afMax) {
-    if (afMax >= afMin) {
-        if (afMax >= apOut) {
-            if (afMin > apOut) {
-                apOut = fmodf(afMax - afMin, apOut - afMin) + afMax;
-            }
-        }
-        else {
-            apOut = fmodf(afMax - afMin, apOut - afMin) + afMin;
-        }
-    }
+static void fClamp(float* apOut, float afMin, float afMax) {
+	if (afMax >= afMin) {
+		if (afMax >= *apOut) {
+			if (afMin > *apOut) {
+				*apOut = fmodf(afMax - afMin, *apOut - afMin) + afMax;
+			}
+		}
+		else {
+			*apOut = fmodf(afMax - afMin, *apOut - afMin) + afMin;
+		}
+	}
 }

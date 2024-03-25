@@ -1,11 +1,6 @@
 #pragma once
-
-#include "TESObjectList.hpp"
-#include "BSSimpleList.hpp"
-#include "NiTArray.hpp"
-#include "NiTPointerList.hpp"
 #include "TESFile.hpp"
-#include "TESRegionList.hpp"
+#include "NiTArray.hpp"
 
 class BGSAcousticSpace;
 class BGSAddonNode;
@@ -61,7 +56,7 @@ class TESQuest;
 class TESRace;
 class TESRecipe;
 class TESRecipeCategory;
-class TESRegions;
+class TESRegionList;
 class TESRegionDataManager;
 class TESReputation;
 class TESSound;
@@ -71,19 +66,20 @@ class TESWaterForm;
 class TESWeather;
 class TESWorldSpace;
 
-struct ModList {
+struct ModList 
+{
 	BSSimpleList<TESFile*>	kModInfos;
 	UInt32					uiLoadedModCount;
 	TESFile*				pLoadedMods[0xFF];
 };
-
-ASSERT_SIZE(ModList, 0x408);
+static_assert(sizeof(ModList) == 0x408);
 
 // 5B8
 class TESDataHandler {
 public:
 	TESDataHandler();
 	~TESDataHandler();
+
 
 	UInt32									unk00;					// 000
 	TESObjectList*							pObjects;				// 004
@@ -173,9 +169,9 @@ public:
 
 	static TESDataHandler* GetSingleton() { return *reinterpret_cast<TESDataHandler**>(0x011C3F2C); }
 
-	std::vector<ModInfo*> GetActiveModList()
+	std::vector<TESFile*> GetActiveModList()
 	{
-		std::vector<ModInfo*> activeMods;
+		std::vector<TESFile*> activeMods;
 		if (activeMods.empty())
 			for (const auto iter : kMods.kModInfos)
 				if (iter->IsLoaded()) activeMods.push_back(iter);
@@ -203,5 +199,4 @@ public:
 
 	TESObjectCELL* GetCellFromCellCoord(SInt32 aiX, SInt32 aiY, TESWorldSpace* apWorldSpace, bool abUnk);
 };
-
-ASSERT_SIZE(TESDataHandler, 0x63C);
+static_assert(sizeof(TESDataHandler) == 0x63C);

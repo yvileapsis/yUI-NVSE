@@ -1,5 +1,4 @@
 #pragma once
-
 #include "TESActorBase.hpp"
 #include "TESRaceForm.hpp"
 
@@ -8,7 +7,11 @@ class TESClass;
 class BGSHeadPart;
 class FaceGenUndo;
 
-class TESNPC : public TESActorBase {
+// 0x20C
+class TESNPC :
+	public TESActorBase,
+	public TESRaceForm
+{
 public:
 	TESNPC();
 	virtual ~TESNPC();
@@ -43,7 +46,6 @@ public:
 		UInt32  size;		// 01C 150 0x01			0x01			0x01			also participate in array offset calculation (offset = count * size)
 	};
 
-	TESRaceForm	race;							// 10C/140
 	UInt8		skillValues[0x0E];				// 114/148
 	UInt8		skillOffsets[0x0E];				// 122
 	TESClass* classID;						// 130/164
@@ -66,12 +68,11 @@ public:
 	UInt32		hairColor;						// 1D8/20C
 	BSSimpleList<BGSHeadPart*>	headPart;				// 1DC/210
 	UInt32		impactMaterialType;				// 1E4/218
-	UInt32      unk01E8;						// 1E8
+	UInt32	  unk01E8;						// 1E8
 	TESRace* race1EC;						// 1EC
 	TESNPC* copyFrom;						// 1F0		not set once PlayerRef exists and the target is the Player
 	float		height;							// 1F4/21C
 	float		weight;							// 1F8/220 Aparently, getWeight purposly returns height except for the player.
 	NiTPrimitiveArray<FaceGenUndo*>	faceGenUndo;	// 1FC
 };
-
-ASSERT_SIZE(TESNPC, 0x20C);
+static_assert(sizeof(TESNPC) == 0x20C);

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "QueuedFile.hpp"
 #include "NiRefObject.hpp"
 
@@ -11,6 +10,7 @@ class Model;
 
 NiSmartPointer(QueuedReference);
 
+// 0x40
 class QueuedReference : public QueuedFile {
 public:
 	QueuedReference();
@@ -30,5 +30,4 @@ public:
 	NiPointer<AttachDistant3DTask>	spAttachDistant3DTask;
 	UInt32							uiWaitCount;
 };
-
-ASSERT_SIZE(QueuedReference, 0x40)
+static_assert(sizeof(QueuedReference) == 0x40);

@@ -1,15 +1,13 @@
 #pragma once
-
 #include "BaseFormComponent.hpp"
 
+// 0x8
 class TESHealthForm : public BaseFormComponent {
 public:
 	TESHealthForm();
-	~TESHealthForm();
+	virtual ~TESHealthForm();
+	virtual UInt32	GetHealth();	// 04
 
-	virtual UInt32	GetHealth(void);	// 0004
-
-	UInt32	uiHealth;		// 004
+	UInt32	uiHealth;	// 04
 };
-
-ASSERT_SIZE(TESHealthForm, 0x8);
+static_assert(sizeof(TESHealthForm) == 0x8);

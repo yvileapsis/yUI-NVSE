@@ -1,5 +1,4 @@
 #pragma once
-
 #include "BSExtraData.hpp"
 
 class ExtraRank : public BSExtraData {
@@ -11,3 +10,4 @@ public:
 
 	static ExtraRank* Create();
 };
+static_assert(sizeof(ExtraRank) == 0x10);

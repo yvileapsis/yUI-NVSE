@@ -1,5 +1,4 @@
 #pragma once
-
 #include "BSExtraData.hpp"
 
 class ExtraUses : public BSExtraData {
@@ -11,3 +10,4 @@ public:
 
 	static ExtraUses* Create();
 };
+static_assert(sizeof(ExtraUses) == 0x10);

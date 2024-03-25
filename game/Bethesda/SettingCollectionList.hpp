@@ -1,12 +1,12 @@
 #pragma once
-
 #include "SettingCollection.hpp"
 #include "BSSimpleList.hpp"
 
 template<class T>
 class SettingCollectionList : public SettingCollection<T> {
 public:
-	BSSimpleList<T*>	SettingsA;
+	SettingCollectionList();
+	~SettingCollectionList() override;
+	BSSimpleList<T*>	kSettingList;
 };
-
-ASSERT_SIZE(SettingCollectionList<UInt32>, 0x114);
+static_assert(sizeof(SettingCollectionList<void*>) == 0x114);

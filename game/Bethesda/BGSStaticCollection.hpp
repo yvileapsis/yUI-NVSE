@@ -1,11 +1,12 @@
 #pragma once
-
 #include "TESBoundObject.hpp"
 #include "TESModelTextureSwap.hpp"
 
-class BGSStaticCollection : public TESBoundObject {
+// 0x50
+class BGSStaticCollection :
+	public TESBoundObject, 
+	public TESModelTextureSwap
+{
 public:
-	TESModelTextureSwap modelSwap;
 };
-
-ASSERT_SIZE(BGSStaticCollection, 0x50);
+static_assert(sizeof(BGSStaticCollection) == 0x50);

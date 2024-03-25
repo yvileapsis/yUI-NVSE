@@ -1,5 +1,4 @@
 #pragma once
-
 #include "BSExtraData.hpp"
 
 class TESForm;
@@ -13,3 +12,4 @@ public:
 
 	static ExtraOwnership* Create();
 };
+static_assert(sizeof(ExtraOwnership) == 0x10);

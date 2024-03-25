@@ -1,21 +1,26 @@
 #pragma once
-
-#include "BSShaderAccumulator.hpp"
-#include "SceneGraph.hpp"
 #include "NiDX9Renderer.hpp"
-#include "BSInputManager.hpp"
+#include "SceneGraph.hpp"
+#include "BSShaderAccumulator.hpp"
 #include "BSPackedTaskQueue.hpp"
 
-class Sun;
-class BSAudioManager;
-class BSPackedTaskQueue;
-class ImageSpaceManager;
-class TESProjectile;
+class OSSoundGlobals;
+
 class NiPointLight;
-class BGSCameraShot;
-class ImageSpaceModifierInstanceForm;
-class TESIdleForm;
+
+class Sun;
+
+class BSInputManager;
+class BSAudioManager;
+
 class BSClearZNode;
+class BSPackedTaskQueue;
+class BGSCameraShot;
+
+class ImageSpaceManager;
+class ImageSpaceModifierInstanceForm;
+class TESProjectile;
+class TESIdleForm;
 
 enum VATS_MODE_ENUM {
 	VATS_MODE_NONE = 0x0,
@@ -53,6 +58,7 @@ struct VATSCameraData {
 	void RemoveLight();
 };
 
+
 class TESMain {
 public:
 	bool					bOneMore;
@@ -67,10 +73,10 @@ public:
 	HINSTANCE				hInstance;
 	UInt32					uiThreadID;
 	HANDLE					hMainThread;
-	UInt32*					PackedTaskHeap;
+	UInt32* PackedTaskHeap;
 	UInt32					unk1C;
-	BSInputManager*			pInput;
-	BSAudioManager*			pSound;
+	BSInputManager* pInput;
+	BSAudioManager* pSound;
 	BSPackedTaskQueue		kTaskQueue;
 	UInt32					SecondaryPackedTaskHeap;
 	UInt32					unk54;
@@ -85,9 +91,9 @@ public:
 	bool					bShouldSetViewPort;
 	NiCameraPtr				spFirstPersonCamera;
 
-	static PerfCounter SimulationCounter;
-	static PerfCounter InputCounter;
-	static PerfCounter FrameCounter;
+//	static PerfCounter SimulationCounter;
+//	static PerfCounter InputCounter;
+//	static PerfCounter FrameCounter;
 
 	static double dSimulationTime;
 	static double dRenderTime;
@@ -157,7 +163,6 @@ public:
 
 	bool __fastcall HandleMouseMove(TESMain* apThis, void*, SInt32 x, SInt32 y);
 };
-
 ASSERT_SIZE(TESMain, 0xA4);
 
 namespace ToggleCellNodesFlags {

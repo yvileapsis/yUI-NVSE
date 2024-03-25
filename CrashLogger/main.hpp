@@ -4,6 +4,13 @@
 
 #include <deque>
 
+class Actor;
+class PlayerCharacter;
+class TESDataHandler;
+class ActorValueOwner;
+class HUDMainMenu;
+class DIHookControl;
+
 inline PluginHandle					g_pluginHandle			= kPluginHandle_Invalid;
 
 inline SEInterface*					g_seInterface			= nullptr;

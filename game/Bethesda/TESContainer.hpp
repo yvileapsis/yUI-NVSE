@@ -1,28 +1,30 @@
 #pragma once
-
 #include "BaseFormComponent.hpp"
 #include "BSSimpleList.hpp"
 
+// 0x10
 struct ContainerItemExtra {
-	UInt32	owner;
-	UInt32	globalOrRequiredRank;
-	double	itemCondition;
+	UInt32	pkOwner;
+	UInt32	uiGlobalOrRequiredRank;
+	Float64	dItemCondition;
 };
+static_assert(sizeof(ContainerItemExtra) == 0x10);
 
+// 0xC
 class TESContainer : public BaseFormComponent {
 public:
 	TESContainer();
 	~TESContainer();
 
-	struct FormCount {
+	struct FormCount
+	{
 		SInt32				iCount;			//	00
-		TESForm*			pForm;			//	04
-		ContainerItemExtra* pItemExtra;	//	08
+		TESForm*			pkForm;			//	04
+		ContainerItemExtra*	pItemExtra;		//	08
 	};
 
-	BSSimpleList<FormCount*> formCountList;	// 004
+	BSSimpleList<FormCount*> kFormCountList;	// 004
 
 	SInt32 GetCountForForm(TESForm* form);
 };
-
-ASSERT_SIZE(TESContainer, 0xC);
+static_assert(sizeof(TESContainer) == 0xC);

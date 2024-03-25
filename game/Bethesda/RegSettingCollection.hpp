@@ -1,5 +1,4 @@
 #pragma once
-
 #include "Setting.hpp"
 #include "SettingCollectionList.hpp"
 

@@ -1,13 +1,16 @@
 #pragma once
-
 #include "TESForm.hpp"
 #include "TESModelTextureSwap.hpp"
 
-class TESObjectANIO : public TESForm {
+// 0x3C
+class TESObjectANIO :
+	public TESForm,
+	public TESModelTextureSwap 
+{
 public:
 	TESObjectANIO();
 	~TESObjectANIO();
 
-	TESModelTextureSwap	modelSwap;		// 18
 	UInt32	unk38;						// 38
 };
+static_assert(sizeof(TESObjectANIO) == 0x3C);

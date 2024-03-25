@@ -20,10 +20,10 @@ struct ScrapHeapManager {
 	void ReleaseBuffer(LPVOID lpAddress, int a3);
 	void* RequestBuffer(SIZE_T* apSize);
 };
+static_assert(sizeof(ScrapHeapManager) == 0x240);
 
-ASSERT_SIZE(ScrapHeapManager, 0x240);
-
-class ScrapHeap {
+class ScrapHeap
+{
 public:
 	void* Allocate(UInt32 aSize, UInt32 aAlignment);
 	void Deallocate(void* apMem);

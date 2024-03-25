@@ -1,9 +1,10 @@
 #pragma once
-
 #include "BaseFormComponent.hpp"
 #include "BSString.hpp"
 
-class TESDescription : public BaseFormComponent {
+// 0x8
+class TESDescription : public BaseFormComponent
+{
 public:
 	TESDescription();
 	~TESDescription();
@@ -13,8 +14,7 @@ public:
 	UInt32	uiFileOffset;	// 4 - how does this work for descriptions in mods?
 	// maybe extracts the mod ID then uses that to find the src file?
 
-	static BSStringT CurrentDescriptionText;
-	static TESDescription* CurrentDescription;
+	static BSStringT<char>	kCurrentDescriptionText;
+	static TESDescription*	pkCurrentDescription;
 };
-
-ASSERT_SIZE(TESDescription, 0x8);
+static_assert(sizeof(TESDescription) == 0x8);

@@ -1,13 +1,12 @@
 #pragma once
-
 #include "TESObjectCELL.hpp"
 
-class BGSLightingTemplate : public TESForm {
+class BGSLightingTemplate :
+	public TESForm,							// 00
+	public TESObjectCELL::InteriorData		// 18
+{
 public:
 	BGSLightingTemplate();
 	~BGSLightingTemplate();
-
-	TESObjectCELL::InteriorData Data;
 };
-
-ASSERT_SIZE(BGSLightingTemplate, 0x44);
+static_assert(sizeof(BGSLightingTemplate) == 0x44);

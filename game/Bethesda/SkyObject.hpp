@@ -1,5 +1,4 @@
 #pragma once
-
 #include "NiNode.hpp"
 
 class Sky;
@@ -13,7 +12,6 @@ public:
 	virtual void		InitSkyObject(NiNode* apRoot);
 	virtual void		Update(Sky* apSky, float afValue);
 
-	NiNodePtr spRoot;
+	NiPointer<NiNode> spRoot;
 };
-
-ASSERT_SIZE(SkyObject, 0x8)
+static_assert(sizeof(SkyObject) == 0x8);

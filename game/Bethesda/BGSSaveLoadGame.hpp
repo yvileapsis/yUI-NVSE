@@ -14,6 +14,7 @@ class BGSSaveLoadReferencesMap;
 class Actor;
 class TESObjectCELL;
 
+// 0x24C
 class BGSSaveLoadGame {
 public:
 	BGSSaveLoadGame();
@@ -47,23 +48,23 @@ public:
 		NiTPointerMap<BGSCellNumericIDArrayMap*, UInt32>* map020; // 020
 	};
 
-	BGSSaveLoadChangesMap* pChangesMap;
-	BGSSaveLoadChangesMap* previousChangeMap;
-	RefIDIndexMapping* refIDmapping;
-	RefIDIndexMapping* visitedWorldspaces;
-	BGSSaveLoadReferencesMap* referencesMap;
-	void* maps014;
-	NiTMap<UInt32, UInt32>* ChangedFormIDMap;
+	BGSSaveLoadChangesMap*					pChangesMap;
+	BGSSaveLoadChangesMap*					previousChangeMap;
+	RefIDIndexMapping*						refIDmapping;
+	RefIDIndexMapping*						visitedWorldspaces;
+	BGSSaveLoadReferencesMap*				referencesMap;
+	NiTMap<TESForm*, BGSLoadGameSubBuffer>* maps014;
+	NiTMap<UInt32, UInt32>*					pkChangedFormIDMap;
 	char** History;
-	BGSReconstructFormsInAllFilesMap* rfiafMap;
-	BGSLoadFormBuffer** changedForms[4];
-	NiTMap<UInt32, Actor*> QueuedInitPackageLocationsActorMap;
-	UInt8 saveMods[255];
-	UInt8 loadedMods[255];
-	UInt16 pad242;
-	UInt32 iGlobalFlags;
-	UInt8 cCurrentMinorVersion;
-	UInt8 pad249[3];
+	BGSReconstructFormsInAllFilesMap*		rfiafMap;
+	BSSimpleArray<BGSLoadFormBuffer*>		kChangedForms;
+	NiTMap<UInt32, Actor*>					kQueuedInitPackageLocationsActorMap;
+	UInt8		ucSaveMods[255];
+	UInt8		ucLoadedMods[255];
+	UInt16		pad242;
+	UInt32		uiGlobalFlags;
+	UInt8		ucCurrentMinorVersion;
+	UInt8		pad249[3];
 
 	static BGSSaveLoadGame* GetSingleton();
 
@@ -75,5 +76,4 @@ public:
 	void LoadCell(TESObjectCELL* apCell);
 
 };
-
-ASSERT_SIZE(BGSSaveLoadGame, 0x24C);
+static_assert(sizeof(BGSSaveLoadGame) == 0x24C);

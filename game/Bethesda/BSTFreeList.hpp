@@ -5,7 +5,7 @@ class BSTFreeList {
 public:
 	virtual ~BSTFreeList();
 
-	UInt32	uiLock;
+	UInt32 uiLock;
 	T_Data* pHead;
 };
 

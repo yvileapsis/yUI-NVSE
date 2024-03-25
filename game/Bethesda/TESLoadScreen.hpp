@@ -1,20 +1,23 @@
 #pragma once
-
 #include "TESForm.hpp"
 #include "TESTexture.hpp"
 #include "TESDescription.hpp"
 
-
 class TESLoadScreenType;
 
-class TESLoadScreen : public TESForm, public TESTexture, public TESDescription {
+// 0x3C
+class TESLoadScreen :
+	public TESForm,
+	public TESTexture,
+	public TESDescription
+{
 public:
+
 	TESLoadScreen();
 	~TESLoadScreen();
 
 	BSSimpleList<void*> unkList2C;
 	TESLoadScreenType*	pType;
-	BSStringT			string;
+	BSStringT<char>		string;	// 02C
 };
-
-ASSERT_SIZE(TESLoadScreen, 0x40);
+static_assert(sizeof(TESLoadScreen) == 0x40);

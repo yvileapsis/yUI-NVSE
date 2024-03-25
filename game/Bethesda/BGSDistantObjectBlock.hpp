@@ -47,3 +47,4 @@ struct BGSDistantObjectBlock : BSMemObject {
 	void RemoveFromList();
 	bool IsInList();
 };
+static_assert(sizeof(BGSDistantObjectBlock) == 0x2C);

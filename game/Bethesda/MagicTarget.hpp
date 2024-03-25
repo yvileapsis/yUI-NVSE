@@ -1,25 +1,21 @@
 #pragma once
-
 #include "BSSimpleList.hpp"
 
 class TESObjectREFR;
 class EffectItem;
 class ActiveEffect;
 
-typedef BSSimpleList<ActiveEffect> EffectNode;
-
+// 0x10
 class MagicTarget {
 public:
 	MagicTarget();
-	~MagicTarget();
+	virtual ~MagicTarget();
+	virtual TESObjectREFR* GetParent();
+	virtual BSSimpleList<ActiveEffect>* GetEffectList();
 
-	virtual void	Destructor(void);
-	virtual TESObjectREFR* GetParent(void);
-	virtual EffectNode* GetEffectList(void);
-
-	UInt8			byt004;		// 004
-	UInt8			byt005;		// 005
-	UInt8			byt006[2];	// 006-7
+	UInt8					byt004;		// 004
+	UInt8					byt005;		// 005
+	UInt8					byt006[2];	// 006-7
 	BSSimpleList<UInt32>	lst008;		// 008
 
 	void RemoveEffect(EffectItem* effItem);
@@ -29,5 +25,4 @@ public:
 		ThisStdCall(0x8248E0, this, arg0, arg1);
 	}
 };
-
-ASSERT_SIZE(MagicTarget, 0x010);
+static_assert(sizeof(MagicTarget) == 0x10);

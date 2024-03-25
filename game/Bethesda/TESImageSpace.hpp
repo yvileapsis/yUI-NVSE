@@ -1,8 +1,8 @@
 #pragma once
-
 #include "TESForm.hpp"
 #include "NiColor.hpp"
 
+// 0x80
 class TESImageSpace : public TESForm {
 public:
 	TESImageSpace();
@@ -99,5 +99,4 @@ public:
 	Bitfield32	uiFlags;
 	UInt32		unusedAC;
 };
-
-ASSERT_SIZE(TESImageSpace, 0xB0);
+static_assert(sizeof(TESImageSpace) == 0xB0);

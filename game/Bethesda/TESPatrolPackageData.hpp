@@ -1,8 +1,8 @@
 #pragma once
-
 #include "TESPackageData.hpp"
 
-class TESPatrolPackageData : public TESPackageData {
+class TESPatrolPackageData : public TESPackageData
+{
 public:
 	TESPatrolPackageData();
 	~TESPatrolPackageData();

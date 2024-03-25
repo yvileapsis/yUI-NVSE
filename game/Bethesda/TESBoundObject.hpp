@@ -1,15 +1,16 @@
 #pragma once
-
 #include "TESObject.hpp"
 
 class NiNode;
 
-class TESBoundObject : public TESObject {
+// 0x30
+class TESBoundObject : public TESObject
+{
 public:
 	TESBoundObject();
-	~TESBoundObject();
+	~TESBoundObject() override;
 
-	virtual NiNode* Clone3D(TESObjectREFR* apRequester);	// calls Fn53, for NPC calls ReadBones, for LevelledActor level them if necessary
+	virtual NiNode* Clone3D_2(TESObjectREFR* apRequester);	// calls Fn53, for NPC calls ReadBones, for LevelledActor level them if necessary
 	virtual bool	ReplaceModel(const char* apPath);
 
 	struct Bounds
@@ -19,13 +20,7 @@ public:
 		SInt16 z;
 	};
 
-	struct BOUND_DATA
-	{
-		Bounds BoundMin;
-		Bounds BoundMax;
-	};
-
-	BOUND_DATA BoundData;	// 024
+	Bounds BoundMin;	// 024
+	Bounds BoundMax;	// 027
 };
-
-ASSERT_SIZE(TESBoundObject, 0x30)
+static_assert(sizeof(TESBoundObject) == 0x30);

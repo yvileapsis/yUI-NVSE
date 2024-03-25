@@ -1,13 +1,13 @@
 #pragma once
 
+// 0xC
 class Setting {
 public:
 	Setting();
 	virtual ~Setting();
-
 	virtual bool IsPrefSetting();
 
-	enum EType {
+	enum EnumType {
 		kSetting_Bool = 0,
 		kSetting_c,
 		kSetting_h,
@@ -40,5 +40,4 @@ public:
 	bool		Set(double newVal);
 	bool		Set(const char* str);
 };
-
-ASSERT_SIZE(Setting, 0xC);
+static_assert(sizeof(Setting) == 0xC);

@@ -4,17 +4,17 @@
 // 0x70
 class TESLoadScreenType : public TESForm
 {
+	enum EnumTypes
+	{
+		kLoadScreenTypeNone = 0x0,
+		kLoadScreenTypeXPProgress = 0x1,
+		kLoadScreenTypeObjective = 0x2,
+		kLoadScreenTypeTip = 0x3,
+		kLoadScreenTypeStats = 0x4,
+	};
+
 	struct Data
 	{
-		enum TESLoadScreenTypes
-		{
-			kLoadScreenTypeNone = 0x0,
-			kLoadScreenTypeXPProgress = 0x1,
-			kLoadScreenTypeObjective = 0x2,
-			kLoadScreenTypeTip = 0x3,
-			kLoadScreenTypeStats = 0x4,
-		};
-
 		struct Info
 		{
 			UInt32 x;
@@ -27,12 +27,12 @@ class TESLoadScreenType : public TESForm
 			UInt32 justification;
 		};
 
-		TESLoadScreenTypes eType;
-		TESLoadScreenType::Data::Info kInfo1;
-		TESLoadScreenType::Data::Info kInfo2;
-		UInt32 uiStats;
+		EnumTypes	eType;
+		Info		kInfo1;
+		Info		kInfo2;
+		UInt32		uiStats;
 	};
 
-	TESLoadScreenType::Data kData;
+	Data kData;
 };
 static_assert(sizeof(TESLoadScreenType) == 0x70);

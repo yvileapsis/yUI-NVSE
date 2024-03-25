@@ -1,5 +1,4 @@
 #pragma once
-
 #include "BSShaderLightingProperty.hpp"
 
 class SpeedTreeShaderLightingProperty : public BSShaderLightingProperty {
@@ -14,5 +13,4 @@ public:
 	NiObjectPtr						spUnk80;
 	NiPointer<UnknownTreeObject>	spUnk84;
 };
-
 ASSERT_SIZE(SpeedTreeShaderLightingProperty, 0x88);

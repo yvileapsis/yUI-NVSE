@@ -1,5 +1,4 @@
 #pragma once
-
 #include "NiTArray.hpp"
 #include "NiTLargeArray.hpp"
 #include "TESObjectREFR.hpp"
@@ -43,7 +42,7 @@ public:
 	UInt32 unk06C;					   // 06C
 	UInt32 unk070;					   // 070
 	UInt8 unk074;					   // 074
-	UInt8 unk075;					   //     init to 0x7D
+	UInt8 unk075;					   //	 init to 0x7D
 	UInt8 pad076[2];
 	NiTLargePrimitiveArray<UInt32>*		array078; // 078 NiTLargePrimitiveArray<?>
 	NiTLargePrimitiveArray<UInt32>*		array07C; // 07C NiTLargePrimitiveArray<?>
@@ -59,5 +58,5 @@ public:
 
 	static TESSaveLoadGame* GetSingleton();
 
-	void AddCreatedForm(TESForm* apForm);
+	void AddCreatedForm(TESForm* pForm) { ThisCall(0x00861780, this, pForm); }
 };

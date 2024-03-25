@@ -1,11 +1,11 @@
 #pragma once
-
 #include "TESTexture.hpp"
+// Complete
 
+// 0xC
 class TESIcon : public TESTexture {
 public:
 	TESIcon();
 	~TESIcon();
-
-	void SetPath(const char* newPath) { TextureName.Set(newPath); }
 };
+static_assert(sizeof(TESIcon) == 0xC);

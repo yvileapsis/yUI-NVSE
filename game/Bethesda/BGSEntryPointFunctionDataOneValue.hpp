@@ -1,11 +1,13 @@
 #pragma once
-
 #include "BGSEntryPointFunctionData.hpp"
 
-class BGSEntryPointFunctionDataOneValue : public BGSEntryPointFunctionData {
+// 0x8
+class BGSEntryPointFunctionDataOneValue : public BGSEntryPointFunctionData
+{
 public:
 	BGSEntryPointFunctionDataOneValue();
 	~BGSEntryPointFunctionDataOneValue();
 
-	float				value;				// 04
+	Float32				value;				// 04
 };
+static_assert(sizeof(BGSEntryPointFunctionDataOneValue) == 0x8);

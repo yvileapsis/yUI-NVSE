@@ -1,5 +1,4 @@
 #pragma once
-
 #include "TESBoundAnimObject.hpp"
 #include "BGSDestructibleObjectForm.hpp"
 #include "TESScriptableForm.hpp"
@@ -10,24 +9,23 @@
 class TESWaterForm;
 class BGSTalkingActivator;
 
-class TESObjectACTI : public TESBoundAnimObject {
+class TESObjectACTI :
+	public TESBoundAnimObject,
+	public TESFullName,
+	public TESModelTextureSwap,
+	public TESScriptableForm,
+	public BGSDestructibleObjectForm,
+	public BGSOpenCloseForm
+{
 public:
 	TESObjectACTI();
 	~TESObjectACTI();
 
-	// bases
-	TESFullName					fullName;			// 30
-	TESModelTextureSwap			modelTextureSwap;	// 3C
-	TESScriptableForm			scriptable;			// 5C
-	BGSDestructibleObjectForm	destructible;		// 68
-	BGSOpenCloseForm			openClose;			// 70
-
-	TESSound* loopingSound;		// 74	SNAM
-	TESSound* activationSound;	// 78	VNAM
-	TESSound* radioTemplate;		// 7C	INAM
-	TESWaterForm* waterType;			// 80	WNAM
-	BGSTalkingActivator* radioStation;		// 84	RNAM
-	BSStringT						activationPrompt;	// 88	XATO
+	TESSound*					pkLoopingSound;			// 74	SNAM
+	TESSound*					pkActivationSound;		// 78	VNAM
+	TESSound*					pkRadioTemplate;		// 7C	INAM
+	TESWaterForm*				pkWaterType;			// 80	WNAM
+	BGSTalkingActivator*		pkRadioStation;			// 84	RNAM
+	BSStringT<char>				kActivationPrompt;		// 88	XATO
 };
-
-ASSERT_SIZE(TESObjectACTI, 0x90);
+static_assert(sizeof(TESObjectACTI) == 0x90);

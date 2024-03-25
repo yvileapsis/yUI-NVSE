@@ -1,5 +1,4 @@
 #pragma once
-
 #include "TESBoundObject.hpp"
 #include "TESFullName.hpp"
 #include "TESModelTextureSwap.hpp"
@@ -11,21 +10,23 @@
 #include "BGSMessageIcon.hpp"
 #include "BGSPickupPutdownSounds.hpp"
 
-class TESObjectMISC : public TESBoundObject {
+// 0xAC
+class TESObjectMISC :
+	public TESBoundObject,
+	public TESFullName,
+	public TESModelTextureSwap,
+	public TESIcon,
+	public TESScriptableForm,
+	public TESValueForm,
+	public TESWeightForm,
+	public BGSDestructibleObjectForm,
+	public BGSMessageIcon,
+	public BGSPickupPutdownSounds
+{
 public:
 	TESObjectMISC();
 	~TESObjectMISC();
 
-	TESFullName fullName;
-	TESModelTextureSwap modelSwap;
-	TESIcon icon;
-	TESScriptableForm scriptable;
-	TESValueForm value;
-	TESWeightForm weight;
-	BGSDestructibleObjectForm destructible;
-	BGSMessageIcon messageIcon;
-	BGSPickupPutdownSounds pickupPutdown;
 	UInt32 unkA8;
 };
-
-ASSERT_SIZE(TESObjectMISC, 0xAC);
+static_assert(sizeof(TESObjectMISC) == 0xAC);

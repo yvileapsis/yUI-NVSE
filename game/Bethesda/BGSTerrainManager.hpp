@@ -1,5 +1,4 @@
 #pragma once
-
 #include "BGSTerrainNode.hpp"
 #include "BSSimpleArray.hpp"
 #include "NiNode.hpp"
@@ -8,20 +7,20 @@ class TESWorldSpace;
 
 class BGSTerrainManager {
 public:
-	TESWorldSpace* pWorld;
-	BGSTerrainNode* pRootNode;
-	NiNodePtr spLODRoot;
-	NiNodePtr spWaterLODNode;
+	TESWorldSpace*		pkWorld;
+	BGSTerrainNode*		pkRootNode;
+	NiPointer<NiNode>	spLODRoot;
+	NiPointer<NiNode>	spWaterLODNode;
 	BGSTerrainNode::Coordinate coordNW;
 	BGSTerrainNode::Coordinate coordSE;
-	UInt32 uiMaxLevel;
-	UInt32 uiMinLevel;
-	UInt32 uiRootLevel;
-	UInt32 uiLODLevel;
-	bool bNeedsImmediateUpdate;
-	bool bHasLOD;
-	UInt8 byte2A;
-	UInt8 byte2B;
+	UInt32				uiMaxLevel;
+	UInt32				uiMinLevel;
+	UInt32				uiRootLevel;
+	UInt32				uiLODLevel;
+	bool				bNeedsImmediateUpdate;
+	bool				bHasLOD;
+	UInt8				byte2A;
+	UInt8				byte2B;
 	BSSimpleArray<TESObjectREFR*> kTreeRefs;
 
 	bool HasRootNode();
@@ -41,6 +40,7 @@ public:
 	void ToggleTreeLOD(bool abEnable, bool abCurrentCellOnly);
 
 	void UpdateMultiBoundVisibility(NiCamera* apCamera);
+
 	void ResetMultiBounds() const;
 
 	BGSDistantTreeBlock* GetDistantTreeBlock(NiPoint3* apPos);
@@ -48,5 +48,4 @@ public:
 
 	void UpdateLODAnimations();
 };
-
-ASSERT_SIZE(BGSTerrainManager, 0x3C);
+static_assert(sizeof(BGSTerrainManager) == 0x3C);

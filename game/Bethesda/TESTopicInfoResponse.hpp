@@ -1,6 +1,6 @@
 #pragma once
-
 #include "BSString.hpp"
+#include "NiSmartPointer.hpp"
 
 class TESIdleForm;
 
@@ -17,9 +17,9 @@ struct TESTopicInfoResponse {
 		UInt8	pad015[3];
 	};
 
-	Data			data;					//	000
-	BSStringT			responseText;			//	018
-	TESIdleFormPtr spkeakerAnimation;		//	020
-	TESIdleForm* listenerAnimation;		//	024
-	TESTopicInfoResponse* next;			//	028
+	Data					data;					//	000
+	BSStringT<char>			responseText;			//	018
+	NiPointer<TESIdleForm>	spkSpeakerAnimation;	//	020
+	NiPointer<TESIdleForm>	listenerAnimation;		//	024
+	TESTopicInfoResponse*	next;					//	028
 };

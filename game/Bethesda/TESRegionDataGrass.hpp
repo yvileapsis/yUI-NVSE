@@ -1,14 +1,14 @@
 #pragma once
-
 #include "TESRegionData.hpp"
-#include "TESRegionGrassObjectList.hpp"
 
+class TESRegionGrassObjectList;
+
+// 0xC
 class TESRegionDataGrass : public TESRegionData {
 public:
 	TESRegionDataGrass();
 	~TESRegionDataGrass();
 
-	TESRegionGrassObjectList* TESRegionGrassObjectList;
+	TESRegionGrassObjectList* kRegionGrassObjectList;
 };
-
-ASSERT_SIZE(TESRegionDataGrass, 0xC)
+static_assert(sizeof(TESRegionDataGrass) == 0xC);

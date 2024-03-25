@@ -1,19 +1,27 @@
 #pragma once
-
-#include "BSShaderAccumulator.hpp"
+#include "NiPlane.hpp"
+#include "NiPoint2.hpp"
+#include "NiNode.hpp"
+#include "BSSimpleList.hpp"
+#include "NiRefObject.hpp"
+#include "NiTListBase.hpp"
+#include "NiTStringMap.hpp"
 #include "BSSoundHandle.hpp"
-#include "TESObjectREFR.hpp"
 
+class NiCamera;
+class BSRenderedTexture;
+class BSShaderAccumulator;
+class TESObjectREFR;
 class TESWaterForm;
-class WadingWaterData;
-class Actor;
 
-class TESWater {
+class TESWater
+{
 public:
 	TESWater();
 	~TESWater();
 
-	struct WaterGroup {
+	struct WaterGroup
+	{
 		TESWaterForm*					pWaterForm;
 		NiPlane							kMainPlane;
 		NiPlane							kPlane014;
@@ -21,8 +29,8 @@ public:
 		NiTPointerList<TESObjectREFR*>	kRefsInWater;
 		NiTPointerList<Actor*>			kActorsInWater;
 		NiTPointerList<UInt32>			kList048;
-		BSRenderedTexturePtr			spReflectionTexture;
-		NiAVObjectPtr					spRef058;
+		NiPointer<BSRenderedTexture>	spReflectionTexture;
+		NiPointer<NiAVObject>			spRef058;
 		bool							bUsesWaterLevel;
 		bool							bIsVisible;
 		bool							bRenderDepth;
@@ -32,18 +40,19 @@ public:
 		NiTPointerList<NiNode*>			kExplosionList;
 		NiTPointerList<NiNode*>			kDepth_CellGeometryList;
 		NiTPointerList<NiNode*>			kList088;
-		BSShaderAccumulatorPtr			spShaderAccum;
-		BSShaderAccumulatorPtr			spDepthShaderAccum;
+		NiPointer<BSShaderAccumulator>	spShaderAccum;
+		NiPointer<BSShaderAccumulator>	spDepthShaderAccum;
 		UInt32							uiReflectionGroupCount;
 		UInt32							uiDepthGroupCount;
-		NiCameraPtr						spCamera;
-		NiCameraPtr						spDepthCamera;
+		NiPointer<NiCamera>				spCamera;
+		NiPointer<NiCamera>				spDepthCamera;
 		UInt32							uiStencilMask;
 
 		static WaterGroup* CreateObject();
 
 		__forceinline NiTPointerList<TESObjectREFR*>& GetPlanes() { return kWaterPlanes; };
 	};
+	static_assert(sizeof(WaterGroup) == 0xB0);
 
 	struct WadingWaterData {
 		NiPoint2 pair0;
@@ -51,30 +60,31 @@ public:
 		NiPoint3 kPoint3;
 	};
 
-
 	UInt32												uiNumWaterGroups;
 	UInt32												uiUnk004;
-	NiObjectPtr											spRT008;
-	NiObjectPtr											spRef00C;
-	NiObjectPtr											spRt010;
-	NiObjectPtr											spRt014;
-	NiObjectPtr											spRef018;
-	NiSourceTexturePtr									spWaterNoiseTexture;
-	NiObjectPtr											spRef020;
-	float												fBlendTimer;
+	NiPointer<NiRefObject>								spRT008;
+	NiPointer<NiRefObject>								spRef00C;
+	NiPointer<NiRefObject>								spRt010;
+	NiPointer<NiRefObject>								spRt014;
+	NiPointer<NiRefObject>								spRef018;
+	NiPointer<NiSourceTexture>							spWaterNoiseTexture;
+	NiPointer<NiRefObject>								spRef020;
+	Float32												fBlendTimer;
 	NiPoint2											kLastDisplaceOffset;
 	UInt32												uiUnk30;
-	BYTE												bUnk34;
-	float												fUnk38;
+	BYTE												unk34;
+	Float32												fUnk38;
 	NiTPointerList<WaterGroup*>							kWaterGroups;
-	WaterGroup*											pWaterLOD;
+	WaterGroup*											pkWaterLOD;
 	NiTPointerMap<TESObjectREFR*, TESObjectREFR*>		kRefMap04C;
 	NiTPointerMap<TESObjectREFR*, TESObjectREFR*>		kRefMap05C;
 	NiTPointerMap<TESWaterForm*, bool>					kWaterFormMap06C;
 	NiTPointerMap<TESObjectREFR*, WadingWaterData*>		kWadingWaterMap;
-	BSSoundHandle										hSound;
-	float												fLastSplashTime;
+	BSSoundHandle										kSoundHandle;
+	Float32												fLastSplashTime;
 	bool												bUnk09C;
+
+
 
 	static bool bSkipNextUpdate;
 	static bool* const bForceRender;
@@ -113,29 +123,29 @@ public:
 	static __forceinline NiNode* GetWadeRoot() { return *(NiNodePtr*)0x11C7C28; }
 
 	// Worldspace height
-	static __forceinline NiCamera* GetWaterHeightCamera() { return *(NiCameraPtr*)0x11C7B44; }
-	static __forceinline void SetWaterHeightCamera(NiCamera* apCamera) { *(NiCameraPtr*)0x11C7B44 = apCamera; }
-	static __forceinline BSShaderAccumulator* GetWaterHeightAccumulator() { return *(BSShaderAccumulatorPtr*)0x11C7CB8; }
-	static __forceinline void SetWaterHeightAccumulator(BSShaderAccumulator* apAccumulator) { (*(BSShaderAccumulatorPtr*)0x11C7CB8) = apAccumulator; }
+	static __forceinline NiCamera* GetWaterHeightCamera() { return *(NiPointer<NiCamera>*)0x11C7B44; }
+	static __forceinline void SetWaterHeightCamera(NiCamera* apCamera) { *(NiPointer<NiCamera>*)0x11C7B44 = apCamera; }
+	static __forceinline BSShaderAccumulator* GetWaterHeightAccumulator() { return *(NiPointer<BSShaderAccumulator>*)0x11C7CB8; }
+	static __forceinline void SetWaterHeightAccumulator(BSShaderAccumulator* apAccumulator) { (*(NiPointer<BSShaderAccumulator>*)0x11C7CB8) = apAccumulator; }
 
 	// Custom height
-	static __forceinline NiCamera* GetCustomWaterHeightCamera() { return *(NiCameraPtr*)0x11C7CBC; }
-	static __forceinline void SetCustomWaterHeightCamera(NiCamera* apCamera) { *(NiCameraPtr*)0x11C7CBC = apCamera; }
-	static __forceinline BSShaderAccumulator* GetCustomWaterHeightAccumulator() { return *(BSShaderAccumulatorPtr*)0x11C7BE8; }
-	static __forceinline void SetCustomWaterHeightAccumulator(BSShaderAccumulator* apAccumulator) { (*(BSShaderAccumulatorPtr*)0x11C7BE8) = apAccumulator; }
+	static __forceinline NiCamera* GetCustomWaterHeightCamera() { return *(NiPointer<NiCamera>*)0x11C7CBC; }
+	static __forceinline void SetCustomWaterHeightCamera(NiCamera* apCamera) { *(NiPointer<NiCamera>*)0x11C7CBC = apCamera; }
+	static __forceinline BSShaderAccumulator* GetCustomWaterHeightAccumulator() { return *(NiPointer<BSShaderAccumulator>*)0x11C7BE8; }
+	static __forceinline void SetCustomWaterHeightAccumulator(BSShaderAccumulator* apAccumulator) { (*(NiPointer<BSShaderAccumulator>*)0x11C7BE8) = apAccumulator; }
 
 	// Textures
-	static __forceinline BSRenderedTexturePtr GetReflectionTexture() { return *(BSRenderedTexturePtr*)0x11C7AD4; }
-	static __forceinline void SetReflectionTexture(BSRenderedTexture* apTexture) { *(BSRenderedTexturePtr*)0x11C7AD4 = apTexture; }
+	static __forceinline NiPointer<BSRenderedTexture> GetReflectionTexture() { return *(NiPointer<BSRenderedTexture>*)0x11C7AD4; }
+	static __forceinline void SetReflectionTexture(BSRenderedTexture* apTexture) { *(NiPointer<BSRenderedTexture>*)0x11C7AD4 = apTexture; }
 
-	static __forceinline BSRenderedTexturePtr GetReflectionTextureCustom() { return *(BSRenderedTexturePtr*)0x11C7C2C; }
-	static __forceinline void SetReflectionTextureCustom(BSRenderedTexture* apTexture) { *(BSRenderedTexturePtr*)0x11C7C2C = apTexture; }
+	static __forceinline NiPointer<BSRenderedTexture> GetReflectionTextureCustom() { return *(NiPointer<BSRenderedTexture>*)0x11C7C2C; }
+	static __forceinline void SetReflectionTextureCustom(BSRenderedTexture* apTexture) { *(NiPointer<BSRenderedTexture>*)0x11C7C2C = apTexture; }
 
-	static __forceinline BSRenderedTexturePtr GetDepthTexture() { return *(BSRenderedTexturePtr*)0x11C7B68; }
-	static __forceinline void SetDepthTexture(BSRenderedTexture* apTexture) { *(BSRenderedTexturePtr*)0x11C7B68 = apTexture; }
+	static __forceinline NiPointer<BSRenderedTexture> GetDepthTexture() { return *(NiPointer<BSRenderedTexture>*)0x11C7B68; }
+	static __forceinline void SetDepthTexture(BSRenderedTexture* apTexture) { *(NiPointer<BSRenderedTexture>*)0x11C7B68 = apTexture; }
 
-	static __forceinline BSRenderedTexturePtr GetWadeTexture() { return *(BSRenderedTexturePtr*)0x11C7B64; }
-	static __forceinline void SetWadeTexture(BSRenderedTexture* apTexture) { *(BSRenderedTexturePtr*)0x11C7B64 = apTexture; }
+	static __forceinline NiPointer<BSRenderedTexture> GetWadeTexture() { return *(NiPointer<BSRenderedTexture>*)0x11C7B64; }
+	static __forceinline void SetWadeTexture(BSRenderedTexture* apTexture) { *(NiPointer<BSRenderedTexture>*)0x11C7B64 = apTexture; }
 
 	static __forceinline BSRenderedTexture* GetRefractionTexture() { return *(BSRenderedTexture**)0x11F943C; }
 	static __forceinline void SetRefractionTexture(BSRenderedTexture* apTexture) { *(BSRenderedTexture**)0x11F943C = apTexture; }
@@ -154,7 +164,7 @@ public:
 	static void SetCurrentPlane(NiPlane akPlane);
 	static NiPlane* GetCurrentPlane();
 
-	void GetNoiseTexture(NiSourceTexturePtr& aspTexture) const;
+	void GetNoiseTexture(NiPointer<NiSourceTexture>& aspTexture) const;
 	void SetNoiseTexture(NiSourceTexture* apTexture);
 
 	void UpdateWaterSystem(NiCamera* apCamera, NiNode* apNode, BSShaderAccumulator* apAccum = nullptr);
@@ -192,6 +202,4 @@ public:
 
 	TESObjectREFR* AddLODWater(NiGeometry* apLODWater, TESWorldSpace* apWorldSpace, NiNode* apWaterLODRoot, BSMultiBoundNode* apBound, bool abLODWaterHeight);
 };
-
-ASSERT_SIZE(TESWater, 0xA0);
-ASSERT_SIZE(TESWater::WaterGroup, 0xB0);
+static_assert(sizeof(TESWater) == 0xA0);

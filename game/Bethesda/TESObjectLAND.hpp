@@ -53,6 +53,7 @@ public:
 		SInt32										iCellY;
 		float										fBaseHeight;
 	};
+	static_assert(sizeof(LoadedLandData) == 0xA4);
 
 	UInt32				iFlags;
 	TESObjectCELL*		pParentCell;
@@ -66,6 +67,4 @@ public:
 
 	bool LoadVertices(bool abLoad3D);
 };
-
-ASSERT_SIZE(TESObjectLAND, 0x2C);
-ASSERT_SIZE(TESObjectLAND::LoadedLandData, 0xA4);
+static_assert(sizeof(TESObjectLAND) == 0x2C);

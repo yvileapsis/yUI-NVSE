@@ -1,75 +1,59 @@
 #pragma once
-
 #include "TESForm.hpp"
 
-class BGSListForm : public TESForm {
+// 0x24
+class BGSListForm :
+	public TESForm,					// 00
+	public BSSimpleList<TESForm*>	// 18 Added as a parent to be able to use BGSList as list
+{
 public:
 	BGSListForm();
 	~BGSListForm();
 
-	BSSimpleList<TESForm*>	list;
-	UInt32					numAddedObjects;
-#if 0
-	UInt32 Count() const {
-		return list.ItemsInList();
-	}
-
-	TESForm* GetNthForm(SInt32 n) const {
-		auto result = list.GetAt(n);
-		if (result)
-			return result->GetItem();
-		return nullptr;
-	}
+	UInt32	uiNumAddedObjects;	// number of objects added via script - assumed to be at the start of the list
 
 	SInt32 AddAt(TESForm* pForm, SInt32 n, bool const checkDupes = false) {
 		if (checkDupes) {
-			if (GetIndexOf(pForm) != -1)
-				return -1;
+			if (GetIndexOf(pForm) != eListInvalid)
+				return eListInvalid;
 		}
-		auto const result = list.AddAt(n, pForm);
+		auto const result = BSSimpleList::AddAt(pForm, n);
 		if (result >= 0 && IsAddedObject(n))
-			numAddedObjects++;
+			uiNumAddedObjects++;
 
 		return result;
 	}
 
+	SInt32 GetIndexOf(TESForm* pForm);
+
+
+	SInt32 RemoveForm(TESForm* pForm);
+	SInt32 ReplaceForm(TESForm* pForm, TESForm* pReplaceWith);
+
+	bool IsAddedObject(SInt32 idx) { return (idx >= 0) && (idx < uiNumAddedObjects); }
+
+#if RUNTIME
+	[[nodiscard]] static game_unique_ptr<BGSListForm> MakeUnique();
+#endif
+
+	SInt32 AddAt(TESForm* pForm, const SInt32 n) {
+		const SInt32 result = BSSimpleList::AddAt(pForm, n);
+		if (result >= 0 && IsAddedObject(n)) uiNumAddedObjects++;
+		return result;
+	}
 
 	SInt32 GetIndexOf(TESForm* pForm);
 
-	TESForm* RemoveNthForm(SInt32 n) {
-		auto entry = list.RemoveAt(n);
-		TESForm* form = entry ? entry->GetItem() : nullptr;
-
-		if (form && IsAddedObject(n)) {
-			if (numAddedObjects == 0)
-			{
-				_MESSAGE("BGSListForm::RemoveNthForm: numAddedObjects = 0");
-			}
-			else
-			{
-				numAddedObjects--;
-			}
-		}
-
+	TESForm* RemoveNth(SInt32 n) {
+		TESForm* form = BSSimpleList::RemoveNth(n);
+		if (form && IsAddedObject(n)) uiNumAddedObjects--;
 		return form;
-	}
-
-	TESForm* ReplaceNthForm(SInt32 n, TESForm* pReplaceWith) {
-		auto entry = list.ReplaceAt(n, pReplaceWith);
-		return entry ? entry->GetItem() : nullptr;;
 	}
 
 	SInt32 RemoveForm(TESForm* pForm);
 	SInt32 ReplaceForm(TESForm* pForm, TESForm* pReplaceWith);
 
-	bool IsAddedObject(SInt32 idx) {
-		return (idx >= 0) && (idx < numAddedObjects);
-	}
-
-#if RUNTIME
-	[[nodiscard]] static game_unique_ptr<BGSListForm> MakeUnique();
-#endif
-#endif
+	bool IsAddedObject(SInt32 idx) { return (idx >= 0) && (idx < uiNumAddedObjects); }
+	bool ContainsRecursive(TESForm* form, UInt32 reclvl = 0);
 };
-
-ASSERT_SIZE(BGSListForm, 0x024);
+static_assert(sizeof(BGSListForm) == 0x24);

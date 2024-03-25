@@ -1,5 +1,4 @@
 #pragma once
-
 #include "TESBoundObject.hpp"
 #include "TESFullName.hpp"
 #include "TESScriptableForm.hpp"
@@ -14,25 +13,27 @@
 #include "BGSBipedModelList.hpp"
 #include "BGSPickupPutdownSounds.hpp"
 
-class TESObjectARMA : public TESBoundObject {
+// 0x180
+class TESObjectARMA :
+	public TESBoundObject,				// 000
+	public TESFullName,					// 030
+	public TESScriptableForm,			// 03C
+	public TESEnchantableForm,			// 048
+	public TESValueForm,				// 058
+	public TESWeightForm,				// 060
+	public TESHealthForm,				// 068
+	public TESBipedModelForm,			// 070
+	public BGSDestructibleObjectForm,	// 14C
+	public BGSEquipType,				// 154
+	public BGSRepairItemList,			// 15C
+	public BGSBipedModelList,			// 164
+	public BGSPickupPutdownSounds		// 16C
+{
 public:
 	TESObjectARMA();
 	~TESObjectARMA();
 
-	TESFullName					fullName;				// 030
-	TESScriptableForm			scriptable;				// 03C
-	TESEnchantableForm			enchantable;			// 048
-	TESValueForm				value;					// 058
-	TESWeightForm				weight;					// 060
-	TESHealthForm				health;					// 068
-	TESBipedModelForm			bipedModelForm;			// 070
-	BGSDestructibleObjectForm	destructible;			// 14C
-	BGSEquipType				equipType;				// 154
-	BGSRepairItemList			repairList;				// 15C
-	BGSBipedModelList			bipedModelList;			// 164
-	BGSPickupPutdownSounds		pickupPutdownSounds;	// 16C
 	UInt32						unk178;					// 178
 	UInt32						unk17C;					// 17C
 };
-
-ASSERT_SIZE(TESObjectARMA, 0x180);
+static_assert(sizeof(TESObjectARMA) == 0x180);

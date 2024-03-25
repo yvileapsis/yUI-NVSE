@@ -1,23 +1,28 @@
 #pragma once
-
 #include "TESForm.hpp"
 #include "TESFullName.hpp"
 #include "TESDescription.hpp"
 #include "TESTexture.hpp"
 #include "TESAttributes.hpp"
 
-class TESClass : public TESForm {
+class TESClass :
+	public TESForm,
+	public TESFullName,		// 18
+	public TESDescription,	// 24
+	public TESTexture,		// 2C
+	public TESAttributes	// 38
+{
 public:
 	TESClass();
 	~TESClass();
 
-	enum
+	enum EnumClassFlags
 	{
 		kFlag_Playable = 0x00000001,
 		kFlag_Guard = 0x00000002,
 	};
 
-	enum
+	enum EnumServices
 	{
 		kService_Weapons = 0x00000001,
 		kService_Armor = 0x00000002,
@@ -34,18 +39,12 @@ public:
 		kService_Repair = 0x00020000,
 	};
 
-	TESFullName		fullName;		// 18
-	TESDescription	description;	// 24
-	TESTexture		texture;		// 2C
-	TESAttributes	attributes;		// 38
-
 	// corresponds to DATA chunk
-	UInt32			tagSkills[4];	// 44
-	UInt32			classFlags;		// 54
-	UInt32			services;		// 58
-	UInt8			teaches;		// 5C
-	UInt8			trainingLevel;	// 5D
-	UInt8			pad5E[2];		// 5E
+	UInt32			uiTagSkills[4];		// 44
+	EnumClassFlags	eFlags;				// 54
+	EnumServices	eServices;			// 58
+	UInt8			ucTeaches;			// 5C
+	UInt8			ucTrainingLevel;	// 5D
+	UInt8			pad5E[2];			// 5E
 };
-
-ASSERT_SIZE(TESClass, 0x60);
+static_assert(sizeof(TESClass) == 0x60);

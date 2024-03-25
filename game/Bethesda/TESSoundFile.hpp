@@ -1,7 +1,7 @@
 #pragma once
-
 #include "BaseFormComponent.hpp"
 
+// 0xC
 class TESSoundFile : public BaseFormComponent {
 public:
 	TESSoundFile();
@@ -9,5 +9,6 @@ public:
 
 	virtual void	Set(const char* str);
 
-	BSStringT	path;	// 4
+	BSStringT<char>	kSoundPath;	// 4
 };
+static_assert(sizeof(TESSoundFile) == 0xC);

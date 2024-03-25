@@ -1,14 +1,14 @@
 #pragma once
-
+// Complete
 #include "BaseFormComponent.hpp"
 #include "BSString.hpp"
 
+// 0xC
 class TESFullName : public BaseFormComponent {
 public:
 	TESFullName();
 	~TESFullName();
 
-	BSStringT	strFullName;
+	BSStringT<char>	kFullName;
 };
-
-ASSERT_SIZE(TESFullName, 0xC);
+static_assert(sizeof(TESFullName) == 0xC);

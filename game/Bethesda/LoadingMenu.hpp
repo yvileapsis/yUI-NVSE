@@ -1,10 +1,6 @@
 #pragma once
-
-#include "BSSoundHandle.hpp"
 #include "Menu.hpp"
-#include "NiColor.hpp"
-#include "NiSmartPointer.hpp"
-#include "NiTList.hpp"
+#include "BSSoundHandle.hpp"
 
 class Tile3D;
 class TileText;
@@ -15,24 +11,27 @@ class TESWorldSpace;
 class NiTexture;
 class BSShaderProperty;
 
-class LoadingMenu : public Menu {
+class LoadingMenu : public Menu
+{
 public:
+	LoadingMenu();
+	~LoadingMenu();
 	enum {
-		LOADING_NIF				= 0,
-		LOADING_PLATENO_TEXT_2	= 1,
-		LOADING_INFO_TEXT		= 2,
-		LOADING_CURROBJ_TEXT	= 3,
-		LOADING_STAT1_LABEL		= 4,
-		LOADING_STAT1_VAL		= 5,
-		LOADING_STAT2_LABEL		= 6,
-		LOADING_STAT2_VAL		= 7,
-		LOADING_STAT3_LABEL		= 8,
-		LOADING_STAT3_VAL		= 9,
-		LOADING_LEVELPROG_METER	= 10,
-		LOADING_PINWHEEL		= 11,
-		LOADING_WORLD_IMAGE		= 12,
-		LOADING_PLATENO_TEXT_1	= 13,
-		LOADING_CURROBJ_LABEL	= 14,
+		LOADING_NIF = 0,
+		LOADING_PLATENO_TEXT_2 = 1,
+		LOADING_INFO_TEXT = 2,
+		LOADING_CURROBJ_TEXT = 3,
+		LOADING_STAT1_LABEL = 4,
+		LOADING_STAT1_VAL = 5,
+		LOADING_STAT2_LABEL = 6,
+		LOADING_STAT2_VAL = 7,
+		LOADING_STAT3_LABEL = 8,
+		LOADING_STAT3_VAL = 9,
+		LOADING_LEVELPROG_METER = 10,
+		LOADING_PINWHEEL = 11,
+		LOADING_WORLD_IMAGE = 12,
+		LOADING_PLATENO_TEXT_1 = 13,
+		LOADING_CURROBJ_LABEL = 14,
 		LOADING_LEVELPROG_LABEL,
 		LOADING_LEVELPROG_RECT,
 		LOADING_STAT_LABEL_RECT,
@@ -60,23 +59,28 @@ public:
 	};
 
 	enum Flags {
-		IsNotInitialGameLoad		= 0,
-		IsForwardSequence			= 1,
-		maybeSomethingAudio			= 2,
-		Unk_3						= 3,
-		Unk_4						= 4,
-		IsMainMenu					= 5,
-		ShowScreenTipsStatsEtc		= 6,
-		Unk_7						= 7,
-		Unk_8						= 8,
-		IsInterior					= 9,
-		IsEnableLoadingMenuCommand	= 10,
+		IsNotInitialGameLoad = 0,
+		IsForwardSequence = 1,
+		maybeSomethingAudio = 2,
+		Unk_3 = 3,
+		Unk_4 = 4,
+		IsMainMenu = 5,
+		ShowScreenTipsStatsEtc = 6,
+		Unk_7 = 7,
+		Unk_8 = 8,
+		IsInterior = 9,
+		IsEnableLoadingMenuCommand = 10,
 	};
 
 
 	enum TipFlags {
 		SETUP_TIP_1 = 1 << 0,
 		SETUP_TIP_2 = 1 << 1,
+
+
+
+
+
 	};
 
 	struct TileData {
@@ -90,44 +94,44 @@ public:
 
 	union {
 		struct {
-			Tile3D*		pLoading_nif;
-			TileText*	pLoading_plateno_text2;
-			TileText*	pLoading_info_text;
-			TileText*	pLoading_currobj_text;
-			TileText*	pLoading_stat1_label;
-			TileText*	pLoading_stat1_val;
-			TileText*	pLoading_stat2_label;
-			TileText*	pLoading_stat2_val;
-			TileText*	pLoading_stat3_label;
-			TileText*	pLoading_stat3_val;
-			TileImage*	pLoading_levelprog_meter;
-			Tile3D*		pLoading_pinwheel;
-			TileImage*	pLoading_world_image;
-			TileText*	pLoading_plateno_text1;
-			TileText*	pLoading_currobj_label;
-			TileText*	pLoading_levelprog_label;
-			TileRect*	pLoading_levelprog_rect;
-			TileText*	pLoading_stat_label_rect;
-			TileRect*	pLoading_stat_val_rect;
-			TileText*	pLoading_stat4_label;
-			TileText*	pLoading_stat4_val;
-			TileText*	pLoading_stat5_label;
-			TileText*	pLoading_stat5_val;
-			TileText*	pLoading_stat6_label;
-			TileText*	pLoading_stat6_val;
-			TileText*	pLoading_stat7_label;
-			TileText*	pLoading_stat7_val;
-			TileRect*	pLoading_currobj_rect;
-			TileText*	pLoading_levelprog_curlevel;
-			TileText*	pLoading_levelprog_nextlevel;
-			TileText*	pLoading_levelprog_char_marker;
-			TileRect*	pLoading_stat_rect;
-			TileImage*	pLoading_tile_slide_01;
-			TileImage*	pLoading_tile_slide_02;
-			TileText*	pHidden_tip_text_01;
-			TileText*	pTip_text_02;
-			TileImage*	pTip_matte_01;
-			TileImage*	pTip_matte_02;
+			Tile3D* pLoading_nif;
+			TileText* pLoading_plateno_text2;
+			TileText* pLoading_info_text;
+			TileText* pLoading_currobj_text;
+			TileText* pLoading_stat1_label;
+			TileText* pLoading_stat1_val;
+			TileText* pLoading_stat2_label;
+			TileText* pLoading_stat2_val;
+			TileText* pLoading_stat3_label;
+			TileText* pLoading_stat3_val;
+			TileImage* pLoading_levelprog_meter;
+			Tile3D* pLoading_pinwheel;
+			TileImage* pLoading_world_image;
+			TileText* pLoading_plateno_text1;
+			TileText* pLoading_currobj_label;
+			TileText* pLoading_levelprog_label;
+			TileRect* pLoading_levelprog_rect;
+			TileText* pLoading_stat_label_rect;
+			TileRect* pLoading_stat_val_rect;
+			TileText* pLoading_stat4_label;
+			TileText* pLoading_stat4_val;
+			TileText* pLoading_stat5_label;
+			TileText* pLoading_stat5_val;
+			TileText* pLoading_stat6_label;
+			TileText* pLoading_stat6_val;
+			TileText* pLoading_stat7_label;
+			TileText* pLoading_stat7_val;
+			TileRect* pLoading_currobj_rect;
+			TileText* pLoading_levelprog_curlevel;
+			TileText* pLoading_levelprog_nextlevel;
+			TileText* pLoading_levelprog_char_marker;
+			TileRect* pLoading_stat_rect;
+			TileImage* pLoading_tile_slide_01;
+			TileImage* pLoading_tile_slide_02;
+			TileText* pHidden_tip_text_01;
+			TileText* pTip_text_02;
+			TileImage* pTip_matte_01;
+			TileImage* pTip_matte_02;
 		};
 		Tile* pTiles[TILE_COUNT];
 	};
@@ -142,16 +146,16 @@ public:
 	NiTList<Tile*>					kHiddenTipTiles;
 	NiTList<Tile*>					kTipTiles;
 	UInt32							uiMiscStatArray[43];
-	BSStringT						strScreenTexture;
+	BSStringT<char>					strScreenTexture;
 	NiColorA						kBackgroundColor;
 	BSSimpleList<TESLoadScreen*>	kLoadScreens;
-	BSSimpleList<TESLoadScreen*>*	pLoadScreenIter;
-	TESLoadScreen*					pCurrentLoadScreen;
+	BSSimpleList<TESLoadScreen*>* pLoadScreenIter;
+	TESLoadScreen* pCurrentLoadScreen;
 	UInt32							uiNextLoadScreenUpdateTime;
 	UInt32							uiTime1E4;
-	TESWorldSpace*					pWorldspace;
-	BSShaderProperty*				pShaderProperty;
-	BSShaderProperty*				pSlide02ShaderProperty;
+	TESWorldSpace* pWorldspace;
+	BSShaderProperty* pShaderProperty;
+	BSShaderProperty* pSlide02ShaderProperty;
 	BSSoundHandle					hSound1F0;
 	BSSoundHandle					hSound1FC;
 	NiPointer<NiTexture>			spSrcTexture[4];
@@ -169,8 +173,10 @@ public:
 		static std::string strCurrentStatText;
 	};
 
+	static LoadingMenu* GetSingleton() { return *reinterpret_cast<LoadingMenu**>(0x11DA0C0); };
+
 	static void __fastcall SetShowTipsStats(LoadingMenu* apThis, void*, bool abShow);
 	void SetStatText(UInt32 auiStat);
 	static void __fastcall UpdateLevelProgressLabels(LoadingMenu* apThis);
 };
-ASSERT_SIZE(LoadingMenu, 0x5C0);
+static_assert(sizeof(LoadingMenu) == 0x5C0);

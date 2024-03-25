@@ -177,6 +177,8 @@ private:
 	std::string m_data;
 };
 
+class Script;
+
 const char GetSeparatorChar(Script * script);
 std::string GetSeparatorChars(Script * script);
 
@@ -217,6 +219,7 @@ public:
 
 void ShowErrorMessageBox(const char* message);
 
+class TESForm;
 const char* GetModName(const TESForm* script);
 
 std::vector<void*> GetCallStack(int i);

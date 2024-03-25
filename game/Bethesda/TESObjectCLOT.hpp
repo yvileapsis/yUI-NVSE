@@ -1,6 +1,6 @@
 #pragma once
-
 #include "TESBoundObject.hpp"
+#include "TESFullName.hpp"
 #include "TESScriptableForm.hpp"
 #include "TESEnchantableForm.hpp"
 #include "TESValueForm.hpp"
@@ -9,20 +9,20 @@
 #include "BGSDestructibleObjectForm.hpp"
 #include "BGSEquipType.hpp"
 
-class TESObjectCLOT : public TESBoundObject {
+// 0x154
+class TESObjectCLOT :
+	public TESBoundObject,				// 000
+	public TESFullName,					// 030
+	public TESScriptableForm,			// 03C
+	public TESEnchantableForm,			// 048
+	public TESValueForm,				// 058
+	public TESWeightForm,				// 060
+	public TESBipedModelForm,			// 068
+	public BGSDestructibleObjectForm,	// 144
+	public BGSEquipType					// 14C
+{
 public:
 	TESObjectCLOT();
-	~TESObjectCLOT();
-
-	// bases
-	TESFullName					fullName;		// 030
-	TESScriptableForm			scriptable;		// 03C
-	TESEnchantableForm			enchantable;	// 048
-	TESValueForm				value;			// 058
-	TESWeightForm				weight;			// 060
-	TESBipedModelForm			bipedModel;		// 068
-	BGSDestructibleObjectForm	destuctible;	// 144
-	BGSEquipType				equipType;		// 14C
+	~TESObjectCLOT() override;
 };
-
-ASSERT_SIZE(TESObjectCLOT, 0x154);
+static_assert(sizeof(TESObjectCLOT) == 0x154);

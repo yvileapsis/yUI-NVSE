@@ -1,11 +1,11 @@
 #pragma once
-
 #include "NiTArray.hpp"
 
 template<class T> 
 class SettingCollection {
 public:
-	virtual void	Destroy(bool);
+	SettingCollection();
+	virtual			~SettingCollection();
 	virtual void	Add(T* apSetting);
 	virtual void	Remove(T* apSetting);
 	virtual UInt32	GetViewerStrings(NiViewerStringsArray* apStrings);
@@ -16,8 +16,7 @@ public:
 	virtual bool	WriteSettings();
 	virtual bool	ReadSettings();
 
-	char pSettingFile[260];
+	char pSettingFile[MAX_PATH];
 	void* pHandle;
 };
-
-ASSERT_SIZE(SettingCollection<UInt32>, 0x10C);
+static_assert(sizeof(SettingCollection<void*>) == 0x10C);

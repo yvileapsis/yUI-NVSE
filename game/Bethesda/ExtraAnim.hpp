@@ -1,7 +1,7 @@
 #pragma once
-
 #include "BSExtraData.hpp"
 
+// 0x10
 class ExtraAnim : public BSExtraData {
 public:
 	ExtraAnim();
@@ -12,4 +12,5 @@ public:
 	};	// 013C
 
 	Animation* data;	// 0C
-};	// 10
+};
+static_assert(sizeof(ExtraAnim) == 0x10);

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "TESBoundAnimObject.hpp"
 #include "TESContainer.hpp"
 #include "TESFullName.hpp"
@@ -11,18 +10,26 @@
 
 class TESSound;
 
-class TESObjectCONT : public TESBoundAnimObject, public TESContainer, public TESFullName, public TESModelTextureSwap,
-	public TESScriptableForm, public TESWeightForm, public BGSDestructibleObjectForm, public BGSOpenCloseForm {
+// 0x9C
+class TESObjectCONT :
+	public TESBoundAnimObject,				// 00
+	public TESContainer,					// 30
+	public TESFullName,						// 3C
+	public TESModelTextureSwap,				// 48
+	public TESScriptableForm,				// 68
+	public TESWeightForm,					// 74
+	public BGSDestructibleObjectForm,		// 7C
+	public BGSOpenCloseForm					// 84
+{
 public:
 	TESObjectCONT();
 	~TESObjectCONT();
 
 	UInt32		unk88;
-	TESSound*	openSound;
-	TESSound*	closeSound;
-	TESSound*	randomLoopingSound;
-	UInt8		flags;
+	TESSound*	pkOpenSound;				// 08C
+	TESSound*	pkCloseSound;				// 090
+	TESSound*	pkRandomLoopingSound;		// 094
+	UInt8		flags;						// 098
 	UInt8		pad099[3];
 };
-
-ASSERT_SIZE(TESObjectCONT, 0x9C);
+static_assert(sizeof(TESObjectCONT) == 0x9C);

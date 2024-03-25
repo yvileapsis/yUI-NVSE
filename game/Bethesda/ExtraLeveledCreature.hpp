@@ -1,18 +1,15 @@
 #pragma once
-
 #include "BSExtraData.hpp"
 
 class TESForm;
+class TESActorBase;
 
 class ExtraLeveledCreature : public BSExtraData {
 public:
 	ExtraLeveledCreature();
 	virtual ~ExtraLeveledCreature();
 
-	EXTRADATATYPE(LEVELEDCREATURE);
-
-	TESForm* pBaseForm;	// 00C
-	TESForm* pForm;		// 010
+	TESForm* baseForm;				// 00C
+	TESActorBase* actorBase;		// 010
 };
-
-ASSERT_SIZE(ExtraLeveledCreature, 0x14);
+static_assert(sizeof(ExtraLeveledCreature) == 0x14);

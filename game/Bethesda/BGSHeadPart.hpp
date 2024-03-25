@@ -1,26 +1,26 @@
 #pragma once
-
 #include "TESForm.hpp"
 #include "TESFullName.hpp"
 #include "TESModelTextureSwap.hpp"
 
-class BGSHeadPart : public TESForm {
+// 50
+class BGSHeadPart :
+	public TESForm,					// 00
+	public TESFullName,				// 18
+	public TESModelTextureSwap		// 24
+{
 public:
 	BGSHeadPart();
 	~BGSHeadPart();
 
-	enum
+	enum EnumFlags : UInt8
 	{
 		kFlag_Playable = 0x01,
 	};
 
-	TESFullName			fullName;	// 18
-	TESModelTextureSwap	texSwap;	// 24
-
-	UInt8				headFlags;	// 44
+	EnumFlags			eFlags;		// 44
 	UInt8				pad45[3];	// 45
 	UInt32				unk48;		// 48
 	UInt32				unk4C;		// 4C
 };
-
-ASSERT_SIZE(BGSHeadPart, 0x50);
+static_assert(sizeof(BGSHeadPart) == 0x50);

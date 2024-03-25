@@ -1,5 +1,4 @@
 #pragma once
-
 #include "BSSimpleList.hpp"
 #include "TESIcon.hpp"
 #include "TESFullName.hpp"
@@ -11,12 +10,19 @@ class TESObjectLIGH;
 class TESEffectShader;
 class TESSound;
 
-class EffectSetting : public TESForm, public TESModel, public TESDescription, public TESFullName, public TESIcon {
+// B0
+class EffectSetting :
+	public TESForm,
+	public TESModel,			// 18
+	public TESDescription,		// 30
+	public TESFullName,			// 38
+	public TESIcon				// 44
+{
 public:
 	EffectSetting();
 	~EffectSetting();
 
-	enum
+	enum EnumArchType
 	{
 		kArchType_ValueModifier = 0,
 		kArchType_Script,
@@ -39,65 +45,62 @@ public:
 		kArchType_Turbo,
 	};
 
-	enum EffectFlags {
-		HOSTILE						= 0x1,
-		RECOVER						= 0x2,
-		DETRIMENTAL					= 0x4,
-		UNK_8						= 0x8,
-		SELF						= 0x10,
-		TOUCH						= 0x20,
-		TARGET						= 0x40,
-		NO_DURATION					= 0x80,
-		NO_MAGNITUDE				= 0x100,
-		NO_AREA						= 0x200,
-		PERSIST						= 0x400,
-		CREATE_SPELLMAKING			= 0x800,
-		GORY_VISUALS				= 0x1000,
-		kDisplayNameOnly			= 0x2000,
-		kRadioBroadcastSomething	= 0x8000,
-		kUseSkill					= 0x80000,
-		kUseAttribute				= 0x100000,
-		PAINLESS					= 0x1000000,
-		kSprayProjectileType		= 0x2000000,
-		kBoltProjectileType			= 0x4000000,
-		NO_HIT_EFFECT				= 0x8000000,
-		NO_DEATH_DISPEL				= 0x10000000,
+	enum EnumEffectFlags : UInt32
+	{
+		kHostile					= 1 << 0,
+		kRecover					= 1 << 1,
+		kDetrimental				= 1 << 2,
+		kSelf						= 1 << 4,
+		kTouch						= 1 << 5,
+		kTarget						= 1 << 6,
+		kNoDuration					= 1 << 7,
+		kNoMagnitude				= 1 << 8,
+		kNoArea						= 1 << 9,
+		kFXPersist					= 1 << 10,
+		kGoryVisuals				= 1 << 12,
+		kDisplayNameOnly			= 1 << 13,
+		kRadioBroadcastSomething	= 1 << 15,
+		kUseSkill					= 1 << 19,
+		kUseAttribute				= 1 << 20,
+		kPainless					= 1 << 24,
+		kSprayProjectileType		= 1 << 25,
+		kBoltProjectileType			= 1 << 26,
+		kNoHitEffect				= 1 << 27,
+		kNoDeathDispel				= 1 << 28,
 	};
 
 	struct EffectSettingData {
-		UInt32				uiEffectFlags;
-		float				fBaseCost;
-		TESForm*			pAssociatedItem;
-		UInt32				magicSchool;
-		UInt32				uiResistVal;
-		UInt16				usCounterEffectCount;
-		TESObjectLIGH*		pLight;
-		float				fProjectileSpeed;
-		TESEffectShader*	pEffectShader;
-		TESEffectShader*	pObjectDisplayShader;
-		TESSound*			pEffectSound;
-		TESSound*			pBoltSound;
-		TESSound*			pHitSound;
-		TESSound*			pAreaSound;
-		float				fMagicDefaultCEEnchantFactor;
-		float				fMagicDefaultCEBarterFactor;
-		UInt32				uiArchType;
-		UInt32				uiActorVal;
+		EnumEffectFlags			eEffectFlags;			// 58 - start of DATA
+		Float32					fBaseCost;				// 5C
+		TESForm*				pkAssociatedItem;		// 60 - Script* for ScriptEffects
+		UInt32					uiMagicSchool;			// 64 - unused
+		UInt32					uiResistValue;			// 68 - actor value for resistance
+		UInt16					usCounterEffectCount;	// 6C - counter effects count
+		UInt8					pad6E[2];				// 6E
+		TESObjectLIGH*			pkLight;				// 70
+		Float32					fProjectileSpeed;		// 74
+		TESEffectShader*		pkEffectShader;			// 78 - effect shader
+		TESEffectShader*		pkObjectDisplayShader;	// 7C
+		TESSound*				pkEffectSound;			// 80
+		TESSound*				pkBoltSound;			// 84
+		TESSound*				pkHitSound;				// 88
+		TESSound*				pkAreaSound;			// 8C
+		Float32					fMagicDefaultCEEnchantFactor;
+		Float32					fMagicDefaultCEBarterFactor;
+		EnumArchType			eArchetypeType;			// 98
+		UInt32					uiActorVal;				// 9C - actor value - last field of DATA
 	};
 
+	UInt32					unk50;					// 50
+	UInt32					unk54;					// 54
+	EffectSettingData		kData;
+	BSSimpleList<EffectSetting*> kCounterEffects;	// A0 - counter effects list
+	UInt32					unkA8;					// A8
+	UInt32					unkAC;					// AC
 
-
-	UInt32							unk50;
-	UInt32							unk54;
-	EffectSettingData				kData;
-	BSSimpleList<EffectSetting*>	kCounterEffects;
-	UInt32							unkA8;
-	UInt32							unkAC;
-
-	Script* GetScript() const { return 1 == kData.uiArchType ? (Script*)kData.pAssociatedItem : NULL; };
-	bool HasScript() const { return 1 == kData.uiArchType ? true : false; };
+	Script* GetScript() const { return 1 == kData.eArchetypeType ? (Script*)kData.pkAssociatedItem : NULL; };
+	bool HasScript() const { return 1 == kData.eArchetypeType ? true : false; };
 	Script* RemoveScript();
 	Script* SetScript(Script* newScript);
 };
-
-ASSERT_SIZE(EffectSetting, 0xB0);
+static_assert(sizeof(EffectSetting) == 0xB0);

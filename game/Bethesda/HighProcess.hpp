@@ -1,9 +1,10 @@
 #pragma once
-
 #include "MiddleHighProcess.hpp"
-#include <BSSoundHandle.hpp>
+#include "BSSoundHandle.hpp"
+#include "NiSmartPointer.hpp"
 
 class NiBSBoneLODController;
+class NiBSplineCompTransformInterpolator;
 class ProjectileData;
 class DetectionEvent;
 class Actor;
@@ -11,14 +12,44 @@ class bhkShapePhantom;
 class DialogueItem;
 class LipSynchAnim;
 class MoveToMarker;
+class PathingRequest;
+class ActorPathingMessageQueue;
 
 NiSmartPointer(PathingRequest);
 NiSmartPointer(ActorPathingMessageQueue);
 
-class HighProcess : public MiddleHighProcess {
+class HighProcess : public MiddleHighProcess
+{
 public:
 	HighProcess();
 	~HighProcess();
+
+	struct HeadTracking {
+		union {
+			TESObjectREFR* pHeadTrackingTargets[6];
+			struct {
+				TESObjectREFR* pTargetDefault;
+				TESObjectREFR* pTargetAction;
+				TESObjectREFR* pTargetCombat;
+				TESObjectREFR* pTargetDialog;
+				TESObjectREFR* pTargetScript;
+				TESObjectREFR* pTargetProcedure;
+			};
+		};
+		UInt8 ucHeadTrackingTargetFlags[6];
+	};
+
+	enum FADE_STATE {
+		FADE_NORMAL = 0x0,
+		FADE_IN = 0x1,
+		FADE_OUT = 0x2,
+		FADE_TELEPORT_IN = 0x3,
+		FADE_TELEPORT_OUT = 0x4,
+		FADE_OUT_DISABLE = 0x5,
+		FADE_OUT_DELETE = 0x6,
+		FADE_MOVE_TO_MARKER = 0x7,
+		FADE_STATE_COUNT = 0x8,
+	};
 
 	enum
 	{
@@ -65,35 +96,6 @@ public:
 
 		Value avs[77];
 	};
-
-	struct HeadTracking {
-		union {
-			TESObjectREFR* pHeadTrackingTargets[6];
-			struct {
-				TESObjectREFR* pTargetDefault;
-				TESObjectREFR* pTargetAction;
-				TESObjectREFR* pTargetCombat;
-				TESObjectREFR* pTargetDialog;
-				TESObjectREFR* pTargetScript;
-				TESObjectREFR* pTargetProcedure;
-			};
-		};
-		UInt8 ucHeadTrackingTargetFlags[6];
-	};
-
-
-	enum FADE_STATE {
-		FADE_NORMAL = 0x0,
-		FADE_IN = 0x1,
-		FADE_OUT = 0x2,
-		FADE_TELEPORT_IN = 0x3,
-		FADE_TELEPORT_OUT = 0x4,
-		FADE_OUT_DISABLE = 0x5,
-		FADE_OUT_DELETE = 0x6,
-		FADE_MOVE_TO_MARKER = 0x7,
-		FADE_STATE_COUNT = 0x8,
-	};
-
 
 	BSSimpleList<DetectionData>*			pDetectedActors;
 	BSSimpleList<DetectionData>*			pDetectingActors;
@@ -198,7 +200,7 @@ public:
 	DetectionEvent*							pActorsGeneratedDetectionEvent;
 	UInt8									byte3E0;
 	DialogueItem*							pDialogueItem3E4;
-	HighProcess::FADE_STATE					eFadeState;
+	FADE_STATE								eFadeState;
 	float									fFadeAlpha;
 	TESObjectREFR*							pTeleportFadeRef;
 	MoveToMarker*							pMoveToMarker;
@@ -223,10 +225,9 @@ public:
 	bool									bIsDoingSayTo;
 	bool									gap45A;
 	bool									gap45B;
-	PathingRequestPtr						spPathingRequest0;
-	PathingRequestPtr						spPathingRequest1;
-	ActorPathingMessageQueuePtr				spPathingMessageQueue0;
-	ActorPathingMessageQueuePtr				spPathingMessageQueue1;
+	NiPointer<PathingRequest>				spPathingRequest0;
+	NiPointer<PathingRequest>				spPathingRequest1;
+	NiPointer<ActorPathingMessageQueue>		spPathingMessageQueue0;
+	NiPointer<ActorPathingMessageQueue>		spPathingMessageQueue1;
 };
-
-ASSERT_SIZE(HighProcess, 0x46C);
+static_assert(sizeof(HighProcess) == 0x46C);

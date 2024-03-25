@@ -1,5 +1,4 @@
 #pragma once
-
 #include "MiddleLowProcess.hpp"
 #include "NiPoint3.hpp"
 
@@ -13,21 +12,20 @@ class BSAnimGroupSequence;
 class BSBound;
 class BSFaceGenNiNode;
 class NiTriShape;
+class ItemChange;
 
-struct PackageInfo {
-	TESPackage*		pPackage;
-	TESPackageData* pPackageData;
-	TESObjectREFR*	pTargetRef;
-	UInt32			unk0C;
-	float			unk10;
-	UInt32			uiFlags;
-};
-
-
-class MiddleHighProcess : public MiddleLowProcess {
+class MiddleHighProcess : public MiddleLowProcess
+{
 public:
-	MiddleHighProcess();
-	~MiddleHighProcess();
+
+	struct PackageInfo {
+		TESPackage*		pPackage;
+		TESPackageData* pPackageData;
+		TESObjectREFR*	pTargetRef;
+		UInt32			unk0C;
+		float			unk10;
+		UInt32			uiFlags;
+	};
 
 	struct	Unk138 {
 		UInt32	unk000;
@@ -44,6 +42,8 @@ public:
 		UInt8	fil00F;
 	};
 
+	MiddleHighProcess();
+	~MiddleHighProcess() override;
 	virtual void	SetAnimation(UInt32 newAnimation);
 	virtual void	Unk_209();
 	virtual void	Unk_20A();
@@ -71,15 +71,12 @@ public:
 	PackageInfo							interruptPackage;	// 0E4
 	UInt8								unk0FC[12];			// 0FC	Saved as one, might be Pos/Rot given size
 	UInt32								unk108;				// 108
-	TESIdleForm* idleForm10C;		// 10C
+	TESIdleForm*						idleForm10C;		// 10C
 	UInt32								unk110;				// 110  EntryData, also handled as part of weapon code. AmmoInfo.
-	WeaponInfo* weaponInfo;		// 114
-	AmmoInfo* ammoInfo;			// 118
-	QueuedFile* unk11C;			// 11C
-	UInt8								byt120;				// 120
-	UInt8								byt121;				// 121
-	UInt8								byt122;				// 122
-	UInt8								fil123;				// 123
+	ItemChange*							weaponInfo;			// 114
+	ItemChange*							ammoInfo;			// 118
+	QueuedFile*							unk11C;				// 11C
+	NiRefObject*						niRefObject;		// 120
 	UInt8								isUsingOneHandGrenade;
 	UInt8								isUsingOneHandMine;
 	UInt8								isUsingOneHandThrown;
@@ -88,57 +85,66 @@ public:
 	UInt8								isWearingPowerArmorHelmet;
 	UInt8								isWearingBackpack;
 	UInt8								gap12B;
-	NiNode* node12C;			// 12C
-	NiNode* projectileNode;	// 130
+	NiNode*								node12C;			// 12C
+	NiNode*								projectileNode;		// 130
 	UInt8								byt134;				// 134
 	bool								isWeaponOut;		// 135
 	UInt8								byt136;				// 136
 	UInt8								byt137;				// 137
-	bhkCharacterController* charCtrl;			// 138
+	bhkCharacterController*				charCtrl;			// 138
 	UInt8								knockedState;		// 13C
 	UInt8								unk13D[3];			// 13D
 	UInt32								unk140[8];			// 140
-	MagicItem* magicItem160;		// 160
+	MagicItem*							magicItem160;		// 160
 	UInt32								unk164[3];			// 164
-	float								actorAlpha;			// 170
+	Float32								actorAlpha;			// 170
 	UInt32								unk174;				// 174
-	BSFaceGenAnimationData* unk178;			// 178
+	BSFaceGenAnimationData*				unk178;				// 178
 	UInt8								byte17C;			// 17C
 	UInt8								byte17D;			// 17D
 	UInt8								byte17E;			// 17E
 	UInt8								byte17F;			// 17F
-	UInt32								unk180[3];			// 180
+	UInt8								byte180;			// 180
+	UInt8								byte181;			// 181
+	UInt8								byte182;			// 182
+	UInt8								byte183;			// 183
+	UInt32								unk184;				// 184
+	UInt8								hasCaughtPCPickpocketting;	// 188
+	UInt8								byte189;			// 189
+	UInt8								byte18A;			// 18A
+	UInt8								byte18B;			// 18B
 	UInt8								byte18C;			// 18C
-	UInt8								byte18D[3];			// 18D
+	UInt8								forceNextUpdate;	// 18D
+	UInt8								pad18E[2];			// 18E
 	UInt32								unk190[10];			// 190
-	void* unk1B8;			// 1B8
-	MagicTarget* magicTarget1BC;	// 1BC
-	AnimData* animData;			// 1C0
-	BSAnimGroupSequence* animSequence[3];	// 1C4
-	float								unk1D0;				// 1D0
-	float								unk1D4;				// 1D4
+	void*								unk1B8;				// 1B8
+	MagicTarget*						magicTarget1BC;		// 1BC
+	AnimData*							animData;			// 1C0
+	BSAnimGroupSequence*				animSequence[3];	// 1C4
+	Float32								angle1D0;			// 1D0
+	Float32								unk1D4;				// 1D4
 	UInt8								byte1D8;			// 1D8
-	UInt8								byte1D9;			// 1D9
-	UInt8								gap1DA[2];			// 1DA
-	NiNode* limbNodes[15];		// 1DC
-	NiNode* unk218;			// 218
-	NiNode* weaponNode;		// 21C
-	void* ptr220;			// 220
-	BSBound* boundingBox;		// 224
+	UInt8								usingAutoWeapon;	// 1D9
+	UInt8								isAttacked;			// 1DA
+	UInt8								byte1DB;			// 1DB
+	NiNode*								limbNodes[15];		// 1DC
+	NiNode*								unk218;				// 218
+	NiNode*								weaponNode;			// 21C
+	void*								ptr220;				// 220
+	BSBound*							boundingBox;		// 224
 	UInt8								isAiming;			// 228
 	UInt8								byte229;			// 229
 	UInt16								byte22A;			// 22A
 	UInt32								unk22C;				// 22C
-	BSSimpleList<void*>					queuedEquipItems;	// 230
-	float								rads238;			// 238
-	float								waterRadsSec;		// 23C
-	ActorHitData* lastHitData;		// 240 - last damage taken by actor
+	BSSimpleList<ItemChange*>			queuedEquipItems;	// 230
+	Float32								rads238;			// 238
+	Float32								waterRadsSec;		// 23C
+	ActorHitData*						lastHitData;		// 240 - last damage taken by actor
 	UInt32								unk244;				// 244
-	BSFaceGenNiNode* unk248;			// 248
-	BSFaceGenNiNode* unk24C;			// 24C
-	NiTriShape* unk250;			// 250
-	ActorHitData* lastTargetHitData; // 254 - last damage dealt by actor
+	BSFaceGenNiNode*					unk248;				// 248
+	BSFaceGenNiNode*					unk24C;				// 24C
+	NiTriShape*							unk250;				// 250
+	ActorHitData*						lastTargetHitData;	// 254 - last damage dealt by actor
 	UInt32								unk258;				// 258
 };
-
-ASSERT_SIZE(MiddleHighProcess, 0x25C);
+static_assert(sizeof(MiddleHighProcess) == 0x25C);

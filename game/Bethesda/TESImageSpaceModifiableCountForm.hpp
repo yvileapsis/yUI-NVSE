@@ -5,6 +5,5 @@
 class TESImageSpaceModifier;
 
 class TESImageSpaceModifiableCountForm : public BaseFormComponent {
-public:
 	TESImageSpaceModifier* pFormImageSpaceModifying[6];
 };

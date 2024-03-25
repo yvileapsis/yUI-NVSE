@@ -1,8 +1,8 @@
 #pragma once
-
 #include "BaseFormComponent.hpp"
 #include "BSSimpleList.hpp"
 
+// 0x8
 class TESRegionData : public BaseFormComponent {
 public:
 	TESRegionData();
@@ -12,6 +12,4 @@ public:
 	bool bIgnore;
 	char cPriority;
 };
-typedef BSSimpleList<TESRegionData> RegionDataEntryList;
-
-ASSERT_SIZE(TESRegionData, 0x8)
+static_assert(sizeof(TESRegionData) == 0x8);

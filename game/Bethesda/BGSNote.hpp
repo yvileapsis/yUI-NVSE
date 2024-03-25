@@ -1,30 +1,31 @@
 #pragma once
-
 #include "TESBoundObject.hpp"
 #include "TESModel.hpp"
 #include "TESIcon.hpp"
 #include "BGSPickupPutdownSounds.hpp"
+#include "BSSimpleList.hpp"
 
 class TESDescription;
 
-class BGSNote : public TESBoundObject {
+// 0x80
+class BGSNote :
+	public TESBoundObject,			// 000
+	public TESModel,				// 030
+	public TESFullName,				// 048
+	public TESIcon,					// 054
+	public BGSPickupPutdownSounds	// 060
+{
 public:
 	BGSNote();
 	~BGSNote();
 
 	// bases
-	TESModel					model;					// 030
-	TESFullName					fullName;				// 048
-	TESIcon						icon;					// 054
-	BGSPickupPutdownSounds		pickupPutdownSounds;	// 060
-	TESDescription* noteText;				// 06C
-	UInt32						unk070[3];				// 070
-	UInt8                       unk07C;					// 07C
-	UInt8                       read;					// 07D
-	UInt8                       unk07E;					// 07E
-	UInt8                       unk07F;					// 07F
+	TESDescription*		pkNoteText;	// 06C
+	TESNPC*				pkVoiceNPC;	// 070
+	BSSimpleList<void*> kQuestList;	// 074
+	UInt8				ucNoteType;	// 07C
+	UInt8				ucRead;
+	UInt8				byte7E;
+	UInt8				byte7F;
 };
-
-ASSERT_OFFSET(BGSNote, pickupPutdownSounds, 0x60);
-ASSERT_OFFSET(BGSNote, noteText, 0x06C);
-ASSERT_SIZE(BGSNote, 0x80);
+static_assert(sizeof(BGSNote) == 0x80);

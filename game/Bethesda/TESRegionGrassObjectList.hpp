@@ -1,5 +1,4 @@
 #pragma once
-
 #include "BSSimpleList.hpp"
 #include "NiSmartPointer.hpp"
 #include "TESRegionGrassObject.hpp"
@@ -8,9 +7,8 @@ class TESRegionGrassObjectList {
 public:
 	virtual void Destroy(bool bFreeMemory);
 
-	BSSimpleList<NiPointer<TESRegionGrassObject>> list;
-	bool bOwnsTESRegionGrassObjectMemory;
-	UInt32 iCount;
+	BSSimpleList<NiPointer<TESRegionGrassObject>> kList;
+	bool	bOwnsTESRegionGrassObjectMemory;
+	UInt32	uiCount;
 };
-
-ASSERT_SIZE(TESRegionGrassObjectList, 0x14)
+static_assert(sizeof(TESRegionGrassObjectList) == 0x14);

@@ -4,17 +4,27 @@
 class Actor;
 class ActorHitData;
 struct AnimData;
+
 class bhkCharacterController;
+
+class BSFaceGenAnimationData;
+class BSFaceGenNiNode;
+class BSAnimGroupSequence;
+class BSBound;
+
 class DetectionData;
+
 class TESAmmo;
 class TESIdleForm;
 class TESObjectREFR;
 class TESObjectWEAP;
+
 class TESPackage;
 class TESPackageData;
+
 class ItemChange;
-class BSAnimGroupSequence;
-class BSBound;
+
+class NiTriShape;
 
 // 0x30
 class BaseProcess 
@@ -251,7 +261,7 @@ public:
 	virtual TESPackageData*			GetRunOncePackageData();
 	virtual TESPackageData*			GetPackageData();
 	virtual void					GetRunningActorPackage();
-	virtual TESPackage*				GetCurrentPackage();
+	virtual TESPackage*				GetCurrentPackage2();
 	virtual UInt32					GetProcedureIndexRunning();
 	virtual void					SetProcedureIndexRunning(UInt32);
 	virtual void					IncreaseProcedureIndexRunning();

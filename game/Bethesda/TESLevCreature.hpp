@@ -1,17 +1,18 @@
 #pragma once
-
 #include "TESBoundObject.hpp"
 #include "TESModelTextureSwap.hpp"
 #include "TESLeveledList.hpp"
 
-class TESLevCreature : public TESBoundObject {
+// 0x70
+class TESLevCreature :
+	public TESBoundObject,		// 000
+	public TESLeveledList, 		// 030
+	public TESModelTextureSwap	// 04C
+{
 public:
 	TESLevCreature();
 	~TESLevCreature();
 
-	TESLeveledList		list;		// 030
-	TESModelTextureSwap	texture;	// 04C
 	UInt32 unk6C;
 };
-
-ASSERT_SIZE(TESLevCreature, 0x70);
+static_assert(sizeof(TESLevCreature) == 0x70);

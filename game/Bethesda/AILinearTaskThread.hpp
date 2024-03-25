@@ -5,7 +5,7 @@
 class AILinearTaskThread : public BSLinearTaskThread {
 public:
 	void(__cdecl* function)();
-	UInt32 unk50;
+	UInt32 memRouter; // hkMemoryRouterx
 	UInt32 unk54;
 	UInt32 unk58;
 	UInt32 unk5C;

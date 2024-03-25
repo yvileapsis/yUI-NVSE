@@ -2,7 +2,8 @@
 #include "TESForm.hpp"
 
 // 0x30
-class TESAmmoEffect : public TESForm {
+class TESAmmoEffect : public TESForm 
+{
 public:
 	TESAmmoEffect();
 	~TESAmmoEffect();

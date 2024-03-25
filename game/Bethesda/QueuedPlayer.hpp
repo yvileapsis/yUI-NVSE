@@ -1,9 +1,11 @@
 #pragma once
-
 #include "QueuedCharacter.hpp"
 
-class QueuedPlayer : public QueuedCharacter {
+// 0x48
+class QueuedPlayer : public QueuedCharacter 
+{
 public:
 	QueuedPlayer();
 	~QueuedPlayer();
 };
+static_assert(sizeof(QueuedPlayer) == 0x48);

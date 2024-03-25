@@ -1,15 +1,17 @@
 #pragma once
-
 #include "TESBoundObject.hpp"
 #include "TESModelTextureSwap.hpp"
 
-class TESObjectSTAT : public TESBoundObject, public TESModelTextureSwap {
+// 0x58
+class TESObjectSTAT :
+	public TESBoundObject,
+	public TESModelTextureSwap
+{
 public:
 	TESObjectSTAT();
 	~TESObjectSTAT();
 
 	// children
-	UInt32				unk50[2];
+	UInt32 unk50[2];
 };
-
-ASSERT_SIZE(TESObjectSTAT, 0x58);
+static_assert(sizeof(TESObjectSTAT) == 0x58);

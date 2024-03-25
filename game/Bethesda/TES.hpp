@@ -20,8 +20,8 @@ public:
 	virtual bool Fn_00(UInt32 arg1, UInt32 arg2, UInt32 arg3, UInt32 arg4, TESWorldSpace* apWorldSpace);
 
 	struct DeathCount {
-		TESCreature*	creatureOrNPC;
-		UInt16			count;
+		TESCreature*	pkCreatureOrNPC;
+		UInt16			usCount;
 	};
 
 	GridDistantArray*				pGridDistantArray;
@@ -32,10 +32,10 @@ public:
 	BSTempNodeManager*				pTempNodeManager;
 	NiDirectionalLight*				pObjLight;
 	NiFogProperty*					pObjFog;
-	int								iCurrentGridX;
-	int								iCurrentGridY;
-	int								iCurrentQueuedX;
-	int								iCurrentQueuedY;
+	SInt32							iCurrentGridX;
+	SInt32							iCurrentGridY;
+	SInt32							iCurrentQueuedX;
+	SInt32							iCurrentQueuedY;
 	TESObjectCELL*					pInteriorCell;
 	TESObjectCELL**					pInteriorBuffer;
 	TESObjectCELL**					pExteriorBuffer;
@@ -60,12 +60,12 @@ public:
 	UInt8							byte7D;
 	UInt8							gap7E;
 	UInt8							gap7F;
-	float							fCell_delta_x;
-	float							fCell_delta_y;
+	Float32							fCell_delta_x;
+	Float32							fCell_delta_y;
 	TESWorldSpace*					pWorldSpace;
 	UInt32*							list8C[2];
-	BSSimpleList<TESObjectREFR*>	cellFurnitureList;
-	BSSimpleList<DeathCount*>		deathCounts;
+	BSSimpleList<TESObjectREFR*>	kCellFurnitureList;
+	BSSimpleList<DeathCount*>		kDeathCounts;
 	NiPointer<QueuedFile>			spQueuedFileA4;
 	NiSourceTexturePtr				spBloodDecalPreload1;
 	NiPointer<QueuedFile>			spQueuedFileAC;
@@ -78,7 +78,7 @@ public:
 	NavMeshInfoMap*					pNavMeshInfoMap;
 	NiPointer<LoadedAreaBound>		spLoadedAreaBound;
 
-	static TES* GetSingleton();
+	__forceinline static TES* GetSingleton() { return *(TES**)0x11DEA10; }
 
 	static Sky* GetSky();
 
@@ -105,8 +105,17 @@ public:
 
 	void UpdateMultiBoundVisibility(NiCamera* apCamera);
 	void ResetAllMultiBoundNodes(bool abLandscape, bool abRooms);
-};
 
-ASSERT_SIZE(TES, 0xC4);
+	__forceinline bool GetTerrainHeight(NiPoint2* posXY, float* result)
+	{
+		return ThisCall<bool>(0x4572E0, this, posXY, result);
+	}
+
+	__forceinline void AddTempNode(NiAVObject* object, float lifetime)
+	{
+		ThisCall(0x458E20, this, object, lifetime);
+	}
+};
+static_assert(sizeof(TES) == 0xC4);
 
 extern TES* g_TES;

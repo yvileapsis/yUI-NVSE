@@ -1,7 +1,9 @@
 #pragma once
-
 #include "TESRegionData.hpp"
 
+class TESTexture;
+
+// 0xC
 class TESRegionDataLandscape : public TESRegionData {
 public:
 	TESRegionDataLandscape();
@@ -9,5 +11,4 @@ public:
 
 	TESTexture* pCanopyShadowTexture;
 };
-
-ASSERT_SIZE(TESRegionDataLandscape, 0xC)
+static_assert(sizeof(TESRegionDataLandscape) == 0xC);

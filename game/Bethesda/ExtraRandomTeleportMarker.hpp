@@ -1,5 +1,4 @@
 #pragma once
-
 #include "BSExtraData.hpp"
 
 class TESObjectREFR;
@@ -11,3 +10,4 @@ public:
 
 	TESObjectREFR* teleportRef;
 };
+static_assert(sizeof(ExtraRandomTeleportMarker) == 0x10);

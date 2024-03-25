@@ -1,5 +1,4 @@
 #pragma once
-
 #include "TESRegionObjectBase.hpp"
 
 class TESGrass;
@@ -10,5 +9,4 @@ public:
 	TESGrass* pObject;
 	TESLandTexture* pParent;
 };
-
-ASSERT_SIZE(TESRegionGrassObject, 0xC)
+static_assert(sizeof(TESRegionGrassObject) == 0xC);

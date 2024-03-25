@@ -5,6 +5,9 @@
 
 class INISettingCollection : public SettingCollectionList<Setting> {
 public:
+	INISettingCollection();
+	~INISettingCollection() override;
+
 	static INISettingCollection* GetSingleton();
 
 	struct AnimationWarning {
@@ -1277,3 +1280,4 @@ public:
 	static float* const fWeaponInteriorNearVolumeMod;
 
 };
+static_assert(sizeof(INISettingCollection) == 0x114);

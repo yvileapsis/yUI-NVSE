@@ -4,12 +4,13 @@
 #include "TESFullName.hpp"
 #include "TESObjectSTAT.hpp"
 
-class BGSMovableStatic {
+// 0x74
+class BGSMovableStatic :
+	public TESFullName,					// 00
+	public BGSDestructibleObjectForm,	// 14
+	public TESObjectSTAT				// 6C
+{
 public:
-	TESFullName name;
-	BGSDestructibleObjectForm destructibleObject;
-	TESObjectSTAT statObject;
 	UInt32 gap6C[2];
 };
-
-ASSERT_SIZE(BGSMovableStatic, 0x74);
+static_assert(sizeof(BGSMovableStatic) == 0x74);

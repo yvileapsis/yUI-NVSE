@@ -4,6 +4,6 @@ class TESForm;
 
 class TESRegionObjectBase {
 public:
-	virtual void Func01(void);
-	virtual TESForm* GetObjectA(void);
+	virtual void Func01();
+	virtual TESForm* GetObjectA();
 };

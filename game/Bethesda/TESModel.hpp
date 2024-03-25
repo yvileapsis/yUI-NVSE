@@ -1,36 +1,39 @@
 #pragma once
-
 #include "BaseFormComponent.hpp"
 #include "BSString.hpp"
 
 class BSFileEntry;
 
-class TESModel : public BaseFormComponent {
+// 0x18
+class TESModel : public BaseFormComponent
+{
 public:
 	TESModel();
-	virtual				~TESModel();
 
-	virtual const char*	GetModel();
-	virtual void		SetModel(const char* apcPath);
-	virtual bool		Unk_7();
+	virtual			~TESModel();
+	virtual char*	GetModel();
+	virtual void	SetModel(const char* apcPath);	// 06
+	virtual bool	Unk_07();
 
-	enum FacegenFlags {
-		HEAD			= 1 << 0,
-		TORSO			= 1 << 1,
-		RIGHT_HAND		= 1 << 2,
-		LEFT_HAND		= 1 << 3,
+	enum EnumFacegenFlags : UInt8
+	{
+		kFacegenFlag_Head		= 1 << 0,
+		kFacegenFlag_Torso		= 1 << 1,
+		kFacegenFlag_RightHand	= 1 << 2,
+		kFacegenFlag_LeftHand	= 1 << 3,
 	};
 
-	struct TextureData {
+	struct TextureData
+	{
 		UInt8			ucCount;
 		BSFileEntry**	pFileEntries;
 	};
 
-	BSStringT	strModel;
-	TextureData kTextures;
-	Bitfield8	ucFaceGenFlags;
+	BSStringT<char>		kModel;
+	TextureData			kTextures;
+	EnumFacegenFlags	ucFacegenFlags;
+	UInt8				pad15[3];
 
-	void SetPath(const char* newPath) { strModel.Set(newPath); }
+	void SetPath(const char* newPath) { kModel.Set(newPath); }
 };
-
-ASSERT_SIZE(TESModel, 0x18);
+static_assert(sizeof(TESModel) == 0x18);

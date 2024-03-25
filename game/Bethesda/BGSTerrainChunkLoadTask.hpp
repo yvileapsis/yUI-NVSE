@@ -1,13 +1,12 @@
 #pragma once
-
 #include "QueuedFileEntry.hpp"
 #include "NiNode.hpp"
 #include "NiGeometry.hpp"
 
 struct BGSTerrainChunk;
-
 class TESWorldSpace;
 
+// 0x60
 class BGSTerrainChunkLoadTask : public QueuedFileEntry {
 public:
 	bool				bQueuedTextures;
@@ -27,5 +26,4 @@ public:
 
 	static void __fastcall RunEx(BGSTerrainChunkLoadTask* apThis);
 };
-
-ASSERT_SIZE(BGSTerrainChunkLoadTask, 0x60);
+static_assert(sizeof(BGSTerrainChunkLoadTask) == 0x60);

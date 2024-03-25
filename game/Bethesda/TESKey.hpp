@@ -1,11 +1,10 @@
 #pragma once
-
 #include "TESObjectMISC.hpp"
 
+// 0xAC
 class TESKey : public TESObjectMISC {
 public:
 	TESKey();
 	~TESKey();
 };
-
-ASSERT_SIZE(TESKey, 0xAC);
+static_assert(sizeof(TESKey) == 0xAC);

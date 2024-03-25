@@ -2,8 +2,6 @@
 
 #include "ConsoleManager.hpp"
 // TODO: script inside tesscript
-#include "TESScript.hpp"
-#include "Script.hpp"
 #include "InterfaceManager.hpp"
 #include "TESScript.hpp"
 #include "TESDataHandler.hpp"
@@ -210,11 +208,11 @@ __declspec(naked) bool IsConsoleMode()
 	}
 }
 
-const char GetSeparatorChar(Script * script)
+const char GetSeparatorChar(Script* script)
 {
 	if(IsConsoleMode())
 	{
-		if(script && script->modIndex != 0xFF)
+		if(script && script->ucModIndex != 0xFF)
 			return '|';
 		else
 			return '@';
@@ -225,7 +223,7 @@ const char GetSeparatorChar(Script * script)
 
 std::string GetSeparatorChars(Script * script)
 {
-	return IsConsoleMode() ? script && script->modIndex != 0xFF ? "|" : "@" : "|";
+	return IsConsoleMode() ? script && script->ucModIndex != 0xFF ? "|" : "@" : "|";
 }
 
 #endif
@@ -359,9 +357,9 @@ std::unordered_set<UInt32> g_warnedScripts;
 const char* GetModName(const TESForm* script)
 {
 	const char* modName = "In-game console";
-	if (script->modIndex != 0xFF)
+	if (script->ucModIndex != 0xFF)
 	{
-		modName = TESDataHandler::GetSingleton()->GetNthModName(script->modIndex);
+		modName = TESDataHandler::GetSingleton()->GetNthModName(script->ucModIndex);
 		if (!modName || !modName[0])
 			modName = "Unknown";
 	}

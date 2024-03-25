@@ -1,17 +1,17 @@
 #pragma once
-
 #include "BaseFormComponent.hpp"
 #include "TESModelTextureSwap.hpp"
 #include "TESModelRDT.hpp"
 #include "BGSMessageIcon.hpp"
 
+// 0xDC
 class TESBipedModelForm : public BaseFormComponent {
 public:
 	TESBipedModelForm();
 	~TESBipedModelForm();
 
 	// bit indices starting from lsb
-	enum EPartBit {
+	enum EnumPartBit {
 		ePart_Head = 0,
 		ePart_Hair,
 		ePart_UpperBody,
@@ -34,11 +34,11 @@ public:
 		ePart_BodyAddon3
 	};
 
-	enum EPartBitMask {
+	enum EnumPartBitMask {
 		ePartBitMask_Full = 0x07FFFF,
 	};
 
-	enum ESlot {
+	enum EnumSlot {
 		eSlot_Head = 0x1 << ePart_Head,
 		eSlot_Hair = 0x1 << ePart_Hair,
 		eSlot_UpperBody = 0x1 << ePart_UpperBody,
@@ -64,7 +64,7 @@ public:
 		eSlot_Full = 0xFFFFF
 	};
 
-	enum EBipedFlags {
+	enum EnumBipedFlags {
 		eBipedFlag_HasBackPack = 0x4,
 		eBipedFlag_MediumArmor = 0x8,
 		eBipedFlag_PowerArmor = 0x20,
@@ -72,7 +72,7 @@ public:
 		eBipedFlag_HeavyArmor = 0x80,
 	};
 
-	enum EBipedPath {
+	enum EnumBipedPath {
 		ePath_Biped,
 		ePath_Ground,
 		ePath_Icon,
@@ -80,36 +80,32 @@ public:
 	};
 
 	// missing part mask and flags
-	UInt32					partMask;			// 004
-	UInt8					bipedFlags;			// 008
-	UInt8					fil009[3];			// 009 seen badly initialized (ArmorCombat)
-	TESModelTextureSwap		bipedModel[2];		// 00C
-	TESModelTextureSwap		groundModel[2];		// 04C
-	TESIcon					icon[2];			// 08C
-	BGSMessageIcon			messageIcon[2];		// 0A4
-	TESModelRDT				modelRDT;			// 0C4
+	UInt32					uiPartMask;			// 004
+	UInt8					eBipedFlags;			// 008
+	UInt8					pad009[3];			// 009 seen badly initialized (ArmorCombat)
+	TESModelTextureSwap		kBipedModel[2];		// 00C
+	TESModelTextureSwap		kGroundModel[2];	// 04C
+	TESIcon					kIcon[2];			// 08C
+	BGSMessageIcon			kMessageIcon[2];	// 0A4
+	TESModelRDT				kModelRDT;			// 0C4
 	// 0DC
 
 	static UInt32 MaskForSlot(UInt32 mask);
 
-	bool IsPowerArmor() const { return (bipedFlags & eBipedFlag_PowerArmor) == eBipedFlag_PowerArmor; }
-	bool IsNonPlayable() const { return (bipedFlags & eBipedFlag_NonPlayable) == eBipedFlag_NonPlayable; }
+	bool IsPowerArmor() const { return (eBipedFlags & eBipedFlag_PowerArmor) == eBipedFlag_PowerArmor; }
+	bool IsNonPlayable() const { return (eBipedFlags & eBipedFlag_NonPlayable) == eBipedFlag_NonPlayable; }
 	bool IsPlayable() const { return !IsNonPlayable(); }
 	void SetPowerArmor(bool bPA) {
-		if (bPA) {
-			bipedFlags |= eBipedFlag_PowerArmor;
-		}
-		else {
-			bipedFlags &= ~eBipedFlag_PowerArmor;
-		}
+		if (bPA)
+			eBipedFlags |= eBipedFlag_PowerArmor;
+		else
+			eBipedFlags &= ~eBipedFlag_PowerArmor;
 	}
 	void SetNonPlayable(bool bNP) {
-		if (bNP) {
-			bipedFlags |= eBipedFlag_NonPlayable;
-		}
-		else {
-			bipedFlags &= ~eBipedFlag_NonPlayable;
-		}
+		if (bNP)
+			eBipedFlags |= eBipedFlag_NonPlayable;
+		else
+			eBipedFlags &= ~eBipedFlag_NonPlayable;
 	}
 	void  SetPath(const char* newPath, UInt32 whichPath, bool bfemalePath);
 	const char* GetPath(UInt32 whichPath, bool bFemalePath);
@@ -120,5 +116,4 @@ public:
 	UInt32 GetBipedMask() const;
 	void SetBipedMask(UInt32 mask);
 };
-
-ASSERT_SIZE(TESBipedModelForm, 0x0DC);
+static_assert(sizeof(TESBipedModelForm) == 0x0DC);

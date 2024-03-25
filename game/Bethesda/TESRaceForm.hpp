@@ -1,11 +1,14 @@
 #pragma once
+#include "BaseFormComponent.hpp"
 
-#include "TESRace.hpp"
+class TESRace;
 
+// 0x8
 class TESRaceForm : public BaseFormComponent {
 public:
 	TESRaceForm();
 	~TESRaceForm();
 
-	TESRace* race;	// 04
+	TESRace* pkRace;	// 04
 };
+static_assert(sizeof(TESRaceForm) == 0x8);

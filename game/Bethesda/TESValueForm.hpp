@@ -2,6 +2,7 @@
 
 #include "BaseFormComponent.hpp"
 
+// 0x8
 class TESValueForm : public BaseFormComponent {
 public:
 	enum
@@ -19,8 +20,6 @@ public:
 
 	//	DEFINE_MEMBER_FN_LONG(TESValueForm, SetValue, void, _TESValueForm_SetValue, UInt32 newVal);
 
-	SInt32	iValue;
-	// 008
+	SInt32	value;
 };
-
-ASSERT_SIZE(TESValueForm, 0x8);
+static_assert(sizeof(TESValueForm) == 0x8);

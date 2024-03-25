@@ -1,5 +1,4 @@
 #pragma once
-
 #include "TESForm.hpp"
 
 class NiNode;
@@ -8,10 +7,12 @@ class TESBoundObject;
 class TESWaterForm;
 class TESObjectList;
 
-class TESObject : public TESForm {
+// 0x24
+class TESObject : public TESForm
+{
 public:
 	TESObject();
-	virtual ~TESObject();
+	~TESObject() override;
 
 	virtual UInt32			Unk_4E();
 	virtual bool			Unk_4F();
@@ -30,12 +31,11 @@ public:
 	virtual UInt32			Unk_5C();
 	virtual NiNode*			LoadGraphics(TESObjectREFR* apRef);
 
-	TESObjectList*	pList;
-	TESObject*		pPrev;
-	TESObject*		pNext;
+	TESObjectList*			pList;		// 018
+	TESBoundObject*			pkPrev;		// 01C
+	TESBoundObject*			pkNext;		// 020
 
 	TESObject* GetNext() const;
 	TESObject* GetPrev() const;
 };
-
-ASSERT_SIZE(TESObject, 0x24)
+static_assert(sizeof(TESObject) == 0x24);

@@ -1,21 +1,22 @@
 #pragma once
-
 #include "TESForm.hpp"
 #include "TESTexture.hpp"
 #include "TESDescription.hpp"
 
-class TESSkill : public TESForm {
+// 60
+class TESSkill :
+	public TESForm,
+	public TESDescription,
+	public TESTexture
+{
 public:
 	TESSkill();
 	~TESSkill();
 
-	TESDescription description;
-	TESTexture texture;
-	UInt32 unk2C;
-	UInt32 unk30;
-	UInt32 unk34;
-	float unk38[2];
-	TESDescription desc2[4];
+	UInt32			unk2C;
+	UInt32			unk30;
+	UInt32			unk34;
+	Float32			unk38[2];
+	TESDescription	kDesc2[4];
 };
-
-ASSERT_SIZE(TESSkill, 0x60);
+static_assert(sizeof(TESSkill) == 0x60);

@@ -1,8 +1,9 @@
 #pragma once
-
 #include "BaseFormComponent.hpp"
 
-class TESAttributes : public BaseFormComponent {
+// 0xC
+class TESAttributes : public BaseFormComponent
+{
 public:
 	TESAttributes();
 	~TESAttributes();
@@ -21,5 +22,4 @@ public:
 	UInt8	attributes[7];	// 4
 	UInt8	padB;			// B
 };
-
-ASSERT_SIZE(TESAttributes, 0xC);
+static_assert(sizeof(TESAttributes) == 0xC);

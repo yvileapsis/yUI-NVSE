@@ -1,26 +1,26 @@
 #pragma once
-
 #include "TESForm.hpp"
 #include "TESFullName.hpp"
 #include "TESTexture.hpp"
 
-class TESEyes : public TESForm {
+// 34
+class TESEyes :
+	public TESForm,
+	public TESFullName,	// 18
+	public TESTexture	// 24
+{
 public:
 	TESEyes();
 	~TESEyes();
 
-	enum
+	enum EnumEyesFlags : UInt8
 	{
-		kFlag_Playable = 0x01,
-		kFlag_NotMale = 0x02,
-		kFlag_NotFemale = 0x04,
+		kFlag_Playable	= 0x01,
+		kFlag_NotMale	= 0x02,
+		kFlag_NotFemale	= 0x04,
 	};
 
-	TESFullName		fullName;	// 18
-	TESTexture		texture;	// 24
-
-	UInt8			eyeFlags;	// 30
+	EnumEyesFlags	eEyeFlags;	// 30
 	UInt8			pad31[3];	// 31
 };
-
-ASSERT_SIZE(TESEyes, 0x34);
+static_assert(sizeof(TESEyes) == 0x34);

@@ -15,5 +15,4 @@ public:
 	DWORD dword30;
 	DWORD dword34;
 };
-
-ASSERT_SIZE(MobileObjectTaskletData, 0x38);
+static_assert(sizeof(MobileObjectTaskletData) == 0x38);

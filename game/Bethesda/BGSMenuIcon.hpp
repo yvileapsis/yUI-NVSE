@@ -1,12 +1,14 @@
 #pragma once
-
 #include "TESForm.hpp"
 #include "TESIcon.hpp"
 
-class BGSMenuIcon : public TESForm, public TESIcon {
+// 24
+class BGSMenuIcon :
+	public TESForm,	// 00
+	public TESIcon	// 18
+{
 public:
 	BGSMenuIcon();
 	virtual ~BGSMenuIcon();
 };
-
-ASSERT_SIZE(BGSMenuIcon, 0x24);
+static_assert(sizeof(BGSMenuIcon) == 0x24);

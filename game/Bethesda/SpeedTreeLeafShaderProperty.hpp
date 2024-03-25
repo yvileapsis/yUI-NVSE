@@ -1,8 +1,8 @@
 #pragma once
-
 #include "SpeedTreeShaderLightingProperty.hpp"
 
-class SpeedTreeLeafShaderProperty : public SpeedTreeShaderLightingProperty {
+class SpeedTreeLeafShaderProperty : public SpeedTreeShaderLightingProperty
+{
 public:
 	class LeafData : public NiRefObject {
 	public:
@@ -15,5 +15,4 @@ public:
 
 	NIRTTI_ADDRESS(0x12007A0)
 };
-
 ASSERT_SIZE(SpeedTreeLeafShaderProperty, 0x90);

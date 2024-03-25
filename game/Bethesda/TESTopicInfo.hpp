@@ -1,11 +1,11 @@
 #pragma once
-
 #include "TESForm.hpp"
 #include "TESCondition.hpp"
 #include "NiTArray.hpp"
 
 class TESTopic;
 
+// 50
 class TESTopicInfo : public TESForm {
 public:
 	TESTopicInfo();
@@ -26,7 +26,7 @@ public:
 	UInt8					flags1;				// 25
 	UInt8					flags2;				// 26
 	UInt8					pad27;				// 27
-	BSStringT				prompt;				// 28
+	BSStringT<char>			prompt;				// 28
 	BSSimpleList<TESTopic*>	addTopics;			// 30
 	RelatedTopics*			relatedTopics;		// 38
 	UInt32					speaker;			// 3C
@@ -34,10 +34,10 @@ public:
 	UInt32					speechChallenge;	// 44
 	UInt32					unk48;				// 48
 	UInt32					modInfoFileOffset;	// 4C	during LoadForm
-	TESTopic*				parentTopic; // Modded
 };
+static_assert(sizeof(TESTopicInfo) == 0x50);
 
-ASSERT_SIZE(TESTopicInfo, 0x50 + 4);
-
-typedef NiTArray<TESTopicInfo*> TopicInfoArray;
-typedef void* INFO_LINK_ELEMENT;
+// modded class from JIP LN
+class TESTopicInfoEx : public TESTopicInfo {
+	TESTopic* parentTopic;
+};

@@ -1,5 +1,4 @@
 #pragma once
-
 #include "TESBoundObject.hpp"
 #include "TESModelTextureSwap.hpp"
 #include "TESIcon.hpp"
@@ -8,16 +7,16 @@
 #include "TESValueForm.hpp"
 #include "TESWeightForm.hpp"
 #include "TESHealthForm.hpp"
-#include "BGSPickupPutdownSounds.hpp"
-#include "BGSBipedModelList.hpp"
-#include "BGSMessageIcon.hpp"
-#include "BGSPreloadable.hpp"
-#include "BGSEquipType.hpp"
-#include "BGSRepairItemList.hpp"
-#include "BGSDestructibleObjectForm.hpp"
-#include "BGSClipRoundsForm.hpp"
-#include "BGSAmmoForm.hpp"
 #include "TESAttackDamageForm.hpp"
+#include "BGSAmmoForm.hpp"
+#include "BGSClipRoundsForm.hpp"
+#include "BGSDestructibleObjectForm.hpp"
+#include "BGSRepairItemList.hpp"
+#include "BGSEquipType.hpp"
+#include "BGSPreloadable.hpp"
+#include "BGSMessageIcon.hpp"
+#include "BGSBipedModelList.hpp"
+#include "BGSPickupPutdownSounds.hpp"
 
 class BGSProjectile;
 class SpellItem;
@@ -25,15 +24,33 @@ class BGSImpactDataSet;
 class TESObjectSTAT;
 class TESObjectIMOD;
 
-class TESObjectWEAP : public TESBoundObject, public TESFullName, public TESModelTextureSwap, public TESIcon, public TESScriptableForm, public TESEnchantableForm,
-						public TESValueForm, public TESWeightForm, public TESHealthForm, public TESAttackDamageForm, public BGSAmmoForm, public BGSClipRoundsForm, 
-							public BGSDestructibleObjectForm, public BGSRepairItemList, public BGSEquipType, public BGSPreloadable, public BGSMessageIcon, public BGSBipedModelList, 
-								public BGSPickupPutdownSounds {
+// 0x388
+class TESObjectWEAP :
+	public TESBoundObject,				// 000
+	public TESFullName,					// 030
+	public TESModelTextureSwap,			// 03C
+	public TESIcon,						// 05C
+	public TESScriptableForm,			// 068
+	public TESEnchantableForm,			// 074
+	public TESValueForm,				// 084
+	public TESWeightForm,				// 08C
+	public TESHealthForm,				// 094
+	public TESAttackDamageForm,			// 09C
+	public BGSAmmoForm,					// 0A4
+	public BGSClipRoundsForm,			// 0AC
+	public BGSDestructibleObjectForm,	// 0B4
+	public BGSRepairItemList,			// 0BC
+	public BGSEquipType,				// 0C4
+	public BGSPreloadable,				// 0CC
+	public BGSMessageIcon,				// 0D0
+	public BGSBipedModelList,			// 0E0
+	public BGSPickupPutdownSounds		// 0E8
+{
 public:
 	TESObjectWEAP();
 	~TESObjectWEAP();
 
-	enum EWeaponType {
+	enum EnumWeaponType {
 		kWeapType_HandToHandMelee = 0,
 		kWeapType_OneHandMelee,
 		kWeapType_TwoHandMelee,
@@ -51,7 +68,7 @@ public:
 		kWeapType_Last	// During animation analysis, player weapon can be classified as 0x0C = last
 	};
 
-	enum EWeaponSounds {
+	enum EnumWeaponSounds {
 		kWeapSound_Shoot3D = 0,
 		kWeapSound_Shoot2D,
 		kWeapSound_Shoot3DLooping,
@@ -63,7 +80,7 @@ public:
 		kWeapSound_Unequip
 	};
 
-	enum EHandGrip {
+	enum EnumHandGrip {
 		eHandGrip_Default = 0xFF,
 		eHandGrip_1 = 0xE6,
 		eHandGrip_2 = 0xE7,
@@ -74,7 +91,7 @@ public:
 		eHandGrip_Count = 7,
 	};
 
-	enum EAttackAnimations {
+	enum EnumAttackAnimations {
 		eAttackAnim_Default = 255,
 		eAttackAnim_Attack3 = 38,
 		eAttackAnim_Attack4 = 44,
@@ -127,35 +144,38 @@ public:
 		eReload_Z,
 		eReload_Count,
 	};
-	STATIC_ASSERT(eReload_Count == 23);
+	static_assert(eReload_Count == 23);
 
-	enum EWeaponFlags1 {
-		eFlag_IgnoresNormalWeapResist = 0x1,
-		eFlag_IsAutomatic = 0x2,
-		eFlag_HasScope = 0x4,
-		eFlag_CantDrop = 0x8,
-		eFlag_HideBackpack = 0x10,
-		eFlag_EmbeddedWeapon = 0x20,
-		eFlag_No1stPersonISAnims = 0x40,
-		Eflag_NonPlayable = 0x80
+	enum WeaponFlags1 : UInt8 
+	{
+		kIgnoresNormalWeapResist	= 1 << 0,
+		kIsAutomatic				= 1 << 1,
+		kHasScope					= 1 << 2,
+		kCantDrop					= 1 << 3,
+		kHideBackpack				= 1 << 4,
+		kEmbeddedWeapon				= 1 << 5,
+		kNo1stPersonISAnims			= 1 << 6,
+		kNonPlayable				= 1 << 7
 	};
 
-	enum EWeaponFlags2 {
-		eFlag_PlayerOnly = 0x1,
-		eFlag_NPCsUseAmmo = 0x2,
-		eFlag_NoJamAfterReload = 0x4,
-		eFlag_ActionPointOverride = 0x8,
-		eFlag_MinorCrime = 0x10,
-		eFlag_FixedRange = 0x20,
-		eFlag_NotUsedNormalCombat = 0x40,
-		eFlag_DamageToWeaponOverride = 0x80,
-		eFlag_No3rdPersonISAnims = 0x100,
-		eFlag_BurstShot = 0x200,
-		eFlag_RumbleAlternate = 0x400,
-		eFlag_LongBurst = 0x800,
+	enum WeaponFlags2 : UInt32 {
+		kPlayerOnly					= 1 << 0,
+		kNPCsUseAmmo				= 1 << 1,
+		kNoJamAfterReload			= 1 << 2,
+		kActionPointOverride		= 1 << 3,
+		kMinorCrime					= 1 << 4,
+		kFixedRange					= 1 << 5,
+		kNotUsedNormalCombat		= 1 << 6,
+		kDamageToWeaponOverride		= 1 << 7,
+		kNo3rdPersonISAnims			= 1 << 8,
+		kBurstShot					= 1 << 9,
+		kRumbleAlternate			= 1 << 10,
+		kLongBurst					= 1 << 11,
+		kNightVision				= 1 << 12,
+		kScopeFromMod				= 1 << 13
 	};
 
-	enum EEmbedWeapAV {
+	enum EnumEmbedWeapAV {
 		eEmbedAV_Perception = 0,
 		eEmbedAV_Endurance,
 		eEmbedAV_LeftAttack,
@@ -165,25 +185,32 @@ public:
 		eEmbedAV_Brain,
 	};
 
-	enum EOnHit {
+	enum EnumOnHit {
 		eOnHit_Normal = 0,
 		eOnHit_DismemberOnly,
 		eOnHit_ExplodeOnly,
 		eOnHit_NoDismemberOrExplode,
 	};
 
-	enum ERumblePattern {
+	enum EnumRumblePattern {
 		eRumblePattern_Constant = 0,
 		eRumblePattern_Square,
 		eRumblePattern_Triangle,
 		eRumblePattern_Sawtooth
 	};
 
-	enum ECritDamageFlags {
+	enum EnumCritDamageFlags {
 		eCritDamage_OnDeath = 0x1
 	};
 
-	enum
+	enum WeaponReloadModes
+	{
+		kReload_Normal = 0x0,
+		kReload_WeaponMod = 0x1,
+		kReload_Looping = 0x2,
+	};
+
+	enum WeaponModEffects
 	{
 		kWeaponModEffect_None = 0,
 		kWeaponModEffect_IncreaseDamage,
@@ -206,7 +233,7 @@ public:
 	UInt8				pad[3];
 	float				animMult;			// 0F8
 	float				reach;				// 0FC
-	Bitfield8			weaponFlags1;		// 100
+	WeaponFlags1		weaponFlags1;		// 100
 	UInt8				handGrip;			// 101
 	UInt8				ammoUse;			// 102
 	UInt8				reloadAnim;			// 103
@@ -223,7 +250,7 @@ public:
 	float				minRange;			// 120
 	float				maxRange;			// 124
 	UInt32				onHit;				// 128
-	Bitfield32			weaponFlags2;		// 12C
+	WeaponFlags2		weaponFlags2;		// 12C
 	float				animAttackMult;		// 130
 	float				fireRate;			// 134
 	float				AP;					// 138
@@ -266,7 +293,18 @@ public:
 	TESModel			targetNIF;			// 1E8 - target NIF
 	TESModel			model200;			// 200 - could be a texture swap
 	UInt32				unk218;				// 218
-	TESSound*			sounds[12];		// 21C
+	TESSound*			shoot3DSound;
+	TESSound*			shootDistSound;
+	TESSound*			shoot2DSound;
+	TESSound*			soundShoot3DLooping;
+	TESSound*			noAmmoSound;
+	TESSound*			blockSound;
+	TESSound*			idleSound;
+	TESSound*			equipSound;
+	TESSound*			unequipSound;
+	TESSound*			modShoot3DSound;
+	TESSound*			modShootDistSound;
+	TESSound*			modShoot2DSound;
 	BGSImpactDataSet*	impactDataSet;	// 24C
 	TESObjectSTAT*		worldStatic;		// 250
 	TESObjectSTAT*		mod1Static;		// 254
@@ -299,25 +337,39 @@ public:
 	UInt8				unk384;				// 384
 	UInt8				unk385[3];			// 385
 
-	bool IsAutomatic() const { return weaponFlags1.GetBit(eFlag_IsAutomatic); }
-	void SetIsAutomatic(bool bAuto) { weaponFlags1.SetBit(eFlag_IsAutomatic, bAuto); }
-	bool HasScope() const { return weaponFlags1.GetBit(eFlag_HasScope); }
-	bool IsNonPlayable() { return weaponFlags1.GetBit(0x80); }
-	bool IsPlayable() { return !IsNonPlayable(); }
-	UInt8 HandGrip() const;
-	void SetHandGrip(UInt8 handGrip);
-	UInt8 AttackAnimation() const;
-	void SetAttackAnimation(UInt8 attackAnim);
-	TESObjectIMOD* GetItemMod(UInt8 which);
-	UInt32 GetItemModEffect(UInt8 which) { which -= 1; ASSERT(which < 3); return effectMods[which]; }
-	float GetItemModValue1(UInt8 which) { which -= 1; ASSERT(which < 3); return value1Mod[which]; }
-	float GetItemModValue2(UInt8 which) { which -= 1; ASSERT(which < 3); return value2Mod[which]; }
+	bool					IsAutomatic() const { return weaponFlags1 & kIsAutomatic; }
+	void					SetIsAutomatic(bool abAuto) { weaponFlags1 = (WeaponFlags1)(abAuto ? weaponFlags1 | kIsAutomatic : weaponFlags1 & ~kIsAutomatic); }
+	bool					HasScope() const { return weaponFlags1 & kHasScope; }
+	bool					IsPlayable() { return !IsNonPlayable(); }
+	bool					IsNonPlayable() { return weaponFlags1 & kNonPlayable; }
+	void					SetNonPlayable(bool abAuto) { weaponFlags1 = (WeaponFlags1)(abAuto ? weaponFlags1 | kNonPlayable : weaponFlags1 & ~kNonPlayable); }
+	UInt8					HandGrip() const;
+	void					SetHandGrip(UInt8 handGrip);
+	UInt8					AttackAnimation() const;
+	void					SetAttackAnimation(UInt8 attackAnim);
+	TESObjectIMOD*			GetItemMod(UInt8 which);
+	__forceinline UInt32	GetItemModEffect(UInt8 which)	{ which -= 1; assert(which < 3); return effectMods[which]; }
+	__forceinline Float32	GetItemModValue1(UInt8 which)	{ which -= 1; assert(which < 3); return value1Mod[which]; }
+	__forceinline Float32	GetItemModValue2(UInt8 which)	{ which -= 1; assert(which < 3); return value2Mod[which]; }
+	Float32					GetEffectModValue(WeaponModEffects value, UInt8 second = 0);
+	void					EjectShellCasing(TESObjectREFR* apReference);
 
-	void EjectShellCasing(TESObjectREFR* apReference);
+	bool					HasNightVision() const { return weaponFlags2 & kNightVision; }
+	bool					IsMeleeWeapon();
+	bool					IsRangedWeapon();
+	void					SetAttackAnimation(UInt32 attackAnim);
+	TESAmmo*				GetAmmo();
+	__forceinline int		GetClipRounds(bool hasExtendedClipMod) { return ThisCall<int>(0x4FE160, this, hasExtendedClipMod); };
+	bool					CanEquipAmmo(TESAmmo* ammo);
+	bool					IsThrownWeapon() { return eWeaponType >= kWeapType_OneHandGrenade; };
+	BGSListForm*			GetAmmoList();
+	__forceinline bool		IgnoresDTDR() const { return weaponFlags1 & kIgnoresNormalWeapResist; }
+
+	float					GetWeaponValue(UInt32 whichVal);
+	__forceinline bool		HasScopeAlt() const { return weaponFlags1 & (kHasScope) && !(weaponFlags2 & kScopeFromMod); }
+	__forceinline TESAmmo*	GetEquippedAmmo(Actor* actor) { return ThisCall<TESAmmo*>(0x525980, this, actor); }
+
+	bool IsMeleeWeapon() const;
+	float GetModBonuses(UInt32 effectID);
 };
-
-ASSERT_OFFSET(TESObjectWEAP, handGrip, 0x101);
-ASSERT_OFFSET(TESObjectWEAP, projectile, 0x118);
-ASSERT_OFFSET(TESObjectWEAP, animShotsPerSec, 0x14C);
-ASSERT_OFFSET(TESObjectWEAP, impactDataSet, 0x24C);
-ASSERT_SIZE(TESObjectWEAP, 0x388);
+static_assert(sizeof(TESObjectWEAP) == 0x388);

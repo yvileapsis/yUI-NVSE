@@ -1,26 +1,24 @@
 #pragma once
-
 #include "MagicItemForm.hpp"
 
+// 0x44
 class EnchantmentItem : public MagicItemForm {
 public:
 	EnchantmentItem();
 	~EnchantmentItem();
 
-	virtual void	ByteSwap(void);
+	virtual void	ByteSwap();
 
-	enum
+	enum EnumType : UInt32
 	{
 		kType_Weapon = 2,
 		kType_Apparel,
 	};
 
-	UInt32		type;		// 34
-	UInt32		unk38;		// 38
-	UInt32		unk3C;		// 3C
-	UInt8		enchFlags;	// 40
-	UInt8		pad41[3];	// 41
+	EType		eType;				// 34
+	UInt32		uiCost;				// 38
+	UInt32		uiLevel;			// 3C
+	UInt8		ucEnchantmentFlags;	// 40
+	UInt8		pad41[3];			// 41
 };
-
-ASSERT_OFFSET(EnchantmentItem, type, 0x34);
-ASSERT_SIZE(EnchantmentItem, 0x44);
+static_assert(sizeof(EnchantmentItem) == 0x44);

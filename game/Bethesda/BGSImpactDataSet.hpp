@@ -1,16 +1,16 @@
 #pragma once
-
 #include "TESForm.hpp"
 #include "BGSPreloadable.hpp"
 
-class BGSImpactData;
-
-class BGSImpactDataSet : public TESForm, public BGSPreloadable {
+// 0x4C
+class BGSImpactDataSet :
+	public TESForm,
+	public BGSPreloadable
+{
 public:
 	BGSImpactDataSet();
 	virtual ~BGSImpactDataSet();
 
 	BGSImpactData* impactDatas[12];
 };
-
-ASSERT_SIZE(BGSImpactDataSet, 0x4C);
+static_assert(sizeof(BGSImpactDataSet) == 0x4C);

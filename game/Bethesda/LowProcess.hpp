@@ -1,25 +1,25 @@
 #pragma once
-
 #include "BaseProcess.hpp"
+#include "NiPoint2.hpp"
 #include "BSSimpleList.hpp"
 
-class BGSListForm;
-class TESBoundObject;
-
-class LowProcess : public BaseProcess {
+class LowProcess : public BaseProcess
+{
 public:
-	LowProcess();
-	~LowProcess();
 
-	struct ActorValueModifier {
-		UInt8	ucActorValue;	// 00 Might allow for other values
-		float	fDamage;		// 04
+	struct ActorValueModifier
+	{
+		UInt8			ucActorValue;	// 00 Might allow for other values
+		UInt8			pad[3];			// 01
+		Float32			fDamage;		// 04
 	};
 
-	struct ActorValueList : public BSSimpleList<ActorValueModifier*> {
-		UInt8								unk008;
-		void***								modifiedAV;
-	};
+	struct ActorValueList : public BSSimpleList<ActorValueModifier*>
+	{
+		UInt8			unk008;			// 08
+		UInt8			pad009[3];		// 09
+		void***			modifiedAV;		// 0C	array of damaged actorValue
+	};	// 10
 
 	struct ObjectToAcquire {
 		TESObjectREFR*	pRef;
@@ -33,6 +33,8 @@ public:
 	};
 
 
+	LowProcess();
+	~LowProcess() override;
 	virtual void	ProcessEscort();
 	virtual void	ProcessSleep();
 	virtual void	ProcessEat();
@@ -60,7 +62,8 @@ public:
 	virtual void	GetLocationForPackage();
 	virtual void	Unk_206();
 
-	UInt8					ucFlags_30;
+	UInt8					ucFlags_30;		// 8 = IsAlerted
+	UInt8					pad31[3];
 	TESBoundObject*			pUsedItem;
 	NiPoint2				kTimer;
 	Actor*					pTarget;
@@ -81,10 +84,9 @@ public:
 	UInt32					ePackageObjectType;
 	TESFaction*				pFaction90;
 	ActorValueList			kActorValues;
-	float					fEssentialDownTimer;
-	float					fGameDayDied;
-	float					fPlayerDamageDealt;
+	Float32					fEssentialDownTimer;
+	Float32					fGameDayDied;
+	Float32					fPlayerDamageDealt;
 	bool					bSkippedTimeStampForPathing;
 };
-
-ASSERT_SIZE(LowProcess, 0xB4);
+static_assert(sizeof(LowProcess) == 0xB4);

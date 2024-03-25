@@ -1,25 +1,25 @@
 #pragma once
-
 #include "TESRegionData.hpp"
 
 class TESSound;
 
+// 0xC
 struct SoundType {
-	TESSound* sound;
-	UInt32			flags;
-	UInt32			chance;
+	TESSound*		pkSound;
+	UInt32			uiFlags;
+	UInt32			uiChance;
 };
-typedef BSSimpleList<SoundType*> SoundTypeList;
+static_assert(sizeof(SoundType) == 0xC);
 
+// 0x20
 class TESRegionDataSound : public TESRegionData {
 public:
 	TESRegionDataSound();
 	~TESRegionDataSound();
 
-	UInt32		unk08;				// 08
-	SoundTypeList	soundTypes;			// 0C
-	UInt32		incidentalMediaSet;		// 14
-	BSSimpleList<UInt32>	mediaSetEntries;		// 18
+	UInt32						unk08;					// 08
+	BSSimpleList<SoundType*>	kSoundTypeList;			// 0C
+	UInt32						uiIncidentalMediaSet;	// 14
+	BSSimpleList<UInt32>		kMediaSetEntryList;		// 18
 };
-
-ASSERT_SIZE(TESRegionDataSound, 0x20)
+static_assert(sizeof(TESRegionDataSound) == 0x20);

@@ -1,9 +1,12 @@
 #pragma once
-
 #include "TESBoundObject.hpp"
 #include "TESModel.hpp"
 
-class TESGrass : public TESBoundObject, public TESModel {
+// 0x68
+class TESGrass :
+	public TESBoundObject,
+	public TESModel
+{
 public:
 	TESGrass();
 	~TESGrass();
@@ -48,19 +51,18 @@ public:
 	virtual void				SetFitToSlope(bool abFitToSlope);
 
 	struct GRASS_DATA {
-		SInt8				cDensity;
-		SInt8				cMinSlopeDegrees;
-		SInt8				cMaxSlopeDegrees;
-		SInt16				sDistanceFromWaterLevel;
-		GRASS_WATER_STATE	eUnderwater;
-		float				fPositionRange;
-		float				fHeightRange;
-		float				fColorRange;
-		float				fWavePeriod;
-		Bitfield8			ucFlags;
+		SInt8						cDensity;
+		SInt8						cMinSlopeDegrees;
+		SInt8						cMaxSlopeDegrees;
+		SInt16						sDistanceFromWaterLevel;
+		TESGrass::GRASS_WATER_STATE eUnderwater;
+		Float32						fPositionRange;
+		Float32						fHeightRange;
+		Float32						fColorRange;
+		Float32						fWavePeriod;
+		SInt8						cFlags;
 	};
 
-	GRASS_DATA	Data;
+	GRASS_DATA	kData;
 };
-
-ASSERT_SIZE(TESGrass, 0x68);
+static_assert(sizeof(TESGrass) == 0x68);

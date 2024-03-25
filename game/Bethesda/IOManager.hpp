@@ -32,6 +32,9 @@ public:
 	bool RemoveTask(IOTask* apTask);
 	void CancelTask(IOTask* apTask, void* apTaskOwner = nullptr);
 	static bool __fastcall UpdateQueue(IOManager* apThis);
-};
 
+	bool IsInQueue(TESObjectREFR *refr);
+	void QueueForDeletion(TESObjectREFR* refr);
+	void DumpQueuedTasks();
+};
 ASSERT_SIZE(IOManager, 0xA0);

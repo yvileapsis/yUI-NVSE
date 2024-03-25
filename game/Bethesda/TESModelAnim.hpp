@@ -1,9 +1,11 @@
 #pragma once
-
 #include "TESModel.hpp"
 
-class TESModelAnim : public TESModel {
+// 0x18
+class TESModelAnim : public TESModel
+{
 public:
 	TESModelAnim();		// Identical to TESModel with a different vTable
 	~TESModelAnim();
-};	// 018
+};
+static_assert(sizeof(TESModelAnim) == 0x18);

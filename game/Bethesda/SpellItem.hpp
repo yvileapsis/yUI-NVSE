@@ -1,15 +1,16 @@
 #pragma once
-
 #include "MagicItemForm.hpp"
 
-class SpellItem : public MagicItemForm {
+// 0x44
+class SpellItem : public MagicItemForm
+{
 public:
 	SpellItem();
 	~SpellItem();
 
-	virtual void	ByteSwap(void);
+	virtual void	ByteSwap();
 
-	enum
+	enum EnumType : UInt32
 	{
 		kType_ActorEffect = 0,
 		kType_Disease,
@@ -20,11 +21,10 @@ public:
 		kType_Addiction = 10,
 	};
 
-	UInt32		type;		// 34
-	UInt32	unk38;		// 38	Cost Unused
-	UInt32	unk3C;		// 3C	Level Unused
-	UInt8		spellFlags;	// 40
-	UInt8	pad41[3];	// 41
+	EnumType	eType;			// 34
+	UInt32		uiCost;			// 38	Cost Unused
+	UInt32		uiLevel;		// 3C	Level Unused
+	UInt8		ucSpellFlags;	// 40
+	UInt8		pad41[3];		// 41
 };
-
-ASSERT_SIZE(SpellItem, 0x44);
+static_assert(sizeof(SpellItem) == 0x44);

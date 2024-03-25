@@ -1,5 +1,4 @@
 #pragma once
-
 #include "NiFloatInterpolator.hpp"
 #include "NiColorInterpolator.hpp"
 #include "TESForm.hpp"
@@ -62,5 +61,4 @@ public:
 	NiColorKeyPair*			pColorKeys[2];
 	NiFloatKeyPair*			pFloatKeys70C[9];
 };
-
-ASSERT_SIZE(TESImageSpaceModifier, 0x730);
+static_assert(sizeof(TESImageSpaceModifier) == 0x730);

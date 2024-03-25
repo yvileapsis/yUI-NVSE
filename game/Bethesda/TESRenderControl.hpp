@@ -1,5 +1,4 @@
 #pragma once
-
 #include "NiNode.hpp"
 #include "NiColor.hpp"
 
@@ -49,5 +48,4 @@ public:
 	BYTE					byte65;
 	BSShaderAccumulatorPtr	spAccumulator;
 };
-
-ASSERT_SIZE(TESRenderControl, 0x6C);
+static_assert(sizeof(TESRenderControl) == 0x6C);

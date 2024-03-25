@@ -1,73 +1,75 @@
 #pragma once
-
 #include "TESForm.hpp"
 #include "TESFullName.hpp"
+#include "TESTexture.hpp"
 #include "TESReactionForm.hpp"
-#include "TESReputation.hpp"
 
-class TESFaction : public TESForm, public TESFullName, public TESReactionForm {
+// 0x4C
+class TESFaction :
+	public TESForm,			// 00
+	public TESFullName,		// 18
+	public TESReactionForm	// 24
+{
 public:
 	TESFaction();
 	~TESFaction();
-	enum
+
+	enum EnumFactionFlags : UInt32
 	{
-		// TESForm flags
+		kFlag_HiddenFromPC	= 0x00000001,
+		kFlag_Evil			= 0x00000002,
+		kFlag_SpecialCombat	= 0x00000004,
 
-		// TESReactionForm flags
-
-		kModified_FactionFlags = 0x00000004
-		// CHANGE_FACTION_FLAGS
-		// UInt8	flags;
-	};
-
-	enum
-	{
-		kFlag_HiddenFromPC = 0x00000001,
-		kFlag_Evil = 0x00000002,
-		kFlag_SpecialCombat = 0x00000004,
-
-		kFlag_TrackCrime = 0x00000100,
-		kFlag_AllowSell = 0x00000200,
+		kFlag_TrackCrime	= 0x00000100,
+		kFlag_AllowSell		= 0x00000200,
 	};
 
 	// 1C
-	struct Rank {
-		BSStringT		name;		// 00
-		BSStringT		femaleName;	// 08
-		TESTexture	insignia;	// 10 - effectively unused, can be set but there is no faction UI
+	struct Rank
+	{
+		BSStringT<char>		kName;			// 00
+		BSStringT<char>		kFemaleName;	// 08
+		TESTexture			kInsignia;		// 10 - effectively unused, can be set but there is no faction UI
 	};
 
-	Bitfield32			factionFlags;	// 34
-	TESReputation*		reputation;		// 38
-	BSSimpleList<Rank*>	ranks;			// 3C
-	UInt32				crimeCount44;	// 44
-	UInt32				crimeCount48;	// 48
+	EnumFactionFlags		eFlags;			// 34
+	TESReputation*			pkReputation;	// 38
+	BSSimpleList<Rank*>		kRanks;			// 3C
+	UInt32					crimeCount44;	// 44
+	UInt32					crimeCount48;	// 48
 
-
+	bool IsFlagSet(UInt32 flag) {
+		return (eFlags & flag) != 0;
+	}
 	void SetFlag(UInt32 flag, bool bMod) {
-		factionFlags.SetBit(flag, bMod);
+		eFlags = (EnumFactionFlags) (bMod ? (eFlags | flag) : (eFlags & ~flag));
 		AddChange(kModified_FactionFlags);
 	}
-	bool IsHidden() const {
-		return factionFlags.GetBit(kFlag_HiddenFromPC);
+	bool IsHidden()
+	{
+		return IsFlagSet(kFlag_HiddenFromPC);
 	}
-	bool IsEvil() const {
-		return factionFlags.GetBit(kFlag_Evil);
+	bool IsEvil()
+	{
+		return IsFlagSet(kFlag_Evil);
 	}
-	bool HasSpecialCombat() const {
-		return factionFlags.GetBit(kFlag_SpecialCombat);
+	bool HasSpecialCombat()
+	{
+		return IsFlagSet(kFlag_SpecialCombat);
 	}
-	void SetHidden(bool bHidden) {
+	void SetHidden(bool bHidden)
+	{
 		SetFlag(kFlag_HiddenFromPC, bHidden);
 	}
-	void SetEvil(bool bEvil) {
+	void SetEvil(bool bEvil)
+	{
 		SetFlag(kFlag_Evil, bEvil);
 	}
-	void SetSpecialCombat(bool bSpec) {
+	void SetSpecialCombat(bool bSpec)
+	{
 		SetFlag(kFlag_SpecialCombat, bSpec);
 	}
 	const char* GetNthRankName(UInt32 whichRank, bool bFemale = false);
 	void SetNthRankName(const char* newName, UInt32 whichRank, bool bFemale);
 };
-
-ASSERT_SIZE(TESFaction, 0x4C);
+static_assert(sizeof(TESFaction) == 0x4C);

@@ -1,6 +1,6 @@
 #pragma once
-
 #include "NiRefObject.hpp"
+#include "NiPoint3.hpp"
 #include <span>
 
 class TESAnimGroup : public NiRefObject {
@@ -8,7 +8,7 @@ public:
 	TESAnimGroup();
 	virtual ~TESAnimGroup();
 
-	enum {
+	enum EnumAnimGroupID : UInt8 {
 		kAnimGroup_Idle = 0x0,
 		kAnimGroup_DynamicIdle,
 		kAnimGroup_SpecialIdle,
@@ -263,27 +263,61 @@ public:
 		const char* name;				// 00
 		UInt8		sequenceType;		// 04
 		UInt8		pad[3];
-		UInt32		unk08[7];			// 08
+		UInt32		sequenceType;
+		UInt32		keyType;
+		UInt32		unk10;
+		UInt32		unk14[4];
 	};
 
-	UInt8 byte08[8];
-	UInt16 groupID;
-	UInt8 unk12[1];
-	UInt32 numKeys;
-	float* keyTimes;
-	float moveVector[3];
-	UInt8 leftOrRight_whichFootToSwitch;
-	UInt8 blend;
-	UInt8 blendIn;
-	UInt8 blendOut;
-	UInt8 decal;
-	UInt8 gap2D[3];
-	char* parentRootNode;
-	UInt32 unk34;
-	UInt32 unk38;
+	struct __declspec(align(4)) AnimGroupSound
+	{
+		float		unk00;
+		UInt8		soundID;
+		UInt8		gap05[3];
+		UInt32		unk08;
+		TESSound*	sound;
+	};
+
+
+	UInt8			byte08[8];
+	UInt16			groupID;
+	UInt8			unk12[1];
+	UInt32			numKeys;
+	float*			keyTimes;
+	NiPoint3		moveVector;
+	UInt8			leftOrRight_whichFootToSwitch;
+	UInt8			blend;
+	UInt8			blendIn;
+	UInt8			blendOut;
+	UInt8			decal;
+	UInt8			gap2D[3];
+	char*			parentRootNode;
+	UInt32			unk34;
+	AnimGroupSound*	ptr38;
 
 	static const char* StringForAnimGroupCode(UInt32 groupCode);
 	static UInt32 AnimGroupForString(const char* groupName);
-};
 
+	bool IsAttack()
+	{
+		return ThisStdCall(0x4937E0, this);
+	}
+
+	bool IsAttackIS();
+	bool IsAttackNonIS();
+
+
+	bool IsAim()
+	{
+		auto idMinor = groupID & 0xFF;
+		return idMinor >= kAnimGroup_Aim && idMinor <= kAnimGroup_AimISDown;
+	}
+
+	bool IsReload()
+	{
+		auto idMinor = groupID & 0xFF;
+		return idMinor >= kAnimGroup_ReloadWStart && idMinor <= kAnimGroup_ReloadZ;
+	}
+};
+static_assert(sizeof(TESAnimGroup) == 0x3C);
 extern std::span<TESAnimGroup::AnimGroupInfo> g_animGroups;

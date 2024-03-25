@@ -1,6 +1,6 @@
 #pragma once
-
 #include "BSExtraData.hpp"
+#include "NiPoint3.hpp"
 
 class TESObjectREFR;
 
@@ -11,18 +11,15 @@ public:
 
 	struct Data
 	{
-		TESObjectREFR* linkedDoor;	// 00
-		float			x;			// 04 x, y, z, zRot refer to teleport marker's position and rotation
-		float			y;
-		float			z;
-		float			xRot;		// 10 angles in radians. x generally 0
-		float			yRot;		// 14 y generally -0.0, no reason to modify
-		float			zRot;		// 18
+		TESObjectREFR*	pkLinkedDoor;	// 00
+		NiPoint3		kPosition;
+		NiPoint3		kRotation;
 		UInt8			unk01C;		// 1C
 		UInt8			pad01D[3];	// 1D
 	};
 
-	Data* data;
+	Data* pkData;
 
 	static ExtraTeleport* Create();
 };
+static_assert(sizeof(ExtraTeleport) == 0x10);

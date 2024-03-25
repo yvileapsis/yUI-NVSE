@@ -24,7 +24,7 @@ public:
 
 	bool SaveTexture(const char* path, const D3DXIMAGE_FILEFORMAT aeFormat) const;
 
-	static BSRenderedTexture* Create(BSStringT* apName, const UInt32 uiWidth, const UInt32 uiHeight,
+	static BSRenderedTexture* Create(BSStringT<char>* apName, const UInt32 uiWidth, const UInt32 uiHeight,
 		NiTexture::FormatPrefs* kPrefs, Ni2DBuffer::MultiSamplePreference eMSAAPref,
 		bool bUseDepthStencil, NiDepthStencilBuffer* pkDSBuffer, UInt32 a7, UInt32 uiBackgroundColor);
 

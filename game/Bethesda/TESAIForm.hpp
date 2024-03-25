@@ -1,42 +1,43 @@
 #pragma once
-
-#include "TESForm.hpp"
+#include "BaseFormComponent.hpp"
+#include "BSSimpleList.hpp"
 
 class TESPackage;
 
-class TESAIForm : public BaseFormComponent {
+// 0x20
+class TESAIForm : public BaseFormComponent
+{
 public:
 	TESAIForm();
 	~TESAIForm();
-
-	typedef BSSimpleList<TESPackage*> PackageList;
 
 	virtual UInt32	GetSaveSize(UInt32 changedFlags);
 	virtual void	Save(UInt32 changedFlags);
 	virtual void	Load(UInt32 changedFlags);
 
-	UInt8	agression;				// 04
-	UInt8	confidence;				// 05
-	UInt8	energyLevel;			// 06
-	UInt8	responsibility;			// 07
-	UInt8	mood;					// 08
-	UInt8	pad09[3];				// 09
+	UInt8	ucAgression;				// 04
+	UInt8	ucConfidence;				// 05
+	UInt8	ucEnergyLevel;				// 06
+	UInt8	ucResponsibility;			// 07
+	UInt8	ucMood;						// 08
+	UInt8	pad09[3];					// 09
 
-	UInt32	buySellsAndServices;	// 0C
-	UInt8	teaches;				// 10
-	UInt8	maximumTrainingLevel;	// 11
-	UInt8	assistance;				// 12
-	UInt8	aggroRadiusBehavior;	// 13
-	SInt32	aggroRadius;			// 14
+	UInt32	uiBuySellsAndServices;		// 0C
+	UInt8	ucTeaches;					// 10
+	UInt8	ucMaximumTrainingLevel;		// 11
+	UInt8	ucAssistance;				// 12
+	UInt8	ucAggroRadiusBehavior;		// 13
+	SInt32	iAggroRadius;				// 14
 
-	PackageList	packageList;	// 18
+	BSSimpleList<TESPackage*>	packageList;	// 18
 
-	UInt32 GetPackageCount() const {
+	UInt32	GetPackageCount() const {
 		return packageList.ItemsInList();
 	}
 
 	// return the nth package
-	TESPackage* GetNthPackage(SInt32 anIndex) const {
+	TESPackage* GetNthPackage(SInt32 anIndex) const
+	{
 		auto entry = packageList.GetAt(anIndex);
 		return entry ? entry->GetItem() : nullptr;
 	}
@@ -66,5 +67,4 @@ public:
 	//	return cCount - GetPackageCount();
 	//}
 };
-
-ASSERT_SIZE(TESAIForm, 0x20);
+static_assert(sizeof(TESAIForm) == 0x20);
