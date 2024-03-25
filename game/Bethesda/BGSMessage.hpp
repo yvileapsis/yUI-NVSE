@@ -1,28 +1,32 @@
 #pragma once
-
 #include "TESForm.hpp"
 #include "TESCondition.hpp"
 #include "TESDescription.hpp"
 
 class BGSMenuIcon;
 
-class BGSMessage : public TESForm {
+// 0x40
+class BGSMessage :
+	public TESForm,			// 00
+	public TESFullName,		// 18
+	public TESDescription	// 24
+{
 public:
 	BGSMessage();
 	~BGSMessage();
 
-	struct Button {
-		BSStringT	buttonText;	// 000
-		TESCondition condition;	// 008
+	enum EnumFlags
+	{
 	};
 
-	TESFullName		fullName;			// 018
-	TESDescription	description;		// 024
+	struct Button {
+		BSStringT			kButtonText;	// 000
+		TESCondition		kCondition;		// 008
+	};
 
-	BGSMenuIcon* menuIcon;		// 2C
-	BSSimpleList<Button*>	buttons;		// 030
-	UInt32			messageFlags;	// 038 init'd to 1
-	float			displayTime;	// 03C init'd to 2
+	BGSMenuIcon*			menuIcon;		// 2C
+	BSSimpleList<Button*>	kButtons;		// 030
+	EnumFlags				eFlags;			// 038 init'd to 1
+	Float32					fDisplayTime;	// 03C init'd to 2
 };
-
-ASSERT_SIZE(BGSMessage, 0x040);
+static_assert(sizeof(BGSMessage) == 0x40);

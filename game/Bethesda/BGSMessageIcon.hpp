@@ -1,11 +1,13 @@
 #pragma once
-
 #include "TESIcon.hpp"
 
-class BGSMessageIcon : public BaseFormComponent {
+// 0x10
+class BGSMessageIcon :
+	public BaseFormComponent,
+	public TESIcon
+{
 public:
 	BGSMessageIcon();
 	~BGSMessageIcon();
-
-	TESIcon	Icon;
 };
+static_assert(sizeof(BGSMessageIcon) == 0x10);

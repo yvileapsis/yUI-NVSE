@@ -1,5 +1,4 @@
 #pragma once
-
 #include "NiColor.hpp"
 #include "NiPoint3.hpp"
 #include "NiSmartPointer.hpp"
@@ -8,6 +7,7 @@
 
 class BSMultiBoundShape;
 
+// 0x34
 class BGSPrimitive {
 public:
 	virtual ~BGSPrimitive();
@@ -23,14 +23,12 @@ public:
 		PLANE = 0x3,
 	};
 
-
-	PrimitiveType eType;
-	NiColorA Color;
-	NiPoint3 Radii;
+	PrimitiveType	eType;
+	NiColorA		kColor;
+	NiPoint3		kRadii;
 	NiPointer<NiGeometry> spGeometry;
 	NiPointer<NiGeometry> spFrame;
 	NiPointer<BSFadeNode> spNode;
 	UInt32 unk30;
 };
-
-ASSERT_SIZE(BGSPrimitive, 0x34);
+static_assert(sizeof(BGSPrimitive) == 0x34);
