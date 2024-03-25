@@ -11,7 +11,7 @@ class BSPortal;
 class BSCompoundFrustum : public BSMemObject {
 public:
 	BSCompoundFrustum();
-	~BSCompoundFrustum();
+	~BSCompoundFrustum() { ThisStdCall(0xC47770, this); };
 
 	class FunctionOp {
 	public:

@@ -9,7 +9,7 @@ public:
 	~BSPointer() {}
 
 	T_Data* pObject;
-	SInt32	iBits;
+	SInt32 iBits;
 
 	bool operator==(const BSPointer& ptr) const { return pObject == ptr.pObject; }
 	bool operator!=(const BSPointer& ptr) const { return pObject != ptr.pObject; }
