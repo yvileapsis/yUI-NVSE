@@ -146,6 +146,8 @@ namespace CrashLogger
 
 		Memory::Get(info);
 
+		Device::Get(info);
+
 		Calltrace::Get(info);
 
 		Registry::Get(info);

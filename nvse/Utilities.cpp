@@ -1095,3 +1095,32 @@ const std::string& SanitizeString(std::string&& str)
 
 	return str;
 }
+
+float ConvertToKB(SIZE_T size) {
+	return (float)size / 1024.0f;
+}
+
+float ConvertToMB(SIZE_T size) {
+	return (float)size / 1024.0f / 1024.0f;
+}
+
+float ConvertToGB(SIZE_T size) {
+	return (float)size / 1024.0f / 1024.0f / 1024.0f;
+}
+
+std::string FormatSize(SIZE_T size) {
+	std::string result;
+	if (size < 1024) {
+		result = std::format("{:>6d} B", size);
+	}
+	else if (size < 1024 * 1024) {
+		result = std::format("{:>6.2f} KB", ConvertToKB(size));
+	}
+	else if (size < 1024 * 1024 * 1024) {
+		result = std::format("{:>6.2f} MB", ConvertToMB(size));
+	}
+	else {
+		result = std::format("{:>6.2f} GB", ConvertToGB(size));
+	}
+	return result;
+}

@@ -3,35 +3,6 @@
 
 namespace CrashLogger::Memory
 {
-	float ConvertToKB(SIZE_T size) {
-		return (float)size / 1024.0f;
-	}
-
-	float ConvertToMB(SIZE_T size) {
-		return (float)size / 1024.0f / 1024.0f;
-	}
-
-	float ConvertToGB(SIZE_T size) {
-		return (float)size / 1024.0f / 1024.0f / 1024.0f;
-	}
-
-	std::string FormatSize(SIZE_T size) {
-		std::string result;
-		if (size < 1024) {
-			result = std::format("{:>6d} B", size);
-		}
-		else if (size < 1024 * 1024) {
-			result = std::format("{:>6.2f} KB", ConvertToKB(size));
-		}
-		else if (size < 1024 * 1024 * 1024) {
-			result = std::format("{:>6.2f} MB", ConvertToMB(size));
-		}
-		else {
-			result = std::format("{:>6.2f} GB", ConvertToGB(size));
-		}
-		return result;
-	}
-
 	extern void Get(EXCEPTION_POINTERS* info)
 	try 
 	{	
@@ -44,10 +15,17 @@ namespace CrashLogger::Memory
 		PROCESS_MEMORY_COUNTERS_EX2 pmc = {};
 		pmc.cb = sizeof(pmc);
 
+		// Get physical memory size
+		MEMORYSTATUSEX memoryStatus;
+		memoryStatus.dwLength = sizeof(memoryStatus);
+		GlobalMemoryStatusEx(&memoryStatus);
+
 		if ( GetProcessMemoryInfo( hProcess, (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc)) )
 		{
-			Log() << std::format("Physical Usage: {:10}", FormatSize(pmc.WorkingSetSize));
-			Log() << std::format("Virtual  Usage: {:10}", FormatSize(pmc.PrivateUsage));
+			float physPercentage = ConvertToMB(pmc.WorkingSetSize) / ConvertToMB(memoryStatus.ullTotalPhys) * 100.0f;
+			float virtPercentage = ConvertToMB(pmc.PrivateUsage) / ConvertToMB(memoryStatus.ullTotalVirtual) * 100.0f;
+			Log() << std::format("Physical Usage: {:10}/{:10} ({:.2f}%)", FormatSize(pmc.WorkingSetSize), FormatSize(memoryStatus.ullTotalPhys), physPercentage);
+			Log() << std::format("Virtual  Usage: {:10}/{:10} ({:.2f}%)", FormatSize(pmc.PrivateUsage), FormatSize(memoryStatus.ullTotalVirtual), virtPercentage);
 		}
 
 		Log();

@@ -889,8 +889,8 @@ public:
 	float				lastTime;			// 20
 	float				weightedLastTime;	// 24
 	float				scaledTime;			// 28
-	NiNode* target;			// 2C
-	NiTimeController* nextCtrl;			// 30
+	NiAVObject*			target;			// 2C
+	NiTimeController*	nextCtrl;			// 30
 };
 
 class NiDefaultAVObjectPalette;

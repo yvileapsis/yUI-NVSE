@@ -760,3 +760,24 @@ public:
 	UInt8	unk0C4;					// 0C4
 	UInt32	unk0C5[3];				// 0C5
 };
+
+class bhkRefObject : public NiObject {
+public:
+	NiAVObject* phkObject;
+
+	NiAVObject* GetAVObject(NiRTTI* apRTTI = nullptr) const {
+		return ThisStdCall<NiAVObject*>(0xC85C80, this, apRTTI);
+	}
+};
+
+class NiCollisionObject : public NiObject {
+public:
+	NiAVObject* sceneObject;
+};
+
+class bhkCharacterController {
+public:
+	NiAVObject* GetNiObject() const {
+		return ThisStdCall<NiAVObject*>(0x810660, this);
+	}
+};

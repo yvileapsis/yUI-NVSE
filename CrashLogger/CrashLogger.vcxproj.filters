@@ -99,6 +99,9 @@
     <ClCompile Include="CrashLoggerMods.cpp">
       <Filter>CrashLogger</Filter>
     </ClCompile>
+    <ClCompile Include="CrashLoggerDevice.cpp">
+      <Filter>CrashLogger</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="definitions.hpp" />

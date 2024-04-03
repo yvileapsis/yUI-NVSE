@@ -26,7 +26,7 @@ namespace CrashLogger::Mods
 
 		if (std::filesystem::exists(folder_path) && std::filesystem::is_directory(folder_path)) {
 			Log() << std::endl;
-			Log() << std::format("Sctrptrunners:");
+			Log() << std::format("Scriptrunners:");
 
 			// Iterate through each entry in the directory
 			for (const auto& entry : std::filesystem::directory_iterator(folder_path)) {
@@ -36,7 +36,7 @@ namespace CrashLogger::Mods
 			}
 		}
 
-		Log() << std::endl;
+		Log();
 	}
 	catch (...) { Log() << "Failed to print out mod list." << std::endl; }
 }

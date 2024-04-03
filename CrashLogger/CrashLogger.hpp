@@ -13,6 +13,7 @@ namespace CrashLogger::Stack		{ inline void Get(EXCEPTION_POINTERS* info); }
 namespace CrashLogger::Modules		{ inline void Get(EXCEPTION_POINTERS* info); }
 namespace CrashLogger::Memory		{ inline void Get(EXCEPTION_POINTERS* info); }
 namespace CrashLogger::Mods			{ inline void Get(EXCEPTION_POINTERS* info); }
+namespace CrashLogger::Device		{ inline void Get(EXCEPTION_POINTERS* info); }
 
 namespace CrashLogger::Stack
 {
