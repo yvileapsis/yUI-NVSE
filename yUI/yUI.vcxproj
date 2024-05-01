@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{AE7CFEE7-4058-4E3C-ADC2-AE7480EE2028}</ProjectGuid>
+    <ProjectGuid>{C16B72E6-ECDB-4C96-AD01-C55094867525}</ProjectGuid>
     <RootNamespace>yUI</RootNamespace>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
@@ -114,26 +114,6 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\CommonLib\BaseFormComponent.cpp" />
-    <ClCompile Include="..\CommonLib\ConsoleManager.cpp" />
-    <ClCompile Include="..\CommonLib\Containers.cpp" />
-    <ClCompile Include="..\CommonLib\SaveLoadGame.cpp" />
-    <ClCompile Include="..\CommonLib\InterfaceManager.cpp" />
-    <ClCompile Include="..\CommonLib\BSExtraData.cpp" />
-    <ClCompile Include="..\CommonLib\GameData.cpp" />
-    <ClCompile Include="..\CommonLib\InventoryChanges.cpp" />
-    <ClCompile Include="..\CommonLib\TESForm.cpp" />
-    <ClCompile Include="..\CommonLib\TESObjectREFR.cpp" />
-    <ClCompile Include="..\CommonLib\OSDepend.cpp" />
-    <ClCompile Include="..\CommonLib\Script.cpp" />
-    <ClCompile Include="..\CommonLib\Setting.cpp" />
-    <ClCompile Include="..\CommonLib\GameTasks.cpp" />
-    <ClCompile Include="..\CommonLib\Tile.cpp" />
-    <ClCompile Include="..\CommonLib\Types.cpp" />
-    <ClCompile Include="..\CommonLib\Menu.cpp" />
-    <ClCompile Include="..\CommonLib\Sound.cpp" />
-    <ClCompile Include="..\CommonLib\NiNodes.cpp" />
-    <ClCompile Include="..\CommonLib\TESObject.cpp" />
     <ClCompile Include="..\nvse\dinput8.cpp" />
     <ClCompile Include="..\nvse\Logging.cpp" />
     <ClCompile Include="..\nvse\SafeWrite.cpp" />
@@ -179,34 +159,7 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClCompile Include="UserInterface\WeaponHweel.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\CommonLib\BaseFormComponent.h" />
-    <ClInclude Include="..\CommonLib\ConsoleManager.h" />
-    <ClInclude Include="..\CommonLib\Containers.h" />
-    <ClInclude Include="..\CommonLib\ProcessLists.h" />
-    <ClInclude Include="..\CommonLib\SaveLoadGame.h" />
-    <ClInclude Include="..\CommonLib\InterfaceManager.h" />
-    <ClInclude Include="..\CommonLib\CommandTable.h" />
-    <ClInclude Include="..\CommonLib\BSExtraData.h" />
-    <ClInclude Include="..\CommonLib\GameData.h" />
-    <ClInclude Include="..\CommonLib\GameEffects.h" />
-    <ClInclude Include="..\CommonLib\InventoryChanges.h" />
-    <ClInclude Include="..\CommonLib\TESForm.h" />
-    <ClInclude Include="..\CommonLib\TESObjectREFR.h" />
-    <ClInclude Include="..\CommonLib\OSDepend.h" />
-    <ClInclude Include="..\CommonLib\BaseProcess.h" />
-    <ClInclude Include="..\CommonLib\RTTI.h" />
-    <ClInclude Include="..\CommonLib\Script.h" />
-    <ClInclude Include="..\CommonLib\Setting.h" />
-    <ClInclude Include="..\CommonLib\Sound.h" />
-    <ClInclude Include="..\CommonLib\GameTasks.h" />
-    <ClInclude Include="..\CommonLib\Tile.h" />
-    <ClInclude Include="..\CommonLib\Types.h" />
-    <ClInclude Include="..\CommonLib\Menu.h" />
-    <ClInclude Include="..\CommonLib\NiNodes.h" />
-    <ClInclude Include="..\CommonLib\NiObjects.h" />
-    <ClInclude Include="..\CommonLib\NiTypes.h" />
     <ClInclude Include="..\nvse\Logging.hpp" />
-    <ClInclude Include="..\CommonLib\TESObject.h" />
     <ClInclude Include="..\nvse\PluginAPI.hpp" />
     <ClInclude Include="..\nvse\prefix.h" />
     <ClInclude Include="..\nvse\Safewrite.hpp" />

@@ -17,25 +17,13 @@
       <Filter>nvse</Filter>
     </ClCompile>
     <ClCompile Include="DbgHelpWrap.cpp" />
-    <ClCompile Include="CrashLoggerExceptionHandler.cpp">
-      <Filter>CrashLogger</Filter>
-    </ClCompile>
-    <ClCompile Include="CrashLoggerLabels.cpp">
-      <Filter>CrashLogger</Filter>
-    </ClCompile>
     <ClCompile Include="PatchNameThreads.cpp" />
-    <ClCompile Include="CrashLoggerModules.cpp">
-      <Filter>CrashLogger</Filter>
-    </ClCompile>
-    <ClCompile Include="CrashLoggerRegistryStack.cpp">
-      <Filter>CrashLogger</Filter>
-    </ClCompile>
-    <ClCompile Include="CrashLoggerCalltrace.cpp">
-      <Filter>CrashLogger</Filter>
-    </ClCompile>
-    <ClCompile Include="CrashLoggerMemory.cpp">
-      <Filter>CrashLogger</Filter>
-    </ClCompile>
+    <ClCompile Include="CrashLoggerCalltrace.cpp" />
+    <ClCompile Include="CrashLoggerExceptionHandler.cpp" />
+    <ClCompile Include="CrashLoggerLabels.cpp" />
+    <ClCompile Include="CrashLoggerMemory.cpp" />
+    <ClCompile Include="CrashLoggerModules.cpp" />
+    <ClCompile Include="CrashLoggerRegistryStack.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="definitions.hpp" />
@@ -69,12 +57,10 @@
     <ClInclude Include="..\nvse\Formatter.hpp">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="CrashLogger.hpp">
-      <Filter>CrashLogger</Filter>
-    </ClInclude>
     <ClInclude Include="..\nvse\CommandTable.hpp">
       <Filter>nvse</Filter>
     </ClInclude>
+    <ClInclude Include="CrashLogger.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
@@ -85,12 +71,6 @@
     </Filter>
     <Filter Include="libraries">
       <UniqueIdentifier>{42cf9c9c-4ade-4f54-8cfd-9a8c9c5a321f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="game">
-      <UniqueIdentifier>{a015f998-0a48-4aa3-a1b7-bb3274a03bde}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CrashLogger">
-      <UniqueIdentifier>{0d1b15a9-14d9-4a32-91d5-bb244d0ffa5f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

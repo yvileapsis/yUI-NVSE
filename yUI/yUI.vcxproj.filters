@@ -56,63 +56,6 @@
     <ClCompile Include="MiscFeatures\PatchMatchedCursor.cpp">
       <Filter>features</Filter>
     </ClCompile>
-    <ClCompile Include="..\CommonLib\BSExtraData.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CommonLib\GameData.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CommonLib\InventoryChanges.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CommonLib\TESForm.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CommonLib\TESObjectREFR.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CommonLib\OSDepend.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CommonLib\Script.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CommonLib\Setting.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CommonLib\Sound.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CommonLib\GameTasks.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CommonLib\Tile.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CommonLib\Types.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CommonLib\Menu.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CommonLib\ConsoleManager.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CommonLib\SaveLoadGame.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CommonLib\InterfaceManager.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CommonLib\Containers.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CommonLib\NiNodes.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
-    <ClCompile Include="..\CommonLib\TESObject.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
     <ClCompile Include="MiscFeatures\FixReorderMCM.cpp">
       <Filter>features</Filter>
     </ClCompile>
@@ -162,9 +105,6 @@
     <ClCompile Include="ConfigurationMenu\ConfigurationMenuBasic.cpp">
       <Filter>features\ConfigurationMenu</Filter>
     </ClCompile>
-    <ClCompile Include="..\CommonLib\BaseFormComponent.cpp">
-      <Filter>game</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h" />
@@ -200,87 +140,6 @@
     <ClInclude Include="SortingIcons\SortingIcons.h">
       <Filter>features\SortingIcons</Filter>
     </ClInclude>
-    <ClInclude Include="..\CommonLib\BSExtraData.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\GameData.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\GameEffects.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\InventoryChanges.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\TESForm.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\TESObjectREFR.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\OSDepend.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\BaseProcess.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\RTTI.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\Script.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\Setting.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\Sound.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\GameTasks.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\Tile.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\Types.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\Menu.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\CommandTable.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\NiNodes.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\NiObjects.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\NiTypes.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\ConsoleManager.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\SaveLoadGame.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\InterfaceManager.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\Containers.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\TESObject.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\BaseFormComponent.h">
-      <Filter>game</Filter>
-    </ClInclude>
-    <ClInclude Include="..\CommonLib\ProcessLists.h">
-      <Filter>game</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
@@ -303,9 +162,6 @@
     </Filter>
     <Filter Include="features\UserInterface">
       <UniqueIdentifier>{c2809161-6d98-4828-951b-1677e5f45c6b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="game">
-      <UniqueIdentifier>{a015f998-0a48-4aa3-a1b7-bb3274a03bde}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
