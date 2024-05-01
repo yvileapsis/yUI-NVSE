@@ -9,7 +9,7 @@
 // 4584 - many Bethesda classes double-include some base-classes
 // credits to Ian Patterson
 #pragma warning(disable: 4018 4244 4267 4305 4288 4312 4311 4584 26812)
-#include "CommonLib/CommonPrefix.hpp"
+#include "CommonPrefix.hpp"
 
 #ifndef __NVSE_VERSION_H__
 #define __NVSE_VERSION_H__
