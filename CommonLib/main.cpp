@@ -1,8 +1,7 @@
-﻿#include <TESObjectREFR.hpp>
+﻿#include <TESForm.hpp>
+#include <TESObjectREFR.hpp>
 #include <PlayerCharacter.hpp>
-#include <TESDataHandler.hpp>
-#include <HUDMainMenu.hpp>
 #include <Menu.hpp>
-
-#include <format>
-#include <iostream>
+#include <HUDMainMenu.hpp>
+#include <TESDataHandler.hpp>
+#include <TESMain.hpp>
