@@ -2,7 +2,7 @@
 
 #include <unordered_map>
 #include <vector>
-#include <game/Bethesda/TESScript.hpp>
+#include <TESScript.hpp>
 
 // for IsInventoryObjectType list, see GameForms.h
 

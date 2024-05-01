@@ -51,6 +51,7 @@ class TESLoadScreen;
 class TESLoadScreenType;
 class TESObjectANIO;
 class TESObjectCELL;
+class TESObjectList;
 class TESPackage;
 class TESQuest;
 class TESRace;

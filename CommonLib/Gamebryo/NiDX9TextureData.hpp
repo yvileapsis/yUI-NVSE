@@ -1,7 +1,5 @@
 #pragma once
-
 #include "NiPersistentSrcTextureRendererData.hpp"
-#include "Defines.hpp"
 #include "NiTexture.hpp"
 
 class NiDX9Renderer;

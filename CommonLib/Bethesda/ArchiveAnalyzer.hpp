@@ -1,5 +1,4 @@
 #pragma once
-
 #include "BSTCaseInsensitiveStringMap.hpp"
 #include "BSSimpleArray.hpp"
 

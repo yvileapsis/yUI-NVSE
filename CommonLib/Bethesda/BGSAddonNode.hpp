@@ -1,7 +1,6 @@
 #pragma once
 #include "TESBoundObject.hpp"
 #include "TESModelTextureSwap.hpp"
-#include "Defines.hpp"
 
 class TESSound;
 

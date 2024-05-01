@@ -1,13 +1,96 @@
 #pragma once
+// This file exists as a trash heap of all basic dependencies of many commonlib headers
+#include <cstdlib>
+#include <cstdio>
+#include <cstring>
+#include <cmath>
+#include <cassert>
+
+#include <winsock2.h>
+#include <Windows.h>
+
+
+
+typedef unsigned char		UInt8;		//!< An unsigned 8-bit integer value
+typedef unsigned short		UInt16;		//!< An unsigned 16-bit integer value
+typedef unsigned long		UInt32;		//!< An unsigned 32-bit integer value
+typedef unsigned long long	UInt64;		//!< An unsigned 64-bit integer value
+typedef signed char			SInt8;		//!< A signed 8-bit integer value
+typedef signed short		SInt16;		//!< A signed 16-bit integer value
+typedef signed long			SInt32;		//!< A signed 32-bit integer value
+typedef signed long long	SInt64;		//!< A signed 64-bit integer value
+typedef float				Float32;	//!< A 32-bit floating point value
+typedef double				Float64;	//!< A 64-bit floating point value
+
+
+
+template <typename T_Ret = UInt32, typename ...Args>
+__forceinline T_Ret ThisCall(UInt32 _addr, void* _this, Args ...args)
+{
+	class T {};
+	union {
+		UInt32  addr;
+		T_Ret(T::* func)(Args...);
+	} u = { _addr };
+	return ((T*)_this->*u.func)(std::forward<Args>(args)...);
+}
+
+template <typename T_Ret = UInt32, typename ...Args>
+__forceinline T_Ret ThisStdCall(UInt32 _addr, const void* _this, Args ...args)
+{
+	return ((T_Ret(__thiscall*)(const void*, Args...))_addr)(_this, std::forward<Args>(args)...);
+}
+
+template <typename T_Ret = void, typename ...Args>
+__forceinline T_Ret StdCall(UInt32 _addr, Args ...args)
+{
+	return ((T_Ret(__stdcall*)(Args...))_addr)(std::forward<Args>(args)...);
+}
+
+template <typename T_Ret = void, typename ...Args>
+__forceinline T_Ret CdeclCall(UInt32 _addr, Args ...args)
+{
+	return ((T_Ret(__cdecl*)(Args...))_addr)(std::forward<Args>(args)...);
+}
+
+
+
+__forceinline void* GameHeapAlloc(UInt32 size) { return ThisStdCall<void*>(0xAA3E40, (void*)0x11F6238, size); }
+template <typename t> __forceinline t* GameHeapAlloc(UInt32 size) { return ThisStdCall<t*>(0xAA3E40, (void*)0x11F6238, size); }
+template <typename t> __forceinline void GameHeapFree(t* ptr) { ThisStdCall(0xAA4060, (t*)0x11F6238, ptr); }
+
+
+
+#define MEMBER_FN_PREFIX(className)	\
+	typedef className _MEMBER_FN_BASE_TYPE
+
+#define DEFINE_MEMBER_FN_LONG(className, functionName, retnType, address, ...)		\
+	typedef retnType (className::* _##functionName##_type)(__VA_ARGS__);			\
+																					\
+	inline _##functionName##_type * _##functionName##_GetPtr()					\
+	{																				\
+		static const UInt32 _address = address;										\
+		return (_##functionName##_type *)&_address;									\
+	}
+
+#define DEFINE_MEMBER_FN(functionName, retnType, address, ...)	\
+	DEFINE_MEMBER_FN_LONG(_MEMBER_FN_BASE_TYPE, functionName, retnType, address, __VA_ARGS__)
+
+#define CALL_MEMBER_FN(obj, fn)	\
+	((*(obj)).*(*((obj)->_##fn##_GetPtr())))
+#define SIZEOF_ARRAY(arrayName, elementType) (sizeof(arrayName) / sizeof(elementType))
+
+
+
 #include <d3d9.h>
 
 #include <Windows.Foundation.h>
 #include <wrl\wrappers\corewrappers.h>
 #include <wrl\client.h>
 #include <stdio.h>
-#include <cassert>
 
 #include <format>
+#include <vector>
 
 using namespace ABI::Windows::Foundation;
 using namespace Microsoft::WRL;

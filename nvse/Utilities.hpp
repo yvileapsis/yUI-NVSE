@@ -18,81 +18,6 @@
 #include <intrin.h>
 #include <Logging.hpp>
 
-#include "Defines.hpp"
-
-// thread-safe template versions of ThisStdCall()
-template <typename T_Ret = UInt32, typename ...Args>
-__forceinline T_Ret ThisCall(UInt32 _addr, void* _this, Args ...args)
-{
-	class T {};
-	union {
-		UInt32  addr;
-		T_Ret(T::* func)(Args...);
-	} u = { _addr };
-	return ((T*)_this->*u.func)(std::forward<Args>(args)...);
-}
-
-template <typename T_Ret = UInt32, typename ...Args>
-__forceinline T_Ret ThisStdCall(UInt32 _addr, const void* _this, Args ...args)
-{
-	return ((T_Ret(__thiscall*)(const void*, Args...))_addr)(_this, std::forward<Args>(args)...);
-}
-
-template <typename T_Ret = void, typename ...Args>
-__forceinline T_Ret StdCall(UInt32 _addr, Args ...args)
-{
-	return ((T_Ret(__stdcall*)(Args...))_addr)(std::forward<Args>(args)...);
-}
-
-template <typename T_Ret = void, typename ...Args>
-__forceinline T_Ret CdeclCall(UInt32 _addr, Args ...args)
-{
-	return ((T_Ret(__cdecl*)(Args...))_addr)(std::forward<Args>(args)...);
-}
-
-/*
-class CriticalSection
-{
-public:
-	CriticalSection() { InitializeCriticalSection(&critSection); }
-	~CriticalSection() { DeleteCriticalSection(&critSection); }
-
-	void	Enter() { EnterCriticalSection(&critSection); }
-	void	Leave() { LeaveCriticalSection(&critSection); }
-	bool	TryEnter() { return TryEnterCriticalSection(&critSection) != 0; }
-
-private:
-	CRITICAL_SECTION	critSection;
-};
-
-class ScopedLock
-{
-public:
-	ScopedLock(CriticalSection& critSection);
-
-	~ScopedLock();
-
-private:
-	CriticalSection& m_critSection;
-};
-
-class SpinLock
-{
-	UInt32	owningThread;
-	UInt32	enterCount;
-
-public:
-	SpinLock() : owningThread(0), enterCount(0) {}
-
-	void Enter();
-	void EnterSleep();
-	void Leave();
-};
-*/
-__forceinline void* GameHeapAlloc(UInt32 size) { return ThisStdCall<void*>(0xAA3E40, (void*)0x11F6238, size); }
-template <typename t> __forceinline t* GameHeapAlloc(UInt32 size) { return ThisStdCall<t*>(0xAA3E40, (void*)0x11F6238, size); }
-template <typename t> __forceinline void GameHeapFree(t* ptr) { ThisStdCall(0xAA4060, (t*)0x11F6238, ptr); }
-
 const std::filesystem::path& GetFalloutDirectory();
 std::string GetNVSEConfigOption(const char * section, const char * key);
 bool GetNVSEConfigOption_UInt32(const char * section, const char * key, UInt32 * dataOut);
@@ -107,29 +32,9 @@ bool GetNVSEConfigOption_UInt32(const char * section, const char * key, UInt32 *
 // all of the weirdness with the _GetType function is because you can't declare a static const pointer
 // inside the class definition. inlining automatically makes the function call go away since it's a const
 
-#define MEMBER_FN_PREFIX(className)	\
-	typedef className _MEMBER_FN_BASE_TYPE
-
-#define DEFINE_MEMBER_FN_LONG(className, functionName, retnType, address, ...)		\
-	typedef retnType (className::* _##functionName##_type)(__VA_ARGS__);			\
-																					\
-	inline _##functionName##_type * _##functionName##_GetPtr()					\
-	{																				\
-		static const UInt32 _address = address;										\
-		return (_##functionName##_type *)&_address;									\
-	}
-
-#define DEFINE_MEMBER_FN(functionName, retnType, address, ...)	\
-	DEFINE_MEMBER_FN_LONG(_MEMBER_FN_BASE_TYPE, functionName, retnType, address, __VA_ARGS__)
-
-#define CALL_MEMBER_FN(obj, fn)	\
-	((*(obj)).*(*((obj)->_##fn##_GetPtr())))
-
-
 // ConsolePrint() limited to 512 chars; use this to print longer strings to console
 void Console_Print_Long(const std::string& str);
 
-#define SIZEOF_ARRAY(arrayName, elementType) (sizeof(arrayName) / sizeof(elementType))
 
 namespace MersenneTwister
 {

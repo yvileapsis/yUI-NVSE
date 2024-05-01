@@ -12,6 +12,8 @@ class IMemoryHeap;
 struct HeapStats;
 class ScrapHeap;
 class IMemoryManagerFile;
+class TESForm;
+class Script;
 
 enum Context {
 	MC_UNK0						= 0,

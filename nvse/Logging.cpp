@@ -12,7 +12,7 @@
 #include <string>
 #include <thread>
 
-#include <game/Bethesda/ConsoleManager.hpp>
+#include <ConsoleManager.hpp>
 
 class LoggerManager {
 public:

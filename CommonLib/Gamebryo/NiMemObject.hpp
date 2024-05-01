@@ -1,6 +1,4 @@
 #pragma once
-
-#include "Utilities.hpp"
 #include "NiMemory.hpp"
 
 class NiMemObject {

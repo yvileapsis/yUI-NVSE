@@ -9,15 +9,7 @@
 // 4584 - many Bethesda classes double-include some base-classes
 // credits to Ian Patterson
 #pragma warning(disable: 4018 4244 4267 4305 4288 4312 4311 4584 26812)
-
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
-#include <cmath>
-#include <cassert>
-
-#include <winsock2.h>
-#include <Windows.h>
+#include "CommonLib/CommonPrefix.hpp"
 
 #ifndef __NVSE_VERSION_H__
 #define __NVSE_VERSION_H__
@@ -46,18 +38,9 @@
 
 #endif /* __NVSE_VERSION_H__ */
 
-typedef unsigned char		UInt8;		//!< An unsigned 8-bit integer value
-typedef unsigned short		UInt16;		//!< An unsigned 16-bit integer value
-typedef unsigned long		UInt32;		//!< An unsigned 32-bit integer value
-typedef unsigned long long	UInt64;		//!< An unsigned 64-bit integer value
-typedef signed char			SInt8;		//!< A signed 8-bit integer value
-typedef signed short		SInt16;		//!< A signed 16-bit integer value
-typedef signed long			SInt32;		//!< A signed 32-bit integer value
-typedef signed long long	SInt64;		//!< A signed 64-bit integer value
-typedef float				Float32;	//!< A 32-bit floating point value
-typedef double				Float64;	//!< A 64-bit floating point value
-
 #define VERSION_CODE(primary, secondary, sub)	(((primary & 0xFFF) << 20) | ((secondary & 0xFFF) << 8) | ((sub & 0xFF) << 0))
 #define VERSION_CODE_PRIMARY(in)				((in >> 20) & 0xFFF)
 #define VERSION_CODE_SECONDARY(in)				((in >> 8) & 0xFFF)
 #define VERSION_CODE_SUB(in)					((in >> 0) & 0xFF)
+
+#include "Utilities.hpp"

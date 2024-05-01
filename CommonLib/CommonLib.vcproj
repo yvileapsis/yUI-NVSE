@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="yUI"
+	Name="CommonLib"
 	ProjectGUID="{AE7CFEE7-4058-4E3C-ADC2-AE7480EE2028}"
-	RootNamespace="yUI"
+	RootNamespace="CommonLib"
 	Keyword="Win32Proj"
 	TargetFrameworkVersion="131072"
 	>
@@ -42,7 +42,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				AdditionalIncludeDirectories="$(SolutionDir);"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;yUI_EXPORTS;RUNTIME_VERSION=0x040020D0;RUNTIME"
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;CommonLib_EXPORTS;RUNTIME_VERSION=0x040020D0;RUNTIME"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -50,7 +50,7 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="4"
-				ForcedIncludeFiles="nvse/prefix.h"
+				ForcedIncludeFiles="nvse/prefix.hpp"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -121,13 +121,13 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories="$(SolutionDir);"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;yUI_EXPORTS;RUNTIME_VERSION=0x040020D0;RUNTIME"
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;CommonLib_EXPORTS;RUNTIME_VERSION=0x040020D0;RUNTIME"
 				RuntimeLibrary="0"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="false"
 				DebugInformationFormat="3"
-				ForcedIncludeFiles="nvse/prefix.h"
+				ForcedIncludeFiles="nvse/prefix.hpp"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
