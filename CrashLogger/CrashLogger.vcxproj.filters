@@ -92,17 +92,5 @@
     <Filter Include="CrashLogger">
       <UniqueIdentifier>{0d1b15a9-14d9-4a32-91d5-bb244d0ffa5f}</UniqueIdentifier>
     </Filter>
-    <Filter Include="CommonLib\Bethesda">
-      <UniqueIdentifier>{6efc5980-0fd7-4cf0-996a-4a039d6a0555}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CommonLib\Gamebryo">
-      <UniqueIdentifier>{534bc693-bf7a-42e0-8a7d-b1055aff848b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CommonLib\Havok">
-      <UniqueIdentifier>{a1ad50b8-234a-4ed2-8dce-e912e0c629b5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="CommonLib\Obsidian">
-      <UniqueIdentifier>{be04948c-6034-4c15-b3fb-e9b165fcf92d}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
 </Project>
