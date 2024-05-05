@@ -98,8 +98,8 @@ public:
 
 	[[nodiscard]] explicit constexpr operator bool() const noexcept { return _impl != static_cast<underlying_type>(0); }
 
-	[[nodiscard]] constexpr enum_type       operator*() const noexcept { return get(); }
-	[[nodiscard]] constexpr enum_type       get() const noexcept { return static_cast<enum_type>(_impl); }
+	[[nodiscard]] constexpr enum_type	   operator*() const noexcept { return get(); }
+	[[nodiscard]] constexpr enum_type	   get() const noexcept { return static_cast<enum_type>(_impl); }
 	[[nodiscard]] constexpr underlying_type underlying() const noexcept { return _impl; }
 
 	template <class... Args>

@@ -138,13 +138,13 @@ typedef struct D3DXMACRO {
 } D3DXMACRO, * LPD3DXMACRO;
 
 // Align D3DXMATRIX
-typedef __declspec(align(16)) D3DXMATRIX    D3DXALIGNEDMATRIX;
+typedef __declspec(align(16)) D3DXMATRIX	D3DXALIGNEDMATRIX;
 
 typedef UInt32 NiShaderError;
 
 #define STACK_ALLOCATE(class_name, pointer_name) \
-    char pointer_name[sizeof(class_name)]; \
-    class_name* p##pointer_name = (class_name*)pointer_name;
+	char pointer_name[sizeof(class_name)]; \
+	class_name* p##pointer_name = (class_name*)pointer_name;
 
 #define DEBUG_MESSAGES false
 

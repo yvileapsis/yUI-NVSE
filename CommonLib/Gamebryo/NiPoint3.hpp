@@ -8,11 +8,11 @@ public:
 	NiPoint3() : XMFLOAT3(0.f, 0.f, 0.f) {};
 	NiPoint3(const float x, const float y, const float z) : XMFLOAT3(x, y, z) {};
 	NiPoint3(const float f) : XMFLOAT3(f, f, f) {};
-	NiPoint3(const XMFLOAT2& src) : XMFLOAT3(src.x, src.y, 0.f)      {};
-	NiPoint3(const XMFLOAT2* src) : XMFLOAT3(src->x, src->y, 0.f)    {};
-	NiPoint3(const XMFLOAT3& src) : XMFLOAT3(src.x, src.y, src.z)    {};
+	NiPoint3(const XMFLOAT2& src) : XMFLOAT3(src.x, src.y, 0.f)	  {};
+	NiPoint3(const XMFLOAT2* src) : XMFLOAT3(src->x, src->y, 0.f)	{};
+	NiPoint3(const XMFLOAT3& src) : XMFLOAT3(src.x, src.y, src.z)	{};
 	NiPoint3(const XMFLOAT3* src) : XMFLOAT3(src->x, src->y, src->z) {};
-	NiPoint3(const XMFLOAT4& src) : XMFLOAT3(src.x, src.y, src.z)    {};
+	NiPoint3(const XMFLOAT4& src) : XMFLOAT3(src.x, src.y, src.z)	{};
 	NiPoint3(const XMFLOAT4* src) : XMFLOAT3(src->x, src->y, src->z) {};
 	NiPoint3(const XMVECTOR& src) { XMStoreFloat3(this, src); };
 	NiPoint3(const XMVECTOR* src) { XMStoreFloat3(this, *src); };

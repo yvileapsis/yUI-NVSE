@@ -7,39 +7,39 @@
 template <class T_Data>
 class NiTObjectList : public NiTListBase <NiTObjectAllocator<T_Data>, T_Data> {
 public:
-    ~NiTObjectList() { RemoveAll(); };
+	~NiTObjectList() { RemoveAll(); };
 
-    T_Data* GetNext(NiTListIterator& kPos) const {
-        if (kPos == 0)
-            return nullptr;
+	T_Data* GetNext(NiTListIterator& kPos) const {
+		if (kPos == 0)
+			return nullptr;
 
-        T_Data* element = &((NiTListItem<T_Data>*) kPos)->m_element;
-        kPos = static_cast<NiTListItem<T_Data>*>(kPos)->m_pkNext;
-        return element;
-    }
+		T_Data* element = &((NiTListItem<T_Data>*) kPos)->m_element;
+		kPos = static_cast<NiTListItem<T_Data>*>(kPos)->m_pkNext;
+		return element;
+	}
 
-    // 0xB71300
-    void RemoveAll() {
-        NiTListItem<T_Data>* pCurr = NiTListBase<NiTObjectAllocator<T_Data>, T_Data>::m_pkHead;
-        while (pCurr) {
-            NiTListItem<T_Data>* pDel = pCurr;
-            pCurr = pCurr->m_pkNext;
-            DeleteItem(pDel);
-        }
+	// 0xB71300
+	void RemoveAll() {
+		NiTListItem<T_Data>* pCurr = NiTListBase<NiTObjectAllocator<T_Data>, T_Data>::m_pkHead;
+		while (pCurr) {
+			NiTListItem<T_Data>* pDel = pCurr;
+			pCurr = pCurr->m_pkNext;
+			DeleteItem(pDel);
+		}
 
-        NiTListBase<NiTObjectAllocator<T_Data>, T_Data>::m_kAllocator.m_uiCount = 0;
-        NiTListBase<NiTObjectAllocator<T_Data>, T_Data>::m_pkHead = 0;
-        NiTListBase<NiTObjectAllocator<T_Data>, T_Data>::m_pkTail = 0;
-    };
+		NiTListBase<NiTObjectAllocator<T_Data>, T_Data>::m_kAllocator.m_uiCount = 0;
+		NiTListBase<NiTObjectAllocator<T_Data>, T_Data>::m_pkHead = 0;
+		NiTListBase<NiTObjectAllocator<T_Data>, T_Data>::m_pkTail = 0;
+	};
 
-    template <typename FUNC>
-    void ForEach(FUNC func) {
-        UInt32 i = 0;
-        NiTListIterator kPos = NiTObjectList<T_Data>::GetHeadPos();
-        while (kPos) {
-            func(GetNext(kPos), i++);
-        }
-    };
+	template <typename FUNC>
+	void ForEach(FUNC func) {
+		UInt32 i = 0;
+		NiTListIterator kPos = NiTObjectList<T_Data>::GetHeadPos();
+		while (kPos) {
+			func(GetNext(kPos), i++);
+		}
+	};
 
 protected:
 	// 0x49FA80

@@ -148,12 +148,7 @@ public:
 	__forceinline void			Open(bool noFadeIn = false) { ThisCall(0xA1DC20, this, noFadeIn); }; // fade in
 	__forceinline void			Close() { pkRootTile->Set(Tile::kValue_fadeout, 1); ThisCall(0xA1D910, this); } // fade out
 
-
-	static bool					IsVisible(const UInt32 menuType) {
-		UInt8* menuVisibility = reinterpret_cast<UInt8*>(0x011F308F);
-		return menuType >= kType_Min && menuType <= kType_Max ? menuVisibility[menuType] : false; 
-	}
-
+	static bool					IsVisible(const UInt32 menuType);
 	bool						IsVisible() const;
 	static TileMenu*			GetTileMenu(const UInt32 menuType);
 	TileMenu*					GetTileMenu() const;

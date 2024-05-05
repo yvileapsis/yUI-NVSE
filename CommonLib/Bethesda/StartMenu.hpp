@@ -1,5 +1,9 @@
 #pragma once
 #include "Menu.hpp"
+#include "ListBox.hpp"
+
+class NiSourceTexture;
+class Tile3D;
 
 class StartMenu : public Menu
 {
@@ -51,13 +55,13 @@ public:
 		const char*		pcTemplateName;				// 10
 		UInt32			uiCurrentValue;				// 14
 		UInt32			uiDefaultValue;				// 18
-		EType			eType;						// 1C
+		EnumType		eType;						// 1C
 		UInt32			uiNumOptions;				// 20
 		UInt32			uiButtonWidth;				// 24
 		const char**	ppcCurrValueName;			// 28
 		void			(__cdecl* pOnSelection)(UserOption*);	// 2C
 
-		UserOption(char* str, void (*_callback)(), EWhichMenus flags, int type, int numOptions, int buttonWidth, char** optionNames)
+		UserOption(char* str, void (*_callback)(), EnumWhichMenus flags, int type, int numOptions, int buttonWidth, char** optionNames)
 			: Option(str, _callback, flags)
 		{
 			ThisCall<UserOption*>(0x7D6350, this, str, _callback, flags, type, numOptions, buttonWidth, optionNames);;
@@ -131,6 +135,6 @@ public:
 
 	static StartMenu* GetSingleton() { return *reinterpret_cast<StartMenu**>(0x11DAAC0); };
 
-	static bool IsActive() { return GetSingleton() && GetSingleton()->flags & kInStartMenu; }
+	static bool IsActive() { return GetSingleton() && GetSingleton()->uiFlags & kInStartMenu; }
 };
 static_assert(sizeof(StartMenu) == 0x1D4);

@@ -8,9 +8,9 @@ public:
 	NiQuatTransform();
 	~NiQuatTransform();
 
-    NiPoint3        m_kTranslate;
-    NiQuaternion    m_kRotate;
-    float           m_fScale;
+	NiPoint3		m_kTranslate;
+	NiQuaternion	m_kRotate;
+	float		   m_fScale;
 };
 
 ASSERT_SIZE(NiQuatTransform, 0x20)

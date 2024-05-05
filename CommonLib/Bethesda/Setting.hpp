@@ -9,8 +9,8 @@ public:
 
 	enum EnumType {
 		kSetting_Bool = 0,
-		kSetting_c,
-		kSetting_h,
+		kSetting_Char,
+		kSetting_Hex,
 		kSetting_Integer,
 		kSetting_Unsigned,
 		kSetting_Float,
@@ -33,11 +33,14 @@ public:
 	Info		uValue;
 	const char* pKey;
 
-	UInt32		GetType();
-	bool		Get(double& out);
-	bool		Get(const char* str);
-	const char* Get();
+	UInt32		GetType() const;
+	bool		Get(double& out) const;
+	bool		Get(const char* str) const;
+	const char* Get() const;
 	bool		Set(double newVal);
 	bool		Set(const char* str);
+
+	std::string GetAsString() const;
+	Float32 GetAsFloat() const;
 };
 static_assert(sizeof(Setting) == 0xC);

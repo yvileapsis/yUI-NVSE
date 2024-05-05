@@ -10,7 +10,7 @@ public:
 
 	virtual			~BSSimpleArray() { Clear(true); };
 	virtual T_Data* Allocate(UInt32 auiCount) { return MemoryManager::Allocate<T_Data>(auiCount); };
-	virtual void    Deallocate(T_Data* apData) { MemoryManager::Deallocate(apData); };
+	virtual void	Deallocate(T_Data* apData) { MemoryManager::Deallocate(apData); };
 	virtual T_Data* Reallocate(T_Data* apData, UInt32 auiCount) { return (T_Data*)MemoryManager::Reallocate(apData, sizeof(T_Data) * auiCount); };
 
 	T_Data*	pBuffer;

@@ -202,8 +202,8 @@ public:
 	virtual								~Tile();
 	virtual void						Init(Tile* parent, const char* name, Tile* replacedChild);
 	virtual NiNode*						CalcNode();
-	virtual UInt32						GetType();		// returns one of kTileValue_XXX
-	virtual const char*					GetTypeName();	// 4-byte id i.e. 'TILE'
+	virtual UInt32						GetType() const;	// returns one of kTileValue_XXX
+	virtual const char*					GetTypeName();		// 4-byte id i.e. 'TILE'
 	virtual bool						OverRadialTile(Float32 x, Float32 y);
 	virtual UInt32						InitMenu(UInt32 valueID, Float32 Float32Value, const char* strValue);
 	virtual void						RecursiveHandleImageFilenameChange();
@@ -291,15 +291,16 @@ public:
 	__forceinline void			SetGradual(const char* apcID, const Float32 afStartValue, const Float32 afEndValue, const Float32 afSeconds, const UInt32 uiChangeMode = 0)
 	{ SetGradual(TraitNameToID(apcID), afStartValue, afEndValue, afSeconds, uiChangeMode); }
 
-	__forceinline Menu*		GetParentMenu() { return ThisCall<Menu*>(0xA03C90, this); };
+	__forceinline Menu*			GetParentMenu() { return ThisCall<Menu*>(0xA03C90, this); };
 
-	__forceinline void		HandleChange(const EnumValue id) { ThisCall<void>(0xA074D0, this, id); }
-	__forceinline Tile*		GetChildByID(const EnumValue id) { return ThisCall<Tile*>(0xA03EB0, this, id); }; // THANKS STEWIE
-	__forceinline Tile*		GetChildByName(const char* name) { return ThisCall<Tile*>(0xA03DA0, this, name); };
-	__forceinline Tile*		GetChildByTraitName(const char* traitName) { return CdeclCall<Tile*>(0xA08B20, this, traitName); };
+	__forceinline void			HandleChange(const EnumValue id) { ThisCall<void>(0xA074D0, this, id); }
+	__forceinline Tile*			GetChildByID(const EnumValue id) { return ThisCall<Tile*>(0xA03EB0, this, id); }; // THANKS STEWIE
+	__forceinline Tile*			GetChildByName(const char* name) { return ThisCall<Tile*>(0xA03DA0, this, name); };
+	__forceinline Tile*			GetChildByTraitName(const char* traitName) { return CdeclCall<Tile*>(0xA08B20, this, traitName); };
 
-	bool					PlayTileSound(EnumValue id = kValue_clicksound) { return ThisCall<char>(0xA0B110, this, id); }
-	Tile*					ReadXML(const char* apcXMLPath) { return ThisCall<Tile*>(0xA01B00, this, apcXMLPath); };
+	bool						PlayTileSound(EnumValue id = kValue_clicksound) { return ThisCall<char>(0xA0B110, this, id); }
+	Tile*						ReadXML(const char* apcXMLPath) { return ThisCall<Tile*>(0xA01B00, this, apcXMLPath); };
 
+	std::string					GetFullPath() const;
 };
 static_assert(sizeof(Tile) == 0x38);

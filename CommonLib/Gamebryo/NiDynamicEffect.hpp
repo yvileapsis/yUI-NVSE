@@ -12,13 +12,13 @@ public:
 	NiDynamicEffect();
 	virtual ~NiDynamicEffect();
 
-    enum EffectType {
-        AMBIENT_LIGHT	= 0,
-        POINT_LIGHT		= 2,
-        DIR_LIGHT		= 3,
-        SPOT_LIGHT		= 4,
-        TEXTURE_EFFECT	= 5,
-    };
+	enum EffectType {
+		AMBIENT_LIGHT	= 0,
+		POINT_LIGHT		= 2,
+		DIR_LIGHT		= 3,
+		SPOT_LIGHT		= 4,
+		TEXTURE_EFFECT	= 5,
+	};
 
 	bool		m_bOn;
 	UInt8		m_ucEffectType;

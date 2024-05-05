@@ -47,8 +47,8 @@ public:
 };
 
 #define NiSmartPointer(className) \
-    class className; \
-    typedef NiPointer<className> className##Ptr;
+	class className; \
+	typedef NiPointer<className> className##Ptr;
 
 
 template <class T_Data>

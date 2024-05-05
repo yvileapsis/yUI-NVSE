@@ -18,10 +18,10 @@ public:
 ASSERT_SIZE(NiRTTI, 0x8);
 
 #define NiImplementRootRTTI(rootclassname) \
-    NiRTTI rootclassname::ms_RTTI(#rootclassname, 0);
+	NiRTTI rootclassname::ms_RTTI(#rootclassname, 0);
 
 #define NiImplementRTTI(classname, baseclassname) \
-    static inline const NiRTTI ms_RTTI = NiRTTI(#classname, baseclassname##::ms_RTTI);
+	static inline const NiRTTI ms_RTTI = NiRTTI(#classname, baseclassname##::ms_RTTI);
 
 #define NiImplementGetRTTI(classname) \
 	static inline const NiRTTI* __fastcall GetRTTIEx() {return &classname##::ms_RTTI;}

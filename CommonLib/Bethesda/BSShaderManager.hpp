@@ -52,12 +52,12 @@ public:
 		BSSM_SHADER_PARALLAX		= 15,
 		BSSM_SHADER_GEOM_DECAL		= 16,
 		BSSM_SHADER_WATER			= 17,
-		// 						      18
-		// 						      19
-		// 						      20
-		// 						      21
-		// 						      22
-		// 						      23
+		// 							  18
+		// 							  19
+		// 							  20
+		// 							  21
+		// 							  22
+		// 							  23
 		BSSM_SHADER_PARTICLE		= 24,
 		BSSM_SHADER_BOLT			= 25,
 		BSSM_SHADER_BEAM			= 26,
@@ -65,7 +65,7 @@ public:
 		//							  28
 		BSSM_SHADER_LIGHTING30		= 29,
 		BSSM_SHADER_PRECIPITATION	= 30,
-		// 						      31
+		// 							  31
 		BSSM_SHADER_TILE			= 32,
 		BSSM_SHADER_NOLIGHTING		= 33,
 		BSSM_SHADER_VOLUMETRIC_FOG	= 34,

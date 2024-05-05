@@ -12,8 +12,8 @@ public:
 	NiPoint4(const XMFLOAT2& src) : XMFLOAT4(src.x, src.y, 0.f, 0.f)		 {};
 	NiPoint4(const XMFLOAT2* src) : XMFLOAT4(src->x, src->y, 0.f, 0.f)		 {};
 	NiPoint4(const XMFLOAT3& src) : XMFLOAT4(src.x, src.y, src.z, 0.f)		 {};
-	NiPoint4(const XMFLOAT3* src) : XMFLOAT4(src->x, src->y, src->z, 0.f)    {};
-	NiPoint4(const XMFLOAT4& src) : XMFLOAT4(src.x, src.y, src.z, src.w)     {};
+	NiPoint4(const XMFLOAT3* src) : XMFLOAT4(src->x, src->y, src->z, 0.f)	{};
+	NiPoint4(const XMFLOAT4& src) : XMFLOAT4(src.x, src.y, src.z, src.w)	 {};
 	NiPoint4(const XMFLOAT4* src) : XMFLOAT4(src->x, src->y, src->z, src->w) {};
 	NiPoint4(const XMVECTOR& src) { XMStoreFloat4(this, src); };
 	NiPoint4(const XMVECTOR* src) { XMStoreFloat4(this, *src); };
