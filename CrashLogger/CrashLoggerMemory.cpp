@@ -47,21 +47,21 @@ namespace CrashLogger::Memory
 
 		if (GetProcessWorkingSetSizeEx(hProcess, &lpMinimumWorkingSetSize, &lpMaximumWorkingSetSize, &flags))
 		{
-			Log() << std::format("MinimumWorkingSetSize:      {}", FormatSize(lpMinimumWorkingSetSize));
-			Log() << std::format("MaximumWorkingSetSize:      {}", FormatSize(lpMaximumWorkingSetSize));
+			Log() << std::format("MinimumWorkingSetSize:	  {}", FormatSize(lpMinimumWorkingSetSize));
+			Log() << std::format("MaximumWorkingSetSize:	  {}", FormatSize(lpMaximumWorkingSetSize));
 		}
 
 		if ( GetProcessMemoryInfo( hProcess, &pmc, sizeof(pmc)) )
 		{
-			Log() << std::format("PeakWorkingSetSize:         {}", FormatSize(pmc.PeakWorkingSetSize));
-			Log() << std::format("WorkingSetSize:             {}", FormatSize(pmc.WorkingSetSize));
-			Log() << std::format("QuotaPeakPagedPoolUsage:    {}", FormatSize(pmc.QuotaPeakPagedPoolUsage));
-			Log() << std::format("QuotaPagedPoolUsage:        {}", FormatSize(pmc.QuotaPagedPoolUsage));
+			Log() << std::format("PeakWorkingSetSize:		 {}", FormatSize(pmc.PeakWorkingSetSize));
+			Log() << std::format("WorkingSetSize:			 {}", FormatSize(pmc.WorkingSetSize));
+			Log() << std::format("QuotaPeakPagedPoolUsage:	{}", FormatSize(pmc.QuotaPeakPagedPoolUsage));
+			Log() << std::format("QuotaPagedPoolUsage:		{}", FormatSize(pmc.QuotaPagedPoolUsage));
 			Log() << std::format("QuotaPeakNonPagedPoolUsage: {}", FormatSize(pmc.QuotaPeakNonPagedPoolUsage));
-			Log() << std::format("QuotaNonPagedPoolUsage:     {}", FormatSize(pmc.QuotaNonPagedPoolUsage));
-			Log() << std::format("PageFaultCount:             {}", FormatSize(pmc.PageFaultCount));
-			Log() << std::format("PagefileUsage:              {}", FormatSize(pmc.PagefileUsage));
-			Log() << std::format("PeakPagefileUsage:          {}", FormatSize(pmc.PeakPagefileUsage));
+			Log() << std::format("QuotaNonPagedPoolUsage:	 {}", FormatSize(pmc.QuotaNonPagedPoolUsage));
+			Log() << std::format("PageFaultCount:			 {}", FormatSize(pmc.PageFaultCount));
+			Log() << std::format("PagefileUsage:			  {}", FormatSize(pmc.PagefileUsage));
+			Log() << std::format("PeakPagefileUsage:		  {}", FormatSize(pmc.PeakPagefileUsage));
 		}
 
 		Log();

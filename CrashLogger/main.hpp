@@ -4,6 +4,8 @@
 
 #include <deque>
 
+class TESForm;
+class TESObjectREFR;
 class Actor;
 class PlayerCharacter;
 class TESDataHandler;

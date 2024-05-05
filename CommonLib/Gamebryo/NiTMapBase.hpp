@@ -181,25 +181,29 @@ public:
 	}
 
 
-		class Iterator
+	class Iterator
 	{
-		friend NiTPointerMap;
+		friend NiTMapBase;
 
-		NiTPointerMap* m_table;
+		NiTMapBase* m_table;
 		Entry* m_entry;
 		Entry** m_bucket;
 		
-		void FindNonEmpty();
+		void FindNonEmpty()
+		{
+			for (Entry** end = &m_table->m_ppkHashTable[m_table->m_uiHashSize]; m_bucket != end; ++m_bucket)
+				if ((m_entry = *m_bucket)) return;
+		};
 
 	public:
 
 		Iterator() : m_table(nullptr), m_entry(nullptr), m_bucket(nullptr) {}
-		Iterator(NiTPointerMap* table, Entry* entry = nullptr)
-			: m_table(table), m_entry(entry), m_bucket(table->m_buckets) { FindNonEmpty(); }
+		Iterator(NiTMapBase* table, Entry* entry = nullptr)
+			: m_table(table), m_entry(entry), m_bucket(table->m_ppkHashTable) { FindNonEmpty(); }
 
 		~Iterator() { }
 
-		T_Data*		Get();
+		T_Data		Get();
 		UInt32		GetKey();
 		bool		Next();
 		bool		Done();
@@ -209,7 +213,7 @@ public:
 		explicit operator bool() const { return m_entry != nullptr; }
 		void operator++()
 		{
-			m_entry = m_entry->next;
+			m_entry = m_entry->m_pkNext;
 			if (!m_entry)
 			{
 				m_bucket++;
@@ -217,8 +221,8 @@ public:
 			}
 		}
 
-		T_Data* operator->() const { return m_entry->data; }
-		T_Data*& operator*() const { return m_entry->data; }
+		T_Data operator->() const { return m_entry->m_val; }
+		T_Data& operator*() const { return m_entry->m_val; }
 		Iterator& operator=(const Iterator& rhs)
 		{
 			m_entry = rhs.m_entry;

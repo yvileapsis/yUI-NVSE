@@ -1,5 +1,8 @@
 #pragma once
 
+#define IS_TYPE(form, type) (*(UInt32*)(form) == kVtbl_##type)
+#define NOT_TYPE(form, type) (*(UInt32*)(form) != kVtbl_##type)
+
 enum ObjectVtbl
 {
 

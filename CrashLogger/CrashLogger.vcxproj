@@ -84,8 +84,7 @@
     <PostBuildEvent>
       <Message>
       </Message>
-      <Command>copy "$(TargetPath)" "$(FalloutNVPath)\Data\NVSE\plugins\$(ProjectName).dll"
-copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\CrashLogger\nvse\plugins"</Command>
+      <Command>copy "$(TargetPath)" "$(FalloutNVPath)\Data\NVSE\plugins\$(ProjectName).dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -115,8 +114,7 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\CrashLogger\nvse\p
     </Link>
     <PostBuildEvent />
     <PostBuildEvent>
-      <Command>copy "$(TargetPath)" "$(FalloutNVPath)\Data\NVSE\plugins\$(ProjectName).dll"
-copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\CrashLogger\nvse\plugins"</Command>
+      <Command>copy "$(TargetPath)" "$(FalloutNVPath)\Data\NVSE\plugins\$(ProjectName).dll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

@@ -261,7 +261,7 @@ public:
 	// 24
 	struct AnimGroupInfo {
 		const char* name;				// 00
-		UInt8		sequenceType;		// 04
+		UInt8		supportsVariants;		// 04
 		UInt8		pad[3];
 		UInt32		sequenceType;
 		UInt32		keyType;

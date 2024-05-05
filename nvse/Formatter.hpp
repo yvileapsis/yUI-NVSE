@@ -1,10 +1,27 @@
 #include <format>
 
 #include "Setting.hpp"
+
 #include "TESForm.hpp"
 #include "TESObjectREFR.hpp"
+#include "NavMesh.hpp"
+
+#include "Character.hpp"
+#include "Creature.hpp"
+
+#include "BaseProcess.hpp"
+
+#include "TESAnimGroup.hpp"
+#include "NiControllerSequence.hpp"
+#include "BSAnimGroupSequence.hpp"
+#include "AnimSequence.hpp"
+
+#include "ActorMover.hpp"
+#include "QueuedReference.hpp"
+
 #include "Tile.hpp"
 #include "Menu.hpp"
+#include "StartMenu.hpp"
 
 #include <set>
 
@@ -37,23 +54,23 @@ struct std::formatter<Derived> {									\
 };																	\
 
 // TODO: fix formatter
-/*
+
 std::ostream &operator<<(std::ostream &os, const Tile& obj) { os << "Path: " << obj.GetFullPath(); return os; }
 std::ostream &operator<<(std::ostream &os, const Menu& obj) 
 {
-	os << std::format("MenuMode: {:d}", obj.id);
+	os << std::format("MenuMode: {:d}", (UInt32) obj.eID);
 	os << std::format(", visible: {:b}", obj.IsVisible());
-	os << std::format(", visibilityState : 0x{:X}", obj.visibilityState);
+	os << std::format(", visibilityState : 0x{:X}", (UInt32) obj.eVisibilityState);
 	std::stringstream ss;
-	ss << ", TileMenu: " << (const Tile&) *obj.tile;
+	ss << ", TileMenu: " << (const Tile&) *obj.pkRootTile;
 	os << ss.str();
 	return os; 
 }
-std::ostream &operator<<(std::ostream &os, const StartMenu::Option& obj) { os << obj.displayString; return os; }
+std::ostream &operator<<(std::ostream &os, const StartMenu::Option& obj) { os << obj.pcDisplayString; return os; }
 
 std::ostream &operator<<(std::ostream &os, const Setting& obj) 
 { 
-	os << obj.name << ": ";
+	os << obj.pKey << ": ";
 	if (obj.GetType() == Setting::kSetting_String)
 		os << obj.GetAsString();
 	else 
@@ -63,27 +80,28 @@ std::ostream &operator<<(std::ostream &os, const Setting& obj)
 
 std::ostream& operator<<(std::ostream& os, const TESForm& obj) 
 { 
-	os << std::format("{:08X}", obj.refID);
-	os << std::format(" ({})", obj.GetName());
+	os << std::format("{:08X}", (UInt32) obj.uiFormID);
+	os << std::format(" ({})", obj.GetEditorID());
 	return os; 
 }
 std::ostream& operator<<(std::ostream& os, const TESObjectREFR& obj)
 {
 	os << (const TESForm&)obj;
 	std::stringstream ss;
-	ss << ", Baseform " << (const TESForm&)*obj.TryGetREFRParent();
+	ss << ", BaseForm " << (const TESForm&)*obj.TryGetREFRParent();
 	os << ss.str();
 	return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const ActorMover& obj) { if (obj.actor) os << (const TESObjectREFR&)obj.actor; return os; }
-std::ostream& operator<<(std::ostream& os, const QueuedReference& obj) { if (obj.refr) os << (const TESObjectREFR&)obj.refr; return os; }
+std::ostream& operator<<(std::ostream& os, const ActorMover& obj) { if (obj.pkActor) os << (const TESObjectREFR&)obj.pkActor; return os; }
+std::ostream& operator<<(std::ostream& os, const QueuedReference& obj) { if (obj.pRefr) os << (const TESObjectREFR&)obj.pRefr; return os; }
+
 
 std::ostream& operator<<(std::ostream& os, const NavMesh& obj)
 {
 	os << (const TESForm&)obj;
 	std::stringstream ss;
-	ss << ", Cell " << (const TESForm&)*obj.parentCell;
+	ss << ", Cell " << (const TESForm&)*obj.pParentCell;
 	os << ss.str();
 	return os;
 }
@@ -91,27 +109,34 @@ std::ostream& operator<<(std::ostream& os, const NavMesh& obj)
 std::ostream& operator<<(std::ostream& os, const BaseProcess& obj)
 {
 	for (const auto iter : *TESForm::GetAll())
-		if ((iter->typeID == kFormType_Creature && static_cast<Creature*>(iter)->baseProcess == &obj) 
-			|| (iter->typeID == kFormType_Character && static_cast<Character*>(iter)->baseProcess == &obj))
+		if ((iter->eTypeID == TESForm::kType_Creature && static_cast<Creature*>(iter)->pkBaseProcess == &obj)
+			|| (iter->eTypeID == TESForm::kType_Character && static_cast<Character*>(iter)->pkBaseProcess == &obj))
 			os << (const TESObjectREFR&)*iter;
+	return os;
+}
+
+std::ostream& operator<<(std::ostream& os, const NiControllerSequence& obj)
+{
+	os << SanitizeString(std::format("{}, {}", reinterpret_cast<const char*>(&obj.m_kName), reinterpret_cast<const char*>(&obj.m_kAccumRootName)));
 	return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const BSAnimGroupSequence& obj)
 {
-	os << SanitizeString(std::format("{}, {}, AnimGroup {:04X}", obj.sequenceName, obj.accumRootName, obj.animGroup->groupID));
+	os << (const NiControllerSequence&) obj 
+		<< SanitizeString(std::format("AnimGroup {:04X}", obj.spAnimGroup->groupID));
 	return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const AnimSequenceSingle& obj)
 {
-	os << (const BSAnimGroupSequence&)*obj.anim;
+	os << (const BSAnimGroupSequence&)*obj.pkAnim;
 	return os;
 }
-
+/*
 std::ostream& operator<<(std::ostream& os, const AnimSequenceMultiple& obj)
 {
-	for (const auto iter : *obj.anims)
+	for (const auto iter : *obj.pkAnims)
 		os << (const BSAnimGroupSequence&)iter << "; ";
 	return os;
 }
@@ -207,7 +232,7 @@ std::ostream& operator<<(std::ostream& os, const QueuedKF& obj)
 	if (obj.kf) os << SanitizeString("Path: " + std::string(obj.kf->path));
 	return os; 
 }
-
+*/
 FORMAT_CLASS(Tile)
 FORMAT_CLASS(Menu)
 FORMAT_CLASS(StartMenu::Option)
@@ -222,6 +247,7 @@ FORMAT_CLASS(QueuedReference)
 FORMAT_CLASS(NavMesh)
 FORMAT_CLASS(BaseProcess);
 
+/*
 FORMAT_CLASS(BSAnimGroupSequence);
 FORMAT_CLASS(AnimSequenceSingle);
 FORMAT_CLASS(AnimSequenceMultiple);
