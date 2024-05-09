@@ -6,7 +6,8 @@ class TESAnimGroup;
 
 // 014
 class KFModel {
-	const char* path;										// 000
+public:
+	const char*						pcPath;					// 000
 	NiPointer<BSAnimGroupSequence>	controllerSequence;		// 004
 	NiPointer<TESAnimGroup>			animGroup;				// 008
 	UInt32							unk0C;					// 00C

@@ -11,6 +11,6 @@ public:
 	virtual void Unk_15();
 	virtual void RunScriptAndDestroyEventList();
 
-	Script* script;
-	ScriptEventList* eventList;
+	Script* pkScript;
+	ScriptEventList* pkEventList;
 };

@@ -3,6 +3,10 @@
 
 class ActiveEffect;
 class BSSoundHandle;
+class MagicItem;
+class MagicCaster;
+class MagicTarget;
+class EffectItem;
 
 // 0x48
 class ActiveEffect
@@ -32,7 +36,7 @@ public:
 	virtual void			Unk_06(UInt32 arg);
 	virtual void			Unk_07(UInt32 arg);
 	virtual void			Unk_08(UInt32 arg);
-	virtual bool			UnregisterCaster(MagicCaster * apkCaster);	// returns 1 and clears caster if it matches the parameter, else returns 0
+	virtual bool			UnregisterCaster(MagicCaster* apkCaster);	// returns 1 and clears caster if it matches the parameter, else returns 0
 	virtual bool			Unk_0A();
 	virtual void			Unk_0B(ActiveEffect* apkTarget);
 	virtual bool			Unk_0C(UInt32 arg);

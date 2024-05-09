@@ -47,10 +47,3 @@ inline std::vector<void(*)()>		pluginLoad;
 inline std::vector<void(*)()>		deferredInit;
 inline std::vector<void(*)()>		mainLoop;
 inline std::vector<void(*)()>		mainLoopDoOnce;
-
-inline std::vector<void(*)()>		onRender;
-inline std::vector<void(*)(Actor*)>	onHit;
-
-inline std::vector<void(*)(TESObjectREFR*, TESObjectREFR*, TESForm*)> onAddDrop;
-inline std::vector<void(*)(TESObjectREFR*, TESObjectREFR*, TESForm*)> onActivate;
-inline std::vector<bool(*)(TESObjectREFR*, Actor*, bool)> onPreActivate;

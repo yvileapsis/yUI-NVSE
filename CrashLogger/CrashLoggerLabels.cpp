@@ -103,7 +103,6 @@ namespace CrashLogger::Labels
 	void FillNVSELabels()
 	{
 		// fix labels
-		/*
 		Push(0x10F1EE0, nullptr, "TypeInfo", Label::kType_Class);
 		Push(0x10B9D28, nullptr, "TileShaderProperty", Label::kType_Class);
 
@@ -2062,7 +2061,6 @@ namespace CrashLogger::Labels
 		Push(kVtbl_hkxVertexIntDataChannel);
 		Push(kVtbl_hkxVertexSelectionChannel);
 		Push(kVtbl_hkxVertexVectorDataChannel);
-	*/
 	};
 
 	void FillFOSELabels()

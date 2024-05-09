@@ -1,5 +1,8 @@
 #include <format>
 
+#include "NiExtraData.hpp"
+#include "NiStream.hpp"
+
 #include "Setting.hpp"
 
 #include "TESForm.hpp"
@@ -18,6 +21,14 @@
 
 #include "ActorMover.hpp"
 #include "QueuedReference.hpp"
+#include "QueuedModel.hpp"
+#include "QueuedTexture.hpp"
+#include "QueuedKF.hpp"
+
+#include "ActiveEffect.hpp"
+#include "ScriptEffect.hpp"
+
+#include "TESScript.hpp"
 
 #include "Tile.hpp"
 #include "Menu.hpp"
@@ -133,7 +144,7 @@ std::ostream& operator<<(std::ostream& os, const AnimSequenceSingle& obj)
 	os << (const BSAnimGroupSequence&)*obj.pkAnim;
 	return os;
 }
-/*
+
 std::ostream& operator<<(std::ostream& os, const AnimSequenceMultiple& obj)
 {
 	for (const auto iter : *obj.pkAnims)
@@ -143,8 +154,7 @@ std::ostream& operator<<(std::ostream& os, const AnimSequenceMultiple& obj)
 
 std::ostream& operator<<(std::ostream& os, const NiObjectNET& obj) 
 {
-	os << SanitizeString(std::format(R"(Name: "{}")", obj.m_pcName)); 
-
+	os << SanitizeString(std::format(R"(Name: "{}")", reinterpret_cast<const char*>(&obj.m_kName)));
 	return os; 
 }
 
@@ -158,46 +168,52 @@ std::ostream& operator<<(std::ostream& os, const NiNode& obj)
 
 std::ostream& operator<<(std::ostream& os, const NiExtraData& obj)
 {
-	os << SanitizeString(std::format(R"(Name: "{}")", obj.m_kName.CStr()));
-	return os; 
+	os << SanitizeString(std::format(R"(Name: "{}")", reinterpret_cast<const char*>(&obj.m_kName)));
+	return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const BSFile& obj) 
 { 
-	os << SanitizeString(std::format("Path: {}", obj.m_path));
+	os << SanitizeString(std::format("Path: {}", obj.cFileName));
 	return os;
 }
 std::ostream& operator<<(std::ostream& os, const TESModel& obj)
 {
-	os << SanitizeString(std::format("Path: {}", obj.nifPath.CStr())); 
+	os << SanitizeString(std::format("Path: {}", obj.kModel.StdStr()));
 	return os; 
 }
 
 std::ostream& operator<<(std::ostream& os, const QueuedModel& obj) 
 {
-	if (obj.model)
-		os << SanitizeString("Path: " + std::string(obj.model->path) + " ");
-	if (obj.tesModel)
-		os << (TESModel&)*obj.tesModel;
+	if (obj.spModel)
+		os << SanitizeString("Path: " + std::string(obj.spModel->pcPath) + " ");
+	if (obj.pTESModel)
+		os << (TESModel&)*obj.pTESModel;
 	return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const TESTexture& obj) { os << std::format("Path: {}", obj.ddsPath.CStr()); return os; }
+std::ostream& operator<<(std::ostream& os, const TESTexture& obj) 
+{
+	os << std::format("Path: {}", obj.kTexturePath.StdStr());
+	return os;
+}
+
 std::ostream& operator<<(std::ostream& os, const QueuedTexture& obj) 
 {
-	os << SanitizeString(std::format("Path: {}", obj.name)); 
+	os << SanitizeString(std::format("Path: {}", obj.pFileName));
 	return os; 
 }
+
 std::ostream& operator<<(std::ostream& os, const NiStream& obj) 
 {
-	os << SanitizeString(std::format("Path: {}", obj.path)); 
+	os << SanitizeString(std::format("Path: {}", obj.m_acFileName));
 	return os; 
 }
 
 std::ostream& operator<<(std::ostream& os, const ActiveEffect& obj)
 {
-	if (obj.enchantObject)
-		os << "Enchanted Object: " << (const TESForm&)*obj.enchantObject;
+	if (obj.pkEnchantObject)
+		os << "Enchanted Object: " << (const TESForm&)*obj.pkEnchantObject;
 	return os; 
 }
 
@@ -206,22 +222,22 @@ std::set<Script*> crashedScripts;
 std::ostream& operator<<(std::ostream& os, const Script& obj)
 {
 	os << (const TESForm&)obj;
-	if (obj.data && std::string(obj.GetName()).empty())
+	if (obj.m_val && std::string(obj.GetEditorID()).empty())
 		if (!crashedScripts.contains(const_cast<Script*>(&obj)))
 		{
 			crashedScripts.emplace(const_cast<Script*>(&obj));
 			os << ", Source: " << DecompileScriptToFolder("UnknownScript" + std::to_string(crashedScripts.size()), const_cast<Script*>(&obj), "gek", "Crash Logger");
 		}
-	return os; 
+	return os;
 }
 
 std::ostream& operator<<(std::ostream& os, const ScriptEffect& obj)
 {
 	os << (const ActiveEffect&)obj << " ";
-	if (obj.script)
+	if (obj.pkScript)
 	{
 		std::stringstream ss;
-		ss << "Script: " << (const Script&)*obj.script;
+		ss << "Script: " << (const Script&)*obj.pkScript;
 		os << SanitizeString(ss.str());
 	}
 	return os; 
@@ -229,10 +245,11 @@ std::ostream& operator<<(std::ostream& os, const ScriptEffect& obj)
 
 std::ostream& operator<<(std::ostream& os, const QueuedKF& obj)
 {
-	if (obj.kf) os << SanitizeString("Path: " + std::string(obj.kf->path));
+	os << SanitizeString(std::format("Path: {}", obj.pFileName));
+	if (obj.pkKFModel) os << SanitizeString(" Path: " + std::string(obj.pkKFModel->pcPath));
 	return os; 
 }
-*/
+
 FORMAT_CLASS(Tile)
 FORMAT_CLASS(Menu)
 FORMAT_CLASS(StartMenu::Option)
@@ -247,7 +264,6 @@ FORMAT_CLASS(QueuedReference)
 FORMAT_CLASS(NavMesh)
 FORMAT_CLASS(BaseProcess);
 
-/*
 FORMAT_CLASS(BSAnimGroupSequence);
 FORMAT_CLASS(AnimSequenceSingle);
 FORMAT_CLASS(AnimSequenceMultiple);
@@ -266,7 +282,7 @@ FORMAT_CLASS(ActiveEffect);
 FORMAT_CLASS(Script);
 FORMAT_CLASS(ScriptEffect);
 FORMAT_CLASS(QueuedKF);
-*/
+
 #if 0
 
 void DumpAnimGroups()

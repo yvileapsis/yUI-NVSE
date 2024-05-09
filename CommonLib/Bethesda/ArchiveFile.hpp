@@ -18,8 +18,8 @@ public:
 	void	Seek(SInt32 aiOffset, SInt32 aiWhence) override;
 	bool	Open(int = 0, bool abTextMode = false) override;
 	UInt32	GetSize() override;
-	UInt32	WriteString(BSStringT& arString, bool abBinary) override;
-	UInt32	WriteStringAlt(BSStringT& arString, bool abBinary) override;
+	UInt32	WriteString(BSStringT<char>& arString, bool abBinary) override;
+	UInt32	WriteStringAlt(BSStringT<char>& arString, bool abBinary) override;
 	bool	IsReadable() override;
 	UInt32	DoRead(void* apBuffer, UInt32 auiBytes) override;
 	UInt32	DoWrite(const void* apBuffer, UInt32 auiBytes) override;

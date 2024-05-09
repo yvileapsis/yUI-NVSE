@@ -33,12 +33,12 @@ public:
 	RecordedCommand		recordedCommands[20];
 	char				COFileName[260];
 
-	static ConsoleManager* GetSingleton();
+	__forceinline static ConsoleManager* GetSingleton(bool canCreateNew = true) { return CdeclCall<ConsoleManager*>(0x0071B160, canCreateNew); }
 
 	static char* GetConsoleOutputFilename();
 	static bool HasConsoleOutputFilename();
 
-	void Print(const char* apFormat, va_list args);
+	__forceinline void Print(const char* fmt, va_list args) { ThisCall(0x0071D0A0, this, fmt, args); }
 	bool IsConsoleActive();
 	bool ToggleConsole();
 };

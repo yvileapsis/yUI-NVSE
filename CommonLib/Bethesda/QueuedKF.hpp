@@ -8,7 +8,7 @@ public:
 	QueuedKF();
 	~QueuedKF();
 
-	KFModel* kf;		// 030
+	KFModel*	pkKFModel;	// 030
 	UInt8		unk034;		// 034
 	UInt8		pad035[3];	// 035
 };

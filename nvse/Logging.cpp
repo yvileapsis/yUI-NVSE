@@ -14,6 +14,17 @@
 
 #include <ConsoleManager.hpp>
 
+inline ConsoleManager* operator<<(ConsoleManager* console, const std::string& str)
+{
+	UInt32 numLines = str.length() / 500;
+	for (UInt32 i = 0; i < numLines; i++)
+		console->Print(str.substr(i * 500, 500).c_str(), nullptr);
+
+	console->Print(str.substr(numLines * 500, str.length() - numLines * 500).c_str(), nullptr);
+
+	return console;
+};
+
 class LoggerManager {
 public:
 
@@ -119,10 +130,8 @@ namespace Logger
 		LoggerManager::GetSingleton().addDestination("console", [prefix](const std::string& msg, LogLevel level)
 			{
 				if ((level & LogLevel::LogConsole))
-//					if (const auto console = ConsoleManager::GetSingleton())
-						;
-// TODO: fix console
-//						console << prefix + ": " + msg;
+					if (const auto console = ConsoleManager::GetSingleton())
+						console << prefix + ": " + msg;
 			});
 	}
 

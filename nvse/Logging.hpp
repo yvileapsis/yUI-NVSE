@@ -3,8 +3,8 @@
 #include <string>
 
 enum LogLevel {
-	LogNone		= 0,
-	LogInfo		= 1 << 0x1,
+	LogNone			= 0,
+	LogInfo			= 1 << 0x1,
 	LogWarning		= 1 << 0x2,
 	LogError		= 1 << 0x3,
 	LogConsole		= 1 << 0x4,
