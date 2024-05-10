@@ -1,6 +1,7 @@
 #pragma once
 #include "TESFile.hpp"
 #include "NiTArray.hpp"
+#include "NiTPointerList.hpp"
 
 class BGSAcousticSpace;
 class BGSAddonNode;

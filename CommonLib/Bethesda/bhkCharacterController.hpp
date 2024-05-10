@@ -17,7 +17,12 @@ NiSmartPointer(bhkCapsuleShape);
 NiSmartPointer(bhkCachingShapePhantom);
 NiSmartPointer(bhkCharacterController);
 
-ALIGN16 class bhkCharacterController : public bhkCharacterProxy, public hkpCharacterContext, public bhkCharacterListener, public hkpSurfaceInfo {
+ALIGN16 class bhkCharacterController :
+	public bhkCharacterProxy,
+	public hkpCharacterContext,
+	public bhkCharacterListener,
+	public hkpSurfaceInfo
+{
 public:
 	enum CharacterState : UInt32 {
 		ON_GROUND	= 0,
@@ -119,7 +124,7 @@ public:
 	BSSimpleList<UInt32>		damageImpacts;
 	Projectile*					pProjectile; // Projectile
 
-	NiAVObject* GetNiObject() const;
+	NiAVObject* GetNiObject() const { return ThisCall<NiAVObject*>(0x810660, const_cast<bhkCharacterController*>(this)); };
 
 	NiNode* GetCollisionDebugNode();
 	void RemoveCollisionDebug();

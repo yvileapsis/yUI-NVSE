@@ -17,7 +17,9 @@ public:
 
 	hkReferencedObject* phkObject;
 
-	NiAVObject* GetAVObject(NiRTTI* apRTTI = nullptr) const;
+	NiAVObject* GetAVObject(NiRTTI* apRTTI = nullptr) const {
+		return ThisStdCall<NiAVObject*>(0xC85C80, this, apRTTI);
+	};
 };
 
 ASSERT_SIZE(bhkRefObject, 0xC);

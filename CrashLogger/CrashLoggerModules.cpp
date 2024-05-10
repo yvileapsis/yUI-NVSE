@@ -96,14 +96,14 @@ namespace CrashLogger::Modules
 
 		Safe_EnumerateLoadedModules(process, EumerateModulesCallback, &infoUser);
 
-		Log() << "Module bases:";
+		Log() << "Module bases:" << std::endl << std::format(" {:^23} | {:>40} | {:>20} | Filepath", "Address", "Module", "Version");
 		for (const auto& [moduleBase, moduleEnd, path] : enumeratedModules)
 		{
             std::string version;
 
             if (g_commandInterface) {
                 if (const auto info = g_commandInterface->GetPluginInfoByName(GetPluginNameForFileName(path.stem().generic_string()).c_str()))
-                    version = std::format("Version: {:>20d}, ", info->version);
+                    version = std::format("{:d}", info->version);
             }
 
             if (version.empty()) {
@@ -111,10 +111,10 @@ namespace CrashLogger::Modules
                 if (dll_version.empty())
                     dll_version = "Unknown";
 
-                version = std::format("Version: {:>20s}, ", dll_version);
+                version = dll_version;
             }
 
-            Log() << std::format("0x{:08X} - 0x{:08X} ==> {:30s}{:>30s}{}", moduleBase, moduleEnd, path.stem().generic_string() + ",", version, SanitizeString(path.generic_string()));
+            Log() << std::format(" 0x{:08X} - 0x{:08X} | {:>40} | {:>20} | {}", moduleBase, moduleEnd, path.stem().generic_string(), version, SanitizeString(path.generic_string()));
 
 		}
 

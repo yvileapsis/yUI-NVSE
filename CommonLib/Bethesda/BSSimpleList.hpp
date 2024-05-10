@@ -327,6 +327,11 @@ public:
 			Remove(pIter->GetItem());
 		return pIter;
 	}
+
+	T_Data TailItem() const {
+		const auto tail = GetTail();
+		return (tail) ? tail->m_item : nullptr;
+	}
 };
 
 ASSERT_SIZE(BSSimpleList<UInt32>, 0x8);

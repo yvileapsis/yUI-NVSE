@@ -1,7 +1,7 @@
 #include <Utilities.hpp>
 
 #include "ConsoleManager.hpp"
-// TODO: script inside tesscript
+
 #include "InterfaceManager.hpp"
 #include "TESScript.hpp"
 #include "TESDataHandler.hpp"

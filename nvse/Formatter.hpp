@@ -1,7 +1,12 @@
 #include <format>
 
+#include "bhkRefObject.hpp"
+#include "bhkCharacterController.hpp"
+
 #include "NiExtraData.hpp"
 #include "NiStream.hpp"
+#include "NiCollisionObject.hpp"
+#include "NiTimeController.hpp"
 
 #include "Setting.hpp"
 
@@ -94,57 +99,65 @@ std::ostream &operator<<(std::ostream &os, const Setting& obj)
 
 std::ostream& operator<<(std::ostream& os, const TESForm& obj) 
 { 
-	UInt32 refID = obj.refID;
-	UInt32 modIndex = (obj.refID >> 24) & 0xFF;
+	UInt32 refID = obj.uiFormID;
 
-	bool isScript = obj.typeID == kFormType_Script;
-	bool isTemp = modIndex == 0xFF;
 	std::string modName;
-	const char* refName = obj.GetName();
-	if (isTemp) {
+	const char* refName = obj.GetEditorID();
+
+	if (obj.ucModIndex == 0xFF)
+	{
 		if (!refName)
-			modName = "Temp Form";
+			refName = "Temp Form";
 		else
-			modName = isScript ? "Scriptrunner" : "Temp Form";
+			refName = obj.eTypeID == TESForm::kType_Script ? "Script Runner" : "Temp Form";
 	}
-	else {
-		ModInfo* sourceMod = obj.mods.GetFirstItem();
-		ModInfo* lastMod = obj.mods.GetLastItem();
+	os << std::format("{:08X} ({})", refID, refName);
 
-		if (sourceMod == lastMod) {
-			modName = std::format("Plugin: {}", sourceMod->name);
-		}
-		else {
-			modName = std::format("Plugin: {}, Last modified by: {}", sourceMod->name, lastMod->name);
-		}
+	if (obj.ucModIndex != 0xFF) {
+		TESFile* sourceMod = obj.kMods.m_item;
+		TESFile* lastMod = obj.kMods.TailItem();
+
+		if (sourceMod == lastMod)
+			modName = std::format(R"(Plugin: "{}")", sourceMod->m_Filename);
+		else
+			modName = std::format(R"(Plugin: "{}", Last modified by: "{}")", sourceMod->m_Filename, lastMod->m_Filename);
+
+		os << ", " << modName;
 	}
-	os << std::format("{:08X} - \"{}\" - {} ", refID, refName, modName.c_str());
-
 
 	return os; 
 }
+
 std::ostream& operator<<(std::ostream& os, const TESObjectREFR& obj)
 {
-	os << (const TESForm&)obj;
+	os << (const TESForm&) obj;
 	TESForm* baseForm = obj.TryGetREFRParent();
 	if (baseForm) {
-		std::stringstream ss;
-		ss << "| Baseform " << baseForm;
-		os << ss.str();
+//		std::stringstream ss;
+		os << ", BaseForm: " << (const TESForm&) *baseForm;
+//		os << ss.str();
 	}
 	return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const ActorMover& obj) { if (obj.pkActor) os << (const TESObjectREFR&)obj.pkActor; return os; }
-std::ostream& operator<<(std::ostream& os, const QueuedReference& obj) { if (obj.pRefr) os << (const TESObjectREFR&)obj.pRefr; return os; }
+std::ostream& operator<<(std::ostream& os, const ActorMover& obj)
+{
+	if (obj.pkActor) os << (const TESObjectREFR&)*obj.pkActor;
+	return os;
+}
 
+std::ostream& operator<<(std::ostream& os, const QueuedReference& obj)
+{ 
+	if (obj.pRefr) os << (const TESObjectREFR&)*obj.pRefr;
+	return os;
+}
 
 std::ostream& operator<<(std::ostream& os, const NavMesh& obj)
 {
 	os << (const TESForm&)obj;
-	if (obj.parentCell) {
+	if (obj.pParentCell) {
 		std::stringstream ss;
-		ss << ", Cell " << (const TESForm&)*obj.parentCell;
+		ss << ", Cell " << (const TESForm&)*obj.pParentCell;
 		os << ss.str();
 	}
 	return os;
@@ -187,17 +200,17 @@ std::ostream& operator<<(std::ostream& os, const AnimSequenceMultiple& obj)
 
 std::ostream& operator<<(std::ostream& os, const NiObjectNET& obj) 
 {
-	if (obj.m_pcName != nullptr && obj.m_pcName[0] != 0 && obj.m_pcName[0] != ' ')
-		os << SanitizeString(std::format("\"{}\"", obj.m_pcName)); 
-
+	const auto name = obj.m_kName.GetStd();
+	if (!name.empty()) os << SanitizeString(std::format(R"("{}")", name)); 
 	return os; 
 }
 
 std::ostream& operator<<(std::ostream& os, const NiNode& obj)
 {
 	os << (const NiObjectNET&)obj;
-	if (const auto ref = TESObjectREFR::FindReferenceFor3D(&obj)) {
-		const char* separator = obj.m_pcName && obj.m_pcName[0] ? ", " : " ";
+	if (const auto ref = TESObjectREFR::FindReferenceFor3D(&obj)) 
+	{
+		const char* separator = !obj.m_kName.GetStd().empty() ? ", " : " ";
 		os << separator << (const TESObjectREFR&)*ref;
 	}
 	return os; 
@@ -205,8 +218,8 @@ std::ostream& operator<<(std::ostream& os, const NiNode& obj)
 
 std::ostream& operator<<(std::ostream& os, const NiExtraData& obj)
 {
-	if (obj.m_kName.CStr() && obj.m_kName.CStr()[0] != 0)
-		os << SanitizeString(std::format("\"{}\"", obj.m_kName.CStr()));
+	const auto name = obj.m_kName.GetStd();
+	if (!name.empty()) os << SanitizeString(std::format(R"("{}")", name));
 	return os; 
 }
 
@@ -232,20 +245,19 @@ std::ostream& operator<<(std::ostream& os, const QueuedModel& obj)
 
 std::ostream& operator<<(std::ostream& os, const TESTexture& obj) 
 {
-	os << std::format("Path: {}", obj.kTexturePath.StdStr());
+	os << SanitizeString(std::format(R"(Path: "{}")", obj.kTexturePath.StdStr()));
 	return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const TESTexture& obj) { os << std::format("Path: \"{}\"", obj.ddsPath.CStr()); return os; }
 std::ostream& operator<<(std::ostream& os, const QueuedTexture& obj) 
 {
-	os << SanitizeString(std::format("Path: {}", obj.pFileName));
+	os << SanitizeString(std::format(R"(Path: "{}")", obj.pFileName));
 	return os; 
 }
 
 std::ostream& operator<<(std::ostream& os, const NiStream& obj) 
 {
-	os << SanitizeString(std::format("Path: {}", obj.m_acFileName));
+	os << SanitizeString(std::format(R"(Path: "{}")", obj.m_acFileName));
 	return os; 
 }
 
@@ -284,7 +296,7 @@ std::ostream& operator<<(std::ostream& os, const ScriptEffect& obj)
 
 std::ostream& operator<<(std::ostream& os, const QueuedKF& obj)
 {
-	if (obj.kf) os << SanitizeString("Path: \"" + std::string(obj.kf->path) + "\"");
+	if (obj.pkKFModel) os << SanitizeString(std::format(R"(Path: "{}")", obj.pkKFModel->pcPath));
 	return os; 
 }
 
@@ -299,9 +311,9 @@ std::ostream& operator<<(std::ostream& os, const bhkRefObject& obj)
 
 std::ostream& operator<<(std::ostream& os, const NiCollisionObject& obj)
 {
-	NiAVObject* object = obj.sceneObject;
+	NiAVObject* object = obj.m_pkSceneObject;
 	if (object) {
-		if (object->GetAsNiNode())
+		if (object->IsNiNode())
 			os << (const NiNode&)*object;
 		else
 			os << object;
@@ -311,9 +323,9 @@ std::ostream& operator<<(std::ostream& os, const NiCollisionObject& obj)
 
 std::ostream& operator<<(std::ostream& os, const NiTimeController& obj)
 {
-	NiAVObject* object = obj.target;
+	NiObjectNET* object = obj.m_pkTarget;
 	if (object) {
-		if (object->GetAsNiNode())
+		if (object->IsNiNode())
 			os << "Target: " << (const NiNode&)*object;
 		else
 			os << "Target: " << object;
@@ -325,7 +337,7 @@ std::ostream& operator<<(std::ostream& os, const bhkCharacterController& obj)
 {
 	NiAVObject* object = obj.GetNiObject();
 	if (object) {
-		if (object->GetAsNiNode())
+		if (object->IsNiNode())
 			os << "Target: " << (const NiNode&)*object;
 		else
 			os << "Target: " << object;
