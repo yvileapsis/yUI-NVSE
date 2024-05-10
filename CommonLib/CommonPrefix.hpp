@@ -8,7 +8,7 @@
 
 #include <winsock2.h>
 #include <Windows.h>
-
+#include <xmmintrin.h>
 
 
 typedef unsigned char		UInt8;		//!< An unsigned 8-bit integer value
