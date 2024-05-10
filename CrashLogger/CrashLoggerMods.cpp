@@ -25,7 +25,6 @@ namespace CrashLogger::Mods
 		std::string folder_path = std::format("{}data/nvse/plugins/scripts", GetFalloutDirectory().generic_string());
 
 		if (std::filesystem::exists(folder_path) && std::filesystem::is_directory(folder_path)) {
-			Log() << std::endl;
 			Log() << std::format("Script Runners:");
 
 			// Iterate through each entry in the directory
