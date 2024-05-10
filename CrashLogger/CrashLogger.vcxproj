@@ -123,8 +123,10 @@
     <ClCompile Include="..\nvse\SafeWrite.cpp" />
     <ClCompile Include="..\nvse\Utilities.cpp" />
     <ClCompile Include="CrashLoggerCalltrace.cpp" />
+    <ClCompile Include="CrashLoggerDevice.cpp" />
     <ClCompile Include="CrashLoggerExceptionHandler.cpp" />
     <ClCompile Include="CrashLoggerMemory.cpp" />
+    <ClCompile Include="CrashLoggerMods.cpp" />
     <ClCompile Include="CrashLoggerModules.cpp" />
     <ClCompile Include="CrashLoggerRegistryStack.cpp" />
     <ClCompile Include="definitions.cpp" />

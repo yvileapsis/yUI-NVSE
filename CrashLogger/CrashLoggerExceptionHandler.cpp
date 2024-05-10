@@ -144,13 +144,17 @@ namespace CrashLogger
 
 		Thread::Get(info);
 
+		Memory::Get(info);
+
+		Device::Get(info);
+
 		Calltrace::Get(info);
 
 		Registry::Get(info);
 
 		Stack::Get(info);
 
-		Memory::Get(info);
+		Mods::Get(info);
 
 		Modules::Get(info);
 
