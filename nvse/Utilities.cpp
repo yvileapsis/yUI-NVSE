@@ -1,11 +1,5 @@
 #include <Utilities.hpp>
 
-#include "ConsoleManager.hpp"
-
-#include "InterfaceManager.hpp"
-#include "TESScript.hpp"
-#include "TESDataHandler.hpp"
-
 #include <cstdlib>
 #include <utility>
 

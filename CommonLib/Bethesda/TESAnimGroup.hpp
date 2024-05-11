@@ -1,7 +1,6 @@
 #pragma once
 #include "NiRefObject.hpp"
 #include "NiPoint3.hpp"
-#include <span>
 
 class TESAnimGroup : public NiRefObject {
 public:

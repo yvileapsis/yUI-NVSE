@@ -1355,7 +1355,7 @@
     <ClInclude Include="..\CommonLib\Havok\hkTransform.hpp" />
     <ClInclude Include="..\CommonLib\Havok\hkUnaryActionCinfo.hpp" />
     <ClInclude Include="..\CommonLib\Havok\hkVector4.hpp" />
-    <ClInclude Include="..\CommonLib\Misc.hpp" />
+    <ClInclude Include="classes.hpp" />
     <ClInclude Include="..\CommonLib\MiscUtils.hpp" />
     <ClInclude Include="..\CommonLib\Obsidian\BGSDehydrationStage.hpp" />
     <ClInclude Include="..\CommonLib\Obsidian\BGSHungerStage.hpp" />

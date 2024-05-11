@@ -2,7 +2,6 @@
 
 #include "NiExtraData.hpp"
 #include "BSSplatterData.hpp"
-#include <stack>
 
 class BSCustomSplatterExtraData : public NiExtraData {
 public:

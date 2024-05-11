@@ -3761,7 +3761,7 @@
       <Filter>Obsidian</Filter>
     </ClInclude>
     <ClInclude Include="..\CommonLib\Bitwise.hpp" />
-    <ClInclude Include="..\CommonLib\Misc.hpp" />
+    <ClInclude Include="classes.hpp" />
     <ClInclude Include="..\CommonLib\MiscUtils.hpp" />
     <ClInclude Include="..\CommonLib\OSInputGlobals.hpp" />
     <ClInclude Include="..\CommonLib\RTTI.hpp" />

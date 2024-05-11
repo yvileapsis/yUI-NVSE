@@ -43,4 +43,22 @@
 #define VERSION_CODE_SECONDARY(in)				((in >> 8) & 0xFFF)
 #define VERSION_CODE_SUB(in)					((in >> 0) & 0xFF)
 
+#include <algorithm>
+#include <filesystem>
+#include <fstream>
+#include <memory>
+#include <type_traits>
+#include <chrono>
+
+#include <ranges>
+#include <string>
+#include <vector>
+#include <span>
+#include <unordered_set>
+#include <unordered_map>
+
+#include <functional>
+
+#include "classes.hpp"
+
 #include "Utilities.hpp"

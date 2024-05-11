@@ -1,20 +1,4 @@
 #pragma once
-#include <algorithm>
-#include <filesystem>
-#include <fstream>
-#include <memory>
-#include <type_traits>
-#include <chrono>
-
-#include <ranges>
-#include <string>
-#include <vector>
-#include <span>
-#include <unordered_set>
-#include <unordered_map>
-
-#include <functional>
-
 #include <intrin.h>
 #include <Logging.hpp>
 
@@ -82,8 +66,6 @@ private:
 	std::string m_data;
 };
 
-class Script;
-
 const char GetSeparatorChar(Script * script);
 std::string GetSeparatorChars(Script * script);
 
@@ -124,7 +106,6 @@ public:
 
 void ShowErrorMessageBox(const char* message);
 
-class TESForm;
 const char* GetModName(const TESForm* script);
 
 std::vector<void*> GetCallStack(int i);

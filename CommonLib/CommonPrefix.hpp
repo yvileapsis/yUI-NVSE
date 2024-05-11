@@ -89,7 +89,7 @@ template <typename t> __forceinline void GameHeapFree(t* ptr) { ThisStdCall(0xAA
 #include <wrl\client.h>
 #include <stdio.h>
 
-#include <format>
+#include <string>
 #include <vector>
 
 using namespace ABI::Windows::Foundation;
