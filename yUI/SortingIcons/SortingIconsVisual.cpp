@@ -168,7 +168,7 @@ namespace SortingIcons::Icons::Hook
 			mov		edx, [ebp - 0x2C]	//menu item entry list
 			push	edx
 			mov		edx, [ebp + 0x8]	//entry
-			call	SetStringValue
+			call    SetStringValue
 			jmp		retnAddr
 		}
 	}
@@ -179,7 +179,7 @@ namespace SortingIcons::Icons::Hook
 		__asm
 		{
 			mov		edx, [ebp - 0x24]
-			call	SetStringValue
+			call    SetStringValue
 			jmp		retnAddr
 		}
 	}
@@ -191,7 +191,7 @@ namespace SortingIcons::Icons::Hook
 		__asm
 		{
 			mov		edx, dword ptr ds : [0x011D9EA8]
-			call	SetStringValue
+			call    SetStringValue
 			jmp		retnAddr
 		}
 	}

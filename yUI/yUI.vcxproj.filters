@@ -56,6 +56,63 @@
     <ClCompile Include="MiscFeatures\PatchMatchedCursor.cpp">
       <Filter>features</Filter>
     </ClCompile>
+    <ClCompile Include="..\game\BSExtraData.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\GameData.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\InventoryChanges.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\TESForm.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\TESObjectREFR.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\OSDepend.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\Script.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\Setting.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\Sound.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\GameTasks.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\Tile.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\Types.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\Menu.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\ConsoleManager.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\SaveLoadGame.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\InterfaceManager.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\Containers.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\NiNodes.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
+    <ClCompile Include="..\game\TESObject.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
     <ClCompile Include="MiscFeatures\FixReorderMCM.cpp">
       <Filter>features</Filter>
     </ClCompile>
@@ -105,6 +162,9 @@
     <ClCompile Include="ConfigurationMenu\ConfigurationMenuBasic.cpp">
       <Filter>features\ConfigurationMenu</Filter>
     </ClCompile>
+    <ClCompile Include="..\game\BaseFormComponent.cpp">
+      <Filter>game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="functions.h" />
@@ -140,6 +200,87 @@
     <ClInclude Include="SortingIcons\SortingIcons.h">
       <Filter>features\SortingIcons</Filter>
     </ClInclude>
+    <ClInclude Include="..\game\BSExtraData.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\GameData.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\GameEffects.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\InventoryChanges.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\TESForm.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\TESObjectREFR.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\OSDepend.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\BaseProcess.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\RTTI.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Script.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Setting.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Sound.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\GameTasks.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Tile.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Types.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Menu.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\CommandTable.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\NiNodes.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\NiObjects.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\NiTypes.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\ConsoleManager.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\SaveLoadGame.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\InterfaceManager.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Containers.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\TESObject.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\BaseFormComponent.h">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\ProcessLists.h">
+      <Filter>game</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
@@ -162,6 +303,9 @@
     </Filter>
     <Filter Include="features\UserInterface">
       <UniqueIdentifier>{c2809161-6d98-4828-951b-1677e5f45c6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="game">
+      <UniqueIdentifier>{a015f998-0a48-4aa3-a1b7-bb3274a03bde}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

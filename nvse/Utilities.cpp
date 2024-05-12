@@ -1,5 +1,13 @@
 #include <Utilities.hpp>
 
+#include "ConsoleManager.hpp"
+// TODO: script inside tesscript
+#include "TESScript.hpp"
+#include "Script.hpp"
+#include "InterfaceManager.hpp"
+#include "TESScript.hpp"
+#include "TESDataHandler.hpp"
+
 #include <cstdlib>
 #include <utility>
 
@@ -80,15 +88,11 @@ const std::filesystem::path& GetFalloutDirectory()
 	if (lastSlash != std::string::npos)	// if we don't find a slash something is VERY WRONG
 	{
 		s_falloutDirectory = falloutPath.substr(0, lastSlash + 1);
-#if _DEBUG
 		Log() << ("fallout root = " + s_falloutDirectory.generic_string());
-#endif
 	}
 	else
 	{
-#if _DEBUG
 		Log() << ("no slash in fallout path? (" + falloutPath + ")");
-#endif
 	}
 
 	return s_falloutDirectory;
@@ -695,7 +699,7 @@ __declspec(naked) char* __fastcall CopyString(const char* key)
 		push	ecx
 		push	eax
 #if !_DEBUG
-		call	_malloc_base
+		call    _malloc_base
 #else
 		call	malloc
 #endif
@@ -1072,33 +1076,4 @@ const std::string& SanitizeString(std::string&& str)
 	SanitizeStringFromUserInfo(str);
 
 	return str;
-}
-
-float ConvertToKB(SIZE_T size) {
-	return (float)size / 1024.0f;
-}
-
-float ConvertToMB(SIZE_T size) {
-	return (float)size / 1024.0f / 1024.0f;
-}
-
-float ConvertToGB(SIZE_T size) {
-	return (float)size / 1024.0f / 1024.0f / 1024.0f;
-}
-
-std::string FormatSize(SIZE_T size) {
-	std::string result;
-	if (size < 1024) {
-		result = std::format("{:>6d} B", size);
-	}
-	else if (size < 1024 * 1024) {
-		result = std::format("{:>6.2f} KB", ConvertToKB(size));
-	}
-	else if (size < 1024 * 1024 * 1024) {
-		result = std::format("{:>6.2f} MB", ConvertToMB(size));
-	}
-	else {
-		result = std::format("{:>6.2f} GB", ConvertToGB(size));
-	}
-	return result;
 }

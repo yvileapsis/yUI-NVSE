@@ -103,6 +103,7 @@ namespace CrashLogger::Labels
 	void FillNVSELabels()
 	{
 		// fix labels
+		/*
 		Push(0x10F1EE0, nullptr, "TypeInfo", Label::kType_Class);
 		Push(0x10B9D28, nullptr, "TileShaderProperty", Label::kType_Class);
 
@@ -429,7 +430,8 @@ namespace CrashLogger::Labels
 
 		// Misc
 		Push(kVtbl_NiPixelData, As<NiObjectNET>);
-		Push(kVtbl_NiCollisionObject, As<NiCollisionObject>);
+		Push(kVtbl_NiCollisionObject);
+		Push(kVtbl_NiCollisionData);
 		Push(kVtbl_bhkNiCollisionObject);
 		Push(kVtbl_bhkCollisionObject);
 		Push(kVtbl_bhkBlendCollisionObject);
@@ -437,13 +439,12 @@ namespace CrashLogger::Labels
 		Push(kVtbl_WeaponObject);
 		Push(kVtbl_bhkPCollisionObject);
 		Push(kVtbl_bhkSPCollisionObject);
-		Push(kVtbl_NiCollisionData, nullptr);
 
 		// Animations
 		Push(kVtbl_NiControllerSequence);
 
 		// NiTimeController
-		Push(kVtbl_NiTimeController, As<NiTimeController>);
+		Push(kVtbl_NiTimeController);
 		//		Push(kVtbl_BSDoorHavokController);
 		Push(kVtbl_BSPlayerDistanceCheckController);
 		//		Push(kVtbl_NiD3DController);
@@ -507,24 +508,7 @@ namespace CrashLogger::Labels
 		Push(kVtbl_NiFloatController);
 		Push(kVtbl_NiRollController);
 
-		//		Push(kVtbl_bhkAvoidBox);
-		Push(kVtbl_bhkRefObject, As<bhkRefObject>);
 		Push(kVtbl_bhkSerializable);
-		Push(kVtbl_bhkEntity);
-		Push(kVtbl_bhkRigidBody);
-		Push(kVtbl_bhkRigidBodyT);
-		Push(kVtbl_bhkConstraint);
-		Push(kVtbl_bhkLimitedHingeConstraint);
-		Push(kVtbl_bhkMalleableConstraint);
-		Push(kVtbl_bhkBreakableConstraint);
-		Push(kVtbl_bhkWheelConstraint);
-		Push(kVtbl_bhkStiffSpringConstraint);
-		Push(kVtbl_bhkRagdollConstraint);
-		Push(kVtbl_bhkPrismaticConstraint);
-		Push(kVtbl_bhkHingeConstraint);
-		Push(kVtbl_bhkBallAndSocketConstraint);
-		Push(kVtbl_bhkGenericConstraint);
-		Push(kVtbl_bhkFixedConstraint);
 		Push(kVtbl_bhkWorld);
 		Push(kVtbl_bhkWorldM);
 		Push(kVtbl_bhkAction);
@@ -541,6 +525,22 @@ namespace CrashLogger::Labels
 		Push(kVtbl_bhkSimpleShapePhantom);
 		Push(kVtbl_bhkCachingShapePhantom);
 		Push(kVtbl_bhkAabbPhantom);
+		//		Push(kVtbl_bhkAvoidBox);
+		Push(kVtbl_bhkEntity);
+		Push(kVtbl_bhkRigidBody);
+		Push(kVtbl_bhkRigidBodyT);
+		Push(kVtbl_bhkConstraint);
+		Push(kVtbl_bhkLimitedHingeConstraint);
+		Push(kVtbl_bhkMalleableConstraint);
+		Push(kVtbl_bhkBreakableConstraint);
+		Push(kVtbl_bhkWheelConstraint);
+		Push(kVtbl_bhkStiffSpringConstraint);
+		Push(kVtbl_bhkRagdollConstraint);
+		Push(kVtbl_bhkPrismaticConstraint);
+		Push(kVtbl_bhkHingeConstraint);
+		Push(kVtbl_bhkBallAndSocketConstraint);
+		Push(kVtbl_bhkGenericConstraint);
+		Push(kVtbl_bhkFixedConstraint);
 		//		Push(kVtbl_bhkPointToPathConstraint);
 		//		Push(kVtbl_bhkPoweredHingeConstraint);
 
@@ -567,10 +567,10 @@ namespace CrashLogger::Labels
 		Push(kVtbl_bhkNiTriStripsShape);
 		Push(kVtbl_bhkHeightFieldShape);
 		Push(kVtbl_bhkPlaneShape);
-		Push(kVtbl_bhkCharacterProxy, nullptr);
+		Push(kVtbl_bhkCharacterProxy);
 		Push(kVtbl_bhkCharacterListenerArrow);
 		Push(kVtbl_bhkCharacterListenerSpell);
-		Push(kVtbl_bhkCharacterController, As<bhkCharacterController>);
+		Push(kVtbl_bhkCharacterController);
 
 		Push(kVtbl_NiExtraData, As<NiExtraData>);
 		//		Push(kVtbl_TESObjectExtraData);
@@ -1584,6 +1584,7 @@ namespace CrashLogger::Labels
 		Push(kVtbl_bhkRagdollShareData);
 		Push(kVtbl_bhkRagdollTemplate);
 		Push(kVtbl_bhkRagdollTemplateData);
+		Push(kVtbl_bhkRefObject);
 		Push(kVtbl_bhkSpringDamperConstraintMotor);
 		Push(kVtbl_bhkTelekinesisListener);
 		Push(kVtbl_bhkTrapListener);
@@ -2061,6 +2062,7 @@ namespace CrashLogger::Labels
 		Push(kVtbl_hkxVertexIntDataChannel);
 		Push(kVtbl_hkxVertexSelectionChannel);
 		Push(kVtbl_hkxVertexVectorDataChannel);
+	*/
 	};
 
 	void FillFOSELabels()

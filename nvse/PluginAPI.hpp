@@ -742,23 +742,23 @@ struct NVSESerializationInterface
  *	(i.e. the pointer to it may never become invalid).
  *  For example, a good way to define it is to make a global variable like this:
  *
- *		static ParamType s_MyEventParams[] = { ParamType::eParamType_AnyForm, ParamType::eParamType_String };
+ *	    static ParamType s_MyEventParams[] = { ParamType::eParamType_AnyForm, ParamType::eParamType_String };
  *
  *	Then you can pass it into PluginEventInfo like this:
  *
  *  Which can be registered like this:
  *
- *		s_EventInterface->RegisterEvent("MyEvent", 2, s_MyEventParams);
+ *	    s_EventInterface->RegisterEvent("MyEvent", 2, s_MyEventParams);
  *
  *  Then, from your code, you can dispatch the event like this:
  *
- *		s_EventInterface->DispatchEvent("MyEvent", callingRef, someForm, someString);
+ *	    s_EventInterface->DispatchEvent("MyEvent", callingRef, someForm, someString);
  *
  *	When passing float types to DispatchEvent you MUST pack them in a float, which then needs to be
  *  cast as a void* pointer. This is due to the nature of variadic arguments in C/C++. Example:
- *	  float number = 10;
- *		void* floatArg = *(void**) &number;
- *		s_EventInterface->DispatchEvent("MyEvent", callingRef, floatArg);
+ *      float number = 10;
+ *	    void* floatArg = *(void**) &number;
+ *	    s_EventInterface->DispatchEvent("MyEvent", callingRef, floatArg);
  */
 
 struct NVSEEventManagerInterface

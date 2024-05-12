@@ -50,7 +50,7 @@ namespace CrashLogger::PDB
 
 		if (!Safe_SymGetLineFromAddr(process, eip, &offset, line)) return "";
 
-		return std::format("{}:{:d}", line->FileName, line->LineNumber);
+		return std::format("<{}:{:d}>", line->FileName, line->LineNumber);
 	}
 
 	std::string& GetClassNameGetSymbol(void* object, std::string& buffer)
@@ -144,17 +144,13 @@ namespace CrashLogger
 
 		Thread::Get(info);
 
-		Memory::Get(info);
-
-		Device::Get(info);
-
 		Calltrace::Get(info);
 
 		Registry::Get(info);
 
 		Stack::Get(info);
 
-		Mods::Get(info);
+		Memory::Get(info);
 
 		Modules::Get(info);
 

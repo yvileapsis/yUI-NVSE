@@ -30,7 +30,7 @@ namespace Patch::ExplosionForce
 		{
 			mov		eax, [ebx + 0x8] // hitData
 			push	eax
-			mov	 eax, [ebp - 0x18] // target
+			mov     eax, [ebp - 0x18] // target
 			push	eax
 			call	AdjustPushForce
 			add		esp, 8

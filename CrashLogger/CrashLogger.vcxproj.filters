@@ -17,15 +17,25 @@
       <Filter>nvse</Filter>
     </ClCompile>
     <ClCompile Include="DbgHelpWrap.cpp" />
+    <ClCompile Include="CrashLoggerExceptionHandler.cpp">
+      <Filter>CrashLogger</Filter>
+    </ClCompile>
+    <ClCompile Include="CrashLoggerLabels.cpp">
+      <Filter>CrashLogger</Filter>
+    </ClCompile>
     <ClCompile Include="PatchNameThreads.cpp" />
-    <ClCompile Include="CrashLoggerCalltrace.cpp" />
-    <ClCompile Include="CrashLoggerExceptionHandler.cpp" />
-    <ClCompile Include="CrashLoggerLabels.cpp" />
-    <ClCompile Include="CrashLoggerMemory.cpp" />
-    <ClCompile Include="CrashLoggerModules.cpp" />
-    <ClCompile Include="CrashLoggerRegistryStack.cpp" />
-    <ClCompile Include="CrashLoggerDevice.cpp" />
-    <ClCompile Include="CrashLoggerMods.cpp" />
+    <ClCompile Include="CrashLoggerModules.cpp">
+      <Filter>CrashLogger</Filter>
+    </ClCompile>
+    <ClCompile Include="CrashLoggerRegistryStack.cpp">
+      <Filter>CrashLogger</Filter>
+    </ClCompile>
+    <ClCompile Include="CrashLoggerCalltrace.cpp">
+      <Filter>CrashLogger</Filter>
+    </ClCompile>
+    <ClCompile Include="CrashLoggerMemory.cpp">
+      <Filter>CrashLogger</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="definitions.hpp" />
@@ -59,10 +69,3786 @@
     <ClInclude Include="..\nvse\Formatter.hpp">
       <Filter>nvse</Filter>
     </ClInclude>
+    <ClInclude Include="CrashLogger.hpp">
+      <Filter>CrashLogger</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bitwise.hpp">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\OSInputGlobals.hpp">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\RTTI.hpp">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkpRigidBodyCinfo.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkShape.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkShapeCollection.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkShapePhantom.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkUnaryAction.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkWorld.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkWorldM.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkWorldObject.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkAction.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkCachingShapePhantom.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkCharacterController.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkCharacterListener.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkCharacterPointCollector.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkCharacterProxy.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkConstraint.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkEntity.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkLiquidActionCInfo.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkNiCollisionObject.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkOrientHingedBodyAction.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkPhantom.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkPickData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkRagdollController.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkRagdollPenetrationUtil.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkRagdollShareData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkRagdollTemplateData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkRefObject.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkRigidBody.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkSerializable.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TallGrassShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TallGrassShaderProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TangentSpaceData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TaskQueueInterface.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESDataHandler.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESDescription.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESEffectShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESEnchantableForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESEyes.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESFaction.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESFile.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESFollowPackageData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESFullName.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESGlobal.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESGrass.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESHair.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESHealthForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESIcon.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESImageSpace.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESImageSpaceModifiableCountForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESImageSpaceModifiableForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESImageSpaceModifier.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESKey.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESLandTexture.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESLevCharacter.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESLevCreature.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESLeveledList.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESLoadScreen.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESMain.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESModel.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESModelAnim.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESModelList.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESModelRDT.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESModelTextureSwap.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESNPC.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESObject.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESObjectACTI.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESObjectANIO.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESObjectARMA.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESObjectARMO.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESObjectCELL.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESObjectCLOT.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESObjectCONT.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESObjectDOOR.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESObjectIMOD.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESObjectLAND.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESObjectLIGH.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESObjectList.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESObjectMISC.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESObjectREFR.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESObjectSTAT.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESObjectTREE.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESObjectWEAP.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESPackage.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESPackageData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESPatrolPackageData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESPreviewControl.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESProduceForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESQuest.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESRace.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESRaceForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESReactionForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESRecipe.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESRecipeCategory.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESRegion.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESRegionData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESRegionDataGrass.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESRegionDataImposter.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESRegionDataLandscape.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESRegionDataMap.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESRegionDataSound.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESRegionDataWeather.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESRegionGrassObject.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESRegionGrassObjectList.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESRegionList.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESRegionObjectBase.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESRenderControl.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESReputation.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESSaveLoadGame.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESScript.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESScriptableForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESSkill.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESSound.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESSoundFile.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESSpellList.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESTerrainLODManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESTexture.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESTexture1024.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESTopic.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESTopicInfo.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESTopicInfoResponse.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESValueForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESWater.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESWaterForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESWeather.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESWeightForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESWorldSpace.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Tile.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TileImage.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TileMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TileRect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TileShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TileShaderProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TileText.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TimeGlobal.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TressPassPackage.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\VariableInfo.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\VolumetricFogShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\VolumetricFogShaderProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\WaterShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\WaterShaderProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\WeatherEntry.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ZeroOverheadHeap.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ShadowLightShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ShadowSceneLight.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ShadowSceneNode.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SkinShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Sky.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SkyObject.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SkyShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SkyShaderProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SkyTextureManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SpecificItemCollector.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SpectatorPackage.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SpeedTreeBranchShaderProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SpeedTreeLeafShaderProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SpeedTreeShaderLightingProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SpeedTreeShaderPPLightingProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SpellItem.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\StartMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Sun.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TES.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESActorBase.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESActorBaseData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESAIForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESAmmo.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESAnimation.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESAnimGroup.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESAttackDamageForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESAttributes.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESBipedModelForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESBoundAnimObject.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESBoundObject.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESChildCell.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESClass.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESClimate.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESCombatStyle.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESCondition.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESContainer.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESCreature.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\QuestTarget.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\QueuedActor.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\QueuedCharacter.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\QueuedCreature.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\QueuedFile.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\QueuedFileEntry.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\QueuedHelmet.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\QueuedModel.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\QueuedPlayer.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\QueuedReference.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\QueuedTexture.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\RadioConvTask.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\RagDollData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\RegSettingCollection.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\RenderingTaskThread.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SceneGraph.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ScrapHeap.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ScreenCustomSplatter.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Script.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ScriptEventList.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ScriptLocal.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Setting.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SettingCollection.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SettingCollectionList.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SettingCollectionMap.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Moon.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MuzzleFlash.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NavMesh.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NavMeshBounds.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NavMeshEdgeHandle.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NavMeshEdgeHandleArrays.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NavMeshInfo.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NavMeshInfoMap.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NiBSBoneLODController.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NiUpdateData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NiWindow.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ObstacleTaskData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ObstacleTaskNavMeshOperation.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ParallaxShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ParticleShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathingAvoidNode.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathingAvoidNodeArray.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathingDebugGeometry.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathingLocation.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathingRequest.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathingRequestClosePoint.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathingRequestCover.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathingRequestCoveredMove.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathingRequestFlee.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathingRequestHide.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathingRequestLOS.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathingRequestOptimalLocation.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathingSearchRayCast.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathingSolution.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PersistentPassList.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PlayerCharacter.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Precipitation.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ProcessLists.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Projectile.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ProjectileListener.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\AlarmPackage.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\AlchemyItem.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Animation.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\AnimationTaskData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Archive.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ArchiveAnalyzer.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ArchiveFile.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ArrowProjectile.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Atmosphere.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\AttachDistant3DTask.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\AudioLoadTask.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BackgroundCloneThread.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BackUpPackage.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BaseFormComponent.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BaseProcess.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSAbilityPerkEntry.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSAcousticSpace.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSAddonNode.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSAmmoForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSAutoWater.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSBipedModelList.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSBodyPart.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSBodyPartData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSCameraPath.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSCameraShot.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSClipRoundsForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSConstructibleObject.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSDebris.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSDecalNode.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSDefaultObjectManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSDestructibleObjectForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSDistantObjectBlock.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSDistantObjectBlockLoadTask.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSDistantTreeBlock.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSEncounterZone.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSEntryPointFunctionData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSEntryPointFunctionDataActivateChoice.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSEntryPointFunctionDataLeveledList.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSEntryPointFunctionDataOneValue.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSEntryPointFunctionDataTwoValue.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSEntryPointPerkEntry.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSEquipType.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSExplosion.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSHeadPart.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSIdleCollection.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSIdleMarker.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSImpactData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSImpactDataSet.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSLightingTemplate.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSListForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSMenuIcon.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSMenuPacker.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSMessage.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSMessageIcon.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSMovableStatic.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSMoviePlayer.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSMusicType.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSNote.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSOpenCloseForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSPerk.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSPerkEntry.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSPickupPutdownSounds.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSPlaceableWater.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSPreloadable.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSPrimitive.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSPrimitiveBox.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSPrimitivePlane.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSPrimitiveSphere.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSProjectile.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSQuestObjective.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSQuestPerkEntry.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSRadiationStage.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSRagdoll.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSRepairItemList.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSSaveLoadGame.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSSaveLoadManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSSceneInfo.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSStaticCollection.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSTalkingActivator.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSTerminal.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSTerrainChunk.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSTerrainChunkLoadTask.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSTerrainManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSTerrainNode.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSTextureModel.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSTextureSet.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSTextureUseMap.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSTouchSpellForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSVoiceType.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BipedAnim.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BoundItemEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSAdditionalGeomDataBlock.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSAnimGroupSequence.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSAnimNote.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSAnimNotes.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSArchive.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSAudio.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSAudioListener.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSAudioManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSAudioManagerThread.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSBatchRenderer.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSBlendTreadTransfInterpolator.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSBound.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSClearZNode.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSCompoundFrustum.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSCubeMapCamera.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSCullingProcess.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSCustomSplatterExtraData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSDirectoryEntry.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSDismemberSkinInstance.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSDistantTreeShaderProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSExtraData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSFaceGenAnimationData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSFaceGenBaseMorphExtraData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSFaceGenBinaryFile.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSFaceGenImage.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSFaceGenKeyframe.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSFaceGenKeyframeMultiple.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSFaceGenManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSFaceGenModel.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSFaceGenModelExtraData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSFaceGenModelMap.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSFaceGenMorphData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSFaceGenMorphDataHead.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSFaceGenNiNode.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSFadeNode.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSFadeNodeCuller.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSFile.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSFileEntry.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSFrustumFOVController.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSGameSound.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSGrabIKNote.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSGraphics.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSHash.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSLinearTaskThread.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSLookIKNote.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSMapBase.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSMasterParticleSystem.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSMaterialEmittanceMultController.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSMemObject.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSMultiBound.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSMultiBoundAABB.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSMultiBoundNode.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSMultiBoundOBB.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSMultiBoundRoom.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSMultiBoundShape.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSMultiTargetTreadTransfController.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSNodeReferences.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSOcclusionPlane.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSOrderedNode.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSPackedAdditionalGeometryData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSPackedTask.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSParallelTask.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSParallelTaskThreadManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSPlayerDistanceCheckController.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSPointer.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSPortal.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSPortalGraph.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSPortalSharedNode.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSPrecisionTimer.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSRandom.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSRenderedTexture.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSRenderer.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSRenderState.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSResizableTriShape.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSRotAccumTransfInterpolator.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSSceneGraph.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSScrapArray.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSSegmentedTriShape.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSSemaphore.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSShaderAccumulator.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSShaderBloodSplatterProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSShaderLightingProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSShaderManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSShaderNoLighting.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSShaderNoLightingProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSShaderPPLightingProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSShaderProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSShaderTextureSet.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSSimpleArray.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSSimpleArrayRefCounted.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSSimpleList.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSSoundHandle.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSSoundInfo.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSSoundMessage.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSSplatterData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSStream.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSString.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSStripParticleSystem.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSStripPSysData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSSystemFile.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTask.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTaskManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTaskThread.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTCaseInsensitiveStringMap.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTCommonLLMessageQueue.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTempEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTempEffectGeometryDecal.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTempNode.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTempNodeManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTestObjects.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTextureManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTexturePalette.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTextureSet.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTFreeList.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSThread.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTMessageQueue.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTreadTransfInterpolator.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSUtilities.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSValueNode.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSWin32Audio.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSWin32AudioListener.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSWin32GameSound.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSXFlags.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\CachedValuesOwner.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Calendar.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Character.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\CombatAction.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\CombatProcedure.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DebugShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DetailedActorPathHandler.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DialoguePackage.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DList.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\EffectItem.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\EffectSetting.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\EnchantmentItem.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Explosion.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraAction.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraAmmo.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraAnim.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraCannotWear.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraCombatStyle.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraContainerChanges.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraCount.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraDataList.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraDroppedItemList.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraFactionChanges.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraGlobal.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraHealth.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraHotkey.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraIntSeenData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraLeveledCreature.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraLock.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraMapMarker.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraNorthRotation.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraObjectHealth.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraOwnership.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraPersistentCell.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraPortalRefData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraRagDollData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraRandomTeleportMarker.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraRank.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraReferencePointer.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraReflectedRefs.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraRefractionProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraSayTopicInfoOnceADay.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraScript.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraSeenData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraTeleport.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraTerminalState.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraUses.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraWeaponModFlags.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraWorn.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraWornLeft.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\FAMThread.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\FleePackage.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\FOPipboyManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\FORenderedMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\GeometryDecalShaderProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\GridArray.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\GridCellArray.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\HairShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\HighProcess.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\HUDMainMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ImageSpaceBaseData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ImageSpaceEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ImageSpaceEffectDepthOfField.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ImageSpaceEffectNoise.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ImageSpaceManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ImageSpaceModifierInstance.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ImageSpaceModifierInstanceDOF.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ImageSpaceModifierInstanceForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ImageSpaceModifierInstanceTemp.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ImageSpaceShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ImageSpaceTexture.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\IMemoryHeap.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\IMemoryManagerFile.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\INISettingCollection.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\InterfacedClass.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\InterfaceManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\InventoryChanges.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\IOManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\IOTask.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\KFModel.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Lighting30Shader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Lighting30ShaderProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\LoadedFile.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\LoadingMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\LoadingMenuThread.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\LockFreeMap.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\LowProcess.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MagicCaster.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MagicHitEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MagicItem.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MagicItemForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MagicShaderHitEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MagicTarget.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MemoryHeap.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MemoryManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MemoryManagerFile.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MemoryPool.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Menu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MiddleHighProcess.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MiddleLowProcess.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MiscStat.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MobileObject.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Model.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ModelLoader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MTRenderingSystem.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\AbstractHeap.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ActiveEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Actor.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ActorHitData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ActorMover.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ActorPackage.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ActorPathHandler.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ActorPathingMessage.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ActorPathingMessageQueue.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ActorProcessManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ActorsScriptTaskData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ActorUpdateTaskData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ActorValue.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ActorValueInfo.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ActorValueOwner.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\AILinearTaskManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\AILinearTaskThread.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\AITaskThread.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\AITaskThreadManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\AStarQueue.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\AStarSearch.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSInputManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSPackedTaskQueue.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTempEffectParticle.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTreeModel.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTreeNode.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\HighActorCuller.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MobIterOperator.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\QueuedFileLoad.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SystemColorManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BeamShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSCameraPathManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSDecalManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSDistantObjectBlockBuilder.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSDistantTreeBlockBuilder.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSLoadedReferenceCollection.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSTerrainChunkBuilder.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSTerrainTextureButcher.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGSWorldLODSettingsDialog.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BGVertexCacheOptimizer.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkBlendCollisionObject.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkConstraintChain.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkMoppBvTreeShape.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkNiTriStripsShape.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\bhkPackedNiTriStripsShape.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\binaryFile.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BlendSettingCollection.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BoltShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BoltShaderProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSAnimNoteListener.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSBlastNode.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSClonePool.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSCoreMath.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSDamageStage.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSDebrisNode.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSDecalPlacementVectorExtraData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSDistantTreeShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSFile_Win32.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSFogProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSFurnitureMarker.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSHalfEdgeMesh.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSMap.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSMultiBoundCapsule.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSMultiBoundSphere.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSNiAllocator.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSNiNode.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSNonReentrantSpinLock.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSParallelTaskThread.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSParentVelocityModifier.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSPSysArrayEmitter.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSPSysMultiTargetEmitterCtlr.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSPSysSimpleColorModifier.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSPSysStripUpdateModifier.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSRangeNode.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSReadWriteLock.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSReference.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSRefractionFirePeriodController.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSRefractionStrengthController.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSScissorTriShape.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSScrapHeapQueueElem.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSShaderBloodSplatter.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSShaderData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSShaderUtil.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSSpinLock.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTasklet.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTaskletData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTaskletGroup.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTaskletGroupData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTaskletManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTaskManagerThread.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTCommonMessageQueue.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTCommonScrapHeapMessageQueue.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTempEffectDecal.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTempEffectSimpleDecal.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTextureData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTimer.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTPersistentList.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSTreeManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSWArray.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSWin32TaskletData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSWin32TaskletGroupData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSWin32TaskletManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSWindModifier.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Clouds.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\CombatController.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\CombatManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\CombatState.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\CombatTargetMap.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ConsoleManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Conversation.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\CreatureSounds.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DetectionTaskData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DistantLODShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DistantLODShaderProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\EdgePropertiesDialog.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\EditorNavMesh.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\EffectARchetype.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\EffectSettingCollection.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraDataObjects.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraFactionChangesMatcher.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\FaderManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\FanControls.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\FileFinder.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\FurnitureMark.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\GameSettingCollection.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\GeometryDecalShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\GlobalFunc.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\GridCell.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\HairShaderProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\HavokStream.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\HeapBlocks.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\HotKeyWheel.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ImageSpaceEffectBlur.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ImageSpaceEffectHDR.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ImageSpaceEffectInterface.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ImageSpaceEffectParam.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ImageSpaceEffectRadialBlur.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ImageSpaceEffectVolumetricFog.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ImageSpaceEffectWaterFFT.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ImageSpaceModifierInstanceDRB.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ImageSpaceShaderParam.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ImageSpaceShaderVolumetricFog.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ImpactMixer.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\IngredientItem.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\INIPrefSettingCollection.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Interface.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\lastError.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\LipSyncBackgroundManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\LipTask.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\LockFreePriorityQueue.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\LockFreeQueue.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MagicSystem.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MenuTopic.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MessageHandler.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MobileObjectMessage.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MobileObjectTaskletData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MovementTaskData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NavMesh_LoadSave.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NavMesh_Util.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NavMeshEditModule.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NavMeshGeneration.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NavMeshInfoSearch.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NavMeshObstacleCutter.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NavMeshObstacleManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NavMeshObstacleTask.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NavMeshPortal.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NavMeshPOVSearch.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NavMeshSearchMaxCost.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NavMeshSearchSLPoint.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Package.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PackageList.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PackageUpdateTaskData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ParticleShaderProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathBuilder.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Pathfind.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathingLOSGridMap.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathingLOSMap.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathingNode.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathingRequestLocation.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathingRequestSafeStraightLine.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathSmoother.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PathSmootherPOV.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PrecipitationShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\PrecipitationShaderProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\QueuedAnimIdle.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\QueuedFaceGenFile.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\QueuedFiles.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\QueuedHead.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\QueuedKF.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\QueuedReplacementKFList.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\QueuedTree.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\QuickKeysMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\RefractionProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Renderer.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\RendererSettingCollection.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ScreenShot.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ScreenSplatter.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ShaderBuffer.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SpeedTreeBillboardShaderProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SpeedTreeBranchShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SpeedTreeFrondShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SpeedTreeLeafShader.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Stars.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TallGrassTriShape.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TallGrassTriStrips.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESBitArrayFile.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESClassDF.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESDialog.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESFlora.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESFurniture.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESGameSettings.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESGrassAreaParam.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESIconTree.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESIdleForm.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESIdleManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESLand.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESLevItem.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESLevSpell.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESModelTree.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESObjectBOOK.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESParameters.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESPathGrid.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESQuestStage.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESRegionDataObjects.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESRegionDataObjectsEditor.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESRegionEditor.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESRegionPointList.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESRender.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESScriptCompiler.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESScriptFunctions.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESVersionControl.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TESWeatherList.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TextureManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ThreadSafeStructures.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\UpdateMasterPsysTaskletData.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ViewCaster.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\XGameSetting.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\Ni2DBuffer.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiAccumulator.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiAdditionalGeometryData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiAllocator.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiAlphaAccumulator.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiAlphaProperty.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiAmbientLight.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiAnimationKey.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiAVObject.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiAVObjectPalette.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiBackToFrontAccumulator.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiBillboardNode.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiBinaryExtraData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiBinaryStream.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiBlendInterpolator.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiBooleanExtraData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiBoolKey.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiBound.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiBSPNode.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiCamera.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiCloningProcess.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiCollisionObject.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiColor.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiColorData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiColorExtraData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiColorInterpolator.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiColorKey.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiControllerManager.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiControllerSequence.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiCriticalSection.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiCullingProcess.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiCullingProperty.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiD3DDefaultShader.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiD3DGeometryGroupManager.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiD3DPass.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiD3DPixelShader.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiD3DRenderState.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiD3DRenderStateGroup.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiD3DShader.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiD3DShaderConstantMap.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiD3DShaderDeclaration.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiD3DShaderInterface.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiD3DShaderLibraryVersion.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiD3DShaderProgram.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiD3DTextureStage.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiD3DTextureStageGroup.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiD3DUtility.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiD3DVertexShader.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDefaultAVObjectPalette.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDepthStencilBuffer.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDevImageConverter.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDirectionalLight.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDitherProperty.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDX9AdapterDesc.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDX9DeviceDesc.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDX9DynamicTextureData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDX9ImplicitBufferData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDX9IndexBufferManager.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDX9LightManager.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDX9MaterialManager.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDX9OnscreenBufferData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDX9RenderedCubeMapData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDX9RenderedTextureData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDX9Renderer.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDX9RenderState.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDX9Resource.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDX9ShaderDeclaration.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDX9SourceCubeMapData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDX9SourceTextureData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDX9TextureData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDX9TextureManager.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDX9VertexBufferManager.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDX92DBufferData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDynamicEffect.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDynamicEffectState.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiDynamicGeometryGroup.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiExtraData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiFile.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiFixedString.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiFloatData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiFloatExtraData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiFloatInterpController.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiFloatInterpolator.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiFloatKey.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiFloatsExtraData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiFogProperty.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiFrustum.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiFrustumPlanes.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiGeometry.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiGeometryBufferData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiGeometryData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiGeometryGroup.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiGeometryGroupManager.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiGeomMorpherController.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiGlobalConstantEntry.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiGlobalStringTable.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiGPUProgram.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiImageConverter.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiImageReader.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiIntegerExtraData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiIntegersExtraData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiInterpController.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiInterpolator.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiKeyBasedInterpolator.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiLight.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiLines.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiLinesData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiLODData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiLODNode.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiMaterialProperty.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiMath.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiMatrix3.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiMemManager.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiMemObject.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiMemory.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiMeshParticleSystem.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiMeshPSysData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiMorphData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiNIFImageReader.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiNode.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiObject.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiObjectGroup.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiObjectNET.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPalette.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiParticleInfo.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiParticleMeshes.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiParticleMeshesData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiParticles.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiParticlesData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiParticleSystem.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPersistentSrcTextureRendererData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPixelData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPixelFormat.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPlane.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPoint2.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPoint3.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPoint4.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPointLight.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiProperty.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPropertyState.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysAgeDeathModifier.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysAirFieldAirFrictionCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysAirFieldInheritVelocityCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysAirFieldModifier.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysAirFieldSpreadCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysBombModifier.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysBoundUpdateModifier.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysBoxEmitter.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysCollider.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysColliderManager.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysColorModifier.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysCylinderEmitter.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysDragFieldModifier.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysDragModifier.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysEmitter.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysEmitterCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysEmitterCtlrData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysEmitterDeclinationCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysEmitterDeclinationVarCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysEmitterInitialRadiusCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysEmitterLifeSpanCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysEmitterPlanarAngleCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysEmitterPlanarAngleVarCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysEmitterSpeedCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysFieldAttenuationCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysFieldMagnitudeCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysFieldMaxDistanceCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysFieldModifier.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysGravityFieldModifier.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysGravityModifier.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysGravityStrengthCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysGrowFadeModifier.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysInitialRotAngleCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysInitialRotAngleVarCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysInitialRotSpeedCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysInitialRotSpeedVarCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysMeshEmitter.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysMeshUpdateModifier.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysModifier.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysModifierActiveCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysModifierBoolCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysModifierCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysModifierFloatCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysPlanarCollider.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysPositionModifier.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysRadialFieldModifier.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysResetOnLoopCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysRotationModifier.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysSpawnModifier.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysSphereEmitter.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysSphericalCollider.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysTurbulenceFieldModifier.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysUpdateCtlr.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysVolumeEmitter.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiPSysVortexFieldModifier.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiQuaternion.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiQuatTransform.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiRangeLODData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiRect.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiRefObject.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiRenderedCubeMap.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiRenderedTexture.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiRenderer.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiRenderTargetGroup.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiRTTI.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiScreenElements.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiScreenElementsData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiScreenGeometry.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiScreenGeometryData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiScreenLODData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiScreenPolygon.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiScreenSpaceCamera.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiScreenTexture.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiSearchPath.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiSequenceStreamHelper.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiShadeProperty.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiShader.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiShaderAttributeDesc.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiShaderConstantMap.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiShaderConstantMapEntry.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NIShaderDeclaration.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiShaderDescBase.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiSingleInterpController.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiSkinData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiSkinInstance.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiSkinPartition.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiSmartPointer.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiSortAdjustNode.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiSourceCubemap.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiSourceTexture.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiSpecularProperty.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiSphere.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiSpotLight.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiStandardAllocator.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiStencilProperty.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiStream.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiString.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiStringExtraData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiStringsExtraData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiSwitchNode.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiSwitchStringExtraData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTAbstractPoolAllocator.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTArray.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTask.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTaskManager.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTDefaultAllocator.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTexture.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTextureCodec.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTextureEffect.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTexturePalette.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTextureTransform.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTexturingProperty.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTFixedStringMap.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiThread.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiThreadProcedure.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTimeController.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTLargeArray.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTList.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTListBase.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTMallocInterface.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTMap.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTMapBase.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTNewInterface.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTObjectAllocator.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTObjectList.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTPointerAllocator.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTPointerList.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTPointerListBase.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTPointerMap.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTQueue.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTransform.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTransformInterpolator.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTreeCtrl.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTriBasedGeom.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTriBasedGeomData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTriShape.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTriShapeData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTriShapeDynamicData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTriStrips.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTriStripsData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTriStripsDynamicData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTSet.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiTStringMap.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiUnsharedGeometryGroup.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiVBBlock.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiVBChip.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiVBDynamicSet.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiVBSet.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiVectorExtraData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiVertexColorProperty.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiVertWeightsExtraData.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiViewerStrings.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiViewport.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Gamebryo\NiVisibleArray.hpp">
+      <Filter>game\Gamebryo</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkAabb.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkaBone.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkActionCinfo.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkaDetectRagdollPenetration.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkaPose.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkaRagdollRaycastInterface.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkaRaycastInterface.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkArray.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkaSkeleton.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkBaseObject.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkContactPoint.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkDiagonal.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkInplaceArray.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkMatrix3.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkMatrix3x4.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkMotionState.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkMultiThreadCheck.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkOrientHingedBodyActionCinfo.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpAllCdPointCollector.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpAllRayHitCollector.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpBroadPhaseHandle.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpCdBody.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpCdPoint.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpCdPointCollector.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpCharacterContext.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpCharacterProxyListener.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpClosestRayHitCollector.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpCollidable.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpConstraintInstance.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpEntity.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpLinkedCollidable.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpMaterial.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpMotion.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpPhantom.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpRayHitCollector.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpRigidBody.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpRigidBodyCinfo.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpRootCdPoint.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpShapePhantom.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpShapeRayCastCollectorOutput.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpShapeRayCastOutput.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpSurfaceInfo.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpTypedBroadPhaseHandle.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpWorldObject.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpWorldRayCastInput.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkpWorldRayCastOutput.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkQsTransform.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkQuaternion.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkReferencedObject.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkSerializableCinfo.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkSimpleProperty.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkSimplePropertyValue.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkSmallArray.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkStepInfo.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkStringPtr.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkSweptTransform.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkTransform.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkUnaryActionCinfo.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Havok\hkVector4.hpp">
+      <Filter>game\Havok</Filter>
+    </ClInclude>
     <ClInclude Include="..\nvse\CommandTable.hpp">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="CrashLogger.hpp" />
+    <ClInclude Include="..\game\Defines.hpp">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Misc.hpp">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\MiscUtils.hpp">
+      <Filter>game</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\algs.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\RepairMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\RepairServicesMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ScriptEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ShieldEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SleepWaitMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SPECIALBookMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\StatsMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SummonCreatureEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\SunDamageEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TelekinesisEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Tile3D.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TileExtra.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\TurnUndeadEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ValueAndConditionsEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ValueModifierEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\VampirismEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\VATSMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraSound.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraTalkingActor.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\FORenderedMenuRaceSex.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\FrenzyEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\GradualSetFloat.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\HackingMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\InventoryMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\InvisibilityEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\LevelUpMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\LightEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\LimbConditionEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ListBox.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\LockEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\LockPickMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\MapMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NavMeshArray.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NightEyeEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NonActorMagicCaster.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\NonActorMagicTarget.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\OpenEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ParalysisEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ProcessManager.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\QuantityMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\RaceSexMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\RadialTile.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ReanimateEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\RecipeMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BarterMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BookMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSRenderPass.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\BSShaderPPLightingProperty_Passes_2x.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\CalmEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ChameleonEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\CharGenMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\CommandCreatureEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\CommandEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\CommandHumanoidEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\CompanionWheelMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ComputersMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ConcussionEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ContainerMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\Creature.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\CureEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DarknessEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DebugText.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DemoralizeEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DetectLifeEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DialogMenu.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DisintegrateArmorEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DisintegrateWeaponEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\DispelEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\EffectShaderProperty.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraActivateRef.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraAshPileRef.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraLinkedRef.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraLinkedRefChildren.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\ExtraPoison.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\AbsorbEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Bethesda\AssociatedItemEffect.hpp">
+      <Filter>game\Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\BGSDehydrationStage.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\BGSHungerStage.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\BGSSleepDeprevationStage.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\BlackJackMenu.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\CaravanMenu.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\ItemModMenu.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\LoveTesterMenu.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\MediaLocationController.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\MediaSet.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\RouletteMenu.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\SlotMachineMenu.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESAmmoEffect.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESCaravanCard.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESCaravanDeck.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESCaravanMoney.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESCasino.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESCasinoChips.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESChallenge.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESLoadScreenType.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESObjectIMOD.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESRecipe.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESRecipeCategory.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TESReputation.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
+    <ClInclude Include="..\game\Obsidian\TraitMenu.hpp">
+      <Filter>game\Obsidian</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
@@ -73,6 +3859,24 @@
     </Filter>
     <Filter Include="libraries">
       <UniqueIdentifier>{42cf9c9c-4ade-4f54-8cfd-9a8c9c5a321f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="game">
+      <UniqueIdentifier>{a015f998-0a48-4aa3-a1b7-bb3274a03bde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CrashLogger">
+      <UniqueIdentifier>{0d1b15a9-14d9-4a32-91d5-bb244d0ffa5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="game\Bethesda">
+      <UniqueIdentifier>{6efc5980-0fd7-4cf0-996a-4a039d6a0555}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="game\Gamebryo">
+      <UniqueIdentifier>{534bc693-bf7a-42e0-8a7d-b1055aff848b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="game\Havok">
+      <UniqueIdentifier>{a1ad50b8-234a-4ed2-8dce-e912e0c629b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="game\Obsidian">
+      <UniqueIdentifier>{be04948c-6034-4c15-b3fb-e9b165fcf92d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

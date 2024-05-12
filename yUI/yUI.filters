@@ -6,49 +6,49 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\CommonLib\GameAPI.cpp">
+    <ClCompile Include="..\game\GameAPI.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="..\CommonLib\GameBSExtraData.cpp">
+    <ClCompile Include="..\game\GameBSExtraData.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="..\CommonLib\GameData.cpp">
+    <ClCompile Include="..\game\GameData.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="..\CommonLib\GameExtraData.cpp">
+    <ClCompile Include="..\game\GameExtraData.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="..\CommonLib\GameForms.cpp">
+    <ClCompile Include="..\game\GameForms.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="..\CommonLib\Objects.cpp">
+    <ClCompile Include="..\game\Objects.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="..\CommonLib\GameOSDepend.cpp">
+    <ClCompile Include="..\game\GameOSDepend.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="..\CommonLib\GameRTTI.cpp">
+    <ClCompile Include="..\game\GameRTTI.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="..\CommonLib\GameScript.cpp">
+    <ClCompile Include="..\game\GameScript.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="..\CommonLib\GameSettings.cpp">
+    <ClCompile Include="..\game\GameSettings.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="..\CommonLib\Sound.cpp">
+    <ClCompile Include="..\game\Sound.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="..\CommonLib\GameTasks.cpp">
+    <ClCompile Include="..\game\GameTasks.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="..\CommonLib\GameTiles.cpp">
+    <ClCompile Include="..\game\GameTiles.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="..\CommonLib\Types.cpp">
+    <ClCompile Include="..\game\Types.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="..\CommonLib\GameUI.cpp">
+    <ClCompile Include="..\game\GameUI.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
     <ClCompile Include="..\nvse\SafeWrite.cpp">
@@ -65,49 +65,49 @@
     <ClCompile Include="LambdaVariableContext.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\CommonLib\GameAPI.h">
+    <ClInclude Include="..\game\GameAPI.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\CommonLib\GameBSExtraData.h">
+    <ClInclude Include="..\game\GameBSExtraData.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\CommonLib\GameData.h">
+    <ClInclude Include="..\game\GameData.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\CommonLib\GameEffects.h">
+    <ClInclude Include="..\game\GameEffects.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\CommonLib\GameExtraData.h">
+    <ClInclude Include="..\game\GameExtraData.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\CommonLib\GameForms.h">
+    <ClInclude Include="..\game\GameForms.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\CommonLib\Objects.h">
+    <ClInclude Include="..\game\Objects.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\CommonLib\GameOSDepend.h">
+    <ClInclude Include="..\game\GameOSDepend.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\CommonLib\GameRTTI.h">
+    <ClInclude Include="..\game\GameRTTI.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\CommonLib\GameSettings.h">
+    <ClInclude Include="..\game\GameSettings.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClCompile Include="..\CommonLib\Sound.cpp">
+    <ClCompile Include="..\game\Sound.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClInclude Include="..\CommonLib\GameTasks.h">
+    <ClInclude Include="..\game\GameTasks.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\CommonLib\GameTiles.h">
+    <ClInclude Include="..\game\GameTiles.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\CommonLib\Types.h">
+    <ClInclude Include="..\game\Types.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClCompile Include="..\CommonLib\GameUI.cpp">
+    <ClCompile Include="..\game\GameUI.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
     <ClInclude Include="..\nvse\Safewrite.hpp">
@@ -116,22 +116,22 @@
     <ClInclude Include="..\nvse\Utilities.hpp">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\CommonLib\CommandTable.h">
+    <ClInclude Include="..\game\CommandTable.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\CommonLib\GameScript.h">
+    <ClInclude Include="..\game\GameScript.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\CommonLib\GameProcess.h">
+    <ClInclude Include="..\game\GameProcess.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\CommonLib\NiNodes.h">
+    <ClInclude Include="..\game\NiNodes.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\CommonLib\NiTypes.h">
+    <ClInclude Include="..\game\NiTypes.h">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\CommonLib\NiObjects.h">
+    <ClInclude Include="..\game\NiObjects.h">
       <Filter>nvse</Filter>
     </ClInclude>
     <ClInclude Include="..\libraries\json.h" />

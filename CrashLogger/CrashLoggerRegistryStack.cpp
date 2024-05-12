@@ -6,7 +6,7 @@ namespace CrashLogger::Registry
 	try
 	{
 		Log() << "Registry:" << std::endl
-			<< std::format("REG | {:^10} | DEREFERENCE INFO", "Value");
+			<< ("REG |    VALUE   | DEREFERENCE INFO");
 
 		const std::map<std::string, UInt32> registers{
 			{ "eax", info->ContextRecord->Eax },
@@ -126,7 +126,7 @@ namespace CrashLogger::Stack
 
 	extern void Get(EXCEPTION_POINTERS* info)
 	try {
-		Log() << "Stack:" << std::endl << std::format("  # | {:^10} | DEREFERENCE INFO", "Value");
+		Log() << "Stack:" << std::endl << " # |    VALUE   | DEREFERENCE INFO";
 
 		const auto esp = reinterpret_cast<UInt32*>(info->ContextRecord->Esp);
 
@@ -138,7 +138,7 @@ namespace CrashLogger::Stack
 			if (i <= 0x8 || !str.empty())
 			{
 				Log line{};
-				line << std::format(" {:2X} | 0x{:08X} | ", i, espi);
+				line << std::format("{:2X} | 0x{:08X} | ", i, espi);
 				if (!str.empty()) line << str;
 			}
 		}

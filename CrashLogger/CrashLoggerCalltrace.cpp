@@ -35,24 +35,25 @@ namespace CrashLogger::Calltrace
 
 		const auto moduleBase = PDB::GetModuleBase(eip, process);
 
-		std::string begin = std::format("0x{:08X} | ", ebp);
+		std::string begin = std::format("0x{:08X} ==> ", ebp);
 
 		std::string middle;
 
 		const auto moduleOffset = (moduleBase != 0x00400000) ? eip - moduleBase + 0x10000000 : eip;
 
 		if (const auto module = PDB::GetModule(eip, process); module.empty()) 
-			middle = std::format("{:>28s} (0x{:08X}) | {:<40s} |", "-\\(°_o)/-", moduleOffset, "(Corrupt stack or heap?)");
+			middle = std::format("{:>20s} (0x{:08X}) : (Corrupt stack or heap?)", "-\\(°_o)/-", moduleOffset);
 		else if (const auto symbol = PDB::GetSymbol(eip, process); symbol.empty())
-			middle = std::format("{:>28s} (0x{:08X}) | {:<40s} |", module, moduleOffset, "");
+			middle = std::format("{:>20s} (0x{:08X}) : EntryPoint+0xFFFFFFFF", module, moduleOffset);
 		else
-			middle = std::format("{:>28s} (0x{:08X}) | {:<40s} |", module, moduleOffset, symbol);
+			middle = std::format("{:>20s} (0x{:08X}) : {}", module, moduleOffset, symbol);
 
 		std::string end;
 
 		if (const auto line = PDB::GetLine(eip, process); !line.empty())
 		{
-			end = " " + line;
+			middle = std::format("{:<80s}", middle);
+			end = " <== " + line;
 		} 
 
 		return begin + middle + end;
@@ -62,6 +63,8 @@ namespace CrashLogger::Calltrace
 	try {
 		HANDLE process = GetCurrentProcess();
 		HANDLE thread = GetCurrentThread();
+
+		Log() << "Calltrace:";
 
 		DWORD machine = IMAGE_FILE_MACHINE_I386;
 		CONTEXT context = {};
@@ -91,9 +94,6 @@ namespace CrashLogger::Calltrace
 		frame.AddrStack.Offset = info->ContextRecord->Esp;
 		frame.AddrStack.Mode = AddrModeFlat;
 		DWORD eip = 0;
-
-		// retarded crutch to try to copy dbghelp before.
-		Log() << "Calltrace:" << std::endl << std::format("{:^10} |  {:^40} | {:^40} | Source", "ebp", "Function Address", "Function Name");
 
 		while (Safe_StackWalk(machine, process, thread, &frame, &context, NULL, Safe_SymFunctionTableAccess, Safe_SymGetModuleBase, NULL)) {
 			/*
