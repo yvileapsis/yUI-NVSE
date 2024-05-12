@@ -81,12 +81,12 @@ namespace Patch::TimeMult
 			{
 				specialMods.emplace(iter->modIndex);
 				Log() << std::format("Found SGTM use in mod: {:02X} ({:50s}), form: {:08X} ({:50s})", iter->modIndex, GetModName(
-					                      iter), iter->refID, iter->GetName());
+										  iter), iter->refID, iter->GetName());
 			}
 			else if (wah(iter, cmdSGTM) == -1)
 			{
 				Log() << std::format("Found FATAL FAILURE AND DISAPPOINTMENT use in mod: {:02X} ({:50s}), form: {:08X} ({:50s}) (to be a bit more serious for a second, this script record is bugged, please look into it)", iter->modIndex, GetModName(
-					                      iter), iter->refID, iter->GetName());
+										  iter), iter->refID, iter->GetName());
 			}
 		}
 		vec.clear();

@@ -1,8 +1,6 @@
 #include "dinput8.hpp"
 #include "Safewrite.hpp"
 
-#include "Utilities.hpp"
-
 #include <queue>
 #include <cassert>
 

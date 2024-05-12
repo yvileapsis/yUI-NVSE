@@ -1,5 +1,7 @@
 #include <CrashLogger.hpp>
 
+#pragma comment (lib, "version.lib")
+
 namespace CrashLogger::Modules
 {
 	struct UserContext {
@@ -61,6 +63,29 @@ namespace CrashLogger::Modules
 		return name;
 	}
 
+    std::string GetFileVersion(std::string path) {
+        std::string version = "";
+        DWORD infoSize = GetFileVersionInfoSizeA(path.c_str(), 0);
+        LPSTR verData = new char[infoSize];
+        if (GetFileVersionInfo(path.c_str(), 0, infoSize, verData)) {
+            LPBYTE lpBuffer = nullptr;
+            UINT   size = 0;
+            if (VerQueryValue(verData, "\\", (VOID FAR * FAR*) & lpBuffer, &size) && size) {
+                VS_FIXEDFILEINFO* verInfo = (VS_FIXEDFILEINFO*)lpBuffer;
+                if (verInfo->dwSignature == 0xfeef04bd) {
+                    version = std::format("{}.{}.{}.{}",
+                        (verInfo->dwFileVersionMS >> 16) & 0xffff,
+                        (verInfo->dwFileVersionMS >> 0) & 0xffff,
+                        (verInfo->dwFileVersionLS >> 16) & 0xffff,
+                        (verInfo->dwFileVersionLS >> 0) & 0xffff
+                    );
+                }
+            }
+        }
+        delete[] verData;
+        return version;
+    }
+
 	extern void Get(EXCEPTION_POINTERS* info)
 	try {
 		HANDLE process = GetCurrentProcess();
@@ -71,15 +96,25 @@ namespace CrashLogger::Modules
 
 		Safe_EnumerateLoadedModules(process, EumerateModulesCallback, &infoUser);
 
-		Log() << "Module bases:";
+		Log() << "Module bases:" << std::endl << std::format(" {:^23} | {:>40} | {:>20} | Filepath", "Address", "Module", "Version");
 		for (const auto& [moduleBase, moduleEnd, path] : enumeratedModules)
 		{
-			std::string version;
+            std::string version;
 
-			if (g_commandInterface) if (const auto info = g_commandInterface->GetPluginInfoByName(GetPluginNameForFileName(path.stem().generic_string()).c_str()))
-				version = std::format("NVSE plugin version: {:>4d}, ", info->version);
+            if (g_commandInterface) {
+                if (const auto info = g_commandInterface->GetPluginInfoByName(GetPluginNameForFileName(path.stem().generic_string()).c_str()))
+                    version = std::format("{:d}", info->version);
+            }
 
-			Log() << std::format("0x{:08X} - 0x{:08X} ==> {:25s}{:>30s}{}", moduleBase, moduleEnd, path.stem().generic_string() + ",", version, SanitizeString(path.generic_string()));
+            if (version.empty()) {
+                std::string dll_version = GetFileVersion(path.generic_string());
+                if (dll_version.empty())
+                    dll_version = "Unknown";
+
+                version = dll_version;
+            }
+
+            Log() << std::format(" 0x{:08X} - 0x{:08X} | {:>40} | {:>20} | {}", moduleBase, moduleEnd, path.stem().generic_string(), version, SanitizeString(path.generic_string()));
 
 		}
 

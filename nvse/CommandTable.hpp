@@ -1,8 +1,6 @@
 #pragma once
-
 #include <unordered_map>
 #include <vector>
-#include <game/Bethesda/TESScript.hpp>
 
 // for IsInventoryObjectType list, see GameForms.h
 
@@ -182,9 +180,7 @@ enum CommandReturnType : UInt8
 #define DEFINE_CMD_COND(name, description, refRequired, paramInfo) \
 	DEFINE_CMD_ALT_COND(name, , description, refRequired, paramInfo)
 
-struct ScriptLineBuffer;
-struct ParamInfo;
-struct ScriptBuffer;
+class ScriptLineBuffer;
 struct PluginInfo;
 
 typedef bool (* Cmd_Execute)(COMMAND_ARGS);

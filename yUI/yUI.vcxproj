@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectGuid>{AE7CFEE7-4058-4E3C-ADC2-AE7480EE2028}</ProjectGuid>
+    <ProjectGuid>{C16B72E6-ECDB-4C96-AD01-C55094867525}</ProjectGuid>
     <RootNamespace>yUI</RootNamespace>
     <Keyword>Win32Proj</Keyword>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
@@ -56,7 +56,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\..\nvse;$(SolutionDir)\..;$(SolutionDir)\..\game;$(SolutionDir)\..\libraries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\CommonLib\Havok;$(SolutionDir)\CommonLib\Gamebryo;$(SolutionDir)\CommonLib\Obsidian;$(SolutionDir)\CommonLib\Bethesda;$(SolutionDir)\CommonLib;$(SolutionDir)\nvse;$(SolutionDir)\libraries;$(SolutionDir)\yUI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;yUI_EXPORTS;RUNTIME_VERSION=0x040020D0;RUNTIME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -67,6 +67,7 @@
       <ForcedIncludeFiles>nvse/prefix.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <BuildStlModules>false</BuildStlModules>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
@@ -87,7 +88,7 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\..;$(SolutionDir)\..\nvse;$(SolutionDir)\..;$(SolutionDir)\..\game;$(SolutionDir)\..\libraries;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\CommonLib\Havok;$(SolutionDir)\CommonLib\Gamebryo;$(SolutionDir)\CommonLib\Obsidian;$(SolutionDir)\CommonLib\Bethesda;$(SolutionDir)\CommonLib;$(SolutionDir)\nvse;$(SolutionDir)\libraries;$(SolutionDir)\yUI;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;yUI_EXPORTS;RUNTIME_VERSION=0x040020D0;RUNTIME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <PrecompiledHeader />
@@ -96,6 +97,7 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
       <ForcedIncludeFiles>nvse/prefix.h;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <BuildStlModules>false</BuildStlModules>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
@@ -114,26 +116,6 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\game\BaseFormComponent.cpp" />
-    <ClCompile Include="..\game\ConsoleManager.cpp" />
-    <ClCompile Include="..\game\Containers.cpp" />
-    <ClCompile Include="..\game\SaveLoadGame.cpp" />
-    <ClCompile Include="..\game\InterfaceManager.cpp" />
-    <ClCompile Include="..\game\BSExtraData.cpp" />
-    <ClCompile Include="..\game\GameData.cpp" />
-    <ClCompile Include="..\game\InventoryChanges.cpp" />
-    <ClCompile Include="..\game\TESForm.cpp" />
-    <ClCompile Include="..\game\TESObjectREFR.cpp" />
-    <ClCompile Include="..\game\OSDepend.cpp" />
-    <ClCompile Include="..\game\Script.cpp" />
-    <ClCompile Include="..\game\Setting.cpp" />
-    <ClCompile Include="..\game\GameTasks.cpp" />
-    <ClCompile Include="..\game\Tile.cpp" />
-    <ClCompile Include="..\game\Types.cpp" />
-    <ClCompile Include="..\game\Menu.cpp" />
-    <ClCompile Include="..\game\Sound.cpp" />
-    <ClCompile Include="..\game\NiNodes.cpp" />
-    <ClCompile Include="..\game\TESObject.cpp" />
     <ClCompile Include="..\nvse\dinput8.cpp" />
     <ClCompile Include="..\nvse\Logging.cpp" />
     <ClCompile Include="..\nvse\SafeWrite.cpp" />
@@ -179,34 +161,7 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
     <ClCompile Include="UserInterface\WeaponHweel.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\game\BaseFormComponent.h" />
-    <ClInclude Include="..\game\ConsoleManager.h" />
-    <ClInclude Include="..\game\Containers.h" />
-    <ClInclude Include="..\game\ProcessLists.h" />
-    <ClInclude Include="..\game\SaveLoadGame.h" />
-    <ClInclude Include="..\game\InterfaceManager.h" />
-    <ClInclude Include="..\game\CommandTable.h" />
-    <ClInclude Include="..\game\BSExtraData.h" />
-    <ClInclude Include="..\game\GameData.h" />
-    <ClInclude Include="..\game\GameEffects.h" />
-    <ClInclude Include="..\game\InventoryChanges.h" />
-    <ClInclude Include="..\game\TESForm.h" />
-    <ClInclude Include="..\game\TESObjectREFR.h" />
-    <ClInclude Include="..\game\OSDepend.h" />
-    <ClInclude Include="..\game\BaseProcess.h" />
-    <ClInclude Include="..\game\RTTI.h" />
-    <ClInclude Include="..\game\Script.h" />
-    <ClInclude Include="..\game\Setting.h" />
-    <ClInclude Include="..\game\Sound.h" />
-    <ClInclude Include="..\game\GameTasks.h" />
-    <ClInclude Include="..\game\Tile.h" />
-    <ClInclude Include="..\game\Types.h" />
-    <ClInclude Include="..\game\Menu.h" />
-    <ClInclude Include="..\game\NiNodes.h" />
-    <ClInclude Include="..\game\NiObjects.h" />
-    <ClInclude Include="..\game\NiTypes.h" />
     <ClInclude Include="..\nvse\Logging.hpp" />
-    <ClInclude Include="..\game\TESObject.h" />
     <ClInclude Include="..\nvse\PluginAPI.hpp" />
     <ClInclude Include="..\nvse\prefix.h" />
     <ClInclude Include="..\nvse\Safewrite.hpp" />
@@ -222,6 +177,11 @@ copy "$(TargetPath)" "D:\Mod Organizer\Fallout New Vegas\mods\yUI\nvse\plugins"<
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CommonLib\CommonLib.vcxproj">
+      <Project>{ae7cfee7-4058-4e3c-adc2-ae7480ee2028}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

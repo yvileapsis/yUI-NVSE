@@ -285,8 +285,8 @@ namespace UserInterface::LootMenu
 			owned = container->IsCrimeOrEnemy();
 
 			tileMain->Set("_Title", FontManager::GetSingleton()->StringShorten(
-				                    container->GetTheName(), tileMain->Get("_FontHead"),
-				                    tileMain->Get("_Width") - indentItem * 3 - 50));
+									container->GetTheName(), tileMain->Get("_FontHead"),
+									tileMain->Get("_Width") - indentItem * 3 - 50));
 			tileMain->Set("_SystemColor", 1 + owned);
 
 			Items::Update();
