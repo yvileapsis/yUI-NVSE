@@ -1,14 +1,21 @@
 #include <CrashLogger.hpp>
 
+// TODO: write/find a converter of exception codes to strings
 namespace CrashLogger::Exception
 {
-	extern void Get(EXCEPTION_POINTERS* info)
-	try { Log() << std::format("Exception {:08X} caught!\n", info->ExceptionRecord->ExceptionCode); }
-	catch (...) { Log() << "Failed to log exception." << std::endl; }
+	std::stringstream output;
+
+	extern void Process(EXCEPTION_POINTERS* info)
+	try { output << std::format("Exception: {:08X}\n", info->ExceptionRecord->ExceptionCode); }
+	catch (...) { output << "Failed to log exception." << std::endl; }
+
+	extern std::stringstream& Get() { return output; }
 }
 
 namespace CrashLogger::Thread
 {
+	std::stringstream output;
+
 	std::string GetThreadName()
 	{
 		std::string threadName;
@@ -20,13 +27,17 @@ namespace CrashLogger::Thread
 		return threadName;
 	}
 
-	extern void Get(EXCEPTION_POINTERS* info)
-	try { Log() << "Thread: " << GetThreadName() << std::endl; }
-	catch (...) { Log() << "Failed to log thread name." << std::endl; }
+	extern void Process(EXCEPTION_POINTERS* info)
+	try { output << "Thread: " << GetThreadName() << std::endl; }
+	catch (...) { output << "Failed to log thread name." << std::endl; }
+
+	extern std::stringstream& Get() { return output; }
 }
 
 namespace CrashLogger::Calltrace
 {
+	std::stringstream output;
+
 	std::string GetCalltraceFunction(UInt32 eip, UInt32 ebp, HANDLE process)
 	{
 		/*if (GetModuleFileName((HMODULE)frame.AddrPC.Offset, path, MAX_PATH)) {  //Do this work on non base addresses even on  Windows? Cal directly the LDR function?
@@ -58,7 +69,7 @@ namespace CrashLogger::Calltrace
 		return begin + middle + end;
 	}
 
-	extern void Get(EXCEPTION_POINTERS* info) 
+	extern void Process(EXCEPTION_POINTERS* info) 
 	try {
 		HANDLE process = GetCurrentProcess();
 		HANDLE thread = GetCurrentThread();
@@ -79,7 +90,7 @@ namespace CrashLogger::Calltrace
 
 		//	SymSetExtendedOption((IMAGEHLP_EXTENDED_OPTIONS)SYMOPT_EX_WINE_NATIVE_MODULES, TRUE);
 		if (!Safe_SymInitialize(process, lookPath.c_str(), true))
-			Log() << "Error initializing symbol store";
+			output << "Error initializing symbol store" << std::endl;
 
 		//	SymSetExtendedOption((IMAGEHLP_EXTENDED_OPTIONS)SYMOPT_EX_WINE_NATIVE_MODULES, TRUE);
 
@@ -93,7 +104,7 @@ namespace CrashLogger::Calltrace
 		DWORD eip = 0;
 
 		// retarded crutch to try to copy dbghelp before.
-		Log() << "Calltrace:" << std::endl << std::format("{:^10} |  {:^40} | {:^40} | Source", "ebp", "Function Address", "Function Name");
+		output << "Calltrace:" << std::endl << std::format("{:^10} |  {:^40} | {:^40} | Source", "ebp", "Function Address", "Function Name") << std::endl;
 
 		while (Safe_StackWalk(machine, process, thread, &frame, &context, NULL, Safe_SymFunctionTableAccess, Safe_SymGetModuleBase, NULL)) {
 			/*
@@ -102,10 +113,10 @@ namespace CrashLogger::Calltrace
 			*/
 			if (frame.AddrPC.Offset == eip) break;
 			eip = frame.AddrPC.Offset;
-			Log() << GetCalltraceFunction(frame.AddrPC.Offset, frame.AddrFrame.Offset, process);
+			output << GetCalltraceFunction(frame.AddrPC.Offset, frame.AddrFrame.Offset, process) << std::endl;
 		}
-
-		Log();
 	}
-	catch (...) {  Log() << "Failed to log callstack." << std::endl; }
+	catch (...) {  output << "Failed to log callstack." << std::endl; }
+
+	extern std::stringstream& Get() { return output; }
 }

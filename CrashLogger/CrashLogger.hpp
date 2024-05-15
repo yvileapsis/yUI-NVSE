@@ -5,15 +5,16 @@
 #include <set>
 #include <map>
 
-namespace CrashLogger::Exception	{ inline void Get(EXCEPTION_POINTERS* info); }
-namespace CrashLogger::Thread		{ inline void Get(EXCEPTION_POINTERS* info); }
-namespace CrashLogger::Calltrace	{ inline void Get(EXCEPTION_POINTERS* info); }
-namespace CrashLogger::Registry		{ inline void Get(EXCEPTION_POINTERS* info); }
-namespace CrashLogger::Stack		{ inline void Get(EXCEPTION_POINTERS* info); }
-namespace CrashLogger::Modules		{ inline void Get(EXCEPTION_POINTERS* info); }
-namespace CrashLogger::Memory		{ inline void Get(EXCEPTION_POINTERS* info); }
-namespace CrashLogger::Mods			{ inline void Get(EXCEPTION_POINTERS* info); }
-namespace CrashLogger::Device		{ inline void Get(EXCEPTION_POINTERS* info); }
+namespace CrashLogger::Exception	{ inline void Process(EXCEPTION_POINTERS* info); inline std::stringstream& Get(); }
+namespace CrashLogger::Thread		{ inline void Process(EXCEPTION_POINTERS* info); inline std::stringstream& Get(); }
+namespace CrashLogger::Calltrace	{ inline void Process(EXCEPTION_POINTERS* info); inline std::stringstream& Get(); }
+namespace CrashLogger::Registry		{ inline void Process(EXCEPTION_POINTERS* info); inline std::stringstream& Get(); }
+namespace CrashLogger::Stack		{ inline void Process(EXCEPTION_POINTERS* info); inline std::stringstream& Get(); }
+namespace CrashLogger::Modules		{ inline void Process(EXCEPTION_POINTERS* info); inline std::stringstream& Get(); }
+namespace CrashLogger::Install		{ inline void Process(EXCEPTION_POINTERS* info); inline std::stringstream& Get(); }
+namespace CrashLogger::Memory		{ inline void Process(EXCEPTION_POINTERS* info); inline std::stringstream& Get(); }
+namespace CrashLogger::Mods			{ inline void Process(EXCEPTION_POINTERS* info); inline std::stringstream& Get(); }
+namespace CrashLogger::Device		{ inline void Process(EXCEPTION_POINTERS* info); inline std::stringstream& Get(); }
 
 namespace CrashLogger::Stack
 {

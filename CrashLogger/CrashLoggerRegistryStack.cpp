@@ -2,11 +2,13 @@
 
 namespace CrashLogger::Registry
 {
-	extern void Get(EXCEPTION_POINTERS* info)
+	std::stringstream output;
+
+	extern void Process(EXCEPTION_POINTERS* info)
 	try
 	{
-		Log() << "Registry:" << std::endl
-			<< std::format("REG | {:^10} | DEREFERENCE INFO", "Value");
+		output << "Registry:" << std::endl
+			<< std::format("REG | {:^10} | DEREFERENCE INFO", "Value") << std::endl;
 
 		const std::map<std::string, UInt32> registers{
 			{ "eax", info->ContextRecord->Eax },
@@ -22,19 +24,23 @@ namespace CrashLogger::Registry
 
 		for (const auto& [name, value] : registers)
 		{
-			Log log{};
-			log << std::format("{} | 0x{:08X} | ", name, value);
+			std::stringstream str;
+			str << std::format("{} | 0x{:08X} | ", name, value);
 			const auto buffer = Stack::GetLineForObject((void**)value, 5);
-			if (!buffer.empty()) log << buffer;
-		}
+			if (!buffer.empty()) str << buffer;
 
-		Log();
+			output << str.str() << std::endl;
+		}
 	}
-	catch (...) { Log() << "Failed to log registry." << std::endl; }
+	catch (...) { output << "Failed to log registry." << std::endl; }
+
+	extern std::stringstream& Get() { return output; }
 }
 
 namespace CrashLogger::Stack
 {
+	std::stringstream output;
+
 	UInt32 VFTableLowerLimit()
 	{
 		if (g_currentGame == kFalloutNewVegas)
@@ -124,9 +130,9 @@ namespace CrashLogger::Stack
 
 	UInt32 GetESPi(UInt32* esp, UInt32 i) try { return esp[i]; } catch (...) { return 0; }
 
-	extern void Get(EXCEPTION_POINTERS* info)
+	extern void Process(EXCEPTION_POINTERS* info)
 	try {
-		Log() << "Stack:" << std::endl << std::format("  # | {:^10} | DEREFERENCE INFO", "Value");
+		output << "Stack:" << std::endl << std::format("  # | {:^10} | DEREFERENCE INFO", "Value") << std::endl;
 
 		const auto esp = reinterpret_cast<UInt32*>(info->ContextRecord->Esp);
 
@@ -137,12 +143,15 @@ namespace CrashLogger::Stack
 
 			if (i <= 0x8 || !str.empty())
 			{
-				Log line{};
+				std::stringstream line;
 				line << std::format(" {:2X} | 0x{:08X} | ", i, espi);
 				if (!str.empty()) line << str;
+
+				output << line.str() << std::endl;
 			}
 		}
-		Log();
 	}
-	catch (...) { Log() << "Failed to log stack." << std::endl; }
+	catch (...) { output << "Failed to log stack." << std::endl; }
+
+	extern std::stringstream& Get() { return output; }
 }

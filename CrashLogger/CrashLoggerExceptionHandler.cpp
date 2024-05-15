@@ -140,23 +140,27 @@ namespace CrashLogger
 
 	void Get(EXCEPTION_POINTERS* info) 
 	{
-		Exception::Get(info);
+		Exception::Process(info);
+		Thread::Process(info);
+		Memory::Process(info);
+		Device::Process(info);
+		Calltrace::Process(info);
+		Registry::Process(info);
+		Stack::Process(info);
+		Mods::Process(info);
+		Install::Process(info);
+		Modules::Process(info);
 
-		Thread::Get(info);
-
-		Memory::Get(info);
-
-		Device::Get(info);
-
-		Calltrace::Get(info);
-
-		Registry::Get(info);
-
-		Stack::Get(info);
-
-		Mods::Get(info);
-
-		Modules::Get(info);
+		Log() << Exception::Get().str();
+		Log() << Thread::Get().str();
+		Log() << Memory::Get().str();
+		Log() << Device::Get().str();
+		Log() << Calltrace::Get().str();
+		Log() << Registry::Get().str();
+		Log() << Stack::Get().str();
+		Log() << Mods::Get().str();
+		Log() << Modules::Get().str();
+		Log() << Install::Get().str();
 
 		Logger::Copy();
 

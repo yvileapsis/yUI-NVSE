@@ -2,6 +2,7 @@
 
 namespace CrashLogger::Device
 {
+	std::stringstream output;
 
 	std::string GetRegistryString(HKEY key, const char* name)
 	{
@@ -12,11 +13,11 @@ namespace CrashLogger::Device
 		return "Unknown";
 	}
 
-	extern void Get(EXCEPTION_POINTERS* info)
-		try
+	extern void Process(EXCEPTION_POINTERS* info)
+	try
 	{
 
-		Log() << "Device:";
+		output << "Device:" << std::endl;
 
 		const char* gpu = *(const char**)0x11C72C4;
 		std::string cpu = "Unknown";
@@ -55,12 +56,12 @@ namespace CrashLogger::Device
 		ULONGLONG memAmount;
 		GetPhysicallyInstalledSystemMemory(&memAmount);
 		
-		Log() << std::format("OS:  \"{} - {} ({})\"", version, buildNumber, release);
-		Log() << std::format("CPU: \"{}\"", cpu);
-		Log() << std::format("GPU: {}", gpu);
-		Log() << std::format("RAM: \"{:>5.2f} GB\"", memAmount / 1024.f / 1024.f);
-
-		Log();
+		output << std::format("OS:  \"{} - {} ({})\"", version, buildNumber, release) << std::endl;
+		output << std::format("CPU: \"{}\"", cpu) << std::endl;
+		output << std::format("GPU: {}", gpu) << std::endl;
+		output << std::format("RAM: \"{:>5.2f} GB\"", memAmount / 1024.f / 1024.f) << std::endl;
 	}
-	catch (...) { Log() << "Failed to print device info." << std::endl; }
+	catch (...) { output << "Failed to print device info." << std::endl; }
+
+	extern std::stringstream& Get() { return output; }
 }

@@ -4,6 +4,8 @@
 
 namespace CrashLogger::Modules
 {
+	std::stringstream output;
+
 	struct UserContext {
 		UInt32 eip;
 		UInt32 moduleBase;
@@ -27,17 +29,15 @@ namespace CrashLogger::Modules
 	BOOL CALLBACK EumerateModulesCallback(PCSTR name, ULONG moduleBase, ULONG moduleSize, PVOID context) {
 		UserContext* info = (UserContext*)context;
 		if (info->eip >= (UInt32)moduleBase && info->eip <= (UInt32)moduleBase + (UInt32)moduleSize) {
-			//Log() << FormatString("%0X %0X  %0X", (UInt32)moduleBase, info->eip, (UInt32)moduleBase + (UInt32) moduleSize);
 			info->moduleBase = moduleBase;
 			strcpy_s(info->name, 100, name);
 		}
-
 		enumeratedModules.emplace((UInt32)moduleBase, (UInt32)moduleBase + (UInt32)moduleSize, std::string(name));
 
 		return TRUE;
 	}
 
-	std::unordered_map<std::string, std::string> pluginNames = {
+	static std::unordered_map<std::string, std::string> pluginNames = {
 		{"hot_reload_editor", "hot_reload"},
 		{"ilsfix", "ILS Fix"},
 		{"improved_console", "Improved Console"},
@@ -63,30 +63,30 @@ namespace CrashLogger::Modules
 		return name;
 	}
 
-    std::string GetFileVersion(std::string path) {
-        std::string version = "";
-        DWORD infoSize = GetFileVersionInfoSizeA(path.c_str(), 0);
-        LPSTR verData = new char[infoSize];
-        if (GetFileVersionInfo(path.c_str(), 0, infoSize, verData)) {
-            LPBYTE lpBuffer = nullptr;
-            UINT   size = 0;
-            if (VerQueryValue(verData, "\\", (VOID FAR * FAR*) & lpBuffer, &size) && size) {
-                VS_FIXEDFILEINFO* verInfo = (VS_FIXEDFILEINFO*)lpBuffer;
-                if (verInfo->dwSignature == 0xfeef04bd) {
-                    version = std::format("{}.{}.{}.{}",
-                        (verInfo->dwFileVersionMS >> 16) & 0xffff,
-                        (verInfo->dwFileVersionMS >> 0) & 0xffff,
-                        (verInfo->dwFileVersionLS >> 16) & 0xffff,
-                        (verInfo->dwFileVersionLS >> 0) & 0xffff
-                    );
-                }
-            }
-        }
-        delete[] verData;
-        return version;
-    }
+	std::string GetFileVersion(std::string path) {
+		std::string version = "";
+		DWORD infoSize = GetFileVersionInfoSizeA(path.c_str(), 0);
+		LPSTR verData = new char[infoSize];
+		if (GetFileVersionInfo(path.c_str(), 0, infoSize, verData)) {
+			LPBYTE lpBuffer = nullptr;
+			UINT size = 0;
+			if (VerQueryValue(verData, "\\", (VOID FAR * FAR*) & lpBuffer, &size) && size) {
+				VS_FIXEDFILEINFO* verInfo = (VS_FIXEDFILEINFO*)lpBuffer;
+				if (verInfo->dwSignature == 0xfeef04bd) {
+					version = std::format("{}.{}.{}.{}",
+						(verInfo->dwFileVersionMS >> 16) & 0xffff,
+						(verInfo->dwFileVersionMS >> 0) & 0xffff,
+						(verInfo->dwFileVersionLS >> 16) & 0xffff,
+						(verInfo->dwFileVersionLS >> 0) & 0xffff
+					);
+				}
+			}
+		}
+		delete[] verData;
+		return version;
+	}
 
-	extern void Get(EXCEPTION_POINTERS* info)
+	extern void Process(EXCEPTION_POINTERS* info)
 	try {
 		HANDLE process = GetCurrentProcess();
 
@@ -96,42 +96,42 @@ namespace CrashLogger::Modules
 
 		Safe_EnumerateLoadedModules(process, EumerateModulesCallback, &infoUser);
 
-		Log() << "Module bases:" << std::endl << std::format(" {:^23} | {:>40} | {:>20} | Filepath", "Address", "Module", "Version");
+		output << "Module bases:" << std::endl << std::format(" {:^23} | {:>40} | {:>20} | Filepath", "Address", "Module", "Version") << std::endl;;
 		for (const auto& [moduleBase, moduleEnd, path] : enumeratedModules)
 		{
-            std::string version;
+			std::string version;
 
-            if (g_commandInterface) {
-                if (const auto info = g_commandInterface->GetPluginInfoByName(GetPluginNameForFileName(path.stem().generic_string()).c_str()))
-                    version = std::format("{:d}", info->version);
-            }
+			if (g_commandInterface) {
+				if (const auto info = g_commandInterface->GetPluginInfoByName(GetPluginNameForFileName(path.stem().generic_string()).c_str()))
+					version = std::format("{:d}", info->version);
+			}
 
-            if (version.empty()) {
-                std::string dll_version = GetFileVersion(path.generic_string());
-                if (dll_version.empty())
-                    dll_version = "Unknown";
+			if (version.empty()) {
+				std::string dll_version = GetFileVersion(path.generic_string());
+				if (dll_version.empty())
+					dll_version = "Unknown";
 
-                version = dll_version;
-            }
+				version = dll_version;
+			}
 
-            Log() << std::format(" 0x{:08X} - 0x{:08X} | {:>40} | {:>20} | {}", moduleBase, moduleEnd, path.stem().generic_string(), version, SanitizeString(path.generic_string()));
+			output << std::format(" 0x{:08X} - 0x{:08X} | {:>40} | {:>20} | {}", moduleBase, moduleEnd, path.stem().generic_string(), version, SanitizeString(path.generic_string())) << std::endl;
 
 		}
 
-		Log();
+		output << std::endl;
 
 		if (infoUser.moduleBase)
-			Log() << std::format("GAME CRASHED AT INSTRUCTION Base+0x{:08X} IN MODULE: {}", (infoUser.eip - infoUser.moduleBase), infoUser.name) << std::endl
+			output << std::format("GAME CRASHED AT INSTRUCTION Base+0x{:08X} IN MODULE: {}", (infoUser.eip - infoUser.moduleBase), infoUser.name) << std::endl
 			<< "Please note that this does not automatically mean that that module is responsible. It may have been supplied bad data or" << std::endl
-			<< "program state as the result of an issue in the base game or a different DLL.";
+			<< "program state as the result of an issue in the base game or a different DLL." << std::endl;
 		else
-			Log() << "UNABLE TO IDENTIFY MODULE CONTAINING THE CRASH ADDRESS." << std::endl
+			output << "UNABLE TO IDENTIFY MODULE CONTAINING THE CRASH ADDRESS." << std::endl
 			<< "This can occur if the crashing instruction is located in the vanilla address space, but it can also occur if there are too many" << std::endl
 			<< "DLLs for us to list, and if the crash occurred in one of their address spaces. Please note that even if the crash occurred" << std::endl
 			<< "in vanilla code, that does not necessarily mean that it is a vanilla problem. The vanilla code may have been supplied bad data" << std::endl
-			<< "or program state as the result of an issue in a loaded DLL.";
-
-		Log();
+			<< "or program state as the result of an issue in a loaded DLL." << std::endl;
 	}
-	catch (...) { Log() << "Failed to print out modules." << std::endl; }
+	catch (...) { output << "Failed to print out modules." << std::endl; }
+
+	extern std::stringstream& Get() { return output; }
 }
