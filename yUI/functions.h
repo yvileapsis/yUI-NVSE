@@ -1,10 +1,6 @@
 #pragma once
 #include <string>
 
-#include <InventoryChanges.h>
-#include <OSDepend.h>
-#include <NiTypes.h>
-
 namespace CraftingComponents
 {
 	void Fill();

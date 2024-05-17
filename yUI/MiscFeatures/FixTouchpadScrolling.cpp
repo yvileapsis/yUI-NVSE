@@ -4,6 +4,7 @@
 
 #include <functions.h>
 #include <Safewrite.hpp>
+#include "OSInputGlobals.hpp"
 
 namespace Fix::TouchpadScrolling
 {
@@ -30,7 +31,7 @@ namespace Fix::TouchpadScrolling
 	SInt32 scrollWheel = 0;
 
 
-	SInt32 __fastcall GetMousewheel(OSInputGlobals* osinput, void* dummyedx, int a2)
+	static SInt32 __fastcall GetMouseWheel(OSInputGlobals* osinput, void* dummyedx, int a2)
 	{
 		if (IsKeyPressed(keyUp)) scrollWheel += scrollValue;
 		if (IsKeyPressed(keyDown)) scrollWheel -= scrollValue;
@@ -45,8 +46,8 @@ namespace Fix::TouchpadScrolling
 	{
 		if (bEnable)
 		{
-			WriteRelCall(0x70CE9E, GetMousewheel);
-			WriteRelCall(0x9459BB, GetMousewheel);
+			WriteRelCall(0x70CE9E, GetMouseWheel);
+			WriteRelCall(0x9459BB, GetMouseWheel);
 		}
 		else
 		{

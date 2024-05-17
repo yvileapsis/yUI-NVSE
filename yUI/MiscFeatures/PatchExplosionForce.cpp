@@ -3,9 +3,6 @@
 
 #include <SimpleINILibrary.h>
 
-#include <RTTI.h>
-#include <TESObjectREFR.h>
-
 namespace Patch::ExplosionForce
 {
 	inline bool enable = true;
@@ -13,10 +10,10 @@ namespace Patch::ExplosionForce
 	Float64 __cdecl AdjustPushForceAlt(Actor* target, ActorHitData* hitdata, ActorValueOwner* owner, SInt32 force)
 	{
 		Float64 scale = 1.0;
-		if (hitdata && hitdata->explosion && hitdata->explosion->IsExplosion() && hitdata->explosion->baseForm)
+		if (hitdata && hitdata->pkExplosion && hitdata->pkExplosion->IsExplosion() && hitdata->pkExplosion->GetBaseForm())
 		{
-			const auto explosion = DYNAMIC_CAST(hitdata->explosion->baseForm, TESForm, BGSExplosion);
-			scale = CdeclCall<Float64>(0x647920, hitdata->explosion->radius, hitdata->explosion->GetDistance(target));
+			const auto explosion = DYNAMIC_CAST(hitdata->pkExplosion->GetBaseForm(), TESForm, BGSExplosion);
+			scale = CdeclCall<Float64>(0x647920, hitdata->pkExplosion->fOuterRadius, hitdata->pkExplosion->GetDistance(target));
 			scale *= explosion->force / 100.0;
 		}
 		return scale * CdeclCall<Float64>(0x646580, owner, force);

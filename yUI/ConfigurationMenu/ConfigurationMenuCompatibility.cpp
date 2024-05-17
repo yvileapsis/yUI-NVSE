@@ -1,10 +1,7 @@
 #include "main.h"
-#include "Menu.h"
 #include "PluginAPI.hpp"
 #include <string>
-
 #include "ConfigurationMenu.h"
-#include "GameData.h"
 
 class CMMCMMod
 {

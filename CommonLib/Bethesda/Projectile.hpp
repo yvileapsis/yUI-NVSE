@@ -46,6 +46,6 @@ public:
 	ItemChange*							RockItLauncherItemChange;	// 0x144
 	UInt8								bHasPlayedPassPlayerSound;// 0x148
 	UInt8								pad149[3];			// 0x149
-	Float32								fRange;
+	Float32								fRange2;
 };
 static_assert(sizeof(Projectile) == 0x150);

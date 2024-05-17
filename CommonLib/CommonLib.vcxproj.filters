@@ -3454,9 +3454,6 @@
     <ClInclude Include="Havok\hkVector4.hpp">
       <Filter>Havok</Filter>
     </ClInclude>
-    <ClInclude Include="Bethesda\algs.hpp">
-      <Filter>Bethesda</Filter>
-    </ClInclude>
     <ClInclude Include="Bethesda\RepairMenu.hpp">
       <Filter>Bethesda</Filter>
     </ClInclude>

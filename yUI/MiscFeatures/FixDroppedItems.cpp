@@ -1,29 +1,27 @@
 #include <main.h>
 #include <Safewrite.hpp>
-
 #include <SimpleINILibrary.h>
-#include <BSExtraData.h>
 
 namespace Fix::DroppedItems
 {
 	inline int enable = 1;
 
-	TList<TESObjectREFR>::Node* iterDroppedItem;
+	BSSimpleList<TESObjectREFR*>* iterDroppedItem;
 
 	TESObjectREFR* __fastcall GetHead(ExtraDataList* extradatalist)
 	{
-		const auto xDropped = reinterpret_cast<ExtraDroppedItemList*>(extradatalist->GetByType(kExtraData_DroppedItemList));
+		const auto xDropped = reinterpret_cast<ExtraDroppedItemList*>(extradatalist->GetByType(ExtraData::kDroppedItemList));
 		if (!xDropped) return nullptr;
 		iterDroppedItem = xDropped->itemRefs.Head();
 		if (!iterDroppedItem) return nullptr;
-		return iterDroppedItem->data;
+		return iterDroppedItem->m_item;
 	}
 
 	TESObjectREFR* __fastcall GetNext()
 	{
-		iterDroppedItem = iterDroppedItem->next;
+		iterDroppedItem = iterDroppedItem->m_pkNext;
 		if (!iterDroppedItem) return nullptr;
-		return iterDroppedItem->data;
+		return iterDroppedItem->m_item;
 	}
 
 	template <UInt32 retn> __declspec(naked) void HookGetNext()

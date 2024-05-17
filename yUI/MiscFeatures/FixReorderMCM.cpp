@@ -1,10 +1,10 @@
 #include <main.h>
-#include <Tile.h>
-#include <Menu.h>
 #include <SimpleINILibrary.h>
 
 inline int g_FixReorderMCM = 1;
 
+// TODO: evaluate if this is needed
+#if 0
 std::unordered_map<std::string, UInt32> g_MCMChildOrder{
 	{"MCM_Version", 0}, {"MCM_RGB", 25}, {"MCM_Images", 2}, {"MCM_Return", 3}, {"MCM_Input", 4}, {"MCM_Font", 5},
 	{"MCM_Highlight", 6}, {"MCM_PressControl", 7}, {"MCM_Defaults", 8}, {"MCM_Back", 9}, {"MCM_Info", 10},
@@ -85,3 +85,4 @@ namespace Fix::ReorderMCM
 		mainLoop.emplace_back(FixReorderMCM);
 	}
 }
+#endif

@@ -119,9 +119,6 @@
     <ClInclude Include="..\nvse\Safewrite.hpp">
       <Filter>nvse</Filter>
     </ClInclude>
-    <ClInclude Include="..\nvse\prefix.h">
-      <Filter>nvse</Filter>
-    </ClInclude>
     <ClInclude Include="..\nvse\PluginAPI.hpp">
       <Filter>nvse</Filter>
     </ClInclude>
@@ -139,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="SortingIcons\SortingIcons.h">
       <Filter>features\SortingIcons</Filter>
+    </ClInclude>
+    <ClInclude Include="..\nvse\prefix.hpp">
+      <Filter>nvse</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

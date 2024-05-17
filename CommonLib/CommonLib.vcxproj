@@ -148,7 +148,6 @@
     <ClInclude Include="Bethesda\AITaskThreadManager.hpp" />
     <ClInclude Include="Bethesda\AlarmPackage.hpp" />
     <ClInclude Include="Bethesda\AlchemyItem.hpp" />
-    <ClInclude Include="Bethesda\algs.hpp" />
     <ClInclude Include="Bethesda\Animation.hpp" />
     <ClInclude Include="Bethesda\AnimationTaskData.hpp" />
     <ClInclude Include="Bethesda\Archive.hpp" />

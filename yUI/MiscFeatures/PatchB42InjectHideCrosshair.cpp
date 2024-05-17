@@ -1,6 +1,4 @@
 #include <main.h>
-#include <Menu.h>
-
 #include <SimpleINILibrary.h>
 
 namespace Patch::B42InjectHideCrosshair
@@ -20,23 +18,13 @@ namespace Patch::B42InjectHideCrosshair
 		ini.SaveFile(iniPath.c_str(), false);
 	}
 
-	void XilOn()
-	{
-		g_HUDMainMenu->tileReticleCenter->Set(kTileValue_visible, false);
-	}
-
-	void XilOff()
-	{
-		g_HUDMainMenu->tileReticleCenter->Set(kTileValue_visible, true);
-	}
-
 	void MainLoopDoOnce()
 	{
 		RegisterEvent("B42IGO", 0, nullptr, 4);
-		SetEventHandler("B42IGO", XilOn);
+		SetEventHandler("B42IGO", [] { g_HUDMainMenu->pkTileReticleCenter->Set(Tile::kValue_visible, false); });
 
 		RegisterEvent("B42IDx", 0, nullptr, 4);
-		SetEventHandler("B42IDx", XilOff);
+		SetEventHandler("B42IDx", [] { g_HUDMainMenu->pkTileReticleCenter->Set(Tile::kValue_visible, true); });
 	}
 
 	extern void Init()

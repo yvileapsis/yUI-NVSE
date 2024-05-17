@@ -1,6 +1,4 @@
 #include <main.h>
-#include <InterfaceManager.h>
-#include <Tile.h>
 #include <Safewrite.hpp>
 
 #include <SimpleINILibrary.h>
@@ -10,16 +8,16 @@ namespace Patch::MatchedCursor
 {
 	bool enable = false;
 
-	void __fastcall CursorTileSetStringValue(Tile* tile, void* dummyEDX, TileValueIDs tilevalue, char* src, char propagate)
+	void __fastcall CursorTileSetStringValue(Tile* tile, void* dummyEDX, Tile::EnumValue tilevalue, char* src, char propagate)
 	{
-		tile->Set(kTileValue_zoom, -1, propagate);
-		tile->Set(kTileValue_systemcolor, 1, propagate);
+		tile->Set(Tile::kValue_zoom, -1, propagate);
+		tile->Set(Tile::kValue_systemcolor, 1, propagate);
 	}
 
-	void __fastcall CursorTileSetIntValue(Tile* tile, void* dummyEDX, TileValueIDs tilevalue, int value)
+	void __fastcall CursorTileSetIntValue(Tile* tile, void* dummyEDX, Tile::EnumValue tilevalue, int value)
 	{
-		tile->Set(kTileValue_visible, value, true);
-		ThisCall(0xA0B350, InterfaceManager::GetSingleton()->cursor, 1, 0);
+		tile->Set(Tile::kValue_visible, value, true);
+		ThisCall(0xA0B350, InterfaceManager::GetSingleton()->pkCursor, 1, 0);
 	}
 
 	void Patch(const bool enable)

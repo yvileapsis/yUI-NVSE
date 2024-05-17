@@ -1,11 +1,7 @@
 #include <main.h>
-#include <Setting.h>
-#include <BaseProcess.h>
 
 #include <Safewrite.hpp>
 #include <SimpleINILibrary.h>
-
-#include "TESObjectREFR.h"
 
 namespace Patch::RestoreFO3Spread
 {
@@ -84,12 +80,12 @@ namespace Patch::RestoreFO3Spread
 	}
 
 	Float32 __fastcall GetMinSpread(Actor* actor) {
-		const auto conditionTier = ThisStdCall<SInt32>(0x92B9E0, actor->baseProcess, actor);
+		const auto conditionTier = ThisStdCall<SInt32>(0x92B9E0, actor->pkBaseProcess, actor);
 		if (conditionTier > 9) return 0.5;
 		const auto spreadArray = reinterpret_cast<Setting**>(0x119B2BC);
 		const Setting* spreadSetting = spreadArray[conditionTier + 10];
-		const float result = spreadSetting->data.f;
-		actor->spreadWeapon = result;
+		const float result = spreadSetting->GetAsFloat();
+		actor->fCachedSpreadWeaponModel = result;
 		return result;
 	}
 
@@ -112,12 +108,12 @@ namespace Patch::RestoreFO3Spread
 
 	Float64 __fastcall GetSpreadCondition(Actor* actor)
 	{
-		if (actor->spreadHealthPercent < 0.0)
+		if (actor->fCachedSpreadHealthPercent < 0.0)
 		{
-			const auto entry = actor->baseProcess->GetWeaponInfo();
-			actor->spreadHealthPercent = entry->GetHealthPercent(1) / 100.0;
+			const auto entry = actor->pkBaseProcess->GetWeapon();
+			actor->fCachedSpreadHealthPercent = entry->GetHealthPercent(1) / 100.0;
 		}
-		return actor->spreadHealthPercent;
+		return actor->fCachedSpreadHealthPercent;
 	}
 
 	void patchRestoreSpreadGameSettings(const bool bEnable)

@@ -1,3 +1,5 @@
+#pragma once
+
 enum EnumActorValueCode
 {
 	kAVCode_None = -1,

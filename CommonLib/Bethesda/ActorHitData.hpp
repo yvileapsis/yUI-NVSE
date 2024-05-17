@@ -8,7 +8,9 @@ class Explosion;
 class TESObjectWEAP;
 
 // 0x64
-struct ActorHitData {
+class ActorHitData 
+{
+public:
 	enum EnumHitFlags
 	{
 		kFlag_TargetIsBlocking			= 1 << 0,

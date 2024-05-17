@@ -1,17 +1,7 @@
 #pragma once
-
 #include <main.h>
-
-#include <Types.h>
-#include <Sound.h>
-#include <Script.h>
-
-#include <GameData.h>
-#include <ConsoleManager.h>
-#include <Safewrite.hpp>
-
+#include <SafeWrite.hpp>
 #include <SimpleINILibrary.h>
-
 
 namespace Patch::TimeMult
 {
@@ -73,20 +63,18 @@ namespace Patch::TimeMult
 	{
 		std::vector<Script*> vec;
 
-		for (auto iter : g_TESDataHandler->scriptList) vec.push_back(iter);
+		for (auto iter : g_TESDataHandler->kScripts) vec.push_back(iter);
 		for (const auto& iter : std::ranges::reverse_view(vec))
 		{
-			if (specialMods.contains(iter->modIndex)) continue;
+			if (specialMods.contains(iter->ucModIndex)) continue;
 			if (wah(iter, cmdSGTM) == 1)
 			{
-				specialMods.emplace(iter->modIndex);
-				Log() << std::format("Found SGTM use in mod: {:02X} ({:50s}), form: {:08X} ({:50s})", iter->modIndex, GetModName(
-										  iter), iter->refID, iter->GetName());
+				specialMods.emplace(iter->ucModIndex);
+				Log() << std::format("Found SGTM use in mod: {:02X} ({:50s}), form: {:08X} ({:50s})", iter->ucModIndex, GetModName(iter), iter->uiFormID, iter->GetEditorID());
 			}
 			else if (wah(iter, cmdSGTM) == -1)
 			{
-				Log() << std::format("Found FATAL FAILURE AND DISAPPOINTMENT use in mod: {:02X} ({:50s}), form: {:08X} ({:50s}) (to be a bit more serious for a second, this script record is bugged, please look into it)", iter->modIndex, GetModName(
-										  iter), iter->refID, iter->GetName());
+				Log() << std::format("Found FATAL FAILURE AND DISAPPOINTMENT use in mod: {:02X} ({:50s}), form: {:08X} ({:50s}) (to be a bit more serious for a second, this script record is bugged, please look into it)", iter->ucModIndex, GetModName(iter), iter->uiFormID, iter->GetEditorID());
 			}
 		}
 		vec.clear();
@@ -144,12 +132,12 @@ namespace Patch::TimeMult
 		*result = 0;
 		if (!ExtractArgsEx(EXTRACT_ARGS_EX, &timeMult, &changeTime, &mod)) return true;
 
-		if (mod == 0) mod = scriptObj->modIndex;
+		if (mod == 0) mod = scriptObj->ucModIndex;
 
 		ModifyMap(timeMult, mod);
 		Set();
 
-		BSAudioManager::GetSingleton()->ignoreTimescale = changeTime;
+		BSAudioManager::GetSingleton()->bIgnoreTimescale = changeTime;
 
 		if (IsConsoleOpen()) {
 			ConsoleManager::GetSingleton() << std::format("Global Time Multiplier >> '{:0.2f}'", g_timeMult);
@@ -166,13 +154,13 @@ namespace Patch::TimeMult
 		*result = 1;
 		if (*reinterpret_cast<UInt16*>(static_cast<UInt8*>(scriptData) + *opcodeOffsetPtr - 2) != 0 && !ExtractArgsEx(EXTRACT_ARGS_EX, &mod)) return true;
 
-		if (!specialMods.contains(scriptObj->modIndex)) mod = -1;
+		if (!specialMods.contains(scriptObj->ucModIndex)) mod = -1;
 		if (mod == -1) {
-			mod = scriptObj->modIndex;
+			mod = scriptObj->ucModIndex;
 			*result = TimeGlobal::Get();
 		}
 		else {
-			if (mod == 0) mod = scriptObj->modIndex;
+			if (mod == 0) mod = scriptObj->ucModIndex;
 			*result = localMults.contains(mod) ? localMults[mod] : 1.0;
 		}
 

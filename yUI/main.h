@@ -4,6 +4,8 @@
 
 #include <deque>
 
+class DIHookControl;
+
 inline PluginHandle					g_pluginHandle			= kPluginHandle_Invalid;
 
 inline NVSEInterface*				g_nvseInterface			= nullptr;

@@ -1,6 +1,4 @@
 #include <main.h>
-#include <Menu.h>
-#include <InterfaceManager.h>
 
 #include <SimpleINILibrary.h>
 
@@ -13,15 +11,15 @@ namespace Fix::TablineSelected
 
 	void MainLoop()
 	{
-		if (CdeclCall<bool>(0x702360) && Menu::IsVisible(kMenuType_Inventory)) {
+		if (CdeclCall<bool>(0x702360) && Menu::IsVisible(Menu::kType_Inventory)) {
 			if (needToFix) {
 				needToFix = false;
 				if (!tabline)
 				{
-					tabline = InventoryMenu::GetSingleton()->tile->GetChild("GLOW_BRANCH")->GetChild("IM_Tabline");
+					tabline = InventoryMenu::GetSingleton()->pkRootTile->GetChild("GLOW_BRANCH")->GetChild("IM_Tabline");
 					return;
 				}
-				for (const auto iter : tabline->children) iter->Set(kTileValue_mouseover, 0, false);
+				for (const auto iter : tabline) iter->Set(Tile::kValue_mouseover, 0, false);
 			}
 		}
 		else needToFix = true;

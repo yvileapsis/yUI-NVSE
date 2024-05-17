@@ -1,8 +1,5 @@
 #pragma once
 
-#include "Utilities.hpp"
-#include "Menu.h"
-
 #include <set>
 #include <map>
 #include <utility>
@@ -18,7 +15,7 @@ class CMTag;
 class CMSetting;
 class ModConfigurationMenu;
 
-inline LogLevel g_LogLevel = LogLevel::Error;
+inline LogLevel g_LogLevel = LogLevel::LogError;
 inline UInt32 g_saveValue = 1;
 
 // TODO: reimplement this last part of stewie code

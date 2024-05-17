@@ -2,9 +2,9 @@
 
 #include <Safewrite.hpp>
 #include <SimpleINILibrary.h>
-#include <TESObject.h>
-#include <RTTI.h>
 
+// TODO: evaluate need for this
+#if 0
 namespace Patch::MultiplicativeShots
 {
 	void HandleINIs()
@@ -50,3 +50,4 @@ namespace Patch::MultiplicativeShots
 		patchMultiplicativeProjectileCount(true);
 	}
 }
+#endif

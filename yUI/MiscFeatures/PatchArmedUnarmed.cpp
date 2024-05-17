@@ -1,13 +1,10 @@
 #include <main.h>
-#include <BaseProcess.h>
-#include <RTTI.h>
 
 #include <Safewrite.hpp>
 #include <SimpleINILibrary.h>
 
-#include "TESForm.h"
-#include "TESObjectREFR.h"
-
+// TODO: evaluate what is the state of effects, what needs to be done
+#if 0
 namespace Patch::ArmedUnarmed
 {
 	inline bool g_ArmedUnarmed = false;
@@ -226,3 +223,4 @@ namespace Patch::ArmedUnarmed
 	}
 
 }
+#endif
