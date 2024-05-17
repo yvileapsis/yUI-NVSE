@@ -16,16 +16,16 @@
     <ClCompile Include="..\nvse\Logging.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="DbgHelpWrap.cpp" />
+    <ClCompile Include="DbgHelpWrapper.cpp" />
     <ClCompile Include="PatchNameThreads.cpp" />
-    <ClCompile Include="CrashLoggerCalltrace.cpp" />
-    <ClCompile Include="CrashLoggerExceptionHandler.cpp" />
-    <ClCompile Include="CrashLoggerLabels.cpp" />
-    <ClCompile Include="CrashLoggerMemory.cpp" />
-    <ClCompile Include="CrashLoggerModules.cpp" />
-    <ClCompile Include="CrashLoggerRegistryStack.cpp" />
-    <ClCompile Include="CrashLoggerDevice.cpp" />
-    <ClCompile Include="CrashLoggerMods.cpp" />
+    <ClCompile Include="Calltrace.cpp" />
+    <ClCompile Include="ExceptionHandler.cpp" />
+    <ClCompile Include="Labels.cpp" />
+    <ClCompile Include="Memory.cpp" />
+    <ClCompile Include="Modules.cpp" />
+    <ClCompile Include="RegistryStack.cpp" />
+    <ClCompile Include="Device.cpp" />
+    <ClCompile Include="Mods.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="definitions.hpp" />
@@ -55,7 +55,7 @@
       <Filter>nvse</Filter>
     </ClInclude>
     <ClInclude Include="namegen.hpp" />
-    <ClInclude Include="DbgHelpWrap.hpp" />
+    <ClInclude Include="DbgHelpWrapper.hpp" />
     <ClInclude Include="..\nvse\Formatter.hpp">
       <Filter>nvse</Filter>
     </ClInclude>

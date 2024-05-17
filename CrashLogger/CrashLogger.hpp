@@ -1,7 +1,7 @@
 #include <main.hpp>
 
 #include <Safewrite.hpp>
-#include <DbgHelpWrap.hpp>
+#include <DbgHelpWrapper.hpp>
 #include <set>
 #include <map>
 

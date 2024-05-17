@@ -23,6 +23,7 @@ public:
 	std::string GetStd() const {
 		if (((const char*)this)[0] != 0 && ((const char*)this)[0] != ' ')
 			return (const char*)this;
+		return "";
 	}
 };
 

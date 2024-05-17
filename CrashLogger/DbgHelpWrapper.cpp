@@ -1,4 +1,4 @@
-#include <DbgHelpWrap.hpp>
+#include <DbgHelpWrapper.hpp>
 
 #include <windows.h>
 #include <mutex>

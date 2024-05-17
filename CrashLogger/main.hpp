@@ -2,8 +2,6 @@
 #include <PluginAPI.hpp>
 #include <definitions.hpp>
 
-#include <deque>
-
 class DIHookControl;
 
 inline PluginHandle					g_pluginHandle			= kPluginHandle_Invalid;
