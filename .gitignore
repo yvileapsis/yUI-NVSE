@@ -376,6 +376,10 @@ FodyWeavers.xsd
 *.la
 *.a
 
+# Rider
+*.idea
+**/.idea
+
 # Visual Studio Files
 **/Debug
 **/Release
