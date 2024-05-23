@@ -35,10 +35,13 @@ namespace CrashLogger::Labels
 		if (!ss.str().empty()) buffer += ": " + ss.str();
 	}
 
-	FormattingHandler lastHandler = nullptr;
 
-	class Label {
+	class Label
+	{
 	public:
+		static inline std::vector<std::unique_ptr<Label>> labels;
+		static inline FormattingHandler lastHandler = nullptr;
+
 		enum Type : UInt8 {
 			kType_None = 0,
 			kType_Class = 1,
@@ -59,7 +62,7 @@ namespace CrashLogger::Labels
 		};
 
 		bool Satisfies(void* ptr) const
-		try { 
+		try {
 			return *reinterpret_cast<UInt32*>(ptr) >= address && *reinterpret_cast<UInt32*>(ptr) <= address + size; 
 		}
 		catch (...)
@@ -72,12 +75,15 @@ namespace CrashLogger::Labels
 			return PDB::GetClassNameFromRTTIorPDB(ptr);
 		}
 
-		[[nodiscard]] std::string GetLabelName() const
+		std::string GetLabelName() const
 		{
-			if (type == kType_Class) return "Class: ";
-			if (type == kType_Global) return "Global: ";
-			return "";
+			if (type == kType_Class) return "Class";
+			if (type == kType_Global) return "Global";
+			return "None";
 		}
+
+
+
 
 		void Get(void* object, std::string& buffer) const
 		{
@@ -94,15 +100,12 @@ namespace CrashLogger::Labels
 		}
 	};
 
-	std::vector<std::unique_ptr<Label>> setOfLabels;
-
-	template <class... _Types> void Push(_Types... args) {
-		setOfLabels.push_back(std::make_unique<Label>(std::forward<_Types>(args)...));
+	template <class LabelType = Label, class... _Types> void Push(_Types... args) {
+		Label::labels.push_back(std::make_unique<LabelType>(std::forward<_Types>(args)...));
 	}
 
 	void FillNVSELabels()
 	{
-		// fix labels
 		Push(0x10F1EE0, nullptr, "TypeInfo", Label::kType_Class);
 		Push(0x10B9D28, nullptr, "TileShaderProperty", Label::kType_Class);
 
@@ -153,8 +156,6 @@ namespace CrashLogger::Labels
 		Push(kVtbl_StartMenu);
 		Push(kVtbl_TraitMenu);
 		Push(kVtbl_TraitSelectMenu);
-		Push(kVtbl_TraitSelectMenu);
-		Push(kVtbl_TutorialMenu);
 
 		Push(kVtbl_Tile, As<Tile>);
 		Push(kVtbl_TileMenu);
@@ -1375,7 +1376,6 @@ namespace CrashLogger::Labels
 		Push(kVtbl_NiObject);
 		Push(kVtbl_NiPSysFieldModifier);
 		Push(kVtbl_NiPersistentSrcTextureRendererData);
-		Push(kVtbl_NiRangeLODData);
 		Push(kVtbl_NiRefObject);
 		Push(kVtbl_NiSearchPath);
 		Push(kVtbl_NiShaderConstantMap);
@@ -2083,17 +2083,18 @@ namespace CrashLogger::Labels
 			FillOBSELabels();
 	}
 
-	bool fillLables = false;
-
 	extern bool GetStringForLabel(void** object, std::string& buffer)
 	try 
 	{
+		static bool fillLables = false;
+
 		if (!fillLables)
 		{
 			FillLabels();
 			fillLables = true;
 		}
-		for (const auto& iter : setOfLabels) if (iter->Satisfies(object)) 
+
+		for (const auto& iter : Label::labels) if (iter->Satisfies(object)) 
 		{ 
 			iter->Get(object, buffer); 
 			return true; 
