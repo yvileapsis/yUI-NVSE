@@ -94,6 +94,8 @@ namespace CrashLogger::Stack
 			if (len == 0 || len >= max || len < 3) return false;
 
 			buffer += std::format(R"(0x{:08X} ==> String: "{}")", *(UInt32*)object, SanitizeString(str));
+
+			// TODO: if string is equal to "D:\_Fallout3\Platforms\Common\Code\Fallout Shared\XXX" or similar should print it out
 			return true;
 		} catch (...) {
 			return false;
