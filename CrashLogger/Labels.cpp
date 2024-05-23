@@ -5,34 +5,20 @@
 
 namespace CrashLogger::Labels
 {
-	typedef void (*FormattingHandler)(void* ptr, std::string& buffer);
+	typedef std::ostream& (*FormattingHandler)(std::ostream& os, void* ptr);
 
-	void AsUInt32(void* ptr, std::string& buffer) { buffer += std::format("{:#08X}", **static_cast<UInt32**>(ptr)); }
+	std::ostream& AsUInt32(std::ostream& buffer, void* ptr) { buffer << std::format("{:#08X}", **static_cast<UInt32**>(ptr)); return buffer; }
 
-	template<typename T> std::ostream& AsInternal(std::ostream& os, void* ptr)
-	{
+	template<typename T> std::ostream& As(std::ostream& os, void* ptr)
+	try {
 		if (auto sanitized = Dereference<T>((UInt32)ptr))
 			os << *sanitized;
 		return os;
 	}
-
-	template<typename T> std::ostream& AsSEH(std::ostream& os, void* ptr)
-	{
-		try {
-			AsInternal<T>(os, ptr);
-		}
-		catch (...) {
-			if (os.rdbuf()->in_avail()) os << ", ";
-			os << "failed to format";
-		}
+	catch (...) {
+		if (os.rdbuf()->in_avail()) os << ", ";
+		os << "failed to format";
 		return os;
-	}
-
-	template<typename T> void As(void* ptr, std::string& buffer)
-	{
-		std::stringstream ss;
-		AsSEH<T>(ss, ptr);
-		if (!ss.str().empty()) buffer += ": " + ss.str();
 	}
 
 
@@ -42,28 +28,28 @@ namespace CrashLogger::Labels
 		static inline std::vector<std::unique_ptr<Label>> labels;
 		static inline FormattingHandler lastHandler = nullptr;
 
-		enum Type : UInt8 {
-			kType_None = 0,
-			kType_Class = 1,
-			kType_Global = 2,
-		};
-
-		Type type = kType_None;
-
 		UInt32 address;
 		UInt32 size;
-		FormattingHandler function;
+		FormattingHandler function = lastHandler;
 		std::string name;
 
-		Label(UInt32 address, FormattingHandler function = lastHandler, std::string name = "", Type type = kType_Class, UInt32 size = 4)
-			: type(type), address(address), size(size), function(function), name(std::move(name))
+		Label() : address(0), size(0), function(nullptr), name("") {}
+		virtual ~Label() {};
+		
+		Label(UInt32 aAddress, FormattingHandler aFunction = lastHandler, std::string aName = "", UInt32 aSize = 4)
+			: Label()
 		{
-			lastHandler = function;
-		};
+			address = aAddress;
+			size = aSize;
+			function = aFunction;
+			name = std::move(aName);
 
+			lastHandler = aFunction;
+		};
+		
 		bool Satisfies(void* ptr) const
 		try {
-			return *reinterpret_cast<UInt32*>(ptr) >= address && *reinterpret_cast<UInt32*>(ptr) <= address + size; 
+			return *static_cast<UInt32*>(ptr) >= address && *static_cast<UInt32*>(ptr) <= address + size; 
 		}
 		catch (...)
 		{
@@ -74,48 +60,92 @@ namespace CrashLogger::Labels
 		{
 			return PDB::GetClassNameFromRTTIorPDB(ptr);
 		}
+		
+		virtual std::string GetLabelName() const { return "None"; }
 
-		std::string GetLabelName() const
+		virtual std::string GetName(void* object) const { return name; }
+		
+		virtual std::string GetDescription(void* object) const
 		{
-			if (type == kType_Class) return "Class";
-			if (type == kType_Global) return "Global";
-			return "None";
+			std::stringstream str;
+            if (function) function(str, object);
+            return str.str();
 		}
-
-
-
-
-		void Get(void* object, std::string& buffer) const
+		
+		virtual void Get(void* object, std::string& buffer) const
 		{
-			if (type == kType_None) return;
+			return;
+		};
+	};
 
-			buffer += std::format("0x{:08X} ==> ", *(UInt32*)object);
+	class LabelClass : public Label
+	{
+	public:
+		using Label::Label;
+		
+		std::string GetLabelName() const override { return "Class"; }
 
+		std::string GetName(void* object) const override { return name.empty() ? GetTypeName(object) : name; }
+
+		void Get(void* object, std::string& buffer) const override
+		{
+			buffer += std::format("0x{:08X}", *(UInt32*)object);
+
+			buffer += " ==> ";
+			
 			buffer += GetLabelName();
 
-			std::string name1 = name.empty() && type == kType_Class ? GetTypeName(object) : name;
-			buffer += name1;
+			buffer += ": ";
+			
+			buffer += GetName(object);
 
-			if (function) function(object, buffer);
+			buffer += ": ";
+			
+			buffer += GetDescription(object);
 		}
 	};
 
-	template <class LabelType = Label, class... _Types> void Push(_Types... args) {
+	class LabelGlobal : public Label
+	{
+	public:
+		using Label::Label;
+		
+		std::string GetLabelName() const override { return "Global"; }
+		
+		void Get(void* object, std::string& buffer) const override
+		{
+			buffer += std::format("0x{:08X}", *(UInt32*)object);
+
+			buffer += " ==> ";
+			
+			buffer += GetLabelName();
+
+			buffer += ": ";
+			
+			buffer += GetName(object);
+
+			buffer += ": ";
+			
+			buffer += GetDescription(object);
+		}
+	};
+
+	template <class LabelType = LabelClass, class... _Types> void Push(_Types... args) {
 		Label::labels.push_back(std::make_unique<LabelType>(std::forward<_Types>(args)...));
 	}
 
 	void FillNVSELabels()
 	{
-		Push(0x10F1EE0, nullptr, "TypeInfo", Label::kType_Class);
-		Push(0x10B9D28, nullptr, "TileShaderProperty", Label::kType_Class);
+		Push(0x10F1EE0, nullptr, "TypeInfo");
+		Push(0x10B9D28, nullptr, "TileShaderProperty");
 
-		Push(0x11F3374, AsUInt32, "TileValueIndirectTemp", Label::kType_Global);
-		Push(0x118FB0C, nullptr, "ShowWhoDetects", Label::kType_Global);
-		Push(0x1042C58, nullptr, "ShowWhoDetects", Label::kType_Global);
-		Push(0x011F6238, nullptr, "HeapManager", Label::kType_Global);
+		Push<LabelGlobal>(0x11F3374, AsUInt32, "TileValueIndirectTemp");
+		Push<LabelGlobal>(0x118FB0C, nullptr, "ShowWhoDetects");
+		Push<LabelGlobal>(0x1042C58, nullptr, "ShowWhoDetects");
+		Push<LabelGlobal>(0x011F6238, nullptr, "HeapManager");
 
-		Push(0x1000000, nullptr, "", Label::kType_None); // integer that is often encountered
-		Push(0x11C0000, nullptr, "", Label::kType_None);
+		Push<Label>(0x1000000, nullptr); // integer that is often encountered
+		Push<Label>(0x11C0000, nullptr);
 
 		Push(kVtbl_Menu, As<Menu>);
 		Push(kVtbl_TutorialMenu);
