@@ -39,8 +39,11 @@ namespace CrashLogger::Registry
 
 namespace CrashLogger::Stack
 {
+	std::map<UInt32, UInt8> memoize;
+	
 	std::stringstream output;
 
+	// can be done smartly by checking bounds of modules
 	UInt32 VFTableLowerLimit()
 	{
 		if (g_currentGame == kFalloutNewVegas)
@@ -141,13 +144,21 @@ namespace CrashLogger::Stack
 
 			const auto str = Stack::GetLineForObject((void**)espi, 5);
 
-			if (i <= 0x8 || !str.empty())
+			if (i <= 0x8 || (!str.empty() && !memoize.contains(espi)))
 			{
 				std::stringstream line;
 				line << std::format(" {:2X} | 0x{:08X} | ", i, espi);
-				if (!str.empty()) line << str;
-
+				if (!memoize.contains(espi))
+				{
+					if (!str.empty()) line << str;				
+					memoize.emplace(espi, i);
+				}
+				else
+				{
+					line << std::format("Identical to {:2X}", memoize[espi]);
+				}
 				output << line.str() << std::endl;
+
 			}
 		}
 	}
