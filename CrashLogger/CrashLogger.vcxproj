@@ -125,6 +125,7 @@
     <ClCompile Include="Calltrace.cpp" />
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="ExceptionHandler.cpp" />
+    <ClCompile Include="LabelsNVSE.cpp" />
     <ClCompile Include="Memory.cpp" />
     <ClCompile Include="Mods.cpp" />
     <ClCompile Include="Modules.cpp" />
@@ -139,7 +140,6 @@
     <ClCompile Include="DbgHelpWrapper.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="PatchNameThreads.cpp" />
-    <ClCompile Include="Labels.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\nvse\CommandTable.hpp" />
