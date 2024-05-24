@@ -1,5 +1,46 @@
 #include <CrashLogger.hpp>
 
+namespace CrashLogger
+{
+
+	inline bool GetStringForClassLabel(void** object, std::string& buffer)
+	try
+	{
+		static bool fillLables = false;
+
+		if (!fillLables)
+		{
+			Labels::FillLabels();
+			fillLables = true;
+		}
+
+		for (const auto& iter : Labels::Label::GetAll()) if (iter->Satisfies(object))
+		{
+
+			buffer += std::format("0x{:08X}", *(UInt32*)object);
+
+			buffer += " ==> ";
+
+			buffer += iter->GetLabelName();
+
+			buffer += ": ";
+
+			buffer += iter->GetName(object);
+
+			buffer += ": ";
+
+			buffer += iter->GetDescription(object);
+
+			return true;
+		}
+		return false;
+	}
+	catch (...) {
+		buffer += "Failed to get string for label";
+		return true;
+	}
+}
+
 namespace CrashLogger::Registry
 {
 	std::stringstream output;
@@ -104,7 +145,7 @@ namespace CrashLogger::Stack
 
 	bool GetStringForLabel(void** object, std::string& buffer)
 	try {
-		if (Labels::GetStringForLabel(object, buffer)) return true;
+		if (GetStringForClassLabel(object, buffer)) return true;
 
 		if (GetStringForRTTIorPDB(object, buffer)) return true;
 
