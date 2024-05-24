@@ -160,7 +160,7 @@ namespace Logger
 				Log() << "Copied " << in << " to " << newOut;
 			}
 			catch (std::filesystem::filesystem_error& e) {
-				Log() << "Could not copy sandbox/abc: " << e.what() << "\n";
+				Log() << "Could not copy sandbox/abc: " << e.what() << std::endl;
 			}
 		}
 	}
