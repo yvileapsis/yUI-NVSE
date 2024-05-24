@@ -7,8 +7,8 @@ namespace CrashLogger::Registry
 	extern void Process(EXCEPTION_POINTERS* info)
 	try
 	{
-		output << "Registry:" << std::endl
-			<< std::format("REG | {:^10} | DEREFERENCE INFO", "Value") << std::endl;
+		output << "Registry:" << '\n'
+			<< std::format("REG | {:^10} | DEREFERENCE INFO", "Value") << '\n';
 
 		const std::map<std::string, UInt32> registers{
 			{ "eax", info->ContextRecord->Eax },
@@ -29,10 +29,10 @@ namespace CrashLogger::Registry
 			const auto buffer = Stack::GetLineForObject((void**)value, 5);
 			if (!buffer.empty()) str << buffer;
 
-			output << str.str() << std::endl;
+			output << str.str() << '\n';
 		}
 	}
-	catch (...) { output << "Failed to log registry." << std::endl; }
+	catch (...) { output << "Failed to log registry." << '\n'; }
 
 	extern std::stringstream& Get() { return output; }
 }
@@ -137,7 +137,7 @@ namespace CrashLogger::Stack
 
 	extern void Process(EXCEPTION_POINTERS* info)
 	try {
-		output << "Stack:" << std::endl << std::format("  # | {:^10} | DEREFERENCE INFO", "Value") << std::endl;
+		output << "Stack:" << '\n' << std::format("  # | {:^10} | DEREFERENCE INFO", "Value") << '\n';
 
 		const auto esp = reinterpret_cast<UInt32*>(info->ContextRecord->Esp);
 
@@ -159,12 +159,12 @@ namespace CrashLogger::Stack
 				{
 					line << std::format("Identical to {:2X}", memoize[espi]);
 				}
-				output << line.str() << std::endl;
+				output << line.str() << '\n';
 
 			}
 		}
 	}
-	catch (...) { output << "Failed to log stack." << std::endl; }
+	catch (...) { output << "Failed to log stack." << '\n'; }
 
 	extern std::stringstream& Get() { return output; }
 }
