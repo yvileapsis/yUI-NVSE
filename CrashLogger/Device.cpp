@@ -17,7 +17,7 @@ namespace CrashLogger::Device
 	try
 	{
 
-		output << "Device:" << '\n';
+		output << "Device:" << std::endl;
 
 		const char* gpu = *(const char**)0x11C72C4;
 		std::string cpu = "Unknown";
@@ -56,12 +56,12 @@ namespace CrashLogger::Device
 		ULONGLONG memAmount;
 		GetPhysicallyInstalledSystemMemory(&memAmount);
 		
-		output << std::format("OS:  \"{} - {} ({})\"", version, buildNumber, release) << '\n';
-		output << std::format("CPU: \"{}\"", cpu) << '\n';
-		output << std::format("GPU: {}", gpu) << '\n';
-		output << std::format("RAM: \"{:>5.2f} GB\"", memAmount / 1024.f / 1024.f) << '\n';
+		output << std::format("OS:  \"{} - {} ({})\"", version, buildNumber, release) << std::endl;
+		output << std::format("CPU: \"{}\"", cpu) << std::endl;
+		output << std::format("GPU: {}", gpu) << std::endl;
+		output << std::format("RAM: \"{:>5.2f} GB\"", memAmount / 1024.f / 1024.f) << std::endl;
 	}
-	catch (...) { output << "Failed to print device info." << '\n'; }
+	catch (...) { output << "Failed to print device info." << std::endl; }
 
 	extern std::stringstream& Get() { return output; }
 }

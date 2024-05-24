@@ -124,7 +124,7 @@ namespace Logger
 				static std::fstream logFile(log, std::fstream::out | std::fstream::trunc);
 
 				if (level & logLevel & LogLevel::LogFile)
-					logFile << msg << '\n';
+					logFile << msg << std::endl;
 			});
 
 		LoggerManager::GetSingleton().addDestination("console", [prefix](const std::string& msg, LogLevel level)
