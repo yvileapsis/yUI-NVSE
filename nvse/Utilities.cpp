@@ -1102,3 +1102,51 @@ std::string FormatSize(SIZE_T size) {
 	}
 	return result;
 }
+
+//Returns the last Win32 error, in string format. Returns an empty string if there is no error.
+std::string GetErrorAsString(UInt32 errorMessageID)
+{
+	if (errorMessageID == 0) return ""; //No error message has been recorded
+
+	LPSTR messageBuffer = nullptr;
+
+	//Ask Win32 to give us the string version of that message ID.
+	//The parameters we pass in, tell Win32 to create the buffer that holds the message for us (because we don't yet know how long the message string will be).
+	size_t size = FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+								 NULL, errorMessageID, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPSTR)&messageBuffer, 0, NULL);
+
+	//Copy the error message into a std::string.
+	std::string message(messageBuffer, size);
+
+	//Free the Win32's string's buffer.
+	LocalFree(messageBuffer);
+
+	return message;
+}
+
+std::string GetExceptionAsString(UInt32 exceptionMessageID)
+{
+	switch (exceptionMessageID) {
+	case EXCEPTION_ACCESS_VIOLATION: return "EXCEPTION_ACCESS_VIOLATION";
+	case EXCEPTION_ARRAY_BOUNDS_EXCEEDED: return "EXCEPTION_ARRAY_BOUNDS_EXCEEDED";
+	case EXCEPTION_BREAKPOINT: return "EXCEPTION_BREAKPOINT >>";
+	case EXCEPTION_DATATYPE_MISALIGNMENT: return "EXCEPTION_DATATYPE_MISALIGNMENT >>";
+	case EXCEPTION_FLT_DENORMAL_OPERAND: return "EXCEPTION_FLT_DENORMAL_OPERAND";
+	case EXCEPTION_FLT_DIVIDE_BY_ZERO: return "EXCEPTION_FLT_DIVIDE_BY_ZERO";
+	case EXCEPTION_FLT_INEXACT_RESULT: return "EXCEPTION_FLT_INEXACT_RESULT";
+	case EXCEPTION_FLT_INVALID_OPERATION: return "EXCEPTION_FLT_INVALID_OPERATION";
+	case EXCEPTION_FLT_OVERFLOW: return "EXCEPTION_FLT_OVERFLOW";
+	case EXCEPTION_FLT_STACK_CHECK: return "EXCEPTION_FLT_STACK_CHECK";
+	case EXCEPTION_FLT_UNDERFLOW: return "EXCEPTION_FLT_UNDERFLOW";
+	case EXCEPTION_ILLEGAL_INSTRUCTION: return "EXCEPTION_ILLEGAL_INSTRUCTION";
+	case EXCEPTION_IN_PAGE_ERROR: return "EXCEPTION_IN_PAGE_ERROR";
+	case EXCEPTION_INT_DIVIDE_BY_ZERO: return "EXCEPTION_INT_DIVIDE_BY_ZERO";
+	case EXCEPTION_INT_OVERFLOW: return "EXCEPTION_INT_OVERFLOW";
+	case EXCEPTION_INVALID_DISPOSITION: return "EXCEPTION_INVALID_DISPOSITION";
+	case EXCEPTION_NONCONTINUABLE_EXCEPTION: return "EXCEPTION_NONCONTINUABLE_EXCEPTION";
+	case EXCEPTION_PRIV_INSTRUCTION: return "EXCEPTION_PRIV_INSTRUCTION";
+	case EXCEPTION_SINGLE_STEP: return "EXCEPTION_SINGLE_STEP";
+	case EXCEPTION_STACK_OVERFLOW: return "EXCEPTION_STACK_OVERFLOW";
+	default: return "UKNOWN_EXCEPTION";
+	}
+}

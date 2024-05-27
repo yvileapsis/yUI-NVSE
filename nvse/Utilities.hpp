@@ -430,3 +430,6 @@ float ConvertToMB(SIZE_T size);
 float ConvertToGB(SIZE_T size);
 
 std::string FormatSize(SIZE_T size);
+
+std::string GetErrorAsString(UInt32 errorMessageID);
+std::string GetExceptionAsString(UInt32 exceptionMessageID);

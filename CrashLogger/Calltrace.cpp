@@ -1,4 +1,5 @@
 #include <CrashLogger.hpp>
+#include <exception>
 
 // TODO: write/find a converter of exception codes to strings
 namespace CrashLogger::Exception
@@ -6,7 +7,11 @@ namespace CrashLogger::Exception
 	std::stringstream output;
 
 	extern void Process(EXCEPTION_POINTERS* info)
-	try { output << std::format("Exception: {:08X}\n", info->ExceptionRecord->ExceptionCode); }
+	try
+	{
+		output << std::format("Exception: {} ({:08X})\n",  GetExceptionAsString(info->ExceptionRecord->ExceptionCode), info->ExceptionRecord->ExceptionCode);
+		if (GetLastError()) output << std::format("Last Error: {} ({:08X})\n", SanitizeString(GetErrorAsString(GetLastError())), GetLastError());
+	}
 	catch (...) { output << "Failed to log exception." << '\n'; }
 
 	extern std::stringstream& Get() { output.flush(); return output; }
