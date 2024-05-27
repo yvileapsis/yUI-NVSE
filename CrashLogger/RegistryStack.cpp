@@ -3,7 +3,7 @@
 namespace CrashLogger
 {
 
-	inline bool GetStringForClassLabel(void** object, std::string& buffer)
+	inline bool GetStringForClassLabel(void* object, std::string& labelName, std::string& objectName, std::string& description)
 	try
 	{
 		static bool fillLables = false;
@@ -16,29 +16,57 @@ namespace CrashLogger
 
 		for (const auto& iter : Labels::Label::GetAll()) if (iter->Satisfies(object))
 		{
-
-			buffer += std::format("0x{:08X}", *(UInt32*)object);
-
-			buffer += " ==> ";
-
-			buffer += iter->GetLabelName();
-
-			buffer += ": ";
-
-			buffer += iter->GetName(object);
-
-			buffer += ": ";
-
-			buffer += iter->GetDescription(object);
-
+			labelName = iter->GetLabelName();
+			objectName = iter->GetName(object);
+			description = iter->GetDescription(object);
 			return true;
 		}
+
 		return false;
 	}
 	catch (...) {
-		buffer += "Failed to get string for label";
-		return true;
+		return false;
 	}
+
+	bool GetAsString(const void* object, std::string& labelName, std::string& string)
+	try {
+		const auto printable = [](const char a_ch) noexcept {
+			if (' ' <= a_ch && a_ch <= '~') return true;
+
+			switch (a_ch) {
+			case '\t':
+			case '\n':
+				return true;
+			default:
+				return false;
+			}
+		};
+
+		const auto cstr = static_cast<const char*>(object);
+		constexpr std::size_t max = MAX_PATH;
+
+		std::size_t len = 0;
+		for (; len < max && cstr[len] != '\0'; ++len) if (!printable(cstr[len])) return false;
+
+		if (len == 0 || len >= max || len < 3) return false;
+
+		const auto str = SanitizeString(cstr);
+
+		// Check if string is equal to a predefined prefix and print out the file name if true
+		if (const auto pos = str.find("D:\\_Fallout3\\"); pos == std::string::npos) {
+			labelName = "String";
+			string = str;
+		} else {
+			const std::filesystem::path path = str.substr(pos);
+			labelName = "Source";
+			string = path.filename().string();
+		}
+
+		return true;
+	} catch (...) {
+		return false;
+	}
+
 }
 
 namespace CrashLogger::Registry
@@ -98,11 +126,11 @@ namespace CrashLogger::Stack
 
 	bool GetStringForRTTIorPDB(void** object, std::string& buffer)
 	try {
-		if (*(UInt32*)object > VFTableLowerLimit() && *(UInt32*)object < 0x1200000)
+//		if (*(UInt32*)object > VFTableLowerLimit() && *(UInt32*)object < 0x1200000)
 		{
 			if (const auto& name = PDB::GetClassNameFromRTTIorPDB((void*)object); !name.empty())
 			{
-				buffer += std::format("0x{:08X} ==> Unhandled: ", *(UInt32*)object) + name;
+				buffer += std::format("0x{:08X} ==> RTTI: ", *(UInt32*)object) + name;
 				return true;
 			}
 		}
@@ -110,46 +138,25 @@ namespace CrashLogger::Stack
 	}
 	catch (...) { return false; }
 
-	// taken out of CrashLoggerSSE
-	bool GetAsString(void** object, std::string& buffer)
-	{
-		try {
-			const auto printable = [](char a_ch) noexcept {
-				if (' ' <= a_ch && a_ch <= '~') return true;
-
-				switch (a_ch) {
-				case '\t':
-				case '\n':
-					return true;
-				default:
-					return false;
-				}
-				};
-
-			const auto str = reinterpret_cast<const char*>(object);
-			constexpr std::size_t max = MAX_PATH;
-
-			std::size_t len = 0;
-			for (; len < max && str[len] != '\0'; ++len) if (!printable(str[len])) return false;
-		
-			if (len == 0 || len >= max || len < 3) return false;
-
-			buffer += std::format(R"(0x{:08X} ==> String: "{}")", *(UInt32*)object, SanitizeString(str));
-
-			// TODO: if string is equal to "D:\_Fallout3\Platforms\Common\Code\Fallout Shared\XXX" or similar should print it out
-			return true;
-		} catch (...) {
-			return false;
-		}
-	}
 
 	bool GetStringForLabel(void** object, std::string& buffer)
 	try {
-		if (GetStringForClassLabel(object, buffer)) return true;
+
+		std::string labelName, objectName, description;
+
+		if (GetStringForClassLabel(object, labelName, objectName, description))
+		{
+			buffer += std::format("0x{:08X} ==> ", *(UInt32*)object) + labelName + ": " + objectName + ": " + description;
+			return true;
+		}
 
 		if (GetStringForRTTIorPDB(object, buffer)) return true;
 
-		if (GetAsString(object, buffer)) return true;
+		if (GetAsString(object, labelName, description))
+		{
+			buffer += std::format("0x{:08X} ==> ", *(UInt32*)object) + labelName + ": " + '"' + description + '"';
+			return true;
+		}
 
 		return false;
 	}
@@ -164,7 +171,7 @@ namespace CrashLogger::Stack
 		UInt32 deref = 0;
 		do
 		{
-			if (GetStringForLabel(object, buffer)) return SanitizeString(buffer.c_str());
+			if (GetStringForLabel(object, buffer)) return buffer;
 			deref = Dereference<UInt32>(object);
 			buffer += std::format("0x{:08X} ==> ", deref);
 			object = (void**)deref;
