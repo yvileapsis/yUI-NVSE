@@ -53,7 +53,7 @@ namespace CrashLogger::Calltrace
 		const auto moduleOffset = (moduleBase != 0x00400000) ? eip - moduleBase + 0x10000000 : eip;
 
 		if (const auto module = PDB::GetModule(eip, process); module.empty()) 
-			middle = std::format("{:>28s} (0x{:08X}) | {:<40s} |", "-\\(°_o)/-", moduleOffset, "(Corrupt stack or heap?)");
+			middle = std::format("{:>28s} (0x{:08X}) | {:<40s} |", "-\\(Â°_o)/-", moduleOffset, "(Corrupt stack or heap?)");
 		else if (const auto symbol = PDB::GetSymbol(eip, process); symbol.empty())
 			middle = std::format("{:>28s} (0x{:08X}) | {:<40s} |", module, moduleOffset, "");
 		else
