@@ -140,6 +140,8 @@ namespace CrashLogger
 
 	void Get(EXCEPTION_POINTERS* info) 
 	{
+		const auto begin = std::chrono::system_clock::now();
+
 		Exception::Process(info);
 		Thread::Process(info);
 		Memory::Process(info);
@@ -151,6 +153,8 @@ namespace CrashLogger
 		Install::Process(info);
 		Modules::Process(info);
 
+		const auto processing = std::chrono::system_clock::now();
+
 		Log() << Exception::Get().str();
 		Log() << Thread::Get().str();
 		Log() << Memory::Get().str();
@@ -161,6 +165,14 @@ namespace CrashLogger
 		Log() << Mods::Get().str();
 		Log() << Modules::Get().str();
 		Log() << Install::Get().str();
+
+		const auto printing = std::chrono::system_clock::now();
+
+		const auto timeProcessing = std::chrono::duration_cast<std::chrono::milliseconds>(processing - begin);
+
+		const auto timePrinting = std::chrono::duration_cast<std::chrono::milliseconds>(printing - processing);
+
+		Log() << std::format("Processed in {:d} ms, printed in {:d} ms", timeProcessing.count(), timePrinting.count()) << '\n';
 
 		Logger::Copy();
 
