@@ -142,6 +142,7 @@ namespace CrashLogger
 	{
 		const auto begin = std::chrono::system_clock::now();
 
+		Playtime::Process(info);
 		Exception::Process(info);
 		Thread::Process(info);
 		Memory::Process(info);
@@ -165,6 +166,7 @@ namespace CrashLogger
 		Log() << Mods::Get().str();
 		Log() << Modules::Get().str();
 		Log() << Install::Get().str();
+		Log() << Playtime::Get().str();
 
 		const auto printing = std::chrono::system_clock::now();
 
@@ -203,6 +205,8 @@ namespace CrashLogger
 
 	extern void Init()
 	{
+		Playtime::Init();
+
 		s_originalFilter = SetUnhandledExceptionFilter(&Filter);
 
 		if (g_currentGame == kFalloutNewVegas)

@@ -1,7 +1,26 @@
 #include <CrashLogger.hpp>
-#include <exception>
 
-// TODO: write/find a converter of exception codes to strings
+namespace CrashLogger::Playtime
+{
+	std::stringstream output;
+
+	std::chrono::time_point<std::chrono::system_clock> gameStart;
+	std::chrono::time_point<std::chrono::system_clock> gameEnd;
+
+	extern void Init() { gameStart = std::chrono::system_clock::now(); }
+
+	extern void Process(EXCEPTION_POINTERS* info)
+	try
+	{
+		gameEnd = std::chrono::system_clock::now();
+		output << std::format("Playtime: {:%T}\n", gameEnd - gameStart);
+	}
+	catch (...) { output << "Failed to log playtime." << '\n'; }
+
+	extern std::stringstream& Get() { output.flush(); return output; }
+
+}
+
 namespace CrashLogger::Exception
 {
 	std::stringstream output;

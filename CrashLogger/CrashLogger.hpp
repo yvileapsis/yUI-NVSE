@@ -5,6 +5,7 @@
 #include <set>
 #include <map>
 
+namespace CrashLogger::Playtime		{ inline void Init(); inline void Process(EXCEPTION_POINTERS* info); inline std::stringstream& Get(); }
 namespace CrashLogger::Exception	{ inline void Process(EXCEPTION_POINTERS* info); inline std::stringstream& Get(); }
 namespace CrashLogger::Thread		{ inline void Process(EXCEPTION_POINTERS* info); inline std::stringstream& Get(); }
 namespace CrashLogger::Calltrace	{ inline void Process(EXCEPTION_POINTERS* info); inline std::stringstream& Get(); }
