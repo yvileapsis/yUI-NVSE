@@ -38,11 +38,7 @@ public:
 
 	~LoggerManager()
 	{
-		{
-			//			std::unique_lock<std::mutex> lock(mutex);
-			//			stop = true;
-			condition.notify_one();
-		}
+		condition.notify_one();
 		worker.join();
 	}
 
@@ -124,7 +120,10 @@ namespace Logger
 				static std::fstream logFile(log, std::fstream::out | std::fstream::trunc);
 
 				if (level & logLevel & LogLevel::LogFile)
-					logFile << msg << std::endl;
+					logFile << msg << '\n';
+
+				if (level & LogLevel::LogFlush)
+					logFile.flush();
 			});
 
 		LoggerManager::GetSingleton().addDestination("console", [prefix](const std::string& msg, LogLevel level)
@@ -142,10 +141,13 @@ namespace Logger
 		copyQueue.push_back({ in, out });
 	}
 
+	// not on separate thread which is weird, had to add a flushing crutch
 	void Copy()
 	{
 		for (const auto& [in, out] : copyQueue)
 		{
+			Log(LogLevel::LogFlush) << "";
+
 			const auto lastmod = std::format(".{0:%F}-{0:%H}-{0:%M}-{0:%S}", floor<std::chrono::seconds>(std::chrono::time_point(std::chrono::system_clock::now())));
 
 			if (!exists(out.parent_path())) std::filesystem::create_directory(out.parent_path());
@@ -160,7 +162,7 @@ namespace Logger
 				Log() << "Copied " << in << " to " << newOut;
 			}
 			catch (std::filesystem::filesystem_error& e) {
-				Log() << "Could not copy sandbox/abc: " << e.what() << std::endl;
+				Log() << "Could not copy sandbox/abc: " << e.what() << '\n';
 			}
 		}
 	}

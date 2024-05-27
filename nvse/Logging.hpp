@@ -8,6 +8,7 @@ enum LogLevel {
 	LogWarning		= 1 << 0x2,
 	LogError		= 1 << 0x3,
 	LogConsole		= 1 << 0x4,
+	LogFlush		= 1 << 0x5,
 
 	LogFile = LogInfo | LogWarning | LogError
 };

@@ -17,13 +17,13 @@ void FillPluginInfo(PluginInfo* info)
 	info->version = CrashLogger_VERSION * 100;
 }
 
-void InitLog(std::filesystem::path path = "")
+void InitLog(const std::filesystem::path& path = "")
 {
-	std::filesystem::path logPath = GetCurPath();
+	auto logPath = GetCurPath();
 	if (!path.empty()) logPath /= path;
 	logPath /= CrashLogger_LOG;
 
-	std::filesystem::path logFolderPath = GetCurPath();
+	auto logFolderPath = GetCurPath();
 	if (!path.empty()) logFolderPath /= path;
 	logFolderPath /= CrashLogger_FLD;
 	logFolderPath /= CrashLogger_LOG;
@@ -33,9 +33,11 @@ void InitLog(std::filesystem::path path = "")
 
 	Log(LogLevel::LogConsole) << CrashLogger_VERSION_STR;
 
-	Log(LogLevel::LogWarning) << GetName() + " version " + CrashLogger_VERSION_STR + " at " + std::format("{0:%F} {0:%T}", std::chrono::time_point(std::chrono::system_clock::now())) << std::endl 
-		<< "If this file is empty, then your game didn't crash or something went so wrong even crash logger was useless! :snig:" << std::endl
-		<< "Topmost stack module is NOT ALWAYS the crash reason! Exercise caution when speculating!" << std::endl;
+	Log(LogLevel::LogWarning) << GetName() + " version " + CrashLogger_VERSION_STR + " at " + std::format("{0:%F} {0:%T}", std::chrono::time_point(std::chrono::system_clock::now())) <<
+		'\n'
+		<< "If this file is empty, then your game didn't crash or something went so wrong even crash logger was useless! :snig:" <<
+		'\n'
+		<< "Topmost stack module is NOT ALWAYS the crash reason! Exercise caution when speculating!" << '\n';
 
 	if (GetModuleHandle("nvac.dll")) {
 		Log(LogLevel::LogWarning) << "NVAC detected! The log will be incorrect!\nPlease remove NVAC to let the game crash properly!\n";

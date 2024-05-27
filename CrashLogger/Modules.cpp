@@ -96,7 +96,8 @@ namespace CrashLogger::Modules
 
 		Safe_EnumerateLoadedModules(process, EumerateModulesCallback, &infoUser);
 
-		output << "Module bases:" << std::endl << std::format(" {:^23} | {:>40} | {:>20} | Filepath", "Address", "Module", "Version") << std::endl;;
+		output << "Module bases:" << '\n' << std::format(" {:^23} | {:>40} | {:>20} | Filepath", "Address", "Module", "Version") <<
+			'\n';;
 		for (const auto& [moduleBase, moduleEnd, path] : enumeratedModules)
 		{
 			std::string version;
@@ -114,24 +115,27 @@ namespace CrashLogger::Modules
 				version = dll_version;
 			}
 
-			output << std::format(" 0x{:08X} - 0x{:08X} | {:>40} | {:>20} | {}", moduleBase, moduleEnd, path.stem().generic_string(), version, SanitizeString(path.generic_string())) << std::endl;
-
+			output << std::format(" 0x{:08X} - 0x{:08X} | {:>40} | {:>20} | {}", moduleBase, moduleEnd, path.stem().generic_string(), version, SanitizeString(path.generic_string())) <<
+				'\n';
 		}
 
-		output << std::endl;
+		output << '\n';
 
 		if (infoUser.moduleBase)
-			output << std::format("GAME CRASHED AT INSTRUCTION Base+0x{:08X} IN MODULE: {}", (infoUser.eip - infoUser.moduleBase), infoUser.name) << std::endl
-			<< "Please note that this does not automatically mean that that module is responsible. It may have been supplied bad data or" << std::endl
-			<< "program state as the result of an issue in the base game or a different DLL." << std::endl;
+			output << std::format("GAME CRASHED AT INSTRUCTION Base+0x{:08X} IN MODULE: {}", (infoUser.eip - infoUser.moduleBase), infoUser.name) <<
+				'\n'
+				<< "Please note that this does not automatically mean that that module is responsible. It may have been supplied bad data or" <<
+				'\n'
+				<< "program state as the result of an issue in the base game or a different DLL." << '\n';
 		else
-			output << "UNABLE TO IDENTIFY MODULE CONTAINING THE CRASH ADDRESS." << std::endl
-			<< "This can occur if the crashing instruction is located in the vanilla address space, but it can also occur if there are too many" << std::endl
-			<< "DLLs for us to list, and if the crash occurred in one of their address spaces. Please note that even if the crash occurred" << std::endl
-			<< "in vanilla code, that does not necessarily mean that it is a vanilla problem. The vanilla code may have been supplied bad data" << std::endl
-			<< "or program state as the result of an issue in a loaded DLL." << std::endl;
-	}
-	catch (...) { output << "Failed to print out modules." << std::endl; }
+			output << "UNABLE TO IDENTIFY MODULE CONTAINING THE CRASH ADDRESS." << '\n'
+				<< "This can occur if the crashing instruction is located in the vanilla address space, but it can also occur if there are too many" << '\n'
+				<< "DLLs for us to list, and if the crash occurred in one of their address spaces. Please note that even if the crash occurred" << '\n'
+				<< "in vanilla code, that does not necessarily mean that it is a vanilla problem. The vanilla code may have been supplied bad data" << '\n'
+				<< "or program state as the result of an issue in a loaded DLL." << '\n';
 
-	extern std::stringstream& Get() { return output; }
+	}
+	catch (...) { output << "Failed to print out modules." << '\n'; }
+
+	extern std::stringstream& Get() { output.flush(); return output; }
 }

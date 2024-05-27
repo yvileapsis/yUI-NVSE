@@ -7,7 +7,7 @@ void InitSingletons()
 	g_HUDMainMenu = HUDMainMenu::GetSingleton();
 }
 
-void InitLog(std::filesystem::path path = "")
+void InitLog(const std::filesystem::path& path = "")
 {
 	std::filesystem::path logPath = GetCurPath();
 	logPath /= path;

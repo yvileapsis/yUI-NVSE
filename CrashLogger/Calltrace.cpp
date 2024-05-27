@@ -7,9 +7,9 @@ namespace CrashLogger::Exception
 
 	extern void Process(EXCEPTION_POINTERS* info)
 	try { output << std::format("Exception: {:08X}\n", info->ExceptionRecord->ExceptionCode); }
-	catch (...) { output << "Failed to log exception." << std::endl; }
+	catch (...) { output << "Failed to log exception." << '\n'; }
 
-	extern std::stringstream& Get() { return output; }
+	extern std::stringstream& Get() { output.flush(); return output; }
 }
 
 namespace CrashLogger::Thread
@@ -28,10 +28,10 @@ namespace CrashLogger::Thread
 	}
 
 	extern void Process(EXCEPTION_POINTERS* info)
-	try { output << "Thread: " << GetThreadName() << std::endl; }
-	catch (...) { output << "Failed to log thread name." << std::endl; }
+	try { output << "Thread: " << GetThreadName() << '\n'; }
+	catch (...) { output << "Failed to log thread name." << '\n'; }
 
-	extern std::stringstream& Get() { return output; }
+	extern std::stringstream& Get() { output.flush(); return output; }
 }
 
 namespace CrashLogger::Calltrace
@@ -90,7 +90,7 @@ namespace CrashLogger::Calltrace
 
 		//	SymSetExtendedOption((IMAGEHLP_EXTENDED_OPTIONS)SYMOPT_EX_WINE_NATIVE_MODULES, TRUE);
 		if (!Safe_SymInitialize(process, lookPath.c_str(), true))
-			output << "Error initializing symbol store" << std::endl;
+			output << "Error initializing symbol store" << '\n';
 
 		//	SymSetExtendedOption((IMAGEHLP_EXTENDED_OPTIONS)SYMOPT_EX_WINE_NATIVE_MODULES, TRUE);
 
@@ -104,7 +104,8 @@ namespace CrashLogger::Calltrace
 		DWORD eip = 0;
 
 		// retarded crutch to try to copy dbghelp before.
-		output << "Calltrace:" << std::endl << std::format("{:^10} |  {:^40} | {:^40} | Source", "ebp", "Function Address", "Function Name") << std::endl;
+		output << "Calltrace:" << '\n' << std::format("{:^10} |  {:^40} | {:^40} | Source", "ebp", "Function Address", "Function Name") <<
+			'\n';
 
 		while (Safe_StackWalk(machine, process, thread, &frame, &context, NULL, Safe_SymFunctionTableAccess, Safe_SymGetModuleBase, NULL)) {
 			/*
@@ -113,10 +114,10 @@ namespace CrashLogger::Calltrace
 			*/
 			if (frame.AddrPC.Offset == eip) break;
 			eip = frame.AddrPC.Offset;
-			output << GetCalltraceFunction(frame.AddrPC.Offset, frame.AddrFrame.Offset, process) << std::endl;
+			output << GetCalltraceFunction(frame.AddrPC.Offset, frame.AddrFrame.Offset, process) << '\n';
 		}
 	}
-	catch (...) {  output << "Failed to log callstack." << std::endl; }
+	catch (...) {  output << "Failed to log callstack." << '\n'; }
 
-	extern std::stringstream& Get() { return output; }
+	extern std::stringstream& Get() { output.flush(); return output; }
 }
