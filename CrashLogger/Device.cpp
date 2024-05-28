@@ -55,6 +55,9 @@ namespace CrashLogger::Device
 
 		ULONGLONG memAmount;
 		GetPhysicallyInstalledSystemMemory(&memAmount);
+
+		// Trim the empty space at the end of the CPU string
+		cpu.erase(std::find_if(cpu.rbegin(), cpu.rend(), [](int ch) { return !std::isspace(ch); }).base(), cpu.end());
 		
 		output << std::format("OS:  \"{} - {} ({})\"", version, buildNumber, release) << '\n';
 		output << std::format("CPU: \"{}\"", cpu) << '\n';
