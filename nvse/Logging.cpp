@@ -150,7 +150,15 @@ namespace Logger
 
 			const auto lastmod = std::format(".{0:%F}-{0:%H}-{0:%M}-{0:%S}", floor<std::chrono::seconds>(std::chrono::time_point(std::chrono::system_clock::now())));
 
-			if (!exists(out.parent_path())) std::filesystem::create_directory(out.parent_path());
+			if (!exists(out.parent_path())) {
+				std::filesystem::create_directory(out.parent_path());
+
+				// Enable NTFS compression
+				HANDLE hDirectory = CreateFile(out.parent_path().string().c_str(), GENERIC_READ | GENERIC_WRITE, NULL, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+				USHORT format = COMPRESSION_FORMAT_DEFAULT;
+				DWORD bytesReturned;
+				DeviceIoControl(hDirectory, FSCTL_SET_COMPRESSION, &format, sizeof(format), NULL, 0, &bytesReturned, NULL);
+			}
 
 			auto newOut = out.parent_path();
 			newOut /= out.stem();
