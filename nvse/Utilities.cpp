@@ -1058,9 +1058,11 @@ std::string& SanitizeStringFromUserInfo(std::string& str)
 		if (GetUserName(infoBuf, &bufCharCount)) userName = infoBuf;
 	}
 
-	while (str.find(pcName) != -1) str.replace(str.find(pcName), pcName.size(), pcName.size(), '*');
+	if (pcName.size() > 1)
+		while (str.find(pcName) != -1) str.replace(str.find(pcName), pcName.size(), pcName.size(), '*');
 
-	while (str.find(userName) != -1) str.replace(str.find(userName), userName.size(), userName.size(), '*');
+	if (userName.size() > 1)
+		while (str.find(userName) != -1) str.replace(str.find(userName), userName.size(), userName.size(), '*');
 
 	return str;
 }
