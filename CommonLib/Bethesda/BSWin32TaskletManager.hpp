@@ -5,21 +5,20 @@
 
 class BSWin32TaskletManager : public BSTaskletManager {
 public:
-	HANDLE hInitThreadHandle;
-	UInt32 uiNumThreads;
-	UInt32 uiNumThreadsCreated;
-	HANDLE hThreadHandles[6];
-	UInt32 dwThreadIDs[6];
-	bool bTerminated;
-	struct _RTL_CRITICAL_SECTION QueueLock;
-	BSWin32TaskletData* pQueueHead[64];
-	BSWin32TaskletData** ppQueueTail[64];
-	LONG lInitialCount;
-	HANDLE StartSemaphore;
-	LONG lMaxCount;
+	HANDLE							hInitThreadHandle;
+	UInt32							uiNumThreads;
+	UInt32							uiNumThreadsCreated;
+	HANDLE							hThreadHandles[6];
+	UInt32							uiThreadIDs[6];
+	bool							bTerminated;
+	CRITICAL_SECTION				kQueueLock;
+	BSWin32TaskletData*				pQueueHead[64];
+	BSWin32TaskletData**			ppQueueTail[64];
+	UInt32							uiInitialCount;
+	HANDLE							hStartSemaphore;
+	UInt32							uiMaxCount;
 
 	static BSWin32TaskletManager* GetSingleton();
-
-	void NameTasklets();
-
 };
+
+ASSERT_SIZE(BSWin32TaskletManager, 0x278);

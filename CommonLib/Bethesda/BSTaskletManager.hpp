@@ -16,11 +16,11 @@ public:
 	virtual void DestroyTaskGroupData(BSTaskletGroupData* apGroupData);
 	virtual void InstanceAvailable();
 
-	bool bAvailable;
-	bool bSignaled;
-	LONG iCount;
-	HANDLE hSemaphore;
-	LONG lMaxCount;
+	bool	bAvailable;
+	bool	bSignaled;
+	LONG	uiCount;
+	HANDLE	hSemaphore;
+	LONG	uiMaxCount;
 
 
 	bool CreateTaskGroup(BSTaskletGroup* apGroup);
