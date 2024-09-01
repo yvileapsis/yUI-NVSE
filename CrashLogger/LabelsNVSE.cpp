@@ -12,10 +12,15 @@ namespace CrashLogger::Labels
 		Push<LabelGlobal>(0x11F3374, AsUInt32, "TileValueIndirectTemp");
 		Push<LabelGlobal>(0x118FB0C, nullptr, "ShowWhoDetects");
 		Push<LabelGlobal>(0x1042C58, nullptr, "ShowWhoDetects");
-		Push<LabelGlobal>(0x011F6238, nullptr, "HeapManager");
+		Push<LabelGlobal>(0x011F6238, nullptr, "MemoryManager");
 
 		Push<LabelEmpty>(0x1000000, nullptr); // integer that is often encountered
 		Push<LabelEmpty>(0x11C0000, nullptr);
+
+		Push(kVtbl_IMemoryHeap, As<IMemoryHeap>);
+		Push(kVtbl_MemoryHeap);
+		Push(kVtbl_ZeroOverheadHeap);
+		Push(kVtbl_AbstractHeap);
 
 		Push(kVtbl_Menu, As<Menu>);
 		Push(kVtbl_TutorialMenu);
@@ -689,7 +694,6 @@ namespace CrashLogger::Labels
 		// w
 		Push(kVtbl_AILinearTaskThread);
 		Push(kVtbl_AITaskThread);
-		Push(kVtbl_AbstractHeap);
 		Push(kVtbl_ActorPackageData);
 		Push(kVtbl_ActorPathHandler);
 		Push(kVtbl_ActorPathingMessageQueue);
@@ -1140,7 +1144,6 @@ namespace CrashLogger::Labels
 		Push(kVtbl_IBSAnimNoteReceiver);
 		Push(kVtbl_IConvexOverlapImpl);
 		Push(kVtbl_IDebugText);
-		Push(kVtbl_IMemoryHeap);
 		Push(kVtbl_IMemoryManagerFile);
 
 		Push(kVtbl_IOManager);
@@ -1173,7 +1176,6 @@ namespace CrashLogger::Labels
 		Push(kVtbl_MagicTarget);
 		Push(kVtbl_MediaLocationController);
 		Push(kVtbl_MediaSet);
-		Push(kVtbl_MemoryHeap);
 		Push(kVtbl_MemoryManagerFile);
 		Push(kVtbl_MessageHandler);
 		Push(kVtbl_MobIterOperator);
@@ -1439,7 +1441,7 @@ namespace CrashLogger::Labels
 		Push(kVtbl_VolumetricFogShader);
 		Push(kVtbl_WaterTargetEntry);
 		Push(kVtbl_WaterZone);
-		Push(kVtbl_ZeroOverheadHeap);
+
 		Push(kVtbl_ZoneEntry);
 
 		Push(kVtbl_ahkpBreakableConstraintData);

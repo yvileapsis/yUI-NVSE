@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <utility>
+#include <oleauto.h>
 
 /*
 ScopedLock::ScopedLock(CriticalSection& critSection) : m_critSection(critSection)
@@ -1076,33 +1077,38 @@ const std::string& SanitizeString(std::string&& str)
 	return str;
 }
 
-float ConvertToKB(SIZE_T size) {
+float ConvertToKiB(const SIZE_T size) {
 	return (float)size / 1024.0f;
 }
 
-float ConvertToMB(SIZE_T size) {
+float ConvertToMiB(const SIZE_T size) {
 	return (float)size / 1024.0f / 1024.0f;
 }
 
-float ConvertToGB(SIZE_T size) {
+float ConvertToGiB(const SIZE_T size) {
 	return (float)size / 1024.0f / 1024.0f / 1024.0f;
 }
 
-std::string FormatSize(SIZE_T size) {
+std::string FormatSize(const SIZE_T size) {
 	std::string result;
 	if (size < 1024) {
 		result = std::format("{:>6d} B", size);
 	}
 	else if (size < 1024 * 1024) {
-		result = std::format("{:>6.2f} KB", ConvertToKB(size));
+		result = std::format("{:>6.2f} KiB", ConvertToKiB(size));
 	}
 	else if (size < 1024 * 1024 * 1024) {
-		result = std::format("{:>6.2f} MB", ConvertToMB(size));
+		result = std::format("{:>6.2f} MiB", ConvertToMiB(size));
 	}
 	else {
-		result = std::format("{:>6.2f} GB", ConvertToGB(size));
+		result = std::format("{:>6.2f} GiB", ConvertToGiB(size));
 	}
 	return result;
+}
+
+std::string GetMemoryUsageString(const SIZE_T used, const SIZE_T total) {
+	float usedPercent = (float)used / total * 100.0f;
+	return std::format("{:10} / {:10} ({:.2f}%)", FormatSize(used), FormatSize(total), usedPercent);
 }
 
 //Returns the last Win32 error, in string format. Returns an empty string if there is no error.
@@ -1151,4 +1157,9 @@ std::string GetExceptionAsString(UInt32 exceptionMessageID)
 	case EXCEPTION_STACK_OVERFLOW: return "EXCEPTION_STACK_OVERFLOW";
 	default: return "UKNOWN_EXCEPTION";
 	}
+}
+
+void PrintSeparator(const UInt32 length) {
+	std::string separator(length, '-');
+	Log() << separator << '\n';
 }
