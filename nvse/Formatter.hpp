@@ -1,5 +1,6 @@
 #include <format>
 #include <set>
+#include <bhkUtilFunctions.hpp>
 
 // If class is described by a single line, no need to name the variable
 // If there is a member class, if it's one-line, leave it as one-line, if there are several, prepend the name and add offset
@@ -234,4 +235,33 @@ inline std::vector<std::string> LogClass(const bhkCharacterController& obj)
 		return LogMember("Target:", *object);
 	}
 	return {};
+}
+
+inline std::vector<std::string> LogClass(const hkpWorldObject& obj)
+{
+	std::vector<std::string> vec;
+	std::string name = obj.GetName();
+
+	if (!name.empty())
+		vec.push_back(std::format("Name: {}", name));
+
+	bhkNiCollisionObject* object = bhkUtilFunctions::GetbhkNiCollisionObject(&obj);
+	if (object)
+		vec.append_range(LogMember("Collision Object:", reinterpret_cast<const NiCollisionObject&>(*object)));
+
+	return vec;
+}
+
+inline std::vector<std::string> LogClass(const IMemoryHeap& obj)
+{
+	HeapStats stats;
+	std::string name = obj.GetName();
+	obj.GetHeapStats(&stats, true);
+	UInt32 total = stats.uiMemHeapSize;
+	UInt32 free = stats.uiMemFreeInBlocks;
+	UInt32 used = stats.uiMemUsedInBlocks;
+	float percentage = ConvertToMiB(used) / ConvertToMiB(total) * 100.0f;
+	std::string str = std::format("{}: {:10}/{:10} ({:.2f}%)", name.c_str(), FormatSize(used), FormatSize(total), percentage);
+
+	return std::vector{ str };
 }
