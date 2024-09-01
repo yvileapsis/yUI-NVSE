@@ -42,6 +42,11 @@ void InitLog(const std::filesystem::path& path = "")
 	if (GetModuleHandle("nvac.dll")) {
 		Log(LogLevel::LogWarning) << "NVAC detected! The log will be incorrect!\nPlease remove NVAC to let the game crash properly!\n";
 	}
+
+
+	if (GetModuleHandle("nvsr.dll")) {
+		Log(LogLevel::LogWarning) << "New Vegas Stutter Remover detected! Using it will cause crashes!\n";
+	}
 }
 
 void NVSEMessageHandler(NVSEMessagingInterface::Message* msg)
