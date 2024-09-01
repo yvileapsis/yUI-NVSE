@@ -16,6 +16,7 @@ namespace CrashLogger::Install		{ inline void Process(EXCEPTION_POINTERS* info);
 namespace CrashLogger::Memory		{ inline void Process(EXCEPTION_POINTERS* info); inline std::stringstream& Get(); }
 namespace CrashLogger::Mods			{ inline void Process(EXCEPTION_POINTERS* info); inline std::stringstream& Get(); }
 namespace CrashLogger::Device		{ inline void Process(EXCEPTION_POINTERS* info); inline std::stringstream& Get(); }
+namespace CrashLogger::AssetTracker	{ inline void Process(EXCEPTION_POINTERS* info); inline std::stringstream& Get(); }
 
 namespace CrashLogger::Stack
 {

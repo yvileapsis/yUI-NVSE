@@ -133,8 +133,6 @@ namespace CrashLogger::PDB
 	}
 };
 
-
-
 namespace CrashLogger
 {
 
@@ -153,20 +151,28 @@ namespace CrashLogger
 		Mods::Process(info);
 		Install::Process(info);
 		Modules::Process(info);
+		AssetTracker::Process(info);
 
 		const auto processing = std::chrono::system_clock::now();
 
+		Log() << Playtime::Get().str();
 		Log() << Exception::Get().str();
 		Log() << Thread::Get().str();
-		Log() << Memory::Get().str();
-		Log() << Device::Get().str();
 		Log() << Calltrace::Get().str();
 		Log() << Registry::Get().str();
 		Log() << Stack::Get().str();
+		PrintSeparator();
+		Log() << Device::Get().str();
+		PrintSeparator();
+		Log() << Memory::Get().str();
+		PrintSeparator();
 		Log() << Mods::Get().str();
+		PrintSeparator();
+		Log() << AssetTracker::Get().str();
+		PrintSeparator();
 		Log() << Modules::Get().str();
+		PrintSeparator();
 		Log() << Install::Get().str();
-		Log() << Playtime::Get().str();
 
 		const auto printing = std::chrono::system_clock::now();
 

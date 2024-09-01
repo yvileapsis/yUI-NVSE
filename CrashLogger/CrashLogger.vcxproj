@@ -122,6 +122,7 @@
     <ClCompile Include="..\nvse\Logging.cpp" />
     <ClCompile Include="..\nvse\SafeWrite.cpp" />
     <ClCompile Include="..\nvse\Utilities.cpp" />
+    <ClCompile Include="AssetTracker.cpp" />
     <ClCompile Include="Calltrace.cpp" />
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="ExceptionHandler.cpp" />
