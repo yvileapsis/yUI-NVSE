@@ -1,6 +1,10 @@
 #pragma once
 
 struct HeapStats {
+	HeapStats() {
+		memset(this, 0, sizeof(HeapStats));
+	}
+
 	const char* pHeapName;
 	DWORD		uiMemHeapSize;
 	DWORD		uiMemHeapCommitted;
@@ -11,8 +15,8 @@ struct HeapStats {
 	DWORD		uiMemUsedInBlocks;
 	DWORD		uiSmallestFreeBlock;
 	DWORD		uiLargestFreeBlock;
-	DWORD		unk28;
-	DWORD		unk2C;
+	DWORD		uiHeapOverhead;
+	DWORD		uiFreeListOverhead;
 	DWORD		uiBlockOverhead;
 	DWORD		unk34;
 	DWORD		uiTotalFree;
@@ -21,15 +25,15 @@ struct HeapStats {
 class IMemoryHeap {
 public:
 	virtual					~IMemoryHeap();
-	virtual const char*		GetName();
-	virtual void*			BaseAllocate(SIZE_T auiSize, UInt32 auiAlignment);
-	virtual void			BaseFree(void* apPointer, SIZE_T);
+	virtual const char*		GetName() const;
+	virtual void*			Allocate(SIZE_T auiSize, UInt32 auiAlignment);
+	virtual void			Deallocate(void* apPointer, SIZE_T);
 	virtual bool			PointerInHeap(void* apPointer) const;
 	virtual void			CheckHeapIntegrity();
-	virtual void			GetHeapStats(HeapStats* apStats, bool abFullBlockInfo);
+	virtual void			GetHeapStats(HeapStats* apStats, bool abFullBlockInfo) const;
 	virtual UInt32			OutputBucketInfo(void*);
 	virtual UInt32			OutputBlockInfo(void* apFile, bool abOutputWalk);
-	virtual int				GetBlockAllocContext(void* apMemory, int = 0);
-	virtual int				GetBlockAllocCheckPoint(int);
+	virtual SIZE_T			Size(void* apPointer, int = 0) const;
+	virtual SIZE_T			TotalSize(void* apPointer) const;
 	virtual void			Unk_11();
 };

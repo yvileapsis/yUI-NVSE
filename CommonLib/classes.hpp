@@ -68,3 +68,7 @@
 #include "BSAudioManager.hpp"
 
 #include "ConsoleManager.hpp"
+
+#include "hkpWorldObject.hpp"
+
+#include "MemoryHeap.hpp"

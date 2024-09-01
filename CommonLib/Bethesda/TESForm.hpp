@@ -13,6 +13,7 @@
 
 class TESLeveledList;
 class TESFullName;
+class Script;
 
 // 0x18
 class TESForm : public BaseFormComponent 
@@ -141,7 +142,10 @@ public:
 		kType_BGSDehydrationStage,
 		kType_BGSHungerStage,
 		kType_BGSSleepDeprevationStage,	// 78
+		kType_Count
 	};
+
+	static const char* const TypeNames[kType_Count];
 
 	enum EnumFlags : UInt32
 	{
