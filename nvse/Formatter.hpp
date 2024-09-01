@@ -60,14 +60,14 @@ inline auto LogClass(const TESForm& obj)
 	UInt32 refID = obj.uiFormID;
 
 	std::string modName;
-	const char* refName = obj.GetEditorID();
+	std::string refName = obj.GetEditorID();
 
 	if (obj.ucModIndex == 0xFF)
 	{
-		if (!refName)
-			refName = "Temp Form";
-		else
-			refName = obj.eTypeID == TESForm::kType_Script ? "Script Runner" : "Temp Form";
+		if (refName.empty())
+		{
+			refName = std::format("Temp {}", TESForm::TypeNames[obj.eTypeID]);
+		}
 	}
 	vec.push_back(std::format("ID: {:08X} ({})", refID, refName));
 
