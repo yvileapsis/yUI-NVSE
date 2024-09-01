@@ -144,12 +144,16 @@ inline std::vector<std::string> LogClass(const AnimSequenceMultiple& obj)
 inline std::vector<std::string> LogClass(const NiObjectNET& obj)
 {
 	const auto name = obj.m_kName.GetStd();
-	return std::vector { '"' + SanitizeString(name.c_str()) + '"' };
+	if (!name.empty())
+		return std::vector { '"' + SanitizeString(name.c_str()) + '"' };
+	return {};
 }
 
 inline std::vector<std::string> LogClass(const NiNode& obj)
 {
-	auto vec = LogMember("Name:", static_cast<const NiObjectNET&>(obj));
+	std::vector<std::string> vec;
+	if (const auto name = obj.m_kName.GetStd(); !name.empty())
+		vec = LogMember("Name:", static_cast<const NiObjectNET&>(obj));
 	if (const auto ref = TESObjectREFR::FindReferenceFor3D(&obj)) 
 		vec.append_range(LogMember("Reference:", *ref));
 	return vec;
