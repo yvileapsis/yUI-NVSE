@@ -20,12 +20,13 @@
     <ClCompile Include="PatchNameThreads.cpp" />
     <ClCompile Include="Calltrace.cpp" />
     <ClCompile Include="ExceptionHandler.cpp" />
-    <ClCompile Include="Labels.cpp" />
     <ClCompile Include="Memory.cpp" />
     <ClCompile Include="Modules.cpp" />
     <ClCompile Include="RegistryStack.cpp" />
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="Mods.cpp" />
+    <ClCompile Include="LabelsNVSE.cpp" />
+    <ClCompile Include="AssetTracker.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="definitions.hpp" />

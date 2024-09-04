@@ -8,24 +8,24 @@ public:
 	MemoryPool(UInt32 auiPoolNumber, UInt32 auiSize, const char* apName);
 	~MemoryPool();
 
-	struct BlockNode {
-		BYTE*	pData;
-		void*	pNext;
+	struct Block {
+		Block* pData = 0;
+		Block* pNext = 0;
 	};
 
 
 	const char* pName;
-	void*		pVirtMemory;
-	BlockNode*	pMemoryBlocks;
+	void*		pAllocBase;
+	Block*		pLastBlock;
 	BYTE		gapC[20];
 	BSSpinLock	kLock;
-	UInt32		uiNumber;
-	UInt32		uiUnk44;
-	SInt16*		pData;
-	UInt32		uiDataCount;
+	UInt32		uiBlockSize;
+	UInt32		uiTotalAllocations;
+	SInt16*		pPages;
+	UInt32		uiPageCount;
 	UInt32		uiSize;
-	UInt32		uiBlockCount;
-	UInt32		uiUnk58;
+	UInt32		uiFreeBlocks;
+	UInt32		uiActiveAllocations;
 	UInt32		dword5C;
 	UInt32		dword60;
 	UInt32		unk64;
@@ -36,15 +36,11 @@ public:
 	UInt32		unk78;
 	UInt32		unk7C;
 
-	void*	Allocate(size_t aSize);
-	void	Free(void* apMemory);
+	static constexpr UInt32 PAGE_SIZE = 4096;
 
-private:
-	void	Register();
-	void	Unregister();
-
-	void	AllocateVirtualMemory();
-	BOOL	ReleaseVirtualMemory();
+	UInt32	GetBlocksPerPage() const {
+		return PAGE_SIZE / uiBlockSize;
+	};
 };
 
 ASSERT_SIZE(MemoryPool, 0x80);

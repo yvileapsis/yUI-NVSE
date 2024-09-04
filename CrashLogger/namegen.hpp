@@ -20,7 +20,10 @@ inline std::vector<std::string> author{
 	"Trooper's ",
 	"Pepe's ",
 	"Todd Howard's ",
-	"xNVSE Discord's "
+	"xNVSE Discord's ",
+	"The Great and Powerful Trixie's ",
+	"ModdingLinked: ",
+	"Karut's "
 };
 
 inline std::vector<std::string> names{
@@ -45,7 +48,10 @@ inline std::vector<std::string> names{
 	"Crash Logger: Enhanced Edition",
 	"Project Crashlogger",
 	"yCL",
-	"Fallout-Crashing-Logging Convergence"
+	"Fallout-Crashing-Logging Convergence",
+	"Great and Powerful Crash Logger",
+	"Program with useless data in it",
+	"NVAC"
 };
 
 inline std::vector<std::string> edition{
@@ -97,6 +103,9 @@ inline std::vector<std::string> edition{
 	": FIX IT NOW NOW NOW",
 	": Tried Following Viva New Vegas Guide Yet?",
 	": ITS NOT A FUCKING HAT",
+	": No Job Edition",
+	" Spoiler: it's not a memory leak",
+	" (Unreal Engine 5 Edition)",
 };
 
 std::string GetName()

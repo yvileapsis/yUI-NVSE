@@ -123,6 +123,16 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Bethesda\AutoMemContext.cpp" />
+    <ClCompile Include="Bethesda\bhkUtilFunctions.cpp" />
+    <ClCompile Include="Bethesda\BSFaceGenManager.cpp" />
+    <ClCompile Include="Bethesda\BSMemory.cpp" />
+    <ClCompile Include="Bethesda\MemoryManager.cpp" />
+    <ClCompile Include="Bethesda\ModelLoader.cpp" />
+    <ClCompile Include="Bethesda\TESForm.cpp" />
+    <ClCompile Include="Bethesda\TLSData.cpp" />
+    <ClCompile Include="Gamebryo\NiMemManager.cpp" />
+    <ClCompile Include="Gamebryo\NiMemory.cpp" />
     <ClCompile Include="Bethesda\BSWin32TaskletManager.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -161,6 +171,7 @@
     <ClInclude Include="Bethesda\Atmosphere.hpp" />
     <ClInclude Include="Bethesda\AttachDistant3DTask.hpp" />
     <ClInclude Include="Bethesda\AudioLoadTask.hpp" />
+    <ClInclude Include="Bethesda\AutoMemContext.hpp" />
     <ClInclude Include="Bethesda\BackgroundCloneThread.hpp" />
     <ClInclude Include="Bethesda\BackUpPackage.hpp" />
     <ClInclude Include="Bethesda\BarterMenu.hpp" />
@@ -280,6 +291,7 @@
     <ClInclude Include="Bethesda\bhkShapeCollection.hpp" />
     <ClInclude Include="Bethesda\bhkShapePhantom.hpp" />
     <ClInclude Include="Bethesda\bhkUnaryAction.hpp" />
+    <ClInclude Include="Bethesda\bhkUtilFunctions.hpp" />
     <ClInclude Include="Bethesda\bhkWorld.hpp" />
     <ClInclude Include="Bethesda\bhkWorldM.hpp" />
     <ClInclude Include="Bethesda\bhkWorldObject.hpp" />
@@ -353,6 +365,7 @@
     <ClInclude Include="Bethesda\BSMasterParticleSystem.hpp" />
     <ClInclude Include="Bethesda\BSMaterialEmittanceMultController.hpp" />
     <ClInclude Include="Bethesda\BSMemObject.hpp" />
+    <ClInclude Include="Bethesda\BSMemory.hpp" />
     <ClInclude Include="Bethesda\BSMultiBound.hpp" />
     <ClInclude Include="Bethesda\BSMultiBoundAABB.hpp" />
     <ClInclude Include="Bethesda\BSMultiBoundCapsule.hpp" />
@@ -659,6 +672,7 @@
     <ClInclude Include="Bethesda\MagicSystem.hpp" />
     <ClInclude Include="Bethesda\MagicTarget.hpp" />
     <ClInclude Include="Bethesda\MapMenu.hpp" />
+    <ClInclude Include="Bethesda\MemoryContexts.hpp" />
     <ClInclude Include="Bethesda\MemoryHeap.hpp" />
     <ClInclude Include="Bethesda\MemoryManager.hpp" />
     <ClInclude Include="Bethesda\MemoryManagerFile.hpp" />
@@ -983,6 +997,7 @@
     <ClInclude Include="Bethesda\TileShaderProperty.hpp" />
     <ClInclude Include="Bethesda\TileText.hpp" />
     <ClInclude Include="Bethesda\TimeGlobal.hpp" />
+    <ClInclude Include="Bethesda\TLSData.hpp" />
     <ClInclude Include="Bethesda\TressPassPackage.hpp" />
     <ClInclude Include="Bethesda\TurnUndeadEffect.hpp" />
     <ClInclude Include="Bethesda\UpdateMasterPsysTaskletData.hpp" />

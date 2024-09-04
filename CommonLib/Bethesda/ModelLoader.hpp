@@ -34,19 +34,6 @@ public:
 	bool															bHasDelayedFree;
 
 	static ModelLoader* GetSingleton();
-
-	UInt32 GetReferenceCount();
-	UInt32 GetTotalTaskCount();
-
-	bool AddLoadedFile(const char* apPath, LoadedFile* apLoadedFile);
-	void RemoveLoadedFile(const char* apPath);
-
-	void QueueReference(TESObjectREFR* apRefr, IO_TASK_PRIORITY aePriority, bool abAllowQueueReferenceQueuing);
-
-	NiNode* LoadFile(const char* apPath, UInt32 aeLODFadeMult, bool a4, int a5, char a6, bool abNoRefCountIncrease);
-
-	static void __fastcall DisplayDebugLoadingText(ModelLoader* apThis);
-	static bool __fastcall UpdateAttachDistant3DQueue(ModelLoader* apThis);
 };
 
 ASSERT_SIZE(ModelLoader, 0x30)

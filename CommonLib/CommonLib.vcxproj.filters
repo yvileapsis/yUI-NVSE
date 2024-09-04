@@ -2,6 +2,34 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Bethesda\bhkUtilFunctions.cpp">
+      <Filter>Bethesda</Filter>
+    </ClCompile>
+    <ClCompile Include="Bethesda\MemoryManager.cpp">
+      <Filter>Bethesda</Filter>
+    </ClCompile>
+    <ClCompile Include="Bethesda\TESForm.cpp">
+      <Filter>Bethesda</Filter>
+    </ClCompile>
+    <ClCompile Include="Bethesda\BSFaceGenManager.cpp">
+      <Filter>Bethesda</Filter>
+    </ClCompile>
+    <ClCompile Include="Bethesda\ModelLoader.cpp">
+      <Filter>Bethesda</Filter>
+    </ClCompile>
+    <ClCompile Include="Bethesda\TLSData.cpp">
+      <Filter>Bethesda</Filter>
+    </ClCompile>
+    <ClCompile Include="Bethesda\BSMemory.cpp">
+      <Filter>Bethesda</Filter>
+    </ClCompile>
+    <ClCompile Include="Gamebryo\NiMemory.cpp">
+      <Filter>Gamebryo</Filter>
+    </ClCompile>
+    <ClCompile Include="Gamebryo\NiMemManager.cpp">
+      <Filter>Gamebryo</Filter>
+    </ClCompile>
+    <ClCompile Include="Bethesda\AutoMemContext.cpp">
     <ClCompile Include="Bethesda\BSWin32TaskletManager.cpp">
       <Filter>Bethesda</Filter>
     </ClCompile>
@@ -3764,6 +3792,21 @@
     <ClInclude Include="RTTI.hpp" />
     <ClInclude Include="CommonPrefix.hpp" />
     <ClInclude Include="Bethesda\AnimSequence.hpp">
+      <Filter>Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="Bethesda\bhkUtilFunctions.hpp">
+      <Filter>Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="Bethesda\TLSData.hpp">
+      <Filter>Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="Bethesda\AutoMemContext.hpp">
+      <Filter>Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="Bethesda\MemoryContexts.hpp">
+      <Filter>Bethesda</Filter>
+    </ClInclude>
+    <ClInclude Include="Bethesda\BSMemory.hpp">
       <Filter>Bethesda</Filter>
     </ClInclude>
   </ItemGroup>

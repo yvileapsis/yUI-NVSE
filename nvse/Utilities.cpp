@@ -2,6 +2,7 @@
 
 #include <cstdlib>
 #include <utility>
+#include <oleauto.h>
 
 /*
 ScopedLock::ScopedLock(CriticalSection& critSection) : m_critSection(critSection)
@@ -1076,33 +1077,38 @@ const std::string& SanitizeString(std::string&& str)
 	return str;
 }
 
-float ConvertToKB(SIZE_T size) {
+float ConvertToKiB(const SIZE_T size) {
 	return (float)size / 1024.0f;
 }
 
-float ConvertToMB(SIZE_T size) {
+float ConvertToMiB(const SIZE_T size) {
 	return (float)size / 1024.0f / 1024.0f;
 }
 
-float ConvertToGB(SIZE_T size) {
+float ConvertToGiB(const SIZE_T size) {
 	return (float)size / 1024.0f / 1024.0f / 1024.0f;
 }
 
-std::string FormatSize(SIZE_T size) {
+std::string FormatSize(const SIZE_T size) {
 	std::string result;
 	if (size < 1024) {
 		result = std::format("{:>6d} B", size);
 	}
 	else if (size < 1024 * 1024) {
-		result = std::format("{:>6.2f} KB", ConvertToKB(size));
+		result = std::format("{:>6.2f} KiB", ConvertToKiB(size));
 	}
 	else if (size < 1024 * 1024 * 1024) {
-		result = std::format("{:>6.2f} MB", ConvertToMB(size));
+		result = std::format("{:>6.2f} MiB", ConvertToMiB(size));
 	}
 	else {
-		result = std::format("{:>6.2f} GB", ConvertToGB(size));
+		result = std::format("{:>6.2f} GiB", ConvertToGiB(size));
 	}
 	return result;
+}
+
+std::string GetMemoryUsageString(const SIZE_T used, const SIZE_T total) {
+	float usedPercent = (float)used / total * 100.0f;
+	return std::format("{:10} / {:10} ({:.2f}%)", FormatSize(used), FormatSize(total), usedPercent);
 }
 
 //Returns the last Win32 error, in string format. Returns an empty string if there is no error.
@@ -1129,26 +1135,31 @@ std::string GetErrorAsString(UInt32 errorMessageID)
 std::string GetExceptionAsString(UInt32 exceptionMessageID)
 {
 	switch (exceptionMessageID) {
-	case EXCEPTION_ACCESS_VIOLATION: return "EXCEPTION_ACCESS_VIOLATION";
-	case EXCEPTION_ARRAY_BOUNDS_EXCEEDED: return "EXCEPTION_ARRAY_BOUNDS_EXCEEDED";
-	case EXCEPTION_BREAKPOINT: return "EXCEPTION_BREAKPOINT >>";
-	case EXCEPTION_DATATYPE_MISALIGNMENT: return "EXCEPTION_DATATYPE_MISALIGNMENT >>";
-	case EXCEPTION_FLT_DENORMAL_OPERAND: return "EXCEPTION_FLT_DENORMAL_OPERAND";
-	case EXCEPTION_FLT_DIVIDE_BY_ZERO: return "EXCEPTION_FLT_DIVIDE_BY_ZERO";
-	case EXCEPTION_FLT_INEXACT_RESULT: return "EXCEPTION_FLT_INEXACT_RESULT";
-	case EXCEPTION_FLT_INVALID_OPERATION: return "EXCEPTION_FLT_INVALID_OPERATION";
-	case EXCEPTION_FLT_OVERFLOW: return "EXCEPTION_FLT_OVERFLOW";
-	case EXCEPTION_FLT_STACK_CHECK: return "EXCEPTION_FLT_STACK_CHECK";
-	case EXCEPTION_FLT_UNDERFLOW: return "EXCEPTION_FLT_UNDERFLOW";
-	case EXCEPTION_ILLEGAL_INSTRUCTION: return "EXCEPTION_ILLEGAL_INSTRUCTION";
-	case EXCEPTION_IN_PAGE_ERROR: return "EXCEPTION_IN_PAGE_ERROR";
-	case EXCEPTION_INT_DIVIDE_BY_ZERO: return "EXCEPTION_INT_DIVIDE_BY_ZERO";
-	case EXCEPTION_INT_OVERFLOW: return "EXCEPTION_INT_OVERFLOW";
-	case EXCEPTION_INVALID_DISPOSITION: return "EXCEPTION_INVALID_DISPOSITION";
-	case EXCEPTION_NONCONTINUABLE_EXCEPTION: return "EXCEPTION_NONCONTINUABLE_EXCEPTION";
-	case EXCEPTION_PRIV_INSTRUCTION: return "EXCEPTION_PRIV_INSTRUCTION";
-	case EXCEPTION_SINGLE_STEP: return "EXCEPTION_SINGLE_STEP";
-	case EXCEPTION_STACK_OVERFLOW: return "EXCEPTION_STACK_OVERFLOW";
+	case EXCEPTION_ACCESS_VIOLATION:			return "EXCEPTION_ACCESS_VIOLATION";
+	case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:		return "EXCEPTION_ARRAY_BOUNDS_EXCEEDED";
+	case EXCEPTION_BREAKPOINT:					return "EXCEPTION_BREAKPOINT >>";
+	case EXCEPTION_DATATYPE_MISALIGNMENT:		return "EXCEPTION_DATATYPE_MISALIGNMENT >>";
+	case EXCEPTION_FLT_DENORMAL_OPERAND:		return "EXCEPTION_FLT_DENORMAL_OPERAND";
+	case EXCEPTION_FLT_DIVIDE_BY_ZERO:			return "EXCEPTION_FLT_DIVIDE_BY_ZERO";
+	case EXCEPTION_FLT_INEXACT_RESULT:			return "EXCEPTION_FLT_INEXACT_RESULT";
+	case EXCEPTION_FLT_INVALID_OPERATION:		return "EXCEPTION_FLT_INVALID_OPERATION";
+	case EXCEPTION_FLT_OVERFLOW:				return "EXCEPTION_FLT_OVERFLOW";
+	case EXCEPTION_FLT_STACK_CHECK:				return "EXCEPTION_FLT_STACK_CHECK";
+	case EXCEPTION_FLT_UNDERFLOW:				return "EXCEPTION_FLT_UNDERFLOW";
+	case EXCEPTION_ILLEGAL_INSTRUCTION:			return "EXCEPTION_ILLEGAL_INSTRUCTION";
+	case EXCEPTION_IN_PAGE_ERROR:				return "EXCEPTION_IN_PAGE_ERROR";
+	case EXCEPTION_INT_DIVIDE_BY_ZERO:			return "EXCEPTION_INT_DIVIDE_BY_ZERO";
+	case EXCEPTION_INT_OVERFLOW:				return "EXCEPTION_INT_OVERFLOW";
+	case EXCEPTION_INVALID_DISPOSITION:			return "EXCEPTION_INVALID_DISPOSITION";
+	case EXCEPTION_NONCONTINUABLE_EXCEPTION:	return "EXCEPTION_NONCONTINUABLE_EXCEPTION";
+	case EXCEPTION_PRIV_INSTRUCTION:			return "EXCEPTION_PRIV_INSTRUCTION";
+	case EXCEPTION_SINGLE_STEP:					return "EXCEPTION_SINGLE_STEP";
+	case EXCEPTION_STACK_OVERFLOW:				return "EXCEPTION_STACK_OVERFLOW";
 	default: return "UKNOWN_EXCEPTION";
 	}
+}
+
+void PrintSeparator(const UInt32 length) {
+	std::string separator(length, '-');
+	Log() << separator << '\n';
 }

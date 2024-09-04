@@ -1,17 +1,17 @@
 #pragma once
 
-#include "MemoryManager.hpp"
+#include "BSMemObject.hpp"
 
 template <typename T_Data>
-class BSSimpleArray {
+class BSSimpleArray : public BSMemObject {
 public:
 	BSSimpleArray() { InitialSetup(0, 0); }
 	BSSimpleArray(UInt32 auiSize) { InitialSetup(auiSize, auiSize); }
 
 	virtual			~BSSimpleArray() { Clear(true); };
-	virtual T_Data* Allocate(UInt32 auiCount) { return MemoryManager::Allocate<T_Data>(auiCount); };
-	virtual void	Deallocate(T_Data* apData) { MemoryManager::Deallocate(apData); };
-	virtual T_Data* Reallocate(T_Data* apData, UInt32 auiCount) { return (T_Data*)MemoryManager::Reallocate(apData, sizeof(T_Data) * auiCount); };
+	virtual T_Data* Allocate(UInt32 auiCount) { return BSNew<T_Data>(auiCount); };
+	virtual void    Deallocate(T_Data* apData) { BSFree(apData); };
+	virtual T_Data* Reallocate(T_Data* apData, UInt32 auiCount) { return (T_Data*)BSReallocate(apData, sizeof(T_Data) * auiCount); };
 
 	T_Data*	pBuffer;
 	UInt32	uiSize;
@@ -22,12 +22,42 @@ public:
 		return pBuffer[idx];
 	}
 
-	UInt32 GetSize() { return uiSize; }
-	UInt32 GetAllocSize() { return uiAllocSize; }
-	bool IsEmpty() { return uiSize == 0; }
-	bool IsFull() { return uiSize == uiAllocSize; }
-	T_Data* GetAt(UInt32 idx) { return &pBuffer[idx]; }
+	UInt32 GetSize() const { return uiSize; }
+	UInt32 GetAllocSize() const { return uiAllocSize; }
+	bool IsEmpty() const { return uiSize == 0; }
+	bool IsFull() const { return uiSize == uiAllocSize; }
+	T_Data* GetAt(const UInt32 idx) const { return &pBuffer[idx]; }
 	T_Data* GetLast() { return &pBuffer[uiSize - 1]; }
+
+	class Iterator {
+	public:
+		Iterator(T_Data* node) : m_node(node) {}
+
+		T_Data* operator*() { return m_node; }
+		const T_Data* operator*() const { return m_node; }
+
+		Iterator& operator++() {
+			m_node++;
+			return *this;
+		}
+
+		bool operator!=(const Iterator& other) const {
+			return m_node != other.m_node;
+		}
+
+	private:
+		T_Data* m_node;
+	};
+
+	Iterator begin() { return Iterator(GetAt(0)); }
+	Iterator end() { return Iterator(GetLast()); }
+
+	template <typename FUNC, typename... ARGS>
+	void ForEach(FUNC&& func, ARGS... args) {
+		for (UInt32 i = 0; i < uiSize; i++)
+			func(GetAt(i), args...);
+	}
+
 
 	void ConstructDefaultItems(UInt32 auiCount) {
 		for (UInt32 i = 0; i < auiCount; ++i)
@@ -187,15 +217,64 @@ public:
 		return uiSize++;
 	}
 
-	// 0x726BF0
-	void AddNewSlots(T_Data* apBuffer, UInt32 auiCount) {
-
+	// 0x7CB2E0
+	UInt32 Append(T_Data& aItem) {
+		UInt32 uiNext = GetNextIndex();
+		ConstructItems(&pBuffer[uiNext], 1);
+		pBuffer[uiNext] = aItem;
+		return uiNext;
 	}
 
-	// 0x7CB2E0
-	void Append(T_Data& aItem) {
-		UInt32 uiNext = GetNextIndex();
-		pBuffer[uiNext] = aItem;
+	bool HasSufficientCapacity() {
+		if (uiAllocSize <= 1024u) {
+			if (uiSize <= uiAllocSize >> 2)
+				return true;
+		}
+		else if (uiSize <= (uiAllocSize - 2048))
+			return true;
+
+		return false;
+	}
+
+	UInt32 GetOptimalCapacity() {
+		if (uiAllocSize <= 2048u)
+			return uiAllocSize >> 1;
+		else
+			return uiAllocSize - 1024;
+	}
+
+	void MoveItems(T_Data* apNewBuffer, const T_Data* apOldBuffer, const UInt32 auiSize) {
+		if (auiSize) {
+			if (apNewBuffer >= apOldBuffer) {
+				if (apNewBuffer > apOldBuffer) {
+					for (UInt32 i = auiSize - 1; i >= 0; --i)
+						memcpy(&apNewBuffer[i], &apOldBuffer[i], sizeof(T_Data));
+				}
+			}
+			else {
+				for (UInt32 j = 0; j < auiSize; ++j)
+					memcpy(&apNewBuffer[j], &apOldBuffer[j], sizeof(T_Data));
+			}
+		}
+	}
+
+	void RemoveAt(UInt32 auiIndex, bool abResize) {
+		if (abResize && BSSimpleArray::HasSufficientCapacity()) {
+			UInt32 uiOptimalCapacity = GetOptimalCapacity();
+			T_Data* pNewBuffer = Allocate(uiOptimalCapacity);
+			MoveItems(pNewBuffer, pBuffer, auiIndex);
+			DestructItems(&pBuffer[auiIndex], 1);
+			MoveItems(&pNewBuffer[auiIndex], &pBuffer[auiIndex + 1], uiSize - 1);
+			FreeArray();
+			pBuffer = pNewBuffer;
+			uiAllocSize = uiOptimalCapacity;
+		}
+		else
+		{
+			DestructItems(&pBuffer[auiIndex], 1);
+			MoveItems(&pBuffer[auiIndex], &pBuffer[auiIndex + 1], uiSize - auiIndex - 1);
+		}
+		--uiSize;
 	}
 };
 

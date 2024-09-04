@@ -1,5 +1,6 @@
 #include <format>
 #include <set>
+#include <bhkUtilFunctions.hpp>
 
 // If class is described by a single line, no need to name the variable
 // If there is a member class, if it's one-line, leave it as one-line, if there are several, prepend the name and add offset
@@ -60,14 +61,14 @@ inline auto LogClass(const TESForm& obj)
 	UInt32 refID = obj.uiFormID;
 
 	std::string modName;
-	const char* refName = obj.GetEditorID();
+	std::string refName = obj.GetEditorID();
 
 	if (obj.ucModIndex == 0xFF)
 	{
-		if (!refName)
-			refName = "Temp Form";
-		else
-			refName = obj.eTypeID == TESForm::kType_Script ? "Script Runner" : "Temp Form";
+		if (refName.empty())
+		{
+			refName = std::format("Temp {}", TESForm::TypeNames[obj.eTypeID]);
+		}
 	}
 	vec.push_back(std::format("ID: {:08X} ({})", refID, refName));
 
@@ -144,12 +145,16 @@ inline std::vector<std::string> LogClass(const AnimSequenceMultiple& obj)
 inline std::vector<std::string> LogClass(const NiObjectNET& obj)
 {
 	const auto name = obj.m_kName.GetStd();
-	return std::vector { '"' + SanitizeString(name.c_str()) + '"' };
+	if (!name.empty())
+		return std::vector { '"' + SanitizeString(name.c_str()) + '"' };
+	return {};
 }
 
 inline std::vector<std::string> LogClass(const NiNode& obj)
 {
-	auto vec = LogMember("Name:", static_cast<const NiObjectNET&>(obj));
+	std::vector<std::string> vec;
+	if (const auto name = obj.m_kName.GetStd(); !name.empty())
+		vec = LogMember("Name:", static_cast<const NiObjectNET&>(obj));
 	if (const auto ref = TESObjectREFR::FindReferenceFor3D(&obj)) 
 		vec.append_range(LogMember("Reference:", *ref));
 	return vec;
@@ -230,4 +235,33 @@ inline std::vector<std::string> LogClass(const bhkCharacterController& obj)
 		return LogMember("Target:", *object);
 	}
 	return {};
+}
+
+inline std::vector<std::string> LogClass(const hkpWorldObject& obj)
+{
+	std::vector<std::string> vec;
+	std::string name = obj.GetName();
+
+	if (!name.empty())
+		vec.push_back(std::format("Name: {}", name));
+
+	bhkNiCollisionObject* object = bhkUtilFunctions::GetbhkNiCollisionObject(&obj);
+	if (object)
+		vec.append_range(LogMember("Collision Object:", reinterpret_cast<const NiCollisionObject&>(*object)));
+
+	return vec;
+}
+
+inline std::vector<std::string> LogClass(const IMemoryHeap& obj)
+{
+	HeapStats stats;
+	std::string name = obj.GetName();
+	obj.GetHeapStats(&stats, true);
+	UInt32 total = stats.uiMemHeapSize;
+	UInt32 free = stats.uiMemFreeInBlocks;
+	UInt32 used = stats.uiMemUsedInBlocks;
+	float percentage = ConvertToMiB(used) / ConvertToMiB(total) * 100.0f;
+	std::string str = std::format("{}: {:10}/{:10} ({:.2f}%)", name.c_str(), FormatSize(used), FormatSize(total), percentage);
+
+	return std::vector{ str };
 }

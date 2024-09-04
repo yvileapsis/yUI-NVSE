@@ -1,24 +1,31 @@
 #pragma once
 
-void*	NiNew(size_t stSize);
-void*	NiAlloc(size_t stSize);
-void	NiFree(void* pvMem);
-void	NiAlignedFree(void* pvMem);
-void	NiDelete(void* pvMem, size_t stElementSize);
+[[nodiscard]]
+extern __declspec(allocator) void* NiNew(size_t stSize);
+[[nodiscard]]
+extern __declspec(allocator) void* NiAlloc(size_t stSize);
+[[nodiscard]]
+extern __declspec(allocator) void* NiAlignedAlloc(size_t stSize, size_t stAlignment);
+extern void		NiFree(void* pvMem);
+extern void		NiAlignedFree(void* pvMem);
+extern void		NiDelete(void* pvMem, size_t stElementSize);
+
 template <typename T_Data>
-static T_Data* NiNew() {
+[[nodiscard]]
+__declspec(restrict) __declspec(allocator) T_Data* NiNew() {
 	return (T_Data*)NiNew(sizeof(T_Data));
 }
 
 template <typename T_Data>
-static T_Data* NiAlloc(UInt32 auiCount = 1) {
+[[nodiscard]]
+__declspec(restrict) __declspec(allocator) T_Data* NiAlloc(UInt32 auiCount = 1) {
 	return (T_Data*)NiAlloc(sizeof(T_Data) * auiCount);
 }
 
-
 template <typename T, const UInt32 ConstructorPtr = 0, typename... Args>
-T* NiCreate(Args &&... args) {
-	auto* alloc = NiNew(sizeof(T));
+[[nodiscard]]
+__declspec(restrict)T* NiCreate(Args &&... args) {
+	auto* alloc = NiNew<T>();
 	if constexpr (ConstructorPtr) {
 		ThisStdCall(ConstructorPtr, alloc, std::forward<Args>(args)...);
 	}

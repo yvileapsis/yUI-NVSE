@@ -12,10 +12,15 @@ namespace CrashLogger::Labels
 		Push<LabelGlobal>(0x11F3374, AsUInt32, "TileValueIndirectTemp");
 		Push<LabelGlobal>(0x118FB0C, nullptr, "ShowWhoDetects");
 		Push<LabelGlobal>(0x1042C58, nullptr, "ShowWhoDetects");
-		Push<LabelGlobal>(0x011F6238, nullptr, "HeapManager");
+		Push<LabelGlobal>(0x011F6238, nullptr, "MemoryManager");
 
 		Push<LabelEmpty>(0x1000000, nullptr); // integer that is often encountered
 		Push<LabelEmpty>(0x11C0000, nullptr);
+
+		Push(kVtbl_IMemoryHeap, As<IMemoryHeap>);
+		Push(kVtbl_MemoryHeap);
+		Push(kVtbl_ZeroOverheadHeap);
+		Push(kVtbl_AbstractHeap);
 
 		Push(kVtbl_Menu, As<Menu>);
 		Push(kVtbl_TutorialMenu);
@@ -689,7 +694,6 @@ namespace CrashLogger::Labels
 		// w
 		Push(kVtbl_AILinearTaskThread);
 		Push(kVtbl_AITaskThread);
-		Push(kVtbl_AbstractHeap);
 		Push(kVtbl_ActorPackageData);
 		Push(kVtbl_ActorPathHandler);
 		Push(kVtbl_ActorPathingMessageQueue);
@@ -1140,7 +1144,6 @@ namespace CrashLogger::Labels
 		Push(kVtbl_IBSAnimNoteReceiver);
 		Push(kVtbl_IConvexOverlapImpl);
 		Push(kVtbl_IDebugText);
-		Push(kVtbl_IMemoryHeap);
 		Push(kVtbl_IMemoryManagerFile);
 
 		Push(kVtbl_IOManager);
@@ -1173,7 +1176,6 @@ namespace CrashLogger::Labels
 		Push(kVtbl_MagicTarget);
 		Push(kVtbl_MediaLocationController);
 		Push(kVtbl_MediaSet);
-		Push(kVtbl_MemoryHeap);
 		Push(kVtbl_MemoryManagerFile);
 		Push(kVtbl_MessageHandler);
 		Push(kVtbl_MobIterOperator);
@@ -1439,7 +1441,7 @@ namespace CrashLogger::Labels
 		Push(kVtbl_VolumetricFogShader);
 		Push(kVtbl_WaterTargetEntry);
 		Push(kVtbl_WaterZone);
-		Push(kVtbl_ZeroOverheadHeap);
+
 		Push(kVtbl_ZoneEntry);
 
 		Push(kVtbl_ahkpBreakableConstraintData);
@@ -1656,7 +1658,6 @@ namespace CrashLogger::Labels
 		Push(kVtbl_hkgpMesh);
 
 		Push(kVtbl_hkp3AxisSweep);
-		Push(kVtbl_hkpAabbPhantom);
 		Push(kVtbl_hkpAabbTreeCollidableRaycaster);
 		Push(kVtbl_hkpAabbTreeWorldManager);
 		Push(kVtbl_hkpAction);
@@ -1685,7 +1686,6 @@ namespace CrashLogger::Labels
 		Push(kVtbl_hkpBvTreeAgent);
 		Push(kVtbl_hkpBvTreeShape);
 		Push(kVtbl_hkpBvTreeStreamAgent);
-		Push(kVtbl_hkpCachingShapePhantom);
 		Push(kVtbl_hkpCallbackConstraintMotor);
 		Push(kVtbl_hkpCapsuleCapsuleAgent);
 		Push(kVtbl_hkpCapsuleShape);
@@ -1741,7 +1741,6 @@ namespace CrashLogger::Labels
 		Push(kVtbl_hkpDisableEntityCollisionFilter);
 		Push(kVtbl_hkpDisplayBindingData);
 		Push(kVtbl_hkpEndOfStepCallbackUtil);
-		Push(kVtbl_hkpEntity);
 		Push(kVtbl_hkpEntityActivationListener);
 		Push(kVtbl_hkpEntityEntityBroadPhaseListener);
 		Push(kVtbl_hkpEntityListener);
@@ -1805,7 +1804,6 @@ namespace CrashLogger::Labels
 		Push(kVtbl_hkpNullContactMgr);
 		Push(kVtbl_hkpNullContactMgrFactory);
 		Push(kVtbl_hkpPairCollisionFilter);
-		Push(kVtbl_hkpPhantom);
 		Push(kVtbl_hkpPhantomAgent);
 		Push(kVtbl_hkpPhantomBroadPhaseListener);
 		Push(kVtbl_hkpPhantomCallbackShape);
@@ -1837,7 +1835,6 @@ namespace CrashLogger::Labels
 		Push(kVtbl_hkpRemoveTerminalsMoppModifier2);
 		Push(kVtbl_hkpReorientAction);
 		Push(kVtbl_hkpReportContactMgr);
-		Push(kVtbl_hkpRigidBody);
 		Push(kVtbl_hkpRigidBodyCentreOfMassViewer);
 		Push(kVtbl_hkpRigidBodyInertiaViewer);
 		Push(kVtbl_hkpRotationalConstraintData);
@@ -1854,12 +1851,10 @@ namespace CrashLogger::Labels
 		Push(kVtbl_hkpShapeDisplayBuilder);
 		Push(kVtbl_hkpShapeDisplayViewer);
 		Push(kVtbl_hkpShapeInfo);
-		Push(kVtbl_hkpShapePhantom);
 		Push(kVtbl_hkpSimpleClosestContactCollector);
 		Push(kVtbl_hkpSimpleConstraintContactMgr);
 		Push(kVtbl_hkpSimpleContactConstraintData);
 		Push(kVtbl_hkpSimpleMeshShape);
-		Push(kVtbl_hkpSimpleShapePhantom);
 		Push(kVtbl_hkpSimpleWorldRayCaster);
 		Push(kVtbl_hkpSimulation);
 		Push(kVtbl_hkpSimulationIsland);
@@ -1922,8 +1917,17 @@ namespace CrashLogger::Labels
 		Push(kVtbl_hkpWorldDeletionListener);
 		Push(kVtbl_hkpWorldLinearCaster);
 		Push(kVtbl_hkpWorldMemoryViewer);
-		Push(kVtbl_hkpWorldObject);
-		Push(kVtbl_hkpWorldPostSimulationListener);
+
+		Push(kVtbl_hkpWorldObject, As<hkpWorldObject>);
+		Push(kVtbl_hkpPhantom);
+		Push(kVtbl_hkpAabbPhantom);
+		Push(kVtbl_hkpShapePhantom);
+		Push(kVtbl_hkpSimpleShapePhantom);
+		Push(kVtbl_hkpCachingShapePhantom);
+		Push(kVtbl_hkpEntity);
+		Push(kVtbl_hkpRigidBody);
+
+		Push(kVtbl_hkpWorldPostSimulationListener, nullptr);
 		Push(kVtbl_hkpWorldRayCaster);
 		Push(kVtbl_hkpWorldSnapshotViewer);
 		Push(kVtbl_hkpWorldViewerBase);

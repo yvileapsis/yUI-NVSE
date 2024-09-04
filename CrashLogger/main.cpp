@@ -39,8 +39,15 @@ void InitLog(const std::filesystem::path& path = "")
 		'\n'
 		<< "Topmost stack module is NOT ALWAYS the crash reason! Exercise caution when speculating!" << '\n';
 
+	Log(LogLevel::LogWarning) << "When asking for help, please send the whole log file!\n";
+
 	if (GetModuleHandle("nvac.dll")) {
 		Log(LogLevel::LogWarning) << "NVAC detected! The log will be incorrect!\nPlease remove NVAC to let the game crash properly!\n";
+	}
+
+
+	if (GetModuleHandle("nvsr.dll")) {
+		Log(LogLevel::LogWarning) << "New Vegas Stutter Remover detected! Using it will cause crashes!\n";
 	}
 }
 

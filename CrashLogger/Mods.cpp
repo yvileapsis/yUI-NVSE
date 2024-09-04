@@ -21,7 +21,7 @@ namespace CrashLogger::Mods
 
 	extern void Process(EXCEPTION_POINTERS* info)
 	try {
-		output << "Mods:" << '\n' << std::format(" # | {:^80} | {:^40} |", "Mod", "Author") << '\n';
+		output << "Mods:" << '\n' << std::format("  # | {:^80} | {:^60}", "Mod", "Author") << '\n';
 		for (UInt32 i = 0; i < g_TESDataHandler->kMods.uiLoadedModCount; i++) {
 			const auto mod = g_TESDataHandler->kMods.pLoadedMods[i];
 			if (!mod)
@@ -29,21 +29,23 @@ namespace CrashLogger::Mods
 
 			const auto author = mod->author.StdStr();
 			if (author.empty() || !author.compare("DEFAULT"))
-				output << std::format("{:02X} | {:80} | {:40} |", i, mod->m_Filename, "") << '\n';
+				output << std::format(" {:02X} | {:80} | {:60}", i, mod->m_Filename, "") << '\n';
 			else
-				output << std::format("{:02X} | {:80} | {:40} |", i, mod->m_Filename, author) << '\n';
+				output << std::format(" {:02X} | {:80} | {:60}", i, mod->m_Filename, author) << '\n';
 		}
 		output << '\n';
 
 		std::string folder_path = std::format("{}data/nvse/plugins/scripts", GetFalloutDirectory().generic_string());
 
 		if (std::filesystem::exists(folder_path) && std::filesystem::is_directory(folder_path)) {
-			output << std::format("Script Runners:") << '\n';
+			output << std::format("Script Runners:") << '\n' << std::format("  # | {:^80}", "Filename") << '\n';;
 
+			UInt32 i = 0;
 			// Iterate through each entry in the directory
 			for (const auto& entry : std::filesystem::directory_iterator(folder_path)) {
 				if (entry.path().extension().string()._Equal(".txt")) {
-					output << entry.path().filename() << '\n';
+					output << std::format(" {:02X} | {:80}", i, entry.path().filename().string()) << '\n';
+					i++;
 				}
 			}
 		}
