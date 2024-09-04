@@ -30,6 +30,7 @@
       <Filter>Gamebryo</Filter>
     </ClCompile>
     <ClCompile Include="Bethesda\AutoMemContext.cpp">
+    <ClCompile Include="Bethesda\BSWin32TaskletManager.cpp">
       <Filter>Bethesda</Filter>
     </ClCompile>
   </ItemGroup>

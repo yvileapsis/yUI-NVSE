@@ -133,6 +133,7 @@
     <ClCompile Include="Bethesda\TLSData.cpp" />
     <ClCompile Include="Gamebryo\NiMemManager.cpp" />
     <ClCompile Include="Gamebryo\NiMemory.cpp" />
+    <ClCompile Include="Bethesda\BSWin32TaskletManager.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
