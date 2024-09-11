@@ -116,8 +116,8 @@ inline std::vector<std::string>  LogClass(const BaseProcess& obj)
 inline auto LogClass(const NiControllerSequence& obj)
 {
 	return std::vector {
-		SanitizeString(std::string("Name: ") + reinterpret_cast<const char*>(&obj.m_kName)),
-		SanitizeString(std::string("RootName: ") + reinterpret_cast<const char*>(&obj.m_kAccumRootName))
+		SanitizeString(std::string("Name: ") + std::string(obj.m_kName.m_kHandle)),
+		SanitizeString(std::string("RootName: ") + std::string(obj.m_kAccumRootName.m_kHandle))
 	};
 }
 
