@@ -11,6 +11,33 @@ namespace CrashLogger::Memory
 {
 	std::stringstream output;
 
+	void HandleNVTF() {
+		char iniDir[MAX_PATH];
+		GetCurrentDirectory(MAX_PATH, iniDir);
+		strcat_s(iniDir, "\\Data\\NVSE\\Plugins\\NVTF.ini");
+
+		if (GetFileAttributes(iniDir) != INVALID_FILE_ATTRIBUTES) {
+			bool hasDXSettings = GetPrivateProfileInt("Main", "bModifyDirectXBehavior", 0, iniDir);
+			bool hasDefaultPool = GetPrivateProfileInt("DirectX", "bUseDefaultPoolForTextures", 0, iniDir);
+			static const char* string = "WARNING: NVTF.ini has bModifyDirectXBehavior=%d %s bUseDefaultPoolForTextures=%d! This will cause high memory usage!\n         See https://performance.moddinglinked.com/falloutnv.html#NVTF on how to resolve this issue.";
+			char errorBuffer[260];
+			if ((hasDXSettings && !hasDefaultPool) || (!hasDXSettings && hasDefaultPool)) {
+				sprintf_s(errorBuffer, string, hasDXSettings, "but", hasDefaultPool);
+				output << errorBuffer << '\n';
+			}
+			else if (!hasDXSettings && !hasDefaultPool) {
+				sprintf_s(errorBuffer, string, hasDXSettings, "and", hasDefaultPool);
+				output << errorBuffer << '\n';
+			}
+		}
+		else if (!GetModuleHandle("nvtf.dll")) {
+			output << "WARNING: New Vegas Tick Fix not found! This will cause high memory usage and performance issues!\n         See https://performance.moddinglinked.com/falloutnv.html#NVTF on how to resolve this issue." << '\n';
+		}
+		else {
+			output << "WARNING: New Vegas Tick Fix is missing its INI file!" << '\n';
+		}
+	}
+
 	extern void Process(EXCEPTION_POINTERS* info)
 	try 
 	{
@@ -31,6 +58,13 @@ namespace CrashLogger::Memory
 			output << "Process' Memory:" << '\n';
 			output << std::format("Physical Usage: {}", GetMemoryUsageString(physUsage, memoryStatus.ullTotalPhys)) << '\n';
 			output << std::format("Virtual  Usage: {}", GetMemoryUsageString(virtUsage, memoryStatus.ullTotalVirtual)) << '\n';
+
+			float usedVirtual = (float)virtUsage / memoryStatus.ullTotalVirtual * 100.0f;
+			if (usedVirtual >= 80.0f) {
+				output << "WARNING: Virtual memory usage is above 80%!" << '\n';
+
+				HandleNVTF();
+			}
 		}
 
 
