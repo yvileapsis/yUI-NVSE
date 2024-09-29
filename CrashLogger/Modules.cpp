@@ -96,6 +96,8 @@ namespace CrashLogger::Modules
 
 		Safe_EnumerateLoadedModules(process, EumerateModulesCallback, &infoUser);
 
+		size_t memoryAllocated = 0;
+
 		output << "Module bases:" << '\n' << std::format(" {:^23} | {:>40} | {:>20} | Filepath", "Address", "Module", "Version") <<
 			'\n';;
 		for (const auto& [moduleBase, moduleEnd, path] : enumeratedModules)
@@ -115,9 +117,13 @@ namespace CrashLogger::Modules
 				version = dll_version;
 			}
 
+			memoryAllocated += moduleEnd - moduleBase;
+
 			output << std::format(" 0x{:08X} - 0x{:08X} | {:>40} | {:>20} | {}", moduleBase, moduleEnd, path.stem().generic_string(), version, SanitizeString(path.generic_string())) <<
 				'\n';
 		}
+
+		output << "\nTotal memory allocated to modules: " << FormatSize(memoryAllocated) << '\n';
 
 		output << '\n';
 
