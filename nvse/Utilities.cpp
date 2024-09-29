@@ -1077,27 +1077,27 @@ const std::string& SanitizeString(std::string&& str)
 	return str;
 }
 
-float ConvertToKiB(const SIZE_T size) {
+float ConvertToKiB(const UInt64 size) {
 	return (float)size / 1024.0f;
 }
 
-float ConvertToMiB(const SIZE_T size) {
+float ConvertToMiB(const UInt64 size) {
 	return (float)size / 1024.0f / 1024.0f;
 }
 
-float ConvertToGiB(const SIZE_T size) {
+float ConvertToGiB(const UInt64 size) {
 	return (float)size / 1024.0f / 1024.0f / 1024.0f;
 }
 
-std::string FormatSize(const SIZE_T size) {
+std::string FormatSize(const UInt64 size) {
 	std::string result;
 	if (size < 1024) {
 		result = std::format("{:>6d} B", size);
 	}
-	else if (size < 1024 * 1024) {
+	else if (size < 1024ull * 1024ull) {
 		result = std::format("{:>6.2f} KiB", ConvertToKiB(size));
 	}
-	else if (size < 1024 * 1024 * 1024) {
+	else if (size < 1024ull * 1024ull * 1024ull) {
 		result = std::format("{:>6.2f} MiB", ConvertToMiB(size));
 	}
 	else {
@@ -1106,7 +1106,7 @@ std::string FormatSize(const SIZE_T size) {
 	return result;
 }
 
-std::string GetMemoryUsageString(const SIZE_T used, const SIZE_T total) {
+std::string GetMemoryUsageString(const UInt64 used, const UInt64 total) {
 	float usedPercent = (float)used / total * 100.0f;
 	return std::format("{:10} / {:10} ({:.2f}%)", FormatSize(used), FormatSize(total), usedPercent);
 }
