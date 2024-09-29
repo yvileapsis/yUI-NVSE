@@ -423,15 +423,15 @@ std::string DecompileScriptToFolder(const std::string& scriptName, Script* scrip
 
 const std::string& SanitizeString(std::string&& str);
 
-float ConvertToKiB(const SIZE_T size);
+float ConvertToKiB(const UInt64 size);
 
-float ConvertToMiB(const SIZE_T size);
+float ConvertToMiB(const UInt64 size);
 
-float ConvertToGiB(const SIZE_T size);
+float ConvertToGiB(const UInt64 size);
 
-std::string FormatSize(const SIZE_T size);
+std::string FormatSize(const UInt64 size);
 
-std::string GetMemoryUsageString(const SIZE_T used, const SIZE_T total);
+std::string GetMemoryUsageString(const UInt64 used, const UInt64 total);
 
 std::string GetErrorAsString(UInt32 errorMessageID);
 std::string GetExceptionAsString(UInt32 exceptionMessageID);
