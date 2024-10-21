@@ -4,6 +4,9 @@
 #include <psapi.h>
 #include <ZeroOverheadHeap.hpp>
 
+#include <dxgi1_6.h>
+#pragma comment(lib, "dxgi.lib")
+
 #define PRINT_HEAPS 1
 #define PRINT_POOLS 0
 
@@ -38,6 +41,51 @@ namespace CrashLogger::Memory
 		}
 	}
 
+	static void PrintGraphicsMemory() {
+		ComPtr<IDXGIFactory2> spDXGIFactory;
+		CreateDXGIFactory2(0, __uuidof(IDXGIFactory2), (void**)(&spDXGIFactory));
+
+		HRESULT hResult = S_OK;
+		UInt32 i = 0;
+		while (hResult != DXGI_ERROR_NOT_FOUND) {
+			ComPtr<IDXGIAdapter1> spDXGIAdapter;
+			hResult = spDXGIFactory->EnumAdapters1(i, spDXGIAdapter.GetAddressOf());
+
+			if (SUCCEEDED(hResult)) {
+				DXGI_ADAPTER_DESC1 kDesc;
+				spDXGIAdapter->GetDesc1(&kDesc);
+				if (kDesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) {
+					i++;
+					continue;
+				}
+
+				const char* gpu = *(const char**)0x11C72C4;
+
+				char cDescription[128];
+				wcstombs(cDescription, kDesc.Description, 128);
+
+				// Game annoyingly wraps the name in quotes
+				char cCompareTarget[130];
+				cCompareTarget[0] = '"';
+				strcpy_s(cCompareTarget + 1, 128, cDescription);
+				strcat_s(cCompareTarget, "\"");
+
+				if (_stricmp(cCompareTarget, gpu) == 0) {
+					ComPtr<IDXGIAdapter3> spAdapter3;
+					spDXGIAdapter.As<IDXGIAdapter3>(&spAdapter3);
+
+					DXGI_QUERY_VIDEO_MEMORY_INFO kInfo;
+					spAdapter3->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &kInfo);
+
+					output << "\nGraphics Memory:\n";
+					output << std::format("Budget Usage:   {}", GetMemoryUsageString(kInfo.CurrentUsage, kInfo.Budget)) << '\n';
+					return;
+				}
+			}
+			i++;
+		}
+	}
+
 	extern void Process(EXCEPTION_POINTERS* info)
 	try 
 	{
@@ -67,6 +115,7 @@ namespace CrashLogger::Memory
 			}
 		}
 
+		PrintGraphicsMemory();
 
 		MemoryManager* memMgr = MemoryManager::GetSingleton();
 		// If NVHR is used, the number will be 0
