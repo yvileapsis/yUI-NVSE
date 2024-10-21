@@ -153,7 +153,7 @@ namespace CrashLogger::Memory
 					end = start + static_cast<MemoryHeap*>(heap)->uiMemHeapSize;
 				}
 
-				output << std::format("{:30}	 {}	  ({:08X} - {:08X})", heap->GetName(), GetMemoryUsageString(used, total), start, end) << '\n';
+				output << std::format("{:16}	 {}	  ({:08X} - {:08X})", heap->GetName(), GetMemoryUsageString(used, total), start, end) << '\n';
 #endif
 				usedHeapMemory += used;
 				totalHeapMemory += total;

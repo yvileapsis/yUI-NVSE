@@ -21,8 +21,8 @@ public:
 	UInt32 GetLength() const;
 
 	std::string GetStd() const {
-		if (((const char*)this)[0] != 0 && ((const char*)this)[0] != ' ')
-			return (const char*)this;
+		if (m_kHandle[0] != 0 && m_kHandle[0] != ' ')
+			return m_kHandle;
 		return "";
 	}
 };
