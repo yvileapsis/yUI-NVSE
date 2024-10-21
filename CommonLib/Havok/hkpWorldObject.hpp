@@ -27,7 +27,7 @@ public:
 	void*						m_treeData;
 
 	const char* GetName() const {
-		return m_name;
+		return m_name.c_str();
 	};
 
 	hkSimplePropertyValue* getProperty(hkSimplePropertyValue* result, UInt32 key) const;
