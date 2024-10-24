@@ -17,38 +17,49 @@ namespace CrashLogger::Memory
 		HIGH_USAGE		= 1,
 		CRITICAL_USAGE	= 2,
 		EXTERNAL_LEAK	= 3,
+		TEXTURE_SHARING = 4,
 	};
 
 	std::stringstream output;
 
-	void HandleNVTF() {
+	char nvtfError[260] = {};
+
+	bool HandleNVTF() {
 		char iniDir[MAX_PATH];
 		GetCurrentDirectory(MAX_PATH, iniDir);
 		strcat_s(iniDir, "\\Data\\NVSE\\Plugins\\NVTF.ini");
+
+		bool usesDefaultPool = true;
 
 		if (GetFileAttributes(iniDir) != INVALID_FILE_ATTRIBUTES) {
 			bool hasDXSettings = GetPrivateProfileInt("Main", "bModifyDirectXBehavior", 0, iniDir);
 			bool hasDefaultPool = GetPrivateProfileInt("DirectX", "bUseDefaultPoolForTextures", 0, iniDir);
 			static const char* string = "WARNING: NVTF.ini has bModifyDirectXBehavior=%d %s bUseDefaultPoolForTextures=%d! This will cause high memory usage!\n         See https://performance.moddinglinked.com/falloutnv.html#NVTF on how to resolve this issue.";
-			char errorBuffer[260];
+			
 			if ((hasDXSettings && !hasDefaultPool) || (!hasDXSettings && hasDefaultPool)) {
-				sprintf_s(errorBuffer, string, hasDXSettings, "but", hasDefaultPool);
-				output << errorBuffer << '\n';
+				sprintf_s(nvtfError, string, hasDXSettings, "but", hasDefaultPool);
+
+				usesDefaultPool = false;
 			}
 			else if (!hasDXSettings && !hasDefaultPool) {
-				sprintf_s(errorBuffer, string, hasDXSettings, "and", hasDefaultPool);
-				output << errorBuffer << '\n';
+				sprintf_s(nvtfError, string, hasDXSettings, "and", hasDefaultPool);
+
+				usesDefaultPool = false;
 			}
 		}
 		else if (!GetModuleHandle("nvtf.dll")) {
-			output << "WARNING: New Vegas Tick Fix not found! This will cause high memory usage and performance issues!\n         See https://performance.moddinglinked.com/falloutnv.html#NVTF on how to resolve this issue." << '\n';
+			strcpy_s(nvtfError, "WARNING: New Vegas Tick Fix not found! This will cause high memory usage and performance issues!\n         See https://performance.moddinglinked.com/falloutnv.html#NVTF on how to resolve this issue.");
+			usesDefaultPool = false;
 		}
 		else {
-			output << "WARNING: New Vegas Tick Fix is missing its INI file!" << '\n';
+			strcpy_s(nvtfError, "WARNING: New Vegas Tick Fix is missing its INI file!\n");
+			usesDefaultPool = false;
 		}
+
+		return usesDefaultPool;
 	}
 
-	static void PrintGraphicsMemory() {
+	static bool PrintGraphicsMemory(bool usesDefaultPool) {
 		ComPtr<IDXGIFactory2> spDXGIFactory;
 		CreateDXGIFactory2(0, __uuidof(IDXGIFactory2), (void**)(&spDXGIFactory));
 
@@ -88,11 +99,13 @@ namespace CrashLogger::Memory
 					output << std::format("Budget Usage:   {}", GetMemoryUsageString(kInfo.CurrentUsage, kInfo.Budget)) << '\n';
 
 					float used = (float)kInfo.CurrentUsage / kInfo.Budget * 100.0f;
-					if (used >= 99.f) {
-						output << "WARNING: Graphics memory went over budget! This can't lead to a crash, but causes performance loss instead!\n";
+					if (used >= 99.f && usesDefaultPool) {
+						output << "\nWARNING: Graphics memory went over budget! This can't lead to a crash, but causes performance loss instead!\n";
 					}
+					// Not sure if there's a point in reporting issues when you go over budget with managed pool, as odds are you'll just crash anyway (unless you have a sub 1GB GPU)
+					// In addition, handling of that case is elsewhere
 
-					return;
+					return ConvertToGiB(kInfo.CurrentUsage) > 1.f;
 				}
 			}
 			i++;
@@ -132,7 +145,9 @@ namespace CrashLogger::Memory
 			}
 		}
 
-		PrintGraphicsMemory();
+		bool defaultPool = HandleNVTF();
+
+		bool highGraphics = PrintGraphicsMemory(defaultPool);
 
 		MemoryManager* memMgr = MemoryManager::GetSingleton();
 		// If NVHR is used, the number will be 0
@@ -142,10 +157,8 @@ namespace CrashLogger::Memory
 
 			PrintSeparator();
 
-			output << "\nGame's Memory:" << '\n';
-
 #if PRINT_HEAPS
-			output << "\nHeaps:" << '\n';
+			output << "\nGame's Heaps:" << '\n';
 #endif
 			for (UInt32 i = 0; i < memMgr->usNumHeaps; i++) {
 				IMemoryHeap* heap = memMgr->ppHeaps[i];
@@ -181,7 +194,7 @@ namespace CrashLogger::Memory
 			SIZE_T uiPoolMemory = 0;
 			SIZE_T uiTotalPoolMemory = 0;
 #if PRINT_POOLS
-			output << "\nPools:" << '\n';
+			output << "\nGame's Pools:" << '\n';
 #endif
 			for (UInt32 i = 0; i < 256; i++) {
 				MemoryPool* pPool = MemoryManager::GetPool(i);
@@ -200,27 +213,37 @@ namespace CrashLogger::Memory
 #endif
 			}
 
-			output << std::format("\nTotal Heap Memory: {}", GetMemoryUsageString(usedHeapMemory, totalHeapMemory)) << '\n';
+			output << "\nGame's Total Memory:" << '\n';
+			output << std::format("Total Heap Memory: {}", GetMemoryUsageString(usedHeapMemory, totalHeapMemory)) << '\n';
 			output << std::format("Total Pool Memory: {}", GetMemoryUsageString(uiPoolMemory, uiTotalPoolMemory)) << '\n';
 			output << std::format("Total Memory:      {}", GetMemoryUsageString(usedHeapMemory + uiPoolMemory, totalHeapMemory + uiTotalPoolMemory)) << '\n';
 
 			float usedHeap = (float)usedHeapMemory / totalHeapMemory * 100.0f;
-			if (usedHeap < 0.8f && memoryErrorState >= MemoryErrors::HIGH_USAGE)
+			if (usedHeap < 80.f && memoryErrorState >= MemoryErrors::HIGH_USAGE)
 				memoryErrorState = MemoryErrors::EXTERNAL_LEAK;
 		}
 
+		output << '\n';
+
+		// We are going to bet here
+		if (!defaultPool && highGraphics && memoryErrorState == MemoryErrors::EXTERNAL_LEAK)
+			memoryErrorState = MemoryErrors::TEXTURE_SHARING;
+
+		if (nvtfError[0])
+			output << nvtfError << '\n';
+
 		switch (memoryErrorState) {
+		case MemoryErrors::TEXTURE_SHARING:
+			output << "\nWARNING: High memory usage due to texture sharing! See above warning about NVTF!" << '\n';
+			break;
 		case MemoryErrors::EXTERNAL_LEAK:
-			output << "WARNING: Memory usage is high, but the game's heaps are not full! Is some module leaking?" << '\n';
-			HandleNVTF();
+			output << "\nWARNING: Memory usage is very high, but the game's heaps are not full! Is some module leaking?" << '\n';
 			break;
 		case MemoryErrors::CRITICAL_USAGE:
-			output << "CRITICAL: Memory usage is critical! Is there a leak?" << '\n';
-			HandleNVTF();
+			output << "\nWARNING: Memory usage is very high! Is there a leak?" << '\n';
 			break;
 		case MemoryErrors::HIGH_USAGE:
-			output << "WARNING: Memory usage is high!" << '\n';
-			HandleNVTF();
+			output << "\nWARNING: Memory usage is high!" << '\n';
 			break;
 		default:
 			break;
