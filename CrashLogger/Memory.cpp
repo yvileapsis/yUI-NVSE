@@ -12,6 +12,13 @@
 
 namespace CrashLogger::Memory
 {
+	enum MemoryErrors {
+		NONE			= 0,
+		HIGH_USAGE		= 1,
+		CRITICAL_USAGE	= 2,
+		EXTERNAL_LEAK	= 3,
+	};
+
 	std::stringstream output;
 
 	void HandleNVTF() {
@@ -79,6 +86,12 @@ namespace CrashLogger::Memory
 
 					output << "\nGraphics Memory:\n";
 					output << std::format("Budget Usage:   {}", GetMemoryUsageString(kInfo.CurrentUsage, kInfo.Budget)) << '\n';
+
+					float used = (float)kInfo.CurrentUsage / kInfo.Budget * 100.0f;
+					if (used >= 99.f) {
+						output << "WARNING: Graphics memory went over budget! This can't lead to a crash, but causes performance loss instead!\n";
+					}
+
 					return;
 				}
 			}
@@ -91,6 +104,7 @@ namespace CrashLogger::Memory
 	{
 		const auto hProcess = GetCurrentProcess();
 
+		MemoryErrors memoryErrorState = MemoryErrors::NONE;
 
 		PROCESS_MEMORY_COUNTERS_EX2 pmc = {};
 		pmc.cb = sizeof(pmc);
@@ -108,10 +122,13 @@ namespace CrashLogger::Memory
 			output << std::format("Virtual  Usage: {}", GetMemoryUsageString(virtUsage, memoryStatus.ullTotalVirtual)) << '\n';
 
 			float usedVirtual = (float)virtUsage / memoryStatus.ullTotalVirtual * 100.0f;
-			if (usedVirtual >= 80.0f) {
-				output << "WARNING: Virtual memory usage is above 80%!" << '\n';
-
-				HandleNVTF();
+			if (usedVirtual >= 80.f) {
+				if (usedVirtual >= 95.f) {
+					memoryErrorState = MemoryErrors::CRITICAL_USAGE;
+				}
+				else {
+					memoryErrorState = MemoryErrors::HIGH_USAGE;
+				}
 			}
 		}
 
@@ -179,14 +196,35 @@ namespace CrashLogger::Memory
 #if PRINT_POOLS
 				SIZE_T start = reinterpret_cast<SIZE_T>(pPool->pAllocBase);
 				SIZE_T end = start + pPool->uiSize;
-				output << std::format("{:30}	 {}	  ({:08X} - {:08X})", pPool->pName, GetMemoryUsageString(used, total), start, end) << '\n';
+				output << std::format("{:16}	 {}	  ({:08X} - {:08X})", pPool->pName, GetMemoryUsageString(used, total), start, end) << '\n';
 #endif
 			}
 
 			output << std::format("\nTotal Heap Memory: {}", GetMemoryUsageString(usedHeapMemory, totalHeapMemory)) << '\n';
 			output << std::format("Total Pool Memory: {}", GetMemoryUsageString(uiPoolMemory, uiTotalPoolMemory)) << '\n';
 			output << std::format("Total Memory:      {}", GetMemoryUsageString(usedHeapMemory + uiPoolMemory, totalHeapMemory + uiTotalPoolMemory)) << '\n';
+
+			float usedHeap = (float)usedHeapMemory / totalHeapMemory * 100.0f;
+			if (usedHeap < 0.8f && memoryErrorState >= MemoryErrors::HIGH_USAGE)
+				memoryErrorState = MemoryErrors::EXTERNAL_LEAK;
 		}
+
+		switch (memoryErrorState) {
+		case MemoryErrors::EXTERNAL_LEAK:
+			output << "WARNING: Memory usage is high, but the game's heaps are not full! Is some module leaking?" << '\n';
+			HandleNVTF();
+			break;
+		case MemoryErrors::CRITICAL_USAGE:
+			output << "CRITICAL: Memory usage is critical! Is there a leak?" << '\n';
+			HandleNVTF();
+			break;
+		case MemoryErrors::HIGH_USAGE:
+			output << "WARNING: Memory usage is high!" << '\n';
+			HandleNVTF();
+			break;
+		default:
+			break;
+		};
 	}
 	catch (...) { output << "Failed to log memory." << '\n'; }
 
