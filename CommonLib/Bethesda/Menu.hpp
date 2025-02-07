@@ -161,9 +161,9 @@ public:
 	static bool					RefreshItemsListForm(TESForm* form = nullptr);
 	static void					RefreshItemsListQuick();
 
-	void  SetTileFade(Tile*	pkTile, bool startToFinish = true, Float32 duration = 0.25)
+	void  SetTileFade(Tile*	pkTile, bool startToFinish = true, Float32 duration = 0.25f)
 	{
-		pkRootTile->SetGradual("_alpha", startToFinish ? 0 : 255.0, !startToFinish ? 0 : 255.0, duration);
+		pkRootTile->SetGradual("_alpha", startToFinish ? 0.f : 255.f, !startToFinish ? 0.f : 255.f, duration);
 	}
 };
 static_assert(sizeof(Menu) == 0x28);

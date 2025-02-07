@@ -27,6 +27,7 @@
     <ClCompile Include="Mods.cpp" />
     <ClCompile Include="LabelsNVSE.cpp" />
     <ClCompile Include="AssetTracker.cpp" />
+    <ClCompile Include="PatchMallocTracking.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="definitions.hpp" />

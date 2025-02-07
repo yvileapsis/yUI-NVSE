@@ -128,7 +128,11 @@ namespace CrashLogger
 
 namespace CrashLogger::Labels
 {
-	inline std::string AsUInt32(void* ptr) { return std::format("{:#08X}", **static_cast<UInt32**>(ptr)); }
+	inline std::string AsUInt32(void* ptr) { 
+		char buffer[16];
+		sprintf_s(buffer, "%#08X", **static_cast<UInt32**>(ptr));
+		return buffer;
+	}
 
 	template<typename T> std::string As(void* ptr)
 	try {

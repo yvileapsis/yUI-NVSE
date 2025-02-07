@@ -22,6 +22,7 @@
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
@@ -90,7 +91,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <AdditionalIncludeDirectories>$(SolutionDir);$(SolutionDir)\CommonLib\Havok;$(SolutionDir)\CommonLib\Gamebryo;$(SolutionDir)\CommonLib\Obsidian;$(SolutionDir)\CommonLib\Bethesda;$(SolutionDir)\CommonLib;$(SolutionDir)\nvse;$(SolutionDir)\libraries;$(SolutionDir)\CrashLogger;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;CrashLogger_EXPORTS;RUNTIME_VERSION=0x040020D0;RUNTIME;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;CrashLogger_EXPORTS;RUNTIME_VERSION=0x040020D0;RUNTIME;WIN32_LEAN_AND_MEAN;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader />
       <WarningLevel>Level3</WarningLevel>
@@ -102,6 +103,8 @@
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <Optimization>MinSpace</Optimization>
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
@@ -132,6 +135,7 @@
     <ClCompile Include="Memory.cpp" />
     <ClCompile Include="Mods.cpp" />
     <ClCompile Include="Modules.cpp" />
+    <ClCompile Include="PatchMallocTracking.cpp" />
     <ClCompile Include="RegistryStack.cpp" />
     <ClCompile Include="definitions.cpp" />
     <ClCompile Include="dllmain.c">

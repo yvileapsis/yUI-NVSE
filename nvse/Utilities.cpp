@@ -3,59 +3,8 @@
 #include <cstdlib>
 #include <utility>
 #include <oleauto.h>
-
-/*
-ScopedLock::ScopedLock(CriticalSection& critSection) : m_critSection(critSection)
-{
-	m_critSection.Enter();
-}
-
-ScopedLock::~ScopedLock()
-{
-	m_critSection.Leave();
-}
-
-void SpinLock::Enter()
-{
-	UInt32 threadID = GetCurrentThreadId();
-	if (owningThread == threadID)
-	{
-		enterCount++;
-		return;
-	}
-	while (InterlockedCompareExchange(&owningThread, threadID, 0));
-	enterCount = 1;
-}
-
-#define FAST_SLEEP_COUNT 10000UL
-
-void SpinLock::EnterSleep()
-{
-	UInt32 threadID = GetCurrentThreadId();
-	if (owningThread == threadID)
-	{
-		enterCount++;
-		return;
-	}
-	UInt32 fastIdx = FAST_SLEEP_COUNT;
-	while (InterlockedCompareExchange(&owningThread, threadID, 0))
-	{
-		if (fastIdx)
-		{
-			fastIdx--;
-			Sleep(0);
-		}
-		else Sleep(1);
-	}
-	enterCount = 1;
-}
-
-void SpinLock::Leave()
-{
-	if (owningThread && !--enterCount)
-		owningThread = 0;
-}
-*/
+#include <UserEnv.h>
+#pragma comment (lib, "Userenv.lib")
 
 static std::filesystem::path s_falloutDirectory;
 
@@ -69,7 +18,9 @@ const std::filesystem::path& GetFalloutDirectory()
 
 	if (!falloutPathLength || falloutPathLength >= sizeof falloutPathBuf)
 	{
-		Log() << (std::format("couldn't find fallout path (len = {:d}, err = {:08X})", falloutPathLength, GetLastError()));
+		char errorBuffer[256];
+		sprintf_s(errorBuffer, "Couldn't find fallout path (len = %d, err = %08X)", falloutPathLength, GetLastError());
+		Log() << errorBuffer;
 		return s_falloutDirectory;
 	}
 
@@ -999,11 +950,14 @@ char* ConvertLiteralPercents(char* srcPtr)
 
 #include <PluginAPI.hpp>
 
-std::string DecompileScriptToFolder(const std::string& scriptName, Script* script, const std::string& fileExtension, const std::string_view& modName)
+std::string DecompileScriptToFolder(const char* scriptName, Script* script, const char* fileExtension, const char* modName)
 {
 	char buffer[0x1000];
-	if (!DecompileScript(script, 0, buffer, sizeof(buffer)))
-		return std::format("Script {} is not compiled", scriptName);
+	char textBuffer[256];
+	if (!DecompileScript(script, 0, buffer, sizeof(buffer))) {
+		sprintf_s(textBuffer, "Script %s is not compiled", scriptName);
+		return textBuffer;
+	}
 
 	std::filesystem::path dirName = "DecompiledScripts";
 	if (!std::filesystem::exists(dirName))
@@ -1014,11 +968,14 @@ std::string DecompileScriptToFolder(const std::string& scriptName, Script* scrip
 	if (!std::filesystem::exists(dirName))
 		std::filesystem::create_directory(dirName);
 
-	dirName /= scriptName + '.' + fileExtension;
+	dirName /= scriptName + '.';
+	dirName += fileExtension;
 
 	std::ofstream os(dirName);
 	os << buffer;
-	return std::format("Decompiled script to '{}'", dirName.string());
+
+	sprintf_s(textBuffer, "Decompiled script to '%s'", dirName.string().c_str());
+	return textBuffer;
 }
 
 std::string& SanitizeStringBySize(std::string& str)
@@ -1040,6 +997,7 @@ std::string& SanitizeStringFromBadData(std::string& str)
 
 std::string pcName;
 std::string userName;
+std::string userDir;
 
 std::string& SanitizeStringFromUserInfo(std::string& str)
 {
@@ -1059,11 +1017,24 @@ std::string& SanitizeStringFromUserInfo(std::string& str)
 		if (GetUserName(infoBuf, &bufCharCount)) userName = infoBuf;
 	}
 
+	[[unlikely]]
+	if (userDir.empty()) {
+		HANDLE hToken;
+		OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken);
+		DWORD bufCharCount = MAX_PATH;
+		char infoBuf[MAX_PATH];
+		if (GetUserProfileDirectoryA(hToken, infoBuf, &bufCharCount)) userDir = infoBuf;
+		CloseHandle(hToken);
+	}
+
 	if (pcName.size() > 1)
 		while (str.find(pcName) != -1) str.replace(str.find(pcName), pcName.size(), pcName.size(), '*');
 
 	if (userName.size() > 1)
 		while (str.find(userName) != -1) str.replace(str.find(userName), userName.size(), userName.size(), '*');
+
+	if (userDir.size() > 1)
+		while (str.find(userDir) != -1) str.replace(str.find(userDir), userDir.size(), userDir.size(), '*');
 
 	return str;
 }
@@ -1089,26 +1060,30 @@ float ConvertToGiB(const UInt64 size) {
 	return (float)size / 1024.0f / 1024.0f / 1024.0f;
 }
 
-std::string FormatSize(const UInt64 size) {
-	std::string result;
+const char* FormatSize(UInt64 size, char* buffer, size_t bufferSize) {
 	if (size < 1024) {
-		result = std::format("{:>6d} B", size);
+		snprintf(buffer, bufferSize, "%6d B", UInt32(size));
 	}
 	else if (size < 1024ull * 1024ull) {
-		result = std::format("{:>6.2f} KiB", ConvertToKiB(size));
+		snprintf(buffer, bufferSize, "%6.2f KiB", ConvertToKiB(size));
 	}
 	else if (size < 1024ull * 1024ull * 1024ull) {
-		result = std::format("{:>6.2f} MiB", ConvertToMiB(size));
+		snprintf(buffer, bufferSize, "%6.2f MiB", ConvertToMiB(size));
 	}
 	else {
-		result = std::format("{:>6.2f} GiB", ConvertToGiB(size));
+		snprintf(buffer, bufferSize, "%6.2f GiB", ConvertToGiB(size));
 	}
-	return result;
+	return buffer;
 }
 
-std::string GetMemoryUsageString(const UInt64 used, const UInt64 total) {
+const char* GetMemoryUsageString(const UInt64 used, const UInt64 total, char* buffer, size_t bufferSize) {
 	float usedPercent = (float)used / total * 100.0f;
-	return std::format("{:10} / {:10} ({:.2f}%)", FormatSize(used), FormatSize(total), usedPercent);
+	char cUsed[64];
+	FormatSize(used, cUsed, sizeof(cUsed));
+	char cTotal[64];
+	FormatSize(total, cTotal, sizeof(cTotal));
+	snprintf(buffer, bufferSize, "%s / %s (%.2f%%)", cUsed, cTotal, usedPercent);
+	return buffer;
 }
 
 //Returns the last Win32 error, in string format. Returns an empty string if there is no error.
@@ -1132,7 +1107,7 @@ std::string GetErrorAsString(UInt32 errorMessageID)
 	return message;
 }
 
-std::string GetExceptionAsString(UInt32 exceptionMessageID)
+const char* GetExceptionAsString(UInt32 exceptionMessageID)
 {
 	switch (exceptionMessageID) {
 	case EXCEPTION_ACCESS_VIOLATION:			return "EXCEPTION_ACCESS_VIOLATION";
@@ -1159,7 +1134,12 @@ std::string GetExceptionAsString(UInt32 exceptionMessageID)
 	}
 }
 
-void PrintSeparator(const UInt32 length) {
-	std::string separator(length, '-');
-	Log() << separator << '\n';
+void PrintSeparator(UInt32 length) {
+	if (length > 256) 
+		length = 256;
+
+	char separator[256] = {};
+	memset(separator, '-', length);
+	strcat_s(separator, "\n");
+	Log() << separator;
 }

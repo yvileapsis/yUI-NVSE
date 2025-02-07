@@ -33,11 +33,17 @@ inline std::vector<std::string> LogClass(const Tile& obj) { return std::vector {
 
 inline std::vector<std::string> LogClass(const Menu& obj)
 {
-	auto vec = std::vector {
-		std::format("MenuMode: {:d}", static_cast<UInt32>(obj.eID)),
-		std::format("Visible: {:b}", obj.IsVisible()),
-		std::format("VisibilityState: 0x{:X}", static_cast<UInt32>(obj.eVisibilityState)),
-	};
+	std::vector<std::string> vec;
+	char textBuffer[256];
+	sprintf_s(textBuffer, "MenuMode: %d", obj.eID);
+	vec.push_back(textBuffer);
+
+	sprintf_s(textBuffer, "Visible: %d", obj.IsVisible());
+	vec.push_back(textBuffer);
+
+	sprintf_s(textBuffer, "VisibilityState: 0x%X", obj.eVisibilityState);
+	vec.push_back(textBuffer);
+
 	vec.append_range(LogMember("TileMenu:", static_cast<Tile&>(*obj.pkRootTile)));
 	return vec;
 }
@@ -60,26 +66,27 @@ inline auto LogClass(const TESForm& obj)
 
 	UInt32 refID = obj.uiFormID;
 
-	std::string modName;
-	std::string refName = obj.GetEditorID();
+	char buffer[256];
 
-	if (obj.ucModIndex == 0xFF)
-	{
-		if (refName.empty())
-		{
-			refName = std::format("Temp {}", TESForm::TypeNames[obj.eTypeID]);
-		}
-	}
-	vec.push_back(std::format("ID: {:08X} ({})", refID, refName));
+	const char* refName = obj.GetEditorID();
+
+	if (!refName || !refName[0])
+		sprintf_s(buffer, "\nID: %08X %s", refID, obj.IsTemporary() ? "Temporary" : "");
+	else
+		sprintf_s(buffer, "\nID: %08X (%s) %s", refID, refName, obj.IsTemporary() ? "Temporary" : "");
+	vec.push_back(buffer);
 
 	if (obj.ucModIndex != 0xFF) {
 		TESFile* sourceMod = obj.kMods.m_item;
 		TESFile* lastMod = obj.kMods.TailItem();
 
-		vec.push_back(std::format(R"(Plugin: "{}")", sourceMod->m_Filename));
+		sprintf_s(buffer, "Plugin: \"%s\"", sourceMod->m_Filename);
+		vec.push_back(buffer);
 
-		if (sourceMod != lastMod)
-			vec.push_back(modName = std::format(R"(Last modified by: "{}")", lastMod->m_Filename));
+		if (sourceMod != lastMod) {
+			sprintf_s(buffer, "Last modified by: \"%s\"", lastMod->m_Filename);
+			vec.push_back(buffer);
+		}
 	}
 
 	return vec;
@@ -88,8 +95,12 @@ inline auto LogClass(const TESForm& obj)
 inline auto LogClass(const TESObjectREFR& obj)
 {
 	auto vec = LogClass(static_cast<const TESForm&>(obj));
-	if (const auto baseForm = obj.TryGetREFRParent())
-		vec.append_range(LogMember("BaseForm:", *baseForm));
+	const auto baseForm = obj.TryGetREFRParent();
+	if (baseForm) {
+		char textBuffer[128];
+		sprintf_s(textBuffer, "\nBaseForm: %s", TESForm::TypeNames[baseForm->eTypeID]);
+		vec.append_range(LogMember(textBuffer, *baseForm));
+	}
 	return vec;
 }
 
@@ -124,7 +135,9 @@ inline auto LogClass(const NiControllerSequence& obj)
 inline auto LogClass(const BSAnimGroupSequence& obj)
 {
 	auto vec = LogClass(static_cast<const NiControllerSequence&>(obj));
-	vec.push_back(std::format("AnimGroup: {:04X}", obj.spAnimGroup->groupID));
+	char textBuffer[32];
+	sprintf_s(textBuffer, "AnimGroup: %04X", obj.spAnimGroup->groupID);
+	vec.push_back(textBuffer);
 	return vec;
 }
 
@@ -134,10 +147,12 @@ inline std::vector<std::string> LogClass(const AnimSequenceMultiple& obj)
 {
 	std::vector<std::string> vec;
 	UInt32 i = 0;
+	char textBuffer[256];
 	for (const auto iter : *obj.pkAnims)
 	{
 		i++;
-		vec.append_range(LogMember(std::format("AnimSequence{}", i), *iter));
+		sprintf_s(textBuffer, "AnimSequence%d:", i);
+		vec.append_range(LogMember(textBuffer, *iter));
 	}
 	return vec;
 }
@@ -190,7 +205,9 @@ inline std::vector<std::string> LogClass(const Script& obj)
 	auto vec = LogClass(static_cast<const TESForm&>(obj));
 	if (obj.m_val && std::string(obj.GetEditorID()).empty())
 	{
-		const auto str = DecompileScriptToFolder(std::format("UnknownScript {:08X}", obj.uiFormID), const_cast<Script*>(&obj), "gek", "Crash Logger");
+		char textBuffer[256];
+		sprintf_s(textBuffer, "UnknownScript 0x%08X", obj.uiFormID);
+		const auto str = DecompileScriptToFolder(textBuffer, const_cast<Script*>(&obj), "gek", "Crash Logger");
 		vec.push_back(str);
 	}
 	return vec;
@@ -240,10 +257,13 @@ inline std::vector<std::string> LogClass(const bhkCharacterController& obj)
 inline std::vector<std::string> LogClass(const hkpWorldObject& obj)
 {
 	std::vector<std::string> vec;
-	std::string name = obj.GetName();
+	const char* name = obj.GetName();
 
-	if (!name.empty())
-		vec.push_back(std::format("Name: {}", name));
+	if (name && name[0]) {
+		char textBuffer[256];
+		sprintf_s(textBuffer, "Name: %s", name);
+		vec.push_back(textBuffer);
+	}
 
 	bhkNiCollisionObject* object = bhkUtilFunctions::GetbhkNiCollisionObject(&obj);
 	if (object)
@@ -258,10 +278,11 @@ inline std::vector<std::string> LogClass(const IMemoryHeap& obj)
 	std::string name = obj.GetName();
 	obj.GetHeapStats(&stats, true);
 	UInt32 total = stats.uiMemHeapSize;
-	UInt32 free = stats.uiMemFreeInBlocks;
 	UInt32 used = stats.uiMemUsedInBlocks;
-	float percentage = ConvertToMiB(used) / ConvertToMiB(total) * 100.0f;
-	std::string str = std::format("{}: {:10}/{:10} ({:.2f}%)", name.c_str(), FormatSize(used), FormatSize(total), percentage);
+	char cMemBuffer[128];
+	char textBuffer[256];
+	GetMemoryUsageString(used, total, cMemBuffer, sizeof(cMemBuffer));
+	sprintf_s(textBuffer, "%s: %s", name.c_str(), cMemBuffer);
 
-	return std::vector{ str };
+	return std::vector{ std::string(textBuffer) };
 }

@@ -419,21 +419,23 @@ inline int GetCharsTillSpace(const char* text, UInt32 offset)
 	return numChars;
 }
 
-std::string DecompileScriptToFolder(const std::string& scriptName, Script* script, const std::string& fileExtension, const std::string_view& modName);
+std::string DecompileScriptToFolder(const char* scriptName, Script* script, const char* fileExtension, const char* modName);
 
 const std::string& SanitizeString(std::string&& str);
 
-float ConvertToKiB(const UInt64 size);
+float ConvertToKiB(UInt64 size);
 
-float ConvertToMiB(const UInt64 size);
+float ConvertToMiB(UInt64 size);
 
-float ConvertToGiB(const UInt64 size);
+float ConvertToGiB(UInt64 size);
 
-std::string FormatSize(const UInt64 size);
+const char* FormatSize(UInt64 size, char* buffer, size_t bufferSize);
 
-std::string GetMemoryUsageString(const UInt64 used, const UInt64 total);
+const char* GetMemoryUsageString(UInt64 used, UInt64 total, char* buffer, size_t bufferSize);
 
 std::string GetErrorAsString(UInt32 errorMessageID);
-std::string GetExceptionAsString(UInt32 exceptionMessageID);
+const char* GetExceptionAsString(UInt32 exceptionMessageID);
 
-void PrintSeparator(const UInt32 length = 80);
+void PrintSeparator(UInt32 length = 80);
+
+#define CENTERED_TEXT(size, name) (size/2) + sizeof(name) / 2, name, (size/2) - sizeof(name) / 2, ""

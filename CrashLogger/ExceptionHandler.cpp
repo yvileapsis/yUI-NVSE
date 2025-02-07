@@ -35,9 +35,9 @@ namespace CrashLogger::PDB
 
 		if (!Safe_SymFromAddr(process, eip, &offset, symbol)) return "";
 
-		const std::string functioName = symbol->Name;
-
-		return std::format("{}+0x{:0X}", functioName, offset);
+		char buffer[256];
+		sprintf_s(buffer, "%s+0x%I64X", symbol->Name, offset);
+		return buffer;
 	}
 
 	extern std::string GetLine(UInt32 eip, HANDLE process)
@@ -50,7 +50,9 @@ namespace CrashLogger::PDB
 
 		if (!Safe_SymGetLineFromAddr(process, eip, &offset, line)) return "";
 
-		return std::format("{}:{:d}", line->FileName, line->LineNumber);
+		char buffer[256];
+		sprintf_s(buffer, "%s:%d", line->FileName, line->LineNumber);
+		return buffer;
 	}
 
 	std::string& GetClassNameGetSymbol(void* object, std::string& buffer)
@@ -180,7 +182,9 @@ namespace CrashLogger
 
 		const auto timePrinting = std::chrono::duration_cast<std::chrono::milliseconds>(printing - processing);
 
-		Log() << std::format("Processed in {:d} ms, printed in {:d} ms", timeProcessing.count(), timePrinting.count()) << '\n';
+		char buffer[64];
+		sprintf_s(buffer, "Processed in %lld ms, printed in %lld ms\n", timeProcessing.count(), timePrinting.count());
+		Log() << buffer;
 
 		Logger::Copy();
 

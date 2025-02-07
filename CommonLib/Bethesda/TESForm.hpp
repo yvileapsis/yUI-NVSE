@@ -337,7 +337,7 @@ public:
 	bool						IsDisabled() const	{ return eFlags & kFlags_IsPermanent; };
 	bool						IsTaken() const { return eFlags & kFlags_Taken; }
 	bool						IsPersistent() const { return eFlags & PERSISTENT; }
-	bool						IsTemporary() { return eFlags & TEMPORARY; }
+	bool						IsTemporary() const { return eFlags & TEMPORARY; }
 	bool						IsDeleted() const { return eFlags & DELETED; }
 	bool						IsDestroyed() { return eFlags & kFlags_Destroyed; }
 

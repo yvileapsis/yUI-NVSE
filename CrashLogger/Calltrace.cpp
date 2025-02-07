@@ -13,9 +13,17 @@ namespace CrashLogger::Playtime
 	try
 	{
 		gameEnd = std::chrono::system_clock::now();
-		output << std::format("Playtime: {:%T}\n", gameEnd - gameStart);
+		auto duration = std::chrono::duration_cast<std::chrono::seconds>(gameEnd - gameStart);
+
+		char textBuffer[32];
+		auto hours = duration.count() / 3600;
+		auto mins = (duration.count() % 3600) / 60;
+		auto secs = duration.count() % 60;
+
+		sprintf_s(textBuffer, sizeof(textBuffer), "Playtime: %02lld:%02lld:%02lld\n", hours, mins, secs);
+		output << textBuffer;
 	}
-	catch (...) { output << "Failed to log playtime." << '\n'; }
+	catch (...) { output << "Failed to log playtime.\n"; }
 
 	extern std::stringstream& Get() { output.flush(); return output; }
 
@@ -28,10 +36,15 @@ namespace CrashLogger::Exception
 	extern void Process(EXCEPTION_POINTERS* info)
 	try
 	{
-		output << std::format("Exception: {} ({:08X})\n",  GetExceptionAsString(info->ExceptionRecord->ExceptionCode), info->ExceptionRecord->ExceptionCode);
-		if (GetLastError()) output << std::format("Last Error: {} ({:08X})\n", SanitizeString(GetErrorAsString(GetLastError())), GetLastError());
+		char textBuffer[128];
+		sprintf_s(textBuffer, "Exception: %s (%08X)\n", GetExceptionAsString(info->ExceptionRecord->ExceptionCode), info->ExceptionRecord->ExceptionCode);
+		output << textBuffer;
+		if (GetLastError()) {
+			sprintf_s(textBuffer, "Last Error: %s (%08X)\n", SanitizeString(GetErrorAsString(GetLastError())).c_str(), GetLastError());
+			output << textBuffer;
+		}
 	}
-	catch (...) { output << "Failed to log exception." << '\n'; }
+	catch (...) { output << "Failed to log exception.\n"; }
 
 	extern std::stringstream& Get() { output.flush(); return output; }
 }
@@ -53,7 +66,7 @@ namespace CrashLogger::Thread
 
 	extern void Process(EXCEPTION_POINTERS* info)
 	try { output << "Thread: " << GetThreadName() << '\n'; }
-	catch (...) { output << "Failed to log thread name." << '\n'; }
+	catch (...) { output << "Failed to log thread name.\n"; }
 
 	extern std::stringstream& Get() { output.flush(); return output; }
 }
@@ -62,7 +75,7 @@ namespace CrashLogger::Calltrace
 {
 	std::stringstream output;
 
-	std::string GetCalltraceFunction(UInt32 eip, UInt32 ebp, HANDLE process)
+	void GetCalltraceFunction(UInt32 eip, UInt32 ebp, HANDLE process, char* buffer, SIZE_T bufferSize)
 	{
 		/*if (GetModuleFileName((HMODULE)frame.AddrPC.Offset, path, MAX_PATH)) {  //Do this work on non base addresses even on  Windows? Cal directly the LDR function?
 		if (!SymLoadModule(process, NULL, path, NULL, 0, 0)) Log() << FormatString("Porcoddio %0X", GetLastError());
@@ -70,27 +83,28 @@ namespace CrashLogger::Calltrace
 
 		const auto moduleBase = PDB::GetModuleBase(eip, process);
 
-		std::string begin = std::format("0x{:08X} | ", ebp);
+        char begin[16];
+        sprintf_s(begin, "0x%08X | ", ebp);
 
-		std::string middle;
+        char middle[128] = {};
 
-		const auto moduleOffset = (moduleBase != 0x00400000) ? eip - moduleBase + 0x10000000 : eip;
+        const auto moduleOffset = (moduleBase != 0x00400000) ? eip - moduleBase + 0x10000000 : eip;
 
-		if (const auto module = PDB::GetModule(eip, process); module.empty()) 
-			middle = std::format("{:>28s} (0x{:08X}) | {:<40s} |", "-\\(°_o)/-", moduleOffset, "(Corrupt stack or heap?)");
-		else if (const auto symbol = PDB::GetSymbol(eip, process); symbol.empty())
-			middle = std::format("{:>28s} (0x{:08X}) | {:<40s} |", module, moduleOffset, "");
-		else
-			middle = std::format("{:>28s} (0x{:08X}) | {:<40s} |", module, moduleOffset, symbol);
+        if (const auto module = PDB::GetModule(eip, process); module.empty()) 
+			sprintf_s(middle, "%28s (0x%08X) | %-40s |", "-\\(°_o)/-", moduleOffset, "(Corrupt stack or heap?)");
+        else if (const auto symbol = PDB::GetSymbol(eip, process); symbol.empty())
+			sprintf_s(middle, "%28s (0x%08X) | %-40s |", module.c_str(), moduleOffset, "");
+        else
+			sprintf_s(middle, "%28s (0x%08X) | %-40s |", module.c_str(), moduleOffset, symbol.c_str());
 
-		std::string end;
+		char end[MAX_PATH] = {};
 
 		if (const auto line = PDB::GetLine(eip, process); !line.empty())
 		{
-			end = " " + line;
-		} 
+			sprintf_s(end, " %s", line.c_str());
+		}
 
-		return begin + middle + end;
+		sprintf_s(buffer, bufferSize, "%s%s%s", begin, middle, end);
 	}
 
 	extern void Process(EXCEPTION_POINTERS* info) 
@@ -104,19 +118,22 @@ namespace CrashLogger::Calltrace
 
 		Safe_SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_DEFERRED_LOADS | SYMOPT_UNDNAME | SYMOPT_ALLOW_ABSOLUTE_SYMBOLS);
 
-		char workingDirectory[MAX_PATH];
-		char symbolPath[MAX_PATH];
-		char altSymbolPath[MAX_PATH];
-		GetCurrentDirectory(MAX_PATH, workingDirectory);
-		GetEnvironmentVariable("_NT_SYMBOL_PATH", symbolPath, MAX_PATH);
-		GetEnvironmentVariable("_NT_ALTERNATE_SYMBOL_PATH ", altSymbolPath, MAX_PATH);
-		std::string lookPath = std::format("{};{}\\Data\\NVSE\\Plugins;{};{}", workingDirectory, workingDirectory, symbolPath, altSymbolPath);
+		char buffer[2048] = {};
+		{
+			char pathBuffer[MAX_PATH];
+			GetCurrentDirectory(sizeof(pathBuffer), pathBuffer);
+			sprintf_s(buffer, "%s;%s\\Data\\NVSE\\Plugins", pathBuffer, pathBuffer);
+			GetEnvironmentVariable("_NT_SYMBOL_PATH", pathBuffer, sizeof(pathBuffer));
+			sprintf_s(buffer, "%s;%s", buffer, pathBuffer);
+			GetEnvironmentVariable("_NT_ALTERNATE_SYMBOL_PATH ", pathBuffer, sizeof(pathBuffer));
+			sprintf_s(buffer, "%s;%s", buffer, pathBuffer);
 
-		//	SymSetExtendedOption((IMAGEHLP_EXTENDED_OPTIONS)SYMOPT_EX_WINE_NATIVE_MODULES, TRUE);
-		if (!Safe_SymInitialize(process, lookPath.c_str(), true))
-			output << "Error initializing symbol store" << '\n';
+			//	SymSetExtendedOption((IMAGEHLP_EXTENDED_OPTIONS)SYMOPT_EX_WINE_NATIVE_MODULES, TRUE);
+			if (!Safe_SymInitialize(process, buffer, true))
+				output << "Error initializing symbol store\n";
 
-		//	SymSetExtendedOption((IMAGEHLP_EXTENDED_OPTIONS)SYMOPT_EX_WINE_NATIVE_MODULES, TRUE);
+			//	SymSetExtendedOption((IMAGEHLP_EXTENDED_OPTIONS)SYMOPT_EX_WINE_NATIVE_MODULES, TRUE);
+		}
 
 		STACKFRAME frame = {};
 		frame.AddrPC.Offset = info->ContextRecord->Eip;
@@ -127,9 +144,8 @@ namespace CrashLogger::Calltrace
 		frame.AddrStack.Mode = AddrModeFlat;
 		DWORD eip = 0;
 
-		// retarded crutch to try to copy dbghelp before.
-		output << "Calltrace:" << '\n' << std::format("{:^10} |  {:^40} | {:^40} | Source", "ebp", "Function Address", "Function Name") <<
-			'\n';
+		sprintf_s(buffer, "Calltrace:\n%*s%*s |  %*s%*s | %*s%*s |  Source\n", CENTERED_TEXT(10, "ebp"), CENTERED_TEXT(40, "Address"), CENTERED_TEXT(40, "Function"));
+		output << buffer;
 
 		while (Safe_StackWalk(machine, process, thread, &frame, &context, NULL, Safe_SymFunctionTableAccess, Safe_SymGetModuleBase, NULL)) {
 			/*
@@ -138,10 +154,11 @@ namespace CrashLogger::Calltrace
 			*/
 			if (frame.AddrPC.Offset == eip) break;
 			eip = frame.AddrPC.Offset;
-			output << GetCalltraceFunction(frame.AddrPC.Offset, frame.AddrFrame.Offset, process) << '\n';
+			GetCalltraceFunction(frame.AddrPC.Offset, frame.AddrFrame.Offset, process, buffer, sizeof(buffer));
+			output << buffer << '\n';
 		}
 	}
-	catch (...) {  output << "Failed to log callstack." << '\n'; }
+	catch (...) {  output << "Failed to log callstack.\n"; }
 
 	extern std::stringstream& Get() { output.flush(); return output; }
 }

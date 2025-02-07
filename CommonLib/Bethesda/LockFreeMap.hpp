@@ -64,7 +64,7 @@ public:
 	UInt32**	ppBuckets;		// 0C array of arg1 DWord elements
 	UInt32		unk010;			// 10 Init'd to arg2
 	Data014*	dat014;		// 14 Init'd to a 16 bytes structure
-	UInt32		uiQueuedCount;			// 18
+	UInt32		uiCount;			// 18
 	UInt32		unk01C;			// 1C
 	BSSpinLock	kLock;
 

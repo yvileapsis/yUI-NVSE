@@ -1,6 +1,7 @@
 LIBRARY	"CrashLogger"
 EXPORTS
 NVSEPlugin_Query
+NVSEPlugin_Preload
 NVSEPlugin_Load
 OBSEPlugin_Query
 OBSEPlugin_Load

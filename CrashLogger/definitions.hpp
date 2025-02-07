@@ -1,5 +1,5 @@
-#define CrashLogger_VERSION 5.12
-#define CrashLogger_VERSION_STR "5.12"
+#define CrashLogger_VERSION 5.13
+#define CrashLogger_VERSION_STR "5.13"
 #define CrashLogger_STR "CrashLogger"
 #define CrashLogger_LOG "CrashLogger.log"
 #define CrashLogger_FLD "Crash Logs"
@@ -8,3 +8,5 @@
 #define MO2_VFS_DLL_NAME "usvfs_x86.dll"
 
 void Inits();
+void InitEarlyPatches();
+void InitPatches();

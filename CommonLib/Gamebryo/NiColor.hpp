@@ -92,7 +92,7 @@ public:
 	};
 
 
-	static NiColor Lerp(const NiColor& to, const NiColor& from, const double by) {
+	static NiColor Lerp(const NiColor& to, const NiColor& from, float by) {
 		return NiColor(to.r * (1 - by) + from.r * by,
 			to.g * (1 - by) + from.g * by,
 			to.b * (1 - by) + from.b * by);

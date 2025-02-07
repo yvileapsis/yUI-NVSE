@@ -15,10 +15,15 @@ namespace CrashLogger::Memory
 	enum MemoryErrors {
 		NONE			= 0,
 		HIGH_USAGE		= 1,
-		CRITICAL_USAGE	= 2,
-		EXTERNAL_LEAK	= 3,
-		TEXTURE_SHARING = 4,
+		CRITICAL_USAGE,
+		EXTERNAL_LEAK,
+		TEXTURE_SHARING,
 	};
+
+	// In percentages
+	constexpr float MEMORY_USAGE_CONCERN_THRESHOLD	= 80.0f;
+	constexpr float MEMORY_USAGE_CRITICAL_THRESHOLD = 92.5f;
+	constexpr float MEMORY_USAGE_OOM_THRESHOLD		= 98.0f;
 
 	std::stringstream output;
 
@@ -34,7 +39,7 @@ namespace CrashLogger::Memory
 		if (GetFileAttributes(iniDir) != INVALID_FILE_ATTRIBUTES) {
 			bool hasDXSettings = GetPrivateProfileInt("Main", "bModifyDirectXBehavior", 0, iniDir);
 			bool hasDefaultPool = GetPrivateProfileInt("DirectX", "bUseDefaultPoolForTextures", 0, iniDir);
-			static const char* string = "WARNING: NVTF.ini has bModifyDirectXBehavior=%d %s bUseDefaultPoolForTextures=%d! This will cause high memory usage!\n         See https://performance.moddinglinked.com/falloutnv.html#NVTF on how to resolve this issue.";
+			static const char* string = "WARNING: NVTF.ini has bModifyDirectXBehavior=%d %s bUseDefaultPoolForTextures=%d! This can cause high memory usage and crashes when using texture mods!\n         See https://performance.moddinglinked.com/falloutnv.html#NVTF on how to resolve this issue.";
 			
 			if ((hasDXSettings && !hasDefaultPool) || (!hasDXSettings && hasDefaultPool)) {
 				sprintf_s(nvtfError, string, hasDXSettings, "but", hasDefaultPool);
@@ -48,7 +53,7 @@ namespace CrashLogger::Memory
 			}
 		}
 		else if (!GetModuleHandle("nvtf.dll")) {
-			strcpy_s(nvtfError, "WARNING: New Vegas Tick Fix not found! This will cause high memory usage and performance issues!\n         See https://performance.moddinglinked.com/falloutnv.html#NVTF on how to resolve this issue.");
+			strcpy_s(nvtfError, "WARNING: New Vegas Tick Fix not found! This will cause performance issues, and crashes if using texutre mods!\n         See https://performance.moddinglinked.com/falloutnv.html#NVTF on how to resolve this issue.");
 			usesDefaultPool = false;
 		}
 		else {
@@ -96,11 +101,14 @@ namespace CrashLogger::Memory
 					spAdapter3->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &kInfo);
 
 					output << "\nGraphics Memory:\n";
-					output << std::format("Budget Usage:   {}", GetMemoryUsageString(kInfo.CurrentUsage, kInfo.Budget)) << '\n';
+					char textBuffer[128];
+					char cMessageBuffer[256];
+					GetMemoryUsageString(kInfo.CurrentUsage, kInfo.Budget, textBuffer, sizeof(textBuffer));
+					sprintf_s(cMessageBuffer, "Budget Usage:   %s\n", textBuffer);
 
 					float used = (float)kInfo.CurrentUsage / kInfo.Budget * 100.0f;
 					if (used >= 99.f && usesDefaultPool) {
-						output << "\nWARNING: Graphics memory went over budget! This can't lead to a crash, but causes performance loss instead!\n";
+						output << "\nWARNING: Graphics memory went over budget! This (usually) can't lead to a crash, but causes performance loss instead!\n";
 					}
 					// Not sure if there's a point in reporting issues when you go over budget with managed pool, as odds are you'll just crash anyway (unless you have a sub 1GB GPU)
 					// In addition, handling of that case is elsewhere
@@ -110,17 +118,22 @@ namespace CrashLogger::Memory
 			}
 			i++;
 		}
+		return false;
 	}
 
 	extern void Process(EXCEPTION_POINTERS* info)
 	try 
 	{
+		char cSmallBuffer[128];
+		char cMessageBuffer[512];
 		const auto hProcess = GetCurrentProcess();
 
 		MemoryErrors memoryErrorState = MemoryErrors::NONE;
 
 		PROCESS_MEMORY_COUNTERS_EX2 pmc = {};
 		pmc.cb = sizeof(pmc);
+
+		bool confirmedOutOfMem = false;
 
 		// Get physical memory size
 		MEMORYSTATUSEX memoryStatus;
@@ -130,13 +143,24 @@ namespace CrashLogger::Memory
 		{
 			DWORDLONG virtUsage = memoryStatus.ullTotalVirtual - memoryStatus.ullAvailVirtual;
 			DWORDLONG physUsage = pmc.PrivateUsage;
-			output << "Process' Memory:" << '\n';
-			output << std::format("Physical Usage: {}", GetMemoryUsageString(physUsage, memoryStatus.ullTotalPhys)) << '\n';
-			output << std::format("Virtual  Usage: {}", GetMemoryUsageString(virtUsage, memoryStatus.ullTotalVirtual)) << '\n';
+			output << "Process' Memory:\n";
+
+			GetMemoryUsageString(physUsage, memoryStatus.ullTotalPhys, cSmallBuffer, sizeof(cSmallBuffer));
+			sprintf_s(cMessageBuffer, "Physical Usage: %s\n", cSmallBuffer);
+			output << cMessageBuffer;
+
+			GetMemoryUsageString(virtUsage, memoryStatus.ullTotalVirtual, cSmallBuffer, sizeof(cSmallBuffer));
+			sprintf_s(cMessageBuffer, "Virtual  Usage: %s\n", cSmallBuffer);
+			output << cMessageBuffer;
 
 			float usedVirtual = (float)virtUsage / memoryStatus.ullTotalVirtual * 100.0f;
-			if (usedVirtual >= 80.f) {
-				if (usedVirtual >= 95.f) {
+			if (usedVirtual >= MEMORY_USAGE_CONCERN_THRESHOLD) {
+				// There's no doubt here
+				if (usedVirtual >= MEMORY_USAGE_OOM_THRESHOLD) {
+					confirmedOutOfMem = true;
+				}
+
+				if (usedVirtual >= MEMORY_USAGE_CRITICAL_THRESHOLD) {
 					memoryErrorState = MemoryErrors::CRITICAL_USAGE;
 				}
 				else {
@@ -158,7 +182,7 @@ namespace CrashLogger::Memory
 			PrintSeparator();
 
 #if PRINT_HEAPS
-			output << "\nGame's Heaps:" << '\n';
+			output << "\nGame's Heaps:\n";
 #endif
 			for (UInt32 i = 0; i < memMgr->usNumHeaps; i++) {
 				IMemoryHeap* heap = memMgr->ppHeaps[i];
@@ -183,7 +207,8 @@ namespace CrashLogger::Memory
 					end = start + static_cast<MemoryHeap*>(heap)->uiMemHeapSize;
 				}
 
-				output << std::format("{:16}	 {}	  ({:08X} - {:08X})", heap->GetName(), GetMemoryUsageString(used, total), start, end) << '\n';
+				sprintf_s(cMessageBuffer, "%-16s %s  (%08X - %08X)\n", heap->GetName(), GetMemoryUsageString(used, total, cSmallBuffer, sizeof(cSmallBuffer)), start, end);
+				output << cMessageBuffer;
 #endif
 				usedHeapMemory += used;
 				totalHeapMemory += total;
@@ -209,47 +234,71 @@ namespace CrashLogger::Memory
 #if PRINT_POOLS
 				SIZE_T start = reinterpret_cast<SIZE_T>(pPool->pAllocBase);
 				SIZE_T end = start + pPool->uiSize;
-				output << std::format("{:16}	 {}	  ({:08X} - {:08X})", pPool->pName, GetMemoryUsageString(used, total), start, end) << '\n';
+
+				sprintf_s(cMessageBuffer, "%-16s %s  (%08X - %08X)\n", pPool->pName, GetMemoryUsageString(used, total, cSmallBuffer, sizeof(cSmallBuffer)), start, end);
+				output << cMessageBuffer;
 #endif
 			}
 
-			output << "\nGame's Total Memory:" << '\n';
-			output << std::format("Total Heap Memory: {}", GetMemoryUsageString(usedHeapMemory, totalHeapMemory)) << '\n';
-			output << std::format("Total Pool Memory: {}", GetMemoryUsageString(uiPoolMemory, uiTotalPoolMemory)) << '\n';
-			output << std::format("Total Memory:      {}", GetMemoryUsageString(usedHeapMemory + uiPoolMemory, totalHeapMemory + uiTotalPoolMemory)) << '\n';
+			output << "\nGame's Total Memory:\n";
+			char textBuffer[128];
+			GetMemoryUsageString(usedHeapMemory, totalHeapMemory, textBuffer, sizeof(textBuffer));
+			sprintf_s(cMessageBuffer, "Total Heap Memory:   %s\n", textBuffer);
+			output << cMessageBuffer;
+
+			GetMemoryUsageString(uiPoolMemory, uiTotalPoolMemory, textBuffer, sizeof(textBuffer));
+			sprintf_s(cMessageBuffer, "Total Pool Memory:   %s\n", textBuffer);
+			output << cMessageBuffer;
+
+			GetMemoryUsageString(usedHeapMemory + uiPoolMemory, totalHeapMemory + uiTotalPoolMemory, textBuffer, sizeof(textBuffer));
+			sprintf_s(cMessageBuffer, "Total Memory:        %s\n", textBuffer);
+			output << cMessageBuffer;
+
+			if (memMgr->uiMallocBytes > 0) {
+				FormatSize(memMgr->uiMallocBytes, textBuffer, sizeof(textBuffer));
+				sprintf_s(cMessageBuffer, "Malloc Memory:       %s\n", textBuffer);
+				output << cMessageBuffer;
+			};
 
 			float usedHeap = (float)usedHeapMemory / totalHeapMemory * 100.0f;
 			if (usedHeap < 80.f && memoryErrorState >= MemoryErrors::HIGH_USAGE)
 				memoryErrorState = MemoryErrors::EXTERNAL_LEAK;
 		}
+		else {
+			output << "\nNew Vegas Heap Replacer found - Game's memory tracking unavailable.\n";
+		}
 
 		output << '\n';
 
+		if (confirmedOutOfMem) {
+			output << "WARNING: Process ran out of memory - this is why you crashed! Logging may be inaccurate as well!\n";
+		}
+
 		// We are going to bet here
-		if (!defaultPool && highGraphics && memoryErrorState == MemoryErrors::EXTERNAL_LEAK)
+		if (!defaultPool && highGraphics && memoryErrorState >= MemoryErrors::HIGH_USAGE)
 			memoryErrorState = MemoryErrors::TEXTURE_SHARING;
 
 		if (nvtfError[0])
 			output << nvtfError << '\n';
 
 		switch (memoryErrorState) {
-		case MemoryErrors::TEXTURE_SHARING:
-			output << "\nWARNING: High memory usage due to texture sharing! See above warning about NVTF!" << '\n';
-			break;
-		case MemoryErrors::EXTERNAL_LEAK:
-			output << "\nWARNING: Memory usage is very high, but the game's heaps are not full! Is some module leaking?" << '\n';
+		case MemoryErrors::HIGH_USAGE:
+			output << "\nWARNING: Memory usage is high!\n";
 			break;
 		case MemoryErrors::CRITICAL_USAGE:
-			output << "\nWARNING: Memory usage is very high! Is there a leak?" << '\n';
+			output << "\nWARNING: Memory usage is very high! Is there a leak?\n";
 			break;
-		case MemoryErrors::HIGH_USAGE:
-			output << "\nWARNING: Memory usage is high!" << '\n';
+		case MemoryErrors::EXTERNAL_LEAK:
+			output << "\nWARNING: Memory usage is very high, but the game's heaps are not full! Is some module leaking?\n";
+			break;
+		case MemoryErrors::TEXTURE_SHARING:
+			output << "\nWARNING: High memory usage due to texture sharing! See above warning about NVTF!\n";
 			break;
 		default:
 			break;
 		};
 	}
-	catch (...) { output << "Failed to log memory." << '\n'; }
+	catch (...) { output << "Failed to log memory.\n"; }
 
 	extern std::stringstream& Get() { output.flush(); return output; }
 }
