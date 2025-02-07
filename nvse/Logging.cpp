@@ -12,6 +12,8 @@
 #include <string>
 #include <thread>
 
+#include <winioctl.h>
+
 #include <ConsoleManager.hpp>
 
 inline ConsoleManager* operator<<(ConsoleManager* console, const std::string& str)
@@ -148,7 +150,17 @@ namespace Logger
 		{
 			Log(LogLevel::LogFlush) << "";
 
-			const auto lastmod = std::format(".{0:%F}-{0:%H}-{0:%M}-{0:%S}", floor<std::chrono::seconds>(std::chrono::time_point(std::chrono::system_clock::now())));
+			char lastmod[48];
+			time_t now = time(nullptr);
+			tm localTime;
+			localtime_s(&localTime, &now);
+			sprintf_s(lastmod, ".%04d-%02d-%02d-%02d-%02d-%02d",
+				localTime.tm_year + 1900,
+				localTime.tm_mon + 1,
+				localTime.tm_mday,
+				localTime.tm_hour,
+				localTime.tm_min,
+				localTime.tm_sec);
 
 			if (!exists(out.parent_path())) {
 				std::filesystem::create_directory(out.parent_path());

@@ -64,9 +64,9 @@ namespace CrashLogger::AssetTracker
 		output << "  <=2048: "		 << textureCounters[4] << '\n';
 		output << "  <=4096: "		 << textureCounters[5] << '\n';
 		output << "  <=8192: "		 << textureCounters[6] << '\n';
-		output << "Models:         " << ModelLoader::GetSingleton()->pModelMap->uiQueuedCount << '\n';
+		output << "Models:         " << ModelLoader::GetSingleton()->pModelMap->uiCount << '\n';
 		output << "FaceGen Models: " << uiFaceGenMeshes << '\n';
-		output << "Animations:     " << ModelLoader::GetSingleton()->pKFModelMap->uiQueuedCount << '\n';
+		output << "Animations:     " << ModelLoader::GetSingleton()->pKFModelMap->uiCount << '\n';
 	}
 
 	extern std::stringstream& Get() { output.flush(); return output; }

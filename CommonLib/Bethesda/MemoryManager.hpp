@@ -56,8 +56,8 @@ struct MemoryManager {
 	size_t Size(void* apMemory) const;
 
 	[[nodiscard]]
-	__declspec(restrict) __declspec(allocator) void* DefaultAllocate(UInt32 auiSize, bool abTrack = false);
-	void Free(void* apMemory, bool abTrack = false);
+	__declspec(restrict) __declspec(allocator) void* DefaultAllocate(UInt32 auiSize, bool abDontTrack = false);
+	void DefaultFree(void* apMemory, bool abDontTrack = false);
 	IMemoryHeap* GetHeapByIndex(UInt32 auiIndex) const;
 	IMemoryHeap* GetHeapForPointer(void* apMem) const;
 	IMemoryHeap* GetHeapForPhysicalPointer(void* apMem) const;
@@ -67,4 +67,10 @@ struct MemoryManager {
 
 	bool GetHeapStats(UInt32 auiIndex, bool abFullBlockInfo, HeapStats* apStats) const;
 	bool GetPhysicalHeapStats(UInt32 auiPhysicalHeapIndex, bool abFullBlockInfo, HeapStats* apStats) const;
+
+private:
+	static [[nodiscard]] __declspec(restrict) __declspec(allocator) void* GameMalloc(size_t aSize);
+	static [[nodiscard]] __declspec(restrict) __declspec(allocator) void* GameRealloc(void* apOldMem, size_t auiNewSize);
+	static void		GameFree(void* apMemory);
+	static size_t	GameSize(void* apMemory);
 };

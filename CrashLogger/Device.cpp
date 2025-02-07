@@ -4,49 +4,49 @@ namespace CrashLogger::Device
 {
 	std::stringstream output;
 
-	std::string GetRegistryString(HKEY key, const char* name)
+	bool GetRegistryString(HKEY key, const char* name, char* buffer, SIZE_T bufferSize)
 	{
-		char buffer[MAX_PATH];
-		DWORD size = sizeof(buffer);
-		if (RegQueryValueExA(key, name, nullptr, nullptr, (BYTE*)buffer, &size) == ERROR_SUCCESS)
-			return buffer;
-		return "Unknown";
+		return RegQueryValueExA(key, name, nullptr, nullptr, (BYTE*)buffer, &bufferSize) == ERROR_SUCCESS;
 	}
 
 	extern void Process(EXCEPTION_POINTERS* info)
 	try
 	{
 
-		output << "Device:" << '\n';
+		output << "Device\n";
 
 		const char* gpu = *(const char**)0x11C72C4;
-		std::string cpu = "Unknown";
+		char cCPU[128] = {};
 
 		{
 			HKEY key;
 			if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0", 0, KEY_READ, &key) == ERROR_SUCCESS)
 			{
-				cpu = GetRegistryString(key, "ProcessorNameString");
+				GetRegistryString(key, "ProcessorNameString", cCPU, sizeof(cCPU));
 				RegCloseKey(key);
 			}
 		}
 
-		std::string version;
-		std::string buildNumber;
-		std::string release;
+		char version[64];
+		char buildNumber[8];
+		char release[16];
 		{
 			HKEY key;
 			if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion", 0, KEY_READ, &key) == ERROR_SUCCESS) {
-				release = GetRegistryString(key, "DisplayVersion");
+				GetRegistryString(key, "DisplayVersion", release, sizeof(release));
 
-				buildNumber = GetRegistryString(key, "CurrentBuild");
+				GetRegistryString(key, "CurrentBuild", buildNumber, sizeof(buildNumber));
 
-				version = GetRegistryString(key, "ProductName");
+				GetRegistryString(key, "ProductName", version, sizeof(version));
 
 				UInt32 buildNumberInt = std::stoul(buildNumber);
 				if (buildNumberInt >= 22000) {
-					// Aaahhh i'm a schizo
-					version.replace(9, 1, "1");
+					// Aaahhh i'm a schizo (context: Windows 11 still reports itself as Windows 10 here)
+					char* p = strstr(version, "10");
+					if (p) {
+						p[0] = '1';
+						p[1] = '1';
+					}
 				}
 
 				RegCloseKey(key);
@@ -57,15 +57,29 @@ namespace CrashLogger::Device
 		GetPhysicallyInstalledSystemMemory(&memAmount);
 
 		// Trim the empty space at the end of the CPU string
-		cpu.erase(std::find_if(cpu.rbegin(), cpu.rend(), [](int ch) { return !std::isspace(ch); }).base(), cpu.end());
+		for (int i = sizeof(cCPU) - 1; i >= 0; i--) {
+			if (cCPU[i] == ' ')
+				cCPU[i] = '\0';
+			else
+				break;
+		}
+
+		char textBuffer[512];
 		
-		output << std::format("OS:  \"{} - {} ({})\"", version, buildNumber, release) << '\n';
-		output << std::format("CPU: \"{}\"", cpu) << '\n';
-		output << std::format("GPU: {}", gpu) << '\n';
-		output << std::format("RAM: \"{:>5.2f} GB\"", memAmount / 1024.f / 1024.f) << '\n';
+		sprintf_s(textBuffer, "OS:  \"%s - %s (%s)\"\n", version, buildNumber, release);
+		output << textBuffer;
+
+		sprintf_s(textBuffer, "CPU: \"%s\"\n", cCPU);
+		output << textBuffer;
+
+		sprintf_s(textBuffer, "GPU: %s\n", gpu); // Already has quotes
+		output << textBuffer;
+
+		sprintf_s(textBuffer, "RAM: \"%.2f GB\"\n", memAmount / 1024.f / 1024.f);
+		output << textBuffer;
 
 	}
-	catch (...) { output << "Failed to print device info." << '\n'; }
+	catch (...) { output << "Failed to print device info.\n"; }
 
 	extern std::stringstream& Get() { output.flush(); return output; }
 }

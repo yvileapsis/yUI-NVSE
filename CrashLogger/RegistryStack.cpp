@@ -76,10 +76,11 @@ namespace CrashLogger::Registry
 	extern void Process(EXCEPTION_POINTERS* info)
 	try
 	{
-		output << "Registry:" << '\n'
-			<< std::format("REG | {:^10} | DEREFERENCE INFO", "Value") << '\n';
+		char textBuffer[128];
+		sprintf_s(textBuffer, "Registry:\n REG | %*s%*s | DEREFERENCE INFO\n", CENTERED_TEXT(10, "Value"));
+		output << textBuffer;
 
-		const std::map<std::string, UInt32> registers{
+		const std::map<std::string_view, UInt32> registers{
 			{ "eax", info->ContextRecord->Eax },
 			{ "ebx", info->ContextRecord->Ebx },
 			{ "ecx", info->ContextRecord->Ecx },
@@ -94,7 +95,8 @@ namespace CrashLogger::Registry
 		for (const auto& [name, value] : registers)
 		{
 			std::stringstream str;
-			str << std::format("{} | 0x{:08X} | ", name, value);
+			sprintf_s(textBuffer, "%s | 0x%08X | ", name.data(), value);
+			str << textBuffer;
 			const auto buffer = Stack::GetLineForObject((void**)value, 5);
 			if (!buffer.empty()) str << buffer;
 
@@ -128,9 +130,11 @@ namespace CrashLogger::Stack
 	try {
 //		if (*(UInt32*)object > VFTableLowerLimit() && *(UInt32*)object < 0x1200000)
 		{
+			char textBuffer[256];
 			if (const auto& name = PDB::GetClassNameFromRTTIorPDB((void*)object); !name.empty())
 			{
-				buffer += std::format("0x{:08X} ==> RTTI: ", *(UInt32*)object) + name;
+				sprintf_s(textBuffer, "0x%08X ==> RTTI: %s", *(UInt32*)object, name.c_str());
+				buffer = textBuffer;
 				return true;
 			}
 		}
@@ -146,7 +150,14 @@ namespace CrashLogger::Stack
 
 		if (GetStringForClassLabel(object, labelName, objectName, description))
 		{
-			buffer += std::format("0x{:08X} ==> ", *(UInt32*)object) + labelName + ": " + objectName + ": " + description;
+			char textBuffer[256];
+			if (description.empty()) {
+				sprintf_s(textBuffer, "0x%08X ==> %s: %s", *(UInt32*)object, labelName.c_str(), objectName.c_str());
+			}
+			else {
+				sprintf_s(textBuffer, "0x%08X ==> %s: %s:\n%s", *(UInt32*)object, labelName.c_str(), objectName.c_str(), description.c_str());
+			}
+			buffer += textBuffer;
 			return true;
 		}
 
@@ -154,7 +165,8 @@ namespace CrashLogger::Stack
 
 		if (GetAsString(object, labelName, description))
 		{
-			buffer += std::format("0x{:08X} ==> ", *(UInt32*)object) + labelName + ": " + '"' + description + '"';
+			char textBuffer[256];
+			sprintf_s(textBuffer, "0x%08X ==> %s: %s", *(UInt32*)object, labelName.c_str(), description.c_str());
 			return true;
 		}
 
@@ -173,7 +185,9 @@ namespace CrashLogger::Stack
 		{
 			if (GetStringForLabel(object, buffer)) return buffer;
 			deref = Dereference<UInt32>(object);
-			buffer += std::format("0x{:08X} ==> ", deref);
+			char textBuffer[32];
+			sprintf_s(textBuffer, "0x%08X ==> ", deref);
+			buffer += textBuffer;
 			object = (void**)deref;
 			depth--;
 		} while (object && depth);
@@ -185,7 +199,9 @@ namespace CrashLogger::Stack
 
 	extern void Process(EXCEPTION_POINTERS* info)
 	try {
-		output << "Stack:" << '\n' << std::format("  # | {:^10} | DEREFERENCE INFO", "Value") << '\n';
+		char textBuffer[128];
+		sprintf_s(textBuffer, "Stack:\n  # | %*s%*s | DEREFERENCE INFO\n", CENTERED_TEXT(10, "Value"));
+		output << textBuffer;
 
 		const auto esp = reinterpret_cast<UInt32*>(info->ContextRecord->Esp);
 
@@ -197,16 +213,20 @@ namespace CrashLogger::Stack
 			if (i <= 0x8 || (!str.empty() && !memoize.contains(espi)))
 			{
 				std::stringstream line;
-				line << std::format(" {:2X} | 0x{:08X} | ", i, espi);
+				sprintf_s(textBuffer, " %02X | 0x%08X | ", i, espi);
+				line << textBuffer;
 				if (!memoize.contains(espi))
 				{
 					if (!str.empty()) line << str;				
 					memoize.emplace(espi, i);
 				}
+#if 0
 				else
 				{
-					line << std::format("Identical to {:2X}", memoize[espi]);
+					sprintf_s(textBuffer, "Identical to %02X", memoize[espi]);
+					line << textBuffer;
 				}
+#endif
 				output << line.str() << '\n';
 
 			}

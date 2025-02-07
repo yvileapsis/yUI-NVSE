@@ -33,11 +33,26 @@ void InitLog(const std::filesystem::path& path = "")
 
 	Log(LogLevel::LogConsole) << CrashLogger_VERSION_STR;
 
-	Log(LogLevel::LogWarning) << GetName() + " version " + CrashLogger_VERSION_STR + " at " + std::format("{0:%F} {0:%T}", std::chrono::time_point(std::chrono::system_clock::now())) <<
-		'\n'
-		<< "If this file is empty, then your game didn't crash or something went so wrong even crash logger was useless! :snig:" <<
-		'\n'
-		<< "Topmost stack module is NOT ALWAYS the crash reason! Exercise caution when speculating!" << '\n';
+	char buffer[512];
+	auto now = std::chrono::system_clock::now();
+	auto timeT = std::chrono::system_clock::to_time_t(now);
+	tm localTime;
+	localtime_s(&localTime, &timeT);
+
+	sprintf_s(buffer,
+		"%s version %s at %04d-%02d-%02d %02d:%02d:%02d\n"
+		"If this file is empty, then your game didn't crash or something went so wrong even crash logger was useless! :snig:\n"
+		"Topmost stack module is NOT ALWAYS the crash reason! Exercise caution when speculating!\n",
+		GetName().c_str(),
+		CrashLogger_VERSION_STR,
+		localTime.tm_year + 1900,
+		localTime.tm_mon + 1,
+		localTime.tm_mday,
+		localTime.tm_hour,
+		localTime.tm_min,
+		localTime.tm_sec);
+
+	Log(LogLevel::LogWarning) << buffer;
 
 	Log(LogLevel::LogWarning) << "When asking for help, please send the whole log file!\n";
 
@@ -80,18 +95,24 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 	if (nvse->isEditor) {
 		if (nvse->editorVersion < CS_VERSION_1_4_0_518)
 		{
-			Log() << std::format("Incorrect editor version (got {:08X} need at least {:08X})", nvse->editorVersion, CS_VERSION_1_4_0_518);
+			char buffer[128];
+			sprintf_s(buffer, "Incorrect editor version (got %08X need at least %08X)", nvse->editorVersion, CS_VERSION_1_4_0_518);
+			Log() << buffer;
 			return false;
 		}
 		return false;
 	} else {
 		if (nvse->version < PACKED_NVSE_VERSION) {
-			Log() << std::format("NVSE version too old (got {:08X} expected at least {:08X}). Plugin will NOT load! Install the latest version here: https://github.com/xNVSE/NVSE/releases/", nvse->version, PACKED_NVSE_VERSION);
+			char buffer[256];
+			sprintf_s(buffer, "NVSE version too old (got %08X expected at least %08X). Plugin will NOT load! Install the latest version here: https://github.com/xNVSE/NVSE/releases/", nvse->version, PACKED_NVSE_VERSION);
+			Log() << buffer;
 			return false;
 		}
 
 		if (nvse->gameVersion < RUNTIME_VERSION_1_4_0_525) {
-			Log() << std::format("Incorrect runtime version (got {:08X} need at least {:08X})", nvse->gameVersion, RUNTIME_VERSION_1_4_0_525);
+			char buffer[128];
+			sprintf_s(buffer, "Incorrect runtime version (got %08X need at least %08X)", nvse->gameVersion, RUNTIME_VERSION_1_4_0_525);
+			Log() << buffer;
 			return false;
 		}
 
@@ -104,6 +125,13 @@ bool NVSEPlugin_Query(const NVSEInterface* nvse, PluginInfo* info)
 
 	Inits();
 
+	return true;
+}
+
+bool NVSEPlugin_Preload() {
+	g_currentGame = kFalloutNewVegas;
+
+	InitEarlyPatches();
 	return true;
 }
 
@@ -166,7 +194,9 @@ bool FOSEPlugin_Query(const OBSEInterface* obse, PluginInfo* info)
 	}
 	else {
 		if (obse->version < 1) {
-			Log() << std::format("FOSE version too old (got {:08X}; expected at least {:08X}).", obse->version, 1);
+			char buffer[128];
+			sprintf_s(buffer, "OBSE version too old (got %08X expected at least %08X)", obse->version, 1);
+			Log() << buffer;
 			return false;
 		}
 //		if (obse->gameVersion != 0x01070030) {
@@ -217,11 +247,15 @@ bool OBSEPlugin_Query(const OBSEInterface* obse, PluginInfo* info)
 	}
 	else {
 		if (obse->version < 21) {
-			Log() << std::format("OBSE version too old (got {:08X}; expected at least {:08X}).", obse->version, 21);
+			char buffer[128];
+			sprintf_s(buffer, "OBSE version too old (got %08X expected at least %08X)", obse->version, 21);
+			Log() << buffer;
 			return false;
 		}
 		if (obse->gameVersion != OBLIVION_VERSION_1_2_416) {
-			Log() << std::format("incorrect Oblivion version (got {:08X}; need {:08X}).", obse->gameVersion, OBLIVION_VERSION_1_2_416);
+			char buffer[128];
+			sprintf_s(buffer, "Incorrect Oblivion version (got %08X; need %08X).", obse->gameVersion, OBLIVION_VERSION_1_2_416);
+			Log() << buffer;
 			return false;
 		}
 	}

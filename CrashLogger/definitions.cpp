@@ -4,9 +4,16 @@
 
 INIT_MODULE(CrashLogger)
 INIT_MODULE(Patch::NameThreads)
+INIT_MODULE(Patch::MallocTracking)
 
 void Inits()
 {
 	CrashLogger::Init();
 	Patch::NameThreads::Init();
+
+}
+
+void InitEarlyPatches() 
+{
+	Patch::MallocTracking::Init();
 }

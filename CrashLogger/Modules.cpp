@@ -37,7 +37,7 @@ namespace CrashLogger::Modules
 		return TRUE;
 	}
 
-	static std::unordered_map<std::string, std::string> pluginNames = {
+	static std::unordered_map<std::string, const char*> pluginNames = {
 		{"hot_reload_editor", "hot_reload"},
 		{"ilsfix", "ILS Fix"},
 		{"improved_console", "Improved Console"},
@@ -64,7 +64,7 @@ namespace CrashLogger::Modules
 	}
 
 	std::string GetFileVersion(std::string path) {
-		std::string version = "";
+		char version[64] = { 0 };
 		DWORD infoSize = GetFileVersionInfoSizeA(path.c_str(), 0);
 		LPSTR verData = new char[infoSize];
 		if (GetFileVersionInfo(path.c_str(), 0, infoSize, verData)) {
@@ -73,17 +73,12 @@ namespace CrashLogger::Modules
 			if (VerQueryValue(verData, "\\", (VOID FAR * FAR*) & lpBuffer, &size) && size) {
 				VS_FIXEDFILEINFO* verInfo = (VS_FIXEDFILEINFO*)lpBuffer;
 				if (verInfo->dwSignature == 0xfeef04bd) {
-					version = std::format("{}.{}.{}.{}",
-						(verInfo->dwFileVersionMS >> 16) & 0xffff,
-						(verInfo->dwFileVersionMS >> 0) & 0xffff,
-						(verInfo->dwFileVersionLS >> 16) & 0xffff,
-						(verInfo->dwFileVersionLS >> 0) & 0xffff
-					);
+					sprintf_s(version, "%d.%d.%d.%d", verInfo->dwFileVersionMS >> 16, verInfo->dwFileVersionMS & 0xffff, verInfo->dwFileVersionLS >> 16, verInfo->dwFileVersionLS & 0xffff);
 				}
 			}
 		}
 		delete[] verData;
-		return version;
+		return std::string(version);
 	}
 
 	extern void Process(EXCEPTION_POINTERS* info)
@@ -98,50 +93,39 @@ namespace CrashLogger::Modules
 
 		size_t memoryAllocated = 0;
 
-		output << "Module bases:" << '\n' << std::format(" {:^23} | {:>40} | {:>20} | Filepath", "Address", "Module", "Version") <<
-			'\n';;
+		char textBuffer[512];
+		sprintf_s(textBuffer, "Module bases:\n %*s%*s  | %*s%*s | %*s%*s | %*s\n", CENTERED_TEXT(22, "Address"), CENTERED_TEXT(40, "Module"), CENTERED_TEXT(20, "Version"), 40, "Filepath");
+		output << textBuffer;
 		for (const auto& [moduleBase, moduleEnd, path] : enumeratedModules)
 		{
-			std::string version;
+			char version[64] = {};
 
 			if (g_commandInterface) {
-				if (const auto info = g_commandInterface->GetPluginInfoByName(GetPluginNameForFileName(path.stem().generic_string()).c_str()))
-					version = std::format("{:d}", info->version);
+				if (const auto info = g_commandInterface->GetPluginInfoByName(GetPluginNameForFileName(path.stem().generic_string()).c_str())) {
+					sprintf_s(version, "%d", info->version);
+				}
 			}
 
-			if (version.empty()) {
-				std::string dll_version = GetFileVersion(path.generic_string());
+			if (version[0] == 0) {
+				const std::string& dll_version = GetFileVersion(path.generic_string());
 				if (dll_version.empty())
-					dll_version = "Unknown";
-
-				version = dll_version;
+					strcpy_s(version, "Unknown");
+				else
+					strcpy_s(version, dll_version.c_str());
 			}
 
 			memoryAllocated += moduleEnd - moduleBase;
 
-			output << std::format(" 0x{:08X} - 0x{:08X} | {:>40} | {:>20} | {}", moduleBase, moduleEnd, path.stem().generic_string(), version, SanitizeString(path.generic_string())) <<
-				'\n';
+			sprintf_s(textBuffer, " 0x%08X - 0x%08X | %-40s | %-20s | %s\n", moduleBase, moduleEnd, path.stem().generic_string().c_str(), version, SanitizeString(path.generic_string()).c_str());
+			output << textBuffer;
 		}
 
-		output << "\nTotal memory allocated to modules: " << FormatSize(memoryAllocated) << '\n';
-
-		output << '\n';
-
-		if (infoUser.moduleBase)
-			output << std::format("GAME CRASHED AT INSTRUCTION Base+0x{:08X} IN MODULE: {}", (infoUser.eip - infoUser.moduleBase), infoUser.name) <<
-				'\n'
-				<< "Please note that this does not automatically mean that that module is responsible. It may have been supplied bad data or" <<
-				'\n'
-				<< "program state as the result of an issue in the base game or a different DLL." << '\n';
-		else
-			output << "UNABLE TO IDENTIFY MODULE CONTAINING THE CRASH ADDRESS." << '\n'
-				<< "This can occur if the crashing instruction is located in the vanilla address space, but it can also occur if there are too many" << '\n'
-				<< "DLLs for us to list, and if the crash occurred in one of their address spaces. Please note that even if the crash occurred" << '\n'
-				<< "in vanilla code, that does not necessarily mean that it is a vanilla problem. The vanilla code may have been supplied bad data" << '\n'
-				<< "or program state as the result of an issue in a loaded DLL." << '\n';
-
+		char cMemBuffer[128];
+		FormatSize(memoryAllocated, cMemBuffer, sizeof(cMemBuffer));
+		sprintf_s(textBuffer, "\nTotal memory allocated to modules: %s\n", cMemBuffer);
+		output << textBuffer;
 	}
-	catch (...) { output << "Failed to print out modules." << '\n'; }
+	catch (...) { output << "Failed to print out modules.\n"; }
 
 	extern std::stringstream& Get() { output.flush(); return output; }
 }

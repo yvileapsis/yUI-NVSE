@@ -162,7 +162,7 @@ public:
 		}
 	}
 
-	void Lerp(const NiPoint3& to, const NiPoint3& from, const double by) {
+	void Lerp(const NiPoint3& to, const NiPoint3& from, float by) {
 		x = to.x * (1 - by) + from.x * by;
 		y = to.y * (1 - by) + from.y * by;
 		z = to.z * (1 - by) + from.z * by;

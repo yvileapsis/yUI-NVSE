@@ -8,7 +8,7 @@ void* BSNew(size_t stSize) {
 
 // 0x553320
 void* BSNewAligned(size_t stAlign, size_t stSize) {
-    char* pMemory = static_cast<char*>(MemoryManager::GetSingleton()->Allocate(stSize));
+    char* pMemory = static_cast<char*>(MemoryManager::GetSingleton()->Allocate(stSize + stAlign));
     UInt32 uiAlignment = stAlign - (reinterpret_cast<UInt8>(pMemory) & (stAlign - 1));
     pMemory[UInt8(uiAlignment) - 1] = uiAlignment;
     return &pMemory[UInt8(uiAlignment)];

@@ -31,6 +31,25 @@ void MemoryManager::Deallocate(void* apMemory) {
 	ThisStdCall(0xAA4060, MemoryManager::GetSingleton(), apMemory);
 }
 
+// GAME - 0xAA4290
+void* MemoryManager::DefaultAllocate(UInt32 auiSize, bool abDontTrack) {
+	if (!abDontTrack)
+		uiMallocBytes += auiSize;
+
+	void* pMem = GameMalloc(auiSize);
+
+
+	return pMem;
+}
+
+// GAME - 0xAA42C0
+void MemoryManager::DefaultFree(void* apMemory, bool abDontTrack) {
+	if (!abDontTrack && apMemory)
+		uiMallocBytes -= GameSize(apMemory);
+
+	GameFree(apMemory);
+}
+
 void MemoryManager::EnterContext(UInt32& apPrevious, UInt32 auiNew) {
 	TLSData* pTLSData = TLSData::GetTLSData();
 	apPrevious = pTLSData->uiHeapIndex;
@@ -62,4 +81,24 @@ bool MemoryManager::GetHeapStats(UInt32 auiIndex, bool abFullBlockInfo, HeapStat
 
 	pHeap->GetHeapStats(apStats, abFullBlockInfo);
 	return true;
+}
+
+// GAME - 0xECD1C7
+void* MemoryManager::GameMalloc(size_t aSize) {
+	return CdeclCall<void*>(0xECD1C7, aSize);
+}
+
+// GAME - 0xECCF5D
+void* MemoryManager::GameRealloc(void* apOldMem, size_t auiNewSize) {
+	return CdeclCall<void*>(0xECCF5D, apOldMem, auiNewSize);
+}
+
+// GAME - 0xECD291
+void MemoryManager::GameFree(void* apMemory) {
+	CdeclCall(0xECD291, apMemory);
+}
+
+// GAME - 0xECD31F
+size_t MemoryManager::GameSize(void* apMemory) {
+	return CdeclCall<size_t>(0xECD31F, apMemory);
 }

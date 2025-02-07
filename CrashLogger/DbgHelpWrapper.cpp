@@ -82,7 +82,9 @@ private:
 		wcscat_s(temp_dbghelp_path, L"nvse_dbghelp.dll");
 
 		if (!CopyFileW(dbghelp_path, temp_dbghelp_path, FALSE)) {
-			Log() << std::format("Cannot create a copy of DbgHelp.dll, error: {} ({:08X})", GetErrorAsString(GetLastError()), GetLastError());
+			char buffer[MAX_PATH];
+			sprintf_s(buffer, "Cannot create a copy of DbgHelp.dll, error: %s (%08X)", GetErrorAsString(GetLastError()).c_str(), GetLastError());
+			Log() << buffer;
 
 			// better continue with some dbghelp than with none!
 			wcscpy_s(temp_dbghelp_path, dbghelp_path);
@@ -91,7 +93,9 @@ private:
 		dbghelp_dll = LoadLibraryW(temp_dbghelp_path);
 		if (!dbghelp_dll) {
 			std::filesystem::remove(temp_dbghelp_path);
-			Log() << std::format("Cannot load DbgHelp.dll, error: {} ({:08X})", GetErrorAsString(GetLastError()), GetLastError());
+			char buffer[MAX_PATH];
+			sprintf_s(buffer, "Cannot load DbgHelp.dll, error: %s (%08X)", GetErrorAsString(GetLastError()).c_str(), GetLastError());
+			Log() << buffer;
 			return;
 		}
 
