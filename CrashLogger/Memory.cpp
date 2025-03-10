@@ -53,7 +53,7 @@ namespace CrashLogger::Memory
 			}
 		}
 		else if (!GetModuleHandle("nvtf.dll")) {
-			strcpy_s(nvtfError, "WARNING: New Vegas Tick Fix not found! This will cause performance issues, and crashes if using texutre mods!\n         See https://performance.moddinglinked.com/falloutnv.html#NVTF on how to resolve this issue.");
+			strcpy_s(nvtfError, "WARNING: New Vegas Tick Fix not found! This will cause performance issues, and crashes if using texture mods!\n         See https://performance.moddinglinked.com/falloutnv.html#NVTF on how to resolve this issue.");
 			usesDefaultPool = false;
 		}
 		else {
