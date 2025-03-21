@@ -997,7 +997,7 @@ std::string& SanitizeStringFromBadData(std::string& str)
 
 std::string pcName;
 std::string userName;
-std::string userDir;
+std::string userDirName;
 
 std::string& SanitizeStringFromUserInfo(std::string& str)
 {
@@ -1018,13 +1018,18 @@ std::string& SanitizeStringFromUserInfo(std::string& str)
 	}
 
 	[[unlikely]]
-	if (userDir.empty()) {
+	if (userDirName.empty()) 
+	{
 		HANDLE hToken;
 		OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken);
 		DWORD bufCharCount = MAX_PATH;
 		char infoBuf[MAX_PATH];
-		if (GetUserProfileDirectoryA(hToken, infoBuf, &bufCharCount)) userDir = infoBuf;
+		if (GetUserProfileDirectoryA(hToken, infoBuf, &bufCharCount)) userDirName = infoBuf;
 		CloseHandle(hToken);
+
+		size_t pos = userDirName.find_last_of("\\");
+		if (pos != std::string::npos)
+			userDirName = userDirName.substr(pos + 1);
 	}
 
 	if (pcName.size() > 1)
@@ -1033,8 +1038,8 @@ std::string& SanitizeStringFromUserInfo(std::string& str)
 	if (userName.size() > 1)
 		while (str.find(userName) != -1) str.replace(str.find(userName), userName.size(), userName.size(), '*');
 
-	if (userDir.size() > 1)
-		while (str.find(userDir) != -1) str.replace(str.find(userDir), userDir.size(), userDir.size(), '*');
+	if (userDirName.size() > 1)
+		while (str.find(userDirName) != -1) str.replace(str.find(userDirName), userDirName.size(), userDirName.size(), '*');
 
 	return str;
 }
