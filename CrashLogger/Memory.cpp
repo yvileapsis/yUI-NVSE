@@ -105,6 +105,7 @@ namespace CrashLogger::Memory
 					char cMessageBuffer[256];
 					GetMemoryUsageString(kInfo.CurrentUsage, kInfo.Budget, textBuffer, sizeof(textBuffer));
 					sprintf_s(cMessageBuffer, "Budget Usage:   %s\n", textBuffer);
+					output << cMessageBuffer;
 
 					float used = (float)kInfo.CurrentUsage / kInfo.Budget * 100.0f;
 					if (used >= 99.f && usesDefaultPool) {
