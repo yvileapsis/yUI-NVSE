@@ -618,7 +618,7 @@ namespace CrashLogger::Labels
 		Push(kVtbl_NiAccumulator);
 		Push(kVtbl_NiBackToFrontAccumulator);
 		Push(kVtbl_NiAlphaAccumulator);
-//		Push(kVtbl_BSShaderAccumulator);
+		Push(kVtbl_BSShaderAccumulator);
 		Push(kVtbl_NiScreenPolygon);
 		Push(kVtbl_NiScreenTexture);
 		Push(kVtbl_NiPSysCollider);
