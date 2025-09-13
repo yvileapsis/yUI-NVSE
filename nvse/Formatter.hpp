@@ -7,7 +7,7 @@
 
 inline auto Offset(std::vector<std::string> vector)
 {
-	for (auto i : vector) i.insert(0, "    ");
+	for (auto& i : vector) i.insert(0, "    ");
 	return vector;
 }
 
