@@ -469,14 +469,15 @@ struct NVSECommandTableInterface
 	};
 
 	UInt32	version;
-	const CommandInfo*	(* Start)();
-	const CommandInfo*	(* End)();
-	CommandInfo*		(* GetByOpcode)(UInt32 opcode);
-	CommandInfo*		(* GetByName)(const char* name);
+	const CommandInfo*	(* Start)(void);
+	const CommandInfo*	(* End)(void);
+	const CommandInfo*	(* GetByOpcode)(UInt32 opcode);
+	const CommandInfo*	(* GetByName)(const char* name);
 	UInt32				(* GetReturnType)(const CommandInfo* cmd);		// return type enum defined in CommandTable.h
 	UInt32				(* GetRequiredNVSEVersion)(const CommandInfo* cmd);
-	PluginInfo*			(* GetParentPlugin)(const CommandInfo* cmd);	// returns a pointer to the PluginInfo of the NVSE plugin that adds the command, if any. returns NULL otherwise
-	PluginInfo*			(* GetPluginInfoByName)(const char *pluginName);	// Returns a pointer to the PluginInfo of the NVSE plugin of the specified name; returns NULL is the plugin is not loaded.
+	const PluginInfo*	(* GetParentPlugin)(const CommandInfo* cmd);	// returns a pointer to the PluginInfo of the NVSE plugin that adds the command, if any. returns NULL otherwise
+	const PluginInfo*	(* GetPluginInfoByName)(const char *pluginName);	// Returns a pointer to the PluginInfo of the NVSE plugin of the specified name; returns NULL is the plugin is not loaded.
+	const PluginInfo*	(* GetPluginInfoByDLLName)(const char* dllName);	// Returns a pointer to the PluginInfo of the NVSE plugin with the specified DLL name; returns NULL if the plugin is not loaded.
 };
 
 /**** script API docs **********************************************************
@@ -1054,7 +1055,7 @@ typedef bool				(*_ExtractFormatStringArgs)(UInt32 fmtStringPos, char* buffer, C
 typedef bool				(*_HasScriptCommand)(Script* script, CommandInfo* info, CommandInfo* eventBlock);
 typedef bool				(*_DecompileScript)(Script* script, SInt32 lineNumber, char* buffer, UInt32 bufferSize);
 
-typedef CommandInfo*		(*_GetByOpcode)(UInt32 opcode);
+typedef const CommandInfo*	(*_GetByOpcode)(UInt32 opcode);
 typedef const char*			(*_GetStringVar)(UInt32 var);
 typedef void				(*_SetStringVar)(UInt32, const char*);
 typedef bool				(*_AssignString)(ParamInfo*, void*, TESObjectREFR*, TESObjectREFR*, Script*, ScriptEventList*, double*, UInt32*, const char*);

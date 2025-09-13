@@ -101,7 +101,13 @@ namespace CrashLogger::Modules
 			char version[64] = {};
 
 			if (g_commandInterface) {
-				if (const auto info = g_commandInterface->GetPluginInfoByName(GetPluginNameForFileName(path.stem().generic_string()).c_str())) {
+				if (g_commandInterface->version >= 2) {
+					const PluginInfo* info = g_commandInterface->GetPluginInfoByDLLName(path.filename().generic_string().c_str());
+					if (info) {
+						sprintf_s(version, "%d", info->version);
+					}
+				}
+				else if (const auto info = g_commandInterface->GetPluginInfoByName(GetPluginNameForFileName(path.stem().generic_string()).c_str())) {
 					sprintf_s(version, "%d", info->version);
 				}
 			}
