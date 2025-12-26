@@ -20,14 +20,14 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -102,7 +102,7 @@
       <ForcedIncludeFiles>CommonLib/CommonPrefix.hpp;%(ForcedIncludeFiles)</ForcedIncludeFiles>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <BuildStlModules>false</BuildStlModules>
-      <ExceptionHandling>Async</ExceptionHandling>
+      <ExceptionHandling>false</ExceptionHandling>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -134,6 +134,7 @@
     <ClCompile Include="Bethesda\BSMemory.cpp" />
     <ClCompile Include="Bethesda\MemoryManager.cpp" />
     <ClCompile Include="Bethesda\ModelLoader.cpp" />
+    <ClCompile Include="Bethesda\ScriptRunManager.cpp" />
     <ClCompile Include="Bethesda\TESForm.cpp" />
     <ClCompile Include="Bethesda\TLSData.cpp" />
     <ClCompile Include="Gamebryo\NiMemManager.cpp" />
@@ -808,6 +809,8 @@
     <ClInclude Include="Bethesda\ScriptEffect.hpp" />
     <ClInclude Include="Bethesda\ScriptEventList.hpp" />
     <ClInclude Include="Bethesda\ScriptLocal.hpp" />
+    <ClInclude Include="Bethesda\ScriptRunManager.hpp" />
+    <ClInclude Include="Bethesda\ScriptRunner.hpp" />
     <ClInclude Include="Bethesda\Setting.hpp" />
     <ClInclude Include="Bethesda\SettingCollection.hpp" />
     <ClInclude Include="Bethesda\SettingCollectionList.hpp" />

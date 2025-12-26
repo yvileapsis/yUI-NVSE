@@ -14,51 +14,51 @@ public:
 	TESPackage();
 	~TESPackage() override;
 
-	virtual bool	Unk_4E(void*);
-	virtual bool	IsActorAtLocation(Actor* apActor, bool abIgnoreDistance, float afExtraRadius, bool abInFurniture);
-	virtual bool	IsActorAtSecondLocation(Actor* apMobileObject, Actor* apPackageowner, bool abIgnoreDistance, float afExtraRadius, bool abInFurniture);
-	virtual bool	IsActorAtRefTarget(Actor* apActor, SInt32 aiExtraRadius);
-	virtual bool	IsTargetAtLocation(Actor* apActor, SInt32 aiExtraRadius);
-	virtual UInt16	GetSaveSize();
-	virtual UInt16	SaveGame();
-	virtual UInt16	LoadGame();
-	virtual void	Unk_56();
-	virtual bool	IsPackageOwner(Actor* apActor = nullptr);
+	virtual bool		IsReadyToRun(Actor* apActor);
+	virtual bool		IsActorAtLocation(Actor* apActor, bool abIgnoreDistance, float afExtraRadius, bool abInFurniture);
+	virtual bool		IsActorAtSecondLocation(Actor* apMobileObject, Actor* apPackageowner, bool abIgnoreDistance, float afExtraRadius, bool abInFurniture);
+	virtual bool		IsActorAtRefTarget(Actor* apActor, int32_t aiExtraRadius);
+	virtual bool		IsTargetAtLocation(Actor* apActor, int32_t aiExtraRadius);
+	virtual uint16_t	GetSaveSize();
+	virtual uint16_t	SaveGameTESAlt();
+	virtual uint16_t	LoadGameTESAlt();
+	virtual void		InitLoadGameTES();
+	virtual bool		IsPackageOwner(Actor* apActor = nullptr);
 
 	enum EnumPackageFlag : UInt32 // From OBSE and FNVEdit
 	{
-		kPackageFlag_OffersServices =			1 << 0,
-		kPackageFlag_MustReachLocation =		1 << 1,
-		kPackageFlag_MustComplete =				1 << 2,
-		kPackageFlag_LockDoorsAtStart =			1 << 3,
-		kPackageFlag_LockDoorsAtEnd =			1 << 4, 	// set by CHANGE_PACKAGE_WAITING ?
-		kPackageFlag_LockDoorsAtLocation =		1 << 5,
-		kPackageFlag_UnlockDoorsAtStart =		1 << 6,
-		kPackageFlag_UnlockDoorsAtEnd =			1 << 7,
-		kPackageFlag_UnlockDoorsAtLocation =	1 << 8,
-		kPackageFlag_ContinueIfPCNear =			1 << 9,
-		kPackageFlag_OncePerDay =				1 << 10,
-		kPackageFlag_Unk11 =					1 << 11,
-		kPackageFlag_SkipFalloutBehavior =		1 << 12,
-		kPackageFlag_AlwaysRun =				1 << 13,
-		kPackageFlag_Unk14 =					1 << 14,
-		kPackageFlag_NeverRun =					1 << 15,	// Save only ?
-		kPackageFlag_Unk16 =					1 << 16,
-		kPackageFlag_AlwaysSneak =				1 << 17,
-		kPackageFlag_AllowSwimming =			1 << 18,
-		kPackageFlag_AllowFalls =				1 << 19,
-		kPackageFlag_ArmorUnequipped =			1 << 20,
-		kPackageFlag_WeaponsUnequipped =		1 << 21,
-		kPackageFlag_DefensiveCombat =			1 << 22,
-		kPackageFlag_WeaponsDrawn =				1 << 23,
-		kPackageFlag_NoIdleAnims =				1 << 24,
-		kPackageFlag_PretendInCombat =			1 << 25,
-		kPackageFlag_ContinueDuringCombat =		1 << 26,
-		kPackageFlag_NoCombatAlert =			1 << 27,
-		kPackageFlag_NoWarnAttackBehavior =		1 << 28,
-		kPackageFlag_Unk29 =					1 << 29,
-		kPackageFlag_Unk30 =					1 << 30,
-		kPackageFlag_Unk31 =					1 << 31
+		kPackageFlag_OffersServices =			1u << 0,
+		kPackageFlag_MustReachLocation =		1u << 1,
+		kPackageFlag_MustComplete =				1u << 2,
+		kPackageFlag_LockDoorsAtStart =			1u << 3,
+		kPackageFlag_LockDoorsAtEnd =			1u << 4, 	// set by CHANGE_PACKAGE_WAITING ?
+		kPackageFlag_LockDoorsAtLocation =		1u << 5,
+		kPackageFlag_UnlockDoorsAtStart =		1u << 6,
+		kPackageFlag_UnlockDoorsAtEnd =			1u << 7,
+		kPackageFlag_UnlockDoorsAtLocation =	1u << 8,
+		kPackageFlag_ContinueIfPCNear =			1u << 9,
+		kPackageFlag_OncePerDay =				1u << 10,
+		kPackageFlag_Created =					1u << 11,
+		kPackageFlag_SkipFalloutBehavior =		1u << 12,
+		kPackageFlag_AlwaysRun =				1u << 13,
+		kPackageFlag_Unk14 =					1u << 14,
+		kPackageFlag_NeverRun =					1u << 15,	// Save only ?
+		kPackageFlag_Unk16 =					1u << 16,
+		kPackageFlag_AlwaysSneak =				1u << 17,
+		kPackageFlag_AllowSwimming =			1u << 18,
+		kPackageFlag_AllowFalls =				1u << 19,
+		kPackageFlag_ArmorUnequipped =			1u << 20,
+		kPackageFlag_WeaponsUnequipped =		1u << 21,
+		kPackageFlag_DefensiveCombat =			1u << 22,
+		kPackageFlag_WeaponsDrawn =				1u << 23,
+		kPackageFlag_NoIdleAnims =				1u << 24,
+		kPackageFlag_PretendInCombat =			1u << 25,
+		kPackageFlag_ContinueDuringCombat =		1u << 26,
+		kPackageFlag_NoCombatAlert =			1u << 27,
+		kPackageFlag_NoWarnAttackBehavior =		1u << 28,
+		kPackageFlag_Unk29 =					1u << 29,
+		kPackageFlag_Unk30 =					1u << 30,
+		kPackageFlag_Unk31 =					1u << 31
 	};
 
 	enum EnumPackageType : UInt8 // From OBSE and FNVEdit. Runtimes has 0x24 types!
@@ -315,16 +315,14 @@ public:
 		UInt32			uiType;
 	};
 
-	struct Data {
-		UInt32			eProcedureType;		// 018 index into array of array of eProcedure terminated by 0x2C. 
-											// -1 if no procedure array exists for package type.
+	struct Data {								// -1 if no procedure array exists for package type.
 		EnumPackageFlag	eFlags;				// 01C
 		EnumPackageType	eType;				// 020
-		UInt8			pad021[1];			// 021
 		UInt16			usBehaviorFlags;	// O22
 		UInt16			usSpecificFlags;	// 024
 	};
 
+	UInt32				eProcedureType;		// 018 index into array of array of eProcedure terminated by 0x2C. 
 	Data				kData;
 	TESPackageData*		pkPackageData;		// 028
 	PackageLocation*	pkPackageLocation;	// 02C
@@ -360,22 +358,5 @@ public:
 	static bool			IsValidObjectCode(UInt8 o) { return o < kObjectType_Max; }
 	static const char*	StringForProcedureCode(EnumProcedureType proc);
 	static const char*	StringForProcedureCode(EnumProcedureType proc, bool bRemovePrefix);
-
-	void				SetTarget(TESObjectREFR* refr);
-	void				SetTarget(TESForm* baseForm, UInt32 count);
-	void				SetTarget(UInt8 typeCode, UInt32 count);
-	void				SetCount(UInt32 aCount);
-	void				SetDistance(UInt32 aDistance) { SetCount(aDistance); }
-	PackageTarget*		GetTargetData();
-	PackageLocation*	GetLocationData();
-
-	bool				IsFlagSet(UInt32 flag);
-	void				SetFlag(UInt32 flag, bool bSet);
-
-	static const char*	StringForPackageType(UInt32 pkgType);
-	static const char*	StringForObjectCode(UInt8 objCode);
-	static UInt8		ObjectCodeForString(const char* objString);
-	static bool			IsValidObjectCode(UInt8 o) { return o < kObjectType_Max; }
-	static const char*	StringForProcedureCode(EnumProcedureType proc);
 };
 static_assert(sizeof(TESPackage) == 0x80);

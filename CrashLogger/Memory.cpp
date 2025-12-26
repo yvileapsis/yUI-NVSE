@@ -25,8 +25,6 @@ namespace CrashLogger::Memory
 	constexpr float MEMORY_USAGE_CRITICAL_THRESHOLD = 92.5f;
 	constexpr float MEMORY_USAGE_OOM_THRESHOLD		= 98.0f;
 
-	std::stringstream output;
-
 	char nvtfError[260] = {};
 
 	bool HandleNVTF() {
@@ -39,7 +37,7 @@ namespace CrashLogger::Memory
 		if (GetFileAttributes(iniDir) != INVALID_FILE_ATTRIBUTES) {
 			bool hasDXSettings = GetPrivateProfileInt("Main", "bModifyDirectXBehavior", 0, iniDir);
 			bool hasDefaultPool = GetPrivateProfileInt("DirectX", "bUseDefaultPoolForTextures", 0, iniDir);
-			static const char* string = "WARNING: NVTF.ini has bModifyDirectXBehavior=%d %s bUseDefaultPoolForTextures=%d! This can cause high memory usage and crashes when using texture mods!\n         See https://performance.moddinglinked.com/falloutnv.html#NVTF on how to resolve this issue.";
+			static const char* string = "INFO: NVTF.ini has bModifyDirectXBehavior=%d %s bUseDefaultPoolForTextures=%d\n";
 			
 			if ((hasDXSettings && !hasDefaultPool) || (!hasDXSettings && hasDefaultPool)) {
 				sprintf_s(nvtfError, string, hasDXSettings, "but", hasDefaultPool);
@@ -53,7 +51,7 @@ namespace CrashLogger::Memory
 			}
 		}
 		else if (!GetModuleHandle("nvtf.dll")) {
-			strcpy_s(nvtfError, "WARNING: New Vegas Tick Fix not found! This will cause performance issues, and crashes if using texture mods!\n         See https://performance.moddinglinked.com/falloutnv.html#NVTF on how to resolve this issue.");
+			strcpy_s(nvtfError, "WARNING: New Vegas Tick Fix not found! This will cause performance issues, and crashes if using texture mods!\n");
 			usesDefaultPool = false;
 		}
 		else {
@@ -64,7 +62,7 @@ namespace CrashLogger::Memory
 		return usesDefaultPool;
 	}
 
-	static bool PrintGraphicsMemory(bool usesDefaultPool) {
+	static bool __fastcall PrintGraphicsMemory(bool usesDefaultPool) {
 		ComPtr<IDXGIFactory2> spDXGIFactory;
 		CreateDXGIFactory2(0, __uuidof(IDXGIFactory2), (void**)(&spDXGIFactory));
 
@@ -84,8 +82,8 @@ namespace CrashLogger::Memory
 
 				const char* gpu = *(const char**)0x11C72C4;
 
-				char cDescription[128];
-				wcstombs(cDescription, kDesc.Description, 128);
+				char cDescription[128] = {};
+				wcstombs_s(nullptr, cDescription, kDesc.Description, 128);
 
 				// Game annoyingly wraps the name in quotes
 				char cCompareTarget[130];
@@ -100,16 +98,17 @@ namespace CrashLogger::Memory
 					DXGI_QUERY_VIDEO_MEMORY_INFO kInfo;
 					spAdapter3->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &kInfo);
 
-					output << "\nGraphics Memory:\n";
+					_MESSAGE("\nGraphics Memory:");
 					char textBuffer[128];
-					char cMessageBuffer[256];
 					GetMemoryUsageString(kInfo.CurrentUsage, kInfo.Budget, textBuffer, sizeof(textBuffer));
-					sprintf_s(cMessageBuffer, "Budget Usage:   %s\n", textBuffer);
-					output << cMessageBuffer;
+
+					AutoIndent indent;
+
+					_MESSAGE("Budget Usage:   %s", textBuffer);
 
 					float used = (float)kInfo.CurrentUsage / kInfo.Budget * 100.0f;
 					if (used >= 99.f && usesDefaultPool) {
-						output << "\nWARNING: Graphics memory went over budget! This (usually) can't lead to a crash, but causes performance loss instead!\n";
+						_MESSAGE("\nWARNING: Graphics memory went over budget! This (usually) can't lead to a crash, but causes performance loss instead!\n");
 					}
 					// Not sure if there's a point in reporting issues when you go over budget with managed pool, as odds are you'll just crash anyway (unless you have a sub 1GB GPU)
 					// In addition, handling of that case is elsewhere
@@ -122,184 +121,185 @@ namespace CrashLogger::Memory
 		return false;
 	}
 
-	extern void Process(EXCEPTION_POINTERS* info)
-	try 
-	{
-		char cSmallBuffer[128];
-		char cMessageBuffer[512];
-		const auto hProcess = GetCurrentProcess();
+	extern void __fastcall Process(EXCEPTION_POINTERS* info) {
+		try {
+			char cSmallBuffer[128];
+			const auto hProcess = GetCurrentProcess();
 
-		MemoryErrors memoryErrorState = MemoryErrors::NONE;
+			MemoryErrors memoryErrorState = MemoryErrors::NONE;
 
-		PROCESS_MEMORY_COUNTERS_EX2 pmc = {};
-		pmc.cb = sizeof(pmc);
+			PROCESS_MEMORY_COUNTERS_EX2 pmc = {};
+			pmc.cb = sizeof(pmc);
 
-		bool confirmedOutOfMem = false;
+			bool confirmedOutOfMem = false;
 
-		// Get physical memory size
-		MEMORYSTATUSEX memoryStatus;
-		memoryStatus.dwLength = sizeof(memoryStatus);
-		GlobalMemoryStatusEx(&memoryStatus);
-		if ( GetProcessMemoryInfo( hProcess, (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc)) )
-		{
-			DWORDLONG virtUsage = memoryStatus.ullTotalVirtual - memoryStatus.ullAvailVirtual;
-			DWORDLONG physUsage = pmc.PrivateUsage;
-			output << "Process' Memory:\n";
+			// Get physical memory size
+			MEMORYSTATUSEX memoryStatus;
+			memoryStatus.dwLength = sizeof(memoryStatus);
+			GlobalMemoryStatusEx(&memoryStatus);
+			if (GetProcessMemoryInfo(hProcess, (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc))) {
+				DWORDLONG virtUsage = memoryStatus.ullTotalVirtual - memoryStatus.ullAvailVirtual;
+				DWORDLONG physUsage = pmc.PrivateUsage;
+				_MESSAGE("\nProcess' Memory:");
 
-			GetMemoryUsageString(physUsage, memoryStatus.ullTotalPhys, cSmallBuffer, sizeof(cSmallBuffer));
-			sprintf_s(cMessageBuffer, "Physical Usage: %s\n", cSmallBuffer);
-			output << cMessageBuffer;
+				AutoIndent indent;
 
-			GetMemoryUsageString(virtUsage, memoryStatus.ullTotalVirtual, cSmallBuffer, sizeof(cSmallBuffer));
-			sprintf_s(cMessageBuffer, "Virtual  Usage: %s\n", cSmallBuffer);
-			output << cMessageBuffer;
+				GetMemoryUsageString(physUsage, memoryStatus.ullTotalPhys, cSmallBuffer, sizeof(cSmallBuffer));
+				_MESSAGE("Physical Usage: %s", cSmallBuffer);
 
-			float usedVirtual = (float)virtUsage / memoryStatus.ullTotalVirtual * 100.0f;
-			if (usedVirtual >= MEMORY_USAGE_CONCERN_THRESHOLD) {
-				// There's no doubt here
-				if (usedVirtual >= MEMORY_USAGE_OOM_THRESHOLD) {
-					confirmedOutOfMem = true;
-				}
+				GetMemoryUsageString(virtUsage, memoryStatus.ullTotalVirtual, cSmallBuffer, sizeof(cSmallBuffer));
+				_MESSAGE("Virtual  Usage: %s", cSmallBuffer);
 
-				if (usedVirtual >= MEMORY_USAGE_CRITICAL_THRESHOLD) {
-					memoryErrorState = MemoryErrors::CRITICAL_USAGE;
-				}
-				else {
-					memoryErrorState = MemoryErrors::HIGH_USAGE;
+				float usedVirtual = (float)virtUsage / memoryStatus.ullTotalVirtual * 100.0f;
+				if (usedVirtual >= MEMORY_USAGE_CONCERN_THRESHOLD) {
+					// There's no doubt here
+					if (usedVirtual >= MEMORY_USAGE_OOM_THRESHOLD) {
+						confirmedOutOfMem = true;
+					}
+
+					if (usedVirtual >= MEMORY_USAGE_CRITICAL_THRESHOLD) {
+						memoryErrorState = MemoryErrors::CRITICAL_USAGE;
+					}
+					else {
+						memoryErrorState = MemoryErrors::HIGH_USAGE;
+					}
 				}
 			}
-		}
 
-		bool defaultPool = HandleNVTF();
+			bool defaultPool = HandleNVTF();
 
-		bool highGraphics = PrintGraphicsMemory(defaultPool);
+			bool highGraphics = PrintGraphicsMemory(defaultPool);
 
-		MemoryManager* memMgr = MemoryManager::GetSingleton();
-		// If NVHR is used, the number will be 0
-		if (memMgr->usNumHeaps > 0) {
-			UInt32 usedHeapMemory = 0;
-			UInt32 totalHeapMemory = 0;
+			MemoryManager* memMgr = MemoryManager::GetSingleton();
+			// If NVHR is used, the number will be 0
+			if (memMgr->usNumHeaps > 0) {
+				UInt32 usedHeapMemory = 0;
+				UInt32 totalHeapMemory = 0;
 
-			PrintSeparator();
+				PrintSeparator();
 
+				{
 #if PRINT_HEAPS
-			output << "\nGame's Heaps:\n";
+					_MESSAGE("\nGame's Heaps:");
 #endif
-			for (UInt32 i = 0; i < memMgr->usNumHeaps; i++) {
-				IMemoryHeap* heap = memMgr->ppHeaps[i];
-				if (!heap)
-					continue;
+					AutoIndent indent;
 
-				HeapStats stats;
-				if (!memMgr->GetHeapStats(i, true, &stats))
-					continue;
+					for (UInt32 i = 0; i < memMgr->usNumHeaps; i++) {
+						IMemoryHeap* heap = memMgr->ppHeaps[i];
+						if (!heap)
+							continue;
 
-				SIZE_T used = stats.uiMemUsedInBlocks;
-				SIZE_T total = stats.uiMemHeapSize;
+						HeapStats stats;
+						if (!memMgr->GetHeapStats(i, true, &stats))
+							continue;
+
+						SIZE_T used = stats.uiMemUsedInBlocks;
+						SIZE_T total = stats.uiMemHeapSize;
 #if PRINT_HEAPS
-				SIZE_T start = 0;
-				SIZE_T end = 0;
-				if (stats.uiHeapOverhead == sizeof(ZeroOverheadHeap)) {
-					start = reinterpret_cast<SIZE_T>(static_cast<ZeroOverheadHeap*>(heap)->pHeap);
-					end = start + static_cast<ZeroOverheadHeap*>(heap)->uiSize;
-				}
-				else {
-					start = reinterpret_cast<SIZE_T>(static_cast<MemoryHeap*>(heap)->pMemHeap);
-					end = start + static_cast<MemoryHeap*>(heap)->uiMemHeapSize;
+						SIZE_T start = 0;
+						SIZE_T end = 0;
+						if (stats.uiHeapOverhead == sizeof(ZeroOverheadHeap)) {
+							start = reinterpret_cast<SIZE_T>(static_cast<ZeroOverheadHeap*>(heap)->pHeap);
+							end = start + static_cast<ZeroOverheadHeap*>(heap)->uiSize;
+						}
+						else {
+							start = reinterpret_cast<SIZE_T>(static_cast<MemoryHeap*>(heap)->pMemHeap);
+							end = start + static_cast<MemoryHeap*>(heap)->uiMemHeapSize;
+						}
+
+						_MESSAGE("%-16s %s  (%08X - %08X)", heap->GetName(), GetMemoryUsageString(used, total, cSmallBuffer, sizeof(cSmallBuffer)), start, end);
+#endif
+						usedHeapMemory += used;
+						totalHeapMemory += total;
+					}
 				}
 
-				sprintf_s(cMessageBuffer, "%-16s %s  (%08X - %08X)\n", heap->GetName(), GetMemoryUsageString(used, total, cSmallBuffer, sizeof(cSmallBuffer)), start, end);
-				output << cMessageBuffer;
+
+				SIZE_T uiPoolMemory = 0;
+				SIZE_T uiTotalPoolMemory = 0;
+				{
+#if PRINT_POOLS
+					_MESSAGE("\nGame's Pools:");
+
+					AutoIndent indent;
 #endif
-				usedHeapMemory += used;
-				totalHeapMemory += total;
+					for (UInt32 i = 0; i < 256; i++) {
+						MemoryPool* pPool = MemoryManager::GetPool(i);
+						if (!pPool)
+							continue;
+
+						SIZE_T used = (pPool->uiActiveAllocations * pPool->uiBlockSize * pPool->GetBlocksPerPage());
+						SIZE_T total = pPool->uiSize;
+
+						uiPoolMemory += used;
+						uiTotalPoolMemory += total;
+#if PRINT_POOLS
+						SIZE_T start = reinterpret_cast<SIZE_T>(pPool->pAllocBase);
+						SIZE_T end = start + pPool->uiSize;
+
+						_MESSAGE("%-16s %s  (%08X - %08X)", pPool->pName, GetMemoryUsageString(used, total, cSmallBuffer, sizeof(cSmallBuffer)), start, end);
+#endif
+					}
+				}
+
+				_MESSAGE("\nGame's Total Memory:");
+
+				AutoIndent indent;
+
+				char textBuffer[128];
+				GetMemoryUsageString(usedHeapMemory, totalHeapMemory, textBuffer, sizeof(textBuffer));
+				_MESSAGE("Total Heap Memory:   %s", textBuffer);
+
+				GetMemoryUsageString(uiPoolMemory, uiTotalPoolMemory, textBuffer, sizeof(textBuffer));
+				_MESSAGE("Total Pool Memory:   %s", textBuffer);
+
+				GetMemoryUsageString(usedHeapMemory + uiPoolMemory, totalHeapMemory + uiTotalPoolMemory, textBuffer, sizeof(textBuffer));
+				_MESSAGE("Total Memory:        %s", textBuffer);
+
+				if (memMgr->uiMallocBytes > 0) {
+					FormatSize(memMgr->uiMallocBytes, textBuffer, sizeof(textBuffer));
+					_MESSAGE("Malloc Memory:       %s", textBuffer);
+				};
+
+				float usedHeap = (float)usedHeapMemory / totalHeapMemory * 100.0f;
+				if (usedHeap < 80.f && memoryErrorState >= MemoryErrors::HIGH_USAGE)
+					memoryErrorState = MemoryErrors::EXTERNAL_LEAK;
+			}
+			else {
+				_MESSAGE("\nNew Vegas Heap Replacer found - Game's memory tracking unavailable.");
 			}
 
-
-
-			SIZE_T uiPoolMemory = 0;
-			SIZE_T uiTotalPoolMemory = 0;
-#if PRINT_POOLS
-			output << "\nGame's Pools:" << '\n';
-#endif
-			for (UInt32 i = 0; i < 256; i++) {
-				MemoryPool* pPool = MemoryManager::GetPool(i);
-				if (!pPool)
-					continue;
-
-				SIZE_T used = (pPool->uiActiveAllocations * pPool->uiBlockSize * pPool->GetBlocksPerPage());
-				SIZE_T total = pPool->uiSize;
-
-				uiPoolMemory += used;
-				uiTotalPoolMemory += total;
-#if PRINT_POOLS
-				SIZE_T start = reinterpret_cast<SIZE_T>(pPool->pAllocBase);
-				SIZE_T end = start + pPool->uiSize;
-
-				sprintf_s(cMessageBuffer, "%-16s %s  (%08X - %08X)\n", pPool->pName, GetMemoryUsageString(used, total, cSmallBuffer, sizeof(cSmallBuffer)), start, end);
-				output << cMessageBuffer;
-#endif
+			if (confirmedOutOfMem) {
+				_MESSAGE("\nWARNING: Process ran out of memory - this is why you crashed! Logging may be inaccurate as well!");
 			}
 
-			output << "\nGame's Total Memory:\n";
-			char textBuffer[128];
-			GetMemoryUsageString(usedHeapMemory, totalHeapMemory, textBuffer, sizeof(textBuffer));
-			sprintf_s(cMessageBuffer, "Total Heap Memory:   %s\n", textBuffer);
-			output << cMessageBuffer;
+			// We are going to bet here
+			if (!defaultPool && highGraphics && memoryErrorState >= MemoryErrors::HIGH_USAGE)
+				memoryErrorState = MemoryErrors::TEXTURE_SHARING;
 
-			GetMemoryUsageString(uiPoolMemory, uiTotalPoolMemory, textBuffer, sizeof(textBuffer));
-			sprintf_s(cMessageBuffer, "Total Pool Memory:   %s\n", textBuffer);
-			output << cMessageBuffer;
+			if (nvtfError[0]) {
+				_MESSAGE("\n%s", nvtfError);
+			}
 
-			GetMemoryUsageString(usedHeapMemory + uiPoolMemory, totalHeapMemory + uiTotalPoolMemory, textBuffer, sizeof(textBuffer));
-			sprintf_s(cMessageBuffer, "Total Memory:        %s\n", textBuffer);
-			output << cMessageBuffer;
-
-			if (memMgr->uiMallocBytes > 0) {
-				FormatSize(memMgr->uiMallocBytes, textBuffer, sizeof(textBuffer));
-				sprintf_s(cMessageBuffer, "Malloc Memory:       %s\n", textBuffer);
-				output << cMessageBuffer;
+			switch (memoryErrorState) {
+				case MemoryErrors::HIGH_USAGE:
+					_MESSAGE("\nWARNING: Memory usage is high!");
+					break;
+				case MemoryErrors::CRITICAL_USAGE:
+					_MESSAGE("\nWARNING: Memory usage is very high! Is there a leak?");
+					break;
+				case MemoryErrors::EXTERNAL_LEAK:
+					_MESSAGE("\nWARNING: Memory usage is very high, but the game's heaps are not full! Is some module leaking?");
+					break;
+				case MemoryErrors::TEXTURE_SHARING:
+					_MESSAGE("\nWARNING: High memory usage due to texture sharing! See https://performance.moddinglinked.com/falloutnv.html#NVTF on how to resolve this issue.");
+					break;
+				default:
+					break;
 			};
-
-			float usedHeap = (float)usedHeapMemory / totalHeapMemory * 100.0f;
-			if (usedHeap < 80.f && memoryErrorState >= MemoryErrors::HIGH_USAGE)
-				memoryErrorState = MemoryErrors::EXTERNAL_LEAK;
 		}
-		else {
-			output << "\nNew Vegas Heap Replacer found - Game's memory tracking unavailable.\n";
+		catch (...) { 
+			_MESSAGE("\nFailed to log memory."); 
 		}
-
-		output << '\n';
-
-		if (confirmedOutOfMem) {
-			output << "WARNING: Process ran out of memory - this is why you crashed! Logging may be inaccurate as well!\n";
-		}
-
-		// We are going to bet here
-		if (!defaultPool && highGraphics && memoryErrorState >= MemoryErrors::HIGH_USAGE)
-			memoryErrorState = MemoryErrors::TEXTURE_SHARING;
-
-		if (nvtfError[0])
-			output << nvtfError << '\n';
-
-		switch (memoryErrorState) {
-		case MemoryErrors::HIGH_USAGE:
-			output << "\nWARNING: Memory usage is high!\n";
-			break;
-		case MemoryErrors::CRITICAL_USAGE:
-			output << "\nWARNING: Memory usage is very high! Is there a leak?\n";
-			break;
-		case MemoryErrors::EXTERNAL_LEAK:
-			output << "\nWARNING: Memory usage is very high, but the game's heaps are not full! Is some module leaking?\n";
-			break;
-		case MemoryErrors::TEXTURE_SHARING:
-			output << "\nWARNING: High memory usage due to texture sharing! See above warning about NVTF!\n";
-			break;
-		default:
-			break;
-		};
 	}
-	catch (...) { output << "Failed to log memory.\n"; }
-
-	extern std::stringstream& Get() { output.flush(); return output; }
 }

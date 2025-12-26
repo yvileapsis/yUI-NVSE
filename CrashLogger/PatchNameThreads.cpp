@@ -34,8 +34,8 @@ namespace Patch::NameThreads
 			SetThreadName(apThis->hCreatedThread, apName);
 	}
 
-	void NameTasklets() {
-		BSWin32TaskletManager* pMgr = BSWin32TaskletManager::GetSingleton();
+	BSWin32TaskletManager* __fastcall NameTasklets(BSWin32TaskletManager* apThis, void*, uint32_t auiNumThreads) {
+		ThisCall(0xB01D50, apThis, auiNumThreads);
 		const char* pMgrName = "BSWin32TaskletManager";
 
 		char cMainName[28];
@@ -52,10 +52,11 @@ namespace Patch::NameThreads
 
 			wchar_t wcName[41];
 			MultiByteToWideChar(CP_UTF8, 0, cName, -1, wcName, ARRAYSIZE(wcName));
-			SetThreadDescription(pMgr->hThreadHandles[i], wcName);
+			SetThreadDescription(apThis->hThreadHandles[i], wcName);
 		}
 
-		SetThreadDescription(pMgr->hInitThreadHandle, wcMainName);
+		SetThreadDescription(apThis->hInitThreadHandle, wcMainName);
+		return apThis;
 	}
 
 
@@ -69,12 +70,11 @@ namespace Patch::NameThreads
 			WriteRelCall(callAddr, SetThreadNameAlt);
 		}
 
-		NameTasklets();
+		WriteRelCall(0xB00A49, NameTasklets);
 	}
 
 	extern void Init()
 	{
-		if (g_currentGame == kFalloutNewVegas)
-			Patch();
+		Patch();
 	}
 }

@@ -58,21 +58,31 @@ public:
 
 ASSERT_SIZE(NavMesh, 0x108);
 
+// Bizarre class
 class NavMeshPtr : public NiPointer<NavMesh> {
 public:
-	NavMeshPtr() : NiPointer<NavMesh>() {}
-	NavMeshPtr(NavMesh* apNavMesh) : NiPointer<NavMesh>(apNavMesh) {}
-	NavMeshPtr(const NavMeshPtr& arPointer) : NiPointer<NavMesh>(arPointer) {}
-	NavMeshPtr(const NavMeshPtr* apPointer) : NiPointer<NavMesh>(apPointer->m_pObject) {}
+	using NiPointer<NavMesh>::NiPointer;
+	NavMeshPtr& operator=(NavMesh* apObject) { NiPointer<NavMesh>::operator=(apObject); return *this; }
+
+	// GAME - 0x464FC0
+	static NavMeshPtr Create(NavMesh* apNavMesh) {
+		return NavMeshPtr(apNavMesh);
+	}
 };
 
-class NavMeshArray : public BSSimpleArray<NavMeshPtr> {
+class NavMeshArray {
 public:
-	inline NavMeshPtr& GetAt(UInt32 auiIndex) {
-		NavMeshPtr kPtr;
-		if (auiIndex >= uiSize)
-			return kPtr;
+	BSSimpleArray<NavMeshPtr> kNavMeshes;
+
+	// GAME - 0x464F60
+	NavMeshPtr GetNavMesh(uint32_t auiIndex) const {
+		if (auiIndex >= kNavMeshes.GetSize())
+			return NavMeshPtr::Create(nullptr);
 		else
-			return pBuffer[auiIndex];
+			return kNavMeshes.GetAt(auiIndex);
+	}
+
+	uint32_t GetNavMeshCount() const {
+		return kNavMeshes.GetSize();
 	}
 };

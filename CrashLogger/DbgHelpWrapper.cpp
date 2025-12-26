@@ -7,7 +7,6 @@
 #include <iostream>
 #include <filesystem>
 
-#include <Logging.hpp>
 #include <map>
 #include <format>
 
@@ -40,7 +39,7 @@ public:
 		if (func_ptr) {
 			return func_ptr(std::forward<Args>(args)...);
 		} else {
-			Log() << ("Cannot find the specified function in DbgHelp.dll");
+			_MESSAGE("Cannot find the specified function in DbgHelp.dll");
 		}
 		return 0;
 	}
@@ -57,7 +56,7 @@ public:
 		if (func_ptr) {
 			return func_ptr(std::forward<Args>(args)...);
 		} else {
-			Log() << ("Cannot find the specified function in DbgHelp.dll");
+			_MESSAGE("Cannot find the specified function in DbgHelp.dll");
 		}
 		return 0;
 	}
@@ -82,9 +81,7 @@ private:
 		wcscat_s(temp_dbghelp_path, L"nvse_dbghelp.dll");
 
 		if (!CopyFileW(dbghelp_path, temp_dbghelp_path, FALSE)) {
-			char buffer[MAX_PATH];
-			sprintf_s(buffer, "Cannot create a copy of DbgHelp.dll, error: %s (%08X)", GetErrorAsString(GetLastError()).c_str(), GetLastError());
-			Log() << buffer;
+			_MESSAGE("Cannot create a copy of DbgHelp.dll, error: %s (%08X)", GetErrorAsString(GetLastError()).c_str(), GetLastError());
 
 			// better continue with some dbghelp than with none!
 			wcscpy_s(temp_dbghelp_path, dbghelp_path);
@@ -93,9 +90,7 @@ private:
 		dbghelp_dll = LoadLibraryW(temp_dbghelp_path);
 		if (!dbghelp_dll) {
 			std::filesystem::remove(temp_dbghelp_path);
-			char buffer[MAX_PATH];
-			sprintf_s(buffer, "Cannot load DbgHelp.dll, error: %s (%08X)", GetErrorAsString(GetLastError()).c_str(), GetLastError());
-			Log() << buffer;
+			_MESSAGE("Cannot load DbgHelp.dll, error: %s (%08X)", GetErrorAsString(GetLastError()).c_str(), GetLastError());
 			return;
 		}
 
@@ -119,7 +114,7 @@ private:
 			return reinterpret_cast<T>(func_ptr);
 		}
 
-		Log() << ("Cannot find the specified function in DbgHelp.dll");
+		_MESSAGE("Cannot find the specified function in DbgHelp.dll");
 
 		return nullptr;
 	}

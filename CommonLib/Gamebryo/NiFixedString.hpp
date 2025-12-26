@@ -20,10 +20,8 @@ public:
 
 	UInt32 GetLength() const;
 
-	std::string GetStd() const {
-		if (m_kHandle[0] != 0 && m_kHandle[0] != ' ')
-			return m_kHandle;
-		return "";
+	std::string_view GetStd() const {
+		return std::string_view(m_kHandle);
 	}
 };
 

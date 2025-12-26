@@ -26,8 +26,8 @@ public:
 	UInt32 GetAllocSize() const { return uiAllocSize; }
 	bool IsEmpty() const { return uiSize == 0; }
 	bool IsFull() const { return uiSize == uiAllocSize; }
-	T_Data* GetAt(const UInt32 idx) const { return &pBuffer[idx]; }
-	T_Data* GetLast() { return &pBuffer[uiSize - 1]; }
+	T_Data& GetAt(const UInt32 idx) const { return pBuffer[idx]; }
+	T_Data& GetLast() const { return pBuffer[uiSize - 1]; }
 
 	class Iterator {
 	public:

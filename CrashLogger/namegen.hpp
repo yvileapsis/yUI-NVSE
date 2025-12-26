@@ -1,7 +1,7 @@
 #pragma once
 #include <random>
 
-inline std::vector<std::string> author{
+inline const char* author[] {
 	"",
 	"",
 	"",
@@ -23,10 +23,31 @@ inline std::vector<std::string> author{
 	"xNVSE Discord's ",
 	"The Great and Powerful Trixie's ",
 	"ModdingLinked: ",
-	"Karut's "
+	"Karut's ",
+	"Todd's ",
+	"Better Gaem's ",
+	"Nobark's ",
+	"Thankfully not karut's ",
+	"The most hated ",
+	"Woah, is that a ",
+	"Where did you get this ",
+	"Wall's ",
+	"lStewieAl's ",
+	"Someguy's ",
+	"Vanilla Enhanced ",
+	"Vanilla "
+	"Hit - ",
+	"B42 ",
+	"TTW Compatible",
+	"JIP ",
+	"Simple ",
+	"AI Generated ",
+	"Enhanced ",
+	"Consistent ",
+	"Broken ",
 };
 
-inline std::vector<std::string> names{
+inline const char* names[] {
 	"Crash Logger",
 	"Crash Logger",
 	"Crash Logger",
@@ -51,10 +72,17 @@ inline std::vector<std::string> names{
 	"Fallout-Crashing-Logging Convergence",
 	"Great and Powerful Crash Logger",
 	"Program with useless data in it",
-	"NVAC"
+	"NVAC",
+	"Slop",
+	"Hopium Dispenser",
+	"Mod Blamer",
+	"Nonsene Generator",
+	"Skill Issue Catcher",
+	"Crash Extender",
+	"Crash Overhaul",
 };
 
-inline std::vector<std::string> edition{
+inline const char* edition[] {
 	"",
 	"",
 	"",
@@ -106,11 +134,48 @@ inline std::vector<std::string> edition{
 	": No Job Edition",
 	" Spoiler: it's not a memory leak",
 	" (Unreal Engine 5 Edition)",
+	" (Enhanced with AI Edition)",
+	": You should play Fallout 4 Instead",
+	": You are not going to fix it, you know.",
+	": Just Reinstall Windows",
+	": Did you try turning it off and on again?",
+	": Play on PS3 instead",
+	": I ran out of bits",
+	": Feed me into ChatGPT so you don't have to use your brain to read words",
+	": Try using Linux",
+	": This is what happens when you don't use smart pointers",
+	" (Spontaneous Bit Flip Edition)",
+	": It's time to take a break",
+	": Stop using mods, now",
+	": Have you tried disabling NVSE?",
+	": You are missing Sexout",
+	": The engine is NOT Gamebryo! Edition",
+	" (This wouldn't have happened on the Creation Engine)",
+	" (Blame Bethesda Edition)",
+	": Devs added this crash deliberately",
+	": This one is personal",
+	": Ignore this one",
+	" (You call this a log?)",
+	" (I know what you are)",
+	"... or is it?",
+	" Plus",
+	" ESPless",
+	" - Translation",
+	" AAAA Edition",
+	": Does anyone even read these?",
+	" (I can't believe it's a crash!)",
+	": Reinstall your game 100 times, that will do it",
+	": Go drink some water",
+	": You call that a modded game?",
 };
 
-std::string GetName()
+void GetName(char* buffer, size_t bufferSize)
 {
 	std::random_device dev;
 	srand(dev());
-	return author[std::rand() % author.size()] + names[std::rand() % names.size()] + edition[std::rand() % edition.size()];
+
+	const char* authorName = author[std::rand() % ARRAYSIZE(author)];
+	const char* loggerName = names[std::rand() % ARRAYSIZE(names)];
+	const char* loggerEdition = edition[std::rand() % ARRAYSIZE(edition)];
+	sprintf_s(buffer, bufferSize, "%s%s%s", authorName, loggerName, loggerEdition);
 }

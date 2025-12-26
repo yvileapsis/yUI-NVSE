@@ -72,3 +72,9 @@
 #include "hkpWorldObject.hpp"
 
 #include "MemoryHeap.hpp"
+
+#include "TESObjectCELL.hpp"
+
+#include "TESPackage.hpp"
+
+#include "ProcessLists.hpp"

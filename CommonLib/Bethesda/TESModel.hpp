@@ -11,7 +11,7 @@ public:
 	TESModel();
 
 	virtual			~TESModel();
-	virtual char*	GetModel();
+	virtual char*	GetModel() const;
 	virtual void	SetModel(const char* apcPath);	// 06
 	virtual bool	Unk_07();
 

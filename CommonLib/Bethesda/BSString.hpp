@@ -22,7 +22,7 @@ public:
 
 	UInt32		GetLength();
 
-	const char* CStr();
+	const char* CStr() const { return (pcString && usLen) ? pcString : ""; }
 	std::string StdStr() const { return { pcString, usLen }; }
 
 	[[nodiscard]] operator std::basic_string_view<T_Name>() const noexcept { return { pcString, usLen }; }

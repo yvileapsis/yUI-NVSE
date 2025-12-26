@@ -3,7 +3,11 @@
 #include <unordered_map>
 #include <vector>
 
+#define RECORD_WRITES 0
+
+#if RECORD_WRITES
 std::unordered_map<UInt32, std::vector<std::byte>> originalData;
+#endif
 
 void SafeWrite8(UInt32 addr, UInt32 data)
 {
@@ -36,8 +40,10 @@ void SafeWriteBuf(UInt32 addr, const char* data, UInt32 len)
 {
 	UInt32	oldProtect;
 
+#if RECORD_WRITES
 	auto patch = std::vector(reinterpret_cast<std::byte*>(addr), reinterpret_cast<std::byte*>(addr) + len);
 	if (!originalData.contains(addr)) originalData.emplace(addr, patch);
+#endif
 
 	VirtualProtect(reinterpret_cast<void*>(addr), len, PAGE_EXECUTE_READWRITE, &oldProtect);
 	memcpy(reinterpret_cast<void*>(addr), data, len);
@@ -47,8 +53,10 @@ void SafeWriteBuf(UInt32 addr, const char* data, UInt32 len)
 void WriteRelJump(UInt32 jumpSrc, UInt32 jumpTgt)
 {
 	// jmp rel32
+#if RECORD_WRITES
 	auto patch = std::vector(reinterpret_cast<std::byte*>(jumpSrc), reinterpret_cast<std::byte*>(jumpSrc) + sizeof jumpTgt + 1);
 	if (!originalData.contains(jumpSrc)) originalData.emplace(jumpSrc, patch);
+#endif
 	
 	SafeWrite8(jumpSrc, 0xE9);
 	SafeWrite32(jumpSrc + 1, jumpTgt - jumpSrc - 1 - 4);
@@ -57,9 +65,11 @@ void WriteRelJump(UInt32 jumpSrc, UInt32 jumpTgt)
 void WriteRelCall(UInt32 jumpSrc, UInt32 jumpTgt)
 {
 	// call rel32
+#if RECORD_WRITES
 	auto patch = std::vector(reinterpret_cast<std::byte*>(jumpSrc), reinterpret_cast<std::byte*>(jumpSrc) + sizeof jumpTgt + 1);
 	if (!originalData.contains(jumpSrc)) originalData.emplace(jumpSrc, patch);
-	
+#endif
+
 	SafeWrite8(jumpSrc, 0xE8);
 	SafeWrite32(jumpSrc + 1, jumpTgt - jumpSrc - 1 - 4);
 }
@@ -87,6 +97,7 @@ void WriteRelJle(UInt32 jumpSrc, UInt32 jumpTgt)
 
 void UndoSafeWrite(UInt32 addr)
 {
+#if RECORD_WRITES
 	if (!originalData.contains(addr)) return;
 	UInt32	oldProtect;
 	VirtualProtect(reinterpret_cast<void*>(addr), originalData[addr].size(), PAGE_EXECUTE_READWRITE, &oldProtect);
@@ -96,6 +107,7 @@ void UndoSafeWrite(UInt32 addr)
 		addroffset++;
 	}
 	VirtualProtect(reinterpret_cast<void*>(addr), originalData[addr].size(), oldProtect, &oldProtect);
+#endif
 }
 
 void PatchMemoryNop(ULONG_PTR Address, SIZE_T Size)
