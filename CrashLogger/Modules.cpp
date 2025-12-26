@@ -35,7 +35,7 @@ namespace CrashLogger::Modules
 		return TRUE;
 	}
 
-	static std::unordered_map<const char*, const char*> pluginNames = {
+	static std::unordered_map<std::string_view, const char*> pluginNames = {
 		{"hot_reload_editor", "hot_reload"},
 		{"ilsfix", "ILS Fix"},
 		{"improved_console", "Improved Console"},
