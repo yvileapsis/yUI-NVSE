@@ -36,7 +36,12 @@ namespace CrashLogger::Mods
 
 				_MESSAGE(" %02X | %-80s | %-60s", i, mod->m_Filename, authorName);
 			}
+		}
+		catch (...) {
+			_MESSAGE("\nFailed to print out mod list.");
+		}
 
+		try {
 			char folder_path[MAX_PATH];
 			sprintf_s(folder_path, "%s\\data\\nvse\\plugins\\scripts", GetFalloutDirectory().generic_string().c_str());
 			if (PathIsDirectory(folder_path)) {
@@ -59,7 +64,7 @@ namespace CrashLogger::Mods
 			}
 		}
 		catch (...) {
-			_MESSAGE("\nFailed to print out mod list.");
+			_MESSAGE("\nFailed to print out script runners.");
 		}
 	}
 }
