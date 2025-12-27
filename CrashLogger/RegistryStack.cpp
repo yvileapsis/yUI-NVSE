@@ -119,17 +119,19 @@ namespace CrashLogger::Registry
 			{ "eip", info->ContextRecord->Eip },
 		};
 
-		try {
-			for (const auto& [name, value] : registers) {
-				char prefix[64];
-				sprintf_s(prefix, " %s | 0x%08X |", name, value);
+
+		for (const auto& [name, value] : registers) {
+			char prefix[64];
+			sprintf_s(prefix, " %s | 0x%08X |", name, value);
+			try {
 				if (!Stack::GetLineForObject(prefix, (void**)value, 5))
 					_MESSAGE(prefix);
 			}
+			catch (...) {
+				_MESSAGE(prefix);
+			}
 		}
-		catch (...) {
-			_MESSAGE("\nFailed to log registry.");
-		}
+
 	}
 }
 
