@@ -63,62 +63,68 @@ namespace CrashLogger::Memory
 	}
 
 	static bool __fastcall PrintGraphicsMemory(bool usesDefaultPool) {
-		ComPtr<IDXGIFactory2> spDXGIFactory;
-		CreateDXGIFactory2(0, __uuidof(IDXGIFactory2), (void**)(&spDXGIFactory));
+		try {
+			ComPtr<IDXGIFactory2> spDXGIFactory;
+			CreateDXGIFactory2(0, __uuidof(IDXGIFactory2), (void**)(&spDXGIFactory));
 
-		HRESULT hResult = S_OK;
-		UInt32 i = 0;
-		while (hResult != DXGI_ERROR_NOT_FOUND) {
-			ComPtr<IDXGIAdapter1> spDXGIAdapter;
-			hResult = spDXGIFactory->EnumAdapters1(i, spDXGIAdapter.GetAddressOf());
+			HRESULT hResult = S_OK;
+			UInt32 i = 0;
+			while (hResult != DXGI_ERROR_NOT_FOUND) {
+				ComPtr<IDXGIAdapter1> spDXGIAdapter;
+				hResult = spDXGIFactory->EnumAdapters1(i, spDXGIAdapter.GetAddressOf());
 
-			if (SUCCEEDED(hResult)) {
-				DXGI_ADAPTER_DESC1 kDesc;
-				spDXGIAdapter->GetDesc1(&kDesc);
-				if (kDesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) {
-					i++;
-					continue;
-				}
-
-				const char* gpu = *(const char**)0x11C72C4;
-
-				char cDescription[128] = {};
-				wcstombs_s(nullptr, cDescription, kDesc.Description, 128);
-
-				// Game annoyingly wraps the name in quotes
-				char cCompareTarget[130];
-				cCompareTarget[0] = '"';
-				strcpy_s(cCompareTarget + 1, 128, cDescription);
-				strcat_s(cCompareTarget, "\"");
-
-				if (_stricmp(cCompareTarget, gpu) == 0) {
-					ComPtr<IDXGIAdapter3> spAdapter3;
-					spDXGIAdapter.As<IDXGIAdapter3>(&spAdapter3);
-
-					DXGI_QUERY_VIDEO_MEMORY_INFO kInfo;
-					spAdapter3->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &kInfo);
-
-					_MESSAGE("\nGraphics Memory:");
-					char textBuffer[128];
-					GetMemoryUsageString(kInfo.CurrentUsage, kInfo.Budget, textBuffer, sizeof(textBuffer));
-
-					AutoIndent indent;
-
-					_MESSAGE("Budget Usage:   %s", textBuffer);
-
-					float used = (float)kInfo.CurrentUsage / kInfo.Budget * 100.0f;
-					if (used >= 99.f && usesDefaultPool) {
-						_MESSAGE("\nWARNING: Graphics memory went over budget! This (usually) can't lead to a crash, but causes performance loss instead!\n");
+				if (SUCCEEDED(hResult)) {
+					DXGI_ADAPTER_DESC1 kDesc;
+					spDXGIAdapter->GetDesc1(&kDesc);
+					if (kDesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) {
+						i++;
+						continue;
 					}
-					// Not sure if there's a point in reporting issues when you go over budget with managed pool, as odds are you'll just crash anyway (unless you have a sub 1GB GPU)
-					// In addition, handling of that case is elsewhere
 
-					return ConvertToGiB(kInfo.CurrentUsage) > 1.f;
+					const char* gpu = *(const char**)0x11C72C4;
+
+					char cDescription[128] = {};
+					wcstombs_s(nullptr, cDescription, kDesc.Description, 128);
+
+					// Game annoyingly wraps the name in quotes
+					char cCompareTarget[130];
+					cCompareTarget[0] = '"';
+					strcpy_s(cCompareTarget + 1, 128, cDescription);
+					strcat_s(cCompareTarget, "\"");
+
+					if (_stricmp(cCompareTarget, gpu) == 0) {
+						ComPtr<IDXGIAdapter3> spAdapter3;
+						spDXGIAdapter.As<IDXGIAdapter3>(&spAdapter3);
+
+						DXGI_QUERY_VIDEO_MEMORY_INFO kInfo;
+						spAdapter3->QueryVideoMemoryInfo(0, DXGI_MEMORY_SEGMENT_GROUP_LOCAL, &kInfo);
+
+						_MESSAGE("\nGraphics Memory:");
+						char textBuffer[128];
+						GetMemoryUsageString(kInfo.CurrentUsage, kInfo.Budget, textBuffer, sizeof(textBuffer));
+
+						AutoIndent indent;
+
+						_MESSAGE("Budget Usage:   %s", textBuffer);
+
+						float used = (float)kInfo.CurrentUsage / kInfo.Budget * 100.0f;
+						if (used >= 99.f && usesDefaultPool) {
+							_MESSAGE("\nWARNING: Graphics memory went over budget! This (usually) can't lead to a crash, but causes performance loss instead!\n");
+						}
+						// Not sure if there's a point in reporting issues when you go over budget with managed pool, as odds are you'll just crash anyway (unless you have a sub 1GB GPU)
+						// In addition, handling of that case is elsewhere
+
+						return ConvertToGiB(kInfo.CurrentUsage) > 1.f;
+					}
 				}
+				i++;
 			}
-			i++;
+			return false;
 		}
-		return false;
+		catch (...) {
+			_MESSAGE("\nFailed to get graphics memory info.");
+			return false;
+		}
 	}
 
 	extern void __fastcall Process(EXCEPTION_POINTERS* info) {
@@ -136,34 +142,39 @@ namespace CrashLogger::Memory
 			// Get physical memory size
 			MEMORYSTATUSEX memoryStatus;
 			memoryStatus.dwLength = sizeof(memoryStatus);
-			GlobalMemoryStatusEx(&memoryStatus);
-			if (GetProcessMemoryInfo(hProcess, (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc))) {
-				DWORDLONG virtUsage = memoryStatus.ullTotalVirtual - memoryStatus.ullAvailVirtual;
-				DWORDLONG physUsage = pmc.PrivateUsage;
-				_MESSAGE("\nProcess' Memory:");
+			try {
+				GlobalMemoryStatusEx(&memoryStatus);
+				if (GetProcessMemoryInfo(hProcess, (PROCESS_MEMORY_COUNTERS*)&pmc, sizeof(pmc))) {
+					DWORDLONG virtUsage = memoryStatus.ullTotalVirtual - memoryStatus.ullAvailVirtual;
+					DWORDLONG physUsage = pmc.PrivateUsage;
+					_MESSAGE("\nProcess' Memory:");
 
-				AutoIndent indent;
+					AutoIndent indent;
 
-				GetMemoryUsageString(physUsage, memoryStatus.ullTotalPhys, cSmallBuffer, sizeof(cSmallBuffer));
-				_MESSAGE("Physical Usage: %s", cSmallBuffer);
+					GetMemoryUsageString(physUsage, memoryStatus.ullTotalPhys, cSmallBuffer, sizeof(cSmallBuffer));
+					_MESSAGE("Physical Usage: %s", cSmallBuffer);
 
-				GetMemoryUsageString(virtUsage, memoryStatus.ullTotalVirtual, cSmallBuffer, sizeof(cSmallBuffer));
-				_MESSAGE("Virtual  Usage: %s", cSmallBuffer);
+					GetMemoryUsageString(virtUsage, memoryStatus.ullTotalVirtual, cSmallBuffer, sizeof(cSmallBuffer));
+					_MESSAGE("Virtual  Usage: %s", cSmallBuffer);
 
-				float usedVirtual = (float)virtUsage / memoryStatus.ullTotalVirtual * 100.0f;
-				if (usedVirtual >= MEMORY_USAGE_CONCERN_THRESHOLD) {
-					// There's no doubt here
-					if (usedVirtual >= MEMORY_USAGE_OOM_THRESHOLD) {
-						confirmedOutOfMem = true;
-					}
+					float usedVirtual = (float)virtUsage / memoryStatus.ullTotalVirtual * 100.0f;
+					if (usedVirtual >= MEMORY_USAGE_CONCERN_THRESHOLD) {
+						// There's no doubt here
+						if (usedVirtual >= MEMORY_USAGE_OOM_THRESHOLD) {
+							confirmedOutOfMem = true;
+						}
 
-					if (usedVirtual >= MEMORY_USAGE_CRITICAL_THRESHOLD) {
-						memoryErrorState = MemoryErrors::CRITICAL_USAGE;
-					}
-					else {
-						memoryErrorState = MemoryErrors::HIGH_USAGE;
+						if (usedVirtual >= MEMORY_USAGE_CRITICAL_THRESHOLD) {
+							memoryErrorState = MemoryErrors::CRITICAL_USAGE;
+						}
+						else {
+							memoryErrorState = MemoryErrors::HIGH_USAGE;
+						}
 					}
 				}
+			}
+			catch (...) {
+				_MESSAGE("\nFailed to get process memory info.");
 			}
 
 			bool defaultPool = HandleNVTF();
@@ -189,28 +200,33 @@ namespace CrashLogger::Memory
 						if (!heap)
 							continue;
 
-						HeapStats stats;
-						if (!memMgr->GetHeapStats(i, true, &stats))
-							continue;
+						try {
+							HeapStats stats;
+							if (!memMgr->GetHeapStats(i, true, &stats))
+								continue;
 
-						SIZE_T used = stats.uiMemUsedInBlocks;
-						SIZE_T total = stats.uiMemHeapSize;
+							SIZE_T used = stats.uiMemUsedInBlocks;
+							SIZE_T total = stats.uiMemHeapSize;
 #if PRINT_HEAPS
-						SIZE_T start = 0;
-						SIZE_T end = 0;
-						if (stats.uiHeapOverhead == sizeof(ZeroOverheadHeap)) {
-							start = reinterpret_cast<SIZE_T>(static_cast<ZeroOverheadHeap*>(heap)->pHeap);
-							end = start + static_cast<ZeroOverheadHeap*>(heap)->uiSize;
-						}
-						else {
-							start = reinterpret_cast<SIZE_T>(static_cast<MemoryHeap*>(heap)->pMemHeap);
-							end = start + static_cast<MemoryHeap*>(heap)->uiMemHeapSize;
-						}
+							SIZE_T start = 0;
+							SIZE_T end = 0;
+							if (stats.uiHeapOverhead == sizeof(ZeroOverheadHeap)) {
+								start = reinterpret_cast<SIZE_T>(static_cast<ZeroOverheadHeap*>(heap)->pHeap);
+								end = start + static_cast<ZeroOverheadHeap*>(heap)->uiSize;
+							}
+							else {
+								start = reinterpret_cast<SIZE_T>(static_cast<MemoryHeap*>(heap)->pMemHeap);
+								end = start + static_cast<MemoryHeap*>(heap)->uiMemHeapSize;
+							}
 
-						_MESSAGE("%-16s %s  (%08X - %08X)", heap->GetName(), GetMemoryUsageString(used, total, cSmallBuffer, sizeof(cSmallBuffer)), start, end);
+							_MESSAGE("%-16s %s  (%08X - %08X)", heap->GetName(), GetMemoryUsageString(used, total, cSmallBuffer, sizeof(cSmallBuffer)), start, end);
 #endif
-						usedHeapMemory += used;
-						totalHeapMemory += total;
+							usedHeapMemory += used;
+							totalHeapMemory += total;
+						}
+						catch (...) {
+							_MESSAGE("Failed to get stats for heap %u", i);
+						}
 					}
 				}
 
@@ -228,17 +244,22 @@ namespace CrashLogger::Memory
 						if (!pPool)
 							continue;
 
-						SIZE_T used = (pPool->uiActiveAllocations * pPool->uiBlockSize * pPool->GetBlocksPerPage());
-						SIZE_T total = pPool->uiSize;
+						try {
+							SIZE_T used = (pPool->uiActiveAllocations * pPool->uiBlockSize * pPool->GetBlocksPerPage());
+							SIZE_T total = pPool->uiSize;
 
-						uiPoolMemory += used;
-						uiTotalPoolMemory += total;
+							uiPoolMemory += used;
+							uiTotalPoolMemory += total;
 #if PRINT_POOLS
-						SIZE_T start = reinterpret_cast<SIZE_T>(pPool->pAllocBase);
-						SIZE_T end = start + pPool->uiSize;
+							SIZE_T start = reinterpret_cast<SIZE_T>(pPool->pAllocBase);
+							SIZE_T end = start + pPool->uiSize;
 
-						_MESSAGE("%-16s %s  (%08X - %08X)", pPool->pName, GetMemoryUsageString(used, total, cSmallBuffer, sizeof(cSmallBuffer)), start, end);
+							_MESSAGE("%-16s %s  (%08X - %08X)", pPool->pName, GetMemoryUsageString(used, total, cSmallBuffer, sizeof(cSmallBuffer)), start, end);
 #endif
+						}
+						catch (...) {
+							_MESSAGE("Failed to get stats for pool %u", i);
+						}
 					}
 				}
 
