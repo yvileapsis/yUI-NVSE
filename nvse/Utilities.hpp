@@ -1,6 +1,7 @@
 #pragma once
 #include <intrin.h>
 #include <Logging.hpp>
+#include <DebugLog.hpp>
 
 const std::filesystem::path& GetFalloutDirectory();
 std::string GetNVSEConfigOption(const char * section, const char * key);
@@ -388,7 +389,7 @@ StackVector<T*, Size> Filter(S& s, F&& f)
 }
 
 std::string UTF8toANSI(const std::string& str);
-std::filesystem::path GetCurPath();
+void GetCurPath(char* buffer, size_t bufferSize);
 bool IsConsoleOpen();
 __forceinline bool MenuMode() { return CdeclCall<bool>(0x702360); }
 
@@ -419,23 +420,23 @@ inline int GetCharsTillSpace(const char* text, UInt32 offset)
 	return numChars;
 }
 
-std::string DecompileScriptToFolder(const char* scriptName, Script* script, const char* fileExtension, const char* modName);
+void __fastcall DecompileScriptToFolder(const char* scriptName, Script* script, const char* fileExtension, const char* modName);
 
-const std::string& SanitizeString(std::string&& str);
+const char* __fastcall SanitizeString(const char* string, char* outBuffer, size_t bufferSize);
 
-float ConvertToKiB(UInt64 size);
+float __fastcall ConvertToKiB(UInt64 size);
 
-float ConvertToMiB(UInt64 size);
+float __fastcall ConvertToMiB(UInt64 size);
 
-float ConvertToGiB(UInt64 size);
+float __fastcall ConvertToGiB(UInt64 size);
 
-const char* FormatSize(UInt64 size, char* buffer, size_t bufferSize);
+const char* __fastcall FormatSize(UInt64 size, char* buffer, size_t bufferSize);
 
-const char* GetMemoryUsageString(UInt64 used, UInt64 total, char* buffer, size_t bufferSize);
+const char* __fastcall GetMemoryUsageString(UInt64 used, UInt64 total, char* buffer, size_t bufferSize);
 
-std::string GetErrorAsString(UInt32 errorMessageID);
-const char* GetExceptionAsString(UInt32 exceptionMessageID);
+std::string __fastcall GetErrorAsString(UInt32 errorMessageID);
+const char* __fastcall GetExceptionAsString(UInt32 exceptionMessageID);
 
-void PrintSeparator(UInt32 length = 80);
+void __fastcall PrintSeparator(UInt32 length = 80);
 
 #define CENTERED_TEXT(size, name) (size/2) + sizeof(name) / 2, name, (size/2) - sizeof(name) / 2, ""

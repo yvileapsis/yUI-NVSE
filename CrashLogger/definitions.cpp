@@ -10,10 +10,5 @@ void Inits()
 {
 	CrashLogger::Init();
 	Patch::NameThreads::Init();
-
-}
-
-void InitEarlyPatches() 
-{
 	Patch::MallocTracking::Init();
 }

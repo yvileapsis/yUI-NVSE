@@ -13,8 +13,11 @@
 #include <thread>
 
 #include <winioctl.h>
+#include <shlwapi.h>
 
 #include <ConsoleManager.hpp>
+
+#pragma comment(lib, "Shlwapi.lib")
 
 inline ConsoleManager* operator<<(ConsoleManager* console, const std::string& str)
 {
@@ -136,54 +139,52 @@ namespace Logger
 			});
 	}
 
-	std::vector<std::pair<std::filesystem::path, std::filesystem::path>> copyQueue;
+	char pathIn[MAX_PATH];
+	char pathOut[MAX_PATH];
 
-	void PrepareCopy(const std::filesystem::path& in, const std::filesystem::path& out)
-	{
-		copyQueue.push_back({ in, out });
+	void PrepareCopy(const char* in, const char* out) {
+		strcpy_s(pathIn, in);
+		strcpy_s(pathOut, out);
 	}
 
-	// not on separate thread which is weird, had to add a flushing crutch
-	void Copy()
-	{
-		for (const auto& [in, out] : copyQueue)
+	void Copy() {
+		const char* in = pathIn;
+		const char* out = pathOut;
+
+		char lastmod[48];
+		time_t now = time(nullptr);
+		tm localTime;
+		localtime_s(&localTime, &now);
+		sprintf_s(lastmod, ".%04d-%02d-%02d-%02d-%02d-%02d",
+			localTime.tm_year + 1900,
+			localTime.tm_mon + 1,
+			localTime.tm_mday,
+			localTime.tm_hour,
+			localTime.tm_min,
+			localTime.tm_sec);
+
+		if (!PathIsDirectory(out)) {
+			CreateDirectory(out, NULL);
+
+			// Enable NTFS compression
+			HANDLE hDirectory = CreateFile(out, GENERIC_READ | GENERIC_WRITE, NULL, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+			USHORT format = COMPRESSION_FORMAT_DEFAULT;
+			DWORD bytesReturned;
+			DeviceIoControl(hDirectory, FSCTL_SET_COMPRESSION, &format, sizeof(format), NULL, 0, &bytesReturned, NULL);
+		}
+
+		char newOut[MAX_PATH];
+		char filename[MAX_PATH];
+		char ext[16];
+		_splitpath_s(in, NULL, 0, NULL, 0, filename, sizeof(filename), ext, sizeof(ext));
+		sprintf_s(newOut, "%s\\%s%s%s", out, filename, lastmod, ext);
 		{
-			Log(LogLevel::LogFlush) << "";
-
-			char lastmod[48];
-			time_t now = time(nullptr);
-			tm localTime;
-			localtime_s(&localTime, &now);
-			sprintf_s(lastmod, ".%04d-%02d-%02d-%02d-%02d-%02d",
-				localTime.tm_year + 1900,
-				localTime.tm_mon + 1,
-				localTime.tm_mday,
-				localTime.tm_hour,
-				localTime.tm_min,
-				localTime.tm_sec);
-
-			if (!exists(out.parent_path())) {
-				std::filesystem::create_directory(out.parent_path());
-
-				// Enable NTFS compression
-				HANDLE hDirectory = CreateFile(out.parent_path().string().c_str(), GENERIC_READ | GENERIC_WRITE, NULL, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
-				USHORT format = COMPRESSION_FORMAT_DEFAULT;
-				DWORD bytesReturned;
-				DeviceIoControl(hDirectory, FSCTL_SET_COMPRESSION, &format, sizeof(format), NULL, 0, &bytesReturned, NULL);
-			}
-
-			auto newOut = out.parent_path();
-			newOut /= out.stem();
-			newOut += lastmod;
-			newOut += out.extension();
-
-			try {
-				std::filesystem::copy_file(in, newOut);
-				Log() << "Copied " << in << " to " << newOut;
-			}
-			catch (std::filesystem::filesystem_error& e) {
-				Log() << "Could not copy sandbox/abc: " << e.what() << '\n';
-			}
+			char sanitizedBufferIn[MAX_PATH] = {};
+			char sanitizedBufferOut[MAX_PATH] = {};
+			if (CopyFile(in, newOut, FALSE))
+				_MESSAGE("\nCopied \"%s\" to \"%s\"", SanitizeString(in, sanitizedBufferIn, sizeof(sanitizedBufferIn)), SanitizeString(newOut, sanitizedBufferOut, sizeof(sanitizedBufferOut)));
+			else
+				_MESSAGE("\nFailed to copy \"%s\" to \"%s\"", SanitizeString(in, sanitizedBufferIn, sizeof(sanitizedBufferIn)), SanitizeString(newOut, sanitizedBufferOut, sizeof(sanitizedBufferOut)));
 		}
 	}
 }

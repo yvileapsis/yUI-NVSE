@@ -51,8 +51,8 @@ Float32 Setting::GetAsFloat() const
 	switch (GetType())
 	{
 	case kSetting_Bool:
-	case kSetting_Integer: return uValue.i;
-	case kSetting_Unsigned: return uValue.u;
+	case kSetting_Integer: return static_cast<float>(uValue.i);
+	case kSetting_Unsigned: return static_cast<float>(uValue.u);
 	case kSetting_Float: return uValue.f;
 	default:
 		return false;
@@ -109,13 +109,18 @@ TESForm* TESForm::TryGetREFRParent() const
 
 std::string	Tile::GetFullPath() const 
 {
+
+	char finalPath[MAX_PATH];
+	char swapPath[MAX_PATH];
+	const char* start = kName.CStr();
+	strcpy_s(finalPath, sizeof(finalPath), start);
+	strcpy_s(swapPath, sizeof(swapPath), start);
+
 	auto tile = this;
-
-	std::string fullPath = tile->kName.StdStr();
-
 	while ((tile->GetType() != Tile::kValue_tilemenu) && (tile = tile->pkParent)) {
-		fullPath = tile->kName.StdStr() + "/" + fullPath;
+		sprintf_s(finalPath, "%s/%s", tile->kName.CStr(), swapPath);
+		strcpy_s(swapPath, sizeof(swapPath), finalPath);
 	}
 
-	return fullPath;
+	return finalPath;
 }

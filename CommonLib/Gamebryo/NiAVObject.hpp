@@ -187,9 +187,9 @@ public:
 
 
 
-	void Update(NiUpdateData& arData = NiUpdateData::kDefaultUpdateData);
-	NiNode* GetParent();
-	const NiNode* GetParent() const;
+	void Update(NiUpdateData& arData);
+	NiNode* GetParent() { return m_pkParent; };
+	const NiNode* GetParent() const { return m_pkParent; };
 	NiProperty* GetProperty(UInt32 iType) const;
 	__forceinline NiBound* GetWorldBound() const;
 	NiAVObject* GetObjectByNameEx(const char* apName);

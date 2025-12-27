@@ -13,7 +13,9 @@ class AnimIdle;
 class BSFileEntry;
 class KFModel;
 class Model;
+class TESBoundObject;
 class TESObjectREFR;
+class TESModel;
 
 class ModelLoader {
 public:
@@ -34,6 +36,8 @@ public:
 	bool															bHasDelayedFree;
 
 	static ModelLoader* GetSingleton();
+
+	TESModel* GetModelForBoundObject(const TESBoundObject* apObject, const TESObjectREFR* apRef);
 };
 
 ASSERT_SIZE(ModelLoader, 0x30)

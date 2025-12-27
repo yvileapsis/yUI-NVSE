@@ -77,10 +77,9 @@ namespace CrashLogger::Labels
 		Push(kVtbl_GameSettingCollection, nullptr);
 		Push(kVtbl_INIPrefSettingCollection);
 		Push(kVtbl_INISettingCollection);
-
+		Push(kVtbl_TESObjectCELL, As<TESObjectCELL>);
 		Push(kVtbl_NavMesh, As<NavMesh>);
 		Push(kVtbl_TESForm, As<TESForm>);
-		Push(kVtbl_AlchemyItem);
 		Push(kVtbl_BGSConstructibleObject);
 		Push(kVtbl_BGSDebris);
 		Push(kVtbl_BGSDehydrationStage);
@@ -90,72 +89,37 @@ namespace CrashLogger::Labels
 		Push(kVtbl_BGSListForm);
 		Push(kVtbl_BGSMessage);
 		Push(kVtbl_BGSMovableStatic);
-		Push(kVtbl_BGSNote);
 		Push(kVtbl_BGSPerk);
-		Push(kVtbl_BGSPlaceableWater);
-		Push(kVtbl_BGSProjectile);
 		Push(kVtbl_BGSSleepDeprevationStage);
-		Push(kVtbl_BGSStaticCollection);
 		Push(kVtbl_BGSTalkingActivator);
 		Push(kVtbl_BGSTerminal);
 		Push(kVtbl_EffectSetting);
 		Push(kVtbl_EnchantmentItem);
-		Push(kVtbl_IngredientItem);
 		Push(kVtbl_MagicItemForm);
-		Push(kVtbl_MagicItemObject);
-		Push(kVtbl_Script, As<Script>);
-		Push(kVtbl_SpellItem, As<TESForm>);
-		Push(kVtbl_TESActorBase);
-		Push(kVtbl_TESAmmo);
+		Push(kVtbl_SpellItem);
 		Push(kVtbl_TESAmmoEffect);
-		Push(kVtbl_TESBoundAnimObject);
-		Push(kVtbl_TESBoundObject);
-		Push(kVtbl_TESBoundTreeObject);
-		Push(kVtbl_TESCaravanCard);
-		Push(kVtbl_TESCaravanDeck);
-		Push(kVtbl_TESCaravanMoney);
 		Push(kVtbl_TESCasino);
 		Push(kVtbl_TESCasinoChips);
 		Push(kVtbl_TESChallenge);
 		Push(kVtbl_TESClass);
 		Push(kVtbl_TESClimate);
 		Push(kVtbl_TESCombatStyle);
-		Push(kVtbl_TESCreature);
 		Push(kVtbl_TESEffectShader);
 		Push(kVtbl_TESEyes);
 		Push(kVtbl_TESFaction);
 		Push(kVtbl_TESFlora);
 		Push(kVtbl_TESFurniture);
 		Push(kVtbl_TESGlobal);
-		Push(kVtbl_TESGrass);
 		Push(kVtbl_TESHair);
 		Push(kVtbl_TESIdleForm);
 		Push(kVtbl_TESImageSpace);
 		Push(kVtbl_TESImageSpaceModifier);
 		Push(kVtbl_TESKey);
 		Push(kVtbl_TESLandTexture);
-		Push(kVtbl_TESLevCharacter);
-		Push(kVtbl_TESLevCreature);
-		Push(kVtbl_TESLevItem);
-		Push(kVtbl_TESLevSpell);
 		Push(kVtbl_TESLoadScreen);
-		Push(kVtbl_TESNPC);
 		Push(kVtbl_TESObject);
-		Push(kVtbl_TESObjectACTI);
 		Push(kVtbl_TESObjectANIO);
 		Push(kVtbl_TESObjectARMA);
-		Push(kVtbl_TESObjectARMO);
-		Push(kVtbl_TESObjectBOOK);
-		Push(kVtbl_TESObjectCELL);
-		Push(kVtbl_TESObjectCLOT);
-		Push(kVtbl_TESObjectCONT);
-		Push(kVtbl_TESObjectDOOR);
-		Push(kVtbl_TESObjectIMOD);
-		Push(kVtbl_TESObjectLIGH);
-		Push(kVtbl_TESObjectMISC);
-		Push(kVtbl_TESObjectSTAT);
-		Push(kVtbl_TESObjectTREE);
-		Push(kVtbl_TESObjectWEAP);
 		Push(kVtbl_TESQuest);
 		Push(kVtbl_TESRace);
 		Push(kVtbl_TESRecipe);
@@ -163,14 +127,61 @@ namespace CrashLogger::Labels
 		Push(kVtbl_TESRegion);
 		Push(kVtbl_TESReputation);
 		Push(kVtbl_TESSkill);
-		Push(kVtbl_TESSound);
 		Push(kVtbl_TESTopic);
 		Push(kVtbl_TESTopicInfo);
 		Push(kVtbl_TESWaterForm);
 		Push(kVtbl_TESWeather);
-		Push(kVtbl_TESWorldSpace);
 
-		Push(kVtbl_TESPackage);
+		Push(kVtbl_Script, As<Script>);
+
+		Push(kVtbl_TESWorldSpace, As<TESWorldSpace>);
+
+		Push(kVtbl_TESBoundObject, As<TESBoundObject>);
+		Push(kVtbl_BGSAddonNode);
+		Push(kVtbl_BGSAcousticSpace);
+		Push(kVtbl_BGSIdleMarker);
+		Push(kVtbl_BGSNote);
+		Push(kVtbl_BGSPlaceableWater);
+		Push(kVtbl_BGSProjectile);
+		Push(kVtbl_BGSStaticCollection);
+		Push(kVtbl_BGSTextureSet);
+		Push(kVtbl_MagicItemObject);
+		Push(kVtbl_TESAmmo);
+		Push(kVtbl_TESBoundAnimObject);
+		Push(kVtbl_TESBoundTreeObject);
+		Push(kVtbl_TESCaravanCard);
+		Push(kVtbl_TESCaravanDeck);
+		Push(kVtbl_TESCaravanMoney);
+		Push(kVtbl_TESGrass);
+		Push(kVtbl_TESLevCreature);
+		Push(kVtbl_TESLevItem);
+		Push(kVtbl_TESLevSpell);
+		Push(kVtbl_TESObjectARMO);
+		Push(kVtbl_TESObjectBOOK);
+		Push(kVtbl_TESObjectCLOT);
+		Push(kVtbl_TESObjectIMOD);
+		Push(kVtbl_TESObjectMISC);
+		Push(kVtbl_TESObjectSTAT);
+		Push(kVtbl_TESObjectWEAP);
+		// From MagicItemObject
+		Push(kVtbl_AlchemyItem);
+		Push(kVtbl_IngredientItem);
+		// From TESBoundAnimObject
+		Push(kVtbl_TESLevCharacter);
+		Push(kVtbl_TESActorBase);
+		Push(kVtbl_TESObjectACTI);
+		Push(kVtbl_TESObjectCONT);
+		Push(kVtbl_TESObjectDOOR);
+		Push(kVtbl_TESObjectLIGH);
+		Push(kVtbl_TESSound);
+		// From TESActorBase
+		Push(kVtbl_TESNPC);
+		Push(kVtbl_TESCreature);
+		// From TESBoundTreeObject
+		Push(kVtbl_TESObjectTREE);
+
+
+		Push(kVtbl_TESPackage, As<TESPackage>);
 		Push(kVtbl_AlarmPackage);
 		Push(kVtbl_BackUpPackage);
 		Push(kVtbl_DialoguePackage);
@@ -184,13 +195,14 @@ namespace CrashLogger::Labels
 		Push(kVtbl_TrespassPackage);
 
 		Push(kVtbl_TESObjectREFR, As<TESObjectREFR>);
-		Push(kVtbl_MobileObject);
+		Push(kVtbl_MobileObject, As<MobileObject>);
+		Push(kVtbl_Explosion);
 		Push(kVtbl_Actor);
 		Push(kVtbl_Creature);
 		Push(kVtbl_Character);
 		Push(kVtbl_PlayerCharacter);
-		Push(kVtbl_Explosion);
-		Push(kVtbl_Projectile);
+
+		Push(kVtbl_Projectile, As<Projectile>);
 		Push(kVtbl_ArrowProjectile);
 		Push(kVtbl_BeamProjectile);
 		Push(kVtbl_ContinuousBeamProjectile);
@@ -219,6 +231,7 @@ namespace CrashLogger::Labels
 		Push(kVtbl_TESIcon);
 		Push(kVtbl_QueuedTexture, As<QueuedTexture>);
 
+		Push(kVtbl_NiRefObject, As<NiRefObject>);
 
 		// Ni
 		Push(kVtbl_NiObjectNET, As<NiObjectNET>);
@@ -278,13 +291,32 @@ namespace CrashLogger::Labels
 		Push(kVtbl_NiRenderedCubeMap);
 
 		// NiAVObject
-		Push(kVtbl_NiAVObject);
+		Push(kVtbl_NiAVObject, As<NiAVObject>);
 		Push(kVtbl_NiDynamicEffect);
 		Push(kVtbl_NiDirectionalLight);
 		Push(kVtbl_NiPointLight);
 		Push(kVtbl_NiSpotLight);
 		Push(kVtbl_NiAmbientLight);
 		Push(kVtbl_NiTextureEffect);
+
+		// NiGeometry
+		Push(kVtbl_NiGeometry);
+		Push(kVtbl_NiCamera);
+		Push(kVtbl_BSCubeMapCamera);
+		Push(kVtbl_NiScreenSpaceCamera);
+		Push(kVtbl_NiLines);
+		Push(kVtbl_NiTriBasedGeom);
+		Push(kVtbl_NiTriShape);
+		Push(kVtbl_BSScissorTriShape);
+		Push(kVtbl_NiScreenElements);
+		Push(kVtbl_NiScreenGeometry);
+		Push(kVtbl_TallGrassTriShape);
+		Push(kVtbl_TallGrassTriStrips);
+		Push(kVtbl_NiTriStrips);
+		Push(kVtbl_NiParticles);
+		Push(kVtbl_NiParticleSystem);
+		Push(kVtbl_NiMeshParticleSystem);
+		Push(kVtbl_NiParticleMeshes);
 
 		Push(kVtbl_NiNode, As<NiNode>);
 		Push(kVtbl_BSNiNode);
@@ -309,28 +341,10 @@ namespace CrashLogger::Labels
 		Push(kVtbl_NiBSPNode);
 		Push(kVtbl_ShadowSceneNode); // 10ADCE0
 
-		// NiGeometry
-		Push(kVtbl_NiGeometry, As<NiObjectNET>);
-		Push(kVtbl_NiCamera);
-		Push(kVtbl_BSCubeMapCamera);
-		Push(kVtbl_NiScreenSpaceCamera);
-		Push(kVtbl_NiLines);
-		Push(kVtbl_NiTriBasedGeom);
-		Push(kVtbl_NiTriShape);
-		Push(kVtbl_BSScissorTriShape);
-		Push(kVtbl_NiScreenElements);
-		Push(kVtbl_NiScreenGeometry);
-		Push(kVtbl_TallGrassTriShape);
-		Push(kVtbl_TallGrassTriStrips);
-		Push(kVtbl_NiTriStrips);
-		Push(kVtbl_NiParticles);
-		Push(kVtbl_NiParticleSystem);
-		Push(kVtbl_NiMeshParticleSystem);
-		Push(kVtbl_NiParticleMeshes);
-		Push(kVtbl_NiSequenceStreamHelper);
+		Push(kVtbl_NiSequenceStreamHelper, As<NiObjectNET>);
 
 		// NiRenderer
-		Push(kVtbl_NiRenderer, nullptr);
+		Push(kVtbl_NiRenderer, As<NiRefObject>);
 		Push(kVtbl_NiDX9Renderer);
 
 		// Misc
@@ -346,7 +360,7 @@ namespace CrashLogger::Labels
 		Push(kVtbl_NiCollisionData, nullptr);
 
 		// Animations
-		Push(kVtbl_NiControllerSequence);
+		Push(kVtbl_NiControllerSequence, As<NiControllerSequence>);
 
 		// NiTimeController
 		Push(kVtbl_NiTimeController, As<NiTimeController>);
@@ -506,7 +520,7 @@ namespace CrashLogger::Labels
 		Push(kVtbl_NiBooleanExtraData);
 
 		// Geometry data
-		Push(kVtbl_NiAdditionalGeometryData, nullptr);
+		Push(kVtbl_NiAdditionalGeometryData, As<NiRefObject>);
 		Push(kVtbl_BSPackedAdditionalGeometryData);
 		Push(kVtbl_NiGeometryData);
 		Push(kVtbl_NiLinesData);
@@ -548,7 +562,7 @@ namespace CrashLogger::Labels
 //		Push(kVtbl_NiTaskManager);
 //		Push(kVtbl_NiParallelUpdateTaskManager);
 		Push(kVtbl_hkPackedNiTriStripsData);
-		Push(kVtbl_NiInterpolator);
+		Push(kVtbl_NiInterpolator, As<NiRefObject>);
 		Push(kVtbl_NiBlendInterpolator);
 		Push(kVtbl_NiBlendTransformInterpolator);
 		Push(kVtbl_NiBlendAccumTransformInterpolator);
@@ -618,14 +632,14 @@ namespace CrashLogger::Labels
 		Push(kVtbl_NiAccumulator);
 		Push(kVtbl_NiBackToFrontAccumulator);
 		Push(kVtbl_NiAlphaAccumulator);
-//		Push(kVtbl_BSShaderAccumulator);
+		Push(kVtbl_BSShaderAccumulator);
 		Push(kVtbl_NiScreenPolygon);
 		Push(kVtbl_NiScreenTexture);
 		Push(kVtbl_NiPSysCollider);
 		Push(kVtbl_NiPSysSphericalCollider);
 		Push(kVtbl_NiPSysPlanarCollider);
 
-		Push(kVtbl_NiShader, nullptr);
+		Push(kVtbl_NiShader);
 
 		// NiStream
 		Push(kVtbl_NiStream, As<NiStream>);
@@ -710,9 +724,7 @@ namespace CrashLogger::Labels
 		Push(kVtbl_AudioLoadTask);
 
 		Push(kVtbl_BGSAbilityPerkEntry);
-		Push(kVtbl_BGSAcousticSpace);
 		Push(kVtbl_BGSAcousticSpaceListener);
-		Push(kVtbl_BGSAddonNode);
 		Push(kVtbl_BGSAddonNodeSoundHandleExtra);
 		Push(kVtbl_BGSAmmoForm);
 		Push(kVtbl_BGSBipedModelList);
@@ -736,7 +748,6 @@ namespace CrashLogger::Labels
 		Push(kVtbl_BGSEntryPointPerkEntry);
 		Push(kVtbl_BGSEquipType);
 		Push(kVtbl_BGSIdleCollection);
-		Push(kVtbl_BGSIdleMarker);
 		Push(kVtbl_BGSImpactData);
 		Push(kVtbl_BGSImpactDataSet);
 		Push(kVtbl_BGSLightingTemplate);
@@ -774,7 +785,6 @@ namespace CrashLogger::Labels
 		Push(kVtbl_BGSSceneInfo);
 		Push(kVtbl_BGSTerrainChunkLoadTask);
 		Push(kVtbl_BGSTextureModel);
-		Push(kVtbl_BGSTextureSet);
 		Push(kVtbl_BGSTouchSpellForm);
 		Push(kVtbl_BGSVoiceType);
 		Push(kVtbl_BGSZoneTargetListener);
@@ -1278,7 +1288,6 @@ namespace CrashLogger::Labels
 		Push(kVtbl_NiObject);
 		Push(kVtbl_NiPSysFieldModifier);
 		Push(kVtbl_NiPersistentSrcTextureRendererData);
-		Push(kVtbl_NiRefObject);
 		Push(kVtbl_NiSearchPath);
 		Push(kVtbl_NiShaderConstantMap);
 		Push(kVtbl_NiShaderConstantMapEntry);

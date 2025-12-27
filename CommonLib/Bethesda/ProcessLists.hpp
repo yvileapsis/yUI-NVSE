@@ -36,9 +36,9 @@ struct ProcessLists {
 
 	struct ProcessArrays {
 		NiTPrimitiveArray<MobileObject*>	kMobileObjects;
-		UInt32								uiBeginOffsets[BaseProcess::ProcessLevel::COUNT];
-		UInt32								uiEndOffsets[BaseProcess::ProcessLevel::COUNT];
-		UInt32								unk034[BaseProcess::ProcessLevel::COUNT];
+		UInt32								uiBeginOffsets[4];
+		UInt32								uiEndOffsets[4];
+		UInt32								unk034[4];
 
 		MobileObject* GetAt(UInt32 auiIndex) const {
 			return kMobileObjects[auiIndex];

@@ -19,14 +19,14 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <PreferredToolArchitecture>x64</PreferredToolArchitecture>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v143</PlatformToolset>
+    <PlatformToolset>v145</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
@@ -53,6 +53,7 @@
     <IntDir>..\$(Configuration)\$(ProjectName)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
     <TargetName>CrashLogger</TargetName>
+    <PostBuildEventUseInBuild>false</PostBuildEventUseInBuild>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -105,6 +106,8 @@
       <FavorSizeOrSpeed>Size</FavorSizeOrSpeed>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
     </ClCompile>
     <Link>
       <ModuleDefinitionFile>exports.def</ModuleDefinitionFile>
@@ -123,11 +126,11 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\nvse\dinput8.cpp" />
+    <ClCompile Include="..\nvse\DebugLog.cpp" />
     <ClCompile Include="..\nvse\Logging.cpp" />
     <ClCompile Include="..\nvse\SafeWrite.cpp" />
     <ClCompile Include="..\nvse\Utilities.cpp" />
-    <ClCompile Include="AssetTracker.cpp" />
+    <ClCompile Include="GameData.cpp" />
     <ClCompile Include="Calltrace.cpp" />
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="ExceptionHandler.cpp" />
@@ -150,15 +153,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\nvse\CommandTable.hpp" />
+    <ClInclude Include="..\nvse\DebugLog.hpp" />
     <ClInclude Include="..\nvse\Formatter.hpp" />
     <ClInclude Include="..\nvse\Logging.hpp" />
     <ClInclude Include="..\nvse\PluginAPI.hpp" />
     <ClInclude Include="..\nvse\prefix.hpp" />
     <ClInclude Include="..\nvse\Safewrite.hpp" />
     <ClInclude Include="..\nvse\Utilities.hpp" />
-    <ClInclude Include="..\nvse\dinput8.hpp" />
-    <ClInclude Include="..\libraries\json.h" />
-    <ClInclude Include="..\libraries\SimpleINILibrary.h" />
     <ClInclude Include="CrashLogger.hpp" />
     <ClInclude Include="DbgHelpWrapper.hpp" />
     <ClInclude Include="definitions.hpp" />

@@ -6,16 +6,18 @@ constexpr UInt32 ce_printStackCount = 256;
 
 namespace CrashLogger::PDB 
 {
-	extern std::string GetModule(UInt32 eip, HANDLE process)
+	extern bool __fastcall GetModule(UInt32 eip, HANDLE process, char* buffer, size_t bufferSize)
 	{
 		IMAGEHLP_MODULE module = { 0 };
 		module.SizeOfStruct = sizeof(IMAGEHLP_MODULE);
-		if (!Safe_SymGetModuleInfo(process, eip, &module)) return "";
+		if (!Safe_SymGetModuleInfo(process, eip, &module)) 
+			return false;
 
-		return module.ModuleName;
+		strcpy_s(buffer, bufferSize, module.ModuleName);
+		return true;
 	}
 
-	extern UInt32 GetModuleBase(UInt32 eip, HANDLE process)
+	extern UInt32 __fastcall GetModuleBase(UInt32 eip, HANDLE process)
 	{
 		IMAGEHLP_MODULE module = { 0 };
 		module.SizeOfStruct = sizeof(IMAGEHLP_MODULE);
@@ -24,7 +26,7 @@ namespace CrashLogger::PDB
 		return module.BaseOfImage;
 	}
 
-	extern std::string GetSymbol(UInt32 eip, HANDLE process)
+	extern bool __fastcall GetSymbol(UInt32 eip, HANDLE process, char* buffer, size_t bufferSize)
 	{
 		char symbolBuffer[sizeof(SYMBOL_INFO) + 255];
 		const auto symbol = (SYMBOL_INFO*)symbolBuffer;
@@ -33,14 +35,14 @@ namespace CrashLogger::PDB
 		symbol->MaxNameLen = 254;
 		DWORD64 offset = 0;
 
-		if (!Safe_SymFromAddr(process, eip, &offset, symbol)) return "";
+		if (!Safe_SymFromAddr(process, eip, &offset, symbol)) 
+			return false;
 
-		char buffer[256];
-		sprintf_s(buffer, "%s+0x%I64X", symbol->Name, offset);
-		return buffer;
+		sprintf_s(buffer, bufferSize, "%s+0x%I64X", symbol->Name, offset);
+		return true;
 	}
 
-	extern std::string GetLine(UInt32 eip, HANDLE process)
+	extern bool __fastcall GetLine(UInt32 eip, HANDLE process, char* buffer, size_t bufferSize)
 	{
 		char lineBuffer[sizeof(IMAGEHLP_LINE) + 255];
 		const auto line = (IMAGEHLP_LINE*)lineBuffer;
@@ -48,29 +50,37 @@ namespace CrashLogger::PDB
 
 		DWORD offset = 0;
 
-		if (!Safe_SymGetLineFromAddr(process, eip, &offset, line)) return "";
+		if (!Safe_SymGetLineFromAddr(process, eip, &offset, line)) 
+			return false;
 
-		char buffer[256];
-		sprintf_s(buffer, "%s:%d", line->FileName, line->LineNumber);
-		return buffer;
+		sprintf_s(buffer, bufferSize, "%s:%d", line->FileName, line->LineNumber);
+		return true;
 	}
 
-	std::string& GetClassNameGetSymbol(void* object, std::string& buffer)
+	bool __fastcall GetClassNameGetSymbol(void* object, char* buffer, size_t bufferSize)
 	{
-		buffer = GetSymbol(*((UInt32*)object), GetCurrentProcess());
-		return buffer;
+		return GetSymbol(*((UInt32*)object), GetCurrentProcess(), buffer, bufferSize);
 	}
 
-	std::string& GetClassNameFromPDBSEH(void* object, std::string& buffer)
-	try { GetClassNameGetSymbol(object, buffer); return buffer; }
-	catch (...) { return buffer; }
+	bool __fastcall GetClassNameFromPDBSEH(void* object, char* buffer, size_t bufferSize)
+	try { 
+		return GetClassNameGetSymbol(object, buffer, bufferSize);
+	}
+	catch (...) { 
+		return false; 
+	}
 
 
-	std::string GetClassNameFromPDB(void* object) 
+	bool __fastcall GetClassNameFromPDB(void* object, char* buffer, size_t bufferSize)
 	{
-		std::string name;
-		GetClassNameFromPDBSEH(object, name);
-		return name.substr(0, name.find("::`vftable'"));
+		char tempBuffer[MAX_PATH];
+		if (GetClassNameFromPDBSEH(object, tempBuffer, sizeof(tempBuffer))) {
+			std::string_view name = buffer;
+			strcpy_s(buffer, bufferSize, name.substr(0, name.find("::`vftable'")).data());
+			return !name.empty();
+		}
+		return false;
+
 	}
 
 	struct RTTIType
@@ -87,7 +97,7 @@ namespace CrashLogger::PDB
 	};
 
 	// use the RTTI information to return an object's class name
-	const char* GetObjectClassNameInternal2(void * objBase)
+	const char* __fastcall GetObjectClassNameInternal2(void * objBase)
 	try
 	{
 		const char* result = "";
@@ -113,82 +123,71 @@ namespace CrashLogger::PDB
 		return "";
 	}
 
-	std::string GetClassNameFromRTTI(void* object)
+	bool __fastcall GetClassNameFromRTTI(void* object, char* buffer, size_t bufferSize)
 	{
-		std::string name = GetObjectClassNameInternal2(object);
+		std::string_view name = GetObjectClassNameInternal2(object);
 
 		// Starts with .?AV, ends with @@
 //		return name.substr(4, name.size() - 6);
 
-		char buffer[MAX_PATH];
-		Safe_UnDecorateSymbolName(name.substr(1, name.size() - 1).c_str(), buffer, MAX_PATH, UNDNAME_NO_ARGUMENTS);
-		name = buffer;
-
-		return name.substr(6, name.size() - 6);
+		char tempBuffer[MAX_PATH];
+		Safe_UnDecorateSymbolName(name.substr(1, name.size() - 1).data(), tempBuffer, MAX_PATH, UNDNAME_NO_ARGUMENTS);
+		std::string_view undecoratedName = tempBuffer;
+		strcpy_s(buffer, bufferSize, undecoratedName.substr(6, undecoratedName.size() - 6).data());
+		return !undecoratedName.empty();
 	}
 
-	extern std::string GetClassNameFromRTTIorPDB(void* object) 
+	extern bool __fastcall GetClassNameFromRTTIorPDB(void* object, char* buffer, size_t bufferSize)
 	{
-		if (const auto str = GetClassNameFromRTTI(object); !str.empty()) return str;
-		return GetClassNameFromPDB(object);
-		//if (const auto str = GetClassNameFromPDB(object); !str.contains("0x")) return str;
+		if (!GetClassNameFromRTTI(object, buffer, bufferSize)) {
+			return GetClassNameFromPDB(object, buffer, bufferSize);
+		}
 	}
 };
 
 namespace CrashLogger
 {
 
-	void Get(EXCEPTION_POINTERS* info) 
+	void __fastcall Get(EXCEPTION_POINTERS* info)
 	{
-		const auto begin = std::chrono::system_clock::now();
+		__try {
+			const auto begin = std::chrono::system_clock::now();
 
-		Playtime::Process(info);
-		Exception::Process(info);
-		Thread::Process(info);
-		Memory::Process(info);
-		Device::Process(info);
-		Calltrace::Process(info);
-		Registry::Process(info);
-		Stack::Process(info);
-		Mods::Process(info);
-		Install::Process(info);
-		Modules::Process(info);
-		AssetTracker::Process(info);
+			Exception::Process(info);
+			Thread::Process(info);
+			Calltrace::Process(info);
+			Registry::Process(info);
+			Stack::Process(info);
+			PrintSeparator();
+			Device::Process(info);
+			PrintSeparator();
+			Memory::Process(info);
+			PrintSeparator();
+			Playtime::Process(info);
+			GameData::Process(info);
+			PrintSeparator();
+			Mods::Process(info);
+			PrintSeparator();
+			Modules::Process(info);
+			PrintSeparator();
+			Install::Process(info);
+			PrintSeparator();
 
-		const auto processing = std::chrono::system_clock::now();
+			const auto processing = std::chrono::system_clock::now();
 
-		Log() << Playtime::Get().str();
-		Log() << Exception::Get().str();
-		Log() << Thread::Get().str();
-		Log() << Calltrace::Get().str();
-		Log() << Registry::Get().str();
-		Log() << Stack::Get().str();
-		PrintSeparator();
-		Log() << Device::Get().str();
-		PrintSeparator();
-		Log() << Memory::Get().str();
-		PrintSeparator();
-		Log() << Mods::Get().str();
-		PrintSeparator();
-		Log() << AssetTracker::Get().str();
-		PrintSeparator();
-		Log() << Modules::Get().str();
-		PrintSeparator();
-		Log() << Install::Get().str();
+			const auto printing = std::chrono::system_clock::now();
 
-		const auto printing = std::chrono::system_clock::now();
+			const auto timeProcessing = std::chrono::duration_cast<std::chrono::milliseconds>(processing - begin);
 
-		const auto timeProcessing = std::chrono::duration_cast<std::chrono::milliseconds>(processing - begin);
+			_MESSAGE("\nProcessed in %lld ms", timeProcessing.count());
 
-		const auto timePrinting = std::chrono::duration_cast<std::chrono::milliseconds>(printing - processing);
-
-		char buffer[64];
-		sprintf_s(buffer, "Processed in %lld ms, printed in %lld ms\n", timeProcessing.count(), timePrinting.count());
-		Log() << buffer;
+			Safe_SymCleanup(GetCurrentProcess());
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER) {
+			_MESSAGE("Fatal error in exception handler.");
+		}
 
 		Logger::Copy();
-
-		Safe_SymCleanup(GetCurrentProcess());
 	};
 
 	static LPTOP_LEVEL_EXCEPTION_FILTER s_originalFilter = nullptr;
@@ -219,11 +218,6 @@ namespace CrashLogger
 
 		s_originalFilter = SetUnhandledExceptionFilter(&Filter);
 
-		if (g_currentGame == kFalloutNewVegas)
-			SafeWrite32(0x00FDF180, (UInt32)&FakeSetUnhandledExceptionFilter);
-		else if (g_currentGame == kFallout3) 	// thanks Stewie
-			SafeWrite32(0x00D9B180, (UInt32)&FakeSetUnhandledExceptionFilter);
-		else if (g_currentGame == kOblivion) 
-			SafeWrite32(0x00A281B4, (UInt32)&FakeSetUnhandledExceptionFilter);
+		SafeWrite32(0x00FDF180, (UInt32)&FakeSetUnhandledExceptionFilter);
 	}
 }

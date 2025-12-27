@@ -22,7 +22,7 @@ namespace Logger
 	// Add a new destination to LoggerManager
 	void AddDestinations(const std::filesystem::path& log, const std::string& prefix, UInt32 logLevel);
 	// Prepare for copying file
-	void PrepareCopy(const std::filesystem::path& in, const std::filesystem::path& out);
+	void PrepareCopy(const char* in, const char* out);
 	// Copy all prepared files
 	void Copy();
 }

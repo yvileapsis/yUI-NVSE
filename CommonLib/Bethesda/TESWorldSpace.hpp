@@ -3,6 +3,8 @@
 #include "TESFullName.hpp"
 #include "TESTexture.hpp"
 #include "BSMap.hpp"
+#include "NiPoint3.hpp"
+#include "NiSmartPointer.hpp"
 
 class BGSTerrainManager;
 class TESClimate;
@@ -14,6 +16,8 @@ class BGSImpactData;
 class LODdata;
 
 class TESObjectCell;
+class BSPortalGraph;
+class TESObjectREFR;
 
 // 0xEC
 class TESWorldSpace :

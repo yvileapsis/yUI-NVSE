@@ -26,6 +26,8 @@ class ItemChange;
 
 class NiTriShape;
 
+class ActorPackageData;
+
 // 0x30
 class BaseProcess 
 {
@@ -233,41 +235,41 @@ public:
 	virtual void					CheckIfThereSomeoneTalkWith();
 	virtual void					Unk_81();
 	virtual void					Unk_82();
-	virtual TESPackage*				GetRunOncePackage();
-	virtual void					SetInterruptPackage(TESPackage* package, Actor* onActor);
-	virtual void					StopInterruptPackage();
-	virtual void					Unk_86();	// 086 - SetInterruptPackageTargetRef
-	virtual void					Unk_87();	// 087 - SetInterruptPackageTargetRef
-	virtual void					Unk_88();	// 088 - IncreaseInterruptPackageUnk00C
+	virtual TESPackage*				GetRunOncePackage() const;
+	virtual void					SetRunOncePackage(TESPackage* apPackage, Actor* apActor);
+	virtual void					ClearRunOncePackage();
+	virtual void					SetRunOnceProcedureIndex(int32_t aiIndex);
+	virtual int32_t					GetRunOnceProcedureIndex() const;
+	virtual void					AddToRunOnceProcedureIndex(int32_t aiOffset);
 	virtual void					ClearGreetingInfoData();
-	virtual void					Unk_8A();
-	virtual TESPackage*				GetCurrentPackage();
-	virtual void					SetCurrentPackage(TESPackage* package, Actor* onActor);
+	virtual bool					IsCurrentProcedureDone(Actor* apActor) const;
+	virtual TESPackage*				GetCurrentPackage() const;
+	virtual void					SetCurrentPackage(TESPackage* apPackage, Actor* apActor);
 	virtual void					ClearCurrentPackage();
-	virtual void					SetRunningPackageProcedureIndex();
-	virtual void					GetRunningPackageProcedureIndex();
-	virtual void					IncreaseRunningPackageProcedureIndex();
+	virtual void					SetCurrentProcedureIndex(int32_t aiIndex);
+	virtual int32_t					GetCurrentProcedureIndex() const;
+	virtual void					AddToCurrentProcedureIndex(int32_t aiOffset);
 	virtual void					SetupNewPackage();
 	virtual void					Unk_92();	// Only HighProcess, get Unk0454
 	virtual void					Unk_93();
 	virtual void					Unk_94();
 	virtual void					GetAvoidNodes();
-	virtual void					Unk_96();
-	virtual void					Unk_97();
-	virtual void					Unk_98();
-	virtual void					GetHeadTrackTimer();
-	virtual void					SetHoldHeadTrackTimer();
-	virtual void					Unk_9B();
-	virtual TESPackageData*			GetRunOncePackageData();
-	virtual TESPackageData*			GetPackageData();
-	virtual void					GetRunningActorPackage();
-	virtual TESPackage*				GetCurrentPackage2();
-	virtual UInt32					GetProcedureIndexRunning();
-	virtual void					SetProcedureIndexRunning(UInt32);
-	virtual void					IncreaseProcedureIndexRunning();
-	virtual bhkCharacterController*	GetCharacterController();
-	virtual void					SetCharacterController(bhkCharacterController* charCtrl);
-	virtual void					StopMoving();
+	virtual bool					IsAvoidAreaInAvoidPathingList(TESObjectREFR* apRef) const;
+	virtual void					SetAvoidWaitTimer(float afVal);
+	virtual void					RemoveAvoidPathingNode(TESObjectREFR* apRef);
+	virtual float					GetHoldHeadTrackTimer() const;
+	virtual void					SetHoldHeadTrackTimer(float afVal);
+	virtual void					ResetPackageTarget();
+	virtual ActorPackageData*		GetRunOncePackageData() const;
+	virtual ActorPackageData*		GetPackageData() const;
+	virtual ActorPackage*			GetActorPackageThatIsRunning() const;
+	virtual TESPackage*				GetPackageThatIsRunning() const;
+	virtual int32_t					GetProcedureIndexRunning() const;
+	virtual void					SetProcedureIndexRunning(uint32_t aiIndex);
+	virtual void					AddToProcedureIndexRunning(Actor* apActor, int32_t aiOffset);
+	virtual bhkCharacterController*	GetCharController() const;
+	virtual void					SetCharacterController(NiPointer<bhkCharacterController>& arController);
+	virtual void					StopMoving(Actor* apActor);
 	virtual void					ProcessFollow();
 	virtual void					ProcessPursue();
 	virtual void					ProcessFlee();

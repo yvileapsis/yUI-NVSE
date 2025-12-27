@@ -43,6 +43,20 @@
 #define VERSION_CODE_SECONDARY(in)				((in >> 8) & 0xFFF)
 #define VERSION_CODE_SUB(in)					((in >> 0) & 0xFF)
 
+#if USE_STB_SPRINTF
+#include <stb/stb_sprintf.h>
+
+static const auto our_snprintf = stbsp_snprintf;
+static const auto our_sprintf = stbsp_sprintf;
+static const auto our_vsprintf = stbsp_vsprintf;
+static const auto our_vsnprintf = stbsp_vsnprintf;
+#else
+static const auto our_snprintf = snprintf;
+static const auto our_sprintf = sprintf;
+static const auto our_vsprintf = vsprintf;
+static const auto our_vsnprintf = vsnprintf;
+#endif
+
 #include <algorithm>
 #include <filesystem>
 #include <fstream>

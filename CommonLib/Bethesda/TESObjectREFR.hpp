@@ -11,6 +11,7 @@ class hkpRigidBody;
 class NiNode;
 class NiAVObject;
 class NiGeometry;
+class TESBoundObject;
 
 struct AnimData;
 struct BipedAnim;
@@ -29,19 +30,20 @@ class ExtraLockData;
 
 class TESContainer;
 class TESSound;
+class bhkPhantom;
 
 struct LoadedRefData
 {
-	TESObjectREFR*		pCurrentWaterType;
-	UInt32				iUnderwaterCount;
-	Float32				fRelevantWaterHeight;
-	Float32				fRevealDistance;
-	UInt32				eFlags;
-	NiPointer<NiNode>	spNode;
-	NiNode*				pkNiNode18;
+	TESObjectREFR*			pCurrentWaterType;
+	UInt32					iUnderwaterCount;
+	Float32					fRelevantWaterHeight;
+	Float32					fCachedRadius;
+	Bitfield32				eFlags;
+	NiPointer<NiNode>		spNode;
+	NiPointer<bhkPhantom>	spPhantom;
 };
 
-class TESObjectREFR : public TESForm
+class TESObjectREFR : public TESForm, public TESChildCell
 {
 public:
 
@@ -115,10 +117,8 @@ public:
 	virtual BSAnimNoteReceiver*		CreateExtraAnimNoteReceiver();
 	virtual BSAnimNoteReceiver*		GetExtraDataAnimNoteReceiver();
 
-
-	TESChildCell*	pkChildCell;
 	TESSound*		pkLoopSound;
-	TESForm*		pkObjectReference;
+	TESBoundObject*	pkObjectReference;
 	NiPoint3		kRotation;
 	NiPoint3		kPosition;
 	Float32			fRefScale;
@@ -200,13 +200,15 @@ public:
 
 	const char*				GetBaseFormFullName() { return ThisCall<const char*>(0x55D520, this); }
 	const char*				GetJIPName();
-	static TESObjectREFR*	FindReferenceFor3D(const NiNode* node) { return CdeclCall<TESObjectREFR*>(0x56F930, node); }
+	static TESObjectREFR*	FindReferenceFor3D(const NiAVObject* object) { return CdeclCall<TESObjectREFR*>(0x56F930, object); }
 
 	TESObjectCELL* GetNearbyWaterContainingCell(float afRadius) const;
 
 	static bool HasAddonNodes(NiNode* apNode);
 
-	TESForm* GetBaseForm() const;
+	TESBoundObject* GetObjectReference() const {
+		return pkObjectReference;
+	}
 };
 static_assert(sizeof(TESObjectREFR) == 0x68);
 

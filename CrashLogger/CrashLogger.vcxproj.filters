@@ -10,9 +10,6 @@
     <ClCompile Include="..\nvse\Utilities.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
-    <ClCompile Include="..\nvse\dinput8.cpp">
-      <Filter>nvse</Filter>
-    </ClCompile>
     <ClCompile Include="..\nvse\Logging.cpp">
       <Filter>nvse</Filter>
     </ClCompile>
@@ -26,18 +23,15 @@
     <ClCompile Include="Device.cpp" />
     <ClCompile Include="Mods.cpp" />
     <ClCompile Include="LabelsNVSE.cpp" />
-    <ClCompile Include="AssetTracker.cpp" />
+    <ClCompile Include="GameData.cpp" />
     <ClCompile Include="PatchMallocTracking.cpp" />
+    <ClCompile Include="..\nvse\DebugLog.cpp">
+      <Filter>nvse</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="definitions.hpp" />
     <ClInclude Include="main.hpp" />
-    <ClInclude Include="..\libraries\SimpleINILibrary.h">
-      <Filter>libraries</Filter>
-    </ClInclude>
-    <ClInclude Include="..\libraries\json.h">
-      <Filter>libraries</Filter>
-    </ClInclude>
     <ClInclude Include="..\nvse\Safewrite.hpp">
       <Filter>nvse</Filter>
     </ClInclude>
@@ -45,9 +39,6 @@
       <Filter>nvse</Filter>
     </ClInclude>
     <ClInclude Include="..\nvse\PluginAPI.hpp">
-      <Filter>nvse</Filter>
-    </ClInclude>
-    <ClInclude Include="..\nvse\dinput8.hpp">
       <Filter>nvse</Filter>
     </ClInclude>
     <ClInclude Include="..\nvse\Utilities.hpp">
@@ -65,6 +56,9 @@
       <Filter>nvse</Filter>
     </ClInclude>
     <ClInclude Include="CrashLogger.hpp" />
+    <ClInclude Include="..\nvse\DebugLog.hpp">
+      <Filter>nvse</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="exports.def" />
@@ -72,9 +66,6 @@
   <ItemGroup>
     <Filter Include="nvse">
       <UniqueIdentifier>{f1afc55a-6e0f-43b8-86b1-67dbd88c1490}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="libraries">
-      <UniqueIdentifier>{42cf9c9c-4ade-4f54-8cfd-9a8c9c5a321f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>

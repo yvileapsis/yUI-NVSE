@@ -265,7 +265,7 @@ public:
 	virtual bool			Unk_48(UInt32 formType);	// returns if the same Type is passed in
 	virtual bool			Activate(void* arg0, void* arg1, void* arg2, void* arg3, void* arg4);	// looks to be func33 in Oblivion
 	virtual void			SetFormID(UInt32 aiID, bool abUpdateFile);
-	virtual const char*		GetObjectTypeName();
+	virtual const char*		GetObjectTypeName() const;
 	virtual const char*		GetEditorID() const;
 	virtual bool			SetEditorID(const char* edid);
 	// 4E

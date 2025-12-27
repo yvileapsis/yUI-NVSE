@@ -3,45 +3,34 @@
 #include <cstdlib>
 #include <utility>
 #include <oleauto.h>
+
+#include <shlwapi.h>
+#pragma comment(lib, "Shlwapi.lib")
+
 #include <UserEnv.h>
 #pragma comment (lib, "Userenv.lib")
+
+
 
 static std::filesystem::path s_falloutDirectory;
 
 const std::filesystem::path& GetFalloutDirectory()
 {
-	if (!s_falloutDirectory.empty()) return s_falloutDirectory;
+	if (!s_falloutDirectory.empty()) 
+		return s_falloutDirectory;
 
 	// can't determine how many bytes we'll need, hope it's not more than MAX_PATH
 	char	falloutPathBuf[MAX_PATH];
 	const UInt32	falloutPathLength = GetModuleFileName(GetModuleHandle(nullptr), falloutPathBuf, sizeof(falloutPathBuf));
 
-	if (!falloutPathLength || falloutPathLength >= sizeof falloutPathBuf)
-	{
-		char errorBuffer[256];
-		sprintf_s(errorBuffer, "Couldn't find fallout path (len = %d, err = %08X)", falloutPathLength, GetLastError());
-		Log() << errorBuffer;
+	if (!falloutPathLength || falloutPathLength >= sizeof(falloutPathBuf)) {
+		_MESSAGE("Couldn't find fallout path (len = %d, err = %08X)", falloutPathLength, GetLastError());
 		return s_falloutDirectory;
 	}
 
-	const std::string	falloutPath(falloutPathBuf, falloutPathLength);
-
 	// truncate at last slash
-	const std::string::size_type lastSlash = falloutPath.rfind('\\');
-
-	if (lastSlash != std::string::npos)	// if we don't find a slash something is VERY WRONG
-	{
-		s_falloutDirectory = falloutPath.substr(0, lastSlash + 1);
-#if _DEBUG
-		Log() << ("fallout root = " + s_falloutDirectory.generic_string());
-#endif
-	}
-	else
-	{
-#if _DEBUG
-		Log() << ("no slash in fallout path? (" + falloutPath + ")");
-#endif
-	}
+	strrchr(falloutPathBuf, '\\')[0] = 0;	// include the slash
+	s_falloutDirectory = falloutPathBuf;
 
 	return s_falloutDirectory;
 }
@@ -532,23 +521,6 @@ __declspec(naked) char* __fastcall StrNCopy(char* dest, const char* src, UInt32 
 	}
 }
 
-__declspec(naked) char* __fastcall StrCat(char* dest, const char* src)
-{
-	__asm
-	{
-		test	ecx, ecx
-		jnz		proceed
-		mov		eax, ecx
-		retn
-	proceed :
-		push	edx
-		call	StrLen
-		pop		edx
-		add		ecx, eax
-		jmp		StrCopy
-	}
-}
-
 __declspec(align(16)) const UInt8 kCaseConverter[] =
 {
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x0F,
@@ -757,12 +729,12 @@ __declspec(naked) UInt32 __fastcall StrHashCI(const char* inKey)
 	}
 }
 
-std::filesystem::path GetCurPath()
+void GetCurPath(char* buffer, size_t bufferSize)
 {
-	char buffer[MAX_PATH] = { 0 };
-	GetModuleFileName(nullptr, buffer, MAX_PATH);
-	const std::string::size_type pos = std::string(buffer).find_last_of("\\/");
-	return std::string(buffer).substr(0, pos);
+	char tempBuffer[MAX_PATH];
+	GetModuleFileName(nullptr, tempBuffer, sizeof(tempBuffer));
+	strrchr(tempBuffer, '\\')[1] = 0; // truncate to directory
+	strncpy_s(buffer, bufferSize, tempBuffer, _TRUNCATE);
 }
 
 bool ends_with(std::string const& value, std::string const& ending)
@@ -781,7 +753,7 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 }
 
 /// Try to find in the Haystack the Needle - ignore case
-
+#if 0
 std::string& ToLower(std::string&& data)
 {
 	ra::transform(data, data.begin(), [](const unsigned char c) { return std::tolower(c); });
@@ -793,6 +765,7 @@ std::string& StripSpace(std::string&& data)
 	std::erase_if(data, isspace);
 	return data;
 }
+#endif
 
 bool StartsWith(const char* string, const char* prefix)
 {
@@ -950,122 +923,170 @@ char* ConvertLiteralPercents(char* srcPtr)
 
 #include <PluginAPI.hpp>
 
-std::string DecompileScriptToFolder(const char* scriptName, Script* script, const char* fileExtension, const char* modName)
+void __fastcall DecompileScriptToFolder(const char* scriptName, Script* script, const char* fileExtension, const char* modName)
 {
 	char buffer[0x1000];
-	char textBuffer[256];
 	if (!DecompileScript(script, 0, buffer, sizeof(buffer))) {
-		sprintf_s(textBuffer, "Script %s is not compiled", scriptName);
-		return textBuffer;
+		_MESSAGE("Script %s is not compiled", scriptName);
 	}
 
-	std::filesystem::path dirName = "DecompiledScripts";
-	if (!std::filesystem::exists(dirName))
-		std::filesystem::create_directory(dirName);
+	char filePath[MAX_PATH] = "DecompiledScripts";
+	if (!PathIsDirectory(filePath))
+		CreateDirectory(filePath, nullptr);
 
-	dirName /= modName;
+	sprintf_s(filePath, "%s\\%s", filePath, modName);
 
-	if (!std::filesystem::exists(dirName))
-		std::filesystem::create_directory(dirName);
+	if (!PathIsDirectory(filePath))
+		CreateDirectory(filePath, nullptr);
 
-	dirName /= scriptName + '.';
-	dirName += fileExtension;
+	sprintf_s(filePath, "%s\\%s.%s", filePath, scriptName, fileExtension);
 
-	std::ofstream os(dirName);
-	os << buffer;
+	HANDLE hFile = CreateFileA(
+		filePath,
+		GENERIC_WRITE,
+		0,
+		nullptr,
+		CREATE_ALWAYS,
+		FILE_ATTRIBUTE_NORMAL,
+		nullptr
+	);
 
-	sprintf_s(textBuffer, "Decompiled script to '%s'", dirName.string().c_str());
-	return textBuffer;
-}
-
-std::string& SanitizeStringBySize(std::string& str)
-{
-	for (UInt32 i = 0; i < MAX_PATH; i++) if (str[i] == 0) 
-		return str;
-	str = "";
-	return str;
-}
-
-std::string& SanitizeStringFromBadData(std::string& str)
-{
-	str.erase(std::remove_if(str.begin(), str.end(), [](char c) { return !(c >= 0 && c <= 0x128); }), str.end());
-
-	std::replace_if(str.begin(), str.end(), [](char c) { return c == '\n' || c == '\r' || c == '\0' || c == '\v'; }, ' ');
-
-	return str;
-}
-
-std::string pcName;
-std::string userName;
-std::string userDirName;
-
-std::string& SanitizeStringFromUserInfo(std::string& str)
-{
-	[[unlikely]]
-	if (pcName.empty())
-	{
-		TCHAR infoBuf[MAX_PATH];
-		DWORD bufCharCount = MAX_PATH;
-		if (GetComputerName(infoBuf, &bufCharCount)) pcName = infoBuf;
+	if (hFile == INVALID_HANDLE_VALUE) {
+		_MESSAGE("Failed to create decompiled script file '%s'", filePath);
+		return;
 	}
 
-	[[unlikely]]
-	if (userName.empty())
-	{
-		TCHAR infoBuf[MAX_PATH];
-		DWORD bufCharCount = MAX_PATH;
-		if (GetUserName(infoBuf, &bufCharCount)) userName = infoBuf;
+	DWORD bytesWritten;
+	BOOL success = WriteFile(
+		hFile,
+		buffer,
+		(DWORD)strlen(buffer),
+		&bytesWritten,
+		nullptr
+	);
+	CloseHandle(hFile);
+
+	if (!success || bytesWritten != strlen(buffer)) {
+		_MESSAGE("Failed to write decompiled script to file '%s'", filePath);
+		return;
 	}
 
-	[[unlikely]]
-	if (userDirName.empty()) 
-	{
-		HANDLE hToken;
-		OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken);
-		DWORD bufCharCount = MAX_PATH;
-		char infoBuf[MAX_PATH];
-		if (GetUserProfileDirectoryA(hToken, infoBuf, &bufCharCount)) userDirName = infoBuf;
-		CloseHandle(hToken);
-
-		size_t pos = userDirName.find_last_of("\\");
-		if (pos != std::string::npos)
-			userDirName = userDirName.substr(pos + 1);
-	}
-
-	if (pcName.size() > 1)
-		while (str.find(pcName) != -1) str.replace(str.find(pcName), pcName.size(), pcName.size(), '*');
-
-	if (userName.size() > 1)
-		while (str.find(userName) != -1) str.replace(str.find(userName), userName.size(), userName.size(), '*');
-
-	if (userDirName.size() > 1)
-		while (str.find(userDirName) != -1) str.replace(str.find(userDirName), userDirName.size(), userDirName.size(), '*');
-
-	return str;
+	_MESSAGE("Decompiled script to '%s'", filePath);
 }
 
-const std::string& SanitizeString(std::string&& str) 
+namespace {
+	void __fastcall SanitizeStringBySize(const char* string, char* outBuffer, size_t bufferSize) {
+		for (size_t i = 0; i < MAX_PATH; i++) {
+			if (string[i] == 0) {
+				strcpy_s(outBuffer, bufferSize, string);
+				return;
+			}
+		}
+
+		strcpy_s(outBuffer, bufferSize, "");
+	}
+
+	void __fastcall SanitizeStringFromBadData(const char* string, char* outBuffer, size_t bufferSize) {
+		{
+			const uint32_t len = strlen(outBuffer);
+			for (size_t i = 0; i < len; i++) {
+				char& c = outBuffer[i];
+				if (!(c >= 0 && c <= 0x128)) {
+					c = 0;
+				}
+			}
+		}
+		{
+			const uint32_t len = strlen(outBuffer);
+			for (size_t i = 0; i < len; i++) {
+				char& c = outBuffer[i];
+				if (c == '\n' || c == '\r' || c == '\0' || c == '\v') {
+					c = ' ';
+				}
+			}
+		}
+	}
+
+	char pcName[MAX_PATH] = {};
+	char userName[MAX_PATH] = {};
+	char userDirName[MAX_PATH] = {};
+
+	void __fastcall SanitizeStringFromUserInfo(char* buffer, size_t bufferSize) {
+		[[unlikely]]
+		if (!pcName[0]) {
+			TCHAR infoBuf[MAX_PATH];
+			DWORD bufCharCount = MAX_PATH;
+			if (GetComputerName(infoBuf, &bufCharCount))
+				strcpy_s(pcName, infoBuf);
+		}
+
+		[[unlikely]]
+		if (!userName[0]) {
+			TCHAR infoBuf[MAX_PATH];
+			DWORD bufCharCount = MAX_PATH;
+			if (GetUserName(infoBuf, &bufCharCount))
+				strcpy_s(userName, infoBuf);
+		}
+
+		[[unlikely]]
+		if (!userDirName[0]) {
+			HANDLE hToken;
+			OpenProcessToken(GetCurrentProcess(), TOKEN_QUERY, &hToken);
+			DWORD bufCharCount = MAX_PATH;
+			char infoBuf[MAX_PATH];
+			if (GetUserProfileDirectoryA(hToken, infoBuf, &bufCharCount)) {
+				char* lastSlash = strrchr(infoBuf, '\\');;
+				if (lastSlash)
+					strcpy_s(userDirName, lastSlash + 1);
+			}
+			CloseHandle(hToken);
+		}
+
+		if (pcName[1]) {
+			const uint32_t len = strlen(pcName);
+			while (char* pos = stristr(buffer, pcName)) {
+				memset(pos, '*', len);
+			}
+		}
+
+		if (userName[1]) {
+			const uint32_t len = strlen(userName);
+			while (char* pos = stristr(buffer, userName)) {
+				memset(pos, '*', len);
+			}
+		}
+
+		if (userDirName[1]) {
+			const uint32_t len = strlen(userDirName);
+			while (char* pos = stristr(buffer, userDirName)) {
+				memset(pos, '*', len);
+			}
+		}
+	}
+}
+
+const char* __fastcall SanitizeString(const char* string, char* outBuffer, size_t bufferSize)
 {
-	SanitizeStringBySize(str);
-	SanitizeStringFromBadData(str);
-	SanitizeStringFromUserInfo(str);
+	SanitizeStringBySize(string, outBuffer, bufferSize);
+	SanitizeStringFromBadData(string, outBuffer, bufferSize);
+	SanitizeStringFromUserInfo(outBuffer, bufferSize);
 
-	return str;
+	return outBuffer;
 }
 
-float ConvertToKiB(const UInt64 size) {
+float __fastcall ConvertToKiB(const UInt64 size) {
 	return (float)size / 1024.0f;
 }
 
-float ConvertToMiB(const UInt64 size) {
+float __fastcall ConvertToMiB(const UInt64 size) {
 	return (float)size / 1024.0f / 1024.0f;
 }
 
-float ConvertToGiB(const UInt64 size) {
+float __fastcall ConvertToGiB(const UInt64 size) {
 	return (float)size / 1024.0f / 1024.0f / 1024.0f;
 }
 
-const char* FormatSize(UInt64 size, char* buffer, size_t bufferSize) {
+const char* __fastcall FormatSize(UInt64 size, char* buffer, size_t bufferSize) {
 	if (size < 1024) {
 		snprintf(buffer, bufferSize, "%6d B", UInt32(size));
 	}
@@ -1081,7 +1102,7 @@ const char* FormatSize(UInt64 size, char* buffer, size_t bufferSize) {
 	return buffer;
 }
 
-const char* GetMemoryUsageString(const UInt64 used, const UInt64 total, char* buffer, size_t bufferSize) {
+const char* __fastcall GetMemoryUsageString(const UInt64 used, const UInt64 total, char* buffer, size_t bufferSize) {
 	float usedPercent = (float)used / total * 100.0f;
 	char cUsed[64];
 	FormatSize(used, cUsed, sizeof(cUsed));
@@ -1092,7 +1113,7 @@ const char* GetMemoryUsageString(const UInt64 used, const UInt64 total, char* bu
 }
 
 //Returns the last Win32 error, in string format. Returns an empty string if there is no error.
-std::string GetErrorAsString(UInt32 errorMessageID)
+std::string __fastcall GetErrorAsString(UInt32 errorMessageID)
 {
 	if (errorMessageID == 0) return ""; //No error message has been recorded
 
@@ -1112,7 +1133,7 @@ std::string GetErrorAsString(UInt32 errorMessageID)
 	return message;
 }
 
-const char* GetExceptionAsString(UInt32 exceptionMessageID)
+const char* __fastcall GetExceptionAsString(UInt32 exceptionMessageID)
 {
 	switch (exceptionMessageID) {
 	case EXCEPTION_ACCESS_VIOLATION:			return "EXCEPTION_ACCESS_VIOLATION";
@@ -1139,12 +1160,13 @@ const char* GetExceptionAsString(UInt32 exceptionMessageID)
 	}
 }
 
-void PrintSeparator(UInt32 length) {
-	if (length > 256) 
-		length = 256;
+void __fastcall PrintSeparator(UInt32 length) {
+	if (length > 254) 
+		length = 254;
 
 	char separator[256] = {};
-	memset(separator, '-', length);
-	strcat_s(separator, "\n");
-	Log() << separator;
+	// Start with \n for better readability	
+	separator[0] = '\n';
+	memset(separator + 1, '-', length);
+	_MESSAGE(separator);
 }

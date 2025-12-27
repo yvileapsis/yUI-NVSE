@@ -29,9 +29,9 @@ public:
 
 	static NiNode* Create(UInt16 ausChildCount = 0);
 
-	UInt32 GetArrayCount() const;
-	UInt32 GetChildCount() const;
-	NiAVObject* GetAt(UInt32 i) const;
+	UInt32 GetArrayCount() const { return m_kChildren.GetSize(); }
+	UInt32 GetChildCount() const { return m_kChildren.GetEffectiveSize(); }
+	NiAVObject* GetAt(UInt32 i) const { return m_kChildren.GetAt(i); }
 	NiAVObject* GetAtSafely(UInt32 i) const;
 	NiAVObject* GetLastChild();
 	void CompactChildArray();
@@ -39,10 +39,6 @@ public:
 	NiNode* FindNodeByName(const NiFixedString& akName);
 
 	void UpdatePropertiesUpward(NiPropertyState*& apParentState);
-
-	static void __fastcall UpdateSelectedDownwardPassEx(BSFadeNode* apThis, void*, const NiUpdateData& arData, UInt32 auiFlags);
-	static void __fastcall ApplyTransformEx(NiNode* apThis, void*, NiMatrix3& kMat, NiPoint3& kTrn, bool abOnLeft);
-	static void __fastcall OnVisibleEx(NiNode* apThis, void*, NiCullingProcess* apCuller);
 
 	static void SetFlagRecurse(NiNode* apNode, UInt32 auiFlag, bool abSet);
 };

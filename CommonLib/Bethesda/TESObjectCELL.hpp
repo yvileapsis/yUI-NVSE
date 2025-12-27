@@ -150,11 +150,11 @@ public:
 	BGSLightingTemplate*					pkLightingTemplate;
 	UInt32									uiInheritFlags;
 
-	__forceinline bool IsInterior() { return (eFlags & 1) != 0; }
+	__forceinline bool IsInterior() const { return (cCellFlags & 1) != 0; }
 
-	__forceinline bool HasWater() { return (eFlags & 2) != 0; }
+	__forceinline bool HasWater() { return (cCellFlags & 2) != 0; }
 
-	__forceinline TESWorldSpace* GetWorldspace() { return IsInterior() ? nullptr : pkWorldSpace; }
+	__forceinline TESWorldSpace* GetWorldspace() const { return IsInterior() ? nullptr : pkWorldSpace; }
 
 	CELL_STATE GetState();
 

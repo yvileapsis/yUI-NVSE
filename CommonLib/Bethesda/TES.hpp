@@ -14,6 +14,7 @@ class TESObjectREFR;
 class QueuedFile;
 class GridDistantArray;
 class BSTempNodeManager;
+class NiDirectionalLight;
 
 class TES {
 public:
