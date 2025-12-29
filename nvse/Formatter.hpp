@@ -123,6 +123,10 @@ inline void __fastcall LogClass(const TESBoundObject& obj, bool nested = false) 
 
 inline void __fastcall LogClass(const TESObjectREFR& obj, bool nested = false) {
 	LogClass(static_cast<const TESForm&>(obj), nested);
+	if (!obj.IsTemporary() && obj.eFlags.IsClear(TESForm::INITIALIZED) && obj.pkParentCell) {
+		_MESSAGE("ERROR: Reference is not initialized! This can be caused by a corrupted plugin!\nOpen xEdit, and resave plugins that modify %08X (\"%s\")\nTo resave a plugin, right-click on it and mark as modified!\nDo not modify vanilla ESMs!", obj.pkParentCell->GetFormID(), obj.pkParentCell->GetEditorID());
+	}
+
 	const auto baseForm = obj.GetObjectReference();
 	if (baseForm) {
 		char cBuffer[128];
