@@ -304,7 +304,7 @@ public:
 	EnumJIPFormFlags	eJIPFormFlags2;		// 006
 	EnumJIPFormFlags	eJIPFormFlags3;		// 007
 
-	EnumFlags			eFlags;				// 008
+	Bitfield32			eFlags;				// 008
 	union
 	{
 		UInt32	uiFormID;					// 00C
@@ -333,13 +333,13 @@ public:
 	const char*					RefToString();
 	TESLeveledList*				GetLvlList();
 	void						SetJIPFlag(UInt8 jipFlag, bool bSet);
-	bool						IsQuestItem2() const	{ return eFlags & QUEST_ITEM; };
-	bool						IsDisabled() const	{ return eFlags & kFlags_IsPermanent; };
-	bool						IsTaken() const { return eFlags & kFlags_Taken; }
-	bool						IsPersistent() const { return eFlags & PERSISTENT; }
-	bool						IsTemporary() const { return eFlags & TEMPORARY; }
-	bool						IsDeleted() const { return eFlags & DELETED; }
-	bool						IsDestroyed() { return eFlags & kFlags_Destroyed; }
+	bool						IsQuestItem2() const	{ return eFlags.GetBit(QUEST_ITEM); };
+	bool						IsDisabled() const	{ return eFlags.GetBit(kFlags_IsPermanent); };
+	bool						IsTaken() const { return eFlags.GetBit(kFlags_Taken); }
+	bool						IsPersistent() const { return eFlags.GetBit(PERSISTENT); }
+	bool						IsTemporary() const { return eFlags.GetBit(TEMPORARY); }
+	bool						IsDeleted() const { return eFlags.GetBit(DELETED); }
+	bool						IsDestroyed() { return eFlags.GetBit(kFlags_Destroyed); }
 
 	bool						IsInteractionDisabled() const { return eJIPFormFlags2 & kJIPFormFlag2_NoPCActivation; };
 	static void					DoAddForm(TESForm* newForm, bool bPersist = true, bool record = true);
