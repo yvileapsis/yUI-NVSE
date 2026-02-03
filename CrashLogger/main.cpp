@@ -46,14 +46,24 @@ void InitLog()
 		localTime.tm_sec);
 
 	_MESSAGE("When asking for help, please send the whole log file!\n");
+}
 
-	if (GetModuleHandle("nvac.dll")) {
-		_MESSAGE("NVAC detected! The log will be incorrect!\nPlease remove NVAC to let the game crash properly!\n");
-	}
+void NVSEMessageHandler(NVSEMessagingInterface::Message* apMessage) {
+	switch (apMessage->type) {
+		case NVSEMessagingInterface::kMessage_PostLoad:
+			{
+				if (GetModuleHandle("nvac.dll")) {
+					_MESSAGE("NVAC detected! The log will be incorrect!\nPlease remove NVAC to let the game crash properly!\n");
+				}
 
 
-	if (GetModuleHandle("nvsr.dll")) {
-		_MESSAGE("New Vegas Stutter Remover detected! Using it will cause crashes!\n");
+				if (GetModuleHandle("nvsr.dll")) {
+					_MESSAGE("New Vegas Stutter Remover detected! Using it will cause crashes!\n");
+				}
+			}
+			break;
+		default:
+			break;
 	}
 }
 
@@ -92,6 +102,9 @@ bool NVSEPlugin_Load(const NVSEInterface* nvse)
 	if (nvse->isEditor)	return true;
 
 	g_commandInterface = static_cast<NVSECommandTableInterface*>(nvse->QueryInterface(NVSEInterface::kInterface_CommandTable));
+
+	NVSEMessagingInterface* pMessaging = static_cast<NVSEMessagingInterface*>(nvse->QueryInterface(NVSEInterface::kInterface_Messaging));
+	pMessaging->RegisterListener(nvse->GetPluginHandle(), "NVSE", NVSEMessageHandler);
 
 	return true;
 }
