@@ -142,6 +142,7 @@ namespace CrashLogger::PDB
 		if (!GetClassNameFromRTTI(object, buffer, bufferSize)) {
 			return GetClassNameFromPDB(object, buffer, bufferSize);
 		}
+		return true;
 	}
 };
 
