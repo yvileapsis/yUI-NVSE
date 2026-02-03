@@ -218,6 +218,16 @@ namespace CrashLogger
 
 		s_originalFilter = SetUnhandledExceptionFilter(&Filter);
 
+		HMODULE hKernel = GetModuleHandleA("kernel32.dll");
+		if (hKernel) {
+			auto pAddr = GetProcAddress(hKernel, "SetUnhandledExceptionFilter");
+			if (pAddr) {
+				WriteRelJump((UInt32)pAddr, (UInt32)&FakeSetUnhandledExceptionFilter);
+			}
+		}
+
+#if 0
 		SafeWrite32(0x00FDF180, (UInt32)&FakeSetUnhandledExceptionFilter);
+#endif
 	}
 }
