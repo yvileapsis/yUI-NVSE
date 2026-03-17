@@ -173,21 +173,21 @@ namespace CrashLogger::GameData
 					const char* pProcessName = "Invalid";
 					switch (i) {
 						case BaseProcess::kProcessLevel_High:
-							pProcessName = "High";
+							pProcessName = "High:       ";
 							break;
 						case BaseProcess::kProcessLevel_MiddleHigh:
-							pProcessName = "Middle High";
+							pProcessName = "Middle High:";
 							break;
 						case BaseProcess::kProcessLevel_MiddleLow:
-							pProcessName = "Middle Low";
+							pProcessName = "Middle Low: ";
 							break;
 						case BaseProcess::kProcessLevel_Low:
-							pProcessName = "Low";
+							pProcessName = "Low:        ";
 							break;
 						default:
 							__assume(0);
 					}
-					_MESSAGE("%s: %i", pProcessName, uiCount);
+					_MESSAGE("%s %i", pProcessName, uiCount);
 					uiTotal += uiCount;
 				}
 			}
