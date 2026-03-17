@@ -3,6 +3,8 @@
 #include "BaseFormComponent.hpp"
 #include "BSString.hpp"
 
+class TESForm;
+
 // 0xC
 class TESFullName : public BaseFormComponent {
 public:
@@ -10,5 +12,8 @@ public:
 	~TESFullName();
 
 	BSStringT<char>	kFullName;
+
+	const char* GetFullName() const;
+	static const char* GetFullName(const TESForm* apForm);
 };
 static_assert(sizeof(TESFullName) == 0xC);

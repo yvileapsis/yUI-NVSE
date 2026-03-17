@@ -44,38 +44,38 @@ public:
 	virtual void			PurgeRendererData(NiDX9Renderer* apRenderer);
 
 	enum NiFlags : DWORD {
-		APP_CULLED							  = 1u <<  0,
-		SELECTIVE_UPDATE						= 1u <<  1,
-		SELECTIVE_UPDATE_TRANSFORMS			 = 1u <<  2,
-		SELECTIVE_UPDATE_CONTROLLER			 = 1u <<  3,
-		SELECTIVE_UPDATE_RIGID				  = 1u <<  4,
-		DISPLAY_OBJECT						  = 1u <<  5,
-		DISABLE_SORTING						 = 1u <<  6,	// Gamebryo's sorter is used only on Tiles
-		SELECTIVE_UPDATE_TRANSFORMS_OVERRIDE	= 1u <<  7,
-		UNK_8									= 1u <<  8,
-		SAVE_EXTERNAL_GEOM_DATA				 = 1u <<  9,
-		NO_DECALS							   = 1u << 10,
-		ALWAYS_DRAW							 = 1u << 11,
-		ACTOR_NODE							  = 1u << 12,
-		FIXED_BOUND							 = 1u << 13,
-		FADED_IN								= 1u << 14,
-		IGNORE_FADE							 = 1u << 15,
-		LOD_FADING_OUT						  = 1u << 16,
-		HAS_MOVING_SOUND						= 1u << 17,
-		HAS_PROPERTY_CONTROLLER					= 1u << 18,
-		HAS_BOUND								= 1u << 19,
-		ACTOR_CULLED							= 1u << 20,
-		IGNORES_PICKING							= 1u << 21,
-		RENDER_USE							  = 1u << 22,
-		UNK_23									= 1u << 23,
-		HIGH_DETAIL								= 1u << 24, // Unused, meant for actors 0x936F75
-		UNK_25									= 1u << 25,
-		UNK_26									= 1u << 26,
-		UNK_27								  = 1u << 27,
-		UNK_28								  = 1u << 28,
-		IS_POINTLIGHT						   = 1u << 29, // Added by JIP
-		DONE_INIT_LIGHTS						= 1u << 30, // Added by JIP
-		IS_INSERTED							 = 1u << 31  // Added by JIP
+		APP_CULLED                              = 1u <<  0, // Forces culled state
+		SELECTIVE_UPDATE						= 1u <<  1, // Allows selective updates - see flags below
+		SELECTIVE_UPDATE_TRANSFORMS             = 1u <<  2, // Allows transform controller update
+		SELECTIVE_UPDATE_CONTROLLER				= 1u <<  3, // Allows controller update
+		SELECTIVE_UPDATE_RIGID                  = 1u <<  4, // Forces use of UpdateRigidDownwardPass
+		DISPLAY_OBJECT                          = 1u <<  5, // Used only by sky objects
+		DISABLE_SORTING                         = 1u <<  6,	// Unused, just like Gamebryo's sorter
+		SELECTIVE_UPDATE_TRANSFORMS_OVERRIDE	= 1u <<  7, // Forces UPDATE_TRANSFORMS even if node has no transform controllers
+		OBJECT_PREPARED							= 1u <<  8, // Xbox 360, used to mark prepared objects by BSShaderManager::PrepareGeometry
+		TRANS_IS_IDENTITY						= 1u <<  9, // Assumes local transform is an identity one, skipping transformations
+		NO_DECALS								= 1u << 10,	// Disables decals for this object
+		ALWAYS_DRAW                             = 1u << 11, // Forces light inclusion, and skips culling
+		PREPROCESSED_NODE						= 1u << 12, // Used to mark actor nodes, for actor culling
+		FIXED_BOUND                             = 1u << 13, // Prevents bound updates
+		FADED_IN								= 1u << 14, // BSFadeNode only; Marks fade state
+		IGNORE_FADE								= 1u << 15, // BSFadeNode only; Disables fading
+		LOD_FADING_OUT							= 1u << 16, // BSFadeNode only; Looks unused
+		HAS_MOVING_SOUND						= 1u << 17, // Used for sound updates
+		HAS_PROPERTY_CONTROLLER					= 1u << 18, // Marks the presence of a property controller
+		ORPHANED_BOUND							= 1u << 19, // Marks lack of a bound
+		NOT_VISIBLE                             = 1u << 20, // Used for actor culling
+		IGNORES_PICKING							= 1u << 21, // Disables picking for this object
+		WORLD_BOUND_CHANGE						= 1u << 22,	// Forces multibound update/attachment
+		NOT_SHADOW_RECEIVER						= 1u << 23, // Set if bActorSelfShadowing == false, checks for it look broken (maybe why the setting doesn't work?)
+		HIGH_DETAIL	                            = 1u << 24, // BSFadeNode only; Unused, meant for actors 0x936F75
+		ALREADY_TRAVERSED						= 1u << 25, // Xbox 360, used for texture streaming
+		UNK_26									= 1u << 26, // ??
+		PLAYER_BONE                             = 1u << 27,	// Marks player's bones, not read anywhere?
+		RELEVANT_IMPOSTER						= 1u << 28, // BSFadeNode only; Marks the imposter state to override fading
+		IS_POINTLIGHT                           = 1u << 29, // Added by JIP
+		DONE_INIT_LIGHTS                        = 1u << 30, // Added by JIP
+		IS_INSERTED                             = 1u << 31  // Added by JIP
 	};
 
 	NiNode*							m_pkParent;

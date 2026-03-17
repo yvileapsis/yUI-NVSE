@@ -147,49 +147,75 @@ public:
 
 	static const char* const TypeNames[kType_Count];
 
-	enum EnumFlags : UInt32
-	{
-		IS_MASTER					= 1u << 0,
-		IS_ALTERED					= 1u << 1,
-		kModified_FactionFlags		= 1u << 2,
-		INITIALIZED					= 1u << 3,
-		UNK_4						= 1u << 4,
-		DELETED						= 1u << 5,
-		kFlags_Taken				= DELETED | IS_ALTERED,
-		KNOWN						= 1u << 6,
-		UNK_7						= 1u << 7,
-		DROPPED						= 1u << 8,
-		CASTS_SHADOWS				= 1u << 9,
-		QUEST_ITEM					= 1u << 10,
-		PERSISTENT					= 1u << 10,
-		DISABLED					= 1u << 11,
-		kFlags_IsPermanent			= 1u << 11,
-		UNK_12						= 1u << 12,
-		UNK_13						= 1u << 13,
-		DONT_SAVE					= 1u << 14,
-		TEMPORARY					= 1u << 14,
-		VISIBLE_WHEN_DISTANT		= 1u << 15,
-		HAVOK_DEATH					= 1u << 16,
-		NEED_TO_CHANGE_PROCESS		= 1u << 17,
-		COMPRESSED					= 1u << 18,
-		UNK_19						= 1u << 19,
-		CENTER_ON_CREATION			= 1u << 20,
-		kFlags_IgnoreFriendlyHits	= 1u << 20,
-		STILL_LOADING				= 1u << 21,
-		BEING_DROPPED				= 1u << 22,
-		UNK_23						= 1u << 23,
-		kFlags_Destroyed			= 1u << 23,
-		UNK_24						= 1u << 24,
-		UNK_25						= 1u << 25,
-		IS_VATS_TARGETTABLE			= 1u << 26,
-		DISABLE_FADE				= 1u << 27,
-		CHANGED_INVENTORY			= 1u << 27,
-		UNK_28						= 1u << 28,
-		UNK_29						= 1u << 29,
-		TALKING_ACTIVATOR			= 1u << 30,
-		CONTINUOUS_BROADCAST		= 1u << 30,
-		UNK_31						= 1u << 31,
+	struct alignas(4) _FormFlags {
+		enum Flags : uint32_t {
+			MASTER					= 1u << 0, // TESForm
+			ALTERED					= 1u << 1, // TESForm
+
+			INITIALIZED				= 1u << 3, // TESForm
+			NO_COLLISION			= 1u << 4, // TESForm
+			DELETED					= 1u << 5, // TESForm
+			TREE_LOD				= 1u << 6, // TESBoundObject
+			HAS_SPOKEN				= 1u << 6, // Actor
+			IN_PLACEABLE_WATER		= 1u << 6, // TESBoundObject (!TESObjectDOOR)
+			HIDDEN_DOOR				= 1u << 6, // TESObjectDOOR
+			BORDER_REGION			= 1u << 6, // TESRegion
+			CONSTANT				= 1u << 6, // TESGlobal
+			FIRE_OFF				= 1u << 7, // TESForm
+			DROPPED					= 1u << 8, // TESObjectREFR (!TESObjectDOOR)
+			INACCESSIBLE			= 1u << 8, // TESObjectREFR (TESObjectDOOR)
+			ON_LOCAL_MAP			= 1u << 9, // TESBoundObject
+			CASTS_SHADOWS			= 1u << 9,  // TESObjectREFR (TESObjectLIGH)
+			MOTION_BLUR				= 1u << 9,  // TESObjectREFR (BGSMovableStatic)
+			QUEST_ITEM				= 1u << 10, // TESBoundObject
+			PERSISTENT				= 1u << 10, // TESObjectREFR
+			PERSISTENT_CELL			= 1u << 10, // TESObjectCELL
+			DISPLAY_ON_MAIN_MENU	= 1u << 10, // TESLoadScreen
+			DISABLED				= 1u << 11, // TESObjectREFR, NavMesh
+
+			EMPTY					= 1u << 13, // TESFlora
+			RESET_DESTRUCT			= 1u << 13, // BGSDestructibleObjectForm
+			NO_VOICE_FILTER			= 1u << 13, // BGSTalkingActivator
+			HAS_RESULTS				= 1u << 13, // TESTopicInfo, TESTopic
+			TEMPORARY				= 1u << 14, // TESForm
+			VISIBLE_DISTANT			= 1u << 15, // TESForm
+			RANDOM_ANIM_START		= 1u << 16, // TESObjectACTI, TESObjectLIGH, TESObjectCONT, TESObjectDOOR, TESFurniture, BGSTalkingActivator, BGSTerminal, BGSMovableStatic
+			HIGH_PRIORITY_LOD		= 1u << 16, // TESObjectREFR
+			HAVOK_DEATH				= 1u << 16, // Actor
+			NEED_TO_CHANGE_PROCESS	= 1u << 17, // MobileObject
+			DANGEROUS				= 1u << 17, // TESObjectACTI
+			RADIO_STATION			= 1u << 17, // BGSTalkingActivator
+			OFF_LIMITS				= 1u << 17, // TESObjectCELL
+			COMPRESSED				= 1u << 18, // TESForm (TESFile)
+			TARGETED				= 1u << 18, // TESObjectREFR
+			STARTS_DEAD				= 1u << 19, // TESActorBase
+			HAS_TEMP_3D				= 1u << 19, // TESObjectREFR
+			SPECIFIC_TEXTURES		= 1u << 19, // TESBoundObject (!TESActorBase)
+			CANT_WAIT				= 1u << 19, // TESWorldSpace, TESObjectCELL
+			CENTER_ON_CREATION		= 1u << 20, // TESObjectREFR (!Actor)
+			IGNORE_FRIENDLY_HITS	= 1u << 20, // Actor
+			STILL_LOADING			= 1u << 21, // TESForm
+			BEING_DROPPED			= 1u << 22, // TESOBjectREFR
+			DESTROYED				= 1u << 23, // TESObjectREFR
+			DESTRUCTIBLE			= 1u << 24, // TESObjectREFR
+			OBSTACLE				= 1u << 25, // TESBoundObject
+			NO_AI_ACQUIRE			= 1u << 25, // TESObjectREFR
+			VATS_TARGET_OVERRIDE	= 1u << 26, // TESObjectREFR
+			NAVMESH_GEN_FILTER		= 1u << 26, // GECK - TESObjectREFR, TESObjectACTI, TESObjectCONT, BGSStaticCollection 
+			DISABLE_FADE			= 1u << 27, // TESObjectREFR
+			NAVMESH_GEN_BOUND_BOX	= 1u << 27, // GECK - TESObjectREFR, TESObjectACTI, TESObjectCONT, BGSStaticCollection 
+			NON_PIPBOY_RADIO		= 1u << 28, // TESObjectACTI
+			REFLECTED_BY_AUTO_WATER = 1u << 28, // TESObjectREFR
+			CHILD_CAN_USE			= 1u << 29, // TESObjectACTI, TESFurniture, BGSIdleMarker
+			REFRACTED_BY_AUTO_WATER = 1u << 29, // TESObjectREFR
+			CONTINUOUS_BROADCAST	= 1u << 30, // BGSTalkingActivator
+			NAVMESH_GEN_GROUND		= 1u << 30, // GECK - TESObjectREFR, TESObjectACTI, TESObjectCONT, BGSStaticCollection 
+			LOCK_MULTIBOUND			= 1u << 31, // GECK
+
+			TAKEN = DELETED | ALTERED,
+		};
 	};
+	using FormFlags = _FormFlags::Flags;
 
 	TESForm();
 	virtual					~TESForm();
@@ -247,14 +273,14 @@ public:
 	virtual void			SetNeedToChangeProcess(bool abChange);	// 00020000
 	virtual void			Unk_37();		// write esp format
 	virtual void			readOBNDSubRecord(TESFile* apFile);	// read esp format
-	virtual bool			IsBoundObject();
-	virtual bool			IsObject();
+	virtual bool			IsBoundObject() const;
+	virtual bool			IsObject() const;
 	virtual bool			IsMagicItem(); // EnchantmentItem, SpellItem, IngredientItem, AlchemyItem
 	virtual bool			IsReference() const;
 	virtual bool			IsArmorAddon();
-	virtual bool			IsActorBase();
+	virtual bool			IsActorBase() const;
 	virtual bool			IsMobileObject() const;
-	virtual bool			IsActor();
+	virtual bool			IsActor() const;
 	virtual UInt32			Unk_41();
 	virtual void			Copy(const TESForm* apCopy);
 	virtual bool			Compare(TESForm* apForm);
@@ -304,7 +330,7 @@ public:
 	EnumJIPFormFlags	eJIPFormFlags2;		// 006
 	EnumJIPFormFlags	eJIPFormFlags3;		// 007
 
-	Bitfield32			eFlags;				// 008
+	Bitfield32			uiFormFlags;				// 008
 	union
 	{
 		UInt32	uiFormID;					// 00C
@@ -319,7 +345,6 @@ public:
 
 	TESForm*					TryGetREFRParent() const;
 	UInt8						GetModIndex() const;
-	TESFullName*				GetFullName() const;
 	const char*					GetTheName() const;
 	std::string					GetStringRepresentation() const;
 	bool						IsCloned() const { return ucModIndex == 0xFF; }
@@ -333,13 +358,13 @@ public:
 	const char*					RefToString();
 	TESLeveledList*				GetLvlList();
 	void						SetJIPFlag(UInt8 jipFlag, bool bSet);
-	bool						IsQuestItem2() const	{ return eFlags.GetBit(QUEST_ITEM); };
-	bool						IsDisabled() const	{ return eFlags.GetBit(kFlags_IsPermanent); };
-	bool						IsTaken() const { return eFlags.GetBit(kFlags_Taken); }
-	bool						IsPersistent() const { return eFlags.GetBit(PERSISTENT); }
-	bool						IsTemporary() const { return eFlags.GetBit(TEMPORARY); }
-	bool						IsDeleted() const { return eFlags.GetBit(DELETED); }
-	bool						IsDestroyed() { return eFlags.GetBit(kFlags_Destroyed); }
+	bool						IsQuestItem2() const	{ return uiFormFlags.GetBit(FormFlags::QUEST_ITEM); };
+	bool						IsDisabled() const	{ return uiFormFlags.GetBit(FormFlags::DISABLED); };
+	bool						IsTaken() const { return uiFormFlags.GetBit(FormFlags::TAKEN); }
+	bool						IsPersistent() const { return uiFormFlags.GetBit(FormFlags::PERSISTENT); }
+	bool						IsTemporary() const { return uiFormFlags.GetBit(FormFlags::TEMPORARY); }
+	bool						IsDeleted() const { return uiFormFlags.GetBit(FormFlags::DELETED); }
+	bool						IsDestroyed() { return uiFormFlags.GetBit(FormFlags::DESTROYED); }
 
 	bool						IsInteractionDisabled() const { return eJIPFormFlags2 & kJIPFormFlag2_NoPCActivation; };
 	static void					DoAddForm(TESForm* newForm, bool bPersist = true, bool record = true);

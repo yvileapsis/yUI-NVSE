@@ -36,6 +36,9 @@
       <Filter>Gamebryo</Filter>
     </ClCompile>
     <ClCompile Include="Bethesda\ScriptRunManager.cpp" />
+    <ClCompile Include="Gamebryo\NiGlobalStringTable.cpp" />
+    <ClCompile Include="Gamebryo\NiFixedString.cpp" />
+    <ClCompile Include="Bethesda\TESFullName.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bethesda\bhkpRigidBodyCinfo.hpp">
