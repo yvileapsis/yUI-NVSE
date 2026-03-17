@@ -11,7 +11,7 @@ namespace CrashLogger::Install
 	extern void __fastcall Process(EXCEPTION_POINTERS* info) {
 		try {
 			char sanitizedBuffer[MAX_PATH] = {};
-			_MESSAGE("\nInstall: %s", SanitizeString(GetFalloutDirectory().generic_string().c_str(), sanitizedBuffer, sizeof(sanitizedBuffer)));
+			_MESSAGE("\nInstall: %s", SanitizeString(GetRootDirectory(), sanitizedBuffer, sizeof(sanitizedBuffer)));
 		}
 		catch (...) { 
 			_MESSAGE("Failed to print install path."); 
@@ -43,7 +43,7 @@ namespace CrashLogger::Mods
 
 		try {
 			char folder_path[MAX_PATH];
-			sprintf_s(folder_path, "%s\\data\\nvse\\plugins\\scripts", GetFalloutDirectory().generic_string().c_str());
+			sprintf_s(folder_path, "%s\\data\\nvse\\plugins\\scripts", GetRootDirectory());
 			if (PathIsDirectory(folder_path)) {
 				_MESSAGE("\nScript Runners:\n  # | %*s%*s", CENTERED_TEXT(80, "Filename"));
 

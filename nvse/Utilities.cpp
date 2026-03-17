@@ -12,27 +12,24 @@
 
 
 
-static std::filesystem::path s_falloutDirectory;
+char cRootDirectoryPath[MAX_PATH] = {};
 
-const std::filesystem::path& GetFalloutDirectory()
+const char* GetRootDirectory()
 {
-	if (!s_falloutDirectory.empty()) 
-		return s_falloutDirectory;
+	if (cRootDirectoryPath[0])
+		return cRootDirectoryPath;
 
-	// can't determine how many bytes we'll need, hope it's not more than MAX_PATH
-	char	falloutPathBuf[MAX_PATH];
-	const UInt32	falloutPathLength = GetModuleFileName(GetModuleHandle(nullptr), falloutPathBuf, sizeof(falloutPathBuf));
+	const UInt32	uiPathLength = GetModuleFileNameA(nullptr, cRootDirectoryPath, sizeof(cRootDirectoryPath));
 
-	if (!falloutPathLength || falloutPathLength >= sizeof(falloutPathBuf)) {
-		_MESSAGE("Couldn't find fallout path (len = %d, err = %08X)", falloutPathLength, GetLastError());
-		return s_falloutDirectory;
+	if (!uiPathLength || uiPathLength >= sizeof(cRootDirectoryPath)) {
+		_MESSAGE("Couldn't find fallout path (len = %d, err = %08X)", uiPathLength, GetLastError());
+		return cRootDirectoryPath;
 	}
 
 	// truncate at last slash
-	strrchr(falloutPathBuf, '\\')[0] = 0;	// include the slash
-	s_falloutDirectory = falloutPathBuf;
+	strrchr(cRootDirectoryPath, '\\')[0] = 0;	// include the slash
 
-	return s_falloutDirectory;
+	return cRootDirectoryPath;
 }
 
 static std::filesystem::path s_configPath;
@@ -42,9 +39,10 @@ static const std::filesystem::path& GetNVSEConfigPath()
 
 	if (!s_configPath.empty()) return s_configPath;
 
-	if (const auto& falloutPath = GetFalloutDirectory(); !falloutPath.empty())
+	if (const auto falloutPath = GetRootDirectory(); !falloutPath[0])
 	{
-		s_configPath = falloutPath.generic_string() + "Data\\NVSE\\nvse_config.ini";
+		s_configPath = falloutPath;
+		s_configPath /= "Data\\NVSE\\nvse_config.ini";
 		Log() << ("config path =" + s_configPath.generic_string());
 	}
 
@@ -1104,9 +1102,9 @@ const char* __fastcall FormatSize(UInt64 size, char* buffer, size_t bufferSize) 
 
 const char* __fastcall GetMemoryUsageString(const UInt64 used, const UInt64 total, char* buffer, size_t bufferSize) {
 	float usedPercent = (float)used / total * 100.0f;
-	char cUsed[64];
+	char cUsed[32];
 	FormatSize(used, cUsed, sizeof(cUsed));
-	char cTotal[64];
+	char cTotal[32];
 	FormatSize(total, cTotal, sizeof(cTotal));
 	snprintf(buffer, bufferSize, "%s / %s (%.2f%%)", cUsed, cTotal, usedPercent);
 	return buffer;
