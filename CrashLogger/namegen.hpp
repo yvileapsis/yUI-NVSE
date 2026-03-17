@@ -38,7 +38,7 @@ inline const char* author[] {
 	"Vanilla "
 	"Hit - ",
 	"B42 ",
-	"TTW Compatible",
+	"TTW Compatible ",
 	"JIP ",
 	"Simple ",
 	"AI Generated ",
