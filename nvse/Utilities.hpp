@@ -3,7 +3,7 @@
 #include <Logging.hpp>
 #include <DebugLog.hpp>
 
-const std::filesystem::path& GetFalloutDirectory();
+const char* GetRootDirectory();
 std::string GetNVSEConfigOption(const char * section, const char * key);
 bool GetNVSEConfigOption_UInt32(const char * section, const char * key, UInt32 * dataOut);
 

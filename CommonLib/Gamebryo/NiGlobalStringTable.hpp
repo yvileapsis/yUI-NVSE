@@ -18,7 +18,7 @@ public:
 	static GlobalStringHandle AddString(const char* pcString);
 	static void IncRefCount(GlobalStringHandle& arHandle);
 	static void DecRefCount(GlobalStringHandle& arHandle);
-	static UInt32 GetLength(const GlobalStringHandle& arHandle);
+	static uint32_t GetLength(const GlobalStringHandle& arHandle);
 
 	static char* GetRealBufferStart(const GlobalStringHandle& arHandle);
 };

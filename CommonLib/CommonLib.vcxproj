@@ -136,7 +136,10 @@
     <ClCompile Include="Bethesda\ModelLoader.cpp" />
     <ClCompile Include="Bethesda\ScriptRunManager.cpp" />
     <ClCompile Include="Bethesda\TESForm.cpp" />
+    <ClCompile Include="Bethesda\TESFullName.cpp" />
     <ClCompile Include="Bethesda\TLSData.cpp" />
+    <ClCompile Include="Gamebryo\NiFixedString.cpp" />
+    <ClCompile Include="Gamebryo\NiGlobalStringTable.cpp" />
     <ClCompile Include="Gamebryo\NiMemManager.cpp" />
     <ClCompile Include="Gamebryo\NiMemory.cpp" />
     <ClCompile Include="Bethesda\BSWin32TaskletManager.cpp" />

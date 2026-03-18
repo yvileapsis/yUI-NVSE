@@ -4,11 +4,11 @@
 #include "TLSData.hpp"
 
 MemoryPool* MemoryManager::GetPool(UInt32 auiIndex) {
-	return ((MemoryPool**)0x11F63B8)[auiIndex];
+	return ((MemoryPool**)0x11F67B8)[auiIndex];
 }
 
 MemoryManager* MemoryManager::GetSingleton() {
-	return &*(MemoryManager*)0x11F6238;
+	return (MemoryManager*)0x11F6238;
 }
 
 // 0xAA42E0
