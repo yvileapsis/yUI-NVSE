@@ -20,11 +20,9 @@ jobs:
       uses: microsoft/setup-msbuild@v2
 
     - name: Restore NuGet packages
-      working-directory: ${{env.GITHUB_WORKSPACE}}
       run: nuget restore ${{env.SOLUTION_FILE_PATH}}
 
     - name: Build Release
-      working-directory: ${{env.GITHUB_WORKSPACE}}
       run: msbuild /m /p:Configuration=Release ${{env.SOLUTION_FILE_PATH}} /p:PostBuildEventUseInBuild=false
 
     - name: Package Artifacts
@@ -35,6 +33,14 @@ jobs:
         Copy-Item -Path "$releaseDir\CrashLogger.dll", "$releaseDir\CrashLogger.pdb" -Destination "$releaseDir\nvse\plugins"
         Compress-Archive -Path "$releaseDir\nvse" -DestinationPath "artifacts\CrashLogger-${{ github.event.release.tag_name }}.zip"
       shell: pwsh
+
+    - name: Attach artifacts to release
+      shell: pwsh
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        $tag = "${{ github.event.release.tag_name }}"
+        gh release upload $tag "artifacts\\CrashLogger-$tag.zip" --clobber
 
     - name: Upload mod to NexusMods
       id: upload
