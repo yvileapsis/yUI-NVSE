@@ -416,12 +416,19 @@ inline void __fastcall LogClass(const TESObjectREFR& obj, bool nested = false) {
 			_MESSAGE("Biped Objects:");
 			AutoIndent kIndent;
 			for (uint32_t i = 0; i < 20; ++i) {
-				const TESModel* pModel = pBiped->kObjects[i].pPart;
-				if (pModel) {
-					const char* pObjectName = reinterpret_cast<const char**>(0x1188B98)[i];
-					sprintf_s(cBuffer, "%s:", pObjectName);
-					LogMember(cBuffer, *pModel);
-				}
+				const char* pObjectName = reinterpret_cast<const char**>(0x1188B98)[i];
+				_MESSAGE("%s:", pObjectName);
+				AutoIndent kIndent2;
+				auto& rObject = pBiped->kObjects[i];
+				const TESForm* pParent = rObject.pParent;
+				if (pParent)
+					LogMember("Parent", *pParent);
+				const TESModel* pModel = rObject.pPart;
+				if (pModel)
+					LogMember("Model", *pModel);
+				const NiAVObject* pScene = rObject.pPartClone;
+				if (pScene)
+					LogMember("Scene", *pScene);
 			}
 		}
 	}

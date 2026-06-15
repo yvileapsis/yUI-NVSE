@@ -28,12 +28,11 @@ struct BipedAnim {
 	// 010
 	struct VB01Data
 	{
-		union
-		{
-			TESForm* item;
-			TESObjectARMO* armor;
-			TESObjectWEAP* weapon;
-			TESRace* race;
+		union {
+			TESForm*		pParent;
+			TESObjectARMO*	pArmor;
+			TESObjectWEAP*	pWeapon;
+			TESRace*		pRace;
 		};
 		TESModel*	pPart;
 		NiAVObject* pPartClone;
