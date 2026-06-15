@@ -386,9 +386,9 @@ inline void __fastcall LogClass(const TESObjectREFR& obj, bool nested = false) {
 		_MESSAGE("ERROR: Reference is not initialized! This can be caused by a corrupted plugin!\nOpen xEdit, and resave plugins that modify %08X (\"%s\")\nTo resave a plugin, right-click on it and mark as modified!\nDo not modify vanilla ESMs!", obj.pkParentCell->GetFormID(), obj.pkParentCell->GetEditorID());
 	}
 
+	char cBuffer[128];
 	const auto baseForm = obj.GetObjectReference();
 	if (baseForm) {
-		char cBuffer[128];
 		sprintf_s(cBuffer, "BaseForm: %s", TESForm::TypeNames[baseForm->eTypeID]);
 		if (!nested)
 			LogMember(cBuffer, *baseForm);
@@ -402,13 +402,27 @@ inline void __fastcall LogClass(const TESObjectREFR& obj, bool nested = false) {
 		}
 
 		try {
-			TESModel* pModel = ModelLoader::GetSingleton()->GetModelForBoundObject(baseForm, &obj);
+			const TESModel* pModel = ModelLoader::GetSingleton()->GetModelForBoundObject(baseForm, &obj);
 			if (pModel) {
 				LogMember("Model:", *pModel);
 			}
 		}
 		catch (...) {
 			_MESSAGE("Failed to retrieve model for reference");
+		}
+
+		const BipedAnim* pBiped = obj.GetBiped();
+		if (pBiped) {
+			_MESSAGE("Biped Objects:");
+			AutoIndent kIndent;
+			for (uint32_t i = 0; i < 20; ++i) {
+				const TESModel* pModel = pBiped->kObjects[i].pPart;
+				if (pModel) {
+					const char* pObjectName = reinterpret_cast<const char**>(0x1188B98)[i];
+					sprintf_s(cBuffer, "%s:", pObjectName);
+					LogMember(cBuffer, *pModel);
+				}
+			}
 		}
 	}
 }
@@ -728,6 +742,23 @@ inline void __fastcall LogClass(const MobileObject& obj, bool nested = false) {
 	}
 }
 
+inline void __fastcall LogClass(const Actor& obj, bool nested = false) {
+	LogClass(static_cast<const MobileObject&>(obj), nested);
+	if (obj.pkObjectReference)
+		_MESSAGE("Level: %i", obj.GetLevel());
+
+	const char** ppLifeStateString = reinterpret_cast<const char**>(0x118C690);
+	_MESSAGE("Life State: %s", ppLifeStateString[obj.eLifeState]);
+
+	TESObjectREFR* pTarget = obj.GetCombatTarget();
+	if (pTarget)
+		LogMember("Combat Target:", *pTarget);
+
+	pTarget = obj.GetCurrentPackageTarget();
+	if (pTarget)
+		LogMember("Package Target:", *pTarget);
+}
+
 inline void __fastcall LogClass(const TESObjectCELL& obj, bool nested = false) {
 	LogClass(static_cast<const TESForm&>(obj), nested);
 
@@ -774,7 +805,7 @@ inline void __fastcall LogClass(const TESWorldSpace& obj, bool nested = false) {
 }
 
 inline void __fastcall LogClass(const Projectile& obj, bool nested = false) {
-	LogClass(static_cast<const TESObjectREFR&>(obj), nested);
+	LogClass(static_cast<const MobileObject&>(obj), nested);
 	if (obj.pSourceRef) {
 		LogMember("Shooter:", *obj.pSourceRef);
 	}

@@ -100,7 +100,7 @@ public:
 	virtual void		GetAlpha();
 	virtual void		ForceAttackActor();
 	virtual bool		IsInCombat();
-	virtual Actor*		GetCombatTarget();
+	virtual Actor*		GetCombatTarget() const;
 	virtual void		UpdateCombat();
 	virtual void		Unk_10D();
 	virtual void		Unk_10E();
@@ -268,6 +268,10 @@ public:
 	UInt8						byte1B2;
 	UInt8						byte1B3;
 	
+	uint16_t GetLevel() const { return ThisStdCall<uint16_t>(0x87F9F0, this); }
+
+	TESObjectREFR* GetCurrentPackageTarget() const { return ThisStdCall<TESObjectREFR*>(0x881650, this); }
+
 	// OBSE: unk1 looks like quantity, usu. 1; ignored for ammo (equips entire stack). In NVSE, pretty much always forced internally to 1
 	// OBSE: itemExtraList is NULL as the container changes entry is not resolved before the call
 	// NVSE: Default values are those used by the vanilla script functions.

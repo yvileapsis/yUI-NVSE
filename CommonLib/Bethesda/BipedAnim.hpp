@@ -2,13 +2,14 @@
 
 class Actor;
 class TESForm;
-class TESModelTextureSwap;
+class TESModel;
 class TESObjectARMO;
 class TESObjectWEAP;
 class TESRace;
 class NiNode;
+class NiAVObject;
 
-struct BipedAnim {	// somehow descend from NiNodeArray
+struct BipedAnim {
 	enum eOptionalBoneType {
 		kOptionalBone_Bip01Head = 0,
 		kOptionalBone_Weapon = 1,
@@ -34,17 +35,17 @@ struct BipedAnim {	// somehow descend from NiNodeArray
 			TESObjectWEAP* weapon;
 			TESRace* race;
 		};
-		TESModelTextureSwap* modelTexture;
-		NiNode* boneNode;
-		UInt32 unk00C;
+		TESModel*	pPart;
+		NiAVObject* pPartClone;
+		bool		bSkinned;
 	};
 
-	NiNode* pRoot;
-	OptionalBone bones[5];
-	VB01Data slotData[20];
-	VB01Data unk016C[20];
-	UInt32 unk2AC;
-	Actor* actor;
+	NiNode*			pRoot;
+	OptionalBone	kBones[5];
+	VB01Data		kObjects[20];
+	VB01Data		kBufferedObjects[20];
+	float			fWeaponOffset;
+	TESObjectREFR*	pRequester;
 
 	MEMBER_FN_PREFIX(BipedAnim);
 #if RUNTIME

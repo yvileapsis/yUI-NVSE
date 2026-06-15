@@ -33,7 +33,5 @@ public:
 	TextureData			kTextures;
 	EnumFacegenFlags	ucFacegenFlags;
 	UInt8				pad15[3];
-
-	void SetPath(const char* newPath) { kModel.Set(newPath); }
 };
 static_assert(sizeof(TESModel) == 0x18);

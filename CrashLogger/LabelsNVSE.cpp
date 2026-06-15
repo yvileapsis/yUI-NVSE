@@ -197,7 +197,7 @@ namespace CrashLogger::Labels
 		Push(kVtbl_TESObjectREFR, As<TESObjectREFR>);
 		Push(kVtbl_MobileObject, As<MobileObject>);
 		Push(kVtbl_Explosion);
-		Push(kVtbl_Actor);
+		Push(kVtbl_Actor, As<Actor>);
 		Push(kVtbl_Creature);
 		Push(kVtbl_Character);
 		Push(kVtbl_PlayerCharacter);

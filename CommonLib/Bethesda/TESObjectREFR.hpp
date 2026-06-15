@@ -94,10 +94,10 @@ public:
 	virtual NiPoint3*				GetMaxBounds(NiPoint3* apMax);
 	virtual void					UpdateAnimation();
 	virtual AnimData*				GetAnimData();						// 0079
-	virtual BipedAnim*				GetValidBip01Names();				// 007A	Character only
-	virtual BipedAnim*				CallGetValidBip01Names();
-	virtual void					SetValidBip01Names(BipedAnim validBip01Names);
-	virtual NiPoint3*				GetPos() const;						// GetPos or GetDistance
+	virtual BipedAnim*				GetBiped() const;
+	virtual BipedAnim*				GetCurrentBiped() const;
+	virtual void					SetBiped(BipedAnim* apBiped);
+	virtual const NiPoint3&			GetPos() const;						// GetPos or GetDistance
 	virtual void					Unk_7E(UInt32 arg0);
 	virtual void					ResetHavokSimulation(bool abRecursive);
 	virtual void					Unk_80(UInt32 arg0);
