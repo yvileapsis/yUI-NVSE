@@ -562,8 +562,7 @@ namespace CrashLogger::Labels
 //		Push(kVtbl_NiTaskManager);
 //		Push(kVtbl_NiParallelUpdateTaskManager);
 		Push(kVtbl_hkPackedNiTriStripsData);
-		Push(kVtbl_NiInterpolator, As<NiRefObject>);
-		Push(kVtbl_NiBlendInterpolator);
+		Push(kVtbl_NiBlendInterpolator, As<NiBlendInterpolator>);
 		Push(kVtbl_NiBlendTransformInterpolator);
 		Push(kVtbl_NiBlendAccumTransformInterpolator);
 		Push(kVtbl_NiBlendFloatInterpolator);
@@ -571,6 +570,7 @@ namespace CrashLogger::Labels
 		Push(kVtbl_NiBlendPoint3Interpolator);
 		Push(kVtbl_NiBlendColorInterpolator);
 		Push(kVtbl_NiBlendBoolInterpolator);
+		Push(kVtbl_NiInterpolator, As<NiInterpolator>);
 		Push(kVtbl_NiLookAtInterpolator);
 		Push(kVtbl_NiKeyBasedInterpolator);
 		Push(kVtbl_NiFloatInterpolator);

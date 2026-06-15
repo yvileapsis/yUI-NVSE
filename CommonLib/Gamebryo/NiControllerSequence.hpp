@@ -1,6 +1,7 @@
 #pragma once
 
 #include "NiInterpolator.hpp"
+#include "NiInterpController.hpp"
 #include "NiTimeController.hpp"
 #include "NiFixedString.hpp"
 #include "BSAnimNote.hpp"
@@ -32,7 +33,7 @@ public:
 	// 10
 	struct InterpArrayItem {
 		NiInterpolatorPtr		m_spInterpolator;
-		NiInterpController*		m_spInterpCtlr;
+		NiInterpControllerPtr	m_spInterpCtlr;
 		NiBlendInterpolator*	m_pkBlendInterp;
 		UInt8					m_ucBlendIdx;
 		UInt8					m_ucPriority;

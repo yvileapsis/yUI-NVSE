@@ -2,6 +2,8 @@
 #include <ModelLoader.hpp>
 #include <TESWorldSpace.hpp>
 #include <NiControllerManager.hpp>
+#include <NiBlendInterpolator.hpp>
+#include <NiInterpController.hpp>
 #include <TESObjectACTI.hpp>
 
 #include <RTTI.hpp>
@@ -481,6 +483,52 @@ inline void __fastcall LogClass(const NiControllerSequence& obj, bool nested = f
 
 	if (obj.m_pkOwner && !nested) {
 		LogMember("Owner:", *static_cast<const NiTimeController*>(obj.m_pkOwner));
+	}
+
+	char cBuffer[128];
+	_MESSAGE("Controlled Blocks: %i", obj.m_uiArraySize);
+	for (uint32_t i = 0; i < obj.m_uiArraySize; ++i) {
+		AutoIndent kIndent;
+		_MESSAGE("Block %i", i);
+		AutoIndent kIndent2;
+		const auto pBlendInterp = obj.m_pkInterpArray[i].m_pkBlendInterp;
+		const NiInterpolator* pInterp = obj.m_pkInterpArray[i].m_spInterpolator;
+		const NiInterpController* pCtrl = obj.m_pkInterpArray[i].m_spInterpCtlr;
+		sprintf_s(cBuffer, "Interpolator: %s", pInterp ? pInterp->GetRTTIName() : "<Empty>");
+		if (pInterp)
+			LogMember(cBuffer, *pInterp);
+		sprintf_s(cBuffer, "Controller: %s", pCtrl ? pCtrl->GetRTTIName() : "<Empty>");
+		if (pCtrl)
+			LogMember(cBuffer, *static_cast<const NiTimeController*>(pCtrl));
+		sprintf_s(cBuffer, "Blend Interpolator: %s", pBlendInterp ? pBlendInterp->GetRTTIName() : "<Empty>");
+		if (pBlendInterp)
+			LogMember(cBuffer, *pBlendInterp);
+		_MESSAGE("Blend ID: %i", obj.m_pkInterpArray[i].m_ucBlendIdx);
+		_MESSAGE("Priority: %i", obj.m_pkInterpArray[i].m_ucPriority);
+	}
+}
+
+inline void __fastcall LogClass(const NiInterpolator& obj, bool nested = false) {
+	LogClass(static_cast<const NiObject&>(obj), nested);
+
+	_MESSAGE("Last Time: %f", obj.m_fLastTime);
+}
+
+inline void __fastcall LogClass(const NiBlendInterpolator& obj, bool nested = false) {
+	LogClass(static_cast<const NiInterpolator&>(obj), nested);
+
+	_MESSAGE("Single Index: %i", obj.m_ucSingleIdx);
+
+	_MESSAGE("Interpolators: %i", obj.m_ucInterpCount);
+	for (uint32_t i = 0; i < obj.m_ucInterpCount; ++i) {
+		AutoIndent kIndent;
+		_MESSAGE("Interpolator %i: %s", i, obj.m_pkInterpArray[i].m_spInterpolator ? obj.m_pkInterpArray[i].m_spInterpolator->GetRTTIName() : "<Empty>");
+		AutoIndent kIndent2;
+		_MESSAGE("Weight: %f", obj.m_pkInterpArray[i].m_fWeight);
+		_MESSAGE("Normalized Weight: %f", obj.m_pkInterpArray[i].m_fNormalizedWeight);
+		_MESSAGE("Priority: %i", obj.m_pkInterpArray[i].m_cPriority);
+		_MESSAGE("Ease Spinner: %f", obj.m_pkInterpArray[i].m_fEaseSpinner);
+		_MESSAGE("Update Time: %f", obj.m_pkInterpArray[i].m_fUpdateTime);
 	}
 }
 
