@@ -261,9 +261,9 @@ template<class Member> void __fastcall LogMember(const char* name, const Member&
 	}
 	catch (...) {
 		if (name)
-			_MESSAGE("Exception occurred while logging member \"%s\"", name);
+			_MESSAGE("Exception occurred while logging member \"%s\" %08X", name, UInt32(&member));
 		else
-			_MESSAGE("Exception occurred while logging member");
+			_MESSAGE("Exception occurred while logging member %08X", UInt32(&member));
 	}
 }
 
@@ -273,7 +273,7 @@ template<class Member> void __fastcall LogClassLineByLine(Member& member) {
 		LogClass(member);
 	}
 	catch (...) {
-		_MESSAGE("Exception occurred while logging");
+		_MESSAGE("Exception occurred while logging %08X", UInt32(&member));
 	}
 }
 
