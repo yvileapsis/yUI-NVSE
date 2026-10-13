@@ -397,8 +397,8 @@ bool In(T t, std::initializer_list<T> l)
 
 namespace ra = std::ranges;
 
-std::string& ToLower(std::string&& data);
-std::string& StripSpace(std::string&& data);
+std::string& ToLower(std::string& data);
+std::string& StripSpace(std::string& data);
 
 bool StartsWith(const char* left, const char* right);
 
