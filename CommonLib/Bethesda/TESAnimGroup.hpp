@@ -299,7 +299,7 @@ public:
 
 	bool IsAttack()
 	{
-		return ThisStdCall(0x4937E0, this);
+		return ThisCall<bool>(0x4937E0, this);
 	}
 
 	bool IsAttackIS();

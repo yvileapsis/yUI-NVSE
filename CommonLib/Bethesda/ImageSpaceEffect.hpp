@@ -36,7 +36,7 @@ public:
 	NiTPrimitiveArray<UInt32*>					kShaderOutputs;
 
 	void SetTexture(UInt32 aiIndex, ImageSpaceTexture* apTex, TextureFilterMode aiFilterMode) {
-		ThisStdCall(0xBA3CB0, this, aiIndex, apTex, aiFilterMode);
+		ThisCall(0xBA3CB0, this, aiIndex, apTex, aiFilterMode);
 	}
 };
 

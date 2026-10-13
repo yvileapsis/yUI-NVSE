@@ -12,7 +12,7 @@ public:
 	}
 
 	UInt32 UnsignedIntBelow(UInt32 auiMax) {
-		return ThisStdCall(0xAA5230, this, auiMax);
+		return ThisCall(0xAA5230, this, auiMax);
 	}
 
 	UInt32 UnsignedInt() {

@@ -14,7 +14,7 @@ uint32_t TESDataHandler::GetCompiledFileCount() const {
 }
 
 TESFile* TESDataHandler::GetCompiledFile(uint32_t auiIndex) const {
-	return ThisStdCall<TESFile*>(0x465010, this, auiIndex);
+	return ThisCall<TESFile*>(0x465010, this, auiIndex);
 }
 
 TESFile* TESDataHandler::GetListFile(uint32_t auiIndex) {
@@ -43,7 +43,7 @@ TESFile* TESDataHandler::GetListFile(uint32_t auiIndex) {
 
 // GAME - 0x462F40
 TESFile* TESDataHandler::GetListFile(const char* apFileName) {
-	return ThisStdCall<TESFile*>(0x462F40, this, apFileName);
+	return ThisCall<TESFile*>(0x462F40, this, apFileName);
 }
 
 bool TESDataHandler::HasExtendedPlugins() const {

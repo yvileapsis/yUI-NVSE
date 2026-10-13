@@ -68,7 +68,7 @@ public:
 
 	NIRTTI_ADDRESS(0x11F4418);
 
-	NiObject* Clone() { return ThisStdCall<NiObject*>(0xA5D680, this); }
+	NiObject* Clone() { return ThisCall<NiObject*>(0xA5D680, this); }
 
 	template <class T_RTTI>
 	bool IsKindOf() const {

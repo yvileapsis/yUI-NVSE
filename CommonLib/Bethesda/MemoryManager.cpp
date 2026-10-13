@@ -13,22 +13,22 @@ MemoryManager* MemoryManager::GetSingleton() {
 
 // 0xAA42E0
 ScrapHeap* MemoryManager::GetThreadScrapHeap() {
-	return ThisStdCall<ScrapHeap*>(0xAA42E0, MemoryManager::GetSingleton());
+	return ThisCall<ScrapHeap*>(0xAA42E0, MemoryManager::GetSingleton());
 }
 
 // 0xAA3E40
 void* MemoryManager::Allocate(size_t aSize) {
-	return ThisStdCall<void*>(0xAA3E40, MemoryManager::GetSingleton(), aSize);
+	return ThisCall<void*>(0xAA3E40, MemoryManager::GetSingleton(), aSize);
 }
 
 // 0xAA4150
 void* MemoryManager::Reallocate(void* apOldMem, size_t auiNewSize) {
-	return ThisStdCall<void*>(0xAA4150, MemoryManager::GetSingleton(), apOldMem, auiNewSize);
+	return ThisCall<void*>(0xAA4150, MemoryManager::GetSingleton(), apOldMem, auiNewSize);
 }
 
 // 0xAA4060
 void MemoryManager::Deallocate(void* apMemory) {
-	ThisStdCall(0xAA4060, MemoryManager::GetSingleton(), apMemory);
+	ThisCall(0xAA4060, MemoryManager::GetSingleton(), apMemory);
 }
 
 // GAME - 0xAA4290

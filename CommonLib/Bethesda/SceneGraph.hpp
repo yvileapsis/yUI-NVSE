@@ -11,7 +11,7 @@ public:
 	static SceneGraph* Create(const char* apName, bool abMenuSceneGraph = false, NiCamera* apCamera = nullptr);
 
 	__forceinline void SetCameraFOV(float afFOV, bool a3, NiCamera* apCamera, bool bSetLODAdjust) {
-		ThisStdCall(0xC52020, this, afFOV, a3, apCamera, bSetLODAdjust);
+		ThisCall(0xC52020, this, afFOV, a3, apCamera, bSetLODAdjust);
 	}
 	static __forceinline void UpdateParticleShaderFoVData(float afFOV) {
 #if 1

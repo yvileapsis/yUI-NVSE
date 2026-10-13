@@ -442,7 +442,7 @@ inline void __fastcall LogClass(const TESPackage& obj, bool nested = false) {
 #if 0
 	if (obj.kData.eFlags & TESPackage::kPackageFlag_Created) {
 		if (obj.kData.eType >= 0 && obj.kData.eType < 40) {
-			const char* pObjectTypeName = ThisStdCall<const char*>(0x67ACD0, &obj);
+			const char* pObjectTypeName = ThisCall<const char*>(0x67ACD0, &obj);
 			char textBuffer[128];
 			_MESSAGE("Package Type: %s", pObjectTypeName);
 		

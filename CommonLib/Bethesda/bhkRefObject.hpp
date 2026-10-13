@@ -18,7 +18,7 @@ public:
 	hkReferencedObject* phkObject;
 
 	NiAVObject* GetAVObject(NiRTTI* apRTTI = nullptr) const {
-		return ThisStdCall<NiAVObject*>(0xC85C80, this, apRTTI);
+		return ThisCall<NiAVObject*>(0xC85C80, this, apRTTI);
 	};
 };
 

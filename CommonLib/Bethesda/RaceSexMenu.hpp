@@ -281,6 +281,6 @@ public:
 	void UpdateScrollButtonVisibilities() { ThisCall(0x7AF6B0, this); };
 	UInt32 GetCurrentMenuID() { return tile->Get(kTileValue_user0); };
 	void SetMenuActive(UInt32 _id) { ThisCall(0x7AF180, this, _id); };
-	void UpdatePlayerHead() { ThisStdCall(0x007B25A0, this); }
+	void UpdatePlayerHead() { ThisCall(0x007B25A0, this); }
 };
 static_assert(sizeof(RaceSexMenu) == 0x1A4);
