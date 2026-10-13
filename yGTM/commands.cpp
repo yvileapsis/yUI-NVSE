@@ -1,6 +1,7 @@
 #include <CommandTable.h>
 #include <GameAPI.h>
 #include <GameSound.h>
+#include <GameData.h>
 #include <timeMult.h>
 
 #include "GameObjects.h"
@@ -15,8 +16,9 @@ extern inline bool Cmd_SetGlobalTimeMultiplierAlt_Execute(COMMAND_ARGS)
 	*result = 0;
 	if (!ExtractArgsEx(EXTRACT_ARGS_EX, &timeMult, &changeTime, &mod)) return true;
 
-	if (mod == 0) mod = scriptObj->modIndex;
-
+	if (mod == 0) {
+		mod = TimeMult::GetModKey(scriptObj);
+	}
 	TimeMult::ModifyMap(timeMult, mod);
 	TimeMult::Set();
 
@@ -32,17 +34,19 @@ extern inline bool Cmd_SetGlobalTimeMultiplierAlt_Execute(COMMAND_ARGS)
 
 extern inline bool Cmd_GetGlobalTimeMultiplierAlt_Execute(COMMAND_ARGS)
 {
-	SInt32 mod = 0;
+	UInt32 mod = 0;
 
 	*result = 1;
 	if (*reinterpret_cast<UInt16*>(static_cast<UInt8*>(scriptData) + *opcodeOffsetPtr - 2) != 0 && !ExtractArgsEx(EXTRACT_ARGS_EX, &mod)) return true;
 
-	if (!TimeMult::g_specialMods.contains(scriptObj->modIndex)) mod = -1;
+	const UInt32 localMod = TimeMult::GetModKey(scriptObj);;
+
+	if (!TimeMult::g_specialMods.contains(localMod)) mod = -1;
 	if (mod == -1) {
-		mod = scriptObj->modIndex;
+		mod = localMod;
 		*result = TimeGlobal::Get();
 	} else {
-		if (mod == 0) mod = scriptObj->modIndex;
+		if (mod == 0) mod = localMod;
 		*result = TimeMult::g_localMults.contains(mod) ? TimeMult::g_localMults[mod] : 1.0;
 	}
 

@@ -4,8 +4,6 @@
 #include <settings.h>
 #include <ranges>
 
-extern DataHandler* g_dataHandler;
-
 namespace TimeMult
 {
 	SInt8 wah(Script* iter, CommandInfo* command)
@@ -23,23 +21,42 @@ namespace TimeMult
 	{
 		std::vector<Script*> vec;
 		const auto command = GetByOpcode(0x1186);
-		for (auto iter : g_dataHandler->scriptList) vec.push_back(iter);
+		for (auto iter : DataHandler::GetSingleton()->scriptList) vec.push_back(iter);
 		for (const auto& iter : std::ranges::reverse_view(vec))
 		{
-			if (g_specialMods.contains(iter->modIndex)) continue;
+			UInt32 modKey = GetModKey(iter);
+			if (g_specialMods.contains(modKey)) continue;
 				if (wah(iter, command) == 1)
 				{
-					g_specialMods.emplace(iter->modIndex);
-					Log(FormatString("Found SGTM use in mod: %02X (%50s), form: %08X (%50s)", iter->modIndex, GetModName(
+					g_specialMods.emplace(modKey);
+					Log(FormatString("Found SGTM use in mod: %02X (%50s), form: %08X (%50s)", modKey, GetModName(
 						iter), iter->refID, iter->GetName()));
 				}
 				else if (wah(iter, command) == -1)
 				{
-					Log(FormatString("Found FATAL FAILURE AND DISAPPOINTMENT use in mod: %02X (%50s), form: %08X (%50s)", iter->modIndex, GetModName(
+					Log(FormatString("Found FATAL FAILURE AND DISAPPOINTMENT use in mod: %02X (%50s), form: %08X (%50s)", modKey, GetModName(
 						iter), iter->refID, iter->GetName()));
 				}
 		}
 		vec.clear();
+	}
+
+	UInt32 __fastcall GetModKey(const TESForm* form) {
+		ModInfo* mod = form->GetFile(0);
+		if (mod)
+			return GetModKey(mod);
+		return form->GetModIndex();
+	}
+
+	UInt32 __fastcall GetModKey(const ModInfo* file) {
+		UInt32 id = 0;
+		if (file->IsSpecial() && DataHandler::HasNewFileTypeSupport()) {
+			file->AdjustFormIDFileIndex(id);
+		}
+		else {
+			id = file->modIndex;
+		}
+		return id;
 	}
 
 	void Set(TimeGlobal* timeGlobal, char isImmediateChange)
@@ -47,7 +64,7 @@ namespace TimeMult
 		timeGlobal->Set(g_timeMult, isImmediateChange);
 	}
 
-	void ModifyMap(const Float64 timeMult, const UInt16 mod)
+	void ModifyMap(const Float64 timeMult, const UInt32 mod)
 	{
 		g_localMults.erase(mod);
 		if (timeMult != 1) g_localMults.emplace(mod, timeMult);

@@ -554,11 +554,17 @@ public:
 
 	TList<ModInfo>	mods;
 
+	UInt32			GetFormID() const;
+	UInt32			GetFormIDWithoutIndex() const;
+	UInt8			GetModIndex() const;
+
 	TESForm*		TryGetREFRParent(void);
 	TESFullName*	GetFullName() const;
 	const char*		GetTheName();
 	bool			IsCloned() const;
 	std::string		GetStringRepresentation() const;
+
+	ModInfo*		GetFile(int32_t aiIndex) const;
 
 	bool			IsWeapon() const { return typeID == kFormType_TESObjectWEAP; }
 	bool			IsArmor() const { return typeID == kFormType_TESObjectARMO; }
