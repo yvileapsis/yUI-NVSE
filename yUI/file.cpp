@@ -50,7 +50,7 @@ namespace SIFiles
 					if (elem.contains("mod") && elem.contains("form"))
 					{
 						auto modName = elem.contains("mod") ? elem["mod"].get<std::string>() : "";
-						const auto* mod = !modName.empty() ? DataHandler::GetSingleton()->LookupModByName(modName.c_str()) : nullptr;
+						const auto* mod = !modName.empty() ? DataHandler::GetSingleton()->GetModByName(modName.c_str()) : nullptr;
 						if (!mod && !modName.empty())
 						{
 							Log("Mod name " + modName + " was not found");
@@ -60,7 +60,7 @@ namespace SIFiles
 						UInt32 formlist = 0;
 						if (elem.contains("formlist")) formlist = elem["formlist"].get<UInt32>();
 
-						std::vector<int> formIds;
+						std::vector<uint32_t> formIds;
 						if (auto* formElem = elem.contains("form") ? &elem["form"] : nullptr; formElem)
 						{
 							if (formElem->is_array())
@@ -73,9 +73,9 @@ namespace SIFiles
 
 						if (mod && !formIds.empty())
 						{
-							for (auto formId : formIds)
+							for (UInt32 formId : formIds)
 							{
-								formId = (mod->modIndex << 24) + (formId & 0x00FFFFFF);
+								mod->AdjustFormIDFileIndex(formId);
 								common.form = LookupFormByID(formId);
 								if (!common.form) { Log(FormatString("Form %X was not found", formId)); continue; }
 								if (!formlist) {
@@ -124,8 +124,10 @@ namespace SIFiles
 						if (elem.contains("ammoMod") && elem.contains("ammoForm"))
 						{
 							auto ammoModName = elem["ammoMod"].get<std::string>();
-							const auto* ammoMod = !ammoModName.empty() ? DataHandler::GetSingleton()->LookupModByName(ammoModName.c_str()) : nullptr;
-							auto* ammoForm = LookupFormByID((ammoMod->modIndex << 24) + (strToFormID(elem["ammoForm"].get<std::string>()) & 0x00FFFFFF));
+							const auto* ammoMod = !ammoModName.empty() ? DataHandler::GetSingleton()->GetModByName(ammoModName.c_str()) : nullptr;
+							UInt32 formID = strToFormID(elem["ammoForm"].get<std::string>());
+							ammoMod->AdjustFormIDFileIndex(formID);
+							auto* ammoForm = LookupFormByID(formID);
 							weapon.ammo = ammoForm;
 						}
 

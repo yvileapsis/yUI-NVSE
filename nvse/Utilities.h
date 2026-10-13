@@ -5,6 +5,7 @@
 #include <functional>
 #include <string>
 #include <intrin.h>
+#include <memory>
 
 // These are used for 10h aligning segments in ASM code (massive performance gain, particularly with loops).
 #define EMIT(bt) __asm _emit bt
@@ -396,8 +397,8 @@ bool In(T t, std::initializer_list<T> l)
 
 namespace ra = std::ranges;
 
-std::string& ToLower(std::string&& data);
-std::string& StripSpace(std::string&& data);
+std::string& ToLower(std::string& data);
+std::string& StripSpace(std::string& data);
 
 bool StartsWith(const char* left, const char* right);
 
