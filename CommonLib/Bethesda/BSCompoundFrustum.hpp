@@ -11,7 +11,7 @@ class BSPortal;
 class BSCompoundFrustum : public BSMemObject {
 public:
 	BSCompoundFrustum();
-	~BSCompoundFrustum() { ThisStdCall(0xC47770, this); };
+	~BSCompoundFrustum() { ThisCall(0xC47770, this); };
 
 	class FunctionOp {
 	public:
@@ -24,7 +24,7 @@ public:
 
 	static BSCompoundFrustum* Create(BSCompoundFrustum* apThis);
 	static BSCompoundFrustum* CreateObject();
-	void Destroy() { ThisStdCall(0xC47770, this); };
+	void Destroy() { ThisCall(0xC47770, this); };
 
 	bool							bPrethreaded;
 	BSSimpleArray<NiFrustumPlanes>	kPlanes;

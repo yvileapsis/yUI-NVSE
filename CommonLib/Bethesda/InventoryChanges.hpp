@@ -25,7 +25,7 @@ public:
 	BSExtraData*				GetExtraData(UInt32 whichVal);
 	float						CalculateWeaponDamage(float condition, TESForm* ammo);
 	float						GetValue();
-	bool						HasWeaponMod(UInt32 modEffect) { return ThisStdCall<bool>(0x4BDA70, this, modEffect); }
+	bool						HasWeaponMod(UInt32 modEffect) { return ThisCall<bool>(0x4BDA70, this, modEffect); }
 	UInt32						GetWeaponNumProjectiles(Actor* owner);
 	bool						ShouldDisplay();
 

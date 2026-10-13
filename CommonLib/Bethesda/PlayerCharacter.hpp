@@ -364,7 +364,7 @@ public:
 
 	bool IsSleepingorResting() { return uiSleepHours > 0; }
 
-	bool HasPipBoyOpen() { return ThisStdCall(0x967AE0, this); }
+	bool HasPipBoyOpen() { return ThisCall<bool>(0x967AE0, this); }
 
 	bool IsVanityMode();
 

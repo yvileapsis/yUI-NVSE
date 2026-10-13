@@ -28,7 +28,7 @@ __declspec(restrict) T* BSCreate(Args &&... args)
 {
 	auto* alloc = BSNew<T>();
 	if constexpr (ConstructorPtr) {
-		ThisStdCall(ConstructorPtr, alloc, std::forward<Args>(args)...);
+		ThisCall(ConstructorPtr, alloc, std::forward<Args>(args)...);
 	}
 	else {
 		memset(alloc, 0, sizeof(T));
@@ -39,7 +39,7 @@ __declspec(restrict) T* BSCreate(Args &&... args)
 template <typename T, const UInt32 DestructorPtr = 0, typename... Args>
 void BSDelete(T* t, Args &&... args) {
 	if constexpr (DestructorPtr) {
-		ThisStdCall(DestructorPtr, t, std::forward<Args>(args)...);
+		ThisCall(DestructorPtr, t, std::forward<Args>(args)...);
 	}
 	BSFree(t);
 }

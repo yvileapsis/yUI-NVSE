@@ -12,5 +12,5 @@ struct HotKeyWheel
 	UInt32 uiSelectedHotkeyTrait;
 	UInt32 uiSelectedTextTrait;
 
-	void SetVisible(bool isVisible) { ThisStdCall(0x701760, this, isVisible); };
+	void SetVisible(bool isVisible) { ThisCall(0x701760, this, isVisible); };
 };

@@ -80,7 +80,7 @@ namespace Patch::RestoreFO3Spread
 	}
 
 	Float32 __fastcall GetMinSpread(Actor* actor) {
-		const auto conditionTier = ThisStdCall<SInt32>(0x92B9E0, actor->pkBaseProcess, actor);
+		const auto conditionTier = ThisCall<SInt32>(0x92B9E0, actor->pkBaseProcess, actor);
 		if (conditionTier > 9) return 0.5;
 		const auto spreadArray = reinterpret_cast<Setting**>(0x119B2BC);
 		const Setting* spreadSetting = spreadArray[conditionTier + 10];

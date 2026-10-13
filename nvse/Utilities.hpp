@@ -190,7 +190,7 @@ UInt32 __fastcall StrHashCS(const char* inKey);
 
 UInt32 __fastcall StrHashCI(const char* inKey);
 
-#define GetRandomUInt(n) ThisStdCall<UInt32, UInt32>(0xAA5230, (void*)0x11C4180, n)
+#define GetRandomUInt(n) ThisCall<UInt32, UInt32>(0xAA5230, (void*)0x11C4180, n)
 
 template <typename T>
 bool In(T t, std::initializer_list<T> l)
@@ -241,7 +241,7 @@ T* New(Args &&... args)
 	auto* alloc = GameHeapAlloc(sizeof(T));
 	if constexpr (ConstructorPtr)
 	{
-		ThisStdCall(ConstructorPtr, alloc, std::forward<Args>(args)...);
+		ThisCall(ConstructorPtr, alloc, std::forward<Args>(args)...);
 	}
 	else
 	{
@@ -255,7 +255,7 @@ void Delete(T* t, Args &&... args)
 {
 	if constexpr (DestructorPtr)
 	{
-		ThisStdCall(DestructorPtr, t, std::forward<Args>(args)...);
+		ThisCall(DestructorPtr, t, std::forward<Args>(args)...);
 	}
 	GameHeapFree(t);
 }

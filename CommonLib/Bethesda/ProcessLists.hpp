@@ -93,7 +93,7 @@ struct ProcessLists {
 	__forceinline static ProcessLists* GetSingleton() { return (ProcessLists*)0x11E0E80; }
 
 	__forceinline int GetTotalDetectionValue(Actor* actor, bool arg2 = false) {
-		return ThisStdCall<int>(0x973710, this, actor, arg2);
+		return ThisCall<int>(0x973710, this, actor, arg2);
 	}
 
 	void UpdateTempEffects(float afTime);

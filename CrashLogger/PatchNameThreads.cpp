@@ -29,7 +29,7 @@ namespace Patch::NameThreads
 	}
 
 	void __fastcall CreateAndResumeThread_Hook(BSThread* apThis, void*, SIZE_T dwStackSize, const char* apName, bool abSuspended)  {
-		ThisStdCall(0xAA6430, apThis, dwStackSize, apName, abSuspended);
+		ThisCall(0xAA6430, apThis, dwStackSize, apName, abSuspended);
 		if (apName && apName[0])
 			SetThreadName(apThis->hCreatedThread, apName);
 	}

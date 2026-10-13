@@ -2,7 +2,7 @@
 
 // GAME - 0x408DA0
 const char* TESFullName::GetFullName() const {
-	return ThisStdCall<const char*>(0x408DA0, this);
+	return ThisCall<const char*>(0x408DA0, this);
 }
 
 // GAME - 0x482720

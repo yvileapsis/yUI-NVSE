@@ -380,7 +380,7 @@ public:
 			if(!GetPipboyManager()->bIsInitialized)
 				return false;
 		}
-		return ThisStdCall(0x7079F0, GetSingleton());
+		return ThisCall<bool>(0x7079F0, GetSingleton());
 	}
 
 	static bool GetIsDebugText() {

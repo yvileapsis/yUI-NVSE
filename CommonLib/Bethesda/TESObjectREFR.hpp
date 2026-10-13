@@ -212,7 +212,7 @@ public:
 
 	// GAME - 0x55D520
 	const char* GetFullName() const {
-		return ThisStdCall<const char*>(0x55D520, this); // Hooked by JIP to allow alt names
+		return ThisCall<const char*>(0x55D520, this); // Hooked by JIP to allow alt names
 	}
 };
 static_assert(sizeof(TESObjectREFR) == 0x68);

@@ -396,7 +396,7 @@ public:
 	UInt32 GetScreenHeight();
 
 	bool BeginUsingRenderTargetGroup(NiRenderTargetGroup* apTarget, NiRenderer::ClearFlags uiClearMode);
-	void EndUsingRenderTargetGroup() { ThisStdCall(0xB6B330, this);}
+	void EndUsingRenderTargetGroup() { ThisCall(0xB6B330, this);}
 
 	bool IsHardwareSkinned(const NiGeometry* pkGeometry, NiD3DShaderInterface* pkShader) const;
 

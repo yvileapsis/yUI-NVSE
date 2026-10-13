@@ -27,7 +27,7 @@ template <typename T, const UInt32 ConstructorPtr = 0, typename... Args>
 __declspec(restrict)T* NiCreate(Args &&... args) {
 	auto* alloc = NiNew<T>();
 	if constexpr (ConstructorPtr) {
-		ThisStdCall(ConstructorPtr, alloc, std::forward<Args>(args)...);
+		ThisCall(ConstructorPtr, alloc, std::forward<Args>(args)...);
 	}
 	else {
 		memset(alloc, 0, sizeof(T));
