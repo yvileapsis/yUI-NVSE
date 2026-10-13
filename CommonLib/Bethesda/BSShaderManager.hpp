@@ -14,8 +14,6 @@
 #include "NiTexturingProperty.hpp"
 #include "NiGeometry.hpp"
 
-#define USE_PBR 0
-
 class BSShader;
 class ShadowSceneNode;
 class BSRenderedTexture;

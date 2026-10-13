@@ -11,10 +11,40 @@
 #include "ScriptRunner.hpp"
 #include "TES.hpp"
 #include "TESWorldSpace.hpp"
+#include "AILinearTaskThreadManager.hpp"
+#include "BSParallelTaskThreadManager.hpp"
+#include "ShadowSceneNode.hpp"
+#include "BGSSaveLoadGame.hpp"
 
 namespace CrashLogger::GameData
 {
 	UInt16 textureCounters[8] = { 0 };
+
+	static const char* AI_TASK_THREAD_1_EVENT_NAMES[] = {
+		"Start",
+		"Interface Update",
+		"Animation Update",
+		"Cell Animations Update",
+		"Combat Update",
+		"Magic Update",
+		"Packages Update",
+		"Actors Update",
+		"Pre-Render Actions",
+		"Post-Render Actions",
+		"Player Followers Update",
+		"Finished",
+	};
+
+	static const char* AI_TASK_THREAD_2_EVENT_NAMES[] = {
+		"Start",
+		"Detection Update",
+		"World Animations Update",
+		"Actor Movement Update",
+		"Actor Ragdoll Anim Update",
+		"Object Destruction Update",
+		"World Update",
+		"Finished",
+	};
 
 	static void __fastcall AddTexture(UInt32 size) {
 		if (size <= 128)
@@ -57,14 +87,17 @@ namespace CrashLogger::GameData
 				PlayerCharacter* pPlayer = PlayerCharacter::GetSingleton();
 				if (pPlayer) {
 					TESObjectCELL* pParentCell = pPlayer->GetParentCell();
-					if (pParentCell)
-						_MESSAGE("Cell:       %08X (\"%s\")", pParentCell->GetFormID(), pParentCell->GetEditorID());
+					if (pParentCell) {
+						const char* pDefaultCellName = reinterpret_cast<Setting*>(0x11CA130)->uValue.str;
+						const char* pCellName = pParentCell->GetFullName();
+						_MESSAGE("Cell:       %08X (\"%s\") - %s", pParentCell->GetFormID(), pParentCell->GetEditorID(), pCellName[0] ? pCellName : pDefaultCellName);
+					}
 					else
 						_MESSAGE("Cell:       None");
 
 					TESWorldSpace* pWorld = TES::GetSingleton()->pWorldSpace;
 					if (pWorld)
-						_MESSAGE("World:      %08X (\"%s\")", pWorld->GetFormID(), pWorld->GetEditorID());
+						_MESSAGE("World:      %08X (\"%s\") - %s", pWorld->GetFormID(), pWorld->GetEditorID(), pWorld->GetFullName());
 					else
 						_MESSAGE("World:      None");
 
@@ -79,21 +112,6 @@ namespace CrashLogger::GameData
 			}
 			catch (...) {
 				_MESSAGE(" Failed to get player character info.");
-			}
-
-			TextureCounter();
-
-			UInt32 uiFaceGenMeshes = 0;
-			if (BSFaceGenManager::GetSingleton() && BSFaceGenManager::GetSingleton()->pModelMap)
-				uiFaceGenMeshes = BSFaceGenManager::GetSingleton()->pModelMap->kEntryMap.GetCount();
-
-			UInt32 uiModels = 0;
-			UInt32 uiAnimations = 0;
-			if (ModelLoader::GetSingleton()) {
-				if (ModelLoader::GetSingleton()->pModelMap)
-					uiModels = ModelLoader::GetSingleton()->pModelMap->uiCount;
-				if (ModelLoader::GetSingleton()->pKFModelMap)
-					uiAnimations = ModelLoader::GetSingleton()->pKFModelMap->uiCount;
 			}
 
 			try {
@@ -146,20 +164,43 @@ namespace CrashLogger::GameData
 				_MESSAGE(" Failed to get currently running script info.");
 			}
 
-			_MESSAGE("\nLoaded assets:");
+			_MESSAGE("\nScene Stats:");
 			{
 				AutoIndent indent;
-				_MESSAGE("Textures:       %i", textureCounters[7]);
-				_MESSAGE("  <= 128:  %i", textureCounters[0]);
-				_MESSAGE("  <= 256:  %i", textureCounters[1]);
-				_MESSAGE("  <= 512:  %i", textureCounters[2]);
-				_MESSAGE("  <= 1024: %i", textureCounters[3]);
-				_MESSAGE("  <= 2048: %i", textureCounters[4]);
-				_MESSAGE("  <= 4096: %i", textureCounters[5]);
-				_MESSAGE("  <= 8192: %i", textureCounters[6]);
-				_MESSAGE("Models:         %i", uiModels);
-				_MESSAGE("FaceGen Models: %i", uiFaceGenMeshes);
-				_MESSAGE("Animations:     %i", uiAnimations);
+				ShadowSceneNode* pSSN = BSShaderManager::GetShadowSceneNode(0);
+				if (pSSN) {
+					_MESSAGE("Scene Lights: %i", pSSN->kLights.GetSize());
+					_MESSAGE("Shadow Lights: %i", pSSN->kActorShadowCasters.GetSize());
+				}
+			}
+
+			BGSSaveLoadGame* pSaveLoad = BGSSaveLoadGame::GetSingleton();
+			if (pSaveLoad) {
+				_MESSAGE("\nSave Load State:");
+				AutoIndent indent;
+				{
+					BGSSaveLoadGame* pSaveLoad = BGSSaveLoadGame::GetSingleton();
+					_MESSAGE("Global Flags:");
+					{
+						AutoIndent indent;
+						_MESSAGE("Global Allow Changes: %i", pSaveLoad->GetGlobalAllowChanges());
+						_MESSAGE("Save Game Loading: %i", pSaveLoad->GetSaveGameLoading());
+						_MESSAGE("Save Game Saving: %i", pSaveLoad->GetSaveGameSaving());
+						_MESSAGE("Initing Forms : %i", pSaveLoad->GetInitingForms());
+						_MESSAGE("Defer Init Forms: %i", pSaveLoad->GetDeferInitForms());
+						_MESSAGE("Positioning Player Character: %i", pSaveLoad->GetPositioningPlayerCharacter());
+						_MESSAGE("Player Location Invalid: %i", pSaveLoad->GetPlayerLocationInvalid());
+						_MESSAGE("Save Load Failed: %i", pSaveLoad->GetSaveLoadFailed());
+					}
+					_MESSAGE("\nThread Flags:");
+					{
+						AutoIndent indent;
+						_MESSAGE("Thread Allow Changes: %i", pSaveLoad->GetThreadAllowChanges());
+						_MESSAGE("Loading Moved Refs: %i", pSaveLoad->GetLoadingMovedRefs());
+						_MESSAGE("Reconstructing Forms: %i", pSaveLoad->GetReconstructingForms());
+						_MESSAGE("Allow Changes: %i", pSaveLoad->GetAllowChanges());
+					}
+				}
 			}
 
 			_MESSAGE("\nProcess Lists:");
@@ -192,6 +233,115 @@ namespace CrashLogger::GameData
 				}
 			}
 			_MESSAGE("Total: %i", uiTotal);
+
+			_MESSAGE("\nLoaded assets:");
+			{
+				TextureCounter();
+
+				UInt32 uiFaceGenMeshes = 0;
+				if (BSFaceGenManager::GetSingleton() && BSFaceGenManager::GetSingleton()->pModelMap)
+					uiFaceGenMeshes = BSFaceGenManager::GetSingleton()->pModelMap->kEntryMap.GetCount();
+
+				UInt32 uiModels = 0;
+				UInt32 uiAnimations = 0;
+				if (ModelLoader::GetSingleton()) {
+					if (ModelLoader::GetSingleton()->pModelMap)
+						uiModels = ModelLoader::GetSingleton()->pModelMap->uiCount;
+					if (ModelLoader::GetSingleton()->pKFModelMap)
+						uiAnimations = ModelLoader::GetSingleton()->pKFModelMap->uiCount;
+				}
+
+				UInt32 uiPlayingSounds = 0;
+				UInt32 uiCachedSounds = 0;
+				if (BSAudioManager::GetSingleton()) {
+					uiPlayingSounds = BSAudioManager::GetSingleton()->kPlayingSounds.GetCount();
+					uiCachedSounds = BSAudioManager::GetSingleton()->kCachedSounds.GetSize();
+				}
+
+				AutoIndent indent;
+				_MESSAGE("Textures:       %i", textureCounters[7]);
+				_MESSAGE("  <= 128:  %i", textureCounters[0]);
+				_MESSAGE("  <= 256:  %i", textureCounters[1]);
+				_MESSAGE("  <= 512:  %i", textureCounters[2]);
+				_MESSAGE("  <= 1024: %i", textureCounters[3]);
+				_MESSAGE("  <= 2048: %i", textureCounters[4]);
+				_MESSAGE("  <= 4096: %i", textureCounters[5]);
+				_MESSAGE("  <= 8192: %i", textureCounters[6]);
+				_MESSAGE("Models:         %i", uiModels);
+				_MESSAGE("FaceGen Models: %i", uiFaceGenMeshes);
+				_MESSAGE("Animations:     %i", uiAnimations);
+				_MESSAGE("Playing Sounds: %i", uiPlayingSounds);
+				{
+					AutoIndent indent;
+					_MESSAGE("Cached Sounds: %i", uiCachedSounds);
+				}
+			}
+
+			_MESSAGE("\nThreads States:");
+			{
+				AutoIndent indent;
+
+				{
+					AutoIndent indent;
+					_MESSAGE("Main Thread");
+					{
+						AutoIndent indent;
+						_MESSAGE("Rendering: %s", AILinearTaskThreadManager::IsMainRendering() ? "Yes" : "No");
+						_MESSAGE("Queue 3D Tasks: %s", AILinearTaskThreadManager::ShouldQueue3DTask() ? "Yes" : "No");
+					}
+				}
+
+				AILinearTaskThreadManager* pThreadMgr = AILinearTaskThreadManager::GetSingleton();
+				if (pThreadMgr) {
+					AutoIndent indent;
+					_MESSAGE("AI Linear Task Threads");
+					{
+						AutoIndent indent;
+						_MESSAGE("Running: %s", AILinearTaskThreadManager::IsRunningThreads() ? "Yes" : "No");
+
+						// 2 threads
+						const char* pThread0 = AI_TASK_THREAD_1_EVENT_NAMES[pThreadMgr->eThreadStage[0]];
+						const char* pThread1 = AI_TASK_THREAD_2_EVENT_NAMES[pThreadMgr->eThreadStage[1]];
+
+						_MESSAGE("Last Thread 0 Stage: %s", pThread0);
+						_MESSAGE("Last Thread 1 Stage: %s", pThread1);
+					}
+				}
+
+				BSTaskManagerThread* pTaskManagerThread = IOManager::GetSingleton()->ppThreads[0];
+				{
+					AutoIndent indent;
+					_MESSAGE("Task Manager Thread");
+					{
+						AutoIndent indent;
+						uint32_t uiQueued = IOManager::GetSingleton()->GetCount();
+						uint32_t uiPostProcessQueued = IOManager::GetSingleton()->GetPostProcessQueueCount();
+						_MESSAGE("Queued Tasks: %i", uiQueued);
+						_MESSAGE("Post Process Tasks: %i", uiPostProcessQueued);
+					}
+				}
+
+				BackgroundCloneThread* pCloneThread = ModelLoader::GetSingleton()->pBackgroundCloneThread;
+				if (pCloneThread) {
+					AutoIndent indent;
+					_MESSAGE("Background Clone Thread");
+					{
+						AutoIndent indent;
+						_MESSAGE("Running Count: %i", pCloneThread->iRunningCount);
+						_MESSAGE("Process Count: %i", pCloneThread->pkProcessTaskQueue->GetCount());
+					}
+				}
+
+				BSParallelTaskThreadManager* pParallelThreadMgr = BSParallelTaskThreadManager::GetSingleton();
+				if (pParallelThreadMgr) {
+					AutoIndent indent;
+					_MESSAGE("Parallel Task Thread");
+					{
+						AutoIndent indent;
+						_MESSAGE("Running: %s", pParallelThreadMgr->bActive ? "Yes" : "No");
+					}
+				}
+			}
 		}
 		catch (...) {
 			_MESSAGE("Failed to print game stats.\n");

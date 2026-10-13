@@ -5,6 +5,11 @@
 
 template<class T_DATA>
 class LockFreeQueue : InterfacedClass {
+public:
+	virtual void		IncrementCount();
+	virtual void		DecrementCount();
+	virtual uint32_t	GetCount() const;
+
 	DWORD dword4;
 	DWORD dword8;
 	DWORD dwordC;

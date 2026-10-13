@@ -128,10 +128,16 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Bethesda\AILinearTaskThreadManager.cpp" />
     <ClCompile Include="Bethesda\AutoMemContext.cpp" />
+    <ClCompile Include="Bethesda\BGSSaveLoadGame.cpp" />
     <ClCompile Include="Bethesda\bhkUtilFunctions.cpp" />
+    <ClCompile Include="Bethesda\BSAudioManager.cpp" />
     <ClCompile Include="Bethesda\BSFaceGenManager.cpp" />
     <ClCompile Include="Bethesda\BSMemory.cpp" />
+    <ClCompile Include="Bethesda\BSParallelTaskThreadManager.cpp" />
+    <ClCompile Include="Bethesda\BSShaderManager.cpp" />
+    <ClCompile Include="Bethesda\IOManager.cpp" />
     <ClCompile Include="Bethesda\MemoryManager.cpp" />
     <ClCompile Include="Bethesda\ModelLoader.cpp" />
     <ClCompile Include="Bethesda\ScriptRunManager.cpp" />
@@ -164,7 +170,7 @@
     <ClInclude Include="Bethesda\ActorValue.hpp" />
     <ClInclude Include="Bethesda\ActorValueInfo.hpp" />
     <ClInclude Include="Bethesda\ActorValueOwner.hpp" />
-    <ClInclude Include="Bethesda\AILinearTaskManager.hpp" />
+    <ClInclude Include="Bethesda\AILinearTaskThreadManager.hpp" />
     <ClInclude Include="Bethesda\AILinearTaskThread.hpp" />
     <ClInclude Include="Bethesda\AITaskThread.hpp" />
     <ClInclude Include="Bethesda\AITaskThreadManager.hpp" />

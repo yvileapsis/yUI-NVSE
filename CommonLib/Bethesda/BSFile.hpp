@@ -32,11 +32,6 @@ public:
 	UInt32		uiTrueFilePos;
 	UInt32		uiFileSize;
 
-	void		SetEndianSwap(bool abDoSwap) override;
-	void		Seek(SInt32 aiOffset, SInt32 aiWhence);
-	const char*	GetFilename() const override;
-	UInt32		GetFileSize() override;
-
 	void Close();
 
 	void CheckIsGood();

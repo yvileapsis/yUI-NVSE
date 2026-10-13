@@ -10,5 +10,7 @@ public:
 	bool	bExit;
 	SInt32	iRunningCount;
 	LockFreeQueue<NiPointer<QueuedReference>>*	pkProcessTaskQueue;
+
+	uint32_t GetQueuedCount() const;
 };
 static_assert(sizeof(BackgroundCloneThread) == 0x3C);

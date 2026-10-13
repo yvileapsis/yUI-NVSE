@@ -159,6 +159,9 @@ namespace CrashLogger::Memory
 
 						GetMemoryUsageString(virtUsage, kMemoryStatus.ullTotalVirtual, cSmallBuffer, sizeof(cSmallBuffer));
 						_MESSAGE("Virtual  Usage: %s", cSmallBuffer);
+
+						if (kMemoryStatus.ullTotalVirtual < ConvertToGiB(3))
+							_MESSAGE("WARNING! FalloutNV.exe is *NOT* 4GB Patched!");
 					}
 
 #if 0

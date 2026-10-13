@@ -4,5 +4,5 @@ class InterfacedClass {
 public:
 	InterfacedClass() {};
 	virtual ~InterfacedClass();
-	virtual void AllocateTLSValue();		// not implemented
+	virtual void* AllocateInterface(uint32_t auiThread) const;
 };

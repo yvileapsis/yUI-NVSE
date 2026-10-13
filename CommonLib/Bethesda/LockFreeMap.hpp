@@ -42,22 +42,22 @@ public:
 		UInt32		uiCount;		// Init'd to 0
 	};	// most likely an array or a map
 
-	virtual bool	Lookup(T_Key key, T_Data* destination);
-	virtual void	Unk_03(UInt32 arg1, UInt32 arg2, UInt32 arg3, UInt8 arg4);
-	virtual bool	Insert(T_Key key, T_Data& dataPtr, UInt8 arg3);
-	virtual void	EraseKey(T_Key key);
-	virtual void	Unk_06(UInt32 arg1, UInt32 arg2);
-	virtual void	Unk_07(UInt32 arg); // Calls 06 for every item
-	virtual bool	Unk_08(UInt32 arg1, UInt32 arg2);
-	virtual UInt32	CalcBucketIndex(T_Key key);
-	virtual void	FreeKey(T_Key key);
-	virtual T_Key	GenerateKey(T_Key src);
-	virtual UInt32	CopyKeyTo(T_Key src, T_Key& destPtr);
-	virtual bool	LKeyGreaterOrEqual(T_Key lkey, T_Key rkey);
-	virtual bool	KeysEqual(T_Key lkey, T_Key rkey);
-	virtual UInt32	IncQueuedCount();
-	virtual UInt32	DecQueuedCount();
-	virtual UInt32	GetQueuedCount();
+	virtual bool		Lookup(T_Key key, T_Data* destination);
+	virtual void		Unk_03(UInt32 arg1, UInt32 arg2, UInt32 arg3, UInt8 arg4);
+	virtual bool		Insert(T_Key key, T_Data& dataPtr, UInt8 arg3);
+	virtual void		EraseKey(T_Key key);
+	virtual void		Unk_06(UInt32 arg1, UInt32 arg2);
+	virtual void		Unk_07(UInt32 arg); // Calls 06 for every item
+	virtual bool		Unk_08(UInt32 arg1, UInt32 arg2);
+	virtual UInt32		CalcBucketIndex(T_Key key);
+	virtual void		FreeKey(T_Key key);
+	virtual T_Key		GenerateKey(T_Key src);
+	virtual UInt32		CopyKeyTo(T_Key src, T_Key& destPtr);
+	virtual bool		LKeyGreaterOrEqual(T_Key lkey, T_Key rkey);
+	virtual bool		KeysEqual(T_Key lkey, T_Key rkey);
+	virtual uint32_t	IncrementCount();
+	virtual uint32_t	DecrementCount();
+	virtual uint32_t	GetCount() const;
 
 	Data004**	dat004;		// 04 array of arg0 12 bytes elements (uninitialized)
 	UInt32		uiSize;	// 08 Init'd to arg1, count of DWord to allocate in array at 000C

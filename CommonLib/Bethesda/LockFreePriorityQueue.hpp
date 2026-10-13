@@ -5,10 +5,10 @@
 template <typename T_Data>
 class LockFreePriorityQueue {
 public:
-	virtual void Destroy(bool abDoFree);
-	virtual void IncRefCount(); // return InterlockedIncrement(&this->dwordC);
-	virtual void DecRefCount(); // return InterlockedDecrement(&this->dwordC);
-	virtual UInt32 GetRefCount(); // return this->dwordC;
+	virtual				~LockFreePriorityQueue();
+	virtual void		IncrementCount();
+	virtual void		DecrementCount();
+	virtual uint32_t	GetCount() const;
 
 	LockFreeQueue<T_Data>** ppQueues;
 	UInt32 uiSize;

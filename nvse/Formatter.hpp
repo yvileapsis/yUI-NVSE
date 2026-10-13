@@ -3,6 +3,7 @@
 #include <TESWorldSpace.hpp>
 #include <NiControllerManager.hpp>
 #include <TESObjectACTI.hpp>
+#include <bhkNiCollisionObject.hpp>
 
 #include <RTTI.hpp>
 
@@ -123,14 +124,16 @@ void __fastcall GetFormFlags(const TESForm* apForm, char* apBuffer, size_t astBu
 		}
 	}
 
-	if (bRef && pBase && uiFormFlags.GetBit(TESForm::FormFlags::CASTS_SHADOWS)) {
-		if (pBase->eTypeID == TESForm::kType_TESObjectLIGH)
-			AddFlag(apBuffer, astBufferSize, "CASTS_SHADOWS");
-		else if (pBase->eTypeID == TESForm::kType_BGSMovableStatic)
-			AddFlag(apBuffer, astBufferSize, "MOTION_BLUR");
+	if (uiFormFlags.GetBit(TESForm::FormFlags::CASTS_SHADOWS)) {
+		if (bRef && pBase) {
+			if (pBase->eTypeID == TESForm::kType_TESObjectLIGH)
+				AddFlag(apBuffer, astBufferSize, "CASTS_SHADOWS");
+			else if (pBase->eTypeID == TESForm::kType_BGSMovableStatic)
+				AddFlag(apBuffer, astBufferSize, "MOTION_BLUR");
+		}
+		else if (bBoundObj)
+			AddFlag(apBuffer, astBufferSize, "ON_LOCAL_MAP");
 	}
-	else if (bBoundObj)
-		AddFlag(apBuffer, astBufferSize, "ON_LOCAL_MAP");
 
 	if (uiFormFlags.GetBit(TESForm::FormFlags::PERSISTENT)) {
 		if (bRef || eFormType == TESForm::kType_TESObjectCELL)
@@ -258,9 +261,9 @@ template<class Member> void __fastcall LogMember(const char* name, const Member&
 	}
 	catch (...) {
 		if (name)
-			_MESSAGE("Exception occurred while logging member \"%s\"", name);
+			_MESSAGE("Exception occurred while logging member \"%s\" %08X", name, UInt32(&member));
 		else
-			_MESSAGE("Exception occurred while logging member");
+			_MESSAGE("Exception occurred while logging member %08X", UInt32(&member));
 	}
 }
 
@@ -270,8 +273,26 @@ template<class Member> void __fastcall LogClassLineByLine(Member& member) {
 		LogClass(member);
 	}
 	catch (...) {
-		_MESSAGE("Exception occurred while logging");
+		_MESSAGE("Exception occurred while logging %08X", UInt32(&member));
 	}
+}
+
+inline void __fastcall LogClass(const BSExtraData& obj, bool nested = false) {
+	_MESSAGE("Type: %i", obj.eType);
+	if (obj.pkNext)
+		LogMember("Next", *obj.pkNext);
+}
+
+inline void __fastcall LogClass(const BaseExtraList& obj, bool nested = false) {
+	_MESSAGE("Presence Bitfield:");
+	{
+		AutoIndent kIndent;
+		for (uint32_t i = 0; i < 19; ++i) {
+			_MESSAGE("%i) %02X", i, obj.ucPresenceBitfield[i]);
+		}
+	}
+	if (obj.pkData)
+		LogMember("Extra Data", *obj.pkData);
 }
 
 inline void __fastcall LogClass(const NiRefObject& obj, bool nested = false) {
@@ -320,18 +341,6 @@ inline void __fastcall LogClass(const TESForm& obj, bool nested = false) {
 	const UInt32 refID = obj.uiFormID;
 
 	const char* pEDID = obj.GetEditorID();
-	const char* pName = nullptr;
-	if (obj.eTypeID == TESForm::kType_TESObjectCELL)
-		pName = static_cast<const TESObjectCELL&>(obj).GetFullName();
-	else if (obj.IsReference())
-		pName = static_cast<const TESObjectREFR&>(obj).GetFullName();
-	else
-		pName = TESFullName::GetFullName(&obj);
-
-	if (pName && pName[0])
-		_MESSAGE("Full Name: \"%s\"", pName);
-	else
-		_MESSAGE("Full Name: None");
 
 	// Temporary forms don't have actual FormIDs, so logging them is useless
 	if (!pEDID || !pEDID[0]) {
@@ -346,6 +355,19 @@ inline void __fastcall LogClass(const TESForm& obj, bool nested = false) {
 		else
 			_MESSAGE("FormID: %08X (\"%s\")", refID, pEDID);
 	}
+
+	const char* pName = nullptr;
+	if (obj.eTypeID == TESForm::kType_TESObjectCELL)
+		pName = static_cast<const TESObjectCELL&>(obj).GetFullName();
+	else if (obj.IsReference())
+		pName = static_cast<const TESObjectREFR&>(obj).GetFullName();
+	else
+		pName = TESFullName::GetFullName(&obj);
+
+	if (pName && pName[0])
+		_MESSAGE("Full Name: \"%s\"", pName);
+	else
+		_MESSAGE("Full Name: None");
 
 	{
 		char cFlagsBuffer[512] = {};
@@ -404,10 +426,23 @@ inline void __fastcall LogClass(const TESObjectREFR& obj, bool nested = false) {
 			_MESSAGE(cBuffer);
 	}
 
+	_MESSAGE("Position: %0.2f, %0.2f, %0.2f", obj.kPosition.x, obj.kPosition.y, obj.kPosition.z);
+	_MESSAGE("Rotation: %0.2f, %0.2f, %0.2f", obj.kRotation.x, obj.kRotation.y, obj.kRotation.z);
+	_MESSAGE("Scale: %0.2f", obj.fRefScale);
+
 	if (!nested) {
 		if (obj.pkParentCell) {
 			LogMember("Cell:", *obj.pkParentCell);
 		}
+		else {
+			TESObjectCELL* pPersistentCell = ThisStdCall<TESObjectCELL*>(0x41D460, &obj.kExtraList);
+			if (pPersistentCell)
+				LogMember("Persistent Cell", *pPersistentCell);
+			else
+				_MESSAGE("Cell: None");
+		}
+
+		LogMember("Extra Data", static_cast<const BaseExtraList&>(obj.kExtraList));
 
 		try {
 			TESModel* pModel = ModelLoader::GetSingleton()->GetModelForBoundObject(baseForm, &obj);
@@ -588,6 +623,9 @@ inline void __fastcall LogClass(const NiExtraData& obj, bool nested = false) {
 inline void __fastcall LogClass(const BSFile& obj, bool nested = false) {
 	char sanitizedPath[MAX_PATH] = {};
 	_MESSAGE("File Path: \"%s\"", SanitizeString(obj.cFileName, sanitizedPath, sizeof(sanitizedPath)));
+	uint32_t uiSize = obj.uiFileSize;
+	char cSizeBuffer[64];
+	_MESSAGE("File Size: %s", FormatSize(uiSize, cSizeBuffer, sizeof(cSizeBuffer)));
 
 }
 inline void __fastcall LogClass(const TESModel& obj, bool nested = false) {
@@ -665,10 +703,12 @@ inline void __fastcall LogClass(const bhkRefObject& obj, bool nested = false) {
 inline void __fastcall LogClass(const NiCollisionObject& obj, bool nested = false) {
 	LogClass(static_cast<const NiRefObject&>(obj), nested);
 	if (const auto object = obj.m_pkSceneObject) {
+		char cNameBuffer[256];
+		sprintf_s(cNameBuffer, "Scene Object: %s", object->GetRTTIName());
 		if (object->IsNiNode())
-			LogMember("Scene Object:", reinterpret_cast<const NiNode&>(*object));
+			LogMember(cNameBuffer, reinterpret_cast<const NiNode&>(*object));
 		else
-			LogMember("Scene Object:", *object);
+			LogMember(cNameBuffer, *object);
 	}
 }
 
@@ -696,8 +736,11 @@ inline void __fastcall LogClass(const hkpWorldObject& obj, bool nested = false) 
 	}
 
 	bhkNiCollisionObject* object = bhkUtilFunctions::GetbhkNiCollisionObject(&obj);
-	if (object)
-		LogMember("Collision Object:", reinterpret_cast<const NiCollisionObject&>(*object));
+	if (object) {
+		char cNameBuffer[256];
+		sprintf_s(cNameBuffer, "Collision Object: %s", object->GetRTTIName());
+		LogMember(cNameBuffer, reinterpret_cast<const NiCollisionObject&>(*object));
+	}
 }
 
 inline void __fastcall LogClass(const IMemoryHeap& obj, bool nested = false) {
@@ -770,8 +813,14 @@ inline void __fastcall LogClass(const TESObjectCELL& obj, bool nested = false) {
 	}
 	_MESSAGE("State: %s", pCellStateName);
 
+	if (!obj.IsInterior() && obj.pCellData.pCellDataExterior) {
+		_MESSAGE("Coordinates: %i, %i", obj.pCellData.pCellDataExterior->iCellX, obj.pCellData.pCellDataExterior->iCellY);
+	}
+
 	if (obj.GetWorldspace())
 		LogMember("Worldspace:", *obj.GetWorldspace());
+
+	LogMember("Extra Data", static_cast<const BaseExtraList&>(obj.kExtraList));
 }
 
 inline void __fastcall LogClass(const TESWorldSpace& obj, bool nested = false) {

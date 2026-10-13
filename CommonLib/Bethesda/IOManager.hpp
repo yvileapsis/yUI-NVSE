@@ -9,7 +9,7 @@ class IOManager : public BSTaskManager {
 public:
 	UInt32 unk05C;
 	UInt32 uiCurrentThreadID;
-	LockFreePriorityQueue<NiPointer<IOTask>>* PostProcessQueue;
+	LockFreePriorityQueue<NiPointer<IOTask>>* pPostProcessQueue;
 	IO_TASK_PRIORITY eLoadingQueuedPriority;
 	UInt32(__thiscall* pGetExternalCountCallback)();
 	void(__thiscall* pUpdateQueueCallback)();
@@ -27,14 +27,6 @@ public:
 
 	static IOManager* GetSingleton();
 	static bool IsUpdating();
-	static void SetIsUpdating(bool abUpdating);
-	UInt32 GetPostProcessQueueCount();
-	bool RemoveTask(IOTask* apTask);
-	void CancelTask(IOTask* apTask, void* apTaskOwner = nullptr);
-	static bool __fastcall UpdateQueue(IOManager* apThis);
-
-	bool IsInQueue(TESObjectREFR *refr);
-	void QueueForDeletion(TESObjectREFR* refr);
-	void DumpQueuedTasks();
+	UInt32 GetPostProcessQueueCount() const;
 };
 ASSERT_SIZE(IOManager, 0xA0);

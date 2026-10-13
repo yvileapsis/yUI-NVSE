@@ -13,6 +13,7 @@ class BGSSaveLoadChangesMap;
 class BGSSaveLoadReferencesMap;
 class Actor;
 class TESObjectCELL;
+class TESForm;
 
 // 0x24C
 class BGSSaveLoadGame {
@@ -68,12 +69,22 @@ public:
 
 	static BGSSaveLoadGame* GetSingleton();
 
-	bool IsLoading();
-	bool IsDeferInitForms();
+	bool GetGlobalAllowChanges() const;
+	bool GetSaveGameLoading() const;
+	bool GetSaveGameSaving() const;
+	bool GetInitingForms() const;
+	bool GetDeferInitForms() const;
+	bool GetPositioningPlayerCharacter() const;
+	bool GetPlayerLocationInvalid() const;
+	bool GetSaveLoadFailed() const;
 
-	bool SetThreadAllowChanges(bool abEnable);
-	void InitForms(bool abLowPriority);
-	void LoadCell(TESObjectCELL* apCell);
+	bool GetThreadAllowChanges() const;
+	[[nodiscard("Previous value")]] bool SetThreadAllowChanges(bool abEnable);
+
+	bool GetLoadingMovedRefs() const;
+	bool GetReconstructingForms() const;
+
+	bool GetAllowChanges() const;
 
 };
 static_assert(sizeof(BGSSaveLoadGame) == 0x24C);
