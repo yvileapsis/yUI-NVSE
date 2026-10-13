@@ -1388,13 +1388,13 @@ std::string ReplaceAll(std::string str, const std::string& from, const std::stri
 
 /// Try to find in the Haystack the Needle - ignore case
 
-std::string& ToLower(std::string&& data)
+std::string& ToLower(std::string& data)
 {
 	ra::transform(data, data.begin(), [](const unsigned char c) { return std::tolower(c); });
 	return data;
 }
 
-std::string& StripSpace(std::string&& data)
+std::string& StripSpace(std::string& data)
 {
 	std::erase_if(data, isspace);
 	return data;
