@@ -9,6 +9,22 @@ static const ActorValueInfo** ActorValueInfoPointerArray = (const ActorValueInfo
 static const _GetActorValueInfo GetActorValueInfo = (_GetActorValueInfo)0x00066E920;	// See GetActorValueName
 BGSDefaultObjectManager ** g_defaultObjectManager = (BGSDefaultObjectManager**)0x011CA80C;
 
+UInt32 TESForm::GetFormID() const {
+	return refID;
+}
+
+UInt32 TESForm::GetFormIDWithoutIndex() const {
+#if RUNTIME
+	return ThisStdCall<UInt32>(0x485BC0, this);
+#else
+	return refID & 0x00FFFFFF;
+#endif
+}
+
+UInt8 TESForm::GetModIndex() const {
+	return modIndex;
+}
+
 TESForm* TESForm::TryGetREFRParent()
 {
 	auto result = this;

@@ -555,6 +555,10 @@ public:
 
 	tList<ModInfo>	mods;
 
+	UInt32			GetFormID() const;
+	UInt32			GetFormIDWithoutIndex() const;
+	UInt8			GetModIndex() const;
+
 	TESForm*		TryGetREFRParent(void);
 	TESFullName*	GetFullName() const;
 	const char*		GetTheName();

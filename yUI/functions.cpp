@@ -272,8 +272,15 @@ bool HasBaseEffectChangesAV(TESForm* form, const int avCode)
 
 TESForm* GetRefFromString(char* mod, char* id)
 {
-	const auto itemID = (g_dataHandler->GetModIndex(mod) << 24) | strtoul(id, nullptr, 0);
-	return LookupFormByRefID(itemID);
+	const ModInfo* pMod = DataHandler::GetSingleton()->GetModByName(mod);
+	UInt32 formID = strtoul(id, nullptr, 0);
+	if (pMod) {
+		pMod->AdjustFormIDFileIndex(formID);
+	}
+	else {
+		formID |= (0xFF << 24);
+	}
+	return LookupFormByRefID(formID);
 }
 
 bool IsCraftingComponent(TESForm* form)
