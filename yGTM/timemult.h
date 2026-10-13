@@ -14,12 +14,15 @@ namespace TimeMult
 
 	void FillMaps();
 
-	inline std::unordered_set<UInt16> g_specialMods;
-	inline std::unordered_map<UInt16, Float64> g_localMults;
+	inline std::unordered_set<UInt32> g_specialMods;
+	inline std::unordered_map<UInt32, Float64> g_localMults;
 	inline Float64 g_timeMult = 1.0;
 
+	UInt32 __fastcall GetModKey(const TESForm* form);
+	UInt32 __fastcall GetModKey(const ModInfo* file);
+
 	void Set(TimeGlobal* timeGlobal = TimeGlobal::GetSingleton(), char isImmediateChange = 1);
-	void ModifyMap(Float64 timeMult, UInt16 mod);
+	void ModifyMap(Float64 timeMult, UInt32 mod);
 
 	template<UInt32 retn> __declspec(naked) void DialogVATSDestructorHook() {
 		Set(TimeGlobal::GetSingleton(), 1);
