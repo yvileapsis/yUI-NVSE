@@ -277,6 +277,24 @@ template<class Member> void __fastcall LogClassLineByLine(Member& member) {
 	}
 }
 
+inline void __fastcall LogClass(const BSExtraData& obj, bool nested = false) {
+	_MESSAGE("Type: %i", obj.eType);
+	if (obj.pkNext)
+		LogMember("Next", *obj.pkNext);
+}
+
+inline void __fastcall LogClass(const BaseExtraList& obj, bool nested = false) {
+	_MESSAGE("Presence Bitfield:");
+	{
+		AutoIndent kIndent;
+		for (uint32_t i = 0; i < 19; ++i) {
+			_MESSAGE("%i) %02X", i, obj.ucPresenceBitfield[i]);
+		}
+	}
+	if (obj.pkData)
+		LogMember("Extra Data", *obj.pkData);
+}
+
 inline void __fastcall LogClass(const NiRefObject& obj, bool nested = false) {
 	_MESSAGE("Reference Count: %i", obj.m_uiRefCount);
 	if (obj.m_uiRefCount == 0)
@@ -423,6 +441,8 @@ inline void __fastcall LogClass(const TESObjectREFR& obj, bool nested = false) {
 			else
 				_MESSAGE("Cell: None");
 		}
+
+		LogMember("Extra Data", static_cast<const BaseExtraList&>(obj.kExtraList));
 
 		try {
 			TESModel* pModel = ModelLoader::GetSingleton()->GetModelForBoundObject(baseForm, &obj);
@@ -799,6 +819,8 @@ inline void __fastcall LogClass(const TESObjectCELL& obj, bool nested = false) {
 
 	if (obj.GetWorldspace())
 		LogMember("Worldspace:", *obj.GetWorldspace());
+
+	LogMember("Extra Data", static_cast<const BaseExtraList&>(obj.kExtraList));
 }
 
 inline void __fastcall LogClass(const TESWorldSpace& obj, bool nested = false) {

@@ -24,7 +24,7 @@ public:
 	__forceinline BSExtraData*	GetPrevExtra(BSExtraData::Type aeType) const { return ThisStdCall<BSExtraData*>(0x4102D0, this, aeType); }
 
 	BSExtraData*	pkData;						// 004
-	UInt8			ucPresenceBitfield[0x15];	// 008 - if a bit is set, then the extralist should contain that extradata
+	UInt8			ucPresenceBitfield[19];	// 008 - if a bit is set, then the extralist should contain that extradata
 	// bits are numbered starting from the lsb
 
 
@@ -38,8 +38,8 @@ public:
 		kJIPExtraListFlag_NoZPosReset			= 1 << 4,
 	};
 
-	JIPExtraListFlags eJIPFlags;
-	UInt16 usJIPPerksInfo;
+	JIPExtraListFlags	eJIPFlags;
+	void*				pJIPPerksInfo;
 };
 static_assert(sizeof(BaseExtraList) == 0x20);
 

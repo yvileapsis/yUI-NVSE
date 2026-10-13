@@ -279,7 +279,6 @@ namespace CrashLogger::Labels
 		Push(kVtbl_BSShaderBloodSplatterProperty);
 		Push(kVtbl_BSShaderNoLighting);
 		Push(kVtbl_BSShaderNoLightingProperty);
-		Push(kVtbl_ExtraRefractionProperty);
 		Push(kVtbl_NiCullingProperty);
 
 		// NiTexture
@@ -810,7 +809,6 @@ namespace CrashLogger::Labels
 		Push(kVtbl_BSDiscBootSystemUtility);
 		Push(kVtbl_BSDismemberSkinInstance);
 		Push(kVtbl_BSDistantTreeShader);
-		Push(kVtbl_BSExtraData);
 		Push(kVtbl_BSFaceGenBinaryFile);
 		Push(kVtbl_BSFaceGenImage);
 		Push(kVtbl_BSFaceGenKeyframe);
@@ -892,7 +890,7 @@ namespace CrashLogger::Labels
 		Push(kVtbl_BSWin32TaskletGroupData);
 		Push(kVtbl_BSWin32TaskletManager);
 		Push(kVtbl_BackgroundCloneThread);
-		Push(kVtbl_BaseExtraList);
+		
 		Push(kVtbl_BaseFormComponent);
 		Push(kVtbl_BeamShader);
 		Push(kVtbl_BlendSettingCollection);
@@ -998,6 +996,9 @@ namespace CrashLogger::Labels
 		Push(kVtbl_ExteriorCellLoaderTask);
 		Push(kVtbl_ExteriorCellNewReferencesMap);
 
+		Push(kVtbl_BaseExtraList, As<BaseExtraList>);
+		Push(kVtbl_ExtraDataList);
+		Push(kVtbl_BSExtraData, As<BSExtraData>);
 		Push(kVtbl_ExtraAction);
 		Push(kVtbl_ExtraActivateLoopSound);
 		Push(kVtbl_ExtraActivateRef);
@@ -1025,7 +1026,6 @@ namespace CrashLogger::Labels
 		Push(kVtbl_ExtraCount);
 		Push(kVtbl_ExtraCreatureAwakeSound);
 		Push(kVtbl_ExtraCreatureMovementSound);
-		Push(kVtbl_ExtraDataList);
 		Push(kVtbl_ExtraDecalRefs);
 		Push(kVtbl_ExtraDetachTime);
 		Push(kVtbl_ExtraDismemberedLimbs);
@@ -1097,8 +1097,6 @@ namespace CrashLogger::Labels
 		Push(kVtbl_ExtraRank);
 		Push(kVtbl_ExtraReferencePointer);
 		Push(kVtbl_ExtraReflectedRefs);
-
-
 		Push(kVtbl_ExtraRegionList);
 		Push(kVtbl_ExtraReservedMarkers);
 		Push(kVtbl_ExtraRoom);
@@ -1132,8 +1130,10 @@ namespace CrashLogger::Labels
 		Push(kVtbl_ExtraWorn);
 		Push(kVtbl_ExtraWornLeft);
 		Push(kVtbl_ExtraXTarget);
+		Push(kVtbl_ExtraRefractionProperty);
 
 		Push(kVtbl_FOCollisionListener);
+		Push(kVtbl_FOCollisionListener, nullptr);
 		Push(kVtbl_FOIslandActivationListener);
 		Push(kVtbl_FOPipboyManager);
 		Push(kVtbl_FORenderedMenu);
